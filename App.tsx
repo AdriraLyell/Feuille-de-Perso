@@ -608,9 +608,21 @@ function App() {
       {/* Navigation / Toolbar (Hidden in Print) */}
       <nav className="bg-gray-800 text-white px-4 shadow-md no-print sticky top-0 z-50 h-14 flex items-center">
         <div className="max-w-[1400px] mx-auto flex justify-between items-center w-full">
-          {/* Left: Logo */}
+          {/* Left: Logo Area -> Now Portrait/Landscape Switcher */}
           <div className="flex items-center gap-2 font-bold text-lg mr-4">
-             <FileText className="text-blue-400" />
+             {/* Portrait/Landscape Button moved here */}
+             <button
+                onClick={() => setIsLandscape(!isLandscape)}
+                className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all ${
+                    isLandscape 
+                    ? 'bg-indigo-600 text-white border border-indigo-400' 
+                    : 'bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600'
+                }`}
+                title={isLandscape ? "Passer en Portrait" : "Passer en Paysage"}
+             >
+                {isLandscape ? <Monitor size={18} /> : <Smartphone size={18} className="rotate-90" />}
+                <span className="hidden md:inline">{isLandscape ? "Paysage" : "Portrait"}</span>
+             </button>
           </div>
 
           {/* Center: Main Navigation Tabs */}
@@ -625,33 +637,13 @@ function App() {
                 title="Voir la fiche"
              >
                 <FileText size={18} />
-                <span className="hidden lg:inline">Fiche</span>
+                <span className="hidden lg:inline">Fiche de Personnage</span>
              </button>
 
-             {/* Portrait/Landscape Button Grouped here */}
-             <button
-                onClick={() => setIsLandscape(!isLandscape)}
-                className={`ml-2 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all ${
-                    isLandscape 
-                    ? 'bg-indigo-600 text-white border border-indigo-400' 
-                    : 'bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600'
-                }`}
-                title={isLandscape ? "Passer en Portrait" : "Passer en Paysage"}
-             >
-                {isLandscape ? <Monitor size={18} /> : <Smartphone size={18} className="rotate-90" />}
-                <span className="hidden md:inline">{isLandscape ? "Paysage" : "Portrait"}</span>
-             </button>
           </div>
 
           {/* Right: Actions */}
           <div className="flex gap-2 items-center">
-             <button 
-               onClick={handlePrintRequest}
-               className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-lg flex items-center gap-2 transition-colors"
-               title="Imprimer"
-             >
-               <Printer size={18} /> <span className="hidden md:inline">Imprimer</span>
-             </button>
              
              {/* Import / Export Button (Reverted to standard style) */}
              <button 
@@ -673,7 +665,7 @@ function App() {
                 }`}
                 title="Bibliothèque de traits"
             >
-                <BookOpen size={18} /> <span className="hidden lg:inline">Bibliothèque</span>
+                <BookOpen size={18} /> <span className="hidden lg:inline">Bibliothèque de Traits</span>
             </button>
 
             {/* Configurer Button */}
@@ -686,8 +678,16 @@ function App() {
                 }`}
                 title="Configurer la structure"
             >
-                <Settings size={18} /> <span className="hidden lg:inline">Configurer</span>
+                <Settings size={18} /> <span className="hidden lg:inline">Configurer la Fiche</span>
             </button>
+
+            <button 
+               onClick={handlePrintRequest}
+               className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-lg flex items-center gap-2 transition-colors"
+               title="Imprimer"
+             >
+               <Printer size={18} />
+             </button>
 
             <button
                 onClick={() => setShowLogs(!showLogs)}

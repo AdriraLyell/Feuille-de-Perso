@@ -34,7 +34,7 @@ jobs:
           node-version: "20"
           # La ligne cache est commentée pour éviter l'erreur "Dependencies lock file is not found"
           # cache: 'npm'
-                    
+          
       - name: Install dependencies
         run: npm install
         
