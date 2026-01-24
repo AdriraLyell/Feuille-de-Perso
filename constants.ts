@@ -2,12 +2,21 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.7.2";
+export const APP_VERSION = "1.7.3";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
-        version: "1.7.2",
+        version: "1.7.3",
         date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "Système : Ajustement du script de déploiement pour compatibilité avec l'export.",
+            "UI : Correctif styles d'impression et mode paysage."
+        ]
+    },
+    {
+        version: "1.7.2",
+        date: "21/01/2026 16:30",
         type: 'patch',
         changes: [
             "UI : Correction d'un problème d'affichage sur les petits écrans qui empêchait de voir le côté gauche de la fiche (scroll bloqué).",
