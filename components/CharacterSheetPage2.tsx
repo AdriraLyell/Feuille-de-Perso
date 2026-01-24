@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { CharacterSheetData, ReputationEntry, TraitEntry, LibraryEntry } from '../types';
-import { BookOpen, X, Edit, Trash2, Check, ArrowRight } from 'lucide-react';
+import { BookOpen, X, Edit, Trash2, Check, ArrowRight, CheckSquare, Square } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 
 // Moved outside to prevent re-creation on every render which causes input focus loss
@@ -592,7 +592,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
                     
                     {/* Modal Header */}
-                    <div className={`p-4 border-b flex justify-between items-center text-white ${editingSlot.type === 'vertus' ? 'bg-green-700' : 'bg-red-700'}`}>
+                    <div className={`p-4 border-b flex justify-between items-center text-white shrink-0 ${editingSlot.type === 'vertus' ? 'bg-green-700' : 'bg-red-700'}`}>
                         <h3 className="font-bold text-lg flex items-center gap-2">
                             <Edit size={20} />
                             Éditer {editingSlot.type === 'vertus' ? 'Vertu' : 'Défaut'} (Ligne {editingSlot.index + 1})
@@ -602,9 +602,9 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                         </button>
                     </div>
 
-                    <div className="flex-grow overflow-y-auto flex flex-col">
+                    <div className="flex-grow flex flex-col overflow-hidden">
                         {/* Manual Entry Section */}
-                        <div className="p-5 bg-gray-50 border-b border-gray-200">
+                        <div className="p-5 bg-gray-50 border-b border-gray-200 shrink-0">
                             <div className="flex gap-4 items-end mb-4">
                                 <div className="flex-grow">
                                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom du Trait</label>
@@ -638,10 +638,22 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                         </div>
 
                         {/* Library Section */}
-                        <div className="flex-grow flex flex-col min-h-[300px] border-t border-gray-200">
-                            <div className="bg-blue-50 px-4 py-2 border-b border-blue-100 flex items-center gap-2 text-blue-800 text-sm font-bold">
-                                <BookOpen size={16} />
-                                Bibliothèque de Traits (Cliquer pour sélectionner)
+                        <div className="flex-grow flex flex-col min-h-0 border-t border-gray-200">
+                            <div className="bg-blue-50 px-4 py-2 border-b border-blue-100 flex items-center justify-between text-blue-800 text-sm font-bold shrink-0">
+                                <div className="flex items-center gap-2">
+                                    <BookOpen size={16} />
+                                    Bibliothèque
+                                </div>
+                                <button 
+                                    onClick={() => {
+                                        const target = editingSlot.type;
+                                        setEditingSlot(null);
+                                        setMultiSelectTarget(target);
+                                    }}
+                                    className="text-xs bg-white border border-blue-200 hover:bg-blue-100 px-2 py-1 rounded text-blue-700 flex items-center gap-1 shadow-sm transition-colors"
+                                >
+                                    <CheckSquare size={12} /> Sélection multiple
+                                </button>
                             </div>
                             <div className="flex-grow overflow-hidden relative">
                                 <TraitLibrary 
@@ -656,7 +668,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                     </div>
 
                     {/* Modal Footer */}
-                    <div className="p-4 bg-gray-100 border-t border-gray-200 flex justify-between items-center">
+                    <div className="p-4 bg-gray-100 border-t border-gray-200 flex justify-between items-center shrink-0">
                         <button 
                             onClick={() => setEditingSlot(null)}
                             className="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg font-medium transition-colors"

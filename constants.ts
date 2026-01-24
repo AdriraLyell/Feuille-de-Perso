@@ -2,12 +2,31 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.7.4";
+export const APP_VERSION = "1.7.6";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
-        version: "1.7.4",
+        version: "1.7.6",
         date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "UI (Détails) : Ajout d'un bouton 'Sélection Multiple' directement dans la fenêtre d'édition d'une Vertu/Défaut.",
+            "UI (Correctif) : Résolution définitive du problème de scroll dans la fenêtre d'édition des traits (le scroll est maintenant interne à la bibliothèque).",
+        ]
+    },
+    {
+        version: "1.7.5",
+        date: "21/01/2026 17:15",
+        type: 'patch',
+        changes: [
+            "UI (Bibliothèque) : Correction d'un problème de scroll empêchant de voir les derniers éléments lors de la sélection.",
+            "UI (Bibliothèque) : Amélioration de l'interface de sélection multiple (bouton d'action toujours visible).",
+            "UX : Amélioration de la réactivité du clic sur les lignes de la bibliothèque."
+        ]
+    },
+    {
+        version: "1.7.4",
+        date: "21/01/2026 17:00",
         type: 'patch',
         changes: [
             "Gestion XP : Renommage de la colonne 'Lieu de Dépense' en 'Notes & Commentaires'.",
