@@ -2,12 +2,21 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.7.3";
+export const APP_VERSION = "1.7.4";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
-        version: "1.7.3",
+        version: "1.7.4",
         date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "Gestion XP : Renommage de la colonne 'Lieu de Dépense' en 'Notes & Commentaires'.",
+            "Gestion XP : Réduction de la largeur des colonnes MJ et XP de 50%.",
+        ]
+    },
+    {
+        version: "1.7.3",
+        date: "21/01/2026 16:45",
         type: 'patch',
         changes: [
             "Système : Ajustement du script de déploiement pour compatibilité avec l'export.",

@@ -1,6 +1,6 @@
 import React from 'react';
 import { CharacterSheetData, XPEntry } from '../types';
-import { Plus, Trash2, Calendar, FileText, TrendingUp, User, MapPin } from 'lucide-react';
+import { Plus, Trash2, Calendar, FileText, TrendingUp, User, MessageSquare } from 'lucide-react';
 
 interface Props {
   data: CharacterSheetData;
@@ -47,8 +47,8 @@ const CharacterSheetXP: React.FC<Props> = ({ data, onChange, isLandscape = false
   const totalXP = (data.xpLogs || []).reduce((sum, entry) => sum + (entry.amount || 0), 0);
 
   // Define grid template for consistent layout
-  // Date: 110px, MJ: 1fr, Scenario: 1.5fr, Location: 1.5fr, XP: 90px, Action: 40px
-  const gridClass = "grid grid-cols-[110px_1fr_1.5fr_1.5fr_90px_40px]";
+  // Date: 110px, MJ: 0.5fr, Scenario: 1.5fr, Notes: 2fr, XP: 45px, Action: 40px
+  const gridClass = "grid grid-cols-[110px_0.5fr_1.5fr_2fr_45px_40px]";
 
   return (
     <div className={`sheet-container xp-sheet p-8 ${isLandscape ? 'landscape' : ''}`}>
@@ -74,7 +74,7 @@ const CharacterSheetXP: React.FC<Props> = ({ data, onChange, isLandscape = false
             <div className="flex items-center gap-2"><Calendar size={14}/> Date</div>
             <div className="flex items-center gap-2"><User size={14}/> MJ</div>
             <div className="flex items-center gap-2"><FileText size={14}/> Scénario</div>
-            <div className="flex items-center gap-2"><MapPin size={14}/> Lieu de Dépense</div>
+            <div className="flex items-center gap-2"><MessageSquare size={14}/> Notes & Commentaires</div>
             <div className="text-center">XP</div>
             <div className="text-center"></div> {/* Empty Actions Header */}
         </div>
@@ -118,11 +118,11 @@ const CharacterSheetXP: React.FC<Props> = ({ data, onChange, isLandscape = false
                             onChange={(e) => updateRow(entry.id, 'scenario', e.target.value)}
                         />
                     </div>
-                    {/* Lieu de Dépense (NEW) */}
+                    {/* Notes & Commentaires (Formerly Lieu de Dépense) */}
                     <div className="pr-2 border-l border-stone-200 pl-2">
                         <input 
                             type="text"
-                            placeholder="Investissement..."
+                            placeholder="Commentaires..."
                             className="w-full bg-transparent border-b border-dotted border-stone-300 focus:border-blue-500 outline-none text-sm font-handwriting text-ink text-stone-600"
                             value={entry.spendingLocation || ''}
                             onChange={(e) => updateRow(entry.id, 'spendingLocation', e.target.value)}
