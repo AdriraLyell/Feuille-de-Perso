@@ -32,7 +32,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: 'npm'
+          # La ligne cache est commentée pour éviter l'erreur "Dependencies lock file is not found"
+          # cache: 'npm'
                     
       - name: Install dependencies
         run: npm install
