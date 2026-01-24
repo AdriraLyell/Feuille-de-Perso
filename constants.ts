@@ -2,12 +2,21 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.7.6";
+export const APP_VERSION = "1.7.7";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
-        version: "1.7.6",
+        version: "1.7.7",
         date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "UI (Détails) : Correction de la hauteur de la fenêtre d'édition pour garantir le défilement de la bibliothèque en mode sélection simple.",
+            "UI (Bibliothèque) : Suppression de l'espace vide inutile en bas de liste lors de la sélection simple."
+        ]
+    },
+    {
+        version: "1.7.6",
+        date: "21/01/2026 17:30",
         type: 'patch',
         changes: [
             "UI (Détails) : Ajout d'un bouton 'Sélection Multiple' directement dans la fenêtre d'édition d'une Vertu/Défaut.",

@@ -589,7 +589,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
         {/* --- TRAIT EDITOR MODAL --- */}
         {editingSlot && (
             <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-                <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
+                <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl h-[85vh] flex flex-col overflow-hidden">
                     
                     {/* Modal Header */}
                     <div className={`p-4 border-b flex justify-between items-center text-white shrink-0 ${editingSlot.type === 'vertus' ? 'bg-green-700' : 'bg-red-700'}`}>
@@ -602,7 +602,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                         </button>
                     </div>
 
-                    <div className="flex-grow flex flex-col overflow-hidden">
+                    <div className="flex-grow flex flex-col overflow-hidden min-h-0">
                         {/* Manual Entry Section */}
                         <div className="p-5 bg-gray-50 border-b border-gray-200 shrink-0">
                             <div className="flex gap-4 items-end mb-4">

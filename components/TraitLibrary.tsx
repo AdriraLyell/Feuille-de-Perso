@@ -256,10 +256,12 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
       }
   };
 
+  const showFooter = !!onMultiSelect;
+
   return (
     <div className="flex flex-col h-full bg-white rounded shadow-sm border border-gray-200 overflow-hidden relative">
         {/* Header Toolbar */}
-        <div className="p-4 bg-gray-50 border-b border-gray-200 flex flex-col gap-3">
+        <div className="p-4 bg-gray-50 border-b border-gray-200 flex flex-col gap-3 shrink-0">
             <div className="flex justify-between items-center">
                  <h3 className="font-bold text-gray-800 flex items-center gap-2">
                      <BookOpen size={20} className="text-blue-600"/>
@@ -359,7 +361,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
         </div>
 
         {/* List Content */}
-        <div className="flex-grow overflow-y-auto p-0 pb-16">
+        <div className={`flex-grow overflow-y-auto p-0 min-h-0 ${showFooter ? 'pb-16' : ''}`}>
             {library.length === 0 && (
                 <div className="text-center text-gray-400 py-10 italic px-4 text-sm">
                     {isEditable 
@@ -381,7 +383,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                     return (
                         <div 
                             key={entry.id} 
-                            className={`p-3 hover:bg-gray-50 transition-colors group cursor-pointer ${isSelected ? 'bg-blue-50 hover:bg-blue-100' : ''}`}
+                            className={`p-3 hover:bg-gray-50 transition-colors group cursor-pointer select-none ${isSelected ? 'bg-blue-50 hover:bg-blue-100' : ''}`}
                             onClick={() => {
                                 if (onMultiSelect) {
                                     toggleSelection(entry.id);
@@ -456,8 +458,8 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
         </div>
 
         {/* Multi-Select Footer Action Bar */}
-        {onMultiSelect && (
-            <div className="absolute bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex justify-between items-center z-10">
+        {showFooter && (
+            <div className="absolute bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex justify-between items-center z-20">
                 <span className="text-xs font-bold text-gray-600">
                     {selectedIds.length} trait(s) sélectionné(s)
                 </span>
@@ -688,37 +690,6 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                                         </div>
                                     );
                                 })}
-                            </div>
-                        </div>
-
-                        {/* Tags Section */}
-                        <div className="bg-white p-3 rounded-lg border border-gray-200">
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1 flex items-center gap-1"><Hash size={12}/> Tags</label>
-                            <div className="flex flex-wrap gap-2 mb-3">
-                                {editForm.tags?.map(tag => (
-                                    <span key={tag} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 border border-blue-200 font-medium">
-                                        {tag}
-                                        <button onClick={() => removeTag(tag)} className="hover:text-red-500 rounded-full p-0.5"><X size={12}/></button>
-                                    </span>
-                                ))}
-                                {(!editForm.tags || editForm.tags.length === 0) && (
-                                    <span className="text-xs text-gray-400 italic">Aucun tag.</span>
-                                )}
-                            </div>
-                            <div className="flex gap-2">
-                                <div className="relative flex-grow">
-                                    <TagIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                    <input 
-                                        className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:border-blue-500 outline-none"
-                                        placeholder="Nouveau tag..."
-                                        value={tagInput}
-                                        onChange={(e) => setTagInput(e.target.value)}
-                                        onKeyDown={(e) => e.key === 'Enter' && addTag()}
-                                    />
-                                </div>
-                                <button onClick={addTag} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg font-bold border border-gray-300 transition-colors">
-                                    Ajouter
-                                </button>
                             </div>
                         </div>
 
