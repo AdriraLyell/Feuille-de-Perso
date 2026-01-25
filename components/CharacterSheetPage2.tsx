@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import { CharacterSheetData, ReputationEntry, TraitEntry, LibraryEntry } from '../types';
 import { BookOpen, X, Edit, Trash2, Check, ArrowRight, CheckSquare, Square } from 'lucide-react';
@@ -50,28 +51,30 @@ const TraitRow: React.FC<{
     return (
         <div 
             onClick={onClick}
-            className={`flex gap-2 items-center h-[22px] px-1 transition-all rounded-sm cursor-pointer group select-none ${
+            className={`flex gap-1 items-center h-[22px] px-1 transition-all rounded-sm cursor-pointer group select-none ${
                 isEmpty 
                 ? 'hover:bg-slate-50 border-b border-dotted border-stone-200' 
                 : 'hover:bg-blue-50 bg-white/50 border-b border-stone-300 shadow-sm'
             }`}
         >
-            {/* Value Column on Left */}
-            <div className={`w-10 text-center font-bold text-xs h-full flex items-center justify-center border-r border-stone-300 mr-1 ${
+            {/* Value Column on Left - Added shrink-0 to prevent collapsing */}
+            <div className={`w-8 shrink-0 text-center font-bold text-xs h-full flex items-center justify-center border-r border-stone-300 ${
                 isEmpty ? 'text-stone-300' : 'text-stone-800 font-handwriting bg-white'
             }`} style={{ fontSize: '0.9rem' }}>
                 {item.value || (isEmpty ? '-' : '')}
             </div>
             
             {/* Name Column */}
-            <div className={`flex-grow h-full flex items-center px-1 font-handwriting ${
+            <div className={`flex-grow h-full flex items-center px-1 font-handwriting min-w-0 ${
                 isEmpty ? 'text-stone-300 italic text-[10px]' : 'text-ink'
             }`} style={{ fontSize: isEmpty ? '0.7rem' : '0.9rem' }}>
-                {item.name || "Vide"}
+                <span className="truncate w-full block" title={!isEmpty ? item.name : undefined}>
+                    {item.name || "Vide"}
+                </span>
             </div>
 
             {/* Hint Icon on Hover */}
-            <div className="opacity-0 group-hover:opacity-100 text-stone-400 scale-75 transition-opacity">
+            <div className="opacity-0 group-hover:opacity-100 text-stone-400 scale-75 transition-opacity shrink-0">
                 <Edit size={14} />
             </div>
         </div>
@@ -616,8 +619,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                                         autoFocus
                                     />
                                 </div>
-                                <div className="w-24">
-                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Valeur / Coût</label>
+                                <div className="w-20">
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Valeur</label>
                                     <input 
                                         className="w-full border border-gray-300 rounded px-3 py-2 font-mono text-center focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-gray-900 bg-white"
                                         value={editorValue}

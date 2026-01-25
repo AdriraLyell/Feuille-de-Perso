@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { CharacterSheetData, DotEntry, AttributeEntry, CombatEntry, SkillCategoryKey, TraitEffect } from '../types';
 import DotRating from './DotRating';
@@ -186,7 +187,7 @@ const AttributeBlock: React.FC<{
       <div className="flex flex-col border-r last:border-r-0 border-stone-400 h-full">
         <SectionHeader title={title} />
         <div className="flex-grow p-0">
-          {items.map(item => (
+          {(items || []).map(item => (
             <AttributeRow 
                key={item.id} 
                entry={item} 
@@ -282,7 +283,7 @@ const SkillBlock: React.FC<{
     <div className="flex flex-col h-full">
         <SectionHeader title={title} />
         <div className="flex-grow py-1">
-            {items.map(item => {
+            {(items || []).map(item => {
                 // Combine specs for this specific item
                 const uSpecs = userSpecs[item.id] || [];
                 const iSpecs = imposedSpecs[item.id] || [];
@@ -308,7 +309,7 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
   // --- Calculation: Attribute Bonuses from Traits ---
   const attributeBonuses = useMemo(() => {
       const bonuses: Record<string, BonusInfo> = {};
-      const allTraits = [...data.page2.vertus, ...data.page2.defauts];
+      const allTraits = [...(data.page2.vertus || []), ...(data.page2.defauts || [])];
 
       allTraits.forEach(trait => {
           if (!trait.name) return;
@@ -340,7 +341,9 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
 
   const updateDot = (section: 'skills', category: string, id: string, value: number) => {
     // @ts-ignore - dynamic access
-    const list = data[section][category] as DotEntry[];
+    const list = data[section]?.[category] as DotEntry[];
+    if (!list) return;
+
     const isCreationMode = data.creationConfig && data.creationConfig.active;
     
     // When in creation mode, update BOTH value and creationValue
@@ -372,10 +375,10 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
 
   const updateAttribute = (category: string, id: string, field: 'val1' | 'val2' | 'val3', value: number) => {
       // Check if it's a main attribute
-      const mainList = data.attributes[String(category)];
+      const mainList = data.attributes?.[String(category)];
       const mainIndex = mainList ? mainList.findIndex(item => item.id === id) : -1;
 
-      if (mainIndex !== -1) {
+      if (mainIndex !== -1 && mainList) {
           const isCreationMode = data.creationConfig && data.creationConfig.active;
           const newList = [...mainList];
           const item = newList[mainIndex];
@@ -432,16 +435,18 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
   };
 
   const updateCombatWeapon = (id: string, field: keyof CombatEntry, value: string) => {
-    const newWeapons = data.combat.weapons.map(w => w.id === id ? { ...w, [field]: value } : w);
+    const newWeapons = (data.combat.weapons || []).map(w => w.id === id ? { ...w, [field]: value } : w);
     onChange({ ...data, combat: { ...data.combat, weapons: newWeapons } });
     onAddLog(`Arme modifiée (${String(field)})`, 'info', 'sheet', `weapon_${String(id)}_${String(field)}`);
   };
 
   const updateArmor = (index: number, field: keyof typeof data.combat.armor[0], value: string) => {
-    const newArmor = [...data.combat.armor];
-    newArmor[index] = { ...newArmor[index], [field]: value };
-    onChange({ ...data, combat: { ...data.combat, armor: newArmor } });
-    onAddLog(`Armure modifiée (${String(field)})`, 'info', 'sheet', `armor_${index}_${String(field)}`);
+    const newArmor = [...(data.combat.armor || [])];
+    if (newArmor[index]) {
+        newArmor[index] = { ...newArmor[index], [field]: value };
+        onChange({ ...data, combat: { ...data.combat, armor: newArmor } });
+        onAddLog(`Armure modifiée (${String(field)})`, 'info', 'sheet', `armor_${index}_${String(field)}`);
+    }
   };
 
   const updateCounter = (id: string, value: number, isCustom = false, field: 'value' | 'current' = 'value') => {
@@ -449,7 +454,7 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
       const isCreationMode = data.creationConfig && data.creationConfig.active;
 
       if (isCustom) {
-          const newCustom = data.counters.custom.map(c => {
+          const newCustom = (data.counters.custom || []).map(c => {
              if (c.id !== id) return c;
              const newItem = { ...c };
 
@@ -465,7 +470,7 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
              return newItem;
           });
           onChange({ ...data, counters: { ...data.counters, custom: newCustom }});
-          counterName = data.counters.custom.find(c => c.id === id)?.name || 'Compteur';
+          counterName = (data.counters.custom || []).find(c => c.id === id)?.name || 'Compteur';
       } else {
           // @ts-ignore
           const current = data.counters[String(id)];
@@ -503,7 +508,8 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
       Object.keys(data.skills).forEach(key => {
           if (key === 'arrieres_plans') return;
           // @ts-ignore
-          data.skills[key].forEach((skill: DotEntry) => {
+          const list = data.skills[key] || [];
+          list.forEach((skill: DotEntry) => {
               if (skill.name && skill.value > 0) {
                   allSkills.push(skill.value);
               }
@@ -647,7 +653,7 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
           </div>
           
           <div className="flex-grow">
-              {data.combat.weapons.map((w) => (
+              {(data.combat.weapons || []).map((w) => (
               <div key={w.id} className="flex items-center text-xs border-b border-dotted border-stone-300 h-[22px] last:border-0 hover:bg-stone-100 transition-colors">
                   <div className="w-[35%] px-1 h-full">
                        <input className="w-full h-full bg-transparent font-bold focus:outline-none placeholder-stone-300 font-handwriting text-ink text-sm" placeholder="Arme..." value={w.weapon} onChange={(e) => updateCombatWeapon(w.id, 'weapon', e.target.value)} />
@@ -672,7 +678,7 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
           </div>
           
           <div className="border-t border-stone-400 bg-stone-100 p-1">
-               {data.combat.armor.map((armor, i) => (
+               {(data.combat.armor || []).map((armor, i) => (
                    <div key={i} className="flex items-center h-[22px] text-xs border-b border-stone-300 last:border-0 border-dotted">
                       <span className="font-bold text-[9px] uppercase w-12 text-stone-700">Armure</span>
                       <input 
@@ -763,7 +769,7 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
              <div className={`grid gap-1 ${isLandscape ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 {renderCounterItem(data.counters.volonte, false)}
                 {renderCounterItem(data.counters.confiance, false)}
-                {data.counters.custom.map(c => renderCounterItem(c, true))}
+                {(data.counters.custom || []).map(c => renderCounterItem(c, true))}
              </div>
           </div>
       </div>
@@ -837,7 +843,7 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
                         <input 
                           readOnly 
                           className="w-20 text-center border-b border-stone-300 text-stone-400 outline-none bg-transparent font-handwriting text-sm" 
-                          value={data.experience.spent} 
+                           value={data.experience.spent} 
                         />
                     </div>
                 </div>

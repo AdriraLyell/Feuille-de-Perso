@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { CharacterSheetData, XPEntry } from '../types';
 import { Plus, Trash2, Calendar, FileText, TrendingUp, User, MessageSquare } from 'lucide-react';
@@ -96,6 +97,7 @@ const CharacterSheetXP: React.FC<Props> = ({ data, onChange, isLandscape = false
                             className="w-full bg-transparent border-b border-dotted border-stone-300 focus:border-blue-500 outline-none text-sm font-handwriting text-ink"
                             value={entry.date}
                             onChange={(e) => updateRow(entry.id, 'date', e.target.value)}
+                            style={{ colorScheme: 'light' }}
                         />
                     </div>
                     {/* MJ */}

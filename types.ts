@@ -158,6 +158,20 @@ export interface CampaignNoteEntry {
   content: string;
 }
 
+// --- NEW TYPES FOR PARTY MEMBERS ---
+export interface PartyColumn {
+    id: string;
+    label: string;
+    width?: number; // Width in pixels
+}
+
+export interface PartyMemberEntry {
+    id: string;
+    name: string; // Personnage (Fixed)
+    player: string; // Joueur (Fixed)
+    data: Record<string, string>; // Dynamic columns data (key = columnId)
+}
+
 export interface CharacterSheetData {
   creationConfig: CreationConfig;
   header: HeaderInfo;
@@ -209,7 +223,15 @@ export interface CharacterSheetData {
   library: LibraryEntry[]; // New field for the Virtue/Flaw library
   xpLogs: XPEntry[];
   appLogs: LogEntry[];
-  campaignNotes: CampaignNoteEntry[]; // Nouvel onglet Notes
+  campaignNotes: CampaignNoteEntry[];
+  partyNotes: {
+      members: PartyMemberEntry[];
+      columns: PartyColumn[];
+      staticColWidths?: { // Widths for the fixed columns
+          character: number;
+          player: number;
+      };
+  };
 }
 
 export interface ChangelogEntry {

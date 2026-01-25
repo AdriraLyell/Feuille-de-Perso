@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { CharacterSheetData, DotEntry, SkillCategoryKey, AttributeEntry } from '../types';
+import { CharacterSheetData, DotEntry, SkillCategoryKey, AttributeEntry, CombatEntry, ReputationEntry } from '../types';
 import { Trash2, Plus, RefreshCw, Minus, GripVertical, Save, AlertTriangle, List, Tag, UserPlus, Circle, Calculator, Info, CreditCard, Sliders, BookOpen, LayoutGrid, Zap, Play, X, CheckSquare, Square } from 'lucide-react';
 import { INITIAL_DATA } from '../constants';
 
@@ -18,6 +19,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
   // Modal States
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showPresetConfirm, setShowPresetConfirm] = useState(false);
+  const [showCreationWarning, setShowCreationWarning] = useState(false);
   const [pendingPreset, setPendingPreset] = useState<any>(null);
 
   const [newlyAddedId, setNewlyAddedId] = useState<string | null>(null);
@@ -43,14 +45,17 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
   };
 
   const getSkillContext = (skillId: string) => {
+      if (!localData.skills) return { name: "Inconnu", categoryLabel: "Inconnu" };
       for (const cat of Object.keys(localData.skills)) {
-          // @ts-ignore
-          const found = localData.skills[cat].find(s => s.id === skillId);
-          if (found) {
-              return { 
-                  name: found.name, 
-                  categoryLabel: getCategoryLabel(cat) 
-              };
+          const list = localData.skills[cat as SkillCategoryKey];
+          if (Array.isArray(list)) {
+              const found = list.find(s => s.id === skillId);
+              if (found) {
+                  return { 
+                      name: found.name, 
+                      categoryLabel: getCategoryLabel(cat) 
+                  };
+              }
           }
       }
       return { name: "Inconnu", categoryLabel: "Inconnu" };
@@ -75,6 +80,92 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
     setLocalData(JSON.parse(JSON.stringify(INITIAL_DATA)));
     setShowResetConfirm(false);
     onAddLog("Réinitialisation complète de la fiche aux valeurs par défaut", 'danger', 'settings');
+  };
+
+  // --- Reset only Character Values (Keep Structure & Library) ---
+  const resetCharacterValues = (source: CharacterSheetData): CharacterSheetData => {
+      const clean = JSON.parse(JSON.stringify(source));
+      
+      // Reset Header
+      Object.keys(clean.header).forEach(k => clean.header[k as keyof typeof clean.header] = "");
+      
+      // Reset XP
+      clean.experience = { gain: '0', spent: '0', rest: '0' };
+      clean.xpLogs = [];
+      clean.appLogs = [];
+
+      // Reset Attributes Values
+      if (clean.attributes) {
+          Object.keys(clean.attributes).forEach(cat => {
+              if (Array.isArray(clean.attributes[cat])) {
+                  clean.attributes[cat].forEach((attr: AttributeEntry) => {
+                      attr.val1 = 0; attr.val2 = 0; attr.val3 = 0;
+                      attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
+                  });
+              }
+          });
+      }
+      
+      // Reset Secondary Attributes
+      if (clean.secondaryAttributes) {
+          Object.keys(clean.secondaryAttributes).forEach(cat => {
+              if (Array.isArray(clean.secondaryAttributes[cat])) {
+                  clean.secondaryAttributes[cat].forEach((attr: AttributeEntry) => {
+                      attr.val1 = 0; attr.val2 = 0; attr.val3 = 0;
+                      attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
+                  });
+              }
+          });
+      }
+
+      // Reset Skills Values
+      Object.keys(clean.skills).forEach(cat => {
+          clean.skills[cat as SkillCategoryKey].forEach((skill: DotEntry) => {
+              skill.value = 0;
+              skill.creationValue = 0;
+              if (typeof skill.current !== 'undefined') skill.current = 0;
+          });
+      });
+
+      // Reset Combat
+      clean.combat.weapons.forEach((w: CombatEntry) => { w.weapon=""; w.level=""; w.init=""; w.attack=""; w.damage=""; w.parry=""; });
+      clean.combat.armor.forEach((a: any) => { a.type=""; a.protection=""; a.weight=""; });
+      clean.combat.stats = { agility: '', dexterity: '', force: '', size: '' };
+
+      // Reset Page 2 Details
+      clean.page2.lieux_importants = "";
+      clean.page2.contacts = "";
+      clean.page2.reputation.forEach((r: ReputationEntry) => { r.reputation = ''; r.lieu = ''; r.valeur = ''; });
+      clean.page2.connaissances = "";
+      clean.page2.valeurs_monetaires = "";
+      clean.page2.armes_list = Array(10).fill("");
+      clean.page2.vertus = Array(28).fill(null).map(() => ({ name: '', value: '' }));
+      clean.page2.defauts = Array(28).fill(null).map(() => ({ name: '', value: '' }));
+      clean.page2.equipement = "";
+      clean.page2.notes = "";
+
+      // Reset Specializations
+      clean.specializations = {};
+      
+      // Reset Campaign Notes
+      clean.campaignNotes = [];
+      
+      // Counters
+      clean.counters.volonte.value = 3; 
+      clean.counters.volonte.creationValue = 3;
+      clean.counters.volonte.current = 0;
+      
+      clean.counters.confiance.value = 3; 
+      clean.counters.confiance.creationValue = 3;
+      clean.counters.confiance.current = 0;
+      
+      clean.counters.custom.forEach((c: DotEntry) => { 
+          c.value = 0; 
+          c.creationValue = 0;
+          c.current = 0; 
+      });
+
+      return clean;
   };
 
   // Define default attribute names for known categories
@@ -250,7 +341,10 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
   };
 
   const updateAttributeName = (catId: string, attrId: string, name: string) => {
-      const newAttrs = localData.attributes[catId].map(attr => 
+      const catAttrs = localData.attributes[catId];
+      if (!catAttrs) return;
+
+      const newAttrs = catAttrs.map(attr => 
           attr.id === attrId ? { ...attr, name } : attr
       );
       setLocalData({
@@ -340,12 +434,26 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
   };
 
   const activateCreationMode = (isActive: boolean) => {
-      updateCreationConfig('active', isActive);
+      // If turning ON, show warning and force reset
       if (isActive) {
-          onAddLog("Mode Création ACTIVÉ", 'success', 'settings');
+          setShowCreationWarning(true);
       } else {
+          updateCreationConfig('active', false);
           onAddLog("Mode Création DÉSACTIVÉ", 'info', 'settings');
       }
+  };
+
+  const executeCreationActivation = () => {
+      const resetData = resetCharacterValues(localData);
+      setLocalData({
+          ...resetData,
+          creationConfig: {
+              ...resetData.creationConfig,
+              active: true
+          }
+      });
+      onAddLog("Mode Création ACTIVÉ - Fiche réinitialisée", 'success', 'settings');
+      setShowCreationWarning(false);
   };
 
   const calculateConfigurationCost = () => {
@@ -372,11 +480,14 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
 
   // --- Skill/Counter CRUD ---
   const updateSkillName = (category: SkillCategoryKey, id: string, newName: string) => {
+    const list = localData.skills[category];
+    if (!list) return;
+
     setLocalData(prev => ({
       ...prev,
       skills: {
         ...prev.skills,
-        [category]: prev.skills[category].map(item =>
+        [category]: list.map(item =>
           item.id === id ? { ...item, name: newName } : item
         )
       }
@@ -384,18 +495,22 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
   };
 
   const removeSkill = (category: SkillCategoryKey, id: string) => {
-    const skillName = localData.skills[category].find(s => s.id === id)?.name || 'Inconnue';
+    const list = localData.skills[category];
+    if (!list) return;
+
+    const skillName = list.find(s => s.id === id)?.name || 'Inconnue';
     setLocalData(prev => ({
       ...prev,
       skills: {
         ...prev.skills,
-        [category]: prev.skills[category].filter(item => item.id !== id)
+        [category]: list.filter(item => item.id !== id)
       }
     }));
     onAddLog(`Suppression : "${skillName}" dans [${getCategoryLabel(category)}]`, 'danger', 'settings');
   };
 
   const addSkill = (category: SkillCategoryKey, isSpacer = false, defaultName = 'Nouvelle Compétence') => {
+    const list = localData.skills[category] || [];
     const newId = Math.random().toString(36).substr(2, 9);
     const newSkill: DotEntry = {
       id: newId,
@@ -408,7 +523,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
       ...prev,
       skills: {
         ...prev.skills,
-        [category]: [...prev.skills[category], newSkill]
+        [category]: [...list, newSkill]
       }
     }));
     if (!isSpacer) {
@@ -465,22 +580,28 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
 
   // --- Counters Handlers ---
   const updateCounterName = (id: string, newName: string) => {
+      const custom = localData.counters.custom;
+      if (!custom) return;
+
       setLocalData(prev => ({
           ...prev,
           counters: {
               ...prev.counters,
-              custom: prev.counters.custom.map(c => c.id === id ? { ...c, name: newName } : c)
+              custom: custom.map(c => c.id === id ? { ...c, name: newName } : c)
           }
       }));
   };
 
   const removeCounter = (id: string) => {
-      const counterName = localData.counters.custom.find(c => c.id === id)?.name;
+      const custom = localData.counters.custom;
+      if (!custom) return;
+
+      const counterName = custom.find(c => c.id === id)?.name;
       setLocalData(prev => ({
           ...prev,
           counters: {
               ...prev.counters,
-              custom: prev.counters.custom.filter(c => c.id !== id)
+              custom: custom.filter(c => c.id !== id)
           }
       }));
       onAddLog(`Suppression Compteur : ${counterName}`, 'danger', 'settings');
@@ -488,6 +609,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
 
   const addCounter = (defaultName = 'Nouveau Compteur') => {
        const newId = Math.random().toString(36).substr(2, 9);
+       const custom = localData.counters.custom || [];
        const newCounter: DotEntry = {
             id: newId,
             name: defaultName,
@@ -499,7 +621,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
             ...prev,
             counters: {
                 ...prev.counters,
-                custom: [...prev.counters.custom, newCounter]
+                custom: [...custom, newCounter]
             }
        }));
        setNewlyAddedId(newId);
@@ -522,7 +644,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
 
     if (sourceCategory === 'counters') {
          if (targetCategory !== 'counters') return; 
-         const newList = [...localData.counters.custom];
+         const newList = [...(localData.counters.custom || [])];
          const [itemToMove] = newList.splice(sourceIndex, 1);
          newList.splice(targetIndex, 0, itemToMove);
          setLocalData({ ...localData, counters: { ...localData.counters, custom: newList } });
@@ -531,8 +653,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
     }
 
     const newSkills = { ...localData.skills };
-    const sourceList = [...newSkills[sourceCategory as SkillCategoryKey]];
-    const targetList = (sourceCategory === targetCategory) ? sourceList : [...newSkills[targetCategory as SkillCategoryKey]];
+    const sourceList = [...(newSkills[sourceCategory as SkillCategoryKey] || [])];
+    const targetList = (sourceCategory === targetCategory) ? sourceList : [...(newSkills[targetCategory as SkillCategoryKey] || [])];
 
     const [itemToMove] = sourceList.splice(sourceIndex, 1);
     targetList.splice(targetIndex, 0, itemToMove);
@@ -555,7 +677,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
   };
 
   const renderAttributeEditor = () => {
-    const categories = localData.attributeSettings;
+    const categories = localData.attributeSettings || [];
     const count = categories.length;
     
     // Find global attribute count from the first category
@@ -744,7 +866,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
     const isCounters = category === 'counters';
     // Use optional chaining fallback to prevent undefined array errors
     // @ts-ignore
-    const list: DotEntry[] = isCounters ? (localData.counters.custom || []) : (localData.skills[category] || []);
+    const list: DotEntry[] = isCounters ? (localData.counters?.custom || []) : (localData.skills?.[category as SkillCategoryKey] || []);
 
     return (
       <div className={`bg-white p-4 rounded shadow flex flex-col ${heightClass}`}>
@@ -845,13 +967,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
   
   const renderSpecializationEditor = (title: string, category: string) => {
     // @ts-ignore
-    const skills: DotEntry[] = localData.skills[category] || [];
+    const skills: DotEntry[] = localData.skills?.[category as SkillCategoryKey] || [];
 
     return (
       <div className="bg-white p-4 rounded shadow flex flex-col h-full">
          <h3 className="font-bold text-sm mb-4 text-gray-800 border-b pb-2">{title}</h3>
          <div className="flex-grow overflow-y-auto space-y-4 pr-1 max-h-[500px]">
-             {skills.filter(s => s.name.trim() !== '').map(skill => {
+             {skills.filter(s => s.name && s.name.trim() !== '').map(skill => {
                  const specs = localData.imposedSpecializations[skill.id] || [];
                  return (
                      <div key={skill.id} className="border border-gray-100 rounded p-2 bg-gray-50/50">
@@ -1212,6 +1334,46 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                         className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-medium shadow-sm transition-colors"
                     >
                         Confirmer le chargement
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
+
+      {/* Creation Mode Activation Warning Modal */}
+      {showCreationWarning && (
+        <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 animate-in fade-in zoom-in duration-200">
+                <div className="bg-blue-50 p-6 flex flex-col items-center text-center">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 text-blue-600">
+                         <UserPlus size={24} />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Activer le Mode Création ?</h3>
+                    <p className="text-gray-600 text-sm mb-4">
+                        L'activation du mode création va <strong>réinitialiser toutes les valeurs</strong> du personnage actuel pour vous permettre de repartir de zéro.
+                    </p>
+                    <div className="bg-white p-3 rounded border border-blue-100 text-left text-xs text-blue-800 space-y-1 w-full">
+                        <p className="font-bold border-b border-blue-50 pb-1 mb-1">Seront effacés :</p>
+                        <ul className="list-disc list-inside">
+                            <li>Identité (Nom, Chronique...)</li>
+                            <li>Points d'Attributs et Compétences</li>
+                            <li>Historique XP et Notes de Campagne</li>
+                        </ul>
+                        <p className="italic pt-1">La structure et la bibliothèque sont conservées.</p>
+                    </div>
+                </div>
+                <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-100">
+                    <button 
+                        onClick={() => setShowCreationWarning(false)} 
+                        className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                    >
+                        Annuler
+                    </button>
+                    <button 
+                        onClick={executeCreationActivation} 
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm transition-colors"
+                    >
+                        Réinitialiser et Activer
                     </button>
                 </div>
             </div>

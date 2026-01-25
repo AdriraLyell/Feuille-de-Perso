@@ -3,12 +3,23 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.8.0";
+export const APP_VERSION = "1.9.0";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
-        version: "1.8.0",
+        version: "1.9.0",
         date: new Date().toLocaleDateString('fr-FR'),
+        type: 'minor',
+        changes: [
+            "Fonctionnalité : Refonte des Notes de Campagne.",
+            "Fonctionnalité : Ajout d'un onglet 'Membres du Groupe' dans le carnet de notes.",
+            "Système : Tableau dynamique pour gérer les autres joueurs (colonnes personnalisables).",
+            "UI : Navigation par onglets à l'intérieur du journal."
+        ]
+    },
+    {
+        version: "1.8.0",
+        date: "22/01/2026",
         type: 'minor',
         changes: [
             "Fonctionnalité : Ajout d'un nouvel onglet 'Notes de Campagne' pour tenir le journal de vos aventures.",
@@ -311,4 +322,9 @@ export const INITIAL_DATA: CharacterSheetData = {
   xpLogs: [],
   appLogs: [],
   campaignNotes: [], // Initialisé vide
+  partyNotes: { // Initialisation Groupe
+      members: [],
+      columns: [],
+      staticColWidths: { character: 200, player: 200 }
+  }
 };

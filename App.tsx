@@ -256,6 +256,16 @@ const migrateData = (parsed: any): CharacterSheetData => {
         parsed.campaignNotes = [];
     }
 
+    // Migration 27: Add Party Notes
+    if (!parsed.partyNotes) {
+        parsed.partyNotes = INITIAL_DATA.partyNotes;
+    }
+    
+    // Migration 28: Add Static Column Widths if missing
+    if (parsed.partyNotes && !parsed.partyNotes.staticColWidths) {
+        parsed.partyNotes.staticColWidths = INITIAL_DATA.partyNotes.staticColWidths;
+    }
+
     // Migration 23: Ensure all skill categories are present
     if (!parsed.skills) {
         parsed.skills = {};
@@ -458,28 +468,37 @@ function App() {
         ];
 
         standardCategories.forEach(key => {
-            currentData.skills[key].forEach(skill => {
-                // Let's assume Free Rank overrides standard calculation:
-                // Effectively, treat 'freeRankLimit' as a base offset similar to creationValue, but dynamic.
-                const freeLimit = getFreeRankLimit(skill.name);
-                const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
-                
-                total += getSpentForValue(skill.value, effectiveCreationValue);
+            const skillList = currentData.skills[key];
+            if (Array.isArray(skillList)) {
+                skillList.forEach(skill => {
+                    // Let's assume Free Rank overrides standard calculation:
+                    // Effectively, treat 'freeRankLimit' as a base offset similar to creationValue, but dynamic.
+                    const freeLimit = getFreeRankLimit(skill.name);
+                    const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
+                    
+                    total += getSpentForValue(skill.value, effectiveCreationValue);
+                });
+            }
+        });
+
+        const secondSkills = currentData.skills.competences2;
+        if (Array.isArray(secondSkills)) {
+            secondSkills.forEach(skill => {
+                 const freeLimit = getFreeRankLimit(skill.name);
+                 const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
+                 const cost = getSpentForValue(skill.value, effectiveCreationValue);
+                 total += cost / 2;
             });
-        });
+        }
 
-        currentData.skills.competences2.forEach(skill => {
-             const freeLimit = getFreeRankLimit(skill.name);
-             const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
-             const cost = getSpentForValue(skill.value, effectiveCreationValue);
-             total += cost / 2;
-        });
-
-        currentData.skills.arrieres_plans.forEach(skill => {
-            if (skill.value === 0) return; 
-            const diff = Math.max(0, skill.value - (skill.creationValue || 0));
-            total += diff * 2;
-        });
+        const backgroundSkills = currentData.skills.arrieres_plans;
+        if (Array.isArray(backgroundSkills)) {
+            backgroundSkills.forEach(skill => {
+                if (skill.value === 0) return; 
+                const diff = Math.max(0, skill.value - (skill.creationValue || 0));
+                total += diff * 2;
+            });
+        }
 
         // Loop over dynamic attributes
         // Get configured cost or default to 6
@@ -917,7 +936,8 @@ function App() {
         onClose={() => setShowImportExport(false)} 
         data={data}
         onImport={(newData) => {
-            setData(newData);
+            const migrated = migrateData(newData);
+            setData(migrated);
             setShowImportExport(false);
             setMode('sheet');
             setIsSettingsDirty(false);
