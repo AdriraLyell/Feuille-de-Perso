@@ -1,7 +1,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { CharacterSheetData, CampaignNoteEntry } from '../types';
-import { Book, Plus, Trash2, Calendar, FileText, ChevronDown, ChevronUp } from 'lucide-react';
+import { Book, Plus, Trash2, Calendar, FileText, ChevronDown, ChevronUp, AlertTriangle, X } from 'lucide-react';
 
 interface Props {
   data: CharacterSheetData;
@@ -69,6 +69,7 @@ const NotebookTextarea: React.FC<{ value: string, onChange: (v: string) => void,
 
 const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, onAddLog }) => {
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
+  const [noteIdToDelete, setNoteIdToDelete] = useState<string | null>(null);
 
   const addNote = () => {
     const newNote: CampaignNoteEntry = {
@@ -93,17 +94,20 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
     onAddLog(`Note modifiée (${field})`, 'info', 'sheet', `note_${id}_${field}`);
   };
 
-  const deleteNote = (id: string) => {
-    if (confirm("Supprimer cette note définitivement ?")) {
-        const newNotes = data.campaignNotes.filter(n => n.id !== id);
+  const confirmDeleteNote = () => {
+    if (noteIdToDelete) {
+        const newNotes = data.campaignNotes.filter(n => n.id !== noteIdToDelete);
         onChange({ ...data, campaignNotes: newNotes });
         onAddLog("Note de campagne supprimée", 'danger', 'sheet');
+        setNoteIdToDelete(null);
     }
   };
 
   const toggleExpand = (id: string) => {
       setExpandedNotes(prev => ({ ...prev, [id]: !prev[id] }));
   };
+
+  const noteToDelete = data.campaignNotes.find(n => n.id === noteIdToDelete);
 
   return (
     <div className={`sheet-container p-8 ${isLandscape ? 'landscape' : ''}`}>
@@ -160,7 +164,7 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
                           
                           <div className="flex items-center gap-1 no-print">
                               <button 
-                                  onClick={() => deleteNote(note.id)}
+                                  onClick={() => setNoteIdToDelete(note.id)}
                                   className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors opacity-0 group-hover:opacity-100"
                                   title="Supprimer la note"
                               >
@@ -193,6 +197,43 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
       <div className="mt-6 border-t border-stone-300 pt-2 text-center text-[10px] text-stone-400 uppercase tracking-widest no-print">
           Fin du journal actuel
       </div>
+
+      {/* MODAL DE CONFIRMATION DE SUPPRESSION */}
+      {noteIdToDelete && (
+        <div className="fixed inset-0 bg-black/60 z-[110] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200 no-print">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 animate-in zoom-in duration-200">
+                <div className="bg-red-50 p-6 flex flex-col items-center text-center">
+                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 text-red-600 shadow-inner">
+                         <AlertTriangle size={32} />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Supprimer cette note ?</h3>
+                    <div className="bg-white p-3 rounded border border-red-100 shadow-sm w-full mb-4">
+                        <span className="block font-bold text-gray-800">{noteToDelete?.title || 'Note sans titre'}</span>
+                        <span className="text-xs text-gray-500">{noteToDelete?.date}</span>
+                    </div>
+                    <p className="text-gray-600 text-sm">
+                        Cette action est <span className="font-bold text-red-600">irréversible</span>. 
+                        Tout le contenu de cette session sera définitivement perdu.
+                    </p>
+                </div>
+                <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-100">
+                    <button 
+                        onClick={() => setNoteIdToDelete(null)} 
+                        className="flex-1 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-bold transition-colors"
+                    >
+                        Annuler
+                    </button>
+                    <button 
+                        onClick={confirmDeleteNote} 
+                        className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold shadow-md transition-colors flex items-center justify-center gap-2"
+                    >
+                        <Trash2 size={18} />
+                        Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 };
