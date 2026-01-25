@@ -2,12 +2,21 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.7.7";
+export const APP_VERSION = "1.7.8";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
-        version: "1.7.7",
+        version: "1.7.8",
         date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "DevOps : Ajout du workflow GitHub Actions pour le déploiement automatique sur GitHub Pages.",
+            "Système : Mise à jour des configurations de dépendances."
+        ]
+    },
+    {
+        version: "1.7.7",
+        date: "21/01/2026 17:45",
         type: 'patch',
         changes: [
             "UI (Détails) : Correction de la hauteur de la fenêtre d'édition pour garantir le défilement de la bibliothèque en mode sélection simple.",
