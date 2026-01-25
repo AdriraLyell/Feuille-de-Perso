@@ -151,6 +151,13 @@ export interface LogEntry {
   deduplicationId?: string;
 }
 
+export interface CampaignNoteEntry {
+  id: string;
+  date: string;
+  title: string;
+  content: string;
+}
+
 export interface CharacterSheetData {
   creationConfig: CreationConfig;
   header: HeaderInfo;
@@ -202,6 +209,7 @@ export interface CharacterSheetData {
   library: LibraryEntry[]; // New field for the Virtue/Flaw library
   xpLogs: XPEntry[];
   appLogs: LogEntry[];
+  campaignNotes: CampaignNoteEntry[]; // Nouvel onglet Notes
 }
 
 export interface ChangelogEntry {

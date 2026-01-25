@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import CharacterSheet from './components/CharacterSheet';
 import CharacterSheetPage2 from './components/CharacterSheetPage2';
 import CharacterSheetSpecializations from './components/CharacterSheetSpecializations';
 import CharacterSheetXP from './components/CharacterSheetXP';
+import CampaignNotes from './components/CampaignNotes';
 import SettingsView from './components/SettingsView';
 import ImportExportModal from './components/ImportExportModal';
 import PrintSelectionModal from './components/PrintSelectionModal';
@@ -12,7 +14,7 @@ import CreationHUD from './components/CreationHUD';
 import TraitLibrary from './components/TraitLibrary';
 import { CharacterSheetData, SkillCategoryKey, AttributeCategoryKey, LogEntry, DotEntry, TraitEffect } from './types';
 import { INITIAL_DATA, APP_VERSION } from './constants';
-import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, Monitor, Smartphone, ArrowRightLeft, TrendingUp, History, Clock, X, Trash2, Save, ScrollText, HelpCircle, BookOpen } from 'lucide-react';
+import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, Monitor, Smartphone, ArrowRightLeft, TrendingUp, History, Clock, X, Trash2, Save, ScrollText, HelpCircle, BookOpen, Book } from 'lucide-react';
 
 // Migration Logic Extracted for Reusability (Import/Init)
 const migrateData = (parsed: any): CharacterSheetData => {
@@ -249,6 +251,11 @@ const migrateData = (parsed: any): CharacterSheetData => {
         }));
     }
 
+    // Migration 26: Add Campaign Notes
+    if (!parsed.campaignNotes) {
+        parsed.campaignNotes = [];
+    }
+
     // Migration 23: Ensure all skill categories are present
     if (!parsed.skills) {
         parsed.skills = {};
@@ -313,7 +320,7 @@ function App() {
   const [mode, setMode] = useState<'sheet' | 'settings' | 'library'>('sheet');
   const [pendingMode, setPendingMode] = useState<'sheet' | 'settings' | 'library' | null>(null);
 
-  const [sheetTab, setSheetTab] = useState<'p1' | 'specs' | 'p2' | 'xp'>('p1');
+  const [sheetTab, setSheetTab] = useState<'p1' | 'specs' | 'p2' | 'xp' | 'notes'>('p1');
   const [isLandscape, setIsLandscape] = useState(false);
   
   // Unsaved changes state (Settings specific)
@@ -325,7 +332,7 @@ function App() {
   
   // Print Modal State
   const [showPrintModal, setShowPrintModal] = useState(false);
-  const [pagesToPrint, setPagesToPrint] = useState({ p1: true, specs: false, p2: true, xp: false });
+  const [pagesToPrint, setPagesToPrint] = useState({ p1: true, specs: false, p2: true, xp: false, notes: false });
 
   // Changelog & Guide Modal State
   const [showChangelog, setShowChangelog] = useState(false);
@@ -546,7 +553,7 @@ function App() {
       setShowPrintModal(true);
   };
 
-  const handlePrintConfirm = (selection: { p1: boolean, specs: boolean, p2: boolean, xp: boolean }) => {
+  const handlePrintConfirm = (selection: { p1: boolean, specs: boolean, p2: boolean, xp: boolean, notes: boolean }) => {
     setPagesToPrint(selection);
     setShowPrintModal(false);
     
@@ -792,7 +799,7 @@ function App() {
            <>
              {/* Sub Navigation for Sheets - Sticky */}
              <div className="sticky top-14 z-40 mb-2 no-print w-full flex justify-center pointer-events-none">
-                 <div className="pointer-events-auto flex gap-4 bg-white/90 backdrop-blur p-1.5 rounded-full shadow-lg border border-gray-200">
+                 <div className="pointer-events-auto flex gap-4 bg-white/90 backdrop-blur p-1.5 rounded-full shadow-lg border border-gray-200 flex-wrap justify-center">
                     <button
                         onClick={() => setSheetTab('p1')}
                         className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'p1' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}
@@ -817,6 +824,12 @@ function App() {
                     >
                         <TrendingUp size={16} /> Gestion XP
                     </button>
+                    <button
+                        onClick={() => setSheetTab('notes')}
+                        className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'notes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                        <Book size={16} /> Notes de Campagne
+                    </button>
                  </div>
              </div>
 
@@ -833,6 +846,9 @@ function App() {
                  </div>
                  <div className={`${sheetTab === 'xp' ? 'block' : 'hidden'} mx-auto`}>
                     <CharacterSheetXP data={data} onChange={setData} isLandscape={isLandscape} onAddLog={addLog} />
+                 </div>
+                 <div className={`${sheetTab === 'notes' ? 'block' : 'hidden'} mx-auto`}>
+                    <CampaignNotes data={data} onChange={setData} isLandscape={isLandscape} onAddLog={addLog} />
                  </div>
              </div>
 
@@ -886,6 +902,11 @@ function App() {
            {pagesToPrint.xp && (
                <div className="print-sheet-wrapper">
                     <CharacterSheetXP data={data} onChange={setData} isLandscape={isLandscape} onAddLog={addLog} />
+               </div>
+           )}
+           {pagesToPrint.notes && (
+               <div className="print-sheet-wrapper">
+                    <CampaignNotes data={data} onChange={setData} isLandscape={isLandscape} onAddLog={addLog} />
                </div>
            )}
       </div>

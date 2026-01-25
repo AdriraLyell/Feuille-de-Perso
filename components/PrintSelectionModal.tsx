@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Printer, CheckSquare, Square, X, Layers, List, FileType, TrendingUp } from 'lucide-react';
+import { Printer, CheckSquare, Square, X, Layers, List, FileType, TrendingUp, Book } from 'lucide-react';
 
 interface PrintSelectionModalProps {
   isOpen: boolean;
@@ -13,7 +13,8 @@ const PrintSelectionModal: React.FC<PrintSelectionModalProps> = ({ isOpen, onClo
     p1: true,
     specs: false,
     p2: true,
-    xp: false
+    xp: false,
+    notes: false
   });
 
   if (!isOpen) return null;
@@ -77,6 +78,15 @@ const PrintSelectionModal: React.FC<PrintSelectionModalProps> = ({ isOpen, onClo
                     {selection.xp ? <CheckSquare size={20} className="text-blue-600"/> : <Square size={20} />}
                     <TrendingUp size={18} />
                     <span className="font-semibold">Gestion de l'Expérience</span>
+                </button>
+
+                <button 
+                    onClick={() => toggle('notes')}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${selection.notes ? 'bg-blue-50 border-blue-300 text-blue-900' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'}`}
+                >
+                    {selection.notes ? <CheckSquare size={20} className="text-blue-600"/> : <Square size={20} />}
+                    <Book size={18} />
+                    <span className="font-semibold">Notes de Campagne</span>
                 </button>
             </div>
 
