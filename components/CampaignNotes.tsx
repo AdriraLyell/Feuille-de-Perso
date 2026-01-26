@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useLayoutEffect, useEffect } from 'react';
 import { CharacterSheetData, CampaignNoteEntry, PartyColumn, PartyMemberEntry } from '../types';
 import { Book, Plus, Trash2, ChevronLeft, ChevronRight, Bookmark, Users, PenTool, X } from 'lucide-react';
@@ -434,177 +435,190 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
 
   return (
     // Outer Wrapper
-    <div className={`w-full flex items-center justify-center bg-stone-900 py-8 px-4 md:px-12 relative overflow-hidden transition-all duration-300 ${isLandscape ? 'h-[1100px]' : 'h-[calc(100vh-140px)] min-h-[800px]'}`}>
+    <div className={`w-full flex items-center justify-center bg-stone-900 py-8 px-4 md:px-12 relative overflow-auto transition-all duration-300 ${isLandscape ? 'min-h-[1200px]' : 'min-h-[1400px]'}`}>
       
       {/* Background Texture */}
       <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]"></div>
 
-      {/* --- SIDE NAVIGATION BUTTONS (Journal Only) --- */}
-      {activeTab === 'journal' && (
-          <>
-            <button 
-                onClick={goToPrevious}
-                disabled={currentIndex <= 0}
-                className={`absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-stone-800 text-stone-200 shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-stone-600 hover:bg-stone-700 hover:scale-110 hover:text-white transition-all duration-300 ${currentIndex <= 0 ? 'opacity-0 pointer-events-none translate-x-[-20px]' : 'opacity-100 translate-x-0'}`}
-                title="Page précédente"
-            >
-                <ChevronLeft size={32} strokeWidth={2} />
-            </button>
+      {/* --- FLEX CONTAINER: BUTTONS + BOOK --- */}
+      <div className="flex items-center gap-3 shrink-0 z-10">
 
-            <button 
-                onClick={goToNext}
-                disabled={currentIndex >= totalPages - 1}
-                className={`absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-stone-800 text-stone-200 shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-stone-600 hover:bg-stone-700 hover:scale-110 hover:text-white transition-all duration-300 ${currentIndex >= totalPages - 1 ? 'opacity-0 pointer-events-none translate-x-[20px]' : 'opacity-100 translate-x-0'}`}
-                title="Page suivante"
-            >
-                <ChevronRight size={32} strokeWidth={2} />
-            </button>
-          </>
-      )}
-
-      {/* --- THE BOOK CONTAINER --- */}
-      <div className={`relative bg-[#fdfbf7] shadow-2xl transition-all duration-500 flex flex-col overflow-hidden z-10
-          ${isLandscape ? 'w-full h-full max-w-[1560px]' : 'w-full max-w-[900px] h-full aspect-[1/1.414]'} 
-          rounded-r-md rounded-l-sm border-r-8 border-r-stone-200 border-l-[12px] border-l-stone-800
-      `}>
-          
-          {/* Visual Binding */}
-          <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-stone-400 opacity-20 z-20 pointer-events-none shadow-[2px_0_5px_rgba(0,0,0,0.2)]"></div>
-
-          {/* BOOK HEADER */}
-          <div className="shrink-0 pt-6 pb-2 px-8 md:px-12 bg-[#fdfbf7] z-20 flex items-end justify-between border-b-2 border-stone-800 relative">
-                
-                {/* Title & Tabs Container */}
-                <div className="flex items-end gap-6">
-                    {/* Tab 1: Journal */}
-                    <button 
-                        onClick={() => setActiveTab('journal')}
-                        className={`group flex items-center gap-2 pb-1 transition-all ${activeTab === 'journal' ? 'text-indigo-950 border-b-4 border-indigo-900' : 'text-stone-400 hover:text-stone-600'}`}
-                    >
-                        <Book size={28} strokeWidth={activeTab === 'journal' ? 2.5 : 2} className="transition-transform group-hover:-translate-y-1" />
-                        <span className={`text-2xl font-black uppercase tracking-[0.1em] font-serif leading-none hidden sm:inline`}>Journal</span>
-                    </button>
-
-                    {/* Tab 2: Party */}
-                    <button 
-                        onClick={() => setActiveTab('party')}
-                        className={`group flex items-center gap-2 pb-1 transition-all ${activeTab === 'party' ? 'text-indigo-950 border-b-4 border-indigo-900' : 'text-stone-400 hover:text-stone-600'}`}
-                    >
-                        <Users size={28} strokeWidth={activeTab === 'party' ? 2.5 : 2} className="transition-transform group-hover:-translate-y-1" />
-                        <span className={`text-2xl font-black uppercase tracking-[0.1em] font-serif leading-none hidden sm:inline`}>Groupe</span>
-                    </button>
-                </div>
-
-                {/* Right Actions */}
-                {activeTab === 'journal' ? (
-                    <button 
-                        onClick={addNote}
-                        className="flex items-center gap-2 bg-indigo-700 text-white pl-3 pr-4 py-2 rounded-sm shadow-md hover:bg-indigo-800 transition-all hover:-translate-y-0.5 font-bold text-sm z-50 ml-auto"
-                        title="Ajouter une nouvelle page à la fin"
-                    >
-                        <Plus size={18} strokeWidth={3} /> <span className="uppercase tracking-wide hidden sm:inline">Nouvelle Page</span>
-                    </button>
-                ) : (
-                   <div className="ml-auto flex items-center gap-2 text-stone-500 font-serif italic text-sm">
-                       <PenTool size={16} /> Édition libre
-                   </div>
-                )}
-                
-                <div className="absolute top-0 right-8 text-red-700 drop-shadow-md">
-                    <Bookmark size={40} fill="currentColor" />
-                </div>
+          {/* PREV BUTTON AREA (Width reserved to prevent shift if hidden, but we use conditional render with opacity for now) */}
+          <div className="w-12 flex justify-end">
+             {activeTab === 'journal' && (
+                <button 
+                    onClick={goToPrevious}
+                    disabled={currentIndex <= 0}
+                    className={`p-3 rounded-full bg-stone-800 text-stone-200 shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-stone-600 hover:bg-stone-700 hover:scale-110 hover:text-white transition-all duration-300 ${currentIndex <= 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                    title="Page précédente"
+                >
+                    <ChevronLeft size={28} strokeWidth={3} />
+                </button>
+             )}
           </div>
 
-          {/* --- CONTENT AREA --- */}
-          <div className="flex-grow flex flex-col overflow-hidden bg-stone-50/20 relative">
+          {/* --- THE BOOK CONTAINER --- */}
+          <div className={`relative bg-[#fdfbf7] shadow-2xl transition-all duration-500 flex flex-col overflow-hidden z-10 shrink-0
+              ${isLandscape 
+                ? 'w-[1560px] h-[1100px]' // Fixed Landscape Dimensions
+                : 'w-[900px] h-[1270px]' // Fixed Portrait Dimensions (A4 Ratio)
+              } 
+              rounded-r-md rounded-l-sm border-r-8 border-r-stone-200 border-l-[12px] border-l-stone-800
+          `}>
               
-              {/* === TAB 1: JOURNAL === */}
-              {activeTab === 'journal' && (
-                  <>
-                    <div className="flex-grow flex flex-col overflow-hidden p-6 md:p-12">
-                        {!currentNote && (
-                            <div className="flex-grow flex flex-col items-center justify-center text-stone-400 italic gap-6 opacity-60 animate-in fade-in duration-1000">
-                                <div className="w-24 h-24 border-4 border-stone-300 rounded-full flex items-center justify-center">
-                                    <Book size={48} strokeWidth={1} />
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-2xl font-serif text-stone-500">Le journal est vierge.</p>
-                                    <p className="text-sm mt-2 font-handwriting text-xl text-stone-400">Cliquez sur "Nouvelle Page" pour commencer l'histoire.</p>
-                                </div>
-                            </div>
-                        )}
+              {/* Visual Binding */}
+              <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-stone-400 opacity-20 z-20 pointer-events-none shadow-[2px_0_5px_rgba(0,0,0,0.2)]"></div>
 
-                        {currentNote && (
-                            <div className="w-full h-full flex flex-col animate-in fade-in zoom-in duration-300">
-                                <div className="bg-white border border-stone-300 shadow-sm relative group w-full h-full flex flex-col rounded-sm overflow-hidden flex-grow min-h-0">
-                                        
-                                        {/* Note Header */}
-                                        <div className="bg-stone-100 border-b border-stone-200 p-3 flex items-center justify-between pl-4 shrink-0 rounded-t-sm z-20">
-                                            <div className="flex items-center gap-3 flex-grow min-w-0">
-                                                {/* Simple Date Input (XP Style) */}
-                                                <div className="w-[130px] shrink-0">
+              {/* BOOK HEADER */}
+              <div className="shrink-0 pt-6 pb-2 px-8 md:px-12 bg-[#fdfbf7] z-20 flex items-end justify-between border-b-2 border-stone-800 relative">
+                    
+                    {/* Title & Tabs Container */}
+                    <div className="flex items-end gap-6">
+                        {/* Tab 1: Journal */}
+                        <button 
+                            onClick={() => setActiveTab('journal')}
+                            className={`group flex items-center gap-2 pb-1 transition-all ${activeTab === 'journal' ? 'text-indigo-950 border-b-4 border-indigo-900' : 'text-stone-400 hover:text-stone-600'}`}
+                        >
+                            <Book size={28} strokeWidth={activeTab === 'journal' ? 2.5 : 2} className="transition-transform group-hover:-translate-y-1" />
+                            <span className={`text-2xl font-black uppercase tracking-[0.1em] font-serif leading-none hidden sm:inline`}>Journal</span>
+                        </button>
+
+                        {/* Tab 2: Party */}
+                        <button 
+                            onClick={() => setActiveTab('party')}
+                            className={`group flex items-center gap-2 pb-1 transition-all ${activeTab === 'party' ? 'text-indigo-950 border-b-4 border-indigo-900' : 'text-stone-400 hover:text-stone-600'}`}
+                        >
+                            <Users size={28} strokeWidth={activeTab === 'party' ? 2.5 : 2} className="transition-transform group-hover:-translate-y-1" />
+                            <span className={`text-2xl font-black uppercase tracking-[0.1em] font-serif leading-none hidden sm:inline`}>Groupe</span>
+                        </button>
+                    </div>
+
+                    {/* Right Actions */}
+                    {activeTab === 'journal' ? (
+                        <button 
+                            onClick={addNote}
+                            className="flex items-center gap-2 bg-indigo-700 text-white pl-3 pr-4 py-2 rounded-sm shadow-md hover:bg-indigo-800 transition-all hover:-translate-y-0.5 font-bold text-sm z-50 ml-auto"
+                            title="Ajouter une nouvelle page à la fin"
+                        >
+                            <Plus size={18} strokeWidth={3} /> <span className="uppercase tracking-wide hidden sm:inline">Nouvelle Page</span>
+                        </button>
+                    ) : (
+                       <div className="ml-auto flex items-center gap-2 text-stone-500 font-serif italic text-sm">
+                           <PenTool size={16} /> Édition libre
+                       </div>
+                    )}
+                    
+                    <div className="absolute top-0 right-8 text-red-700 drop-shadow-md">
+                        <Bookmark size={40} fill="currentColor" />
+                    </div>
+              </div>
+
+              {/* --- CONTENT AREA --- */}
+              <div className="flex-grow flex flex-col overflow-hidden bg-stone-50/20 relative">
+                  
+                  {/* === TAB 1: JOURNAL === */}
+                  {activeTab === 'journal' && (
+                      <>
+                        <div className="flex-grow flex flex-col overflow-hidden p-6 md:p-12">
+                            {!currentNote && (
+                                <div className="flex-grow flex flex-col items-center justify-center text-stone-400 italic gap-6 opacity-60 animate-in fade-in duration-1000">
+                                    <div className="w-24 h-24 border-4 border-stone-300 rounded-full flex items-center justify-center">
+                                        <Book size={48} strokeWidth={1} />
+                                    </div>
+                                    <div className="text-center">
+                                        <p className="text-2xl font-serif text-stone-500">Le journal est vierge.</p>
+                                        <p className="text-sm mt-2 font-handwriting text-xl text-stone-400">Cliquez sur "Nouvelle Page" pour commencer l'histoire.</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {currentNote && (
+                                <div className="w-full h-full flex flex-col animate-in fade-in zoom-in duration-300">
+                                    <div className="bg-white border border-stone-300 shadow-sm relative group w-full h-full flex flex-col rounded-sm overflow-hidden flex-grow min-h-0">
+                                            
+                                            {/* Note Header */}
+                                            <div className="bg-stone-100 border-b border-stone-200 p-3 flex items-center justify-between pl-4 shrink-0 rounded-t-sm z-20">
+                                                <div className="flex items-center gap-3 flex-grow min-w-0">
+                                                    {/* Simple Date Input (XP Style) */}
+                                                    <div className="w-[130px] shrink-0">
+                                                        <input 
+                                                            type="date"
+                                                            className="w-full bg-transparent border-b border-dotted border-stone-400 focus:border-indigo-500 outline-none text-base font-handwriting text-stone-800 font-bold"
+                                                            value={currentNote.date}
+                                                            onChange={(e) => updateNote(currentNote.id, 'date', e.target.value)}
+                                                            style={{ colorScheme: 'light' }}
+                                                        />
+                                                    </div>
+
+                                                    <div className="h-8 w-px bg-stone-300 mx-1"></div>
                                                     <input 
-                                                        type="date"
-                                                        className="w-full bg-transparent border-b border-dotted border-stone-400 focus:border-indigo-500 outline-none text-base font-handwriting text-stone-800 font-bold"
-                                                        value={currentNote.date}
-                                                        onChange={(e) => updateNote(currentNote.id, 'date', e.target.value)}
-                                                        style={{ colorScheme: 'light' }}
+                                                        type="text"
+                                                        value={currentNote.title}
+                                                        onChange={(e) => updateNote(currentNote.id, 'title', e.target.value)}
+                                                        placeholder="Titre de la session..."
+                                                        className="bg-transparent text-lg font-serif font-bold text-indigo-950 focus:outline-none flex-grow placeholder-stone-300"
                                                     />
                                                 </div>
+                                                
+                                                <div className="flex items-center gap-1 no-print shrink-0 ml-2">
+                                                    <button 
+                                                        onClick={() => setNoteIdToDelete(currentNote.id)}
+                                                        className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                                        title="Arracher cette page"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            </div>
 
-                                                <div className="h-8 w-px bg-stone-300 mx-1"></div>
-                                                <input 
-                                                    type="text"
-                                                    value={currentNote.title}
-                                                    onChange={(e) => updateNote(currentNote.id, 'title', e.target.value)}
-                                                    placeholder="Titre de la session..."
-                                                    className="bg-transparent text-lg font-serif font-bold text-indigo-950 focus:outline-none flex-grow placeholder-stone-300"
+                                            {/* Note Body */}
+                                            <div className="flex-grow min-h-0 bg-white relative rounded-b-sm">
+                                                <NotebookTextarea 
+                                                    value={currentNote.content}
+                                                    onChange={(v) => updateNote(currentNote.id, 'content', v)}
+                                                    placeholder="Récit des événements..."
                                                 />
                                             </div>
-                                            
-                                            <div className="flex items-center gap-1 no-print shrink-0 ml-2">
-                                                <button 
-                                                    onClick={() => setNoteIdToDelete(currentNote.id)}
-                                                    className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                                    title="Arracher cette page"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Note Body */}
-                                        <div className="flex-grow min-h-0 bg-white relative rounded-b-sm">
-                                            <NotebookTextarea 
-                                                value={currentNote.content}
-                                                onChange={(v) => updateNote(currentNote.id, 'content', v)}
-                                                placeholder="Récit des événements..."
-                                            />
-                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                    {/* BOOK FOOTER - Page Indicator Only */}
-                    <div className="shrink-0 bg-[#fdfbf7] py-3 border-t border-stone-200 flex justify-center items-center px-8 md:px-12 text-stone-500 font-serif select-none relative z-30">
-                        <div className="font-mono text-xs uppercase tracking-widest text-stone-400 font-bold">
-                            {totalPages > 0 ? (
-                                <span>Page {currentIndex + 1} <span className="mx-1 text-stone-300">/</span> {totalPages}</span>
-                            ) : (
-                                <span>-</span>
                             )}
                         </div>
-                    </div>
-                  </>
-              )}
+                        {/* BOOK FOOTER - Page Indicator Only */}
+                        <div className="shrink-0 bg-[#fdfbf7] py-3 border-t border-stone-200 flex justify-center items-center px-8 md:px-12 text-stone-500 font-serif select-none relative z-30">
+                            <div className="font-mono text-xs uppercase tracking-widest text-stone-400 font-bold">
+                                {totalPages > 0 ? (
+                                    <span>Page {currentIndex + 1} <span className="mx-1 text-stone-300">/</span> {totalPages}</span>
+                                ) : (
+                                    <span>-</span>
+                                )}
+                            </div>
+                        </div>
+                      </>
+                  )}
 
-              {/* === TAB 2: PARTY MEMBERS === */}
-              {activeTab === 'party' && (
-                  <div className="flex-grow flex flex-col overflow-hidden animate-in fade-in slide-in-from-right-8 duration-300">
-                      <PartyTable data={data} onChange={onChange} onAddLog={onAddLog} />
-                  </div>
-              )}
+                  {/* === TAB 2: PARTY MEMBERS === */}
+                  {activeTab === 'party' && (
+                      <div className="flex-grow flex flex-col overflow-hidden animate-in fade-in slide-in-from-right-8 duration-300">
+                          <PartyTable data={data} onChange={onChange} onAddLog={onAddLog} />
+                      </div>
+                  )}
 
+              </div>
+
+          </div>
+
+          {/* NEXT BUTTON AREA */}
+          <div className="w-12 flex justify-start">
+             {activeTab === 'journal' && (
+                <button 
+                    onClick={goToNext}
+                    disabled={currentIndex >= totalPages - 1}
+                    className={`p-3 rounded-full bg-stone-800 text-stone-200 shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-stone-600 hover:bg-stone-700 hover:scale-110 hover:text-white transition-all duration-300 ${currentIndex >= totalPages - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                    title="Page suivante"
+                >
+                    <ChevronRight size={28} strokeWidth={3} />
+                </button>
+             )}
           </div>
 
       </div>

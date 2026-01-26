@@ -3,9 +3,33 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.1";
+export const APP_VERSION = "1.9.4";
 
 export const CHANGELOG: ChangelogEntry[] = [
+    {
+        version: "1.9.4",
+        date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "UI (Notes de Campagne) : Application d'un format fixe en mode Portrait (900x1270px) pour éviter les ascenseurs horizontaux et garantir un ratio cohérent."
+        ]
+    },
+    {
+        version: "1.9.3",
+        date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "UI (Notes de Campagne) : Les boutons de navigation (Précédent/Suivant) sont désormais ancrés visuellement aux bords du livre (flex layout) au lieu d'être fixés à l'écran, améliorant le confort de lecture lors du défilement."
+        ]
+    },
+    {
+        version: "1.9.2",
+        date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "UI (Notes de Campagne) : Adaptation automatique du format au mode Paysage (format A4 paysage 1.414:1) pour une meilleure cohérence visuelle avec les autres onglets."
+        ]
+    },
     {
         version: "1.9.1",
         date: new Date().toLocaleDateString('fr-FR'),
