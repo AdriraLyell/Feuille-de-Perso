@@ -3,12 +3,22 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.10";
+export const APP_VERSION = "1.9.11";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
-        version: "1.9.10",
+        version: "1.9.11",
         date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "UI (Détails - Portrait) : Réorganisation majeure de la mise en page.",
+            "UI (Détails - Portrait) : L'image du personnage est considérablement agrandie en hauteur.",
+            "UI (Détails - Portrait) : Les widgets 'Valeurs Monétaires' et 'Armes' sont maintenant alignés sous les blocs précédents."
+        ]
+    },
+    {
+        version: "1.9.10",
+        date: "24/01/2026",
         type: 'patch',
         changes: [
             "UI (Config Attributs) : Renommage du terme 'Catégorie' en 'Pavé' pour correspondre aux retours utilisateurs."
@@ -16,7 +26,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     },
     {
         version: "1.9.9",
-        date: new Date().toLocaleDateString('fr-FR'),
+        date: "24/01/2026",
         type: 'patch',
         changes: [
             "Système : Changement du stockage des attributs (Texte au lieu de Nombre) pour permettre la distinction entre un champ vide et une valeur '0' explicite.",

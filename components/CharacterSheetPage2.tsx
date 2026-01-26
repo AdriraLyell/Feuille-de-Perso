@@ -631,9 +631,10 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
             // Portrait Mode
             <div className="sheet-container flex flex-col">
             
-            {/* Row 1: Image & Identity (Lieux, Contacts, Conn, Rep) */}
-            <div className="flex border-b border-stone-400 h-[260px] overflow-hidden">
-                {/* Left: Image (Fixed Width) */}
+            {/* LARGE HEADER: Image Left + All Details Right (Merged 2 Rows into 1) */}
+            <div className="flex border-b border-stone-400 h-[420px] overflow-hidden">
+                
+                {/* Left: Image (Full Height) */}
                 <div className="w-[35%] border-r border-stone-400 bg-stone-50 p-0 flex flex-col overflow-hidden">
                     <CharacterImageWidget 
                         imageId={data.page2.characterImageId}
@@ -643,10 +644,11 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                     />
                 </div>
 
-                {/* Right: Text Fields Grid (2x2) */}
+                {/* Right: Text Fields Stack (3 Rows) */}
                 <div className="w-[65%] flex flex-col">
-                    {/* Top Right: Lieux & Contacts */}
-                    <div className="h-1/2 flex border-b border-stone-400">
+                    
+                    {/* Row A: Lieux & Contacts (1/3 Height) */}
+                    <div className="h-1/3 flex border-b border-stone-400">
                         <div className="w-1/2 border-r border-stone-400 p-1 flex flex-col">
                             <SectionHeader title="Lieux Importants" />
                             <div className="flex-grow relative min-h-0 overflow-hidden">
@@ -660,8 +662,9 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                             </div>
                         </div>
                     </div>
-                    {/* Bottom Right: Connaissances & Reputation */}
-                    <div className="h-1/2 flex">
+
+                    {/* Row B: Connaissances & Reputation (1/3 Height) */}
+                    <div className="h-1/3 flex border-b border-stone-400">
                         <div className="w-1/2 border-r border-stone-400 p-1 flex flex-col">
                             <SectionHeader title="Connaissances" />
                             <div className="flex-grow relative min-h-0 overflow-hidden">
@@ -681,25 +684,23 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            {/* Row 2: Valeurs Monetaires & Armes */}
-            <div className="grid grid-cols-4 h-[160px] border-b border-stone-400">
-                {/* Valeurs Monetaires */}
-                <div className="col-span-1 border-r border-stone-400 flex flex-col h-full">
-                    <SectionHeader title="Valeurs Monétaires" />
-                    <div className="p-1 space-y-0.5 flex-grow overflow-hidden">
-                        <NotebookInput value={data.page2.valeurs_monetaires} onChange={(v) => updateStringField('valeurs_monetaires', v)} />
+                    {/* Row C: Valeurs Monétaires & Armes (1/3 Height) */}
+                    <div className="h-1/3 flex">
+                        <div className="w-1/2 border-r border-stone-400 p-1 flex flex-col">
+                            <SectionHeader title="Valeurs Monétaires" />
+                            <div className="flex-grow relative min-h-0 overflow-hidden">
+                                <NotebookInput value={data.page2.valeurs_monetaires} onChange={(v) => updateStringField('valeurs_monetaires', v)} />
+                            </div>
+                        </div>
+                        <div className="w-1/2 p-1 flex flex-col">
+                            <SectionHeader title="Armes" />
+                            <div className="flex-grow relative min-h-0 overflow-hidden">
+                                <NotebookInput value={data.page2.armes_list} onChange={(v) => updateStringField('armes_list', v)} />
+                            </div>
+                        </div>
                     </div>
-                </div>
-                {/* Armes */}
-                <div className="col-span-3 flex flex-col h-full">
-                    <SectionHeader title="Armes" />
-                    {/* MODIFIED: Single Notebook Input spanning full width, replacing the 2-column grid */}
-                    <div className="flex-grow relative min-h-0 overflow-hidden p-1">
-                        <NotebookInput value={data.page2.armes_list} onChange={(v) => updateStringField('armes_list', v)} />
-                    </div>
+
                 </div>
             </div>
 
