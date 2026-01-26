@@ -82,7 +82,8 @@ const CreationHUD: React.FC<CreationHUDProps> = ({ data, onValidate }) => {
 
     attrCats.forEach(cat => {
         data.attributes[cat].forEach(attr => {
-            const val = attr.val1;
+            // Updated: Parse string value
+            const val = parseInt(attr.val1) || 0;
             
             // Validation Logic: Check Min/Max
             if (val < minAttr) {

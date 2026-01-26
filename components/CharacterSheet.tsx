@@ -34,61 +34,6 @@ const HeaderInput: React.FC<{
   </div>
 );
 
-// Custom input to handle negative numbers and '0' display logic
-const NumberInput = React.forwardRef<HTMLInputElement, {
-    value: number;
-    onChange: (val: number) => void;
-    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-    onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
-    className?: string;
-    placeholder?: string;
-}>(({ value, onChange, onKeyDown, onFocus, className, placeholder }, ref) => {
-    const [localValue, setLocalValue] = useState(value === 0 ? '' : value.toString());
-
-    useEffect(() => {
-        const parsed = parseInt(localValue, 10);
-        // Treat empty or minus as 0 for comparison purposes
-        const current = (localValue === '' || localValue === '-') ? 0 : (isNaN(parsed) ? 0 : parsed);
-        
-        if (current !== value) {
-             setLocalValue(value === 0 ? '' : value.toString());
-        } else if (value === 0 && localValue !== '' && localValue !== '-') {
-             // Force clear if value is 0 and user isn't typing a negative number
-             setLocalValue('');
-        }
-    }, [value]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;
-        setLocalValue(val);
-        
-        if (val === '' || val === '-') {
-            onChange(0);
-        } else {
-            const parsed = parseInt(val, 10);
-            if (!isNaN(parsed)) {
-                onChange(parsed);
-            }
-        }
-    };
-
-    return (
-        <input
-            ref={ref}
-            // Added 'no-spinner' class back to hide browser increment arrows
-            className={`${className} no-spinner`} 
-            value={localValue}
-            onChange={handleChange}
-            onKeyDown={onKeyDown}
-            onFocus={onFocus}
-            placeholder={placeholder}
-            type="number" 
-            // We removed min/max here to allow free typing, validation happens in HUD
-        />
-    );
-});
-NumberInput.displayName = 'NumberInput';
-
 interface BonusInfo {
     value: number;
     sources: string[];
@@ -97,7 +42,7 @@ interface BonusInfo {
 const AttributeRow: React.FC<{ 
     entry: AttributeEntry, 
     category: string,
-    onUpdate: (category: string, id: string, field: 'val1' | 'val2' | 'val3', value: number) => void;
+    onUpdate: (category: string, id: string, field: 'val1' | 'val2' | 'val3', value: string) => void;
     bonus?: BonusInfo;
 }> = ({ entry, category, onUpdate, bonus }) => {
     const ref1 = useRef<HTMLInputElement>(null);
@@ -105,7 +50,13 @@ const AttributeRow: React.FC<{
     const ref3 = useRef<HTMLInputElement>(null);
 
     const bonusValue = bonus?.value || 0;
-    const baseTotal = (entry.val1 || 0) + (entry.val2 || 0) + (entry.val3 || 0);
+    
+    // Parse strings safely for total calculation
+    const v1 = parseInt(entry.val1) || 0;
+    const v2 = parseInt(entry.val2) || 0;
+    const v3 = parseInt(entry.val3) || 0;
+    
+    const baseTotal = v1 + v2 + v3;
     const total = baseTotal + bonusValue;
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, nextRef?: React.RefObject<HTMLInputElement>) => {
@@ -129,34 +80,40 @@ const AttributeRow: React.FC<{
       <div className="flex items-center px-2 border-b border-dotted border-stone-300 h-[22px] text-xs hover:bg-stone-50 transition-colors">
           <span className="w-24 truncate font-semibold text-stone-700">{entry.name}</span>
           <div className="flex items-center gap-1 flex-grow justify-end">
-              <NumberInput 
+              <input 
                   ref={ref1}
-                  className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50"
-                  value={entry.val1 || 0}
-                  onChange={(val) => onUpdate(category, entry.id, 'val1', val)}
+                  className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50 no-spinner"
+                  value={entry.val1}
+                  onChange={(e) => onUpdate(category, entry.id, 'val1', e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e, ref2)}
                   onFocus={(e) => e.target.select()}
                   placeholder=""
+                  type="text"
+                  inputMode="numeric"
               />
               <span className="text-stone-400 font-handwriting">+</span>
-              <NumberInput 
+              <input 
                   ref={ref2}
-                  className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50"
-                  value={entry.val2 || 0}
-                  onChange={(val) => onUpdate(category, entry.id, 'val2', val)}
+                  className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50 no-spinner"
+                  value={entry.val2}
+                  onChange={(e) => onUpdate(category, entry.id, 'val2', e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e, ref3)}
                   onFocus={(e) => e.target.select()}
                   placeholder=""
+                  type="text"
+                  inputMode="numeric"
               />
               <span className="text-stone-400 font-handwriting">+</span>
-              <NumberInput 
+              <input 
                   ref={ref3}
-                  className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50"
-                  value={entry.val3 || 0}
-                  onChange={(val) => onUpdate(category, entry.id, 'val3', val)}
+                  className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50 no-spinner"
+                  value={entry.val3}
+                  onChange={(e) => onUpdate(category, entry.id, 'val3', e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e)}
                   onFocus={(e) => e.target.select()}
                   placeholder=""
+                  type="text"
+                  inputMode="numeric"
               />
               
               <span className="text-stone-400 font-handwriting">=</span>
@@ -179,7 +136,7 @@ const AttributeBlock: React.FC<{
   title: string; 
   items: AttributeEntry[]; 
   cat: string; 
-  onUpdate: (category: string, id: string, field: 'val1' | 'val2' | 'val3', value: number) => void;
+  onUpdate: (category: string, id: string, field: 'val1' | 'val2' | 'val3', value: string) => void;
   bonuses: Record<string, BonusInfo>;
   secondaryItems?: AttributeEntry[];
 }> = ({ title, items, cat, onUpdate, bonuses, secondaryItems }) => {
@@ -373,10 +330,13 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
     onAddLog(`Modification ${String(itemName)} : ${value}`, 'info', 'sheet', `dot_${String(id)}`);
   };
 
-  const updateAttribute = (category: string, id: string, field: 'val1' | 'val2' | 'val3', value: number) => {
+  const updateAttribute = (category: string, id: string, field: 'val1' | 'val2' | 'val3', value: string) => {
       // Check if it's a main attribute
       const mainList = data.attributes?.[String(category)];
       const mainIndex = mainList ? mainList.findIndex(item => item.id === id) : -1;
+
+      // Determine numeric value for creation logic (safely)
+      const numValue = parseInt(value) || 0;
 
       if (mainIndex !== -1 && mainList) {
           const isCreationMode = data.creationConfig && data.creationConfig.active;
@@ -385,7 +345,8 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
 
           if (isCreationMode) {
               const creationKey = `creation${field.charAt(0).toUpperCase() + field.slice(1)}` as keyof AttributeEntry;
-              newList[mainIndex] = { ...item, [field]: value, [creationKey]: value };
+              // Update string value AND creation number value
+              newList[mainIndex] = { ...item, [field]: value, [creationKey]: numValue };
           } else {
               newList[mainIndex] = { ...item, [field]: value };
           }
@@ -413,7 +374,7 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
 
               if (isCreationMode) {
                   const creationKey = `creation${field.charAt(0).toUpperCase() + field.slice(1)}` as keyof AttributeEntry;
-                  newList[secIndex] = { ...item, [field]: value, [creationKey]: value };
+                  newList[secIndex] = { ...item, [field]: value, [creationKey]: numValue };
               } else {
                   newList[secIndex] = { ...item, [field]: value };
               }

@@ -99,7 +99,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
           Object.keys(clean.attributes).forEach(cat => {
               if (Array.isArray(clean.attributes[cat])) {
                   clean.attributes[cat].forEach((attr: AttributeEntry) => {
-                      attr.val1 = 0; attr.val2 = 0; attr.val3 = 0;
+                      attr.val1 = ""; attr.val2 = ""; attr.val3 = ""; // Changed to string
                       attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
                   });
               }
@@ -111,7 +111,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
           Object.keys(clean.secondaryAttributes).forEach(cat => {
               if (Array.isArray(clean.secondaryAttributes[cat])) {
                   clean.secondaryAttributes[cat].forEach((attr: AttributeEntry) => {
-                      attr.val1 = 0; attr.val2 = 0; attr.val3 = 0;
+                      attr.val1 = ""; attr.val2 = ""; attr.val3 = ""; // Changed to string
                       attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
                   });
               }
@@ -138,9 +138,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
       clean.page2.reputation.forEach((r: ReputationEntry) => { r.reputation = ''; r.lieu = ''; r.valeur = ''; });
       clean.page2.connaissances = "";
       clean.page2.valeurs_monetaires = "";
-      clean.page2.armes_list = Array(10).fill("");
-      clean.page2.vertus = Array(28).fill(null).map(() => ({ name: '', value: '' }));
-      clean.page2.defauts = Array(28).fill(null).map(() => ({ name: '', value: '' }));
+      clean.page2.armes_list = "";
+      clean.page2.avantages = Array(28).fill(null).map(() => ({ name: '', value: '' }));
+      clean.page2.desavantages = Array(28).fill(null).map(() => ({ name: '', value: '' }));
       clean.page2.equipement = "";
       clean.page2.notes = "";
 
@@ -182,7 +182,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
   const ATTRIBUTE_PRESETS = [
       {
           name: "Standard (Classique)",
-          desc: "3 Catégories de 4 Attributs",
+          desc: "3 Pavés de 4 Attributs",
           structure: [
               { id: 'physique', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'] },
               { id: 'mental', label: 'Mental', attrs: ['Intellect', 'Volonté', 'Intuition', 'Perception'] },
@@ -191,7 +191,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
       },
       {
           name: "Complet (Mystique)",
-          desc: "4 Catégories de 5 Attributs",
+          desc: "4 Pavés de 5 Attributs",
           structure: [
               { id: 'physique', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'] },
               { id: 'mental', label: 'Mental', attrs: ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'] },
@@ -217,7 +217,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
           newAttributes[cat.id] = cat.attrs.map((name: string) => ({
               id: Math.random().toString(36).substr(2, 9),
               name: name,
-              val1: 0, val2: 0, val3: 0,
+              val1: "", val2: "", val3: "", // Changed to string
               creationVal1: 0, creationVal2: 0, creationVal3: 0
           }));
       });
@@ -255,7 +255,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
               let defToAdd = defaultDefs[i];
               // If we exceed predefined categories, create generic one
               if (!defToAdd) {
-                  defToAdd = { id: `cat_${i+1}`, label: `Catégorie ${i+1}` };
+                  defToAdd = { id: `cat_${i+1}`, label: `Pavé ${i+1}` };
               }
               
               // Ensure ID uniqueness if modifying beyond defaults
@@ -278,7 +278,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                   return {
                     id: Math.random().toString(36).substr(2, 9),
                     name: attrName,
-                    val1: 0, val2: 0, val3: 0
+                    val1: "", val2: "", val3: "" // Changed to string
                   };
               });
           }
@@ -318,7 +318,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                   attrs.push({
                       id: Math.random().toString(36).substr(2, 9),
                       name: attrName,
-                      val1: 0, val2: 0, val3: 0
+                      val1: "", val2: "", val3: "" // Changed to string
                   });
               }
           } else if (count < attrs.length) {
@@ -367,8 +367,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
           localData.attributeSettings.forEach(cat => {
               if (!newSecondary[cat.id]) {
                   newSecondary[cat.id] = [
-                      { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 1', val1: 0, val2: 0, val3: 0 },
-                      { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 2', val1: 0, val2: 0, val3: 0 }
+                      { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 1', val1: "", val2: "", val3: "" },
+                      { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 2', val1: "", val2: "", val3: "" }
                   ];
               }
           });
@@ -724,7 +724,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                         <CheckSquare size={16} /> Attributs Secondaires Optionnels
                     </h4>
                     <p className="text-xs text-purple-600 mt-1">
-                        Active 2 attributs supplémentaires par catégorie, séparés par une ligne de démarcation.
+                        Active 2 attributs supplémentaires par pavé, séparés par une ligne de démarcation.
                     </p>
                 </div>
                 <button
@@ -740,7 +740,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                 
                 {/* Category Count */}
                 <div className="flex flex-col gap-2">
-                    <span className="font-bold text-gray-700 text-sm">Nombre de catégories :</span>
+                    <span className="font-bold text-gray-700 text-sm">Nombre de pavés :</span>
                     <div className="flex gap-2">
                         {[1, 2, 3, 4].map(n => (
                             <button
@@ -760,7 +760,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
 
                 {/* Attributes Count (Global) */}
                 <div className="flex flex-col gap-2">
-                    <span className="font-bold text-gray-700 text-sm">Nombre d'attributs (par cat.) :</span>
+                    <span className="font-bold text-gray-700 text-sm">Nombre d'attributs (par pavé) :</span>
                     <div className="flex gap-2">
                         {[1, 2, 3, 4, 5].map(n => (
                             <button
@@ -807,7 +807,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                              {/* Header / Name */}
                              <div className="bg-slate-100 p-3 border-b border-gray-200">
                                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1">
-                                     Catégorie {idx + 1}
+                                     Pavé {idx + 1}
                                  </label>
                                  <input 
                                     id={`cat-label-${idx}`}
@@ -815,7 +815,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                                     onChange={(e) => updateCategoryLabel(cat.id, e.target.value)}
                                     onFocus={(e) => e.target.select()}
                                     className="w-full font-bold text-lg bg-white border border-gray-300 rounded px-2 py-1 shadow-inner focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-gray-900 transition-all"
-                                    placeholder="Nom de la catégorie"
+                                    placeholder="Nom du pavé"
                                  />
                              </div>
 

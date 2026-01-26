@@ -39,10 +39,10 @@ export interface DotEntry {
 export interface AttributeEntry {
   id: string;
   name: string;
-  val1: number;
-  val2: number;
-  val3: number;
-  // Valeurs à la création pour calcul XP
+  val1: string; // Changed to string to support "" vs "0"
+  val2: string; // Changed to string
+  val3: string; // Changed to string
+  // Valeurs à la création pour calcul XP (Restent en number pour la logique)
   creationVal1?: number;
   creationVal2?: number;
   creationVal3?: number;

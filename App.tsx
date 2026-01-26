@@ -91,9 +91,17 @@ const migrateData = (parsed: any): CharacterSheetData => {
         const categories = ['physique', 'mental', 'social'];
         let needsConversion = false;
         
+        // Also check if type conversion (number -> string) is needed (Migration 1.9.9)
+        let needsTypeConversion = false;
+
         categories.forEach(cat => {
-            if (parsed.attributes[cat] && parsed.attributes[cat].length > 0 && typeof parsed.attributes[cat][0].val1 === 'undefined') {
-                needsConversion = true;
+            if (parsed.attributes[cat] && parsed.attributes[cat].length > 0) {
+                if (typeof parsed.attributes[cat][0].val1 === 'undefined') {
+                    needsConversion = true;
+                }
+                if (typeof parsed.attributes[cat][0].val1 === 'number') {
+                    needsTypeConversion = true;
+                }
             }
         });
 
@@ -102,9 +110,9 @@ const migrateData = (parsed: any): CharacterSheetData => {
                 return list.map(item => ({
                     id: item.id || Math.random().toString(36).substr(2, 9),
                     name: item.name,
-                    val1: item.value || 0,
-                    val2: 0,
-                    val3: 0,
+                    val1: "", // Convert to string (default empty)
+                    val2: "",
+                    val3: "",
                     creationVal1: 0,
                     creationVal2: 0,
                     creationVal3: 0,
@@ -115,6 +123,26 @@ const migrateData = (parsed: any): CharacterSheetData => {
                 mental: convertAttributes(parsed.attributes.mental),
                 social: convertAttributes(parsed.attributes.social),
             };
+        } else if (needsTypeConversion) {
+            // Convert numbers to strings for visual fidelity (0 -> "0", but we default old 0s to "" to clean up unless specified)
+            const convertType = (list: any[]) => {
+                return list.map(item => ({
+                    ...item,
+                    val1: item.val1 === 0 ? "" : item.val1.toString(),
+                    val2: item.val2 === 0 ? "" : item.val2.toString(),
+                    val3: item.val3 === 0 ? "" : item.val3.toString(),
+                }));
+            };
+            // Apply to main attributes
+            Object.keys(parsed.attributes).forEach(key => {
+                parsed.attributes[key] = convertType(parsed.attributes[key]);
+            });
+            // Apply to secondary attributes
+            if (parsed.secondaryAttributes) {
+                Object.keys(parsed.secondaryAttributes).forEach(key => {
+                    parsed.secondaryAttributes[key] = convertType(parsed.secondaryAttributes[key]);
+                });
+            }
         }
     }
     
@@ -144,8 +172,8 @@ const migrateData = (parsed: any): CharacterSheetData => {
         parsed.attributeSettings.forEach((cat: any) => {
             if (!parsed.secondaryAttributes[cat.id]) {
                 parsed.secondaryAttributes[cat.id] = [
-                    { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 1', val1: 0, val2: 0, val3: 0 },
-                    { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 2', val1: 0, val2: 0, val3: 0 }
+                    { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 1', val1: "", val2: "", val3: "" },
+                    { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 2', val1: "", val2: "", val3: "" }
                 ];
             }
         });
@@ -543,7 +571,8 @@ function App() {
 
                 if (allAttrs) {
                     allAttrs.forEach(attr => {
-                        const val = attr.val1 || 0;
+                        // Change: val1 is now string, parse it
+                        const val = parseInt(attr.val1) || 0;
                         if (val === 0) return;
                         
                         // Check for attribute bonus logic

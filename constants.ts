@@ -3,12 +3,29 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.8";
+export const APP_VERSION = "1.9.10";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
-        version: "1.9.8",
+        version: "1.9.10",
         date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "UI (Config Attributs) : Renommage du terme 'Catégorie' en 'Pavé' pour correspondre aux retours utilisateurs."
+        ]
+    },
+    {
+        version: "1.9.9",
+        date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "Système : Changement du stockage des attributs (Texte au lieu de Nombre) pour permettre la distinction entre un champ vide et une valeur '0' explicite.",
+            "UI : Le chiffre '0' saisi dans un attribut reste désormais visible après la sauvegarde."
+        ]
+    },
+    {
+        version: "1.9.8",
+        date: "24/01/2026",
         type: 'minor',
         changes: [
             "Terminologie : Renommage global de 'Vertus' en 'Avantages' et 'Défauts' en 'Désavantages' pour mieux coller à la sémantique du jeu."
@@ -195,9 +212,9 @@ const createDotEntry = (name: string, value = 0): any => ({
 const createAttributeEntry = (name: string): any => ({
   id: generateId(),
   name,
-  val1: 0,
-  val2: 0,
-  val3: 0,
+  val1: "", // Init as string
+  val2: "", 
+  val3: "",
   creationVal1: 0,
   creationVal2: 0,
   creationVal3: 0,

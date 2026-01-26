@@ -56,7 +56,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
               if (Array.isArray(clean.attributes[cat])) {
                   // @ts-ignore
                   clean.attributes[cat].forEach((attr: any) => {
-                      attr.val1 = 0; attr.val2 = 0; attr.val3 = 0;
+                      attr.val1 = ""; attr.val2 = ""; attr.val3 = ""; // Changed to string
                       attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
                   });
               }
