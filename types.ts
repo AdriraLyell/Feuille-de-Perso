@@ -131,6 +131,8 @@ export interface Page2Data {
   defauts: TraitEntry[];
   equipement: string; 
   notes: string;
+  characterImage?: string; // Base64 string (Legacy / Export carrier)
+  characterImageId?: string; // IndexedDB Key (New persistent storage)
 }
 
 export interface XPEntry {

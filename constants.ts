@@ -3,9 +3,29 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.4";
+export const APP_VERSION = "1.9.6";
 
 export const CHANGELOG: ChangelogEntry[] = [
+    {
+        version: "1.9.6",
+        date: new Date().toLocaleDateString('fr-FR'),
+        type: 'minor',
+        changes: [
+            "UI (Détails) : Ajout d'un widget d'image de personnage en haut à gauche.",
+            "UI (Détails) : Réorganisation de la mise en page pour intégrer l'image de manière harmonieuse (Portrait & Paysage).",
+            "Fonctionnalité : Import/Export de l'image du personnage inclus dans le fichier de sauvegarde."
+        ]
+    },
+    {
+        version: "1.9.5",
+        date: "23/01/2026",
+        type: 'minor',
+        changes: [
+            "Fonctionnalité (Détails) : Ajout d'un cadre pour importer une image du personnage (Portrait ou Illustration).",
+            "UI (Détails) : Réorganisation de la mise en page pour intégrer l'image tout en conservant les widgets existants.",
+            "UI (Détails) : Réduction de la taille de la zone Équipement pour libérer de l'espace."
+        ]
+    },
     {
         version: "1.9.4",
         date: new Date().toLocaleDateString('fr-FR'),
@@ -349,6 +369,7 @@ export const INITIAL_DATA: CharacterSheetData = {
     defauts: Array(28).fill(null).map(() => ({ name: '', value: '' })),
     equipement: '', // Changed to empty string for notebook style
     notes: '',
+    characterImage: '', // Initialized empty
   },
   specializations: {},
   imposedSpecializations: {},

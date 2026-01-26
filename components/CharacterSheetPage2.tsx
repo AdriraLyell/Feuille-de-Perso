@@ -1,8 +1,9 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { CharacterSheetData, ReputationEntry, TraitEntry, LibraryEntry } from '../types';
-import { BookOpen, X, Edit, Trash2, Check, ArrowRight, CheckSquare, Square } from 'lucide-react';
+import { BookOpen, X, Edit, Trash2, Check, ArrowRight, CheckSquare, Square, Image as ImageIcon, Upload, AlertTriangle } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
+import { saveImage, getImage, deleteImage, base64ToBlob } from '../imageDB';
 
 // Moved outside to prevent re-creation on every render which causes input focus loss
 const SectionHeader: React.FC<{ title: string, total?: number, totalColor?: string, onOpenLibrary?: () => void }> = ({ title, total, totalColor, onOpenLibrary }) => (
@@ -149,6 +150,187 @@ const NotebookInput: React.FC<{ value: string, onChange: (v: string) => void, pl
     );
 };
 
+// --- NEW CHARACTER IMAGE WIDGET (IndexedDB Compatible) ---
+const CharacterImageWidget: React.FC<{ 
+    imageId: string | undefined,
+    legacyImage: string | undefined, // Backwards compatibility
+    onImageUpdate: (id: string) => void,
+    onAddLog: (msg: string, type: 'success' | 'danger') => void
+}> = ({ imageId, legacyImage, onImageUpdate, onAddLog }) => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    // Effect to load image from IndexedDB
+    useEffect(() => {
+        let active = true;
+        
+        const load = async () => {
+            if (imageId) {
+                try {
+                    const blob = await getImage(imageId);
+                    if (blob && active) {
+                        const url = URL.createObjectURL(blob);
+                        setImageUrl(url);
+                        return () => URL.revokeObjectURL(url); // Cleanup previous
+                    }
+                } catch (e) {
+                    console.error("Failed to load image from DB", e);
+                }
+            } else if (legacyImage && legacyImage.length > 100) {
+                // MIGRATION DETECTED: We have legacy base64 but no ID.
+                // Convert to Blob and save to DB immediately.
+                if (active) setLoading(true);
+                try {
+                    const blob = await base64ToBlob(legacyImage);
+                    const newId = await saveImage(blob);
+                    if (active) {
+                        onImageUpdate(newId); // This will clear legacyImage in parent
+                        onAddLog("Migration automatique de l'image vers la base de données locale (Optimisation).", 'success');
+                    }
+                } catch (e) {
+                    console.error("Migration failed", e);
+                    // Fallback to displaying legacy image directly if migration fails
+                    if (active) setImageUrl(legacyImage);
+                } finally {
+                    if (active) setLoading(false);
+                }
+            } else {
+                setImageUrl(null);
+            }
+        };
+
+        load();
+
+        return () => {
+            active = false;
+            // Note: We can't revoke ObjectURL easily in cleanup because it's async based, 
+            // but browsers handle this relatively well on navigation/refresh. 
+            // Ideally we'd store the current objectURL in a ref to revoke it.
+        };
+    }, [imageId, legacyImage, onImageUpdate]);
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setLoading(true);
+        try {
+            // Save to IndexedDB
+            const newId = await saveImage(file);
+            onImageUpdate(newId);
+            onAddLog("Image enregistrée dans la base de données locale.", 'success');
+        } catch (error) {
+            console.error(error);
+            onAddLog("Erreur lors de la sauvegarde de l'image.", 'danger');
+        } finally {
+            setLoading(false);
+            e.target.value = ''; // Reset input
+        }
+    };
+
+    const handleRemoveRequest = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setShowDeleteConfirm(true);
+    };
+
+    const confirmRemove = async () => {
+        if (imageId) {
+            await deleteImage(imageId);
+        }
+        onImageUpdate(''); // Empty ID
+        onAddLog("Image supprimée.", 'danger');
+        setShowDeleteConfirm(false);
+    };
+
+    return (
+        <>
+            <div 
+                className="w-full h-full flex flex-col relative group cursor-pointer bg-white"
+                onClick={() => !imageUrl && !loading && fileInputRef.current?.click()}
+            >
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    accept="image/*" 
+                    onChange={handleFileChange} 
+                />
+                
+                {imageUrl ? (
+                    <div className="relative w-full h-full p-2">
+                        {/* Frame Effect */}
+                        <div className="w-full h-full border-2 border-stone-200 shadow-inner bg-stone-100 flex items-center justify-center overflow-hidden relative">
+                            <img src={imageUrl} alt="Character" className="w-full h-full object-contain" />
+                            
+                            {/* Overlay Actions */}
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                                    className="bg-white/90 p-2 rounded-full hover:bg-blue-50 text-blue-600 transition-colors shadow-lg"
+                                    title="Changer l'image"
+                                >
+                                    <Upload size={20} />
+                                </button>
+                                <button 
+                                    onClick={handleRemoveRequest}
+                                    className="bg-white/90 p-2 rounded-full hover:bg-red-50 text-red-600 transition-colors shadow-lg"
+                                    title="Supprimer l'image"
+                                >
+                                    <Trash2 size={20} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className={`w-full h-full border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-400 bg-stone-50 hover:bg-stone-100 hover:border-stone-400 transition-colors m-2 w-[calc(100%-1rem)] h-[calc(100%-1rem)] rounded-lg ${loading ? 'opacity-50 cursor-wait' : ''}`}>
+                        {loading ? (
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-stone-500 mb-2"></div>
+                        ) : (
+                            <ImageIcon size={48} className="mb-2 opacity-50" />
+                        )}
+                        <span className="text-xs font-bold uppercase tracking-wider text-center px-4">
+                            {loading ? "Traitement..." : "Cliquez pour ajouter une image"}
+                        </span>
+                    </div>
+                )}
+            </div>
+
+            {/* DELETE CONFIRM MODAL */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 z-[200] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 animate-in zoom-in duration-200">
+                        <div className="flex flex-col items-center text-center gap-4">
+                            <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
+                                <Trash2 size={24} />
+                            </div>
+                            <h3 className="font-bold text-lg text-stone-800">Supprimer l'image ?</h3>
+                            <p className="text-stone-500 text-sm">
+                                Cette action retirera l'image de la fiche de personnage.
+                            </p>
+                            <div className="flex gap-3 w-full mt-2">
+                                <button 
+                                    onClick={() => setShowDeleteConfirm(false)}
+                                    className="flex-1 py-2 border border-stone-300 rounded-lg font-bold text-stone-600 hover:bg-stone-50 transition-colors"
+                                >
+                                    Annuler
+                                </button>
+                                <button 
+                                    onClick={confirmRemove}
+                                    className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold shadow-md transition-colors"
+                                >
+                                    Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+};
+
 interface Props {
   data: CharacterSheetData;
   onChange: (newData: CharacterSheetData) => void;
@@ -198,6 +380,17 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
           }
       });
       onAddLog(`Modification ${field}`, 'info', 'sheet', `${field}`);
+  };
+
+  const updateCharacterImageId = (id: string) => {
+      onChange({
+          ...data,
+          page2: {
+              ...data.page2,
+              characterImageId: id,
+              characterImage: '' // Clear legacy base64 if ID is set
+          }
+      });
   };
 
   const saveTraitFromEditor = () => {
@@ -289,7 +482,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
 
   // Helper to render layout content to avoid duplication (keeping logic separate)
   const VertusColumn = (
-     <div className="col-span-2 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
+     <div className="col-span-1 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
          <SectionHeader 
             title="Vertus" 
             total={calculateTotal(data.page2.vertus)}
@@ -305,7 +498,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
   );
 
   const DefautsColumn = (
-     <div className="col-span-2 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
+     <div className="col-span-1 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
          <SectionHeader 
             title="Défauts" 
             total={calculateTotal(data.page2.defauts)}
@@ -324,9 +517,20 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
     <>
         {isLandscape ? (
             <div className="sheet-container landscape flex flex-col overflow-hidden">
-                {/* Top Section: Small Lists (3 Columns Grid) - Fixed 35% Height to maximize bottom section */}
-                <div className="grid grid-cols-3 border-b-2 border-stone-800 h-[35%] overflow-hidden">
-                    {/* Top-Col 1: Lieux & Contacts */}
+                {/* Top Section: Small Lists (4 Columns Grid) - Fixed 35% Height to maximize bottom section */}
+                <div className="grid grid-cols-4 border-b-2 border-stone-800 h-[35%] overflow-hidden">
+                    
+                    {/* Top-Col 1: Image Widget (NEW Position - Top Left) */}
+                    <div className="border-r border-stone-400 p-0 flex flex-col h-full overflow-hidden bg-stone-50">
+                        <CharacterImageWidget 
+                            imageId={data.page2.characterImageId}
+                            legacyImage={data.page2.characterImage}
+                            onImageUpdate={updateCharacterImageId} 
+                            onAddLog={(msg, type) => onAddLog(msg, type, 'sheet')}
+                        />
+                    </div>
+
+                    {/* Top-Col 2: Lieux & Contacts */}
                     <div className="border-r border-stone-400 p-1.5 flex flex-col gap-2 h-full overflow-hidden">
                         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                             <SectionHeader title="Lieux Importants" />
@@ -342,7 +546,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                         </div>
                     </div>
 
-                    {/* Top-Col 2: Connaissances & Réputation */}
+                    {/* Top-Col 3: Connaissances & Réputation */}
                     <div className="border-r border-stone-400 p-1.5 flex flex-col gap-2 h-full overflow-hidden">
                         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                             <SectionHeader title="Connaissances" />
@@ -370,7 +574,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                         </div>
                     </div>
 
-                    {/* Top-Col 3: Valeurs & Armes */}
+                    {/* Top-Col 4: Valeurs & Armes */}
                     <div className="p-1.5 flex flex-col gap-2 h-full overflow-hidden">
                         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                             <SectionHeader title="Valeurs Monétaires" />
@@ -390,8 +594,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                     </div>
                 </div>
 
-                {/* Bottom Section: Long Lists (12 Columns Grid) - Fixed 65% Height */}
-                <div className="grid grid-cols-12 h-[65%] overflow-hidden">
+                {/* Bottom Section: Long Lists (4 Equal Columns) - Fixed 65% Height */}
+                <div className="grid grid-cols-4 h-[65%] overflow-hidden">
                     {/* Bot-Col 1: Vertus */}
                     {VertusColumn}
 
@@ -399,7 +603,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                     {DefautsColumn}
 
                     {/* Bot-Col 3: Equipement */}
-                    <div className="col-span-4 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
+                    <div className="col-span-1 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
                         <SectionHeader title="Equipement" />
                         <div className="flex-grow min-h-0">
                             <NotebookInput 
@@ -410,7 +614,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                     </div>
 
                     {/* Bot-Col 4: Notes */}
-                    <div className="col-span-4 p-1.5 flex flex-col h-full overflow-hidden">
+                    <div className="col-span-1 p-1.5 flex flex-col h-full overflow-hidden">
                         <SectionHeader title="Notes" />
                         <div className="flex-grow min-h-0">
                             <NotebookInput 
@@ -424,57 +628,53 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
             </div>
         ) : (
             // Portrait Mode
-            <div className="sheet-container">
-            {/* Top Row: Lieux & Contacts | Connaissances & Réputation */}
-            <div className="grid grid-cols-2 h-[220px]">
-                {/* Lieux Importants & Contacts */}
-                <div className="border-r border-stone-400 flex flex-col h-full">
-                    <div className="grid grid-cols-2 shrink-0">
-                        <div className="border-r border-stone-400"><SectionHeader title="Lieux Importants" /></div>
-                        <div><SectionHeader title="Contacts" /></div>
-                    </div>
-                    
-                    <div className="flex-grow grid grid-cols-2 h-full overflow-hidden">
-                        <div className="border-r border-stone-400 p-1 flex flex-col h-full overflow-hidden">
-                            <div className="flex-grow overflow-hidden">
-                            <NotebookInput value={data.page2.lieux_importants} onChange={(v) => updateStringField('lieux_importants', v)} />
+            <div className="sheet-container flex flex-col">
+            
+            {/* Row 1: Image & Identity (Lieux, Contacts, Conn, Rep) */}
+            <div className="flex border-b border-stone-400 h-[260px] overflow-hidden">
+                {/* Left: Image (Fixed Width) */}
+                <div className="w-[35%] border-r border-stone-400 bg-stone-50 p-0 flex flex-col">
+                    <CharacterImageWidget 
+                        imageId={data.page2.characterImageId}
+                        legacyImage={data.page2.characterImage}
+                        onImageUpdate={updateCharacterImageId} 
+                        onAddLog={(msg, type) => onAddLog(msg, type, 'sheet')}
+                    />
+                </div>
+
+                {/* Right: Text Fields Grid (2x2) */}
+                <div className="w-[65%] flex flex-col">
+                    {/* Top Right: Lieux & Contacts */}
+                    <div className="h-1/2 flex border-b border-stone-400">
+                        <div className="w-1/2 border-r border-stone-400 p-1 flex flex-col">
+                            <SectionHeader title="Lieux Importants" />
+                            <div className="flex-grow relative min-h-0 overflow-hidden">
+                                <NotebookInput value={data.page2.lieux_importants} onChange={(v) => updateStringField('lieux_importants', v)} />
                             </div>
                         </div>
-                        <div className="p-1 flex flex-col h-full overflow-hidden">
-                            <div className="flex-grow overflow-hidden">
+                        <div className="w-1/2 p-1 flex flex-col">
+                            <SectionHeader title="Contacts" />
+                            <div className="flex-grow relative min-h-0 overflow-hidden">
                                 <NotebookInput value={data.page2.contacts} onChange={(v) => updateStringField('contacts', v)} />
                             </div>
                         </div>
                     </div>
-                </div>
-
-                {/* Connaissances & Reputation */}
-                <div className="flex flex-col h-full">
-                    <div className="grid grid-cols-2 shrink-0">
-                        <div className="border-r border-stone-400"><SectionHeader title="Connaissances" /></div>
-                        <div><SectionHeader title="Réputation" /></div>
-                    </div>
-                    <div className="flex-grow grid grid-cols-2 h-full overflow-hidden">
-                        {/* Connaissances Column */}
-                        <div className="border-r border-stone-400 p-1 flex flex-col h-full overflow-hidden">
-                            <div className="flex-grow overflow-hidden">
+                    {/* Bottom Right: Connaissances & Reputation */}
+                    <div className="h-1/2 flex">
+                        <div className="w-1/2 border-r border-stone-400 p-1 flex flex-col">
+                            <SectionHeader title="Connaissances" />
+                            <div className="flex-grow relative min-h-0 overflow-hidden">
                                 <NotebookInput value={data.page2.connaissances} onChange={(v) => updateStringField('connaissances', v)} />
                             </div>
                         </div>
-
-                        {/* Réputation Column */}
-                        <div className="p-1 flex flex-col h-full overflow-hidden">
-                            <div className="flex text-[10px] font-bold mb-1 shrink-0 text-stone-600 uppercase tracking-wide">
-                                <span className="w-1/2">Réputation</span>
-                                <span className="w-1/4 text-center">Lieu</span>
-                                <span className="w-1/4 text-center">Valeur</span>
-                            </div>
-                            <div className="space-y-0.5 overflow-auto">
-                                {data.page2.reputation.map((rep, i) => (
+                        <div className="w-1/2 p-1 flex flex-col overflow-hidden">
+                            <SectionHeader title="Réputation" />
+                            <div className="space-y-0.5 flex-grow overflow-auto mt-1">
+                                {data.page2.reputation.slice(0, 5).map((rep, i) => (
                                     <div key={i} className="flex gap-1 h-[22px] items-end">
-                                        <input className="border-b border-stone-300 w-1/2 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.reputation} onChange={(e) => updateReputationEntry('reputation', i, 'reputation', e.target.value)} />
-                                        <input className="border-b border-stone-300 w-1/4 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.lieu} onChange={(e) => updateReputationEntry('reputation', i, 'lieu', e.target.value)} />
-                                        <input className="border-b border-stone-300 w-1/4 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.valeur} onChange={(e) => updateReputationEntry('reputation', i, 'valeur', e.target.value)} />
+                                        <input className="border-b border-stone-300 w-1/2 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.reputation} onChange={(e) => updateReputationEntry('reputation', i, 'reputation', e.target.value)} placeholder="Rep..." />
+                                        <input className="border-b border-stone-300 w-1/4 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.lieu} onChange={(e) => updateReputationEntry('reputation', i, 'lieu', e.target.value)} placeholder="Lieu" />
+                                        <input className="border-b border-stone-300 w-1/4 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.valeur} onChange={(e) => updateReputationEntry('reputation', i, 'valeur', e.target.value)} placeholder="Val" />
                                     </div>
                                 ))}
                             </div>
@@ -483,8 +683,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                 </div>
             </div>
 
-            {/* Second Row: Valeurs Monetaires & Armes */}
-            <div className="grid grid-cols-4 h-[160px] border-t-2 border-stone-800">
+            {/* Row 2: Valeurs Monetaires & Armes */}
+            <div className="grid grid-cols-4 h-[160px] border-b border-stone-400">
                 {/* Valeurs Monetaires */}
                 <div className="col-span-1 border-r border-stone-400 flex flex-col h-full">
                     <SectionHeader title="Valeurs Monétaires" />
@@ -510,63 +710,59 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                 </div>
             </div>
 
-            {/* Third Row: Traits & Equipement */}
-            <div className="grid grid-cols-2 border-t-2 border-stone-800">
-                {/* Traits */}
-                <div className="border-r-2 border-stone-800 flex flex-col overflow-hidden">
-                    <SectionHeader title="Traits - Signes Particuliers" />
-                    <div className="grid grid-cols-2 flex-grow overflow-hidden">
-                        {/* Vertus Column */}
-                        <div className="border-r border-stone-400 flex flex-col overflow-hidden">
-                             <div className="relative text-center text-[10px] font-bold italic py-1 bg-green-50/50 border-b border-stone-300 flex items-center justify-center min-h-[1.75rem] shrink-0 group">
-                                <div className="absolute left-2 top-0 bottom-0 flex items-center">
-                                    <span className="w-10 flex justify-center items-center bg-white border border-stone-300 rounded-sm text-xs h-5 font-bold shadow-sm text-green-700">
-                                        {calculateTotal(data.page2.vertus)}
-                                    </span>
-                                </div>
-                                <span className="text-stone-600">Vertus</span>
-                                <button 
-                                    onClick={() => setMultiSelectTarget('vertus')}
-                                    className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-white text-stone-500 hover:text-green-600 transition-colors"
-                                    title="Ouvrir la bibliothèque"
-                                >
-                                    <BookOpen size={14} />
-                                </button>
-                            </div>
-                            <div className="p-1 space-y-0.5 overflow-auto flex-grow">
-                                {data.page2.vertus.map((item, i) => (
-                                    <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'vertus', index: i })} />
-                                ))}
-                            </div>
+            {/* Row 3: Traits (Full Height Priority) */}
+            <div className="grid grid-cols-2 border-b border-stone-400 flex-grow min-h-[500px]">
+                {/* Vertus Column */}
+                <div className="border-r border-stone-400 flex flex-col overflow-hidden">
+                        <div className="relative text-center text-[10px] font-bold italic py-1 bg-green-50/50 border-b border-stone-300 flex items-center justify-center min-h-[1.75rem] shrink-0 group">
+                        <div className="absolute left-2 top-0 bottom-0 flex items-center">
+                            <span className="w-10 flex justify-center items-center bg-white border border-stone-300 rounded-sm text-xs h-5 font-bold shadow-sm text-green-700">
+                                {calculateTotal(data.page2.vertus)}
+                            </span>
                         </div>
-                        {/* Défauts Column */}
-                        <div className="flex flex-col overflow-hidden">
-                             <div className="relative text-center text-[10px] font-bold italic py-1 bg-red-50/50 border-b border-stone-300 flex items-center justify-center min-h-[1.75rem] shrink-0 group">
-                                <div className="absolute left-2 top-0 bottom-0 flex items-center">
-                                    <span className="w-10 flex justify-center items-center bg-white border border-stone-300 rounded-sm text-xs h-5 font-bold shadow-sm text-red-700">
-                                        {calculateTotal(data.page2.defauts)}
-                                    </span>
-                                </div>
-                                <span className="text-stone-600">Défauts</span>
-                                <button 
-                                    onClick={() => setMultiSelectTarget('defauts')}
-                                    className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-white text-stone-500 hover:text-red-600 transition-colors"
-                                    title="Ouvrir la bibliothèque"
-                                >
-                                    <BookOpen size={14} />
-                                </button>
-                            </div>
-                            <div className="p-1 space-y-0.5 overflow-auto flex-grow">
-                                {data.page2.defauts.map((item, i) => (
-                                    <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'defauts', index: i })} />
-                                ))}
-                            </div>
-                        </div>
+                        <span className="text-stone-600 uppercase">Vertus</span>
+                        <button 
+                            onClick={() => setMultiSelectTarget('vertus')}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-white text-stone-500 hover:text-green-600 transition-colors"
+                            title="Ouvrir la bibliothèque"
+                        >
+                            <BookOpen size={14} />
+                        </button>
+                    </div>
+                    <div className="p-1 space-y-0.5 overflow-auto flex-grow">
+                        {data.page2.vertus.map((item, i) => (
+                            <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'vertus', index: i })} />
+                        ))}
                     </div>
                 </div>
-
-                {/* Equipement */}
+                {/* Défauts Column */}
                 <div className="flex flex-col overflow-hidden">
+                        <div className="relative text-center text-[10px] font-bold italic py-1 bg-red-50/50 border-b border-stone-300 flex items-center justify-center min-h-[1.75rem] shrink-0 group">
+                        <div className="absolute left-2 top-0 bottom-0 flex items-center">
+                            <span className="w-10 flex justify-center items-center bg-white border border-stone-300 rounded-sm text-xs h-5 font-bold shadow-sm text-red-700">
+                                {calculateTotal(data.page2.defauts)}
+                            </span>
+                        </div>
+                        <span className="text-stone-600 uppercase">Défauts</span>
+                        <button 
+                            onClick={() => setMultiSelectTarget('defauts')}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-white text-stone-500 hover:text-red-600 transition-colors"
+                            title="Ouvrir la bibliothèque"
+                        >
+                            <BookOpen size={14} />
+                        </button>
+                    </div>
+                    <div className="p-1 space-y-0.5 overflow-auto flex-grow">
+                        {data.page2.defauts.map((item, i) => (
+                            <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'defauts', index: i })} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Row 4: Equipement & Notes (Reduced height, split 50/50) */}
+            <div className="grid grid-cols-2 h-[200px]">
+                <div className="border-r border-stone-400 flex flex-col overflow-hidden">
                     <SectionHeader title="Equipement" />
                     <div className="p-1 flex-grow overflow-hidden">
                         <NotebookInput 
@@ -575,19 +771,18 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                         />
                     </div>
                 </div>
-            </div>
-
-            {/* Fourth Row: Notes */}
-            <div className="flex-grow border-t-2 border-stone-800 flex flex-col min-h-[100px] overflow-hidden">
-                <SectionHeader title="Notes" />
-                <div className="flex-grow p-1 overflow-hidden">
+                <div className="flex flex-col overflow-hidden">
+                    <SectionHeader title="Notes" />
+                    <div className="p-1 flex-grow overflow-hidden">
                         <NotebookInput 
                             value={data.page2.notes} 
                             onChange={(v) => updateStringField('notes', v)}
                             placeholder=""
                         />
+                    </div>
                 </div>
             </div>
+
             </div>
         )}
 

@@ -182,6 +182,11 @@ const migrateData = (parsed: any): CharacterSheetData => {
             parsed.page2.equipement = '';
     }
 
+    // Migration 29: Add Character Image
+    if (typeof parsed.page2.characterImage === 'undefined') {
+        parsed.page2.characterImage = '';
+    }
+
     // Migration 8: Add Specializations
     if (!parsed.specializations) {
         parsed.specializations = {};

@@ -1,7 +1,9 @@
+
 import React, { useState, useRef } from 'react';
 import { CharacterSheetData, LibraryEntry } from '../types';
 import { Download, Upload, FileJson, CheckSquare, Square, X, AlertTriangle, BookOpen, User, LayoutTemplate, ArrowRight, CheckCircle2, HelpCircle, Merge, RefreshCw, FileBox } from 'lucide-react';
 import { INITIAL_DATA } from '../constants';
+import { getImage, saveImage, blobToBase64, base64ToBlob } from '../imageDB';
 
 interface ImportExportModalProps {
   isOpen: boolean;
@@ -87,6 +89,8 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
       clean.page2.defauts.fill({ name: '', value: '' });
       clean.page2.equipement = "";
       clean.page2.notes = "";
+      clean.page2.characterImage = "";
+      clean.page2.characterImageId = undefined; // Do not export ID in template
 
       // Reset Specializations
       clean.specializations = {};
@@ -104,15 +108,35 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
 
   // --- LOGIC: EXPORT ---
 
-  const handleExport = () => {
+  const handleExport = async () => {
       let exportData: any = {};
       let filename = "Sauvegarde";
 
-      const template = createTemplateFromData(data);
+      // Preparation logic for image
+      // Clone data to avoid mutating state
+      const dataToProcess = JSON.parse(JSON.stringify(data));
+
+      // Resolve Image from DB if present
+      if (dataToProcess.page2.characterImageId) {
+          try {
+              const blob = await getImage(dataToProcess.page2.characterImageId);
+              if (blob) {
+                  const base64 = await blobToBase64(blob);
+                  // Inject into old field for portability
+                  dataToProcess.page2.characterImage = base64;
+              }
+          } catch (e) {
+              console.error("Failed to export image from DB", e);
+          }
+          // Remove ID from export to force import logic to re-save
+          delete dataToProcess.page2.characterImageId;
+      }
+
+      const template = createTemplateFromData(dataToProcess);
 
       switch (exportType) {
           case 'full':
-              exportData = JSON.parse(JSON.stringify(data)); // Clone full
+              exportData = dataToProcess; 
               filename = `Personnage_${data.header.name || 'SansNom'}`;
               break;
           case 'system':
@@ -187,7 +211,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
       reader.readAsText(file);
   };
 
-  const executeImport = () => {
+  const executeImport = async () => {
       if (!pendingFile || !importAction) return;
 
       let finalData = { ...data };
@@ -212,9 +236,27 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
           return merged;
       };
 
+      // Handle Image Import Logic (Base64 -> IDB)
+      const processImportedImage = async (dataObj: any) => {
+          if (dataObj.page2 && dataObj.page2.characterImage && dataObj.page2.characterImage.length > 100) {
+              try {
+                  // Convert Base64 to Blob
+                  const blob = await base64ToBlob(dataObj.page2.characterImage);
+                  // Save to IndexedDB
+                  const newId = await saveImage(blob);
+                  // Update references
+                  dataObj.page2.characterImageId = newId;
+                  dataObj.page2.characterImage = ""; // Clear heavy string
+              } catch (e) {
+                  console.error("Failed to import image to DB", e);
+              }
+          }
+          return dataObj;
+      };
+
       if (importAction === 'replace_all') {
           // Full Overwrite
-          finalData = pendingFile;
+          finalData = await processImportedImage(pendingFile);
           // Safety: ensure library exists
           if (!finalData.library) finalData.library = [];
           logMsg = "Remplacement complet du personnage.";
@@ -222,7 +264,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
       else if (importAction === 'system') {
           // Apply Structure (Template) + Lib, Reset Values
           const template = createTemplateFromData(pendingFile);
-          finalData = template;
+          finalData = template; // Template doesn't have image, so no need to process
           // Handle Lib: The 'system' import implies replacing the lib with the system one
           if (pendingFile.library) finalData.library = pendingFile.library;
           else finalData.library = []; // If system file has no lib, empty it
