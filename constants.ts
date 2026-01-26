@@ -3,12 +3,77 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.13";
+export const APP_VERSION = "1.9.20";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
-        version: "1.9.13",
+        version: "1.9.20",
         date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "UI (Détails) : Le widget Réputation est maintenant dynamique.",
+            "UI (Détails) : Navigation au clavier dans la Réputation (Entrée passe au champ/ligne suivant).",
+            "UI (Détails) : Appuyer sur Entrée dans la dernière case de Réputation crée automatiquement une nouvelle ligne.",
+            "UI (Détails) : Réduction de l'affichage initial de la Réputation à 4 lignes pour aérer la mise en page (avec ascenseur si dépassement)."
+        ]
+    },
+    {
+        version: "1.9.19",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "UI (Détails) : Ajustement précis de l'alignement vertical des lignes du widget Réputation pour correspondre parfaitement à la grille du carnet Connaissances voisin.",
+            "Correctif : Suppression d'un décalage de 6px qui désynchronisait les bordures."
+        ]
+    },
+    {
+        version: "1.9.18",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "UI (Détails) : Intégration des en-têtes de colonnes du widget Réputation (Réputation, Lieu, Valeur) directement dans la barre de titre.",
+            "UI (Détails) : Alignement vertical des lignes de Réputation avec les lignes du carnet Connaissances voisin.",
+            "UI (Détails) : Suppression de l'ascenseur vertical dans le widget Réputation pour un rendu plus propre."
+        ]
+    },
+    {
+        version: "1.9.17",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "UI (Détails - Portrait) : Ajustement fin de la hauteur de la section Traits (720px) pour réduire l'espace vide avant les Notes."
+        ]
+    },
+    {
+        version: "1.9.16",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "UI (Détails) : Alignement précis du badge 'Total' des avantages/désavantages avec la colonne des valeurs (réduction de la largeur à 32px pour correspondre à la colonne)."
+        ]
+    },
+    {
+        version: "1.9.15",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "UI (Détails - Portrait) : Ajustement de la hauteur de la section Traits/Equipement (750px) pour éviter l'apparition d'un ascenseur vertical sur les listes complètes (28 lignes).",
+            "UI (Détails - Portrait) : Repositionnement automatique de la section Notes pour un meilleur équilibre visuel."
+        ]
+    },
+    {
+        version: "1.9.14",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "UI (Détails - Portrait) : Harmonisation de la mise en page avec le mode paysage.",
+            "UI (Détails - Portrait) : La section 'Traits - Signes Particuliers' occupe désormais les 2/3 de la largeur en bas de page.",
+            "UI (Détails - Portrait) : 'Equipement' et 'Notes' sont déplacés dans une colonne latérale (1/3 largeur)."
+        ]
+    },
+    {
+        version: "1.9.13",
+        date: "24/01/2026",
         type: 'patch',
         changes: [
             "Système : Vérification de la version du fichier lors de l'import. Une alerte s'affiche si la version du fichier diffère de celle de l'application."
@@ -421,7 +486,7 @@ export const INITIAL_DATA: CharacterSheetData = {
   page2: {
     lieux_importants: '',
     contacts: '',
-    reputation: Array(7).fill({ reputation: '', lieu: '', valeur: '' }), // Increased to 7
+    reputation: Array(4).fill({ reputation: '', lieu: '', valeur: '' }), // Reduced to 4 for new sheets
     connaissances: '', 
     valeurs_monetaires: '',
     armes_list: '', 

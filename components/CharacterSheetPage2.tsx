@@ -12,7 +12,7 @@ const SectionHeader: React.FC<{ title: string, total?: number, totalColor?: stri
     {total !== undefined && (
         <div className="absolute left-1 top-0 bottom-0 flex items-center">
             <span 
-                className={`w-10 flex justify-center items-center bg-white border border-stone-400 rounded-sm text-xs h-5 font-bold shadow-sm ${totalColor || 'text-stone-800'}`}
+                className={`w-8 flex justify-center items-center bg-white border border-stone-400 rounded-sm text-xs h-5 font-bold shadow-sm ${totalColor || 'text-stone-800'}`}
                 title="Total"
             >
                 {total}
@@ -347,6 +347,9 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
   // State for Multi-Select Library Modal
   const [multiSelectTarget, setMultiSelectTarget] = useState<'avantages' | 'desavantages' | null>(null);
 
+  // State for auto-focusing new reputation rows
+  const [focusNewReputation, setFocusNewReputation] = useState<number | null>(null);
+
   const [editorName, setEditorName] = useState('');
   const [editorValue, setEditorValue] = useState('');
 
@@ -358,6 +361,17 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
           setEditorValue(item.value);
       }
   }, [editingSlot, data.page2]);
+
+  // Effect to handle focus when adding a new reputation line
+  useEffect(() => {
+      if (focusNewReputation !== null) {
+          const element = document.getElementById(`rep-row-${focusNewReputation}-rep`);
+          if (element) {
+              element.focus();
+              setFocusNewReputation(null);
+          }
+      }
+  }, [focusNewReputation, data.page2.reputation]);
 
   const updateList = (field: keyof CharacterSheetData['page2'], index: number, value: string) => {
     // This is now only used for potentially other lists if any. arme_list is now a string.
@@ -477,6 +491,38 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
     onAddLog(`Modification Réputation (ligne ${index + 1})`, 'info', 'sheet', `${field}_${index}_${key}`);
   };
 
+  const addReputationRow = () => {
+      const newList = [...data.page2.reputation, { reputation: '', lieu: '', valeur: '' }];
+      onChange({
+          ...data,
+          page2: {
+              ...data.page2,
+              reputation: newList
+          }
+      });
+      setFocusNewReputation(newList.length - 1);
+      onAddLog("Ajout d'une ligne de réputation", 'info', 'sheet');
+  };
+
+  const handleReputationKeyDown = (e: React.KeyboardEvent, index: number, field: 'reputation' | 'lieu' | 'valeur') => {
+      if (e.key === 'Enter') {
+          e.preventDefault();
+          if (field === 'reputation') {
+              document.getElementById(`rep-row-${index}-lieu`)?.focus();
+          } else if (field === 'lieu') {
+              document.getElementById(`rep-row-${index}-val`)?.focus();
+          } else if (field === 'valeur') {
+              // If not the last element, focus next row
+              if (index < data.page2.reputation.length - 1) {
+                  document.getElementById(`rep-row-${index + 1}-rep`)?.focus();
+              } else {
+                  // If last element, add new row
+                  addReputationRow();
+              }
+          }
+      }
+  };
+
   const calculateTotal = (list: TraitEntry[]) => {
       return list.reduce((acc, item) => {
           const val = parseInt(item.value);
@@ -502,7 +548,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
   );
 
   const DesavantagesColumn = (
-     <div className="col-span-1 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
+     <div className="col-span-1 p-1.5 flex flex-col h-full overflow-hidden">
          <SectionHeader 
             title="Désavantages" 
             total={calculateTotal(data.page2.desavantages)}
@@ -515,6 +561,15 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
              ))}
          </div>
      </div>
+  );
+
+  // Custom Header for Reputation to include columns
+  const ReputationHeader = () => (
+      <div className="bg-slate-200 text-slate-800 text-xs border-y border-stone-500 uppercase py-0.5 tracking-wide mb-0.5 flex items-center min-h-[1.5rem] shadow-sm font-bold shrink-0">
+          <span className="w-1/2 text-center pl-1">Réputation</span>
+          <span className="w-1/4 text-center border-l border-stone-400">Lieu</span>
+          <span className="w-1/4 text-center border-l border-stone-400">Valeur</span>
+      </div>
   );
 
   return (
@@ -559,19 +614,31 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                             </div>
                         </div>
                         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-                            <SectionHeader title="Réputation" />
-                            <div className="space-y-0.5 flex-grow overflow-auto">
-                                <div className="flex text-[10px] font-bold mb-1 text-stone-600 uppercase tracking-wide shrink-0">
-                                    <span className="w-1/2">Réputation</span>
-                                    <span className="w-1/4 text-center">Lieu</span>
-                                    <span className="w-1/4 text-center">Valeur</span>
-                                </div>
-                                {/* LIMIT TO 5 LINES IN LANDSCAPE TO AVOID SCROLLBAR */}
-                                {data.page2.reputation.slice(0, 5).map((rep, i) => (
-                                    <div key={i} className="flex gap-1 h-[22px] items-end shrink-0">
-                                        <input className="border-b border-stone-300 w-1/2 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.reputation} onChange={(e) => updateReputationEntry('reputation', i, 'reputation', e.target.value)} />
-                                        <input className="border-b border-stone-300 w-1/4 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.lieu} onChange={(e) => updateReputationEntry('reputation', i, 'lieu', e.target.value)} />
-                                        <input className="border-b border-stone-300 w-1/4 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.valeur} onChange={(e) => updateReputationEntry('reputation', i, 'valeur', e.target.value)} />
+                            <ReputationHeader />
+                            <div className="flex-grow overflow-y-auto custom-scrollbar">
+                                {data.page2.reputation.map((rep, i) => (
+                                    <div key={i} className="flex gap-1 h-[22px] items-end shrink-0 border-b border-stone-200">
+                                        <input 
+                                            id={`rep-row-${i}-rep`}
+                                            className="w-1/2 bg-transparent font-handwriting text-ink text-sm h-full px-1 focus:outline-none" 
+                                            value={rep.reputation} 
+                                            onChange={(e) => updateReputationEntry('reputation', i, 'reputation', e.target.value)} 
+                                            onKeyDown={(e) => handleReputationKeyDown(e, i, 'reputation')}
+                                        />
+                                        <input 
+                                            id={`rep-row-${i}-lieu`}
+                                            className="w-1/4 bg-transparent font-handwriting text-ink text-sm h-full border-l border-stone-200 px-1 focus:outline-none" 
+                                            value={rep.lieu} 
+                                            onChange={(e) => updateReputationEntry('reputation', i, 'lieu', e.target.value)} 
+                                            onKeyDown={(e) => handleReputationKeyDown(e, i, 'lieu')}
+                                        />
+                                        <input 
+                                            id={`rep-row-${i}-val`}
+                                            className="w-1/4 bg-transparent font-handwriting text-ink text-sm h-full border-l border-stone-200 px-1 focus:outline-none" 
+                                            value={rep.valeur} 
+                                            onChange={(e) => updateReputationEntry('reputation', i, 'valeur', e.target.value)} 
+                                            onKeyDown={(e) => handleReputationKeyDown(e, i, 'valeur')}
+                                        />
                                     </div>
                                 ))}
                             </div>
@@ -600,11 +667,13 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                     {/* Bot-Col 1: Avantages */}
                     {AvantagesColumn}
 
-                    {/* Bot-Col 2: Désavantages */}
-                    {DesavantagesColumn}
+                    {/* Bot-Col 2: Désavantages (with left border because extracted components logic) */}
+                    <div className="border-l border-stone-400 -ml-[1px] h-full overflow-hidden">
+                        {DesavantagesColumn}
+                    </div>
 
                     {/* Bot-Col 3: Equipement */}
-                    <div className="col-span-1 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
+                    <div className="col-span-1 border-r border-l border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
                         <SectionHeader title="Equipement" />
                         <div className="flex-grow min-h-0">
                             <NotebookInput 
@@ -631,10 +700,10 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
             // Portrait Mode
             <div className="sheet-container flex flex-col">
             
-            {/* LARGE HEADER: Image Left + All Details Right (Merged 2 Rows into 1) */}
-            <div className="flex border-b border-stone-400 h-[420px] overflow-hidden">
+            {/* SECTION 1: HEADER (Image + Details) - Fixed Height */}
+            <div className="flex border-b border-stone-400 h-[400px] shrink-0 overflow-hidden">
                 
-                {/* Left: Image (Full Height) */}
+                {/* Left: Image (35%) */}
                 <div className="w-[35%] border-r border-stone-400 bg-stone-50 p-0 flex flex-col overflow-hidden">
                     <CharacterImageWidget 
                         imageId={data.page2.characterImageId}
@@ -644,10 +713,10 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                     />
                 </div>
 
-                {/* Right: Text Fields Stack (3 Rows) */}
-                <div className="w-[65%] flex flex-col">
+                {/* Right: Text Fields Stack (65%) */}
+                <div className="w-[65%] flex flex-col overflow-hidden">
                     
-                    {/* Row A: Lieux & Contacts (1/3 Height) */}
+                    {/* Row A: Lieux & Contacts */}
                     <div className="h-1/3 flex border-b border-stone-400">
                         <div className="w-1/2 border-r border-stone-400 p-1 flex flex-col">
                             <SectionHeader title="Lieux Importants" />
@@ -663,7 +732,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                         </div>
                     </div>
 
-                    {/* Row B: Connaissances & Reputation (1/3 Height) */}
+                    {/* Row B: Connaissances & Reputation */}
                     <div className="h-1/3 flex border-b border-stone-400">
                         <div className="w-1/2 border-r border-stone-400 p-1 flex flex-col">
                             <SectionHeader title="Connaissances" />
@@ -672,20 +741,41 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                             </div>
                         </div>
                         <div className="w-1/2 p-1 flex flex-col overflow-hidden">
-                            <SectionHeader title="Réputation" />
-                            <div className="space-y-0.5 flex-grow overflow-auto mt-1">
-                                {data.page2.reputation.slice(0, 5).map((rep, i) => (
-                                    <div key={i} className="flex gap-1 h-[22px] items-end">
-                                        <input className="border-b border-stone-300 w-1/2 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.reputation} onChange={(e) => updateReputationEntry('reputation', i, 'reputation', e.target.value)} placeholder="Rep..." />
-                                        <input className="border-b border-stone-300 w-1/4 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.lieu} onChange={(e) => updateReputationEntry('reputation', i, 'lieu', e.target.value)} placeholder="Lieu" />
-                                        <input className="border-b border-stone-300 w-1/4 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.valeur} onChange={(e) => updateReputationEntry('reputation', i, 'valeur', e.target.value)} placeholder="Val" />
+                            <ReputationHeader />
+                            <div className="flex-grow overflow-y-auto custom-scrollbar">
+                                {data.page2.reputation.map((rep, i) => (
+                                    <div key={i} className="flex gap-1 h-[22px] items-end border-b border-stone-200">
+                                        <input 
+                                            id={`rep-row-${i}-rep`}
+                                            className="w-1/2 bg-transparent font-handwriting text-ink text-sm h-full px-1 focus:outline-none" 
+                                            value={rep.reputation} 
+                                            onChange={(e) => updateReputationEntry('reputation', i, 'reputation', e.target.value)} 
+                                            onKeyDown={(e) => handleReputationKeyDown(e, i, 'reputation')}
+                                            placeholder="" 
+                                        />
+                                        <input 
+                                            id={`rep-row-${i}-lieu`}
+                                            className="w-1/4 bg-transparent font-handwriting text-ink text-sm h-full border-l border-stone-200 px-1 focus:outline-none" 
+                                            value={rep.lieu} 
+                                            onChange={(e) => updateReputationEntry('reputation', i, 'lieu', e.target.value)} 
+                                            onKeyDown={(e) => handleReputationKeyDown(e, i, 'lieu')}
+                                            placeholder="" 
+                                        />
+                                        <input 
+                                            id={`rep-row-${i}-val`}
+                                            className="w-1/4 bg-transparent font-handwriting text-ink text-sm h-full border-l border-stone-200 px-1 focus:outline-none" 
+                                            value={rep.valeur} 
+                                            onChange={(e) => updateReputationEntry('reputation', i, 'valeur', e.target.value)} 
+                                            onKeyDown={(e) => handleReputationKeyDown(e, i, 'valeur')}
+                                            placeholder="" 
+                                        />
                                     </div>
                                 ))}
                             </div>
                         </div>
                     </div>
 
-                    {/* Row C: Valeurs Monétaires & Armes (1/3 Height) */}
+                    {/* Row C: Valeurs Monétaires & Armes */}
                     <div className="h-1/3 flex">
                         <div className="w-1/2 border-r border-stone-400 p-1 flex flex-col">
                             <SectionHeader title="Valeurs Monétaires" />
@@ -704,84 +794,51 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                 </div>
             </div>
 
-            {/* Row 3: Traits (Full Height Priority) */}
-            <div className="grid grid-cols-2 border-b border-stone-400 flex-grow min-h-[500px]">
-                {/* Avantages Column */}
-                <div className="border-r border-stone-400 flex flex-col overflow-hidden">
-                        <div className="relative text-center text-[10px] font-bold italic py-1 bg-green-50/50 border-b border-stone-300 flex items-center justify-center min-h-[1.75rem] shrink-0 group">
-                        <div className="absolute left-2 top-0 bottom-0 flex items-center">
-                            <span className="w-10 flex justify-center items-center bg-white border border-stone-300 rounded-sm text-xs h-5 font-bold shadow-sm text-green-700">
-                                {calculateTotal(data.page2.avantages)}
-                            </span>
-                        </div>
-                        <span className="text-stone-600 uppercase">Avantages</span>
-                        <button 
-                            onClick={() => setMultiSelectTarget('avantages')}
-                            className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-white text-stone-500 hover:text-green-600 transition-colors"
-                            title="Ouvrir la bibliothèque"
-                        >
-                            <BookOpen size={14} />
-                        </button>
-                    </div>
-                    <div className="p-1 space-y-0.5 overflow-auto flex-grow">
-                        {data.page2.avantages.map((item, i) => (
-                            <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'avantages', index: i })} />
-                        ))}
-                    </div>
+            {/* SECTION 2: CONTENT (Traits Left, Equipment Right) */}
+            <div className="flex h-[720px] overflow-hidden shrink-0 border-b border-stone-400">
+                {/* LEFT: TRAITS (Aligned with Image + Left Details Column = 35% + 32.5% = 67.5%) */}
+                <div className="w-[67.5%] border-r border-stone-400 flex flex-col">
+                     <SectionHeader title="Traits - Signes Particuliers" />
+                     <div className="grid grid-cols-2 flex-grow overflow-hidden min-h-0">
+                         {/* Avantages */}
+                         {AvantagesColumn}
+                         {/* Désavantages */}
+                         <div className="border-l border-stone-400 -ml-[1px] h-full overflow-hidden">
+                            {DesavantagesColumn}
+                         </div>
+                     </div>
                 </div>
-                {/* Désavantages Column */}
-                <div className="flex flex-col overflow-hidden">
-                        <div className="relative text-center text-[10px] font-bold italic py-1 bg-red-50/50 border-b border-stone-300 flex items-center justify-center min-h-[1.75rem] shrink-0 group">
-                        <div className="absolute left-2 top-0 bottom-0 flex items-center">
-                            <span className="w-10 flex justify-center items-center bg-white border border-stone-300 rounded-sm text-xs h-5 font-bold shadow-sm text-red-700">
-                                {calculateTotal(data.page2.desavantages)}
-                            </span>
-                        </div>
-                        <span className="text-stone-600 uppercase">Désavantages</span>
-                        <button 
-                            onClick={() => setMultiSelectTarget('desavantages')}
-                            className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-white text-stone-500 hover:text-red-600 transition-colors"
-                            title="Ouvrir la bibliothèque"
-                        >
-                            <BookOpen size={14} />
-                        </button>
-                    </div>
-                    <div className="p-1 space-y-0.5 overflow-auto flex-grow">
-                        {data.page2.desavantages.map((item, i) => (
-                            <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'desavantages', index: i })} />
-                        ))}
-                    </div>
-                </div>
-            </div>
 
-            {/* Row 4: Equipement & Notes (Reduced height, split 50/50) */}
-            <div className="grid grid-cols-2 h-[200px]">
-                <div className="border-r border-stone-400 flex flex-col overflow-hidden">
+                {/* RIGHT: EQUIPEMENT (Aligned with Armes Column = 32.5%) */}
+                <div className="w-[32.5%] flex flex-col h-full overflow-hidden">
                     <SectionHeader title="Equipement" />
-                    <div className="p-1 flex-grow overflow-hidden">
+                    <div className="p-1.5 flex-grow min-h-0">
                         <NotebookInput 
                             value={data.page2.equipement} 
                             onChange={(v) => updateStringField('equipement', v)}
                         />
                     </div>
                 </div>
-                <div className="flex flex-col overflow-hidden">
-                    <SectionHeader title="Notes" />
-                    <div className="p-1 flex-grow overflow-hidden">
-                        <NotebookInput 
-                            value={data.page2.notes} 
-                            onChange={(v) => updateStringField('notes', v)}
-                            placeholder=""
-                        />
-                    </div>
+            </div>
+
+            {/* SECTION 3: BOTTOM NOTES (Full Width) */}
+            <div className="flex-grow border-t border-stone-400 p-1.5 flex flex-col shrink-0 min-h-0">
+                <SectionHeader title="Notes" />
+                <div className="flex-grow min-h-0 mt-1">
+                    <NotebookInput 
+                        value={data.page2.notes} 
+                        onChange={(v) => updateStringField('notes', v)}
+                        placeholder=""
+                    />
                 </div>
             </div>
 
             </div>
         )}
 
-        {/* --- TRAIT EDITOR MODAL --- */}
+        {/* ... (Modals remain same) */}
         {editingSlot && (
+            // ...
             <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl h-[85vh] flex flex-col overflow-hidden">
                     
@@ -883,7 +940,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
             </div>
         )}
 
-        {/* --- MULTI-SELECT LIBRARY MODAL --- */}
+        {/* ... (MultiSelect Modal remains same) */}
         {multiSelectTarget && (
             <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl h-[85vh] flex flex-col overflow-hidden">
