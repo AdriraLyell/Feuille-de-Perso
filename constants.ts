@@ -3,9 +3,19 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.0";
+export const APP_VERSION = "1.9.1";
 
 export const CHANGELOG: ChangelogEntry[] = [
+    {
+        version: "1.9.1",
+        date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "UI (Paysage) : Rééquilibrage de la page 'Détails' (35% Haut / 65% Bas) pour maximiser l'espace des Traits et Notes.",
+            "UI (Paysage) : Alignement strict des sections 'Réputation', 'Contacts' et 'Armes'.",
+            "UI (Paysage) : Réduction du nombre de lignes affichées pour 'Réputation' et 'Armes' afin d'éliminer les ascenseurs vides."
+        ]
+    },
     {
         version: "1.9.0",
         date: new Date().toLocaleDateString('fr-FR'),

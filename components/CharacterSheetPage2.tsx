@@ -289,14 +289,14 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
 
   // Helper to render layout content to avoid duplication (keeping logic separate)
   const VertusColumn = (
-     <div className={`col-span-2 border-r border-stone-400 p-1.5 flex flex-col ${isLandscape ? '' : 'overflow-hidden'}`}>
+     <div className="col-span-2 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
          <SectionHeader 
             title="Vertus" 
             total={calculateTotal(data.page2.vertus)}
             totalColor="text-green-700 bg-green-50 border-green-200"
             onOpenLibrary={() => setMultiSelectTarget('vertus')}
          />
-         <div className="space-y-0.5 flex-grow overflow-auto">
+         <div className="space-y-0.5 flex-grow overflow-auto min-h-0">
              {data.page2.vertus.map((item, i) => (
                 <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'vertus', index: i })} />
              ))}
@@ -305,14 +305,14 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
   );
 
   const DefautsColumn = (
-     <div className={`col-span-2 border-r border-stone-400 p-1.5 flex flex-col ${isLandscape ? '' : 'overflow-hidden'}`}>
+     <div className="col-span-2 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
          <SectionHeader 
             title="Défauts" 
             total={calculateTotal(data.page2.defauts)}
             totalColor="text-red-700 bg-red-50 border-red-200"
             onOpenLibrary={() => setMultiSelectTarget('defauts')}
          />
-         <div className="space-y-0.5 flex-grow overflow-auto">
+         <div className="space-y-0.5 flex-grow overflow-auto min-h-0">
              {data.page2.defauts.map((item, i) => (
                 <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'defauts', index: i })} />
              ))}
@@ -323,43 +323,44 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
   return (
     <>
         {isLandscape ? (
-            <div className="sheet-container landscape flex flex-col">
-                {/* Top Section: Small Lists (3 Columns Grid) */}
-                <div className="grid grid-cols-3 border-b-2 border-stone-800">
+            <div className="sheet-container landscape flex flex-col overflow-hidden">
+                {/* Top Section: Small Lists (3 Columns Grid) - Fixed 35% Height to maximize bottom section */}
+                <div className="grid grid-cols-3 border-b-2 border-stone-800 h-[35%] overflow-hidden">
                     {/* Top-Col 1: Lieux & Contacts */}
-                    <div className="border-r border-stone-400 p-1.5 flex flex-col gap-2">
-                        <div className="flex-grow flex flex-col">
+                    <div className="border-r border-stone-400 p-1.5 flex flex-col gap-2 h-full overflow-hidden">
+                        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                             <SectionHeader title="Lieux Importants" />
-                            <div className="flex-grow relative h-32">
+                            <div className="flex-grow relative min-h-0">
                                 <NotebookInput value={data.page2.lieux_importants} onChange={(v) => updateStringField('lieux_importants', v)} />
                             </div>
                         </div>
-                        <div className="flex-grow flex flex-col">
+                        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                             <SectionHeader title="Contacts" />
-                            <div className="flex-grow relative h-32">
+                            <div className="flex-grow relative min-h-0">
                                 <NotebookInput value={data.page2.contacts} onChange={(v) => updateStringField('contacts', v)} />
                             </div>
                         </div>
                     </div>
 
                     {/* Top-Col 2: Connaissances & Réputation */}
-                    <div className="border-r border-stone-400 p-1.5 flex flex-col gap-2">
-                        <div className="flex-grow flex flex-col">
+                    <div className="border-r border-stone-400 p-1.5 flex flex-col gap-2 h-full overflow-hidden">
+                        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                             <SectionHeader title="Connaissances" />
-                            <div className="flex-grow relative h-32">
+                            <div className="flex-grow relative min-h-0">
                                 <NotebookInput value={data.page2.connaissances} onChange={(v) => updateStringField('connaissances', v)} />
                             </div>
                         </div>
-                        <div>
+                        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                             <SectionHeader title="Réputation" />
-                            <div className="space-y-0.5">
-                                <div className="flex text-[10px] font-bold mb-1 text-stone-600 uppercase tracking-wide">
+                            <div className="space-y-0.5 flex-grow overflow-auto">
+                                <div className="flex text-[10px] font-bold mb-1 text-stone-600 uppercase tracking-wide shrink-0">
                                     <span className="w-1/2">Réputation</span>
                                     <span className="w-1/4 text-center">Lieu</span>
                                     <span className="w-1/4 text-center">Valeur</span>
                                 </div>
-                                {data.page2.reputation.map((rep, i) => (
-                                    <div key={i} className="flex gap-1 h-[22px] items-end">
+                                {/* LIMIT TO 5 LINES IN LANDSCAPE TO AVOID SCROLLBAR */}
+                                {data.page2.reputation.slice(0, 5).map((rep, i) => (
+                                    <div key={i} className="flex gap-1 h-[22px] items-end shrink-0">
                                         <input className="border-b border-stone-300 w-1/2 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.reputation} onChange={(e) => updateReputationEntry('reputation', i, 'reputation', e.target.value)} />
                                         <input className="border-b border-stone-300 w-1/4 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.lieu} onChange={(e) => updateReputationEntry('reputation', i, 'lieu', e.target.value)} />
                                         <input className="border-b border-stone-300 w-1/4 bg-transparent font-handwriting text-ink text-sm h-full" value={rep.valeur} onChange={(e) => updateReputationEntry('reputation', i, 'valeur', e.target.value)} />
@@ -370,17 +371,18 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                     </div>
 
                     {/* Top-Col 3: Valeurs & Armes */}
-                    <div className="p-1.5 flex flex-col gap-2">
-                        <div className="flex-grow flex flex-col">
+                    <div className="p-1.5 flex flex-col gap-2 h-full overflow-hidden">
+                        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                             <SectionHeader title="Valeurs Monétaires" />
-                            <div className="flex-grow relative h-32">
+                            <div className="flex-grow relative min-h-0">
                                 <NotebookInput value={data.page2.valeurs_monetaires} onChange={(v) => updateStringField('valeurs_monetaires', v)} />
                             </div>
                         </div>
-                        <div className="flex-grow">
+                        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                             <SectionHeader title="Armes" />
-                            <div className="space-y-0.5">
-                                {data.page2.armes_list.map((val, i) => (
+                            <div className="space-y-0.5 flex-grow overflow-auto">
+                                {/* LIMIT TO 6 LINES IN LANDSCAPE TO AVOID SCROLLBAR */}
+                                {data.page2.armes_list.slice(0, 6).map((val, i) => (
                                     <LineInput key={i} value={val} onChange={(v) => updateList('armes_list', i, v)} />
                                 ))}
                             </div>
@@ -388,8 +390,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                     </div>
                 </div>
 
-                {/* Bottom Section: Long Lists (12 Columns Grid) */}
-                <div className="flex-grow grid grid-cols-12 h-1/2">
+                {/* Bottom Section: Long Lists (12 Columns Grid) - Fixed 65% Height */}
+                <div className="grid grid-cols-12 h-[65%] overflow-hidden">
                     {/* Bot-Col 1: Vertus */}
                     {VertusColumn}
 
@@ -397,9 +399,9 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                     {DefautsColumn}
 
                     {/* Bot-Col 3: Equipement */}
-                    <div className="col-span-4 border-r border-stone-400 p-1.5 flex flex-col h-full">
+                    <div className="col-span-4 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
                         <SectionHeader title="Equipement" />
-                        <div className="flex-grow">
+                        <div className="flex-grow min-h-0">
                             <NotebookInput 
                                 value={data.page2.equipement} 
                                 onChange={(v) => updateStringField('equipement', v)}
@@ -408,9 +410,9 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                     </div>
 
                     {/* Bot-Col 4: Notes */}
-                    <div className="col-span-4 p-1.5 flex flex-col h-full">
+                    <div className="col-span-4 p-1.5 flex flex-col h-full overflow-hidden">
                         <SectionHeader title="Notes" />
-                        <div className="flex-grow">
+                        <div className="flex-grow min-h-0">
                             <NotebookInput 
                                 value={data.page2.notes} 
                                 onChange={(v) => updateStringField('notes', v)}
