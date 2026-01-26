@@ -16,18 +16,18 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Copier fichiers de main vers misenligne
+      - name: Copier fichiers de main vers miseenligne
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin misenligne
-          git checkout misenligne
+          git fetch origin miseenligne
+          git checkout miseenligne
           git checkout main -- .
           git add .
           # On ne commit que s'il y a des changements
           if ! git diff --cached --quiet; then
             git commit -m "Copie automatique depuis main via GitHub Actions"
-            git push origin misenligne
+            git push origin miseenligne
           else
             echo "Pas de modifications à copier."
           fi
