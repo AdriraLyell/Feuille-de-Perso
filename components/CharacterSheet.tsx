@@ -309,7 +309,7 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
   // --- Calculation: Attribute Bonuses from Traits ---
   const attributeBonuses = useMemo(() => {
       const bonuses: Record<string, BonusInfo> = {};
-      const allTraits = [...(data.page2.vertus || []), ...(data.page2.defauts || [])];
+      const allTraits = [...(data.page2.avantages || []), ...(data.page2.desavantages || [])];
 
       allTraits.forEach(trait => {
           if (!trait.name) return;
@@ -332,7 +332,7 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
           }
       });
       return bonuses;
-  }, [data.page2.vertus, data.page2.defauts, data.library]);
+  }, [data.page2.avantages, data.page2.desavantages, data.library]);
 
   const updateHeader = (field: keyof typeof data.header, value: string) => {
     onChange({ ...data, header: { ...data.header, [field]: value } });

@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { CharacterSheetData, LibraryEntry, TraitEffect } from '../types';
 import { Search, Plus, Trash2, Edit2, X, BookOpen, Filter, Tag as TagIcon, AlertCircle, Zap, Save, Check, AlignLeft, Hash, Star, GraduationCap, Dumbbell, ChevronDown, ArrowDownAZ, ArrowUpAZ, Coins, Layers, Square, CheckSquare } from 'lucide-react';
@@ -8,7 +9,7 @@ interface TraitLibraryProps {
   onSelect?: (entry: LibraryEntry) => void;
   onMultiSelect?: (entries: LibraryEntry[]) => void; // New Prop for Multi-select
   isEditable?: boolean;
-  defaultFilter?: 'all' | 'vertu' | 'defaut';
+  defaultFilter?: 'all' | 'avantage' | 'desavantage';
 }
 
 type SortOption = 'name' | 'cost' | 'type';
@@ -16,7 +17,7 @@ type SortOrder = 'asc' | 'desc';
 
 const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, onMultiSelect, isEditable = true, defaultFilter = 'all' }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'vertu' | 'defaut'>(defaultFilter);
+  const [filterType, setFilterType] = useState<'all' | 'avantage' | 'desavantage'>(defaultFilter);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   // Sorting State
@@ -83,7 +84,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
       setEditForm({
           id: Math.random().toString(36).substr(2, 9),
           name: '',
-          type: filterType === 'all' ? 'vertu' : filterType, 
+          type: filterType === 'all' ? 'avantage' : filterType, 
           cost: '1',
           description: '',
           tags: [],
@@ -294,16 +295,16 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                         Tout
                     </button>
                     <button 
-                        onClick={() => setFilterType('vertu')}
-                        className={`px-3 py-1 text-xs font-bold rounded transition-colors ${filterType === 'vertu' ? 'bg-white shadow text-green-700' : 'text-gray-600 hover:text-gray-800'}`}
+                        onClick={() => setFilterType('avantage')}
+                        className={`px-3 py-1 text-xs font-bold rounded transition-colors ${filterType === 'avantage' ? 'bg-white shadow text-green-700' : 'text-gray-600 hover:text-gray-800'}`}
                     >
-                        Vertus
+                        Avantages
                     </button>
                     <button 
-                        onClick={() => setFilterType('defaut')}
-                        className={`px-3 py-1 text-xs font-bold rounded transition-colors ${filterType === 'defaut' ? 'bg-white shadow text-red-700' : 'text-gray-600 hover:text-gray-800'}`}
+                        onClick={() => setFilterType('desavantage')}
+                        className={`px-3 py-1 text-xs font-bold rounded transition-colors ${filterType === 'desavantage' ? 'bg-white shadow text-red-700' : 'text-gray-600 hover:text-gray-800'}`}
                     >
-                        Défauts
+                        Désavantages
                     </button>
                 </div>
             </div>
@@ -365,8 +366,8 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
             {library.length === 0 && (
                 <div className="text-center text-gray-400 py-10 italic px-4 text-sm">
                     {isEditable 
-                        ? "La bibliothèque est vide. Ajoutez des vertus et défauts ici pour les réutiliser facilement."
-                        : "La bibliothèque est vide. Pour ajouter des vertus ou défauts, veuillez passer par le menu Configurer > Bibliothèque."
+                        ? "La bibliothèque est vide. Ajoutez des avantages et désavantages ici pour les réutiliser facilement."
+                        : "La bibliothèque est vide. Pour ajouter des avantages ou désavantages, veuillez passer par le menu Configurer > Bibliothèque."
                     }
                 </div>
             )}
@@ -400,7 +401,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                                     </div>
                                 )}
                                 
-                                <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${entry.type === 'vertu' ? 'bg-green-500' : 'bg-red-500'}`} title={entry.type === 'vertu' ? 'Vertu' : 'Défaut'} />
+                                <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${entry.type === 'avantage' ? 'bg-green-500' : 'bg-red-500'}`} title={entry.type === 'avantage' ? 'Avantage' : 'Désavantage'} />
                                 
                                 <div className="flex-grow">
                                     <div className="flex justify-between items-baseline mb-1">
@@ -480,7 +481,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
                     
                     {/* Modal Header */}
-                    <div className={`p-4 border-b flex justify-between items-center text-white ${editForm.type === 'vertu' ? 'bg-green-600' : 'bg-red-600'} transition-colors duration-300`}>
+                    <div className={`p-4 border-b flex justify-between items-center text-white ${editForm.type === 'avantage' ? 'bg-green-600' : 'bg-red-600'} transition-colors duration-300`}>
                         <h3 className="font-bold text-lg flex items-center gap-2">
                             {editForm.id && library.some(l => l.id === editForm.id) ? <Edit2 size={20} /> : <Plus size={20} />}
                             {library.some(l => l.id === editForm.id) ? 'Éditer le Trait' : 'Nouveau Trait'}
@@ -496,16 +497,16 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                         <div className="flex justify-center">
                             <div className="bg-gray-200 p-1 rounded-lg flex shadow-inner">
                                 <button
-                                    onClick={() => setEditForm({ ...editForm, type: 'vertu' })}
-                                    className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${editForm.type === 'vertu' ? 'bg-white text-green-700 shadow' : 'text-gray-500 hover:text-gray-700'}`}
+                                    onClick={() => setEditForm({ ...editForm, type: 'avantage' })}
+                                    className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${editForm.type === 'avantage' ? 'bg-white text-green-700 shadow' : 'text-gray-500 hover:text-gray-700'}`}
                                 >
-                                    Vertu
+                                    Avantage
                                 </button>
                                 <button
-                                    onClick={() => setEditForm({ ...editForm, type: 'defaut' })}
-                                    className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${editForm.type === 'defaut' ? 'bg-white text-red-700 shadow' : 'text-gray-500 hover:text-gray-700'}`}
+                                    onClick={() => setEditForm({ ...editForm, type: 'desavantage' })}
+                                    className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${editForm.type === 'desavantage' ? 'bg-white text-red-700 shadow' : 'text-gray-500 hover:text-gray-700'}`}
                                 >
-                                    Défaut
+                                    Désavantage
                                 </button>
                             </div>
                         </div>
@@ -712,7 +713,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                         </button>
                         <button 
                             onClick={handleSave} 
-                            className={`px-6 py-2 text-white rounded-lg font-bold shadow-md flex items-center gap-2 transition-transform hover:scale-105 ${editForm.type === 'vertu' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
+                            className={`px-6 py-2 text-white rounded-lg font-bold shadow-md flex items-center gap-2 transition-transform hover:scale-105 ${editForm.type === 'avantage' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
                         >
                             <Save size={18} />
                             Enregistrer

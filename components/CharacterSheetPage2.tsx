@@ -247,7 +247,7 @@ const CharacterImageWidget: React.FC<{
     return (
         <>
             <div 
-                className="w-full h-full flex flex-col relative group cursor-pointer bg-white"
+                className="w-full h-full flex flex-col items-center justify-center relative group cursor-pointer bg-stone-50/30 overflow-hidden"
                 onClick={() => !imageUrl && !loading && fileInputRef.current?.click()}
             >
                 <input 
@@ -259,13 +259,13 @@ const CharacterImageWidget: React.FC<{
                 />
                 
                 {imageUrl ? (
-                    <div className="relative w-full h-full p-2">
-                        {/* Frame Effect */}
-                        <div className="w-full h-full border-2 border-stone-200 shadow-inner bg-stone-100 flex items-center justify-center overflow-hidden relative">
+                    <div className="w-full h-full p-4 flex items-center justify-center">
+                        {/* Frame Effect - Centered with Padding */}
+                        <div className="w-full h-full border-4 border-white shadow-md bg-stone-200 flex items-center justify-center overflow-hidden relative ring-1 ring-stone-300 rounded-sm">
                             <img src={imageUrl} alt="Character" className="w-full h-full object-contain" />
                             
                             {/* Overlay Actions */}
-                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[1px]">
                                 <button 
                                     onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                                     className="bg-white/90 p-2 rounded-full hover:bg-blue-50 text-blue-600 transition-colors shadow-lg"
@@ -284,15 +284,17 @@ const CharacterImageWidget: React.FC<{
                         </div>
                     </div>
                 ) : (
-                    <div className={`w-full h-full border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-400 bg-stone-50 hover:bg-stone-100 hover:border-stone-400 transition-colors m-2 w-[calc(100%-1rem)] h-[calc(100%-1rem)] rounded-lg ${loading ? 'opacity-50 cursor-wait' : ''}`}>
-                        {loading ? (
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-stone-500 mb-2"></div>
-                        ) : (
-                            <ImageIcon size={48} className="mb-2 opacity-50" />
-                        )}
-                        <span className="text-xs font-bold uppercase tracking-wider text-center px-4">
-                            {loading ? "Traitement..." : "Cliquez pour ajouter une image"}
-                        </span>
+                    <div className="w-full h-full p-4 flex items-center justify-center">
+                        <div className={`w-full h-full border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-400 bg-white/50 hover:bg-white hover:border-blue-400 hover:text-blue-500 transition-all rounded-lg ${loading ? 'opacity-50 cursor-wait' : ''}`}>
+                            {loading ? (
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-stone-500 mb-2"></div>
+                            ) : (
+                                <ImageIcon size={48} className="mb-2 opacity-50" />
+                            )}
+                            <span className="text-xs font-bold uppercase tracking-wider text-center px-4">
+                                {loading ? "Traitement..." : "Cliquez pour ajouter une image"}
+                            </span>
+                        </div>
                     </div>
                 )}
             </div>
@@ -340,10 +342,10 @@ interface Props {
 
 const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = false, onAddLog }) => {
   // State for the specific Trait Editor Modal
-  const [editingSlot, setEditingSlot] = useState<{ type: 'vertus' | 'defauts', index: number } | null>(null);
+  const [editingSlot, setEditingSlot] = useState<{ type: 'avantages' | 'desavantages', index: number } | null>(null);
   
   // State for Multi-Select Library Modal
-  const [multiSelectTarget, setMultiSelectTarget] = useState<'vertus' | 'defauts' | null>(null);
+  const [multiSelectTarget, setMultiSelectTarget] = useState<'avantages' | 'desavantages' | null>(null);
 
   const [editorName, setEditorName] = useState('');
   const [editorValue, setEditorValue] = useState('');
@@ -358,6 +360,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
   }, [editingSlot, data.page2]);
 
   const updateList = (field: keyof CharacterSheetData['page2'], index: number, value: string) => {
+    // This is now only used for potentially other lists if any. arme_list is now a string.
     // @ts-ignore
     const newList = [...data.page2[field]];
     newList[index] = value;
@@ -407,7 +410,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
           }
       });
       
-      onAddLog(`Modification ${editingSlot.type} (ligne ${editingSlot.index + 1})`, 'info', 'sheet');
+      const typeLabel = editingSlot.type === 'avantages' ? 'Avantage' : 'Désavantage';
+      onAddLog(`Modification ${typeLabel} (ligne ${editingSlot.index + 1})`, 'info', 'sheet');
       setEditingSlot(null);
   };
 
@@ -481,33 +485,33 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
   };
 
   // Helper to render layout content to avoid duplication (keeping logic separate)
-  const VertusColumn = (
+  const AvantagesColumn = (
      <div className="col-span-1 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
          <SectionHeader 
-            title="Vertus" 
-            total={calculateTotal(data.page2.vertus)}
+            title="Avantages" 
+            total={calculateTotal(data.page2.avantages)}
             totalColor="text-green-700 bg-green-50 border-green-200"
-            onOpenLibrary={() => setMultiSelectTarget('vertus')}
+            onOpenLibrary={() => setMultiSelectTarget('avantages')}
          />
          <div className="space-y-0.5 flex-grow overflow-auto min-h-0">
-             {data.page2.vertus.map((item, i) => (
-                <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'vertus', index: i })} />
+             {data.page2.avantages.map((item, i) => (
+                <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'avantages', index: i })} />
              ))}
          </div>
      </div>
   );
 
-  const DefautsColumn = (
+  const DesavantagesColumn = (
      <div className="col-span-1 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
          <SectionHeader 
-            title="Défauts" 
-            total={calculateTotal(data.page2.defauts)}
+            title="Désavantages" 
+            total={calculateTotal(data.page2.desavantages)}
             totalColor="text-red-700 bg-red-50 border-red-200"
-            onOpenLibrary={() => setMultiSelectTarget('defauts')}
+            onOpenLibrary={() => setMultiSelectTarget('desavantages')}
          />
          <div className="space-y-0.5 flex-grow overflow-auto min-h-0">
-             {data.page2.defauts.map((item, i) => (
-                <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'defauts', index: i })} />
+             {data.page2.desavantages.map((item, i) => (
+                <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'desavantages', index: i })} />
              ))}
          </div>
      </div>
@@ -584,11 +588,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                         </div>
                         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                             <SectionHeader title="Armes" />
-                            <div className="space-y-0.5 flex-grow overflow-auto">
-                                {/* LIMIT TO 6 LINES IN LANDSCAPE TO AVOID SCROLLBAR */}
-                                {data.page2.armes_list.slice(0, 6).map((val, i) => (
-                                    <LineInput key={i} value={val} onChange={(v) => updateList('armes_list', i, v)} />
-                                ))}
+                            <div className="flex-grow relative min-h-0">
+                                <NotebookInput value={data.page2.armes_list} onChange={(v) => updateStringField('armes_list', v)} />
                             </div>
                         </div>
                     </div>
@@ -596,11 +597,11 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
 
                 {/* Bottom Section: Long Lists (4 Equal Columns) - Fixed 65% Height */}
                 <div className="grid grid-cols-4 h-[65%] overflow-hidden">
-                    {/* Bot-Col 1: Vertus */}
-                    {VertusColumn}
+                    {/* Bot-Col 1: Avantages */}
+                    {AvantagesColumn}
 
-                    {/* Bot-Col 2: Défauts */}
-                    {DefautsColumn}
+                    {/* Bot-Col 2: Désavantages */}
+                    {DesavantagesColumn}
 
                     {/* Bot-Col 3: Equipement */}
                     <div className="col-span-1 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
@@ -633,7 +634,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
             {/* Row 1: Image & Identity (Lieux, Contacts, Conn, Rep) */}
             <div className="flex border-b border-stone-400 h-[260px] overflow-hidden">
                 {/* Left: Image (Fixed Width) */}
-                <div className="w-[35%] border-r border-stone-400 bg-stone-50 p-0 flex flex-col">
+                <div className="w-[35%] border-r border-stone-400 bg-stone-50 p-0 flex flex-col overflow-hidden">
                     <CharacterImageWidget 
                         imageId={data.page2.characterImageId}
                         legacyImage={data.page2.characterImage}
@@ -695,34 +696,26 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                 {/* Armes */}
                 <div className="col-span-3 flex flex-col h-full">
                     <SectionHeader title="Armes" />
-                    <div className="grid grid-cols-2 h-full overflow-hidden">
-                            <div className="border-r border-stone-400 p-1 space-y-0.5 overflow-auto">
-                                {data.page2.armes_list.slice(0, 5).map((val, i) => (
-                                    <LineInput key={i} value={val} onChange={(v) => updateList('armes_list', i, v)} />
-                                ))}
-                            </div>
-                            <div className="p-1 space-y-0.5 overflow-auto">
-                                {data.page2.armes_list.slice(5, 10).map((val, i) => (
-                                    <LineInput key={i + 5} value={val} onChange={(v) => updateList('armes_list', i + 5, v)} />
-                                ))}
-                            </div>
+                    {/* MODIFIED: Single Notebook Input spanning full width, replacing the 2-column grid */}
+                    <div className="flex-grow relative min-h-0 overflow-hidden p-1">
+                        <NotebookInput value={data.page2.armes_list} onChange={(v) => updateStringField('armes_list', v)} />
                     </div>
                 </div>
             </div>
 
             {/* Row 3: Traits (Full Height Priority) */}
             <div className="grid grid-cols-2 border-b border-stone-400 flex-grow min-h-[500px]">
-                {/* Vertus Column */}
+                {/* Avantages Column */}
                 <div className="border-r border-stone-400 flex flex-col overflow-hidden">
                         <div className="relative text-center text-[10px] font-bold italic py-1 bg-green-50/50 border-b border-stone-300 flex items-center justify-center min-h-[1.75rem] shrink-0 group">
                         <div className="absolute left-2 top-0 bottom-0 flex items-center">
                             <span className="w-10 flex justify-center items-center bg-white border border-stone-300 rounded-sm text-xs h-5 font-bold shadow-sm text-green-700">
-                                {calculateTotal(data.page2.vertus)}
+                                {calculateTotal(data.page2.avantages)}
                             </span>
                         </div>
-                        <span className="text-stone-600 uppercase">Vertus</span>
+                        <span className="text-stone-600 uppercase">Avantages</span>
                         <button 
-                            onClick={() => setMultiSelectTarget('vertus')}
+                            onClick={() => setMultiSelectTarget('avantages')}
                             className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-white text-stone-500 hover:text-green-600 transition-colors"
                             title="Ouvrir la bibliothèque"
                         >
@@ -730,22 +723,22 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                         </button>
                     </div>
                     <div className="p-1 space-y-0.5 overflow-auto flex-grow">
-                        {data.page2.vertus.map((item, i) => (
-                            <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'vertus', index: i })} />
+                        {data.page2.avantages.map((item, i) => (
+                            <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'avantages', index: i })} />
                         ))}
                     </div>
                 </div>
-                {/* Défauts Column */}
+                {/* Désavantages Column */}
                 <div className="flex flex-col overflow-hidden">
                         <div className="relative text-center text-[10px] font-bold italic py-1 bg-red-50/50 border-b border-stone-300 flex items-center justify-center min-h-[1.75rem] shrink-0 group">
                         <div className="absolute left-2 top-0 bottom-0 flex items-center">
                             <span className="w-10 flex justify-center items-center bg-white border border-stone-300 rounded-sm text-xs h-5 font-bold shadow-sm text-red-700">
-                                {calculateTotal(data.page2.defauts)}
+                                {calculateTotal(data.page2.desavantages)}
                             </span>
                         </div>
-                        <span className="text-stone-600 uppercase">Défauts</span>
+                        <span className="text-stone-600 uppercase">Désavantages</span>
                         <button 
-                            onClick={() => setMultiSelectTarget('defauts')}
+                            onClick={() => setMultiSelectTarget('desavantages')}
                             className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-white text-stone-500 hover:text-red-600 transition-colors"
                             title="Ouvrir la bibliothèque"
                         >
@@ -753,8 +746,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                         </button>
                     </div>
                     <div className="p-1 space-y-0.5 overflow-auto flex-grow">
-                        {data.page2.defauts.map((item, i) => (
-                            <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'defauts', index: i })} />
+                        {data.page2.desavantages.map((item, i) => (
+                            <TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'desavantages', index: i })} />
                         ))}
                     </div>
                 </div>
@@ -792,10 +785,10 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl h-[85vh] flex flex-col overflow-hidden">
                     
                     {/* Modal Header */}
-                    <div className={`p-4 border-b flex justify-between items-center text-white shrink-0 ${editingSlot.type === 'vertus' ? 'bg-green-700' : 'bg-red-700'}`}>
+                    <div className={`p-4 border-b flex justify-between items-center text-white shrink-0 ${editingSlot.type === 'avantages' ? 'bg-green-700' : 'bg-red-700'}`}>
                         <h3 className="font-bold text-lg flex items-center gap-2">
                             <Edit size={20} />
-                            Éditer {editingSlot.type === 'vertus' ? 'Vertu' : 'Défaut'} (Ligne {editingSlot.index + 1})
+                            Éditer {editingSlot.type === 'avantages' ? 'Avantage' : 'Désavantage'} (Ligne {editingSlot.index + 1})
                         </h3>
                         <button onClick={() => setEditingSlot(null)} className="hover:bg-white/20 p-1 rounded transition-colors">
                             <X size={24} />
@@ -861,7 +854,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                                     onUpdate={onChange} 
                                     onSelect={handleLibrarySelectInEditor}
                                     isEditable={false}
-                                    defaultFilter={editingSlot.type === 'vertus' ? 'vertu' : 'defaut'} 
+                                    defaultFilter={editingSlot.type === 'avantages' ? 'avantage' : 'desavantage'} 
                                 />
                             </div>
                         </div>
@@ -878,7 +871,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                         <button 
                             onClick={saveTraitFromEditor}
                             className={`px-6 py-2 text-white rounded-lg font-bold shadow-md flex items-center gap-2 transition-transform hover:scale-105 ${
-                                editingSlot.type === 'vertus' ? 'bg-green-700 hover:bg-green-800' : 'bg-red-700 hover:bg-red-800'
+                                editingSlot.type === 'avantages' ? 'bg-green-700 hover:bg-green-800' : 'bg-red-700 hover:bg-red-800'
                             }`}
                         >
                             <Check size={18} />
@@ -893,10 +886,10 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
         {multiSelectTarget && (
             <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl h-[85vh] flex flex-col overflow-hidden">
-                    <div className={`p-4 border-b flex justify-between items-center text-white ${multiSelectTarget === 'vertus' ? 'bg-green-700' : 'bg-red-700'}`}>
+                    <div className={`p-4 border-b flex justify-between items-center text-white ${multiSelectTarget === 'avantages' ? 'bg-green-700' : 'bg-red-700'}`}>
                         <h3 className="font-bold text-lg flex items-center gap-2">
                             <BookOpen size={20} />
-                            Ajouter des {multiSelectTarget === 'vertus' ? 'Vertus' : 'Défauts'}
+                            Ajouter des {multiSelectTarget === 'avantages' ? 'Avantages' : 'Désavantages'}
                         </h3>
                         <button onClick={() => setMultiSelectTarget(null)} className="hover:bg-white/20 p-1 rounded transition-colors">
                             <X size={24} />
@@ -908,7 +901,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ data, onChange, isLandscape = fa
                             data={data} 
                             onUpdate={onChange} 
                             isEditable={false}
-                            defaultFilter={multiSelectTarget === 'vertus' ? 'vertu' : 'defaut'}
+                            defaultFilter={multiSelectTarget === 'avantages' ? 'avantage' : 'desavantage'}
                             onMultiSelect={handleMultiAdd}
                         />
                     </div>

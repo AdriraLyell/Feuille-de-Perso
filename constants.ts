@@ -3,12 +3,28 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.6";
+export const APP_VERSION = "1.9.8";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
-        version: "1.9.6",
+        version: "1.9.8",
         date: new Date().toLocaleDateString('fr-FR'),
+        type: 'minor',
+        changes: [
+            "Terminologie : Renommage global de 'Vertus' en 'Avantages' et 'Défauts' en 'Désavantages' pour mieux coller à la sémantique du jeu."
+        ]
+    },
+    {
+        version: "1.9.7",
+        date: "24/01/2026",
+        type: 'minor',
+        changes: [
+            "UI (Détails) : Conversion du widget 'Armes' en champ texte libre (style carnet) pour plus de flexibilité, harmonisé avec les autres champs."
+        ]
+    },
+    {
+        version: "1.9.6",
+        date: "24/01/2026",
         type: 'minor',
         changes: [
             "UI (Détails) : Ajout d'un widget d'image de personnage en haut à gauche.",
@@ -28,7 +44,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     },
     {
         version: "1.9.4",
-        date: new Date().toLocaleDateString('fr-FR'),
+        date: "22/01/2026",
         type: 'patch',
         changes: [
             "UI (Notes de Campagne) : Application d'un format fixe en mode Portrait (900x1270px) pour éviter les ascenseurs horizontaux et garantir un ratio cohérent."
@@ -36,7 +52,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     },
     {
         version: "1.9.3",
-        date: new Date().toLocaleDateString('fr-FR'),
+        date: "22/01/2026",
         type: 'patch',
         changes: [
             "UI (Notes de Campagne) : Les boutons de navigation (Précédent/Suivant) sont désormais ancrés visuellement aux bords du livre (flex layout) au lieu d'être fixés à l'écran, améliorant le confort de lecture lors du défilement."
@@ -44,7 +60,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     },
     {
         version: "1.9.2",
-        date: new Date().toLocaleDateString('fr-FR'),
+        date: "22/01/2026",
         type: 'patch',
         changes: [
             "UI (Notes de Campagne) : Adaptation automatique du format au mode Paysage (format A4 paysage 1.414:1) pour une meilleure cohérence visuelle avec les autres onglets."
@@ -52,7 +68,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     },
     {
         version: "1.9.1",
-        date: new Date().toLocaleDateString('fr-FR'),
+        date: "22/01/2026",
         type: 'patch',
         changes: [
             "UI (Paysage) : Rééquilibrage de la page 'Détails' (35% Haut / 65% Bas) pour maximiser l'espace des Traits et Notes.",
@@ -62,7 +78,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     },
     {
         version: "1.9.0",
-        date: new Date().toLocaleDateString('fr-FR'),
+        date: "22/01/2026",
         type: 'minor',
         changes: [
             "Fonctionnalité : Refonte des Notes de Campagne.",
@@ -364,10 +380,10 @@ export const INITIAL_DATA: CharacterSheetData = {
     reputation: Array(7).fill({ reputation: '', lieu: '', valeur: '' }), // Increased to 7
     connaissances: '', 
     valeurs_monetaires: '',
-    armes_list: Array(10).fill(''),
-    vertus: Array(28).fill(null).map(() => ({ name: '', value: '' })),
-    defauts: Array(28).fill(null).map(() => ({ name: '', value: '' })),
-    equipement: '', // Changed to empty string for notebook style
+    armes_list: '', 
+    avantages: Array(28).fill(null).map(() => ({ name: '', value: '' })), // Renamed from vertus
+    desavantages: Array(28).fill(null).map(() => ({ name: '', value: '' })), // Renamed from defauts
+    equipement: '', 
     notes: '',
     characterImage: '', // Initialized empty
   },

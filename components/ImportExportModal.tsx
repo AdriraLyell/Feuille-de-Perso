@@ -84,9 +84,9 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
       clean.page2.reputation.fill({ reputation: '', lieu: '', valeur: '' });
       clean.page2.connaissances = "";
       clean.page2.valeurs_monetaires = "";
-      clean.page2.armes_list.fill("");
-      clean.page2.vertus.fill({ name: '', value: '' });
-      clean.page2.defauts.fill({ name: '', value: '' });
+      clean.page2.armes_list = ""; // Reset as empty string
+      clean.page2.avantages.fill({ name: '', value: '' }); // Renamed
+      clean.page2.desavantages.fill({ name: '', value: '' }); // Renamed
       clean.page2.equipement = "";
       clean.page2.notes = "";
       clean.page2.characterImage = "";
@@ -443,7 +443,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                      <input type="radio" name="exportType" checked={exportType === 'library'} onChange={() => setExportType('library')} className="mt-1" />
                      <div>
                          <span className="font-bold text-gray-800 flex items-center gap-2"><BookOpen size={16} /> Bibliothèque Seule</span>
-                         <span className="text-xs text-gray-500 block">Uniquement la liste des Traits (Vertus/Défauts).</span>
+                         <span className="text-xs text-gray-500 block">Uniquement la liste des Traits (Avantages/Désavantages).</span>
                      </div>
                  </label>
              </div>

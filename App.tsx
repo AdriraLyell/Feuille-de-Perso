@@ -23,22 +23,37 @@ const migrateData = (parsed: any): CharacterSheetData => {
         parsed = { ...parsed, page2: INITIAL_DATA.page2 };
     }
 
-    // Migration 2: Convert old string[] vertus/defauts to object[]
-    if (parsed.page2.vertus && parsed.page2.vertus.length > 0 && typeof parsed.page2.vertus[0] === 'string') {
-        parsed.page2.vertus = parsed.page2.vertus.map((s: string) => ({ name: s || '', value: '' }));
+    // Migration Terminology: Vertus -> Avantages, Defauts -> Desavantages
+    if (parsed.page2.vertus && !parsed.page2.avantages) {
+        parsed.page2.avantages = parsed.page2.vertus;
+        delete parsed.page2.vertus;
     }
-    if (parsed.page2.defauts && parsed.page2.defauts.length > 0 && typeof parsed.page2.defauts[0] === 'string') {
-        parsed.page2.defauts = parsed.page2.defauts.map((s: string) => ({ name: s || '', value: '' }));
+    if (parsed.page2.defauts && !parsed.page2.desavantages) {
+        parsed.page2.desavantages = parsed.page2.defauts;
+        delete parsed.page2.defauts;
+    }
+
+    // Migration 2: Convert old string[] to object[] (Apply to new names)
+    if (parsed.page2.avantages && parsed.page2.avantages.length > 0 && typeof parsed.page2.avantages[0] === 'string') {
+        parsed.page2.avantages = parsed.page2.avantages.map((s: string) => ({ name: s || '', value: '' }));
+    }
+    if (parsed.page2.desavantages && parsed.page2.desavantages.length > 0 && typeof parsed.page2.desavantages[0] === 'string') {
+        parsed.page2.desavantages = parsed.page2.desavantages.map((s: string) => ({ name: s || '', value: '' }));
     }
 
     // Fix: Ensure correct array lengths if old data was shorter
-    if (parsed.page2.vertus && parsed.page2.vertus.length < 28) {
-            const diff = 28 - parsed.page2.vertus.length;
-            parsed.page2.vertus = [...parsed.page2.vertus, ...Array(diff).fill(null).map(() => ({ name: '', value: '' }))];
+    if (parsed.page2.avantages && parsed.page2.avantages.length < 28) {
+            const diff = 28 - parsed.page2.avantages.length;
+            parsed.page2.avantages = [...parsed.page2.avantages, ...Array(diff).fill(null).map(() => ({ name: '', value: '' }))];
+    } else if (!parsed.page2.avantages) {
+            parsed.page2.avantages = Array(28).fill(null).map(() => ({ name: '', value: '' }));
     }
-        if (parsed.page2.defauts && parsed.page2.defauts.length < 28) {
-            const diff = 28 - parsed.page2.defauts.length;
-            parsed.page2.defauts = [...parsed.page2.defauts, ...Array(diff).fill(null).map(() => ({ name: '', value: '' }))];
+
+    if (parsed.page2.desavantages && parsed.page2.desavantages.length < 28) {
+            const diff = 28 - parsed.page2.desavantages.length;
+            parsed.page2.desavantages = [...parsed.page2.desavantages, ...Array(diff).fill(null).map(() => ({ name: '', value: '' }))];
+    } else if (!parsed.page2.desavantages) {
+            parsed.page2.desavantages = Array(28).fill(null).map(() => ({ name: '', value: '' }));
     }
 
     // Migration 3: Convert old counters structure to new DotEntry structure
@@ -187,6 +202,13 @@ const migrateData = (parsed: any): CharacterSheetData => {
         parsed.page2.characterImage = '';
     }
 
+    // Migration 30: Convert Armes List from string[] to string
+    if (Array.isArray(parsed.page2.armes_list)) {
+        parsed.page2.armes_list = parsed.page2.armes_list.filter((n: string) => n && n.trim() !== '').join('\n');
+    } else if (typeof parsed.page2.armes_list !== 'string') {
+        parsed.page2.armes_list = '';
+    }
+
     // Migration 8: Add Specializations
     if (!parsed.specializations) {
         parsed.specializations = {};
@@ -248,10 +270,11 @@ const migrateData = (parsed: any): CharacterSheetData => {
         parsed.library = [];
     }
 
-    // Migration 21: Ensure Library entries have tags
+    // Migration Terminology Library: Vertu->Avantage, Defaut->Desavantage
     if (parsed.library) {
         parsed.library = parsed.library.map((l: any) => ({
             ...l,
+            type: l.type === 'vertu' ? 'avantage' : (l.type === 'defaut' ? 'desavantage' : l.type),
             tags: Array.isArray(l.tags) ? l.tags : []
         }));
     }
@@ -414,7 +437,7 @@ function App() {
   // --- Experience Calculation Effect (UPDATED FOR CREATION LOGIC AND TRAIT EFFECTS) ---
   useEffect(() => {
     
-    // 0. Extract Active Effects from Traits (Vertus/Défauts)
+    // 0. Extract Active Effects from Traits (Avantages/Désavantages)
     const activeEffects: TraitEffect[] = [];
     
     // Helper to find effects in library based on trait name
@@ -426,8 +449,8 @@ function App() {
         }
     };
 
-    data.page2.vertus.forEach(t => findEffects(t.name));
-    data.page2.defauts.forEach(t => findEffects(t.name));
+    data.page2.avantages.forEach(t => findEffects(t.name));
+    data.page2.desavantages.forEach(t => findEffects(t.name));
 
     // Calculate Bonus XP from Traits
     const traitXPBonus = activeEffects
@@ -570,7 +593,7 @@ function App() {
         }));
     }
 
-  }, [data.skills, data.attributes, data.secondaryAttributes, data.secondaryAttributesActive, data.xpLogs, data.attributeSettings, data.creationConfig.attributeCost, data.page2.vertus, data.page2.defauts, data.library]);
+  }, [data.skills, data.attributes, data.secondaryAttributes, data.secondaryAttributesActive, data.xpLogs, data.attributeSettings, data.creationConfig.attributeCost, data.page2.avantages, data.page2.desavantages, data.library]);
 
   // --- Handlers ---
   const handlePrintRequest = () => {

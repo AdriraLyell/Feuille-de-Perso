@@ -112,7 +112,7 @@ export interface TraitEffect {
 
 export interface LibraryEntry {
   id: string;
-  type: 'vertu' | 'defaut';
+  type: 'avantage' | 'desavantage'; // Renamed from vertu/defaut
   name: string;
   cost: string;
   description: string;
@@ -121,14 +121,14 @@ export interface LibraryEntry {
 }
 
 export interface Page2Data {
-  lieux_importants: string; // Changed to string for notebook style
-  contacts: string; // Changed to string for notebook style
+  lieux_importants: string;
+  contacts: string; 
   reputation: ReputationEntry[];
-  connaissances: string; // Changed to string for notebook style
-  valeurs_monetaires: string; // Changed to string for notebook style
-  armes_list: string[]; // Simple list for the second page
-  vertus: TraitEntry[];
-  defauts: TraitEntry[];
+  connaissances: string; 
+  valeurs_monetaires: string; 
+  armes_list: string;
+  avantages: TraitEntry[]; // Renamed from vertus
+  desavantages: TraitEntry[]; // Renamed from defauts
   equipement: string; 
   notes: string;
   characterImage?: string; // Base64 string (Legacy / Export carrier)
