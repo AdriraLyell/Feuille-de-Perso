@@ -1,0 +1,33 @@
+name: Copier changes de main vers misenligne
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  copy-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Copier fichiers de main vers misenligne
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin misenligne
+          git checkout misenligne
+          git checkout main -- .
+          git add .
+          # On ne commit que s'il y a des changements
+          if ! git diff --cached --quiet; then
+            git commit -m "Copie automatique depuis main via GitHub Actions"
+            git push origin misenligne
+          else
+            echo "Pas de modifications à copier."
+          fi
