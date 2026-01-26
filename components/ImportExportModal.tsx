@@ -1,8 +1,8 @@
 
 import React, { useState, useRef } from 'react';
 import { CharacterSheetData, LibraryEntry } from '../types';
-import { Download, Upload, FileJson, CheckSquare, Square, X, AlertTriangle, BookOpen, User, LayoutTemplate, ArrowRight, CheckCircle2, HelpCircle, Merge, RefreshCw, FileBox } from 'lucide-react';
-import { INITIAL_DATA } from '../constants';
+import { Download, Upload, FileJson, CheckSquare, Square, X, AlertTriangle, BookOpen, User, LayoutTemplate, ArrowRight, CheckCircle2, HelpCircle, Merge, RefreshCw, FileBox, Info } from 'lucide-react';
+import { INITIAL_DATA, APP_VERSION } from '../constants';
 import { getImage, saveImage, blobToBase64, base64ToBlob } from '../imageDB';
 
 interface ImportExportModalProps {
@@ -21,6 +21,8 @@ interface FileAnalysis {
     hasStructure: boolean; // Skills, Attributes
     hasLibrary: boolean;
     isFilled: boolean; // Guess if it's a played character (has values)
+    fileVersion?: string;
+    versionMismatch: boolean;
 }
 
 const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, data, onImport, onExportSuccess, onAddLog }) => {
@@ -132,29 +134,49 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
           delete dataToProcess.page2.characterImageId;
       }
 
+      // Add APP_VERSION to dataToProcess if not present
+      if (!dataToProcess.appVersion) {
+          dataToProcess.appVersion = APP_VERSION;
+      }
+
       const template = createTemplateFromData(dataToProcess);
+      // Ensure template has version
+      if (!(template as any).appVersion) {
+          (template as any).appVersion = APP_VERSION;
+      }
+
+      // Generate Timestamp DD-MM-YYYY_HHhMM
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      
+      const timestamp = `${day}-${month}-${year}_${hours}h${minutes}`;
 
       switch (exportType) {
           case 'full':
               exportData = dataToProcess; 
-              filename = `Personnage_${data.header.name || 'SansNom'}`;
+              // Format: DD-MM-YYYY_HHhMM_Personnage_Nom
+              filename = `${timestamp}_Personnage_${data.header.name || 'SansNom'}`;
               break;
           case 'system':
               // Template + Library
               exportData = template;
               exportData.library = data.library; // Include lib
-              filename = `Systeme_Jeu`;
+              filename = `${timestamp}_Systeme_Jeu`;
               break;
           case 'template':
               // Template Only (No Lib)
               exportData = template;
               delete exportData.library; // Remove lib
-              filename = `Template_Structure`;
+              filename = `${timestamp}_Template_Structure`;
               break;
           case 'library':
               // Library Only
-              exportData = { library: data.library };
-              filename = `Bibliotheque`;
+              exportData = { library: data.library, appVersion: APP_VERSION };
+              filename = `${timestamp}_Bibliotheque`;
               break;
       }
 
@@ -188,6 +210,10 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
               const hasStructure = !!(json.skills && json.attributes);
               const hasLibrary = !!(json.library && Array.isArray(json.library));
               
+              // Version check
+              const fileVersion = json.appVersion;
+              const versionMismatch = fileVersion !== APP_VERSION;
+              
               // Simple check for "filled" data: name is present OR xp spent > 0
               const isFilled = (json.header && json.header.name) || (json.experience && parseInt(json.experience.spent) > 0);
 
@@ -197,7 +223,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
               }
 
               setPendingFile(json);
-              setAnalysis({ hasHeader, hasStructure, hasLibrary, isFilled });
+              setAnalysis({ hasHeader, hasStructure, hasLibrary, isFilled, fileVersion, versionMismatch });
               setImportAction(''); // Reset choice
 
               // Clean input
@@ -497,15 +523,31 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
              ) : (
                  <div className="flex-grow flex flex-col animate-in fade-in slide-in-from-right-4 duration-300">
                      {/* Analysis Header */}
-                     <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 mb-4 flex gap-3 text-xs text-blue-800">
+                     <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 mb-4 flex gap-3 text-xs text-blue-800 flex-col">
                          <div className="flex-grow">
                              <span className="font-bold block mb-1">Contenu détecté :</span>
-                             <div className="flex gap-2">
+                             <div className="flex gap-2 flex-wrap">
                                  {analysis?.hasStructure && <span className="bg-white border px-2 py-0.5 rounded flex items-center gap-1"><LayoutTemplate size={10}/> Structure</span>}
                                  {analysis?.hasLibrary && <span className="bg-white border px-2 py-0.5 rounded flex items-center gap-1"><BookOpen size={10}/> Bibliothèque</span>}
                                  {analysis?.isFilled && <span className="bg-white border px-2 py-0.5 rounded flex items-center gap-1"><User size={10}/> Données Joueur</span>}
                              </div>
                          </div>
+                         
+                         {/* VERSION WARNING */}
+                         {analysis?.versionMismatch && (
+                             <div className="mt-2 pt-2 border-t border-blue-200 text-orange-700 font-semibold flex items-start gap-2">
+                                 <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                                 <div>
+                                     {!analysis.fileVersion ? (
+                                         "Fichier ancien (sans numéro de version). Risque d'incompatibilité mineure."
+                                     ) : analysis.fileVersion < APP_VERSION ? (
+                                         <span>Version du fichier (v{analysis.fileVersion}) antérieure à l'application (v{APP_VERSION}). Mise à jour automatique.</span>
+                                     ) : (
+                                         <span>Version du fichier (v{analysis.fileVersion}) plus récente que l'application (v{APP_VERSION}). Certaines fonctionnalités pourraient manquer.</span>
+                                     )}
+                                 </div>
+                             </div>
+                         )}
                      </div>
                      
                      <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2 text-sm uppercase tracking-wide">

@@ -3,12 +3,29 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.11";
+export const APP_VERSION = "1.9.13";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
-        version: "1.9.11",
+        version: "1.9.13",
         date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "Système : Vérification de la version du fichier lors de l'import. Une alerte s'affiche si la version du fichier diffère de celle de l'application."
+        ]
+    },
+    {
+        version: "1.9.12",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "Système : Le nom des fichiers de sauvegarde inclut désormais la date et l'heure en préfixe (JJ-MM-AAAA_HHhMM).",
+            "Système : La version de l'application est incluse dans les métadonnées du fichier JSON exporté (si absente)."
+        ]
+    },
+    {
+        version: "1.9.11",
+        date: "24/01/2026",
         type: 'patch',
         changes: [
             "UI (Détails - Portrait) : Réorganisation majeure de la mise en page.",
