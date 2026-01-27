@@ -3,12 +3,69 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.28";
+export const APP_VERSION = "1.9.35";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
+        version: "1.9.35",
+        date: "25/01/2026 17:15",
+        type: 'patch',
+        changes: [
+            "UI (Notes de Campagne) : Activation du défilement horizontal dans le tableau 'Groupe' lorsque la largeur totale des colonnes dépasse l'espace disponible."
+        ]
+    },
+    {
+        version: "1.9.34",
+        date: "25/01/2026 17:00",
+        type: 'patch',
+        changes: [
+            "UI (Notes de Campagne) : Les titres de colonnes trop longs dans le tableau Groupe sont désormais tronqués (...) et affichent leur nom complet au survol."
+        ]
+    },
+    {
+        version: "1.9.33",
+        date: "25/01/2026 16:30",
+        type: 'patch',
+        changes: [
+            "UI (Notes de Campagne) : Le bouton 'Ajouter un membre' dans l'onglet Groupe est maintenant intégré directement dans le tableau (dernière ligne) pour être toujours visible à la suite des données."
+        ]
+    },
+    {
+        version: "1.9.32",
+        date: "25/01/2026 16:00",
+        type: 'patch',
+        changes: [
+            "UI (Fiche) : Déplacement du bouton d'activation du 'Mode Création' dans le bandeau supérieur de la fiche de personnage (coin haut droit).",
+            "UI (Configuration) : Suppression de l'interrupteur 'Mode Création' dans les paramètres (désormais accessible directement depuis la fiche)."
+        ]
+    },
+    {
+        version: "1.9.31",
+        date: "25/01/2026 15:30",
+        type: 'patch',
+        changes: [
+            "UI (Configuration) : Renommage de l'onglet 'Paramètres de Création' en 'Paramètres' dans la barre de navigation (pilule) pour plus de concision."
+        ]
+    },
+    {
+        version: "1.9.30",
+        date: "25/01/2026 15:00",
+        type: 'patch',
+        changes: [
+            "UI (Configuration) : Renommage du bloc 'Paramètres Généraux' en 'Paramètres de Création' dans l'onglet de configuration."
+        ]
+    },
+    {
+        version: "1.9.29",
+        date: "25/01/2026 14:30",
+        type: 'patch',
+        changes: [
+            "Système : Correction du format des dates dans le journal des modifications. Les dates sont désormais statiques pour garantir l'exactitude de l'historique."
+        ]
+    },
+    {
         version: "1.9.28",
-        date: new Date().toLocaleDateString('fr-FR'),
+        date: "25/01/2026",
         type: 'patch',
         changes: [
             "Config : Le Système de Carte (calcul automatique) est désormais activé par défaut pour les nouvelles fiches."

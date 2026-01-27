@@ -19,7 +19,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
   // Modal States
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showPresetConfirm, setShowPresetConfirm] = useState(false);
-  const [showCreationWarning, setShowCreationWarning] = useState(false);
   const [pendingPreset, setPendingPreset] = useState<any>(null);
 
   const [newlyAddedId, setNewlyAddedId] = useState<string | null>(null);
@@ -80,92 +79,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
     setLocalData(JSON.parse(JSON.stringify(INITIAL_DATA)));
     setShowResetConfirm(false);
     onAddLog("Réinitialisation complète de la fiche aux valeurs par défaut", 'danger', 'settings');
-  };
-
-  // --- Reset only Character Values (Keep Structure & Library) ---
-  const resetCharacterValues = (source: CharacterSheetData): CharacterSheetData => {
-      const clean = JSON.parse(JSON.stringify(source));
-      
-      // Reset Header
-      Object.keys(clean.header).forEach(k => clean.header[k as keyof typeof clean.header] = "");
-      
-      // Reset XP
-      clean.experience = { gain: '0', spent: '0', rest: '0' };
-      clean.xpLogs = [];
-      clean.appLogs = [];
-
-      // Reset Attributes Values
-      if (clean.attributes) {
-          Object.keys(clean.attributes).forEach(cat => {
-              if (Array.isArray(clean.attributes[cat])) {
-                  clean.attributes[cat].forEach((attr: AttributeEntry) => {
-                      attr.val1 = ""; attr.val2 = ""; attr.val3 = ""; // Changed to string
-                      attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
-                  });
-              }
-          });
-      }
-      
-      // Reset Secondary Attributes
-      if (clean.secondaryAttributes) {
-          Object.keys(clean.secondaryAttributes).forEach(cat => {
-              if (Array.isArray(clean.secondaryAttributes[cat])) {
-                  clean.secondaryAttributes[cat].forEach((attr: AttributeEntry) => {
-                      attr.val1 = ""; attr.val2 = ""; attr.val3 = ""; // Changed to string
-                      attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
-                  });
-              }
-          });
-      }
-
-      // Reset Skills Values
-      Object.keys(clean.skills).forEach(cat => {
-          clean.skills[cat as SkillCategoryKey].forEach((skill: DotEntry) => {
-              skill.value = 0;
-              skill.creationValue = 0;
-              if (typeof skill.current !== 'undefined') skill.current = 0;
-          });
-      });
-
-      // Reset Combat
-      clean.combat.weapons.forEach((w: CombatEntry) => { w.weapon=""; w.level=""; w.init=""; w.attack=""; w.damage=""; w.parry=""; });
-      clean.combat.armor.forEach((a: any) => { a.type=""; a.protection=""; a.weight=""; });
-      clean.combat.stats = { agility: '', dexterity: '', force: '', size: '' };
-
-      // Reset Page 2 Details
-      clean.page2.lieux_importants = "";
-      clean.page2.contacts = "";
-      clean.page2.reputation.forEach((r: ReputationEntry) => { r.reputation = ''; r.lieu = ''; r.valeur = ''; });
-      clean.page2.connaissances = "";
-      clean.page2.valeurs_monetaires = "";
-      clean.page2.armes_list = "";
-      clean.page2.avantages = Array(28).fill(null).map(() => ({ name: '', value: '' }));
-      clean.page2.desavantages = Array(28).fill(null).map(() => ({ name: '', value: '' }));
-      clean.page2.equipement = "";
-      clean.page2.notes = "";
-
-      // Reset Specializations
-      clean.specializations = {};
-      
-      // Reset Campaign Notes
-      clean.campaignNotes = [];
-      
-      // Counters
-      clean.counters.volonte.value = 3; 
-      clean.counters.volonte.creationValue = 3;
-      clean.counters.volonte.current = 0;
-      
-      clean.counters.confiance.value = 3; 
-      clean.counters.confiance.creationValue = 3;
-      clean.counters.confiance.current = 0;
-      
-      clean.counters.custom.forEach((c: DotEntry) => { 
-          c.value = 0; 
-          c.creationValue = 0;
-          c.current = 0; 
-      });
-
-      return clean;
   };
 
   // Define default attribute names for known categories
@@ -431,29 +344,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
               }
           }
       }));
-  };
-
-  const activateCreationMode = (isActive: boolean) => {
-      // If turning ON, show warning and force reset
-      if (isActive) {
-          setShowCreationWarning(true);
-      } else {
-          updateCreationConfig('active', false);
-          onAddLog("Mode Création DÉSACTIVÉ", 'info', 'settings');
-      }
-  };
-
-  const executeCreationActivation = () => {
-      const resetData = resetCharacterValues(localData);
-      setLocalData({
-          ...resetData,
-          creationConfig: {
-              ...resetData.creationConfig,
-              active: true
-          }
-      });
-      onAddLog("Mode Création ACTIVÉ - Fiche réinitialisée", 'success', 'settings');
-      setShowCreationWarning(false);
   };
 
   const calculateConfigurationCost = () => {
@@ -1021,36 +911,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
       return (
           <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
               
-              {/* Main Switch */}
-              <div className="bg-white p-6 rounded-xl shadow-lg border border-blue-100 flex items-center justify-between">
-                  <div>
-                      <h3 className="font-bold text-xl text-gray-800 flex items-center gap-2">
-                          <UserPlus className="text-blue-600" /> Mode Création de Personnage
-                      </h3>
-                      <p className="text-gray-500 text-sm mt-1">
-                          Active un HUD spécial pour guider la création (répartition des points, rangs, etc.).
-                      </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                      <span className={`text-sm font-bold ${config.active ? 'text-green-600' : 'text-gray-400'}`}>
-                          {config.active ? 'ACTIVÉ' : 'DÉSACTIVÉ'}
-                      </span>
-                      <button 
-                          onClick={() => activateCreationMode(!config.active)}
-                          className={`w-14 h-8 rounded-full p-1 transition-colors duration-300 ${config.active ? 'bg-green-500' : 'bg-gray-300'}`}
-                      >
-                          <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ${config.active ? 'translate-x-6' : ''}`} />
-                      </button>
-                  </div>
-              </div>
-
-              {/* Configuration Grid (Decoupled from Activation) */}
+              {/* Configuration Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                   
                   {/* General Settings */}
                   <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
                       <h4 className="font-bold text-gray-800 border-b pb-2 mb-4 flex items-center gap-2">
-                          <Sliders size={18} /> Paramètres Généraux
+                          <Sliders size={18} /> Paramètres de Création
                       </h4>
                       
                       <div className="space-y-4">
@@ -1224,7 +1091,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
             <button onClick={() => setActiveTab('attributes')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'attributes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><LayoutGrid size={16} /> Attributs</button>
             <button onClick={() => setActiveTab('skills')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'skills' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><List size={16} /> Compétences</button>
             <button onClick={() => setActiveTab('specializations')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'specializations' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Tag size={16} /> Spécialisations Imposées</button>
-            <button onClick={() => setActiveTab('creation')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'creation' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><UserPlus size={16} /> Paramètres de Création</button>
+            <button onClick={() => setActiveTab('creation')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'creation' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><UserPlus size={16} /> Paramètres</button>
             <div className="w-px h-5 bg-gray-300 mx-1"></div>
             <button onClick={() => setShowResetConfirm(true)} className="px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 text-red-600 hover:bg-red-50 transition-colors" title="Réinitialiser tout à zéro"><RefreshCw size={16} /> <span className="hidden sm:inline">Réinitialiser</span></button>
             <button onClick={() => { onUpdate(localData); onAddLog('Modifications de la structure sauvegardées', 'success', 'settings'); }} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 text-white shadow-md hover:scale-[1.02] transition-all ${isDirty ? 'bg-amber-600 hover:bg-amber-700 animate-pulse' : 'bg-green-600 hover:bg-green-700'}`} title={isDirty ? "Des modifications sont en attente de validation" : "La structure est à jour"}><Save size={16} /> Sauvegarder</button>
@@ -1334,46 +1201,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                         className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-medium shadow-sm transition-colors"
                     >
                         Confirmer le chargement
-                    </button>
-                </div>
-            </div>
-        </div>
-      )}
-
-      {/* Creation Mode Activation Warning Modal */}
-      {showCreationWarning && (
-        <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 animate-in fade-in zoom-in duration-200">
-                <div className="bg-blue-50 p-6 flex flex-col items-center text-center">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 text-blue-600">
-                         <UserPlus size={24} />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Activer le Mode Création ?</h3>
-                    <p className="text-gray-600 text-sm mb-4">
-                        L'activation du mode création va <strong>réinitialiser toutes les valeurs</strong> du personnage actuel pour vous permettre de repartir de zéro.
-                    </p>
-                    <div className="bg-white p-3 rounded border border-blue-100 text-left text-xs text-blue-800 space-y-1 w-full">
-                        <p className="font-bold border-b border-blue-50 pb-1 mb-1">Seront effacés :</p>
-                        <ul className="list-disc list-inside">
-                            <li>Identité (Nom, Chronique...)</li>
-                            <li>Points d'Attributs et Compétences</li>
-                            <li>Historique XP et Notes de Campagne</li>
-                        </ul>
-                        <p className="italic pt-1">La structure et la bibliothèque sont conservées.</p>
-                    </div>
-                </div>
-                <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-100">
-                    <button 
-                        onClick={() => setShowCreationWarning(false)} 
-                        className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
-                    >
-                        Annuler
-                    </button>
-                    <button 
-                        onClick={executeCreationActivation} 
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm transition-colors"
-                    >
-                        Réinitialiser et Activer
                     </button>
                 </div>
             </div>

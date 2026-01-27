@@ -1,5 +1,4 @@
 
-// ... keep imports ...
 import React, { useRef, useState, useLayoutEffect, useEffect } from 'react';
 import { CharacterSheetData, CampaignNoteEntry, PartyColumn, PartyMemberEntry, ImageConfig, NoteImage } from '../types';
 import { Book, Plus, Trash2, ChevronLeft, ChevronRight, Bookmark, Users, PenTool, X, Image as ImageIcon, Move, Scaling, WrapText, BoxSelect, Maximize2, Minimize2, StretchHorizontal } from 'lucide-react';
@@ -433,18 +432,24 @@ const NotebookTextarea: React.FC<{
     );
 };
 
-// ... PartyTable (unchanged) ...
+// ... PartyTable ...
 const PartyTable: React.FC<{
     data: CharacterSheetData;
     onChange: React.Dispatch<React.SetStateAction<CharacterSheetData>>;
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info') => void;
 }> = ({ data, onChange, onAddLog }) => {
-    // ... (PartyTable code remains unchanged, but needs to be included for full file replacement)
     const columns = data.partyNotes?.columns || [];
     const members = data.partyNotes?.members || [];
     const staticWidths = data.partyNotes?.staticColWidths || { character: 200, player: 200 };
     const [newlyAddedColId, setNewlyAddedColId] = useState<string | null>(null);
     const resizingRef = useRef<{ colId: string | 'character' | 'player', startX: number, startWidth: number } | null>(null);
+
+    // Calculate total minimum width required for the table based on column configs
+    const totalTableWidth = 
+        (staticWidths.character || 200) + 
+        (staticWidths.player || 200) + 
+        columns.reduce((acc, col) => acc + (col.width || 150), 0) + 
+        100; // 100px buffer for fixed columns (Add button + Actions)
 
     useEffect(() => {
         if (newlyAddedColId) {
@@ -457,6 +462,7 @@ const PartyTable: React.FC<{
         }
     }, [columns, newlyAddedColId]);
 
+    // ... mouse move/up effects for resizing ...
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (!resizingRef.current) return;
@@ -592,24 +598,28 @@ const PartyTable: React.FC<{
 
     return (
         <div className="w-full h-full flex flex-col p-4">
-             <div className="flex-grow overflow-auto">
-                 <table className="border-collapse table-fixed min-w-full">
-                     <thead className="sticky top-0 z-10">
+             <div className="flex-grow overflow-auto custom-scrollbar">
+                 <table 
+                    className="border-collapse table-fixed bg-white shadow-sm"
+                    style={{ minWidth: '100%', width: `${totalTableWidth}px` }}
+                 >
+                     <thead className="sticky top-0 z-10 shadow-sm">
                          <tr>
                              <th className="border-b-2 border-stone-400 bg-[#f6f3ed] text-left p-2 font-serif text-stone-700 relative" style={{ width: staticWidths.character }}>
-                                Personnage
+                                <div className="truncate font-bold w-full" title="Personnage">Personnage</div>
                                 <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, 'character', staticWidths.character)} />
                              </th>
                              <th className="border-b-2 border-stone-400 bg-[#f6f3ed] text-left p-2 font-serif text-stone-700 border-l border-stone-300 relative" style={{ width: staticWidths.player }}>
-                                Joueur
+                                <div className="truncate font-bold w-full" title="Joueur">Joueur</div>
                                 <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, 'player', staticWidths.player)} />
                              </th>
                              {columns.map(col => (
                                  <th key={col.id} className="border-b-2 border-stone-400 bg-[#f6f3ed] text-left p-2 font-serif text-stone-700 border-l border-stone-300 group relative" style={{ width: col.width || 150 }}>
                                      <input 
                                         id={`party-col-header-${col.id}`}
-                                        className="bg-transparent font-bold w-full outline-none focus:border-b border-indigo-500 pr-6" 
+                                        className="bg-transparent font-bold w-full outline-none focus:border-b border-indigo-500 pr-6 truncate" 
                                         value={col.label}
+                                        title={col.label}
                                         onChange={(e) => updateColumnLabel(col.id, e.target.value)}
                                      />
                                      <button onClick={() => deleteColumn(col.id)} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10" title="Supprimer colonne">
@@ -618,8 +628,8 @@ const PartyTable: React.FC<{
                                      <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, col.id, col.width || 150)} />
                                  </th>
                              ))}
-                             <th className="border-b-2 border-stone-400 bg-[#f6f3ed] p-2 w-12 text-center">
-                                 <button onClick={addColumn} className="text-stone-500 hover:text-indigo-600 transition-colors" title="Ajouter une colonne">
+                             <th className="border-b-2 border-stone-400 bg-[#f6f3ed] p-2 w-12 text-center align-middle">
+                                 <button onClick={addColumn} className="text-stone-500 hover:text-indigo-600 transition-colors flex justify-center w-full" title="Ajouter une colonne">
                                      <Plus size={20} />
                                  </button>
                              </th>
@@ -641,26 +651,26 @@ const PartyTable: React.FC<{
                                      </td>
                                  ))}
                                  <td colSpan={2} className="border-b border-stone-300 text-center w-24">
-                                     <button onClick={() => deleteMember(member.id)} className="text-stone-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                                     <button onClick={() => deleteMember(member.id)} className="text-stone-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-2">
                                          <Trash2 size={16} />
                                      </button>
                                  </td>
                              </tr>
                          ))}
-                         {members.length === 0 && (
-                             <tr>
-                                 <td colSpan={columns.length + 4} className="text-center py-8 text-stone-400 italic font-handwriting text-xl">
-                                     Aucun membre dans le groupe pour l'instant.
-                                 </td>
-                             </tr>
-                         )}
+                         
+                         {/* Button Row - Visible directly after entries or as first entry if empty */}
+                         <tr 
+                            onClick={addMember}
+                            className="hover:bg-indigo-50/50 transition-colors cursor-pointer group/add h-10 border-b border-dashed border-stone-300"
+                         >
+                             <td colSpan={columns.length + 4} className="p-0 text-center align-middle">
+                                <button className="flex items-center gap-2 text-stone-400 group-hover/add:text-indigo-600 font-bold uppercase text-xs tracking-wider mx-auto transition-colors w-full h-full justify-center py-2">
+                                     <Plus size={16} /> Ajouter un Membre
+                                 </button>
+                             </td>
+                         </tr>
                      </tbody>
                  </table>
-             </div>
-             <div className="pt-4 mt-2 border-t border-stone-300 flex justify-center">
-                 <button onClick={addMember} className="flex items-center gap-2 text-indigo-800 hover:text-indigo-600 font-bold uppercase text-sm tracking-wider px-4 py-2 rounded hover:bg-indigo-50 transition-colors">
-                     <Plus size={18} /> Ajouter un Membre
-                 </button>
              </div>
         </div>
     );

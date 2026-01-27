@@ -2,6 +2,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { CharacterSheetData, DotEntry, AttributeEntry, CombatEntry, SkillCategoryKey, TraitEffect } from '../types';
 import DotRating from './DotRating';
+import { UserPlus, AlertTriangle } from 'lucide-react';
 
 interface Props {
   data: CharacterSheetData;
@@ -262,7 +263,117 @@ const SkillBlock: React.FC<{
   );
 
 const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, onAddLog }) => {
-  
+  const [showCreationWarning, setShowCreationWarning] = useState(false);
+
+  // --- Reset Helper Logic (Duplicated from SettingsView logic to avoid circular deps or complex refactor) ---
+  const resetCharacterValues = (source: CharacterSheetData): CharacterSheetData => {
+      const clean = JSON.parse(JSON.stringify(source));
+      
+      // Reset Header (keep structure)
+      Object.keys(clean.header).forEach((k: keyof typeof clean.header) => clean.header[k] = "");
+      
+      // Reset XP
+      clean.experience = { gain: '0', spent: '0', rest: '0' };
+      clean.xpLogs = [];
+      clean.appLogs = [];
+
+      // Attributes
+      if (clean.attributes) {
+          Object.keys(clean.attributes).forEach((cat: string) => {
+              if (Array.isArray(clean.attributes[cat])) {
+                  clean.attributes[cat].forEach((attr: any) => {
+                      attr.val1 = ""; attr.val2 = ""; attr.val3 = "";
+                      attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
+                  });
+              }
+          });
+      }
+      
+      // Secondary Attributes
+      if (clean.secondaryAttributes) {
+          Object.keys(clean.secondaryAttributes).forEach((cat: string) => {
+              if (Array.isArray(clean.secondaryAttributes[cat])) {
+                  clean.secondaryAttributes[cat].forEach((attr: any) => {
+                      attr.val1 = ""; attr.val2 = ""; attr.val3 = "";
+                      attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
+                  });
+              }
+          });
+      }
+
+      // Skills
+      Object.keys(clean.skills).forEach((cat: string) => {
+          clean.skills[cat].forEach((skill: any) => {
+              skill.value = 0;
+              skill.creationValue = 0;
+              if (typeof skill.current !== 'undefined') skill.current = 0;
+          });
+      });
+
+      // Combat
+      clean.combat.weapons.forEach((w: any) => { w.weapon=""; w.level=""; w.init=""; w.attack=""; w.damage=""; w.parry=""; });
+      clean.combat.armor.forEach((a: any) => { a.type=""; a.protection=""; a.weight=""; });
+      clean.combat.stats = { agility: '', dexterity: '', force: '', size: '' };
+
+      // Page 2
+      clean.page2.lieux_importants = "";
+      clean.page2.contacts = "";
+      clean.page2.reputation.forEach((r: any) => { r.reputation = ''; r.lieu = ''; r.valeur = ''; });
+      clean.page2.connaissances = "";
+      clean.page2.valeurs_monetaires = "";
+      clean.page2.armes_list = "";
+      clean.page2.avantages = Array(28).fill(null).map(() => ({ name: '', value: '' }));
+      clean.page2.desavantages = Array(28).fill(null).map(() => ({ name: '', value: '' }));
+      clean.page2.equipement = "";
+      clean.page2.notes = "";
+      clean.page2.characterImage = "";
+      clean.page2.characterImageId = undefined;
+
+      // Specializations
+      clean.specializations = {};
+      
+      // Campaign Notes
+      clean.campaignNotes = [];
+      
+      // Counters
+      clean.counters.volonte.value = 3; clean.counters.volonte.creationValue = 3; clean.counters.volonte.current = 0;
+      clean.counters.confiance.value = 3; clean.counters.confiance.creationValue = 3; clean.counters.confiance.current = 0;
+      clean.counters.custom.forEach((c: any) => { c.value = 0; c.creationValue = 0; c.current = 0; });
+
+      return clean;
+  };
+
+  const handleToggleCreationMode = () => {
+      const isActive = data.creationConfig?.active;
+      if (isActive) {
+          // Simply deactivate
+          onChange({
+              ...data,
+              creationConfig: {
+                  ...data.creationConfig,
+                  active: false
+              }
+          });
+          onAddLog("Mode Création DÉSACTIVÉ", 'info', 'sheet');
+      } else {
+          // Ask for confirmation because it resets data
+          setShowCreationWarning(true);
+      }
+  };
+
+  const executeCreationActivation = () => {
+      const resetData = resetCharacterValues(data);
+      onChange({
+          ...resetData,
+          creationConfig: {
+              ...resetData.creationConfig,
+              active: true
+          }
+      });
+      onAddLog("Mode Création ACTIVÉ - Fiche réinitialisée", 'success', 'sheet');
+      setShowCreationWarning(false);
+  };
+
   // --- Calculation: Attribute Bonuses from Traits ---
   const attributeBonuses = useMemo(() => {
       const bonuses: Record<string, BonusInfo> = {};
@@ -736,13 +847,31 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
       </div>
   );
 
+  const creationActive = data.creationConfig?.active;
+
   return (
     <div className={`sheet-container ${isLandscape ? 'landscape' : ''}`}>
       {/* Main Title */}
-      <div className="py-3 border-b-2 border-stone-800 bg-white">
+      <div className="py-3 border-b-2 border-stone-800 bg-white relative flex justify-center items-center">
         <h1 className="text-4xl font-black text-center uppercase tracking-[0.2em] text-indigo-950 font-serif">
             Seigneurs des Mystères
         </h1>
+        {/* Creation Mode Toggle Button */}
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center no-print">
+             <button
+                onClick={handleToggleCreationMode}
+                className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                    creationActive 
+                    ? 'bg-green-100 text-green-700 border border-green-300 shadow-sm' 
+                    : 'bg-stone-100 text-stone-500 border border-stone-300 hover:bg-stone-200'
+                }`}
+                title={creationActive ? "Désactiver le Mode Création" : "Activer le Mode Création (Réinitialise la fiche !)"}
+             >
+                 <UserPlus size={16} />
+                 <span>Mode Création</span>
+                 <div className={`w-2 h-2 rounded-full ${creationActive ? 'bg-green-500 animate-pulse' : 'bg-stone-300'}`} />
+             </button>
+        </div>
       </div>
 
       {/* New 2-Line Header Layout */}
@@ -916,6 +1045,46 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
                 </div>
             </div>
           </>
+      )}
+
+      {/* Creation Mode Activation Warning Modal */}
+      {showCreationWarning && (
+        <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm no-print">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 animate-in fade-in zoom-in duration-200">
+                <div className="bg-blue-50 p-6 flex flex-col items-center text-center">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 text-blue-600">
+                         <UserPlus size={24} />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Activer le Mode Création ?</h3>
+                    <p className="text-gray-600 text-sm mb-4">
+                        L'activation du mode création va <strong>réinitialiser toutes les valeurs</strong> du personnage actuel pour vous permettre de repartir de zéro.
+                    </p>
+                    <div className="bg-white p-3 rounded border border-blue-100 text-left text-xs text-blue-800 space-y-1 w-full">
+                        <p className="font-bold border-b border-blue-50 pb-1 mb-1">Seront effacés :</p>
+                        <ul className="list-disc list-inside">
+                            <li>Identité (Nom, Chronique...)</li>
+                            <li>Points d'Attributs et Compétences</li>
+                            <li>Historique XP et Notes de Campagne</li>
+                        </ul>
+                        <p className="italic pt-1">La structure et la bibliothèque sont conservées.</p>
+                    </div>
+                </div>
+                <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-100">
+                    <button 
+                        onClick={() => setShowCreationWarning(false)} 
+                        className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                    >
+                        Annuler
+                    </button>
+                    <button 
+                        onClick={executeCreationActivation} 
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm transition-colors"
+                    >
+                        Réinitialiser et Activer
+                    </button>
+                </div>
+            </div>
+        </div>
       )}
     </div>
   );
