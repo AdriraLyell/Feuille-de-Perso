@@ -158,6 +158,8 @@ export interface CampaignNoteEntry {
   date: string;
   title: string;
   content: string;
+  imageId?: string; // ID de l'image stockée en IndexedDB
+  imagePosition?: 'top' | 'left' | 'right'; // Nouvelle propriété de positionnement
 }
 
 // --- NEW TYPES FOR PARTY MEMBERS ---

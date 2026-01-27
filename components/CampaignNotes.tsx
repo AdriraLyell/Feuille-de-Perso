@@ -1,7 +1,8 @@
 
 import React, { useRef, useState, useLayoutEffect, useEffect } from 'react';
 import { CharacterSheetData, CampaignNoteEntry, PartyColumn, PartyMemberEntry } from '../types';
-import { Book, Plus, Trash2, ChevronLeft, ChevronRight, Bookmark, Users, PenTool, X } from 'lucide-react';
+import { Book, Plus, Trash2, ChevronLeft, ChevronRight, Bookmark, Users, PenTool, X, Image as ImageIcon, AlignLeft, AlignRight, AlignCenter } from 'lucide-react';
+import { saveImage, getImage, deleteImage } from '../imageDB';
 
 interface Props {
   data: CharacterSheetData;
@@ -10,56 +11,164 @@ interface Props {
   onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', deduplicationId?: string) => void;
 }
 
-const NotebookTextarea: React.FC<{ value: string, onChange: (v: string) => void, placeholder?: string }> = ({ value, onChange, placeholder }) => {
-    // Configuration des lignes pour un alignement parfait
-    const lineHeight = 32; 
-    const fontSize = '1.2rem'; 
-    
-    // Ajustement précis pour que la police "Patrick Hand" se pose sur la ligne
-    const paddingTop = '7px'; 
-    const paddingX = '24px'; // Marge gauche/droite pour ne pas coller aux bords du papier
+// --- SUB-COMPONENT FOR NOTE IMAGE ---
+const NoteImageZone: React.FC<{ 
+    imageId: string; 
+    position: 'top' | 'left' | 'right';
+    onDelete: () => void;
+    onPositionChange: (pos: 'top' | 'left' | 'right') => void;
+}> = ({ imageId, position, onDelete, onPositionChange }) => {
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        let active = true;
+        const load = async () => {
+            try {
+                const blob = await getImage(imageId);
+                if (blob && active) {
+                    const url = URL.createObjectURL(blob);
+                    setImageUrl(url);
+                    return () => URL.revokeObjectURL(url);
+                }
+            } catch (e) {
+                console.error("Erreur chargement image note", e);
+            }
+        };
+        load();
+        return () => { active = false; };
+    }, [imageId]);
+
+    if (!imageUrl) return null;
+
+    // Dynamic Classes based on position
+    const containerClasses = position === 'top' 
+        ? "w-full mb-4 flex justify-center relative group shrink-0" 
+        : position === 'left'
+            ? "float-left mr-4 mb-2 relative group w-[45%] z-10"
+            : "float-right ml-4 mb-2 relative group w-[45%] z-10";
 
     return (
-        <div className="relative w-full h-full rounded-sm bg-stone-50/30 overflow-hidden">
-            <textarea 
-              className="w-full h-full bg-transparent resize-none focus:outline-none text-ink block custom-scrollbar"
-              style={{
-                  fontFamily: '"Patrick Hand", cursive',
-                  fontSize,
-                  lineHeight: `${lineHeight}px`,
-                  paddingTop,
-                  paddingLeft: paddingX,
-                  paddingRight: paddingX,
-                  paddingBottom: '20px', // Marge en bas pour ne pas couper la dernière ligne
-                  whiteSpace: 'pre-wrap',
-                  wordWrap: 'break-word',
-                  
-                  // Le fond est appliqué directement au textarea
-                  backgroundImage: `linear-gradient(transparent ${lineHeight - 1}px, #d6d3d1 ${lineHeight - 1}px)`,
-                  backgroundSize: `100% ${lineHeight}px`,
-                  backgroundAttachment: 'local',
-                  backgroundPosition: `0 ${paddingTop}`, // Aligne le début du gradient avec le padding
-              }}
-              value={value}
-              onChange={(e) => onChange(e.target.value)}
-              placeholder={placeholder}
-              spellCheck={false}
-            />
+        <div className={containerClasses} style={{ clear: position === 'top' ? 'both' : 'none' }}>
+            <div className={`relative inline-block shadow-md rotate-[-1deg] border-4 border-white bg-white transition-all ${position === 'top' ? 'max-w-full' : 'max-w-full'}`}>
+                <img src={imageUrl} alt="Note Attachment" className="max-h-[300px] object-contain w-full" />
+                
+                {/* Controls Overlay */}
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-start justify-end p-2 gap-1">
+                    <div className="bg-white rounded-md shadow-sm flex overflow-hidden mr-2">
+                        <button 
+                            onClick={() => onPositionChange('left')}
+                            className={`p-1.5 hover:bg-gray-100 ${position === 'left' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600'}`}
+                            title="Habillage Gauche"
+                        >
+                            <AlignLeft size={16} />
+                        </button>
+                        <button 
+                            onClick={() => onPositionChange('top')}
+                            className={`p-1.5 hover:bg-gray-100 ${position === 'top' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600'}`}
+                            title="Position Haut (Fixe)"
+                        >
+                            <AlignCenter size={16} />
+                        </button>
+                        <button 
+                            onClick={() => onPositionChange('right')}
+                            className={`p-1.5 hover:bg-gray-100 ${position === 'right' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600'}`}
+                            title="Habillage Droite"
+                        >
+                            <AlignRight size={16} />
+                        </button>
+                    </div>
+
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                        className="bg-red-600 text-white p-1.5 rounded-md shadow-md hover:bg-red-700 transition-colors"
+                        title="Supprimer l'image"
+                    >
+                        <X size={16} />
+                    </button>
+                </div>
+
+                {/* Tape effect visual */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-6 bg-yellow-100/50 rotate-2 shadow-sm border border-yellow-200/30 pointer-events-none"></div>
+            </div>
+        </div>
+    );
+};
+
+// --- MODIFIED NOTEBOOK TEXTAREA (ContentEditable DIV) ---
+const NotebookTextarea: React.FC<{ 
+    value: string, 
+    onChange: (v: string) => void, 
+    placeholder?: string,
+    imageNode?: React.ReactNode // Image is injected here to allow floating
+}> = ({ value, onChange, placeholder, imageNode }) => {
+    const editableRef = useRef<HTMLDivElement>(null);
+
+    // Configuration des lignes pour un alignement parfait
+    const lineHeight = 26; 
+    const fontSize = '1.05rem'; 
+    const paddingX = '24px'; 
+    const paddingTop = '5px';
+
+    // Handle Content Updates
+    // We only update if the content is significantly different to avoid cursor jumps
+    useEffect(() => {
+        if (editableRef.current && editableRef.current.innerText !== value) {
+            // Using innerText for plain text editing feel
+            editableRef.current.innerText = value;
+        }
+    }, [value]);
+
+    const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
+        const text = e.currentTarget.innerText;
+        onChange(text);
+    };
+
+    return (
+        <div className="relative w-full h-full rounded-sm bg-stone-50/30 overflow-hidden flex flex-col">
+            {/* The Container with Lines Background */}
+            <div 
+                className="w-full h-full overflow-y-auto custom-scrollbar relative"
+                style={{
+                    paddingTop,
+                    paddingLeft: paddingX,
+                    paddingRight: paddingX,
+                    paddingBottom: '20px',
+                    backgroundImage: `linear-gradient(transparent ${lineHeight - 1}px, #d6d3d1 ${lineHeight - 1}px)`,
+                    backgroundSize: `100% ${lineHeight}px`,
+                    backgroundAttachment: 'local', // Scrolls with content
+                    backgroundPosition: `0 ${paddingTop}`,
+                }}
+            >
+                {/* Image Injection (Float works here because it is a sibling inside the flow) */}
+                {imageNode}
+
+                {/* Editable Text Area */}
+                <div 
+                    ref={editableRef}
+                    contentEditable
+                    suppressContentEditableWarning
+                    onInput={handleInput}
+                    className="outline-none min-h-full text-ink whitespace-pre-wrap break-words"
+                    style={{
+                        fontFamily: '"Patrick Hand", cursive',
+                        fontSize,
+                        lineHeight: `${lineHeight}px`,
+                    }}
+                    data-placeholder={placeholder}
+                />
+            </div>
             
-            {/* Styles pour personnaliser légèrement la scrollbar */}
             <style>{`
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 8px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: rgba(0,0,0,0.05);
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: rgba(0,0,0,0.2);
-                    border-radius: 4px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: rgba(0,0,0,0.4);
+                .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.4); }
+                
+                /* Placeholder logic for contentEditable */
+                [contentEditable]:empty:before {
+                    content: attr(data-placeholder);
+                    color: #a8a29e;
+                    cursor: text;
                 }
             `}</style>
         </div>
@@ -72,42 +181,32 @@ const PartyTable: React.FC<{
     onChange: React.Dispatch<React.SetStateAction<CharacterSheetData>>;
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info') => void;
 }> = ({ data, onChange, onAddLog }) => {
-    
+    // ... (PartyTable code remains unchanged, omitted for brevity but assumed present)
     const columns = data.partyNotes?.columns || [];
     const members = data.partyNotes?.members || [];
     const staticWidths = data.partyNotes?.staticColWidths || { character: 200, player: 200 };
-    
-    // State to track newly added column for auto-focus
     const [newlyAddedColId, setNewlyAddedColId] = useState<string | null>(null);
-    
-    // State for Resizing
     const resizingRef = useRef<{ colId: string | 'character' | 'player', startX: number, startWidth: number } | null>(null);
 
-    // Effect to focus and select the input of the newly created column
     useEffect(() => {
         if (newlyAddedColId) {
             const inputEl = document.getElementById(`party-col-header-${newlyAddedColId}`) as HTMLInputElement;
             if (inputEl) {
                 inputEl.focus();
-                inputEl.select(); // Select all text to allow immediate overwrite
-                setNewlyAddedColId(null); // Reset flag
+                inputEl.select(); 
+                setNewlyAddedColId(null); 
             }
         }
     }, [columns, newlyAddedColId]);
 
-    // Resizing Logic
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (!resizingRef.current) return;
-            
             const { colId, startX, startWidth } = resizingRef.current;
             const delta = e.clientX - startX;
-            const newWidth = Math.max(50, startWidth + delta); // Min width 50px
+            const newWidth = Math.max(50, startWidth + delta); 
 
             if (colId === 'character' || colId === 'player') {
-                // Update Static Columns locally first (perf) then sync or directly sync?
-                // Direct sync might be heavy if many rows, but safe enough for this app scale.
-                // Actually, let's just update via onChange to keep it simple.
                 onChange(prev => ({
                     ...prev,
                     partyNotes: {
@@ -119,7 +218,6 @@ const PartyTable: React.FC<{
                     }
                 }));
             } else {
-                // Dynamic Columns
                 onChange(prev => ({
                     ...prev,
                     partyNotes: {
@@ -143,7 +241,7 @@ const PartyTable: React.FC<{
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mouseup', handleMouseUp);
         };
-    }, [onChange]); // Depend on onChange to access latest state
+    }, [onChange]); 
 
     const startResizing = (e: React.MouseEvent, colId: string | 'character' | 'player', currentWidth: number) => {
         e.preventDefault();
@@ -165,7 +263,7 @@ const PartyTable: React.FC<{
                 columns: [...columns, newCol]
             }
         });
-        setNewlyAddedColId(newId); // Trigger the focus effect
+        setNewlyAddedColId(newId);
         onAddLog("Colonne ajoutée au groupe", 'info');
     };
 
@@ -240,100 +338,52 @@ const PartyTable: React.FC<{
                  <table className="border-collapse table-fixed min-w-full">
                      <thead className="sticky top-0 z-10">
                          <tr>
-                             {/* Static: Character */}
-                             <th 
-                                className="border-b-2 border-stone-400 bg-[#f6f3ed] text-left p-2 font-serif text-stone-700 relative"
-                                style={{ width: staticWidths.character }}
-                             >
+                             <th className="border-b-2 border-stone-400 bg-[#f6f3ed] text-left p-2 font-serif text-stone-700 relative" style={{ width: staticWidths.character }}>
                                 Personnage
-                                <div 
-                                    className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20"
-                                    onMouseDown={(e) => startResizing(e, 'character', staticWidths.character)}
-                                />
+                                <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, 'character', staticWidths.character)} />
                              </th>
-                             
-                             {/* Static: Player */}
-                             <th 
-                                className="border-b-2 border-stone-400 bg-[#f6f3ed] text-left p-2 font-serif text-stone-700 border-l border-stone-300 relative"
-                                style={{ width: staticWidths.player }}
-                             >
+                             <th className="border-b-2 border-stone-400 bg-[#f6f3ed] text-left p-2 font-serif text-stone-700 border-l border-stone-300 relative" style={{ width: staticWidths.player }}>
                                 Joueur
-                                <div 
-                                    className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20"
-                                    onMouseDown={(e) => startResizing(e, 'player', staticWidths.player)}
-                                />
+                                <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, 'player', staticWidths.player)} />
                              </th>
-
-                             {/* Dynamic Columns */}
                              {columns.map(col => (
-                                 <th 
-                                    key={col.id} 
-                                    className="border-b-2 border-stone-400 bg-[#f6f3ed] text-left p-2 font-serif text-stone-700 border-l border-stone-300 group relative"
-                                    style={{ width: col.width || 150 }}
-                                 >
+                                 <th key={col.id} className="border-b-2 border-stone-400 bg-[#f6f3ed] text-left p-2 font-serif text-stone-700 border-l border-stone-300 group relative" style={{ width: col.width || 150 }}>
                                      <input 
                                         id={`party-col-header-${col.id}`}
-                                        className="bg-transparent font-bold w-full outline-none focus:border-b border-indigo-500 pr-6" // pr-6 for space for delete button
+                                        className="bg-transparent font-bold w-full outline-none focus:border-b border-indigo-500 pr-6" 
                                         value={col.label}
                                         onChange={(e) => updateColumnLabel(col.id, e.target.value)}
                                      />
-                                     <button 
-                                        onClick={() => deleteColumn(col.id)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                                        title="Supprimer colonne"
-                                     >
+                                     <button onClick={() => deleteColumn(col.id)} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10" title="Supprimer colonne">
                                          <X size={14} />
                                      </button>
-                                     {/* Resizer Handle */}
-                                     <div 
-                                        className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20"
-                                        onMouseDown={(e) => startResizing(e, col.id, col.width || 150)}
-                                     />
+                                     <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, col.id, col.width || 150)} />
                                  </th>
                              ))}
-                             
-                             {/* Add Column Button */}
                              <th className="border-b-2 border-stone-400 bg-[#f6f3ed] p-2 w-12 text-center">
                                  <button onClick={addColumn} className="text-stone-500 hover:text-indigo-600 transition-colors" title="Ajouter une colonne">
                                      <Plus size={20} />
                                  </button>
                              </th>
-                             <th className="border-b-2 border-stone-400 bg-[#f6f3ed] w-12"></th> {/* Action column space */}
+                             <th className="border-b-2 border-stone-400 bg-[#f6f3ed] w-12"></th>
                          </tr>
                      </thead>
                      <tbody>
                          {members.map(member => (
                              <tr key={member.id} className="hover:bg-stone-50 group">
                                  <td className="p-0 border-b border-stone-300 h-10 overflow-hidden">
-                                     <input 
-                                        className="w-full h-full bg-transparent px-2 font-handwriting text-lg text-ink outline-none"
-                                        placeholder="Nom du perso..."
-                                        value={member.name}
-                                        onChange={(e) => updateMember(member.id, 'name', e.target.value)}
-                                     />
+                                     <input className="w-full h-full bg-transparent px-2 font-handwriting text-lg text-ink outline-none" placeholder="Nom du perso..." value={member.name} onChange={(e) => updateMember(member.id, 'name', e.target.value)} />
                                  </td>
                                  <td className="p-0 border-b border-stone-300 h-10 border-l border-stone-200 overflow-hidden">
-                                     <input 
-                                        className="w-full h-full bg-transparent px-2 font-handwriting text-lg text-ink outline-none"
-                                        placeholder="Nom du joueur..."
-                                        value={member.player}
-                                        onChange={(e) => updateMember(member.id, 'player', e.target.value)}
-                                     />
+                                     <input className="w-full h-full bg-transparent px-2 font-handwriting text-lg text-ink outline-none" placeholder="Nom du joueur..." value={member.player} onChange={(e) => updateMember(member.id, 'player', e.target.value)} />
                                  </td>
                                  {columns.map(col => (
                                      <td key={col.id} className="p-0 border-b border-stone-300 h-10 border-l border-stone-200 overflow-hidden">
-                                         <input 
-                                            className="w-full h-full bg-transparent px-2 font-handwriting text-lg text-stone-600 outline-none"
-                                            value={member.data[col.id] || ''}
-                                            onChange={(e) => updateMember(member.id, 'data', e.target.value, col.id)}
-                                         />
+                                         <input className="w-full h-full bg-transparent px-2 font-handwriting text-lg text-stone-600 outline-none" value={member.data[col.id] || ''} onChange={(e) => updateMember(member.id, 'data', e.target.value, col.id)} />
                                      </td>
                                  ))}
                                  <td colSpan={2} className="border-b border-stone-300 text-center w-24">
-                                     <button 
-                                        onClick={() => deleteMember(member.id)}
-                                        className="text-stone-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                                     >
+                                     <button onClick={() => deleteMember(member.id)} className="text-stone-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
                                          <Trash2 size={16} />
                                      </button>
                                  </td>
@@ -349,13 +399,8 @@ const PartyTable: React.FC<{
                      </tbody>
                  </table>
              </div>
-             
-             {/* Footer Add Button */}
              <div className="pt-4 mt-2 border-t border-stone-300 flex justify-center">
-                 <button 
-                    onClick={addMember}
-                    className="flex items-center gap-2 text-indigo-800 hover:text-indigo-600 font-bold uppercase text-sm tracking-wider px-4 py-2 rounded hover:bg-indigo-50 transition-colors"
-                 >
+                 <button onClick={addMember} className="flex items-center gap-2 text-indigo-800 hover:text-indigo-600 font-bold uppercase text-sm tracking-wider px-4 py-2 rounded hover:bg-indigo-50 transition-colors">
                      <Plus size={18} /> Ajouter un Membre
                  </button>
              </div>
@@ -365,6 +410,7 @@ const PartyTable: React.FC<{
 
 const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, onAddLog }) => {
   const [activeTab, setActiveTab] = useState<'journal' | 'party'>('journal');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // --- JOURNAL STATES ---
   // Initialize to last page if notes exist, else 0
@@ -389,7 +435,8 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
       id: Math.random().toString(36).substr(2, 9),
       date: new Date().toLocaleDateString('fr-CA'),
       title: 'Nouvelle Session',
-      content: ''
+      content: '',
+      imagePosition: 'top' // Default position
     };
     
     const newNotes = [...(data.campaignNotes || []), newNote];
@@ -404,13 +451,20 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
     onAddLog("Nouvelle page ajoutée au journal", 'success', 'sheet');
   };
 
-  const updateNote = (id: string, field: keyof CampaignNoteEntry, value: string) => {
+  const updateNote = (id: string, field: keyof CampaignNoteEntry, value: any) => {
     const newNotes = (data.campaignNotes || []).map(n => n.id === id ? { ...n, [field]: value } : n);
     onChange({ ...data, campaignNotes: newNotes });
   };
 
   const confirmDeleteNote = () => {
     if (noteIdToDelete) {
+        const noteToDelete = (data.campaignNotes || []).find(n => n.id === noteIdToDelete);
+        
+        // Cleanup image from DB if exists
+        if (noteToDelete?.imageId) {
+            deleteImage(noteToDelete.imageId).catch(console.error);
+        }
+
         const newNotes = (data.campaignNotes || []).filter(n => n.id !== noteIdToDelete);
         onChange({ ...data, campaignNotes: newNotes });
         onAddLog("Page du journal arrachée", 'danger', 'sheet');
@@ -431,6 +485,45 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
       if (currentIndex < totalPages - 1) setCurrentIndex(currentIndex + 1);
   };
 
+  // --- IMAGE HANDLING ---
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file || !currentNote) return;
+
+      try {
+          const id = await saveImage(file);
+          // If previous image existed, delete it
+          if (currentNote.imageId) {
+              await deleteImage(currentNote.imageId);
+          }
+          updateNote(currentNote.id, 'imageId', id);
+          // Reset position to top by default on new image
+          updateNote(currentNote.id, 'imagePosition', 'top'); 
+          onAddLog("Image ajoutée à la note", 'success', 'sheet');
+      } catch (err) {
+          console.error(err);
+          onAddLog("Erreur lors de l'ajout de l'image", 'danger');
+      } finally {
+          if (fileInputRef.current) fileInputRef.current.value = "";
+      }
+  };
+
+  const handleRemoveImage = async () => {
+      if (!currentNote || !currentNote.imageId) return;
+      try {
+          await deleteImage(currentNote.imageId);
+          updateNote(currentNote.id, 'imageId', undefined);
+          onAddLog("Image retirée de la note", 'info', 'sheet');
+      } catch (err) {
+          console.error(err);
+      }
+  };
+
+  const handleImagePositionChange = (pos: 'top' | 'left' | 'right') => {
+      if (!currentNote) return;
+      updateNote(currentNote.id, 'imagePosition', pos);
+  };
+
   const noteToDelete = (data.campaignNotes || []).find(n => n.id === noteIdToDelete);
 
   return (
@@ -443,7 +536,7 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
       {/* --- FLEX CONTAINER: BUTTONS + BOOK --- */}
       <div className="flex items-center gap-3 shrink-0 z-10">
 
-          {/* PREV BUTTON AREA (Width reserved to prevent shift if hidden, but we use conditional render with opacity for now) */}
+          {/* PREV BUTTON AREA */}
           <div className="w-12 flex justify-end">
              {activeTab === 'journal' && (
                 <button 
@@ -460,8 +553,8 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
           {/* --- THE BOOK CONTAINER --- */}
           <div className={`relative bg-[#fdfbf7] shadow-2xl transition-all duration-500 flex flex-col overflow-hidden z-10 shrink-0
               ${isLandscape 
-                ? 'w-[1560px] h-[1100px]' // Fixed Landscape Dimensions
-                : 'w-[900px] h-[1270px]' // Fixed Portrait Dimensions (A4 Ratio)
+                ? 'w-[1560px] h-[1100px]' 
+                : 'w-[900px] h-[1270px]' 
               } 
               rounded-r-md rounded-l-sm border-r-8 border-r-stone-200 border-l-[12px] border-l-stone-800
           `}>
@@ -561,6 +654,22 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
                                                 </div>
                                                 
                                                 <div className="flex items-center gap-1 no-print shrink-0 ml-2">
+                                                    {/* Image Button */}
+                                                    <button
+                                                        onClick={() => fileInputRef.current?.click()}
+                                                        className="p-2 text-stone-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                                                        title="Ajouter une image"
+                                                    >
+                                                        <ImageIcon size={18} />
+                                                    </button>
+                                                    <input 
+                                                        type="file" 
+                                                        ref={fileInputRef} 
+                                                        className="hidden" 
+                                                        accept="image/*" 
+                                                        onChange={handleImageUpload} 
+                                                    />
+
                                                     <button 
                                                         onClick={() => setNoteIdToDelete(currentNote.id)}
                                                         className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
@@ -571,12 +680,22 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
                                                 </div>
                                             </div>
 
-                                            {/* Note Body */}
+                                            {/* Note Content Wrapper (Textarea handles wrapping) */}
                                             <div className="flex-grow min-h-0 bg-white relative rounded-b-sm">
                                                 <NotebookTextarea 
                                                     value={currentNote.content}
                                                     onChange={(v) => updateNote(currentNote.id, 'content', v)}
                                                     placeholder="Récit des événements..."
+                                                    imageNode={
+                                                        currentNote.imageId ? (
+                                                            <NoteImageZone 
+                                                                imageId={currentNote.imageId} 
+                                                                position={currentNote.imagePosition || 'top'}
+                                                                onDelete={handleRemoveImage}
+                                                                onPositionChange={handleImagePositionChange}
+                                                            />
+                                                        ) : null
+                                                    }
                                                 />
                                             </div>
                                     </div>
