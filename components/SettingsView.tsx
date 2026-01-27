@@ -1044,8 +1044,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                   </div>
               </div>
 
-              {/* Configuration Grid (Dependent on Active) */}
-              <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 transition-opacity duration-300 ${config.active ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
+              {/* Configuration Grid (Decoupled from Activation) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                   
                   {/* General Settings */}
                   <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
@@ -1224,7 +1224,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
             <button onClick={() => setActiveTab('attributes')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'attributes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><LayoutGrid size={16} /> Attributs</button>
             <button onClick={() => setActiveTab('skills')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'skills' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><List size={16} /> Compétences</button>
             <button onClick={() => setActiveTab('specializations')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'specializations' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Tag size={16} /> Spécialisations Imposées</button>
-            <button onClick={() => setActiveTab('creation')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'creation' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><UserPlus size={16} /> Création Personnage</button>
+            <button onClick={() => setActiveTab('creation')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'creation' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><UserPlus size={16} /> Paramètres de Création</button>
             <div className="w-px h-5 bg-gray-300 mx-1"></div>
             <button onClick={() => setShowResetConfirm(true)} className="px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 text-red-600 hover:bg-red-50 transition-colors" title="Réinitialiser tout à zéro"><RefreshCw size={16} /> <span className="hidden sm:inline">Réinitialiser</span></button>
             <button onClick={() => { onUpdate(localData); onAddLog('Modifications de la structure sauvegardées', 'success', 'settings'); }} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 text-white shadow-md hover:scale-[1.02] transition-all ${isDirty ? 'bg-amber-600 hover:bg-amber-700 animate-pulse' : 'bg-green-600 hover:bg-green-700'}`} title={isDirty ? "Des modifications sont en attente de validation" : "La structure est à jour"}><Save size={16} /> Sauvegarder</button>

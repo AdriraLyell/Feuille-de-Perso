@@ -1,10 +1,12 @@
 
+// ... (imports remain the same)
 import React, { useState, useRef } from 'react';
 import { CharacterSheetData, LibraryEntry } from '../types';
-import { Download, Upload, FileJson, CheckSquare, Square, X, AlertTriangle, BookOpen, User, LayoutTemplate, ArrowRight, CheckCircle2, HelpCircle, Merge, RefreshCw, FileBox, Info } from 'lucide-react';
+import { Download, Upload, FileJson, AlertTriangle, BookOpen, User, LayoutTemplate, X, CheckCircle2, HelpCircle, Merge, RefreshCw, FileBox, Info } from 'lucide-react';
 import { INITIAL_DATA, APP_VERSION } from '../constants';
 import { getImage, saveImage, blobToBase64, base64ToBlob } from '../imageDB';
 
+// ... (interfaces remain the same)
 interface ImportExportModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -26,6 +28,9 @@ interface FileAnalysis {
 }
 
 const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, data, onImport, onExportSuccess, onAddLog }) => {
+  // UI State
+  const [activeTab, setActiveTab] = useState<'export' | 'import'>('export');
+
   // Export State
   const [exportType, setExportType] = useState<ExportType>('full');
   
@@ -39,8 +44,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
   if (!isOpen) return null;
 
   // --- LOGIC: RESET / CLEANING ---
-
-  // Returns a "Reset" version of the data (Structure kept, Values cleared)
+  // ... (createTemplateFromData logic remains same)
   const createTemplateFromData = (source: CharacterSheetData): CharacterSheetData => {
       const clean = JSON.parse(JSON.stringify(source));
       
@@ -109,7 +113,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
   };
 
   // --- LOGIC: EXPORT ---
-
+  // ... (handleExport logic remains same)
   const handleExport = async () => {
       let exportData: any = {};
       let filename = "Sauvegarde";
@@ -118,7 +122,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
       // Clone data to avoid mutating state
       const dataToProcess = JSON.parse(JSON.stringify(data));
 
-      // Resolve Image from DB if present
+      // Resolve Character Image from DB if present
       if (dataToProcess.page2.characterImageId) {
           try {
               const blob = await getImage(dataToProcess.page2.characterImageId);
@@ -128,10 +132,34 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                   dataToProcess.page2.characterImage = base64;
               }
           } catch (e) {
-              console.error("Failed to export image from DB", e);
+              console.error("Failed to export character image from DB", e);
           }
           // Remove ID from export to force import logic to re-save
           delete dataToProcess.page2.characterImageId;
+      }
+
+      // Resolve Campaign Notes Images from DB if present
+      if (dataToProcess.campaignNotes) {
+          for (const note of dataToProcess.campaignNotes) {
+              if (note.images && Array.isArray(note.images)) {
+                  for (const img of note.images) {
+                      if (img.imageId) {
+                          try {
+                              const blob = await getImage(img.imageId);
+                              if (blob) {
+                                  // Inject base64 for export into a temporary field
+                                  // We use 'any' to bypass TS check for this export-only field
+                                  (img as any).base64Data = await blobToBase64(blob);
+                              }
+                          } catch (e) {
+                              console.error(`Failed to export note image ${img.id}`, e);
+                          }
+                          // Remove IDB key from export
+                          delete img.imageId;
+                      }
+                  }
+              }
+          }
       }
 
       // Add APP_VERSION to dataToProcess if not present
@@ -195,7 +223,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
   };
 
   // --- LOGIC: IMPORT ---
-
+  // ... (handleFileSelect logic remains same)
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
@@ -237,6 +265,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
       reader.readAsText(file);
   };
 
+  // ... (executeImport logic remains same)
   const executeImport = async () => {
       if (!pendingFile || !importAction) return;
 
@@ -263,7 +292,8 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
       };
 
       // Handle Image Import Logic (Base64 -> IDB)
-      const processImportedImage = async (dataObj: any) => {
+      const processImportedData = async (dataObj: any) => {
+          // 1. Character Image
           if (dataObj.page2 && dataObj.page2.characterImage && dataObj.page2.characterImage.length > 100) {
               try {
                   // Convert Base64 to Blob
@@ -274,15 +304,36 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                   dataObj.page2.characterImageId = newId;
                   dataObj.page2.characterImage = ""; // Clear heavy string
               } catch (e) {
-                  console.error("Failed to import image to DB", e);
+                  console.error("Failed to import character image to DB", e);
               }
           }
+
+          // 2. Campaign Note Images
+          if (dataObj.campaignNotes) {
+              for (const note of dataObj.campaignNotes) {
+                  if (note.images && Array.isArray(note.images)) {
+                      for (const img of note.images) {
+                          if (img.base64Data) {
+                              try {
+                                  const blob = await base64ToBlob(img.base64Data);
+                                  const newId = await saveImage(blob);
+                                  img.imageId = newId;
+                                  delete img.base64Data; // Clear memory
+                              } catch (e) {
+                                  console.error("Failed to import note image to DB", e);
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+
           return dataObj;
       };
 
       if (importAction === 'replace_all') {
           // Full Overwrite
-          finalData = await processImportedImage(pendingFile);
+          finalData = await processImportedData(pendingFile);
           // Safety: ensure library exists
           if (!finalData.library) finalData.library = [];
           logMsg = "Remplacement complet du personnage.";
@@ -329,7 +380,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
   };
 
   // --- RENDER HELPERS ---
-
+  // ... (renderImportOptions logic remains same)
   const renderImportOptions = () => {
       if (!analysis) return null;
 
@@ -428,154 +479,190 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
 
   return (
     <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden relative animate-in fade-in zoom-in duration-200 flex flex-col md:flex-row min-h-[500px] max-h-[90vh]">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden relative animate-in fade-in zoom-in duration-200 flex flex-col min-h-[500px] max-h-[90vh]">
         
-        {/* --- EXPORT COLUMN --- */}
-        <div className="flex-1 bg-slate-50 p-6 flex flex-col border-b md:border-b-0 md:border-r border-slate-200">
-             <div className="flex items-center gap-2 border-b border-slate-300 pb-3 mb-4">
-                <div className="bg-blue-600 p-2 rounded-lg text-white"><Download size={24} /></div>
-                <div>
-                    <h3 className="font-bold text-lg text-gray-800">Sauvegarder</h3>
-                    <p className="text-xs text-gray-500">Exporter les données</p>
-                </div>
-             </div>
-
-             <div className="space-y-4 flex-grow">
-                 <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${exportType === 'full' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-gray-200 hover:bg-white'}`}>
-                     <input type="radio" name="exportType" checked={exportType === 'full'} onChange={() => setExportType('full')} className="mt-1" />
-                     <div>
-                         <span className="font-bold text-gray-800 flex items-center gap-2"><User size={16} /> Personnage Complet</span>
-                         <span className="text-xs text-gray-500 block">Fiche remplie + Template + Bibliothèque.</span>
-                     </div>
-                 </label>
-
-                 <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${exportType === 'system' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-gray-200 hover:bg-white'}`}>
-                     <input type="radio" name="exportType" checked={exportType === 'system'} onChange={() => setExportType('system')} className="mt-1" />
-                     <div>
-                         <span className="font-bold text-gray-800 flex items-center gap-2"><FileBox size={16} /> Système de Jeu</span>
-                         <span className="text-xs text-gray-500 block">Template + Bibliothèque. <span className="text-red-500">Sans les valeurs de la fiche.</span></span>
-                     </div>
-                 </label>
-
-                 <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${exportType === 'template' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-gray-200 hover:bg-white'}`}>
-                     <input type="radio" name="exportType" checked={exportType === 'template'} onChange={() => setExportType('template')} className="mt-1" />
-                     <div>
-                         <span className="font-bold text-gray-800 flex items-center gap-2"><LayoutTemplate size={16} /> Template Seul</span>
-                         <span className="text-xs text-gray-500 block">Uniquement la structure (Compétences, Config).</span>
-                     </div>
-                 </label>
-
-                 <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${exportType === 'library' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-gray-200 hover:bg-white'}`}>
-                     <input type="radio" name="exportType" checked={exportType === 'library'} onChange={() => setExportType('library')} className="mt-1" />
-                     <div>
-                         <span className="font-bold text-gray-800 flex items-center gap-2"><BookOpen size={16} /> Bibliothèque Seule</span>
-                         <span className="text-xs text-gray-500 block">Uniquement la liste des Traits (Avantages/Désavantages).</span>
-                     </div>
-                 </label>
-             </div>
-
-             <button
-                onClick={handleExport}
-                className="w-full mt-6 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-all font-bold flex items-center justify-center gap-2 shadow-sm"
-            >
-                <Download size={18} />
-                Sauvegarder JSON
-            </button>
+        {/* HEADER & TABS */}
+        <div className="bg-slate-100 flex flex-col border-b border-slate-200">
+            <div className="flex justify-between items-center p-4">
+                <h3 className="font-bold text-xl text-slate-800">Gestion des Données</h3>
+                <button onClick={handleClose} className="text-slate-400 hover:text-slate-700 p-1 rounded-full hover:bg-slate-200 transition-colors">
+                    <X size={24} />
+                </button>
+            </div>
+            
+            <div className="flex px-4 gap-4 justify-center">
+                <button 
+                    onClick={() => setActiveTab('export')}
+                    className={`flex-1 flex justify-center items-center gap-2 px-6 py-3 font-bold text-sm border-b-4 transition-colors ${
+                        activeTab === 'export' 
+                        ? 'border-blue-600 text-blue-700 bg-white rounded-t-lg' 
+                        : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded-t-lg'
+                    }`}
+                >
+                    <Download size={18} />
+                    Sauvegarder (Export)
+                </button>
+                <button 
+                    onClick={() => setActiveTab('import')}
+                    className={`flex-1 flex justify-center items-center gap-2 px-6 py-3 font-bold text-sm border-b-4 transition-colors ${
+                        activeTab === 'import' 
+                        ? 'border-orange-500 text-orange-700 bg-white rounded-t-lg' 
+                        : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded-t-lg'
+                    }`}
+                >
+                    <Upload size={18} />
+                    Charger (Import)
+                </button>
+            </div>
         </div>
 
-        {/* --- IMPORT COLUMN --- */}
-        <div className="flex-1 bg-white p-6 flex flex-col relative">
-             <button onClick={handleClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-1"><X size={24} /></button>
-
-             <div className="flex items-center gap-2 border-b border-gray-200 pb-3 mb-4">
-                <div className="bg-orange-500 p-2 rounded-lg text-white"><Upload size={24} /></div>
-                <div>
-                    <h3 className="font-bold text-lg text-gray-800">Charger</h3>
-                    <p className="text-xs text-gray-500">Importer ou fusionner</p>
+        {/* --- EXPORT TAB CONTENT --- */}
+        {activeTab === 'export' && (
+            <div className="flex-1 bg-slate-50 p-6 flex flex-col animate-in fade-in duration-300">
+                <div className="mb-4">
+                    <h3 className="font-bold text-lg text-blue-800 flex items-center gap-2">
+                        <Download size={20} />
+                        Choisissez le format de sauvegarde
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1">Crée un fichier .json sur votre ordinateur.</p>
                 </div>
-             </div>
 
-             {!pendingFile ? (
-                 <div className="flex-grow flex flex-col justify-center items-center text-center space-y-4 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 p-6 hover:bg-blue-50 hover:border-blue-300 transition-colors">
-                     <div className="p-4 bg-white rounded-full shadow-sm text-gray-400 mb-2">
-                         <FileJson size={48} />
-                     </div>
-                     <p className="text-sm text-gray-600 font-medium">
-                         Cliquez pour sélectionner un fichier <code>.json</code>
-                     </p>
-                     <p className="text-xs text-gray-400 max-w-[200px]">
-                         Le système analysera le fichier pour vous proposer les options adaptées.
-                     </p>
-                     <input 
-                        type="file" 
-                        accept=".json" 
-                        ref={fileInputRef} 
-                        className="hidden" 
-                        onChange={handleFileSelect}
-                     />
-                     <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-sm"
+                <div className="space-y-3 flex-grow">
+                    <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${exportType === 'full' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
+                        <input type="radio" name="exportType" checked={exportType === 'full'} onChange={() => setExportType('full')} className="mt-1 accent-blue-600" />
+                        <div>
+                            <span className="font-bold text-slate-800 flex items-center gap-2"><User size={16} /> Personnage Complet</span>
+                            <span className="text-xs text-slate-500 block mt-1">Tout ce que contient la fiche actuelle (Valeurs, Notes, Images, Bibliothèque).</span>
+                        </div>
+                    </label>
+
+                    <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${exportType === 'system' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
+                        <input type="radio" name="exportType" checked={exportType === 'system'} onChange={() => setExportType('system')} className="mt-1 accent-blue-600" />
+                        <div>
+                            <span className="font-bold text-slate-800 flex items-center gap-2"><FileBox size={16} /> Système de Jeu (MJ)</span>
+                            <span className="text-xs text-slate-500 block mt-1">Structure + Bibliothèque. <span className="text-red-500 font-bold">Sans les valeurs du joueur.</span> Idéal pour partager un template.</span>
+                        </div>
+                    </label>
+
+                    <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${exportType === 'template' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
+                        <input type="radio" name="exportType" checked={exportType === 'template'} onChange={() => setExportType('template')} className="mt-1 accent-blue-600" />
+                        <div>
+                            <span className="font-bold text-slate-800 flex items-center gap-2"><LayoutTemplate size={16} /> Structure Seule</span>
+                            <span className="text-xs text-slate-500 block mt-1">Uniquement la configuration des compétences et attributs. Pas de bibliothèque.</span>
+                        </div>
+                    </label>
+
+                    <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${exportType === 'library' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
+                        <input type="radio" name="exportType" checked={exportType === 'library'} onChange={() => setExportType('library')} className="mt-1 accent-blue-600" />
+                        <div>
+                            <span className="font-bold text-slate-800 flex items-center gap-2"><BookOpen size={16} /> Bibliothèque Seule</span>
+                            <span className="text-xs text-slate-500 block mt-1">Uniquement la liste des Avantages et Désavantages.</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-slate-200">
+                    <button
+                        onClick={handleExport}
+                        className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-all font-bold flex items-center justify-center gap-2 shadow-lg"
                     >
-                        Choisir un fichier
+                        <Download size={20} />
+                        Télécharger le fichier
                     </button>
-                 </div>
-             ) : (
-                 <div className="flex-grow flex flex-col animate-in fade-in slide-in-from-right-4 duration-300">
-                     {/* Analysis Header */}
-                     <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 mb-4 flex gap-3 text-xs text-blue-800 flex-col">
-                         <div className="flex-grow">
-                             <span className="font-bold block mb-1">Contenu détecté :</span>
-                             <div className="flex gap-2 flex-wrap">
-                                 {analysis?.hasStructure && <span className="bg-white border px-2 py-0.5 rounded flex items-center gap-1"><LayoutTemplate size={10}/> Structure</span>}
-                                 {analysis?.hasLibrary && <span className="bg-white border px-2 py-0.5 rounded flex items-center gap-1"><BookOpen size={10}/> Bibliothèque</span>}
-                                 {analysis?.isFilled && <span className="bg-white border px-2 py-0.5 rounded flex items-center gap-1"><User size={10}/> Données Joueur</span>}
-                             </div>
-                         </div>
-                         
-                         {/* VERSION WARNING */}
-                         {analysis?.versionMismatch && (
-                             <div className="mt-2 pt-2 border-t border-blue-200 text-orange-700 font-semibold flex items-start gap-2">
-                                 <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-                                 <div>
-                                     {!analysis.fileVersion ? (
-                                         "Fichier ancien (sans numéro de version). Risque d'incompatibilité mineure."
-                                     ) : analysis.fileVersion < APP_VERSION ? (
-                                         <span>Version du fichier (v{analysis.fileVersion}) antérieure à l'application (v{APP_VERSION}). Mise à jour automatique.</span>
-                                     ) : (
-                                         <span>Version du fichier (v{analysis.fileVersion}) plus récente que l'application (v{APP_VERSION}). Certaines fonctionnalités pourraient manquer.</span>
-                                     )}
-                                 </div>
-                             </div>
-                         )}
-                     </div>
-                     
-                     <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2 text-sm uppercase tracking-wide">
-                         Action requise
-                     </h4>
-                     
-                     <div className="flex-grow">
-                         {renderImportOptions()}
-                     </div>
+                </div>
+            </div>
+        )}
 
-                     <div className="mt-4 flex gap-3 pt-3 border-t border-gray-100">
-                         <button 
-                            onClick={() => { setPendingFile(null); setAnalysis(null); }}
-                            className="flex-1 py-2 rounded-lg text-gray-600 hover:bg-gray-100 font-bold border border-gray-300"
-                         >
-                             Annuler
-                         </button>
-                         <button 
-                            onClick={executeImport}
-                            disabled={!importAction}
-                            className="flex-1 py-2 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                         >
-                             Charger
-                         </button>
-                     </div>
-                 </div>
-             )}
-        </div>
+        {/* --- IMPORT TAB CONTENT --- */}
+        {activeTab === 'import' && (
+            <div className="flex-1 bg-white p-6 flex flex-col animate-in fade-in duration-300">
+                {!pendingFile ? (
+                    <div className="flex-grow flex flex-col justify-center items-center text-center space-y-6 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-8 hover:bg-orange-50 hover:border-orange-300 transition-colors cursor-pointer group" onClick={() => fileInputRef.current?.click()}>
+                        <div className="p-5 bg-white rounded-full shadow-sm text-slate-400 group-hover:text-orange-500 transition-colors">
+                            <Upload size={48} />
+                        </div>
+                        <div>
+                            <p className="text-lg text-slate-700 font-bold mb-2">
+                                Cliquez pour sélectionner un fichier
+                            </p>
+                            <p className="text-sm text-slate-500">
+                                Accepte les fichiers <code>.json</code>
+                            </p>
+                        </div>
+                        <input 
+                            type="file" 
+                            accept=".json" 
+                            ref={fileInputRef} 
+                            className="hidden" 
+                            onChange={handleFileSelect}
+                        />
+                        <button
+                            className="bg-white border border-slate-300 text-slate-700 px-6 py-2 rounded-full font-bold hover:bg-white hover:text-orange-600 hover:border-orange-400 transition-colors shadow-sm pointer-events-none"
+                        >
+                            Parcourir...
+                        </button>
+                    </div>
+                ) : (
+                    <div className="flex-grow flex flex-col animate-in fade-in slide-in-from-right-4 duration-300">
+                        {/* Analysis Header */}
+                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4 flex gap-3 text-sm text-blue-900 flex-col">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <span className="font-bold block mb-1">Contenu détecté dans le fichier :</span>
+                                    <div className="flex gap-2 flex-wrap mt-2">
+                                        {analysis?.hasStructure && <span className="bg-white border border-blue-200 px-2 py-1 rounded flex items-center gap-1 shadow-sm"><LayoutTemplate size={12}/> Structure</span>}
+                                        {analysis?.hasLibrary && <span className="bg-white border border-blue-200 px-2 py-1 rounded flex items-center gap-1 shadow-sm"><BookOpen size={12}/> Bibliothèque</span>}
+                                        {analysis?.isFilled && <span className="bg-white border border-blue-200 px-2 py-1 rounded flex items-center gap-1 shadow-sm"><User size={12}/> Données Joueur</span>}
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={() => { setPendingFile(null); setAnalysis(null); }}
+                                    className="text-slate-400 hover:text-red-500 p-1"
+                                    title="Changer de fichier"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+                            
+                            {/* VERSION WARNING */}
+                            {analysis?.versionMismatch && (
+                                <div className="mt-3 pt-3 border-t border-blue-200 text-orange-700 font-semibold flex items-start gap-2 text-xs">
+                                    <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                                    <div>
+                                        {!analysis.fileVersion ? (
+                                            "Fichier ancien (sans numéro de version). Risque d'incompatibilités."
+                                        ) : analysis.fileVersion < APP_VERSION ? (
+                                            <span>Version du fichier (v{analysis.fileVersion}) antérieure à l'application (v{APP_VERSION}).</span>
+                                        ) : (
+                                            <span>Version du fichier (v{analysis.fileVersion}) plus récente que l'application (v{APP_VERSION}). Certaines fonctionnalités pourraient manquer.</span>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <h4 className="font-bold text-slate-800 mb-3 flex items-center gap-2 text-sm uppercase tracking-wide">
+                            Choisir une action
+                        </h4>
+                        
+                        <div className="flex-grow overflow-y-auto pr-1">
+                            {renderImportOptions()}
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-slate-200">
+                            <button 
+                                onClick={executeImport}
+                                disabled={!importAction}
+                                className="w-full py-3 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transition-all"
+                            >
+                                <CheckCircle2 size={20} />
+                                Confirmer l'importation
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        )}
 
       </div>
     </div>

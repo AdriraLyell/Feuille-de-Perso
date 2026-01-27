@@ -312,6 +312,27 @@ const migrateData = (parsed: any): CharacterSheetData => {
         parsed.campaignNotes = [];
     }
 
+    // Migration 31 (New): Campaign Notes Multiple Images Support
+    // Convert single image fields to array of images
+    if (parsed.campaignNotes) {
+        parsed.campaignNotes = parsed.campaignNotes.map((note: any) => {
+            // Check if note has old single image data but no images array
+            if (note.imageId && (!note.images || note.images.length === 0)) {
+                note.images = [{
+                    id: Math.random().toString(36).substr(2, 9), // Unique placement ID
+                    imageId: note.imageId, // Blob ID
+                    config: note.imageConfig || { width: 200, height: 200, marginTop: 0, align: 'right' }
+                }];
+                // Clean up old fields
+                delete note.imageId;
+                delete note.imageConfig;
+            }
+            // Ensure array exists
+            if (!note.images) note.images = [];
+            return note;
+        });
+    }
+
     // Migration 27: Add Party Notes
     if (!parsed.partyNotes) {
         parsed.partyNotes = INITIAL_DATA.partyNotes;

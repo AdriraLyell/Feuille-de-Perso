@@ -1,7 +1,8 @@
 
+// ... keep imports ...
 import React, { useRef, useState, useLayoutEffect, useEffect } from 'react';
-import { CharacterSheetData, CampaignNoteEntry, PartyColumn, PartyMemberEntry } from '../types';
-import { Book, Plus, Trash2, ChevronLeft, ChevronRight, Bookmark, Users, PenTool, X, Image as ImageIcon, AlignLeft, AlignRight, AlignCenter } from 'lucide-react';
+import { CharacterSheetData, CampaignNoteEntry, PartyColumn, PartyMemberEntry, ImageConfig, NoteImage } from '../types';
+import { Book, Plus, Trash2, ChevronLeft, ChevronRight, Bookmark, Users, PenTool, X, Image as ImageIcon, Move, Scaling, WrapText, BoxSelect, Maximize2, Minimize2, StretchHorizontal } from 'lucide-react';
 import { saveImage, getImage, deleteImage } from '../imageDB';
 
 interface Props {
@@ -11,14 +12,48 @@ interface Props {
   onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', deduplicationId?: string) => void;
 }
 
-// --- SUB-COMPONENT FOR NOTE IMAGE ---
+// --- SUB-COMPONENT FOR NOTE IMAGE (Movable/Resizable) ---
 const NoteImageZone: React.FC<{ 
-    imageId: string; 
-    position: 'top' | 'left' | 'right';
+    uniqueId: string; // Placement ID
+    imageId: string; // Blob ID
+    config?: ImageConfig;
+    onUpdateConfig: (newConfig: ImageConfig) => void;
     onDelete: () => void;
-    onPositionChange: (pos: 'top' | 'left' | 'right') => void;
-}> = ({ imageId, position, onDelete, onPositionChange }) => {
+}> = ({ uniqueId, imageId, config, onUpdateConfig, onDelete }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+    
+    // Default Config Initialization
+    const defaultConfig: ImageConfig = { 
+        width: 300, 
+        height: 200, 
+        marginTop: 0, 
+        align: 'right',
+        x: 0,
+        y: 0,
+        mode: 'absolute',
+        fit: 'cover' // New default
+    };
+
+    const [tempConfig, setTempConfig] = useState<ImageConfig>(config || defaultConfig);
+    const [isResizing, setIsResizing] = useState(false);
+    const [isMoving, setIsMoving] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const startPosRef = useRef<{ x: number, y: number, w: number, h: number, configX: number, configY: number, mt: number } | null>(null);
+
+    // Sync props to internal state only when not interacting
+    useEffect(() => {
+        if (!isResizing && !isMoving && config) {
+            setTempConfig(prev => ({
+                ...prev,
+                ...config,
+                // Ensure defaults for new properties if migrating old data
+                mode: config.mode || prev.mode || 'absolute',
+                x: config.x ?? prev.x ?? 0,
+                y: config.y ?? prev.y ?? 0,
+                fit: config.fit || prev.fit || 'cover'
+            }));
+        }
+    }, [config, isResizing, isMoving]);
 
     useEffect(() => {
         let active = true;
@@ -38,96 +73,304 @@ const NoteImageZone: React.FC<{
         return () => { active = false; };
     }, [imageId]);
 
+    // --- RESIZE HANDLERS ---
+    const handleResizeStart = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsResizing(true);
+        startPosRef.current = { 
+            x: e.clientX, 
+            y: e.clientY, 
+            w: tempConfig.width, 
+            h: tempConfig.height,
+            configX: 0, configY: 0, mt: 0
+        };
+    };
+
+    // --- MOVE HANDLERS ---
+    const handleMoveStart = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsMoving(true);
+        startPosRef.current = { 
+            x: e.clientX, 
+            y: e.clientY, 
+            w: 0, h: 0,
+            configX: tempConfig.x || 0,
+            configY: tempConfig.y || 0,
+            mt: tempConfig.marginTop
+        };
+    };
+
+    // Global Mouse Listeners for Drag/Resize
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!startPosRef.current) return;
+            const { x, y, w, h, configX, configY, mt } = startPosRef.current;
+            const dx = e.clientX - x;
+            const dy = e.clientY - y;
+
+            if (isResizing) {
+                const newWidth = Math.max(50, w + dx);
+                const newHeight = Math.max(50, h + dy);
+                setTempConfig(prev => ({ ...prev, width: newWidth, height: newHeight }));
+            } 
+            
+            if (isMoving) {
+                if (tempConfig.mode === 'absolute') {
+                    // Absolute Mode: Free X/Y movement
+                    const newX = Math.max(0, configX + dx);
+                    const newY = Math.max(0, configY + dy);
+                    setTempConfig(prev => ({ ...prev, x: newX, y: newY }));
+                } else {
+                    // Flow Mode: Vertical Margin + Align Flip
+                    const newMarginTop = Math.max(0, mt + dy);
+                    let newAlign = tempConfig.align;
+                    if (tempConfig.align === 'left' && dx > 150) newAlign = 'right';
+                    if (tempConfig.align === 'right' && dx < -150) newAlign = 'left';
+                    setTempConfig(prev => ({ ...prev, marginTop: newMarginTop, align: newAlign }));
+                }
+            }
+        };
+
+        const handleMouseUp = () => {
+            if (isResizing || isMoving) {
+                onUpdateConfig(tempConfig);
+                setIsResizing(false);
+                setIsMoving(false);
+                startPosRef.current = null;
+            }
+        };
+
+        if (isResizing || isMoving) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+        }
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isResizing, isMoving, tempConfig, onUpdateConfig]);
+
+    const toggleMode = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const newMode = tempConfig.mode === 'absolute' ? 'flow' : 'absolute';
+        
+        // When switching to absolute, sync X/Y from current visual state if possible
+        // Ideally we would calculate position, but for now we rely on existing X/Y or marginTop
+        let updates: Partial<ImageConfig> = { mode: newMode };
+        
+        if (newMode === 'absolute') {
+            // Initialize X/Y if they are 0 (first switch)
+            if (!tempConfig.x && !tempConfig.y) {
+                updates.y = tempConfig.marginTop; // Approximation
+                // X approximation based on align
+                updates.x = tempConfig.align === 'right' ? 400 : 20; // Generic fallback
+            }
+        } else {
+            // Initialize marginTop if switching to flow
+            if (tempConfig.marginTop === 0 && tempConfig.y) {
+                updates.marginTop = tempConfig.y;
+            }
+        }
+
+        const newConfig = { ...tempConfig, ...updates };
+        setTempConfig(newConfig);
+        onUpdateConfig(newConfig);
+    };
+
+    const toggleFit = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const modes: ImageConfig['fit'][] = ['cover', 'contain', 'fill'];
+        const currentIdx = modes.indexOf(tempConfig.fit || 'cover');
+        const nextMode = modes[(currentIdx + 1) % modes.length];
+        
+        const newConfig = { ...tempConfig, fit: nextMode };
+        setTempConfig(newConfig);
+        onUpdateConfig(newConfig);
+    };
+
     if (!imageUrl) return null;
 
-    // Dynamic Classes based on position
-    const containerClasses = position === 'top' 
-        ? "w-full mb-4 flex justify-center relative group shrink-0" 
-        : position === 'left'
-            ? "float-left mr-4 mb-2 relative group w-[45%] z-10"
-            : "float-right ml-4 mb-2 relative group w-[45%] z-10";
+    // Computed Styles based on Mode
+    const isAbsolute = tempConfig.mode === 'absolute';
+    
+    const containerStyle: React.CSSProperties = isAbsolute ? {
+        position: 'absolute',
+        top: tempConfig.y || 0,
+        left: tempConfig.x || 0,
+        width: tempConfig.width,
+        height: tempConfig.height,
+        zIndex: 20
+    } : {
+        float: tempConfig.align,
+        width: tempConfig.width,
+        // Important: In flow mode, we add the margin to the total height but allow text to flow in it via shape-outside
+        height: tempConfig.height + tempConfig.marginTop, 
+        paddingTop: tempConfig.marginTop, // Push the visual image down
+        shapeOutside: `inset(${tempConfig.marginTop}px 0 0 0)`, // Tell text it can occupy the top area
+        
+        [tempConfig.align === 'left' ? 'marginRight' : 'marginLeft']: '20px',
+        marginBottom: '10px',
+        zIndex: 10,
+        position: 'relative' // Need relative for internal absolute children
+    };
+
+    const isInteracting = isMoving || isResizing;
+    const currentFit = tempConfig.fit || 'cover';
 
     return (
-        <div className={containerClasses} style={{ clear: position === 'top' ? 'both' : 'none' }}>
-            <div className={`relative inline-block shadow-md rotate-[-1deg] border-4 border-white bg-white transition-all ${position === 'top' ? 'max-w-full' : 'max-w-full'}`}>
-                <img src={imageUrl} alt="Note Attachment" className="max-h-[300px] object-contain w-full" />
+        <div 
+            ref={containerRef}
+            className="group/image select-none"
+            style={containerStyle}
+        >
+            <div className={`w-full h-full relative border-4 border-white shadow-md bg-white transition-shadow ${isInteracting ? 'shadow-xl ring-2 ring-indigo-400 opacity-90' : ''}`}>
+                <img 
+                    src={imageUrl} 
+                    alt="Note Attachment" 
+                    className={`w-full h-full pointer-events-none transition-all duration-300 object-${currentFit}`}
+                />
                 
-                {/* Controls Overlay */}
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-start justify-end p-2 gap-1">
-                    <div className="bg-white rounded-md shadow-sm flex overflow-hidden mr-2">
+                {/* Overlay Controls */}
+                <div className={`absolute inset-0 bg-black/10 transition-opacity flex flex-col justify-between p-2
+                    ${isInteracting ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover/image:opacity-100 pointer-events-none group-hover/image:pointer-events-auto'}
+                `}>
+                    <div className="flex justify-between items-start">
+                        <div className="flex gap-1">
+                            {/* Mode Toggle Button */}
+                            <button
+                                onClick={toggleMode}
+                                className={`p-1.5 rounded shadow text-xs font-bold flex items-center gap-1 transition-colors ${
+                                    isAbsolute 
+                                    ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                                    : 'bg-white text-indigo-700 hover:bg-indigo-50'
+                                }`}
+                                title={isAbsolute ? "Mode Libre (Flottant)" : "Mode Habillage (Texte autour)"}
+                            >
+                                {isAbsolute ? <BoxSelect size={14} /> : <WrapText size={14} />}
+                            </button>
+
+                            {/* Fit Toggle Button */}
+                            <button
+                                onClick={toggleFit}
+                                className="p-1.5 rounded shadow text-xs font-bold flex items-center gap-1 transition-colors bg-white text-stone-700 hover:bg-stone-50"
+                                title={`Ajustement : ${currentFit === 'cover' ? 'Remplir (Zoom)' : currentFit === 'contain' ? 'Ajuster (Entier)' : 'Étirer'}`}
+                            >
+                                {currentFit === 'cover' && <Maximize2 size={14} />}
+                                {currentFit === 'contain' && <Minimize2 size={14} />}
+                                {currentFit === 'fill' && <StretchHorizontal size={14} />}
+                            </button>
+                        </div>
+
                         <button 
-                            onClick={() => onPositionChange('left')}
-                            className={`p-1.5 hover:bg-gray-100 ${position === 'left' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600'}`}
-                            title="Habillage Gauche"
+                            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                            className="bg-red-600 text-white p-1 rounded shadow hover:bg-red-700"
+                            title="Supprimer"
                         >
-                            <AlignLeft size={16} />
-                        </button>
-                        <button 
-                            onClick={() => onPositionChange('top')}
-                            className={`p-1.5 hover:bg-gray-100 ${position === 'top' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600'}`}
-                            title="Position Haut (Fixe)"
-                        >
-                            <AlignCenter size={16} />
-                        </button>
-                        <button 
-                            onClick={() => onPositionChange('right')}
-                            className={`p-1.5 hover:bg-gray-100 ${position === 'right' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600'}`}
-                            title="Habillage Droite"
-                        >
-                            <AlignRight size={16} />
+                            <X size={14} />
                         </button>
                     </div>
-
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                        className="bg-red-600 text-white p-1.5 rounded-md shadow-md hover:bg-red-700 transition-colors"
-                        title="Supprimer l'image"
+                    
+                    {/* Move Handle (Center) */}
+                    <div 
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-move bg-white/80 p-2 rounded-full hover:bg-white text-stone-700"
+                        onMouseDown={handleMoveStart}
+                        title="Déplacer"
                     >
-                        <X size={16} />
-                    </button>
+                        <Move size={20} />
+                    </div>
+
+                    {/* Resize Handle (Bottom Right) */}
+                    <div 
+                        className="absolute bottom-0 right-0 cursor-nwse-resize p-1 text-white bg-indigo-600/80 rounded-tl-lg hover:bg-indigo-600"
+                        onMouseDown={handleResizeStart}
+                    >
+                        <Scaling size={16} />
+                    </div>
                 </div>
 
-                {/* Tape effect visual */}
+                {/* Tape visual */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-6 bg-yellow-100/50 rotate-2 shadow-sm border border-yellow-200/30 pointer-events-none"></div>
             </div>
         </div>
     );
 };
 
-// --- MODIFIED NOTEBOOK TEXTAREA (ContentEditable DIV) ---
+// ... NotebookTextarea ...
 const NotebookTextarea: React.FC<{ 
     value: string, 
     onChange: (v: string) => void, 
     placeholder?: string,
-    imageNode?: React.ReactNode // Image is injected here to allow floating
-}> = ({ value, onChange, placeholder, imageNode }) => {
+    imageNodes?: React.ReactNode, // Changed to allow multiple nodes
+    isDrawing: boolean,
+    onDrawComplete: (rect: {x: number, y: number, w: number, h: number, containerWidth: number}) => void
+}> = ({ value, onChange, placeholder, imageNodes, isDrawing, onDrawComplete }) => {
     const editableRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [drawStart, setDrawStart] = useState<{x: number, y: number} | null>(null);
+    const [currentRect, setCurrentRect] = useState<{x: number, y: number, w: number, h: number} | null>(null);
 
-    // Configuration des lignes pour un alignement parfait
-    const lineHeight = 26; 
-    const fontSize = '1.05rem'; 
-    const paddingX = '24px'; 
-    const paddingTop = '5px';
-
-    // Handle Content Updates
-    // We only update if the content is significantly different to avoid cursor jumps
+    // Sync content
     useEffect(() => {
         if (editableRef.current && editableRef.current.innerText !== value) {
-            // Using innerText for plain text editing feel
             editableRef.current.innerText = value;
         }
     }, [value]);
 
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
-        const text = e.currentTarget.innerText;
-        onChange(text);
+        onChange(e.currentTarget.innerText);
     };
+
+    // Drawing Logic
+    const handleMouseDown = (e: React.MouseEvent) => {
+        if (!isDrawing || !containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left + containerRef.current.scrollLeft;
+        const y = e.clientY - rect.top + containerRef.current.scrollTop; // Add scrollTop to fix position when scrolled
+        setDrawStart({ x, y });
+        setCurrentRect({ x, y, w: 0, h: 0 });
+    };
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (!isDrawing || !drawStart || !containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const currentX = e.clientX - rect.left + containerRef.current.scrollLeft;
+        const currentY = e.clientY - rect.top + containerRef.current.scrollTop;
+
+        const w = Math.abs(currentX - drawStart.x);
+        const h = Math.abs(currentY - drawStart.y);
+        const x = Math.min(currentX, drawStart.x);
+        const y = Math.min(currentY, drawStart.y);
+
+        setCurrentRect({ x, y, w, h });
+    };
+
+    const handleMouseUp = () => {
+        if (!isDrawing || !drawStart || !currentRect || !containerRef.current) return;
+        
+        // Only trigger if box is big enough
+        if (currentRect.w > 20 && currentRect.h > 20) {
+            onDrawComplete({
+                ...currentRect,
+                containerWidth: containerRef.current.clientWidth
+            });
+        }
+        setDrawStart(null);
+        setCurrentRect(null);
+    };
+
+    // Styling
+    const lineHeight = 26; 
+    const fontSize = '1.05rem'; 
+    const paddingX = '24px'; 
+    const paddingTop = '5px';
 
     return (
         <div className="relative w-full h-full rounded-sm bg-stone-50/30 overflow-hidden flex flex-col">
-            {/* The Container with Lines Background */}
             <div 
-                className="w-full h-full overflow-y-auto custom-scrollbar relative"
+                ref={containerRef}
+                className={`w-full h-full overflow-y-auto custom-scrollbar relative ${isDrawing ? 'cursor-crosshair select-none' : ''}`}
                 style={{
                     paddingTop,
                     paddingLeft: paddingX,
@@ -135,20 +378,37 @@ const NotebookTextarea: React.FC<{
                     paddingBottom: '20px',
                     backgroundImage: `linear-gradient(transparent ${lineHeight - 1}px, #d6d3d1 ${lineHeight - 1}px)`,
                     backgroundSize: `100% ${lineHeight}px`,
-                    backgroundAttachment: 'local', // Scrolls with content
+                    backgroundAttachment: 'local',
                     backgroundPosition: `0 ${paddingTop}`,
                 }}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={() => { if(isDrawing) { setDrawStart(null); setCurrentRect(null); }}}
             >
-                {/* Image Injection (Float works here because it is a sibling inside the flow) */}
-                {imageNode}
+                {/* Drawing Overlay Box */}
+                {isDrawing && currentRect && (
+                    <div 
+                        className="absolute border-2 border-red-500 bg-red-200/30 z-50 pointer-events-none"
+                        style={{
+                            left: currentRect.x,
+                            top: currentRect.y,
+                            width: currentRect.w,
+                            height: currentRect.h
+                        }}
+                    />
+                )}
 
-                {/* Editable Text Area */}
+                {/* Sibling Image Nodes (Floated or Absolute) */}
+                {imageNodes}
+
+                {/* Text Content */}
                 <div 
                     ref={editableRef}
-                    contentEditable
+                    contentEditable={!isDrawing} // Disable edit while drawing
                     suppressContentEditableWarning
                     onInput={handleInput}
-                    className="outline-none min-h-full text-ink whitespace-pre-wrap break-words"
+                    className="outline-none min-h-full text-ink whitespace-pre-wrap break-words relative z-0"
                     style={{
                         fontFamily: '"Patrick Hand", cursive',
                         fontSize,
@@ -163,8 +423,6 @@ const NotebookTextarea: React.FC<{
                 .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.4); }
-                
-                /* Placeholder logic for contentEditable */
                 [contentEditable]:empty:before {
                     content: attr(data-placeholder);
                     color: #a8a29e;
@@ -175,13 +433,13 @@ const NotebookTextarea: React.FC<{
     );
 };
 
-// --- SUBS-COMPONENT FOR PARTY TABLE ---
+// ... PartyTable (unchanged) ...
 const PartyTable: React.FC<{
     data: CharacterSheetData;
     onChange: React.Dispatch<React.SetStateAction<CharacterSheetData>>;
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info') => void;
 }> = ({ data, onChange, onAddLog }) => {
-    // ... (PartyTable code remains unchanged, omitted for brevity but assumed present)
+    // ... (PartyTable code remains unchanged, but needs to be included for full file replacement)
     const columns = data.partyNotes?.columns || [];
     const members = data.partyNotes?.members || [];
     const staticWidths = data.partyNotes?.staticColWidths || { character: 200, player: 200 };
@@ -410,10 +668,12 @@ const PartyTable: React.FC<{
 
 const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, onAddLog }) => {
   const [activeTab, setActiveTab] = useState<'journal' | 'party'>('journal');
+  const [isDrawingImage, setIsDrawingImage] = useState(false);
+  const [pendingImageConfig, setPendingImageConfig] = useState<ImageConfig | null>(null);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // --- JOURNAL STATES ---
-  // Initialize to last page if notes exist, else 0
   const [currentIndex, setCurrentIndex] = useState(() => {
       return data.campaignNotes && data.campaignNotes.length > 0 ? data.campaignNotes.length - 1 : 0;
   });
@@ -422,7 +682,6 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
   const currentNote = totalPages > 0 && data.campaignNotes ? data.campaignNotes[currentIndex] : null;
 
   // --- EFFECTS ---
-  // Ensure index remains valid if data changes externally
   useEffect(() => {
       if (totalPages > 0 && currentIndex >= totalPages) {
           setCurrentIndex(totalPages - 1);
@@ -436,7 +695,7 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
       date: new Date().toLocaleDateString('fr-CA'),
       title: 'Nouvelle Session',
       content: '',
-      imagePosition: 'top' // Default position
+      images: [] // Initialize images array
     };
     
     const newNotes = [...(data.campaignNotes || []), newNote];
@@ -445,9 +704,8 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
       campaignNotes: newNotes
     });
     
-    // Switch to new page
     setCurrentIndex(newNotes.length - 1);
-    setActiveTab('journal'); // Ensure we switch back to journal view
+    setActiveTab('journal');
     onAddLog("Nouvelle page ajoutée au journal", 'success', 'sheet');
   };
 
@@ -460,7 +718,13 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
     if (noteIdToDelete) {
         const noteToDelete = (data.campaignNotes || []).find(n => n.id === noteIdToDelete);
         
-        // Cleanup image from DB if exists
+        // Clean up all images associated with this note
+        if (noteToDelete?.images) {
+            noteToDelete.images.forEach(img => {
+                deleteImage(img.imageId).catch(console.error);
+            });
+        }
+        // Fallback for deprecated single image field
         if (noteToDelete?.imageId) {
             deleteImage(noteToDelete.imageId).catch(console.error);
         }
@@ -470,7 +734,6 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
         onAddLog("Page du journal arrachée", 'danger', 'sheet');
         setNoteIdToDelete(null);
         
-        // Adjust index: stay on same index unless it was the last one
         if (currentIndex >= newNotes.length) {
             setCurrentIndex(Math.max(0, newNotes.length - 1));
         }
@@ -486,57 +749,106 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
   };
 
   // --- IMAGE HANDLING ---
+  const toggleDrawMode = () => {
+      setIsDrawingImage(!isDrawingImage);
+      if (!isDrawingImage) {
+          onAddLog("Mode dessin : Tracez un rectangle sur la page pour insérer une image.", 'info', 'sheet');
+      }
+  };
+
+  const handleDrawComplete = (rect: {x: number, y: number, w: number, h: number, containerWidth: number}) => {
+      setIsDrawingImage(false);
+      
+      // Calculate Align based on center of drawn box relative to container center
+      const centerBox = rect.x + (rect.w / 2);
+      const centerContainer = rect.containerWidth / 2;
+      const align = centerBox < centerContainer ? 'left' : 'right';
+
+      setPendingImageConfig({
+          width: rect.w,
+          height: rect.h,
+          marginTop: rect.y,
+          align,
+          x: rect.x,
+          y: rect.y,
+          mode: 'absolute', // Defaulting to absolute for maximum freedom (Face to Face)
+          fit: 'cover'
+      });
+
+      // Open file dialog
+      fileInputRef.current?.click();
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (!file || !currentNote) return;
+      if (!file || !currentNote || !pendingImageConfig) return;
 
       try {
-          const id = await saveImage(file);
-          // If previous image existed, delete it
-          if (currentNote.imageId) {
-              await deleteImage(currentNote.imageId);
-          }
-          updateNote(currentNote.id, 'imageId', id);
-          // Reset position to top by default on new image
-          updateNote(currentNote.id, 'imagePosition', 'top'); 
-          onAddLog("Image ajoutée à la note", 'success', 'sheet');
+          const blobId = await saveImage(file);
+          
+          const newImage: NoteImage = {
+              id: Math.random().toString(36).substr(2, 9), // Unique ID for placement
+              imageId: blobId, // Blob ID
+              config: pendingImageConfig
+          };
+
+          const newImages = [...(currentNote.images || []), newImage];
+          
+          const newNotes = (data.campaignNotes || []).map(n => 
+              n.id === currentNote.id 
+              ? { ...n, images: newImages } 
+              : n
+          );
+          onChange({ ...data, campaignNotes: newNotes });
+
+          onAddLog("Image ajoutée à la zone dessinée", 'success', 'sheet');
       } catch (err) {
           console.error(err);
           onAddLog("Erreur lors de l'ajout de l'image", 'danger');
       } finally {
           if (fileInputRef.current) fileInputRef.current.value = "";
+          setPendingImageConfig(null);
       }
   };
 
-  const handleRemoveImage = async () => {
-      if (!currentNote || !currentNote.imageId) return;
+  const handleUpdateImageConfig = (uniqueId: string, newConfig: ImageConfig) => {
+      if (!currentNote) return;
+      
+      const newImages = (currentNote.images || []).map(img => 
+          img.id === uniqueId ? { ...img, config: newConfig } : img
+      );
+
+      updateNote(currentNote.id, 'images', newImages);
+  };
+
+  const handleRemoveImage = async (uniqueId: string) => {
+      if (!currentNote) return;
+      
+      const imageToRemove = (currentNote.images || []).find(img => img.id === uniqueId);
+      if (!imageToRemove) return;
+
       try {
-          await deleteImage(currentNote.imageId);
-          updateNote(currentNote.id, 'imageId', undefined);
+          await deleteImage(imageToRemove.imageId);
+          
+          const newImages = (currentNote.images || []).filter(img => img.id !== uniqueId);
+          updateNote(currentNote.id, 'images', newImages);
+          
           onAddLog("Image retirée de la note", 'info', 'sheet');
       } catch (err) {
           console.error(err);
       }
   };
 
-  const handleImagePositionChange = (pos: 'top' | 'left' | 'right') => {
-      if (!currentNote) return;
-      updateNote(currentNote.id, 'imagePosition', pos);
-  };
-
   const noteToDelete = (data.campaignNotes || []).find(n => n.id === noteIdToDelete);
 
   return (
-    // Outer Wrapper
     <div className={`w-full flex items-center justify-center bg-stone-900 py-8 px-4 md:px-12 relative overflow-auto transition-all duration-300 ${isLandscape ? 'min-h-[1200px]' : 'min-h-[1400px]'}`}>
       
-      {/* Background Texture */}
       <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]"></div>
 
       {/* --- FLEX CONTAINER: BUTTONS + BOOK --- */}
       <div className="flex items-center gap-3 shrink-0 z-10">
 
-          {/* PREV BUTTON AREA */}
           <div className="w-12 flex justify-end">
              {activeTab === 'journal' && (
                 <button 
@@ -559,15 +871,12 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
               rounded-r-md rounded-l-sm border-r-8 border-r-stone-200 border-l-[12px] border-l-stone-800
           `}>
               
-              {/* Visual Binding */}
               <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-stone-400 opacity-20 z-20 pointer-events-none shadow-[2px_0_5px_rgba(0,0,0,0.2)]"></div>
 
               {/* BOOK HEADER */}
               <div className="shrink-0 pt-6 pb-2 px-8 md:px-12 bg-[#fdfbf7] z-20 flex items-end justify-between border-b-2 border-stone-800 relative">
                     
-                    {/* Title & Tabs Container */}
                     <div className="flex items-end gap-6">
-                        {/* Tab 1: Journal */}
                         <button 
                             onClick={() => setActiveTab('journal')}
                             className={`group flex items-center gap-2 pb-1 transition-all ${activeTab === 'journal' ? 'text-indigo-950 border-b-4 border-indigo-900' : 'text-stone-400 hover:text-stone-600'}`}
@@ -576,7 +885,6 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
                             <span className={`text-2xl font-black uppercase tracking-[0.1em] font-serif leading-none hidden sm:inline`}>Journal</span>
                         </button>
 
-                        {/* Tab 2: Party */}
                         <button 
                             onClick={() => setActiveTab('party')}
                             className={`group flex items-center gap-2 pb-1 transition-all ${activeTab === 'party' ? 'text-indigo-950 border-b-4 border-indigo-900' : 'text-stone-400 hover:text-stone-600'}`}
@@ -586,7 +894,6 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
                         </button>
                     </div>
 
-                    {/* Right Actions */}
                     {activeTab === 'journal' ? (
                         <button 
                             onClick={addNote}
@@ -609,7 +916,6 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
               {/* --- CONTENT AREA --- */}
               <div className="flex-grow flex flex-col overflow-hidden bg-stone-50/20 relative">
                   
-                  {/* === TAB 1: JOURNAL === */}
                   {activeTab === 'journal' && (
                       <>
                         <div className="flex-grow flex flex-col overflow-hidden p-6 md:p-12">
@@ -627,12 +933,11 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
 
                             {currentNote && (
                                 <div className="w-full h-full flex flex-col animate-in fade-in zoom-in duration-300">
-                                    <div className="bg-white border border-stone-300 shadow-sm relative group w-full h-full flex flex-col rounded-sm overflow-hidden flex-grow min-h-0">
+                                    <div className="bg-white border border-stone-300 shadow-sm relative w-full h-full flex flex-col rounded-sm overflow-hidden flex-grow min-h-0">
                                             
                                             {/* Note Header */}
                                             <div className="bg-stone-100 border-b border-stone-200 p-3 flex items-center justify-between pl-4 shrink-0 rounded-t-sm z-20">
                                                 <div className="flex items-center gap-3 flex-grow min-w-0">
-                                                    {/* Simple Date Input (XP Style) */}
                                                     <div className="w-[130px] shrink-0">
                                                         <input 
                                                             type="date"
@@ -654,13 +959,14 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
                                                 </div>
                                                 
                                                 <div className="flex items-center gap-1 no-print shrink-0 ml-2">
-                                                    {/* Image Button */}
+                                                    {/* Image Draw Button */}
                                                     <button
-                                                        onClick={() => fileInputRef.current?.click()}
-                                                        className="p-2 text-stone-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
-                                                        title="Ajouter une image"
+                                                        onClick={toggleDrawMode}
+                                                        className={`p-2 rounded transition-colors flex items-center gap-1 ${isDrawingImage ? 'bg-indigo-600 text-white shadow-inner animate-pulse' : 'text-stone-400 hover:text-indigo-600 hover:bg-indigo-50'}`}
+                                                        title={isDrawingImage ? "Mode dessin actif - Cliquez pour annuler" : "Dessiner une zone pour l'image"}
                                                     >
                                                         <ImageIcon size={18} />
+                                                        {isDrawingImage && <span className="text-xs font-bold px-1">Annuler</span>}
                                                     </button>
                                                     <input 
                                                         type="file" 
@@ -680,21 +986,25 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
                                                 </div>
                                             </div>
 
-                                            {/* Note Content Wrapper (Textarea handles wrapping) */}
+                                            {/* Note Content Wrapper */}
                                             <div className="flex-grow min-h-0 bg-white relative rounded-b-sm">
                                                 <NotebookTextarea 
                                                     value={currentNote.content}
                                                     onChange={(v) => updateNote(currentNote.id, 'content', v)}
                                                     placeholder="Récit des événements..."
-                                                    imageNode={
-                                                        currentNote.imageId ? (
+                                                    isDrawing={isDrawingImage}
+                                                    onDrawComplete={handleDrawComplete}
+                                                    imageNodes={
+                                                        currentNote.images && currentNote.images.map((img) => (
                                                             <NoteImageZone 
-                                                                imageId={currentNote.imageId} 
-                                                                position={currentNote.imagePosition || 'top'}
-                                                                onDelete={handleRemoveImage}
-                                                                onPositionChange={handleImagePositionChange}
+                                                                key={img.id}
+                                                                uniqueId={img.id}
+                                                                imageId={img.imageId} 
+                                                                config={img.config}
+                                                                onUpdateConfig={(cfg) => handleUpdateImageConfig(img.id, cfg)}
+                                                                onDelete={() => handleRemoveImage(img.id)}
                                                             />
-                                                        ) : null
+                                                        ))
                                                     }
                                                 />
                                             </div>
@@ -702,7 +1012,7 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
                                 </div>
                             )}
                         </div>
-                        {/* BOOK FOOTER - Page Indicator Only */}
+                        {/* BOOK FOOTER */}
                         <div className="shrink-0 bg-[#fdfbf7] py-3 border-t border-stone-200 flex justify-center items-center px-8 md:px-12 text-stone-500 font-serif select-none relative z-30">
                             <div className="font-mono text-xs uppercase tracking-widest text-stone-400 font-bold">
                                 {totalPages > 0 ? (
@@ -715,7 +1025,6 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
                       </>
                   )}
 
-                  {/* === TAB 2: PARTY MEMBERS === */}
                   {activeTab === 'party' && (
                       <div className="flex-grow flex flex-col overflow-hidden animate-in fade-in slide-in-from-right-8 duration-300">
                           <PartyTable data={data} onChange={onChange} onAddLog={onAddLog} />
@@ -726,7 +1035,6 @@ const CampaignNotes: React.FC<Props> = ({ data, onChange, isLandscape = false, o
 
           </div>
 
-          {/* NEXT BUTTON AREA */}
           <div className="w-12 flex justify-start">
              {activeTab === 'journal' && (
                 <button 

@@ -153,13 +153,39 @@ export interface LogEntry {
   deduplicationId?: string;
 }
 
+export interface ImageConfig {
+    width: number;
+    height: number;
+    
+    // Mode Flow (Habillage texte)
+    marginTop: number;
+    align: 'left' | 'right';
+    
+    // Mode Absolute (Position libre)
+    x?: number;
+    y?: number;
+    mode?: 'flow' | 'absolute';
+
+    // Mode d'affichage de l'image dans le cadre
+    fit?: 'cover' | 'contain' | 'fill';
+}
+
+export interface NoteImage {
+    id: string; // Unique placement ID
+    imageId: string; // IndexedDB Blob ID
+    config: ImageConfig;
+}
+
 export interface CampaignNoteEntry {
   id: string;
   date: string;
   title: string;
   content: string;
-  imageId?: string; // ID de l'image stockée en IndexedDB
-  imagePosition?: 'top' | 'left' | 'right'; // Nouvelle propriété de positionnement
+  // Deprecated singular fields (kept for migration types if needed, but handled in code)
+  imageId?: string; 
+  imageConfig?: ImageConfig;
+  // New Array Field
+  images?: NoteImage[]; 
 }
 
 // --- NEW TYPES FOR PARTY MEMBERS ---

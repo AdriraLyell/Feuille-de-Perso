@@ -3,12 +3,80 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.20";
+export const APP_VERSION = "1.9.28";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
-        version: "1.9.20",
+        version: "1.9.28",
         date: new Date().toLocaleDateString('fr-FR'),
+        type: 'patch',
+        changes: [
+            "Config : Le Système de Carte (calcul automatique) est désormais activé par défaut pour les nouvelles fiches."
+        ]
+    },
+    {
+        version: "1.9.27",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "UI (Configuration) : L'onglet 'Création Personnage' est renommé 'Paramètres de Création'.",
+            "UX (Configuration) : Les paramètres de création (coûts XP, limites, rangs) sont désormais modifiables à tout moment, sans avoir besoin d'activer le mode création."
+        ]
+    },
+    {
+        version: "1.9.26",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "UI (Sauvegarde) : Les onglets Sauvegarder et Charger ont maintenant la même largeur et sont centrés dans la modale."
+        ]
+    },
+    {
+        version: "1.9.25",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "UI (Journal) : Ajout d'un bouton sur les images pour basculer le mode d'affichage : Remplir (Zoom), Ajuster (Entier) ou Étirer."
+        ]
+    },
+    {
+        version: "1.9.24",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "UI (Journal) : Correction d'un bug où les contrôles des images s'affichaient au survol de la page entière. Ils ne s'affichent désormais qu'au survol de l'image.",
+        ]
+    },
+    {
+        version: "1.9.23",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "UI (Sauvegarde) : Refonte de la fenêtre de Sauvegarde/Chargement avec un système d'onglets pour une meilleure clarté.",
+            "UI (Sauvegarde) : Les options sont désormais présentées de manière distincte pour éviter les confusions."
+        ]
+    },
+    {
+        version: "1.9.22",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "Système : Correction critique. Les images du journal de campagne sont maintenant correctement incluses dans le fichier de sauvegarde (JSON).",
+            "Système : Optimisation du processus d'import/export pour les données volumineuses."
+        ]
+    },
+    {
+        version: "1.9.21",
+        date: "24/01/2026",
+        type: 'patch',
+        changes: [
+            "UX (Notes) : Les contrôles des images (déplacement, redimensionnement, suppression) ne sont désormais visibles et actifs qu'au survol de la souris.",
+            "UX (Notes) : Amélioration de la stabilité visuelle lors du déplacement des images."
+        ]
+    },
+    {
+        version: "1.9.20",
+        date: "24/01/2026",
         type: 'patch',
         changes: [
             "UI (Détails) : Le widget Réputation est maintenant dynamique.",
@@ -334,7 +402,7 @@ export const INITIAL_DATA: CharacterSheetData = {
       backgroundPoints: 7,
       rankSlots: { 1: 10, 2: 8, 3: 6, 4: 2, 5: 0 },
       cardConfig: {
-          active: false,
+          active: true,
           bestSkillsCount: 6,
           increment: 0.5,
           baseStart: 2
