@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seigneurs des Mystères - Fiche de Personnage</title>
+    <!-- Import Handwriting Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'sheet-bg': '#fdfbf7', /* Papier Crème léger */
+              'sheet-border': '#44403c', /* Stone 700 */
+              'header-bg': '#e2e8f0', /* Slate 200 */
+              'ink': '#1e3a8a', /* Bleu nuit pour le texte manuscrit */
+            },
+            fontFamily: {
+              sans: ['Arial', 'Helvetica', 'sans-serif'],
+              handwriting: ['"Patrick Hand"', 'cursive'],
+            }
+          }
+        }
+      }
+    </script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "vite-plugin-singlefile": "https://esm.sh/vite-plugin-singlefile@^2.3.0",
+    "idb-keyval": "https://esm.sh/idb-keyval@^6.2.2"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
