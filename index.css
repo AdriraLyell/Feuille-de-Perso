@@ -1,3 +1,5 @@
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -19,6 +21,11 @@ body {
 }
 .sheet-input:focus {
   background-color: rgba(59, 130, 246, 0.05);
+}
+
+.sheet-input::placeholder {
+  color: #cbd5e1; /* Slate 300 - Visible but subtle */
+  opacity: 1;
 }
 
 /* Hide Spin Buttons for Number Inputs */
@@ -140,9 +147,17 @@ body {
   }
   
   /* Input styling for print */
-  .sheet-input { color: black; }
-  input, textarea {
+  .sheet-input { color: black !important; }
+  .text-ink { color: black !important; }
+  
+  input {
       border-bottom: 1px solid #ccc;
+      background: transparent !important;
+  }
+  
+  /* Notebook Textareas should NOT have a border bottom, they use background lines */
+  textarea {
+      border: none !important;
       background: transparent !important;
   }
   
