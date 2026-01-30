@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { CharacterSheetData, DotEntry, SkillCategoryKey, AttributeEntry, CombatEntry, ReputationEntry, ThemeConfig } from '../types';
-import { Trash2, Plus, RefreshCw, Minus, GripVertical, Save, AlertTriangle, List, Tag, UserPlus, Circle, Calculator, Info, CreditCard, Sliders, BookOpen, LayoutGrid, Zap, Play, X, CheckSquare, Square, Palette, RotateCcw } from 'lucide-react';
+import { Trash2, Plus, RefreshCw, Minus, GripVertical, Save, AlertTriangle, List, Tag, UserPlus, Circle, Calculator, Info, CreditCard, Sliders, BookOpen, LayoutGrid, Zap, Play, X, CheckSquare, Square, Palette, RotateCcw, PieChart, Brush } from 'lucide-react';
 import { INITIAL_DATA, DEFAULT_THEME } from '../constants';
 
 interface SettingsViewProps {
@@ -23,7 +22,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
 
   const [newlyAddedId, setNewlyAddedId] = useState<string | null>(null);
   const [newlyAddedSpec, setNewlyAddedSpec] = useState<{ skillId: string; index: number } | null>(null);
-  const [activeTab, setActiveTab] = useState<'skills' | 'attributes' | 'specializations' | 'creation'>('skills');
+  const [activeTab, setActiveTab] = useState<'skills' | 'attributes' | 'specializations' | 'creation' | 'appearance'>('skills');
   const [focusedValue, setFocusedValue] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
 
@@ -320,6 +319,19 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
       onAddLog(`Config Création modifiée : ${field}`, 'info', 'settings');
   };
   
+  const updatePointsBuckets = (bucket: 'attributes' | 'skills' | 'backgrounds', value: number) => {
+      setLocalData(prev => ({
+          ...prev,
+          creationConfig: {
+              ...prev.creationConfig,
+              pointsBuckets: {
+                  ...(prev.creationConfig.pointsBuckets || { attributes: 0, skills: 0, backgrounds: 0 }),
+                  [bucket]: value
+              }
+          }
+      }));
+  };
+  
   const updateCardConfig = (field: string, value: any) => {
       setLocalData(prev => ({
           ...prev,
@@ -344,28 +356,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
               }
           }
       }));
-  };
-
-  const calculateConfigurationCost = () => {
-      const { attributePoints, backgroundPoints, rankSlots } = localData.creationConfig;
-      let total = 0;
-
-      // Attributes (approx 6 XP per point)
-      total += (attributePoints || 0) * 6;
-
-      // Backgrounds (2 XP per point)
-      total += (backgroundPoints || 0) * 2;
-
-      // Ranks
-      // Formula: (Rank * (Rank + 1)) / 2
-      [1, 2, 3, 4, 5].forEach(rank => {
-           // @ts-ignore
-           const count = rankSlots[rank] || 0;
-           const costPerSkill = (rank * (rank + 1)) / 2;
-           total += count * costPerSkill;
-      });
-
-      return total;
   };
 
   // --- Theme Handlers ---
@@ -772,6 +762,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
   };
 
   const renderCategoryEditor = (title: string, category: string, heightClass = 'h-full', defaultItemName = 'Nouvelle Compétence') => {
+    // ... code identical to original ...
     const isCounters = category === 'counters';
     // Use optional chaining fallback to prevent undefined array errors
     // @ts-ignore
@@ -874,59 +865,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
     );
   };
   
-  const renderSpecializationEditor = (title: string, category: string) => {
-    // @ts-ignore
-    const skills: DotEntry[] = localData.skills?.[category as SkillCategoryKey] || [];
-
-    return (
-      <div className="bg-white p-4 rounded shadow flex flex-col h-full">
-         <h3 className="font-bold text-sm mb-4 text-gray-800 border-b pb-2">{title}</h3>
-         <div className="flex-grow overflow-y-auto space-y-4 pr-1 max-h-[500px]">
-             {skills.filter(s => s.name && s.name.trim() !== '').map(skill => {
-                 const specs = localData.imposedSpecializations[skill.id] || [];
-                 return (
-                     <div key={skill.id} className="border border-gray-100 rounded p-2 bg-gray-50/50">
-                         <div className="flex justify-between items-center mb-2">
-                             <span className="font-bold text-xs text-gray-700">{skill.name}</span>
-                             <button 
-                                onClick={() => addSpecialization(skill.id)}
-                                className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded hover:bg-blue-200 transition-colors flex items-center gap-1"
-                             >
-                                 <Plus size={10} /> Ajouter
-                             </button>
-                         </div>
-                         <div className="space-y-1">
-                             {specs.length === 0 && <div className="text-[10px] text-gray-400 italic">Aucune spécialisation imposée.</div>}
-                             {specs.map((spec, idx) => (
-                                 <div key={idx} className="flex gap-1 items-center">
-                                     <input 
-                                        value={spec}
-                                        onChange={(e) => updateSpecialization(skill.id, idx, e.target.value)}
-                                        className="flex-grow text-xs border border-gray-300 rounded px-1 py-0.5 focus:border-blue-500 outline-none"
-                                        placeholder="Spécialisation..."
-                                     />
-                                     <button 
-                                        onClick={() => removeSpecialization(skill.id, idx)}
-                                        className="text-red-400 hover:text-red-600 p-0.5"
-                                     >
-                                         <X size={12} />
-                                     </button>
-                                 </div>
-                             ))}
-                         </div>
-                     </div>
-                 );
-             })}
-             {skills.length === 0 && <div className="text-xs text-gray-400 italic text-center py-4">Aucune compétence dans cette catégorie.</div>}
-         </div>
-      </div>
-    );
-  };
-  
   const renderCreationEditor = () => {
       const config = localData.creationConfig;
       if (!config) return null; // Safety
-      const theme = localData.theme || DEFAULT_THEME;
 
       return (
           <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -948,7 +889,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                                       onClick={() => updateCreationConfig('mode', 'rangs')}
                                       className={`flex-1 py-1.5 text-sm font-bold rounded-md transition-all ${config.mode === 'rangs' ? 'bg-white text-blue-700 shadow' : 'text-gray-500 hover:text-gray-700'}`}
                                   >
-                                      Par Rangs (Slots)
+                                      Par Rangs
                                   </button>
                                   <button 
                                       onClick={() => updateCreationConfig('mode', 'points')}
@@ -960,37 +901,92 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                           </div>
 
                           {config.mode === 'points' && (
-                              <div>
-                                  <label className="block text-sm font-bold text-gray-700 mb-1">XP de Départ</label>
-                                  <input 
-                                      type="number" 
-                                      value={config.startingXP || 0}
-                                      onChange={(e) => updateCreationConfig('startingXP', parseInt(e.target.value) || 0)}
-                                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                                  />
+                              <div className="space-y-4">
+                                  {/* Sub-mode selector */}
+                                  <div>
+                                      <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Type de Répartition</label>
+                                      <div className="flex bg-gray-100 p-1 rounded-lg">
+                                          <button 
+                                              onClick={() => updateCreationConfig('pointsDistributionMode', 'global')}
+                                              className={`flex-1 py-1 text-xs font-bold rounded-md transition-all ${(!config.pointsDistributionMode || config.pointsDistributionMode === 'global') ? 'bg-white text-blue-600 shadow' : 'text-gray-500 hover:text-gray-700'}`}
+                                          >
+                                              Pot Commun
+                                          </button>
+                                          <button 
+                                              onClick={() => updateCreationConfig('pointsDistributionMode', 'buckets')}
+                                              className={`flex-1 py-1 text-xs font-bold rounded-md transition-all ${config.pointsDistributionMode === 'buckets' ? 'bg-white text-blue-600 shadow' : 'text-gray-500 hover:text-gray-700'}`}
+                                          >
+                                              Budgets Séparés
+                                          </button>
+                                      </div>
+                                  </div>
+
+                                  {(!config.pointsDistributionMode || config.pointsDistributionMode === 'global') ? (
+                                      <div className="animate-in fade-in slide-in-from-top-2">
+                                          <label className="block text-sm font-bold text-gray-700 mb-1">XP de Départ (Global)</label>
+                                          <input 
+                                              type="number" 
+                                              value={config.startingXP || 0}
+                                              onChange={(e) => updateCreationConfig('startingXP', parseInt(e.target.value) || 0)}
+                                              className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none font-mono font-bold text-lg"
+                                          />
+                                      </div>
+                                  ) : (
+                                      <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
+                                          <div>
+                                              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">XP Attributs</label>
+                                              <input 
+                                                  type="number" 
+                                                  value={config.pointsBuckets?.attributes || 0}
+                                                  onChange={(e) => updatePointsBuckets('attributes', parseInt(e.target.value) || 0)}
+                                                  className="w-full border border-gray-300 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                              />
+                                          </div>
+                                          <div>
+                                              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">XP Compétences</label>
+                                              <input 
+                                                  type="number" 
+                                                  value={config.pointsBuckets?.skills || 0}
+                                                  onChange={(e) => updatePointsBuckets('skills', parseInt(e.target.value) || 0)}
+                                                  className="w-full border border-gray-300 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                              />
+                                          </div>
+                                          <div>
+                                              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">XP Arrière-plans</label>
+                                              <input 
+                                                  type="number" 
+                                                  value={config.pointsBuckets?.backgrounds || 0}
+                                                  onChange={(e) => updatePointsBuckets('backgrounds', parseInt(e.target.value) || 0)}
+                                                  className="w-full border border-gray-300 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                              />
+                                          </div>
+                                      </div>
+                                  )}
                               </div>
                           )}
 
-                          <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                  <label className="block text-sm font-bold text-gray-700 mb-1">Pts Attributs</label>
-                                  <input 
-                                      type="number" 
-                                      value={config.attributePoints || 0}
-                                      onChange={(e) => updateCreationConfig('attributePoints', parseInt(e.target.value) || 0)}
-                                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                                  />
+                          {config.mode === 'rangs' && (
+                              <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                                  <div>
+                                      <label className="block text-sm font-bold text-gray-700 mb-1">Pts Attributs</label>
+                                      <input 
+                                          type="number" 
+                                          value={config.attributePoints || 0}
+                                          onChange={(e) => updateCreationConfig('attributePoints', parseInt(e.target.value) || 0)}
+                                          className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                                      />
+                                  </div>
+                                  <div>
+                                      <label className="block text-sm font-bold text-gray-700 mb-1">Pts Arr. Plans</label>
+                                      <input 
+                                          type="number" 
+                                          value={config.backgroundPoints || 0}
+                                          onChange={(e) => updateCreationConfig('backgroundPoints', parseInt(e.target.value) || 0)}
+                                          className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                                      />
+                                  </div>
                               </div>
-                              <div>
-                                  <label className="block text-sm font-bold text-gray-700 mb-1">Pts Arr. Plans</label>
-                                  <input 
-                                      type="number" 
-                                      value={config.backgroundPoints || 0}
-                                      onChange={(e) => updateCreationConfig('backgroundPoints', parseInt(e.target.value) || 0)}
-                                      className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                                  />
-                              </div>
-                          </div>
+                          )}
 
                           <div className="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded border border-gray-200">
                               <div>
@@ -1044,63 +1040,34 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                           </div>
                       )}
 
-                      {/* Theme / Colors Configuration */}
-                      <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
-                           <div className="flex items-center justify-between border-b pb-2 mb-4">
-                                <h4 className="font-bold text-gray-800 flex items-center gap-2">
-                                    <Palette size={18} /> Configuration des Couleurs
-                                </h4>
-                                <button
-                                    onClick={resetTheme}
-                                    className="text-xs text-gray-500 hover:text-red-500 hover:bg-red-50 px-2 py-1 rounded flex items-center gap-1 transition-colors"
-                                    title="Remettre les couleurs par défaut"
-                                >
-                                    <RotateCcw size={12} /> Défaut
-                                </button>
-                           </div>
-                           
-                           <div className="grid grid-cols-2 gap-4">
-                               <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-gray-500 uppercase">Pts Création</label>
-                                    <div className="flex items-center gap-2">
-                                        <input 
-                                            type="color" 
-                                            value={theme.creationColor}
-                                            onChange={(e) => updateTheme('creationColor', e.target.value)}
-                                            className="w-10 h-10 border-none rounded cursor-pointer bg-transparent"
-                                        />
-                                        <div className="flex-grow flex flex-col justify-center">
-                                            <div className="flex gap-1">
-                                                <span className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: theme.creationColor }}></span>
-                                                <span className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: theme.creationColor }}></span>
-                                                <span className="w-3 h-3 rounded-full border border-stone-400 bg-transparent"></span>
-                                            </div>
-                                            <span className="text-[10px] text-gray-400 font-mono mt-0.5">{theme.creationColor}</span>
-                                        </div>
-                                    </div>
-                               </div>
-
-                               <div className="space-y-2">
-                                    <label className="block text-xs font-bold text-gray-500 uppercase">Pts Standard / XP</label>
-                                    <div className="flex items-center gap-2">
-                                        <input 
-                                            type="color" 
-                                            value={theme.xpColor}
-                                            onChange={(e) => updateTheme('xpColor', e.target.value)}
-                                            className="w-10 h-10 border-none rounded cursor-pointer bg-transparent"
-                                        />
-                                        <div className="flex-grow flex flex-col justify-center">
-                                            <div className="flex gap-1">
-                                                <span className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: theme.xpColor }}></span>
-                                                <span className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: theme.xpColor }}></span>
-                                                <span className="w-3 h-3 rounded-full border border-stone-400 bg-transparent"></span>
-                                            </div>
-                                            <span className="text-[10px] text-gray-400 font-mono mt-0.5">{theme.xpColor}</span>
-                                        </div>
-                                    </div>
-                               </div>
-                           </div>
-                      </div>
+                      {/* Distribution Preview for Points Mode (Buckets) */}
+                      {config.mode === 'points' && config.pointsDistributionMode === 'buckets' && (
+                          <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
+                              <h4 className="font-bold text-gray-800 border-b pb-2 mb-4 flex items-center gap-2">
+                                  <PieChart size={18} /> Répartition Totale
+                              </h4>
+                              <div className="space-y-4">
+                                  <div className="flex justify-between items-center">
+                                      <span className="text-sm text-gray-600">Attributs</span>
+                                      <span className="font-bold">{config.pointsBuckets?.attributes || 0} XP</span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                      <span className="text-sm text-gray-600">Compétences</span>
+                                      <span className="font-bold">{config.pointsBuckets?.skills || 0} XP</span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                      <span className="text-sm text-gray-600">Arrière-plans</span>
+                                      <span className="font-bold">{config.pointsBuckets?.backgrounds || 0} XP</span>
+                                  </div>
+                                  <div className="pt-2 border-t border-gray-200 flex justify-between items-center">
+                                      <span className="font-bold text-gray-800">Total</span>
+                                      <span className="font-bold text-blue-600 text-lg">
+                                          {(config.pointsBuckets?.attributes || 0) + (config.pointsBuckets?.skills || 0) + (config.pointsBuckets?.backgrounds || 0)} XP
+                                      </span>
+                                  </div>
+                              </div>
+                          </div>
+                      )}
 
                   </div>
 
@@ -1168,6 +1135,143 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
       );
   };
 
+  const renderAppearanceEditor = () => {
+      const theme = localData.theme || DEFAULT_THEME;
+
+      return (
+          <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
+                   <div className="flex items-center justify-between border-b pb-2 mb-4">
+                        <h4 className="font-bold text-gray-800 flex items-center gap-2">
+                            <Palette size={18} /> Configuration des Couleurs
+                        </h4>
+                        <button
+                            onClick={resetTheme}
+                            className="text-xs text-gray-500 hover:text-red-500 hover:bg-red-50 px-2 py-1 rounded flex items-center gap-1 transition-colors"
+                            title="Remettre les couleurs par défaut"
+                        >
+                            <RotateCcw size={12} /> Défaut
+                        </button>
+                   </div>
+                   
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <div className="space-y-3 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                            <label className="block text-sm font-bold text-gray-700 uppercase">Points acquis à la Création</label>
+                            <p className="text-xs text-gray-500 mb-2">Utilisé pour les points "de base" et en mode création.</p>
+                            <div className="flex items-center gap-3">
+                                <input 
+                                    type="color" 
+                                    value={theme.creationColor}
+                                    onChange={(e) => updateTheme('creationColor', e.target.value)}
+                                    className="w-12 h-12 border-none rounded-lg cursor-pointer bg-white shadow-sm ring-1 ring-gray-200"
+                                />
+                                <div className="flex-grow flex flex-col justify-center">
+                                    <div className="flex gap-1.5 mb-1">
+                                        <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: theme.creationColor }}></span>
+                                        <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: theme.creationColor }}></span>
+                                        <span className="w-4 h-4 rounded-full border border-stone-400 bg-transparent"></span>
+                                    </div>
+                                    <span className="text-xs font-mono font-bold text-gray-600">{theme.creationColor}</span>
+                                </div>
+                            </div>
+                       </div>
+
+                       <div className="space-y-3 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                            <label className="block text-sm font-bold text-gray-700 uppercase">Points acquis par XP</label>
+                            <p className="text-xs text-gray-500 mb-2">Utilisé pour les points achetés avec de l'expérience.</p>
+                            <div className="flex items-center gap-3">
+                                <input 
+                                    type="color" 
+                                    value={theme.xpColor}
+                                    onChange={(e) => updateTheme('xpColor', e.target.value)}
+                                    className="w-12 h-12 border-none rounded-lg cursor-pointer bg-white shadow-sm ring-1 ring-gray-200"
+                                />
+                                <div className="flex-grow flex flex-col justify-center">
+                                    <div className="flex gap-1.5 mb-1">
+                                        <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: theme.xpColor }}></span>
+                                        <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: theme.xpColor }}></span>
+                                        <span className="w-4 h-4 rounded-full border border-stone-400 bg-transparent"></span>
+                                    </div>
+                                    <span className="text-xs font-mono font-bold text-gray-600">{theme.xpColor}</span>
+                                </div>
+                            </div>
+                       </div>
+                   </div>
+              </div>
+          </div>
+      );
+  };
+
+  const renderSpecializationEditor = (title: string, category: string) => {
+    // @ts-ignore
+    const list: DotEntry[] = localData.skills[category] || [];
+
+    return (
+      <div className="bg-white p-4 rounded shadow flex flex-col h-full animate-in fade-in duration-300">
+        <h3 className="font-bold text-sm mb-4 text-gray-800 border-b pb-2 flex items-center justify-between">
+          {title}
+        </h3>
+        <div className="flex-grow overflow-y-auto space-y-3 pr-2 max-h-[500px] custom-scrollbar">
+          {list.length === 0 && (
+            <div className="text-center text-gray-400 text-xs italic py-4 border-2 border-dashed border-gray-100 rounded">
+              Aucune compétence.
+            </div>
+          )}
+          {list.map((skill) => {
+            const imposedSpecs = localData.imposedSpecializations[skill.id] || [];
+            
+            // Skip spacers (empty names)
+            if (!skill.name) return null;
+
+            return (
+              <div key={skill.id} className="border border-gray-200 rounded p-2.5 bg-gray-50/50 hover:bg-white hover:shadow-sm transition-all group">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-bold text-sm text-gray-700">{skill.name}</span>
+                  <button
+                    onClick={() => addSpecialization(skill.id)}
+                    className="text-[10px] bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 px-2 py-1 rounded flex items-center gap-1 transition-colors font-bold shadow-sm opacity-0 group-hover:opacity-100"
+                  >
+                    <Plus size={10} /> Ajouter
+                  </button>
+                </div>
+                
+                {imposedSpecs.length === 0 && (
+                  <div className="text-[10px] text-gray-400 italic px-1 pb-1">
+                    Aucune spécialisation imposée.
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  {imposedSpecs.map((spec, idx) => (
+                    <div key={idx} className="flex items-center gap-1 animate-in slide-in-from-left-2 duration-200">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0 ml-1"></div>
+                      <input
+                        type="text"
+                        autoFocus={newlyAddedSpec?.skillId === skill.id && newlyAddedSpec?.index === idx}
+                        value={spec}
+                        placeholder="Nom de la spécialisation"
+                        onChange={(e) => updateSpecialization(skill.id, idx, e.target.value)}
+                        onBlur={() => setNewlyAddedSpec(null)}
+                        className="flex-grow text-xs border border-gray-300 rounded px-2 py-1 focus:border-blue-500 outline-none bg-white focus:ring-1 focus:ring-blue-200 transition-shadow"
+                      />
+                      <button
+                        onClick={() => removeSpecialization(skill.id, idx)}
+                        className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1 rounded transition-colors"
+                        title="Supprimer"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="px-6 pb-20 max-w-[1400px] mx-auto relative">
       <div className="sticky top-14 z-40 mb-8 flex justify-center no-print pointer-events-none">
@@ -1176,6 +1280,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
             <button onClick={() => setActiveTab('skills')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'skills' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><List size={16} /> Compétences</button>
             <button onClick={() => setActiveTab('specializations')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'specializations' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Tag size={16} /> Spécialisations Imposées</button>
             <button onClick={() => setActiveTab('creation')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'creation' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><UserPlus size={16} /> Paramètres</button>
+            <button onClick={() => setActiveTab('appearance')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'appearance' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Palette size={16} /> Apparence</button>
             <div className="w-px h-5 bg-gray-300 mx-1"></div>
             <button onClick={() => setShowResetConfirm(true)} className="px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 text-red-600 hover:bg-red-50 transition-colors" title="Réinitialiser tout à zéro"><RefreshCw size={16} /> <span className="hidden sm:inline">Réinitialiser</span></button>
             <button onClick={() => { onUpdate(localData); onAddLog('Modifications de la structure sauvegardées', 'success', 'settings'); }} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 text-white shadow-md hover:scale-[1.02] transition-all ${isDirty ? 'bg-amber-600 hover:bg-amber-700 animate-pulse' : 'bg-green-600 hover:bg-green-700'}`} title={isDirty ? "Des modifications sont en attente de validation" : "La structure est à jour"}><Save size={16} /> Sauvegarder</button>
@@ -1231,6 +1336,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
          )}
 
          {activeTab === 'creation' && renderCreationEditor()}
+         
+         {activeTab === 'appearance' && renderAppearanceEditor()}
       </div>
 
       {/* Reset Confirmation Modal */}

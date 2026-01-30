@@ -3,13 +3,59 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.42";
+export const APP_VERSION = "1.9.47";
 
 // REMPLACEZ CECI PAR L'URL DE VOTRE GITHUB PAGES (DOSSIER RACINE)
 // Exemple : "https://username.github.io/repo-name/version.json"
 export const REMOTE_MANIFEST_URL = "https://adriralyell.github.io/Feuille-de-Perso/version.json";
 
 export const CHANGELOG: ChangelogEntry[] = [
+    {
+        version: "1.9.47",
+        date: "27/01/2026 11:00",
+        type: 'patch',
+        changes: [
+            "Ajustement mineur de texte dans la fenêtre d'activation du Mode Création : 'Slots de Rangs' devient simplement 'Rangs'."
+        ]
+    },
+    {
+        version: "1.9.46",
+        date: "27/01/2026 10:30",
+        type: 'patch',
+        changes: [
+            "Correction : L'affichage des slots de Rang 5 était manquant dans la fenêtre d'activation du Mode Création."
+        ]
+    },
+    {
+        version: "1.9.45",
+        date: "27/01/2026 10:00",
+        type: 'minor',
+        changes: [
+            "Refonte esthétique majeure de la fenêtre d'activation du Mode Création.",
+            "Harmonisation visuelle avec le thème 'Seigneurs des Mystères' (Stone/Amber/Papier).",
+            "Amélioration de la lisibilité des avertissements et des résumés de configuration avant lancement."
+        ]
+    },
+    {
+        version: "1.9.44",
+        date: "26/01/2026 21:00",
+        type: 'minor',
+        changes: [
+            "Refonte visuelle complète du Mode Création (HUD).",
+            "Agrandissement de l'interface et des polices pour une meilleure lisibilité.",
+            "Ajout de jauges visuelles pour les budgets XP.",
+            "Amélioration de la fenêtre de validation (style rapport)."
+        ]
+    },
+    {
+        version: "1.9.43",
+        date: "26/01/2026 20:30",
+        type: 'minor',
+        changes: [
+            "Amélioration du mode Création par Points : Possibilité de définir des budgets séparés (Attributs, Compétences, Arrière-plans) au lieu d'un pot commun.",
+            "Mise à jour de l'interface de création pour supporter l'affichage des budgets XP distincts."
+        ]
+    },
     {
         version: "1.9.42",
         date: "26/01/2026 19:15",
@@ -106,7 +152,13 @@ export const INITIAL_DATA: CharacterSheetData = {
   creationConfig: {
       active: false,
       mode: 'rangs',
+      pointsDistributionMode: 'global', // Nouveau
       startingXP: 350,
+      pointsBuckets: { // Nouveau : Valeurs mises à jour
+          attributes: 60,
+          skills: 140,
+          backgrounds: 20
+      },
       attributePoints: 12,
       attributeCost: 6,
       attributeMin: -1,

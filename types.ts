@@ -2,7 +2,15 @@
 export interface CreationConfig {
   active: boolean;
   mode: 'points' | 'rangs';
-  startingXP: number; // Pour le mode Points
+  
+  // Pour le mode Points (XP)
+  pointsDistributionMode?: 'global' | 'buckets'; // Nouveau : Choix du type de répartition
+  startingXP: number; // Utilisé si 'global'
+  pointsBuckets?: { // Utilisé si 'buckets'
+      attributes: number;
+      skills: number;
+      backgrounds: number;
+  };
   
   // Pour le mode Rangs
   attributePoints: number; // Points à dépenser dans les attributs

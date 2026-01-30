@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { CharacterSheetData, DotEntry, AttributeEntry, CombatEntry, SkillCategoryKey, TraitEffect } from '../types';
 import DotRating from './DotRating';
-import { UserPlus, AlertTriangle, Sliders } from 'lucide-react';
+import { UserPlus, AlertTriangle, Sliders, Check } from 'lucide-react';
 
 interface Props {
   data: CharacterSheetData;
@@ -1063,68 +1063,109 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
 
       {/* Creation Mode Activation Warning Modal */}
       {showCreationWarning && (
-        <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm no-print">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 animate-in fade-in zoom-in duration-200">
-                <div className="bg-blue-50 p-6 flex flex-col items-center text-center">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 text-blue-600">
-                         <UserPlus size={24} />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Activer le Mode Création ?</h3>
-                    <p className="text-gray-600 text-sm mb-4">
-                        L'activation du mode création va <strong>réinitialiser toutes les valeurs</strong> du personnage actuel pour vous permettre de repartir de zéro.
-                    </p>
+        <div className="fixed inset-0 bg-stone-950/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm no-print animate-in fade-in duration-200">
+            <div className="bg-[#fdfbf7] rounded-lg shadow-2xl w-full max-w-2xl overflow-hidden border border-stone-400 relative">
+                {/* Paper Texture hint */}
+                <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]"></div>
 
-                    <div className="bg-slate-50 border border-slate-200 rounded p-3 mb-4 w-full text-left shadow-sm">
-                        <h4 className="font-bold text-xs text-slate-500 uppercase mb-2 flex items-center gap-2">
-                            <Sliders size={12} /> Paramètres de la session
+                {/* Header */}
+                <div className="bg-stone-900 p-6 flex items-center gap-4 border-b-4 border-amber-600 relative z-10">
+                    <div className="w-16 h-16 bg-stone-800 rounded-full flex items-center justify-center text-amber-500 border-2 border-amber-600 shadow-lg shrink-0">
+                         <UserPlus size={32} />
+                    </div>
+                    <div>
+                        <h3 className="text-3xl font-black text-amber-50 font-serif tracking-wide uppercase">Nouvelle Session</h3>
+                        <p className="text-stone-400 text-sm font-medium">Initialisation du protocole de création</p>
+                    </div>
+                </div>
+
+                {/* Body */}
+                <div className="p-8 relative z-10">
+                    
+                    {/* Warning Block */}
+                    <div className="bg-red-50 border-l-8 border-red-600 p-6 mb-8 shadow-sm">
+                        <h4 className="text-red-900 font-bold text-lg mb-2 flex items-center gap-2 uppercase tracking-wide font-serif">
+                            <AlertTriangle size={24} /> Avertissement
                         </h4>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-slate-700">
-                            <div className="col-span-2 font-semibold text-indigo-700 mb-1">
-                                Mode : {data.creationConfig.mode === 'points' ? 'Par Points (XP)' : 'Par Rangs (Slots)'}
+                        <p className="text-red-800 text-base leading-relaxed">
+                            L'activation du mode création va <strong>effacer irréversiblement</strong> les données actuelles du personnage (Identité, XP, Valeurs) pour repartir d'une feuille vierge.
+                        </p>
+                        <p className="text-red-700 text-sm mt-2 italic">
+                            La structure (noms des compétences) et la bibliothèque seront conservées.
+                        </p>
+                    </div>
+
+                    {/* Settings Recap */}
+                    <div className="bg-white border border-stone-200 p-6 rounded-sm shadow-inner">
+                        <h4 className="text-stone-500 font-bold text-xs uppercase tracking-widest mb-4 border-b border-stone-200 pb-2 flex items-center gap-2">
+                            <Sliders size={14} /> Paramètres de la session
+                        </h4>
+                        
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="col-span-2 md:col-span-1">
+                                <span className="block text-xs font-bold text-stone-400 uppercase">Mode de Création</span>
+                                <span className="block text-2xl font-serif font-bold text-indigo-900">
+                                    {data.creationConfig.mode === 'points' ? 'Par Points (XP)' : 'Par Rangs'}
+                                </span>
                             </div>
+
                             {data.creationConfig.mode === 'points' ? (
                                 <>
-                                    <div>XP de départ : <b>{data.creationConfig.startingXP}</b></div>
-                                    <div>Coût Attribut : <b>{data.creationConfig.attributeCost} xp</b></div>
+                                    <div>
+                                        <span className="block text-xs font-bold text-stone-400 uppercase">Budget</span>
+                                        {(!data.creationConfig.pointsDistributionMode || data.creationConfig.pointsDistributionMode === 'global') ? (
+                                            <span className="block text-xl font-mono font-bold text-stone-700">{data.creationConfig.startingXP} XP (Global)</span>
+                                        ) : (
+                                            <div className="text-sm font-medium text-stone-700 space-y-1 mt-1">
+                                                <div className="flex justify-between border-b border-dotted border-stone-300"><span>Attributs:</span> <b>{data.creationConfig.pointsBuckets?.attributes} XP</b></div>
+                                                <div className="flex justify-between border-b border-dotted border-stone-300"><span>Compétences:</span> <b>{data.creationConfig.pointsBuckets?.skills} XP</b></div>
+                                                <div className="flex justify-between"><span>Arr. Plans:</span> <b>{data.creationConfig.pointsBuckets?.backgrounds} XP</b></div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </>
                             ) : (
                                 <>
-                                    <div>Pts Attributs : <b>{data.creationConfig.attributePoints}</b></div>
-                                    <div>Pts Arr-plans : <b>{data.creationConfig.backgroundPoints}</b></div>
-                                    <div className="col-span-2 text-xs text-slate-500 mt-1 pt-1 border-t border-slate-200">
-                                        Répartition des Rangs : 
-                                        R1:<b>{data.creationConfig.rankSlots[1]}</b> • 
-                                        R2:<b>{data.creationConfig.rankSlots[2]}</b> • 
-                                        R3:<b>{data.creationConfig.rankSlots[3]}</b> • 
-                                        R4:<b>{data.creationConfig.rankSlots[4]}</b>
+                                    <div>
+                                        <span className="block text-xs font-bold text-stone-400 uppercase">Budgets</span>
+                                        <div className="text-sm font-medium text-stone-700 mt-1">
+                                            <span className="mr-3">Attributs: <b>{data.creationConfig.attributePoints}</b></span>
+                                            <span>Arr. Plans: <b>{data.creationConfig.backgroundPoints}</b></span>
+                                        </div>
+                                    </div>
+                                    <div className="col-span-2">
+                                        <span className="block text-xs font-bold text-stone-400 uppercase mb-1">Rangs</span>
+                                        <div className="flex gap-2">
+                                            {[1,2,3,4,5].map(r => (
+                                                <div key={r} className="bg-stone-100 border border-stone-300 px-3 py-1 rounded text-center">
+                                                    <div className="text-[10px] text-stone-500 font-bold uppercase">R{r}</div>
+                                                    {/* @ts-ignore */}
+                                                    <div className="font-mono font-bold text-lg text-stone-800">{data.creationConfig.rankSlots[r]}</div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </>
                             )}
                         </div>
                     </div>
 
-                    <div className="bg-white p-3 rounded border border-blue-100 text-left text-xs text-blue-800 space-y-1 w-full">
-                        <p className="font-bold border-b border-blue-50 pb-1 mb-1">Seront effacés :</p>
-                        <ul className="list-disc list-inside">
-                            <li>Identité (Nom, Chronique...)</li>
-                            <li>Points d'Attributs et Compétences</li>
-                            <li>Historique XP et Notes de Campagne</li>
-                        </ul>
-                        <p className="italic pt-1">La structure et la bibliothèque sont conservées.</p>
-                    </div>
                 </div>
-                <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-100">
+
+                {/* Footer */}
+                <div className="bg-stone-100 p-6 flex justify-end gap-4 border-t border-stone-300 relative z-10">
                     <button 
                         onClick={() => setShowCreationWarning(false)} 
-                        className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                        className="px-6 py-3 bg-white border border-stone-300 text-stone-600 font-bold rounded hover:bg-stone-50 transition-colors uppercase tracking-wide text-sm"
                     >
                         Annuler
                     </button>
                     <button 
                         onClick={executeCreationActivation} 
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm transition-colors"
+                        className="px-8 py-3 bg-green-700 text-green-50 font-bold rounded shadow-lg hover:bg-green-800 hover:shadow-xl transition-all uppercase tracking-wide text-sm flex items-center gap-2"
                     >
-                        Réinitialiser et Activer
+                        <Check size={18} />
+                        Confirmer et Réinitialiser
                     </button>
                 </div>
             </div>
