@@ -3,13 +3,22 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.41";
+export const APP_VERSION = "1.9.42";
 
 // REMPLACEZ CECI PAR L'URL DE VOTRE GITHUB PAGES (DOSSIER RACINE)
 // Exemple : "https://username.github.io/repo-name"
 export const REMOTE_MANIFEST_URL = "https://adriralyell.github.io/Feuille-de-Perso/";
 
 export const CHANGELOG: ChangelogEntry[] = [
+    {
+        version: "1.9.42",
+        date: "26/01/2026 19:15",
+        type: 'minor',
+        changes: [
+            "Intégration du système de 'Messager' : une notification discrète apparaît désormais en bas d'écran si une nouvelle version de l'application est disponible en ligne.",
+            "Détection automatique du mode (En ligne ou Fichier local) pour proposer l'action adaptée (Actualiser ou Télécharger)."
+        ]
+    },
     {
         version: "1.9.41",
         date: "26/01/2026 18:00",
