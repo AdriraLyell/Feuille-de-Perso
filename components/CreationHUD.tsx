@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { CharacterSheetData, AttributeCategoryKey, DotEntry } from '../types';
 import { Check, Info, Calculator, AlertTriangle, X, ShieldAlert, CreditCard, Sliders } from 'lucide-react';
@@ -149,8 +150,8 @@ const CreationHUD: React.FC<CreationHUDProps> = ({ data, onValidate }) => {
               if (max === 0) return;
               const used = ranksUsed[rank] || 0;
               
-              if (used < max) messages.push(`Rang ${rank} : Manque ${formatNumber(max - used)} slots.`);
-              if (used > max) overspent.push(`Rang ${rank} : ${formatNumber(used - max)} slots en trop.`);
+              if (used < max) messages.push(`Rang ${rank} : Manque ${formatNumber(max - used)} rangs.`);
+              if (used > max) overspent.push(`Rang ${rank} : ${formatNumber(used - max)} rangs en trop.`);
           });
       }
 

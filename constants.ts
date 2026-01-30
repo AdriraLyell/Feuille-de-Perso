@@ -3,9 +3,32 @@ import { CharacterSheetData, ChangelogEntry } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-export const APP_VERSION = "1.9.39";
+export const APP_VERSION = "1.9.41";
+
+// REMPLACEZ CECI PAR L'URL DE VOTRE GITHUB PAGES (DOSSIER RACINE)
+// Exemple : "https://username.github.io/repo-name"
+export const REMOTE_MANIFEST_URL = "https://votre-site-web.com/version.json";
 
 export const CHANGELOG: ChangelogEntry[] = [
+    {
+        version: "1.9.41",
+        date: "26/01/2026 18:00",
+        type: 'minor',
+        changes: [
+            "Remplacement du Guide rapide par une Documentation complète.",
+            "Ajout de sections spécifiques pour les Joueurs et les Meneurs de Jeu (MJ).",
+            "Explication détaillée des fonctions d'export/import et de la bibliothèque."
+        ]
+    },
+    {
+        version: "1.9.40",
+        date: "26/01/2026 17:30",
+        type: 'minor',
+        changes: [
+            "Ajout de la configuration des couleurs pour les bulles (Points de Création et XP).",
+            "Nouveau widget de thème dans les paramètres."
+        ]
+    },
     {
         version: "1.9.39",
         date: "26/01/2026 16:50",
@@ -65,6 +88,11 @@ const createCombatEntry = (): any => ({
   parry: '',
 });
 
+export const DEFAULT_THEME = {
+    creationColor: '#2563eb', // blue-600
+    xpColor: '#292524'        // stone-800
+};
+
 export const INITIAL_DATA: CharacterSheetData = {
   creationConfig: {
       active: false,
@@ -83,6 +111,7 @@ export const INITIAL_DATA: CharacterSheetData = {
           baseStart: 2
       }
   },
+  theme: DEFAULT_THEME,
   header: {
     name: '', age: '', sex: '',
     player: '', born: '', height: '',

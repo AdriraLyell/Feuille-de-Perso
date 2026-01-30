@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { CharacterSheetData, DotEntry, AttributeEntry, CombatEntry, SkillCategoryKey, TraitEffect } from '../types';
 import DotRating from './DotRating';
-import { UserPlus, AlertTriangle } from 'lucide-react';
+import { UserPlus, AlertTriangle, Sliders } from 'lucide-react';
 
 interface Props {
   data: CharacterSheetData;
@@ -180,7 +180,8 @@ const DotRow: React.FC<{
   category: string; 
   onUpdate: (section: 'skills', category: string, id: string, value: number) => void;
   specializations?: string[];
-}> = ({ entry, category, onUpdate, specializations = [] }) => {
+  theme?: { creationColor: string, xpColor: string };
+}> = ({ entry, category, onUpdate, specializations = [], theme }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     // Spacer logic
@@ -225,6 +226,8 @@ const DotRow: React.FC<{
             creationValue={entry.creationValue} 
             onChange={(val) => onUpdate('skills', category, entry.id, val)} 
             className="scale-90 origin-right"
+            creationColor={theme?.creationColor}
+            xpColor={theme?.xpColor}
           />
         </div>
     );
@@ -237,7 +240,8 @@ const SkillBlock: React.FC<{
   onUpdate: (section: 'skills', category: string, id: string, value: number) => void;
   userSpecs?: Record<string, string[]>;
   imposedSpecs?: Record<string, string[]>;
-}> = ({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {} }) => (
+  theme?: { creationColor: string, xpColor: string };
+}> = ({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme }) => (
     <div className="flex flex-col h-full">
         <SectionHeader title={title} />
         <div className="flex-grow py-1">
@@ -255,6 +259,7 @@ const SkillBlock: React.FC<{
                         category={cat} 
                         onUpdate={onUpdate} 
                         specializations={combinedSpecs}
+                        theme={theme}
                     />
                 );
             })}
@@ -799,6 +804,8 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
                             creationValue={counter.creationValue} 
                             max={10} 
                             onChange={(v) => updateCounter(counter.id, v, isCustom, 'value')} 
+                            creationColor={data.theme?.creationColor}
+                            xpColor={data.theme?.xpColor}
                          />
                      </div>
                  </div>
@@ -813,6 +820,11 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
                                 return <div key={i} className="w-3 h-3" />;
                             }
                             const isChecked = i < (counter.current || 0);
+                            
+                            // Custom color for counter usage ticks? 
+                            // Currently sticking to 'ink' style or standard black.
+                            // Could use theme.xpColor here too for consistency?
+                            
                             return (
                                 <button
                                     key={i}
@@ -977,6 +989,7 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
                                   onUpdate={updateDot} 
                                   userSpecs={data.specializations}
                                   imposedSpecs={data.imposedSpecializations}
+                                  theme={data.theme}
                               />
                           </div>
                       ))}
@@ -992,7 +1005,8 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
                           cat="arrieres_plans" 
                           onUpdate={updateDot}
                           userSpecs={data.specializations}
-                          imposedSpecs={data.imposedSpecializations} 
+                          imposedSpecs={data.imposedSpecializations}
+                          theme={data.theme}
                        />
                   </div>
                   <div className="flex-none border-b border-stone-400 overflow-hidden">
@@ -1008,31 +1022,31 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
           <>
             <div className="grid grid-cols-4 border-b-2 border-stone-800 h-auto">
                 <div className="border-r border-stone-400">
-                    <SkillBlock title="Talents" items={data.skills.talents || []} cat="talents" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} />
+                    <SkillBlock title="Talents" items={data.skills.talents || []} cat="talents" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
                 </div>
                 <div className="border-r border-stone-400">
-                    <SkillBlock title="Compétences" items={data.skills.competences || []} cat="competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} />
+                    <SkillBlock title="Compétences" items={data.skills.competences || []} cat="competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
                 </div>
                 <div className="border-r border-stone-400">
-                    <SkillBlock title="Compétences" items={data.skills.competences_col_2 || []} cat="competences_col_2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} />
+                    <SkillBlock title="Compétences" items={data.skills.competences_col_2 || []} cat="competences_col_2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
                 </div>
                 <div>
-                    <SkillBlock title="Connaissances" items={data.skills.connaissances || []} cat="connaissances" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} />
+                    <SkillBlock title="Connaissances" items={data.skills.connaissances || []} cat="connaissances" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
                 </div>
             </div>
 
             <div className="grid grid-cols-4 border-b-2 border-stone-800 flex-grow min-h-[200px]">
                 <div className="border-r border-stone-400">
-                <SkillBlock title="Autres Compétences" items={data.skills.autres_competences || []} cat="autres_competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} />
+                <SkillBlock title="Autres Compétences" items={data.skills.autres_competences || []} cat="autres_competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
                 </div>
                 <div className="border-r border-stone-400">
-                <SkillBlock title="Compétences Secondaires" items={data.skills.competences2 || []} cat="competences2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} />
+                <SkillBlock title="Compétences Secondaires" items={data.skills.competences2 || []} cat="competences2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
                 </div>
                 <div className="border-r border-stone-400">
-                <SkillBlock title="Autres" items={data.skills.autres || []} cat="autres" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} />
+                <SkillBlock title="Autres" items={data.skills.autres || []} cat="autres" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
                 </div>
                 <div>
-                <SkillBlock title="Arrières Plans" items={data.skills.arrieres_plans || []} cat="arrieres_plans" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} />
+                <SkillBlock title="Arrières Plans" items={data.skills.arrieres_plans || []} cat="arrieres_plans" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
                 </div>
             </div>
 
@@ -1059,6 +1073,36 @@ const CharacterSheet: React.FC<Props> = ({ data, onChange, isLandscape = false, 
                     <p className="text-gray-600 text-sm mb-4">
                         L'activation du mode création va <strong>réinitialiser toutes les valeurs</strong> du personnage actuel pour vous permettre de repartir de zéro.
                     </p>
+
+                    <div className="bg-slate-50 border border-slate-200 rounded p-3 mb-4 w-full text-left shadow-sm">
+                        <h4 className="font-bold text-xs text-slate-500 uppercase mb-2 flex items-center gap-2">
+                            <Sliders size={12} /> Paramètres de la session
+                        </h4>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-slate-700">
+                            <div className="col-span-2 font-semibold text-indigo-700 mb-1">
+                                Mode : {data.creationConfig.mode === 'points' ? 'Par Points (XP)' : 'Par Rangs (Slots)'}
+                            </div>
+                            {data.creationConfig.mode === 'points' ? (
+                                <>
+                                    <div>XP de départ : <b>{data.creationConfig.startingXP}</b></div>
+                                    <div>Coût Attribut : <b>{data.creationConfig.attributeCost} xp</b></div>
+                                </>
+                            ) : (
+                                <>
+                                    <div>Pts Attributs : <b>{data.creationConfig.attributePoints}</b></div>
+                                    <div>Pts Arr-plans : <b>{data.creationConfig.backgroundPoints}</b></div>
+                                    <div className="col-span-2 text-xs text-slate-500 mt-1 pt-1 border-t border-slate-200">
+                                        Répartition des Rangs : 
+                                        R1:<b>{data.creationConfig.rankSlots[1]}</b> • 
+                                        R2:<b>{data.creationConfig.rankSlots[2]}</b> • 
+                                        R3:<b>{data.creationConfig.rankSlots[3]}</b> • 
+                                        R4:<b>{data.creationConfig.rankSlots[4]}</b>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
                     <div className="bg-white p-3 rounded border border-blue-100 text-left text-xs text-blue-800 space-y-1 w-full">
                         <p className="font-bold border-b border-blue-50 pb-1 mb-1">Seront effacés :</p>
                         <ul className="list-disc list-inside">

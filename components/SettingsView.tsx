@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { CharacterSheetData, DotEntry, SkillCategoryKey, AttributeEntry, CombatEntry, ReputationEntry } from '../types';
-import { Trash2, Plus, RefreshCw, Minus, GripVertical, Save, AlertTriangle, List, Tag, UserPlus, Circle, Calculator, Info, CreditCard, Sliders, BookOpen, LayoutGrid, Zap, Play, X, CheckSquare, Square } from 'lucide-react';
-import { INITIAL_DATA } from '../constants';
+import { CharacterSheetData, DotEntry, SkillCategoryKey, AttributeEntry, CombatEntry, ReputationEntry, ThemeConfig } from '../types';
+import { Trash2, Plus, RefreshCw, Minus, GripVertical, Save, AlertTriangle, List, Tag, UserPlus, Circle, Calculator, Info, CreditCard, Sliders, BookOpen, LayoutGrid, Zap, Play, X, CheckSquare, Square, Palette, RotateCcw } from 'lucide-react';
+import { INITIAL_DATA, DEFAULT_THEME } from '../constants';
 
 interface SettingsViewProps {
   data: CharacterSheetData;
@@ -366,6 +366,25 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
       });
 
       return total;
+  };
+
+  // --- Theme Handlers ---
+  const updateTheme = (field: keyof ThemeConfig, value: string) => {
+      setLocalData(prev => ({
+          ...prev,
+          theme: {
+              ...prev.theme,
+              [field]: value
+          }
+      }));
+  };
+
+  const resetTheme = () => {
+      setLocalData(prev => ({
+          ...prev,
+          theme: DEFAULT_THEME
+      }));
+      onAddLog('Thème réinitialisé aux couleurs par défaut.', 'info', 'settings');
   };
 
   // --- Skill/Counter CRUD ---
@@ -907,6 +926,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
   const renderCreationEditor = () => {
       const config = localData.creationConfig;
       if (!config) return null; // Safety
+      const theme = localData.theme || DEFAULT_THEME;
 
       return (
           <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -995,31 +1015,95 @@ const SettingsView: React.FC<SettingsViewProps> = ({ data, onUpdate, onClose, on
                       </div>
                   </div>
 
-                  {/* Rank Slots Configuration (Only if mode is 'rangs') */}
-                  {config.mode === 'rangs' && (
-                      <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
-                          <h4 className="font-bold text-gray-800 border-b pb-2 mb-4 flex items-center gap-2">
-                              <List size={18} /> Slots par Rang
-                          </h4>
-                          <div className="space-y-3">
-                              {[5, 4, 3, 2, 1].map(rank => (
-                                  <div key={rank} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
-                                      <span className="font-bold text-gray-600">Rang {rank}</span>
-                                      <div className="flex items-center gap-2">
-                                          <input 
-                                              type="number"
-                                              // @ts-ignore
-                                              value={config.rankSlots[rank] || 0}
-                                              onChange={(e) => updateRankSlot(rank, parseInt(e.target.value) || 0)}
-                                              className="w-20 border border-gray-300 rounded px-2 py-1 text-center font-mono focus:border-blue-500 outline-none"
-                                          />
-                                          <span className="text-sm text-gray-400">slots</span>
+                  {/* Right Column: Rank Slots or Colors */}
+                  <div className="flex flex-col gap-6">
+
+                      {/* Rank Slots Configuration (Only if mode is 'rangs') */}
+                      {config.mode === 'rangs' && (
+                          <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
+                              <h4 className="font-bold text-gray-800 border-b pb-2 mb-4 flex items-center gap-2">
+                                  <List size={18} /> Répartition des Rangs
+                              </h4>
+                              <div className="space-y-3">
+                                  {[5, 4, 3, 2, 1].map(rank => (
+                                      <div key={rank} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                                          <span className="font-bold text-gray-600">Rang {rank}</span>
+                                          <div className="flex items-center gap-2">
+                                              <input 
+                                                  type="number"
+                                                  // @ts-ignore
+                                                  value={config.rankSlots[rank] || 0}
+                                                  onChange={(e) => updateRankSlot(rank, parseInt(e.target.value) || 0)}
+                                                  className="w-20 border border-gray-300 rounded px-2 py-1 text-center font-mono focus:border-blue-500 outline-none"
+                                              />
+                                              <span className="text-sm text-gray-400">rangs</span>
+                                          </div>
                                       </div>
-                                  </div>
-                              ))}
+                                  ))}
+                              </div>
                           </div>
+                      )}
+
+                      {/* Theme / Colors Configuration */}
+                      <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
+                           <div className="flex items-center justify-between border-b pb-2 mb-4">
+                                <h4 className="font-bold text-gray-800 flex items-center gap-2">
+                                    <Palette size={18} /> Configuration des Couleurs
+                                </h4>
+                                <button
+                                    onClick={resetTheme}
+                                    className="text-xs text-gray-500 hover:text-red-500 hover:bg-red-50 px-2 py-1 rounded flex items-center gap-1 transition-colors"
+                                    title="Remettre les couleurs par défaut"
+                                >
+                                    <RotateCcw size={12} /> Défaut
+                                </button>
+                           </div>
+                           
+                           <div className="grid grid-cols-2 gap-4">
+                               <div className="space-y-2">
+                                    <label className="block text-xs font-bold text-gray-500 uppercase">Pts Création</label>
+                                    <div className="flex items-center gap-2">
+                                        <input 
+                                            type="color" 
+                                            value={theme.creationColor}
+                                            onChange={(e) => updateTheme('creationColor', e.target.value)}
+                                            className="w-10 h-10 border-none rounded cursor-pointer bg-transparent"
+                                        />
+                                        <div className="flex-grow flex flex-col justify-center">
+                                            <div className="flex gap-1">
+                                                <span className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: theme.creationColor }}></span>
+                                                <span className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: theme.creationColor }}></span>
+                                                <span className="w-3 h-3 rounded-full border border-stone-400 bg-transparent"></span>
+                                            </div>
+                                            <span className="text-[10px] text-gray-400 font-mono mt-0.5">{theme.creationColor}</span>
+                                        </div>
+                                    </div>
+                               </div>
+
+                               <div className="space-y-2">
+                                    <label className="block text-xs font-bold text-gray-500 uppercase">Pts Standard / XP</label>
+                                    <div className="flex items-center gap-2">
+                                        <input 
+                                            type="color" 
+                                            value={theme.xpColor}
+                                            onChange={(e) => updateTheme('xpColor', e.target.value)}
+                                            className="w-10 h-10 border-none rounded cursor-pointer bg-transparent"
+                                        />
+                                        <div className="flex-grow flex flex-col justify-center">
+                                            <div className="flex gap-1">
+                                                <span className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: theme.xpColor }}></span>
+                                                <span className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: theme.xpColor }}></span>
+                                                <span className="w-3 h-3 rounded-full border border-stone-400 bg-transparent"></span>
+                                            </div>
+                                            <span className="text-[10px] text-gray-400 font-mono mt-0.5">{theme.xpColor}</span>
+                                        </div>
+                                    </div>
+                               </div>
+                           </div>
                       </div>
-                  )}
+
+                  </div>
+
               </div>
 
               {/* Separator */}

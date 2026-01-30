@@ -8,9 +8,20 @@ interface DotRatingProps {
   onChange?: (val: number) => void;
   className?: string;
   readOnly?: boolean;
+  creationColor?: string; // New: Dynamic creation color
+  xpColor?: string;       // New: Dynamic XP color
 }
 
-const DotRating: React.FC<DotRatingProps> = ({ value, creationValue = 0, max = 5, onChange, className = '', readOnly = false }) => {
+const DotRating: React.FC<DotRatingProps> = ({ 
+    value, 
+    creationValue = 0, 
+    max = 5, 
+    onChange, 
+    className = '', 
+    readOnly = false,
+    creationColor,
+    xpColor
+}) => {
   return (
     <div className={`flex items-center space-x-1 ${className}`}>
       {Array.from({ length: max }).map((_, index) => {
@@ -18,19 +29,30 @@ const DotRating: React.FC<DotRatingProps> = ({ value, creationValue = 0, max = 5
         const isCreationDot = index < creationValue;
         
         // Visual Logic:
-        // - Creation Dot: Filled with Royal Blue (Distinct from black, visible, fits ink theme)
-        // - XP Dot (Post-Creation): Filled with Dark Stone/Black
-        // - Empty: Transparent with Stone border
+        // Use inline styles for dynamic user-defined colors
         
-        let dotStyle = 'bg-transparent border-stone-400'; // Default Empty
+        let style: React.CSSProperties = {};
+        let dotClass = 'bg-transparent border-stone-400'; // Default Empty
         
         if (filled) {
             if (isCreationDot) {
-                // Création : Bleu Roi (Blue 600) avec bordure assortie
-                dotStyle = 'bg-blue-600 border-blue-700'; 
+                // Creation Dot (Dynamic Color)
+                if (creationColor) {
+                    style = { backgroundColor: creationColor, borderColor: creationColor };
+                    dotClass = ''; // Override classes
+                } else {
+                    // Fallback default
+                    dotClass = 'bg-blue-600 border-blue-700'; 
+                }
             } else {
-                // XP : Noir / Gris Foncé (Stone 800)
-                dotStyle = 'bg-stone-800 border-stone-900';
+                // XP Dot (Dynamic Color)
+                if (xpColor) {
+                     style = { backgroundColor: xpColor, borderColor: xpColor };
+                     dotClass = ''; // Override classes
+                } else {
+                    // Fallback default
+                    dotClass = 'bg-stone-800 border-stone-900';
+                }
             }
         }
 
@@ -44,7 +66,8 @@ const DotRating: React.FC<DotRatingProps> = ({ value, creationValue = 0, max = 5
               const newValue = index + 1;
               onChange(newValue === value ? newValue - 1 : newValue);
             }}
-            className={`w-3 h-3 rounded-full border transition-colors ${dotStyle} ${
+            style={style}
+            className={`w-3 h-3 rounded-full border transition-colors ${dotClass} ${
                 readOnly ? 'cursor-default' : 'cursor-pointer hover:bg-blue-200 hover:border-blue-300'
             }`}
             aria-label={`Set rating to ${index + 1}`}

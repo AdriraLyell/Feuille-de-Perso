@@ -12,6 +12,7 @@ import ChangelogModal from './components/ChangelogModal';
 import UserGuideModal from './components/UserGuideModal'; // Import Guide
 import CreationHUD from './components/CreationHUD';
 import TraitLibrary from './components/TraitLibrary';
+import UpdateNotifier from './components/UpdateNotifier'; // Import Notifier
 import { CharacterSheetData, SkillCategoryKey, AttributeCategoryKey, LogEntry, DotEntry, TraitEffect } from './types';
 import { INITIAL_DATA, APP_VERSION } from './constants';
 import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, Monitor, Smartphone, ArrowRightLeft, TrendingUp, History, Clock, X, Trash2, Save, ScrollText, HelpCircle, BookOpen, Book } from 'lucide-react';
@@ -276,6 +277,11 @@ const migrateData = (parsed: any): CharacterSheetData => {
         parsed.creationConfig = INITIAL_DATA.creationConfig;
     }
     
+    // Migration 32: Add Theme Config
+    if (!parsed.theme) {
+        parsed.theme = INITIAL_DATA.theme;
+    }
+
     // Migration 19: Add attribute limits to creationConfig if missing
     if (typeof parsed.creationConfig.attributeMin === 'undefined') {
         parsed.creationConfig.attributeMin = INITIAL_DATA.creationConfig.attributeMin;
@@ -709,6 +715,10 @@ function App() {
   
   return (
     <div className="min-h-screen pb-10">
+      
+      {/* Update Notifier */}
+      <UpdateNotifier />
+
       {/* Navigation / Toolbar (Hidden in Print) */}
       <nav className="bg-gray-800 text-white px-4 shadow-md no-print sticky top-0 z-50 h-14 flex items-center">
         <div className="max-w-[1400px] mx-auto flex justify-between items-center w-full">

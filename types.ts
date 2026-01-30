@@ -27,6 +27,11 @@ export interface CreationConfig {
   };
 }
 
+export interface ThemeConfig {
+    creationColor: string; // Couleur des points "acquis à la création"
+    xpColor: string;       // Couleur des points "acquis par XP"
+}
+
 export interface DotEntry {
   id: string;
   name: string;
@@ -204,6 +209,7 @@ export interface PartyMemberEntry {
 
 export interface CharacterSheetData {
   creationConfig: CreationConfig;
+  theme: ThemeConfig; // New Theme Config
   header: HeaderInfo;
   
   // Dynamic Attributes Structure

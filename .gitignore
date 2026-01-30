@@ -27,9 +27,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-tsconfig.json
 
 # Environment variables
 .env
 .env.test
 .env.production
+
+# User specific request to ignore deployment workflow
+.github/workflows/deploy.yml
+.github/workflows/copy-to-miseenligne.yml
