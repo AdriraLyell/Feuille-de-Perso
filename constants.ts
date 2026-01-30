@@ -6,8 +6,8 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 export const APP_VERSION = "1.9.42";
 
 // REMPLACEZ CECI PAR L'URL DE VOTRE GITHUB PAGES (DOSSIER RACINE)
-// Exemple : "https://username.github.io/repo-name"
-export const REMOTE_MANIFEST_URL = "https://adriralyell.github.io/Feuille-de-Perso/";
+// Exemple : "https://username.github.io/repo-name/version.json"
+export const REMOTE_MANIFEST_URL = "https://adriralyell.github.io/Feuille-de-Perso/version.json";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
