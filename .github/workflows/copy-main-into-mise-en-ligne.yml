@@ -1,0 +1,44 @@
+name: Copy main into Mise-en-Ligne (no deletion)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch all branches
+        run: git fetch origin
+
+      - name: Switch to Mise-en-Ligne (create if missing)
+        run: |
+          git checkout -B Mise-en-Ligne origin/Mise-en-Ligne || git checkout -b Mise-en-Ligne
+
+      - name: Copy files from main into Mise-en-Ligne (keep extra files)
+        run: |
+          git checkout origin/main -- .
+
+      - name: Commit changes if any
+        run: |
+          if git status --porcelain | grep .; then
+            git commit -am "Sync files from main (no deletion)"
+          else
+            echo "No changes to commit"
+          fi
+
+      - name: Push Mise-en-Ligne
+        run: git push origin Mise-en-Ligne
