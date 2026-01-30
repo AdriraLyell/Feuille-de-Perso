@@ -7,7 +7,7 @@ export const APP_VERSION = "1.9.41";
 
 // REMPLACEZ CECI PAR L'URL DE VOTRE GITHUB PAGES (DOSSIER RACINE)
 // Exemple : "https://username.github.io/repo-name"
-export const REMOTE_MANIFEST_URL = "https://votre-site-web.com/version.json";
+export const REMOTE_MANIFEST_URL = "https://adriralyell.github.io/Feuille-de-Perso/";
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
