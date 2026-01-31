@@ -1,5 +1,5 @@
 import React from 'react';
-import { Book, Settings, FileText, Layout, Save, Upload, Feather, LogOut, Printer, Monitor, Smartphone, History, HelpCircle, ScrollText, ArrowRightLeft, BookOpen } from 'lucide-react';
+import { Book, Settings, FileText, Layout, Save, Upload, Feather, LogOut, Printer, Monitor, Smartphone, History, HelpCircle, ScrollText, ArrowRightLeft, BookOpen, Download, RectangleVertical, RectangleHorizontal } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { CharacterSheetData } from '../../types';
 
@@ -25,11 +25,11 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     const { data } = useCharacter();
 
     return (
-        <nav className="bg-gray-800 text-white px-4 shadow-md no-print sticky top-0 z-50 h-14 flex items-center border-b border-gray-700">
+        <nav className="bg-gray-800 text-white px-4 shadow-md no-print sticky top-0 z-50 h-14 flex items-center border-b border-gray-700 relative">
             <div className="max-w-[1920px] mx-auto flex justify-between items-center w-full">
 
-                {/* Left: Toggles + Character Name */}
-                <div className="flex items-center gap-4 mr-4">
+                {/* Left: Toggles + Sheet Button */}
+                <div className="flex items-center gap-4 mr-4 z-10">
                     <button
                         onClick={onToggleLandscape}
                         className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all ${isLandscape
@@ -38,10 +38,10 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                             }`}
                         title={isLandscape ? "Passer en Portrait" : "Passer en Paysage"}
                     >
-                        {isLandscape ? <Monitor size={18} /> : <Smartphone size={18} className="rotate-90" />}
-                        {/* Hide label on very small screens if needed, otherwise keep it */}
-                        <span className="hidden md:inline">{isLandscape ? "Paysage" : "Portrait"}</span>
+                        {isLandscape ? <RectangleHorizontal size={18} /> : <RectangleVertical size={18} />}
                     </button>
+
+                    <div className="w-px h-6 bg-gray-600 hidden md:block"></div>
 
                     {/* Sheet Button */}
                     <button
@@ -50,22 +50,21 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                             ? 'bg-blue-600 text-white shadow-sm'
                             : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
                     >
-                        <FileText size={16} /> Fiche
+                        <FileText size={16} /> Fiche de Personnage
                     </button>
 
-                    <div className="w-px h-6 bg-gray-600 hidden md:block"></div>
+                </div>
 
-                    {/* Character Name (Centered) */}
-                    <div className="flex flex-col items-center">
-                        <span className="text-[10px] text-gray-400 uppercase font-bold leading-none text-center">Personnage</span>
-                        <span className="text-sm font-bold text-gray-200 max-w-[200px] truncate leading-tight text-center">
-                            {data.header?.name || 'Sans Nom'}
-                        </span>
-                    </div>
+                {/* Center: Character Name (Absolute Centered) */}
+                <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none z-0">
+                    <span className="text-[10px] text-gray-400 uppercase font-bold leading-none text-center">Personnage</span>
+                    <span className="text-sm font-bold text-gray-200 max-w-[300px] truncate leading-tight text-center">
+                        {data.header?.name || 'Sans Nom'}
+                    </span>
                 </div>
 
                 {/* Right: Main Navigation + Tools */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 z-10">
 
                     {/* Navigation Buttons (Moved to Right) */}
                     <div className="hidden md:flex items-center gap-2 mr-4 border-r border-gray-600 pr-4">
@@ -89,23 +88,25 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                     {/* Action Tools */}
                     <button
+                        onClick={onOpenImportExport}
+                        className="bg-amber-700/20 hover:bg-amber-700/40 text-amber-500 hover:text-amber-400 border border-amber-700/50 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all text-sm font-bold"
+                        title="Sauvegarder / Charger"
+                    >
+                        <div className="flex items-center gap-0.5">
+                            <Save size={18} />
+                            <Download size={18} />
+                        </div>
+                    </button>
+
+                    <div className="w-px h-6 bg-gray-600 mx-1"></div>
+
+                    <button
                         onClick={onPrintRequest}
                         className="p-2 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white rounded-lg transition-colors"
                         title="Imprimer"
                     >
                         <Printer size={18} />
                     </button>
-
-                    <button
-                        onClick={onOpenImportExport}
-                        className="bg-amber-700/20 hover:bg-amber-700/40 text-amber-500 hover:text-amber-400 border border-amber-700/50 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all text-sm font-bold"
-                        title="Sauvegarder / Charger"
-                    >
-                        <Save size={18} />
-                        <span className="hidden sm:inline">Sauvegarder</span>
-                    </button>
-
-                    <div className="w-px h-6 bg-gray-600 mx-1"></div>
 
                     <button
                         onClick={onShowLogs}

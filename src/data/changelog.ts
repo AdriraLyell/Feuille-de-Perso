@@ -3,6 +3,53 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
+        version: "2.0.5",
+        date: "31/01/2026 23:15",
+        type: 'patch',
+        changes: [
+            "UI : Remplacement du sélecteur d'orientation textuel par des icônes géométriques explicites.",
+            "Visual : Utilisation de RectangleHorizontal (Paysage) et RectangleVertical (Portrait) pour indiquer le mode actuel."
+        ]
+    },
+    {
+        version: "2.0.4",
+        date: "31/01/2026 21:58",
+        type: 'patch',
+        changes: [
+            "UI : Simplification du bouton de gestion des données (Sauvegarde/Chargement).",
+            "Visual : Suppression du label textuel pour ne conserver que les icônes, allégeant la barre de navigation."
+        ]
+    },
+    {
+        version: "2.0.3",
+        date: "31/01/2026 21:55",
+        type: 'patch',
+        changes: [
+            "UI : Mise à jour de l'icône du bouton de sauvegarde.",
+            "Visual : Ajout de l'icône 'Download' (Import) à côté de la 'Disquette' (Sauvegarde) pour mieux signifier la double fonction du menu."
+        ]
+    },
+    {
+        version: "2.0.2",
+        date: "31/01/2026 21:40",
+        type: 'patch',
+        changes: [
+            "Navigation : Ajustement de la disposition des boutons.",
+            "Visual : Le séparateur gauche est déplacé entre le sélecteur de vue et le bouton 'Fiche de Personnage'.",
+            "Ergonomie : Le bouton d'impression est regroupé avec les outils (Historique, Aide) pour une meilleure logique visuelle."
+        ]
+    },
+    {
+        version: "2.0.1",
+        date: "31/01/2026 21:35",
+        type: 'patch',
+        changes: [
+            "Navigation : Réorganisation de la barre supérieure. Le bouton 'Fiche de Personnage' est désormais à gauche.",
+            "Visual : Le nom du personnage est centré de manière absolue pour une symétrie parfaite.",
+            "UI : Renommage du bouton 'Fiche' en 'Fiche de Personnage' pour plus de clarté."
+        ]
+    },
+    {
         version: "2.0.0",
         date: "31/01/2026 20:30",
         type: 'major',
