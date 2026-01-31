@@ -33,6 +33,3 @@ dist-ssr
 .env.test
 .env.production
 
-# User specific request to ignore deployment workflow
-.github/workflows/deploy.yml
-.github/workflows/copy-to-miseenligne.yml
