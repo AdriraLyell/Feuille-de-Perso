@@ -1,13 +1,14 @@
 {
   "name": "rpg-sheet-manager",
-  "version": "2.6.0",
+  "version": "2.7.7",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "sync-version": "node scripts/sync-version.js"
   },
   "dependencies": {
     "idb-keyval": "^6.2.1",

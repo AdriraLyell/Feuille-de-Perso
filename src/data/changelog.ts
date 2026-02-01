@@ -3,6 +3,15 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
+        version: "2.7.7",
+        date: "01/02/2026 15:20",
+        type: 'patch',
+        changes: [
+            "Versioning : Automatisation de la synchronisation entre package.json, version.json et constants.ts.",
+            "Versioning : Correction de la version dans le fichier version.json."
+        ]
+    },
+    {
         version: "2.7.6",
         date: "01/02/2026 15:15",
         type: 'patch',
