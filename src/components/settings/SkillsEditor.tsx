@@ -268,17 +268,17 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
 
         return (
             <div
-                className={`bg-white p-4 rounded shadow flex flex-col ${heightClass} border-2 border-transparent transition-colors ${draggedItem && !isCounters ? 'border-dashed border-blue-200 bg-blue-50/30' : ''}`}
+                className={`bg-[#fdfbf7]/80 backdrop-blur-sm p-4 rounded-sm shadow-md flex flex-col ${heightClass} border border-[#bfae85]/30 transition-all duration-300 ${draggedItem && !isCounters ? 'border-dashed border-amber-400 bg-amber-50/50 scale-[1.01]' : ''}`}
                 onDragOver={handleDragOver}
                 onDrop={(e) => !isCounters && handleDropOnSheet(e, category, list.length)}
             >
-                <h3 className="font-bold text-sm mb-4 text-gray-800 border-b pb-2 flex justify-between items-center select-none">
+                <h3 className="font-bold text-[10px] mb-4 text-[#5c4d41] border-b border-[#bfae85]/30 pb-2 flex justify-between items-center select-none uppercase tracking-widest">
                     {title}
                     <div className="flex gap-1">
                         {!isCounters && (
                             <button
                                 onClick={() => addSkill(category as SkillCategoryKey, true)}
-                                className="text-[10px] bg-gray-500 text-white px-2 py-1 rounded flex items-center gap-1 hover:bg-gray-600 transition-colors"
+                                className="text-[9px] bg-stone-500 text-white px-2 py-1 rounded-sm flex items-center gap-1 hover:bg-stone-600 transition-colors font-bold shadow-sm"
                                 title="Ajouter un espaceur"
                             >
                                 <Minus size={12} /> Espace
@@ -286,7 +286,7 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                         )}
                         <button
                             onClick={() => isCounters ? addCounter(defaultItemName) : addSkill(category as SkillCategoryKey, false, defaultItemName)}
-                            className="text-[10px] bg-green-600 text-white px-2 py-1 rounded flex items-center gap-1 hover:bg-green-700 transition-colors"
+                            className="text-[9px] bg-[#166534] text-white px-2 py-1 rounded-sm flex items-center gap-1 hover:bg-[#114b27] transition-colors font-bold shadow-sm"
                         >
                             <Plus size={12} /> Ajouter
                         </button>
@@ -294,8 +294,8 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                 </h3>
                 <div className="flex-grow overflow-y-auto space-y-2 pr-1 max-h-[500px] min-h-[50px] custom-scrollbar">
                     {list.length === 0 && !isCounters && (
-                        <div className="h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center text-gray-400 text-xs pointer-events-none">
-                            Déposez ici
+                        <div className="h-16 border-2 border-dashed border-[#bfae85]/30 rounded-sm flex items-center justify-center text-[#5c4d41]/40 text-[10px] pointer-events-none italic">
+                            Zone de dépôt
                         </div>
                     )}
                     {list.map((item, index) => {
@@ -303,20 +303,20 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                         return (
                             <div
                                 key={item.id}
-                                className={`flex items-center gap-2 text-sm group transition-all duration-200 p-1 rounded ${isDragging ? 'opacity-50 bg-gray-100' : 'hover:bg-gray-50'}`}
+                                className={`flex items-center gap-2 text-sm group transition-all duration-200 p-1 rounded-sm ${isDragging ? 'opacity-50 bg-[#bfae85]/10' : 'hover:bg-[#bfae85]/5'}`}
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, 'sheet_skill', { category, index, item })}
                                 onDragOver={handleDragOver}
                                 onDrop={(e) => { e.stopPropagation(); handleDropOnSheet(e, category, index); }}
                             >
-                                <div className="cursor-grab text-gray-300 hover:text-gray-600 active:cursor-grabbing p-1">
+                                <div className="cursor-grab text-[#bfae85]/40 hover:text-[#8b2e2e] active:cursor-grabbing p-1 transition-colors">
                                     <GripVertical size={16} />
                                 </div>
-                                <span className="text-gray-400 text-xs w-4 text-center select-none">{index + 1}</span>
+                                <span className="text-[#5c4d41]/30 text-[9px] w-4 text-center select-none font-mono">{index + 1}</span>
 
                                 {item.name === '' ? (
-                                    <div className="flex-grow h-8 bg-gray-100 border border-dashed border-gray-300 rounded flex items-center justify-center text-xs text-gray-400 italic cursor-default select-none">
-                                        Espaceur (Vide)
+                                    <div className="flex-grow h-8 bg-black/5 border border-dashed border-[#bfae85]/30 rounded-sm flex items-center justify-center text-[10px] text-[#5c4d41]/40 italic cursor-default select-none shadow-inner">
+                                        Espaceur
                                     </div>
                                 ) : (
                                     <input
@@ -350,7 +350,7 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                                             }
                                         }}
                                         onChange={(e) => isCounters ? updateCounterName(item.id, e.target.value) : updateSkillName(category as SkillCategoryKey, item.id, e.target.value)}
-                                        className="border p-1 rounded w-full focus:border-blue-500 outline-none bg-transparent"
+                                        className="border border-[#bfae85]/30 p-1 rounded-sm w-full focus:border-[#8b2e2e] outline-none bg-white/50 text-xs font-bold text-[#2c241b] transition-all"
                                     />
                                 )}
                                 <button

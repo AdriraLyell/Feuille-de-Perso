@@ -3,6 +3,165 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
+        version: "2.9.11",
+        date: "2026-02-01",
+        type: 'patch',
+        changes: [
+            "UI : Mise à jour du libellé de la légende de la réserve ('Présent dans la Fiche')."
+        ]
+    },
+    {
+        version: "2.9.10",
+        date: "2026-02-01",
+        type: 'patch',
+        changes: [
+            "UI : Centrage de la légende 'Sur la fiche' dans la barre d'outils de la réserve."
+        ]
+    },
+    {
+        version: "2.9.9",
+        date: "2026-02-01",
+        type: 'patch',
+        changes: [
+            "Optimisation UX : Réduction de la taille des vignettes de compétences dans la réserve.",
+            "Optimisation UX : L'indicateur 'Sur la fiche' est désormais une icône placée avant le nom de la compétence.",
+            "Optimisation UX : Ajout d'une légende globale dans la barre d'outils de la réserve."
+        ]
+    },
+    {
+        version: "2.9.8",
+        date: "2026-02-01",
+        type: 'patch',
+        changes: [
+            "Bug Fix : Restauration des imports critiques dans les Réglages (Correction du crash ReferenceError)."
+        ]
+    },
+    {
+        version: "2.9.7",
+        date: "2026-02-01",
+        type: 'minor',
+        changes: [
+            "Audit d'accessibilité et correction des contrastes dans les Réglages",
+            "Harmonisation thématique complète du menu Réglages (Style Grimoire)",
+            "Migration des modales de confirmation des réglages vers ThematicModal",
+            "Amélioration de la lisibilité des textes secondaires (tons Sépia/Encre)"
+        ]
+    },
+    {
+        version: "2.9.6",
+        date: "01/02/2026 17:40",
+        type: 'patch',
+        changes: [
+            "UX : L'aide des catégories s'affiche désormais comme un panneau latéral coulissant dans l'éditeur (au lieu d'une modale superposée).",
+            "UX : Permet de consulter les codes de placement tout en saisissant les informations de la compétence."
+        ]
+    },
+    {
+        version: "2.9.5",
+        date: "01/02/2026 17:35",
+        type: 'patch',
+        changes: [
+            "UX : Déplacement du bouton d'aide des catégories dans l'éditeur de compétence.",
+            "UI : Passage de l'aide des catégories en mode 'ThematicModal' avec style Grimoire.",
+            "Accessibilité : Audit et correction globale des contrastes (textes gris trop clairs).",
+            "Accessibilité : Amélioration de la visibilité des placeholders sur le parchemin."
+        ]
+    },
+    {
+        version: "2.9.4",
+        date: "01/02/2026 17:22",
+        type: 'patch',
+        changes: [
+            "Bug Fix : Correction d'une ReferenceError lors du chargement de la modale d'édition de compétence (Import manquant)."
+        ]
+    },
+    {
+        version: "2.9.3",
+        date: "01/02/2026 17:20",
+        type: 'minor',
+        changes: [
+            "UI : Refonte visuelle complète des formulaires bibliothèque vers un style 'Grimoire' (Papier & Encre).",
+            "Accessibilité : Correction majeure des contrastes sur les descriptions et sélecteurs.",
+            "Design : Suppression des couleurs vives (rose fushia) au profit d'une palette plus naturelle (Bordeaux, Forêt, Ambre).",
+            "UX : Passage de tous les éditeurs de la bibliothèque sur le système de modales thématiques."
+        ]
+    },
+    {
+        version: "2.9.2",
+        date: "01/02/2026 17:10",
+        type: 'patch',
+        changes: [
+            "Réserve : Masquage de l'icône de suppression pour les compétences présentes sur la fiche (Sécurité).",
+            "Réserve : Maintien de l'icône d'édition pour permettre le renommage synchronisé."
+        ]
+    },
+    {
+        version: "2.9.1",
+        date: "01/02/2026 16:45",
+        type: 'patch',
+        changes: [
+            "Fix : Correction d'un crash (ReferenceError) lors de l'enregistrement d'une compétence renommée dû à une icône manquante."
+        ]
+    },
+    {
+        version: "2.9.0",
+        date: "01/02/2026 16:45",
+        type: 'major',
+        changes: [
+            "Réserve : Déblocage de l'édition et de la suppression des compétences déjà présentes sur la fiche.",
+            "Réserve : Possibilité de définir/modifier la catégorie de placement par défaut pour chaque compétence.",
+            "Réserve : Système de renommage synchronisé avec la fiche de personnage (avec confirmation de sécurité).",
+            "UX : Amélioration de la visibilité des indicateurs 'Sur la fiche' dans la réserve."
+        ]
+    },
+    {
+        version: "2.8.2",
+        date: "01/02/2026 15:55",
+        type: 'patch',
+        changes: [
+            "Import : Remplacement de l'alerte navigateur par une modale thématique élégante après une migration.",
+            "Import : Ajout d'un bouton de sauvegarde directe dans la modale de succès de migration."
+        ]
+    },
+    {
+        version: "2.8.1",
+        date: "01/02/2026 15:50",
+        type: 'patch',
+        changes: [
+            "Import : Ajout d'une recommandation de sauvegarde immédiate après une migration de fichier.",
+            "Migration : Finalisation du système de moissonnage des spécialisations."
+        ]
+    },
+    {
+        version: "2.8.0",
+        date: "01/02/2026 15:45",
+        type: 'minor',
+        changes: [
+            "Migration : Système de moissonnage automatique des spécialisations lors de l'importation de vieilles fiches.",
+            "Migration : Initialisation automatique de la bibliothèque de spécialisations si absente.",
+            "Migration : Sécurisation de l'intégrité des données (thèmes, effets des traits, configuration de création) pour les imports d'anciennes versions (v2.4+).",
+            "Migration : Correction d'un bug où la bibliothèque de compétences n'était pas toujours correctement réactivée lors d'un import."
+        ]
+    },
+    {
+        version: "2.7.9",
+        date: "01/02/2026 15:35",
+        type: 'patch',
+        changes: [
+            "Bugfix : Correction d'un crash au démarrage suite à un import manquant (icône Plus)."
+        ]
+    },
+    {
+        version: "2.7.8",
+        date: "01/02/2026 15:30",
+        type: 'patch',
+        changes: [
+            "UI/UX : Refonte visuelle des zones de spécialisations (Design 'Pills' épuré).",
+            "UI/UX : Suppression des placeholders texte encombrants au profit d'un design pointillé minimalist pour les champs vides.",
+            "UI/UX : Distinction visuelle accrue entre spécialisations imposées (bleues) et spécialisations joueur (ambrées)."
+        ]
+    },
+    {
         version: "2.7.7",
         date: "01/02/2026 15:20",
         type: 'patch',

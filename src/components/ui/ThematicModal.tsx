@@ -10,6 +10,7 @@ interface ThematicModalProps {
     footer?: React.ReactNode;
     size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
     className?: string;
+    zIndex?: number;
 }
 
 const ThematicModal: React.FC<ThematicModalProps> = ({
@@ -20,7 +21,8 @@ const ThematicModal: React.FC<ThematicModalProps> = ({
     children,
     footer,
     size = 'md',
-    className = ''
+    className = '',
+    zIndex
 }) => {
     const [isVisible, setIsVisible] = useState(false);
 
@@ -47,7 +49,10 @@ const ThematicModal: React.FC<ThematicModalProps> = ({
     };
 
     return (
-        <div className={`fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+        <div
+            className={`fixed inset-0 flex items-center justify-center p-4 transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+            style={{ zIndex: zIndex || 100 }}
+        >
 
             {/* Backdrop */}
             <div

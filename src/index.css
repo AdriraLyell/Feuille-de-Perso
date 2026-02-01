@@ -24,7 +24,7 @@ body {
 }
 
 .sheet-input::placeholder {
-  color: #cbd5e1; /* Slate 300 - Visible but subtle */
+  color: #64748b; /* slate-500 - Visible on parchment */
   opacity: 1;
 }
 

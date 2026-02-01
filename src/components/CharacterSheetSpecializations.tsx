@@ -3,7 +3,7 @@ import { useCharacter } from '../context/CharacterContext';
 import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../types';
 import SpecializationOmnibar from './specialization-library/SpecializationOmnibar';
 import SpecializationLibraryDrawer from './specialization-library/SpecializationLibraryDrawer';
-import { Award, Book } from 'lucide-react';
+import { Award, Book, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 interface Props {
@@ -90,10 +90,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
     };
 
     const renderSkillBox = (skill: DotEntry) => {
-        // Determine how many inputs to show based on dot value
         const count = skill.value;
-        // We check if there are imposed specializations OR if there are dots
-        // GLOBAL FIX: Skill must be > 0 for ANY specialization to appear
         const imposedSpecs = skill.value > 0
             ? (data.imposedSpecializations[skill.id] || []).filter(spec => skill.value >= (spec.minLevel || 0))
             : [];
@@ -105,46 +102,62 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         return (
             <div
                 key={skill.id}
-                className="border border-stone-400 p-1 bg-white break-inside-avoid shadow-sm flex flex-col gap-0.5 rounded-sm group/skill hover:border-amber-300 transition-colors"
+                className="border border-stone-300 p-1.5 bg-white/50 backdrop-blur-sm shadow-sm flex flex-col gap-1.5 rounded-md group/skill hover:border-amber-400 hover:bg-white transition-all duration-200"
                 onDragOver={(e) => {
                     e.preventDefault();
-                    e.currentTarget.classList.add('bg-amber-50');
+                    e.currentTarget.classList.add('bg-amber-50', 'border-amber-400');
                 }}
                 onDragLeave={(e) => {
-                    e.currentTarget.classList.remove('bg-amber-50');
+                    e.currentTarget.classList.remove('bg-amber-50', 'border-amber-400');
                 }}
                 onDrop={(e) => {
-                    e.currentTarget.classList.remove('bg-amber-50');
+                    e.currentTarget.classList.remove('bg-amber-50', 'border-amber-400');
                     handleDrop(e, skill.id);
                 }}
             >
-                <div className="font-bold text-[10px] border-b border-stone-300 mb-0.5 flex justify-between bg-stone-50 px-1 items-center text-stone-700 group-hover/skill:bg-amber-50 transition-colors">
+                <div className="font-black text-[9px] uppercase tracking-tighter flex justify-between items-center text-stone-500 group-hover/skill:text-amber-700 transition-colors px-0.5">
                     <span className="truncate" title={skill.name}>{skill.name}</span>
-                    <span className="text-stone-400 text-[9px] ml-1">({count})</span>
+                    <span className="opacity-40 text-[8px]">({count})</span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                     {/* Render Imposed Specializations first (Read Only) */}
                     {imposedSpecs.map((spec, i) => (
-                        <input
-                            key={`imposed-${i}`}
-                            className="w-full bg-slate-100 border-b border-dotted border-stone-300 text-[10px] h-4 px-1 font-bold text-slate-700 focus:outline-none cursor-default font-handwriting"
-                            value={spec.name}
-                            readOnly
-                            title={`Spécialisation imposée (Niveau requis : ${spec.minLevel || 0})`}
-                        />
+                        <div key={`imp-${i}`} className="bg-slate-100 border border-slate-200 rounded-full py-0.5 px-2 flex items-center shadow-inner h-5">
+                            <div className="w-1 h-1 rounded-full bg-slate-400 mr-1.5 shrink-0"></div>
+                            <span className="text-[10px] font-bold text-slate-600 truncate leading-none" title={spec.name}>
+                                {spec.name}
+                            </span>
+                        </div>
                     ))}
 
-                    {/* Render User Specializations (Count based on dots) */}
-                    {Array.from({ length: count }).map((_, i) => (
-                        <SpecializationOmnibar
-                            key={`user-${i}`}
-                            value={userSpecs[i] || ''}
-                            onChange={(val) => updateSpecialization(skill.id, i, val)}
-                            skillId={skill.id}
-                            className="w-full"
-                        />
-                    ))}
+                    {/* Render User Specializations */}
+                    {Array.from({ length: count }).map((_, i) => {
+                        const hasValue = !!userSpecs[i];
+                        return (
+                            <div
+                                key={`user-${i}`}
+                                className={`relative flex items-center h-5 transition-all duration-200 ${hasValue
+                                    ? 'bg-amber-50 border border-amber-200 rounded-full shadow-sm'
+                                    : 'border-b border-dashed border-stone-300 hover:border-amber-400'
+                                    }`}
+                            >
+                                <SpecializationOmnibar
+                                    value={userSpecs[i] || ''}
+                                    onChange={(val) => updateSpecialization(skill.id, i, val)}
+                                    skillId={skill.id}
+                                    className="w-full"
+                                    variant="sheet"
+                                    showPlaceholder={false}
+                                />
+                                {!hasValue && (
+                                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-0 group-hover/skill:opacity-20">
+                                        <Plus size={8} className="text-stone-400" />
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         );

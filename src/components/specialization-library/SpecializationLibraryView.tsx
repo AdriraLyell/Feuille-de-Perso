@@ -179,7 +179,7 @@ const SpecializationLibraryView: React.FC = () => {
             {/* Toolbar */}
             <div className="p-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0">
                 <div className="relative flex-grow max-w-md w-full">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#5c4d41]/60" />
                     <input
                         className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:border-amber-500 outline-none text-gray-800 placeholder-gray-400 bg-white"
                         placeholder="Rechercher une spécialisation..."
@@ -206,13 +206,13 @@ const SpecializationLibraryView: React.FC = () => {
             {/* List */}
             <div className="flex-grow overflow-y-auto p-4 custom-scrollbar">
                 {library.length === 0 ? (
-                    <div className="text-center text-gray-400 py-10 italic px-4 text-sm flex flex-col items-center">
+                    <div className="text-center text-[#5c4d41]/60 py-10 italic px-4 text-sm flex flex-col items-center">
                         <Award size={48} className="opacity-20 mb-2" />
                         <p>La bibliothèque de spécialisations est vide.</p>
                         <p className="text-xs mt-2">Peuplez-la manuellement ou importez l'existant.</p>
                     </div>
                 ) : filteredLibrary.length === 0 ? (
-                    <div className="text-center text-gray-400 py-10 italic">Aucun résultat.</div>
+                    <div className="text-center text-[#5c4d41]/60 py-10 italic">Aucun résultat.</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         {filteredLibrary.map(entry => {
@@ -256,7 +256,7 @@ const SpecializationLibraryView: React.FC = () => {
                                             })}
                                         </div>
                                     </div>
-                                    <div className="mt-2 text-[10px] text-gray-400 flex justify-between items-center">
+                                    <div className="mt-2 text-[10px] text-[#5c4d41]/60 flex justify-between items-center">
                                         <span>Seuil MJ : <span className="font-bold text-amber-600">{entry.defaultMinLevel}</span></span>
                                     </div>
                                 </div>
@@ -293,7 +293,7 @@ const SpecializationLibraryView: React.FC = () => {
                             <div>
                                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Compétences associées</label>
                                 <div className="relative mb-2">
-                                    <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-[#5c4d41]/60" />
                                     <input
                                         className="w-full pl-7 pr-2 py-1 text-[11px] border border-gray-200 rounded focus:border-amber-500 outline-none"
                                         placeholder="Filtrer les compétences..."
@@ -303,7 +303,7 @@ const SpecializationLibraryView: React.FC = () => {
                                     {skillSearch && (
                                         <button
                                             onClick={() => setSkillSearch('')}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[#5c4d41]/60 hover:text-gray-600"
                                         >
                                             <X size={12} />
                                         </button>
@@ -311,7 +311,7 @@ const SpecializationLibraryView: React.FC = () => {
                                 </div>
                                 <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded p-2 bg-white custom-scrollbar">
                                     {filteredSkillsForModal.length === 0 ? (
-                                        <div className="col-span-2 text-center py-2 text-[10px] text-gray-400 italic">Aucun résultat.</div>
+                                        <div className="col-span-2 text-center py-2 text-[10px] text-[#5c4d41]/60 italic">Aucun résultat.</div>
                                     ) : filteredSkillsForModal.map(skill => (
                                         <label key={skill.id} className={`flex items-center gap-2 text-xs cursor-pointer hover:bg-gray-50 p-1 rounded transition-colors ${editingEntry.skillIds.includes(skill.id) ? 'bg-amber-50/50' : ''}`}>
                                             <input
@@ -330,7 +330,7 @@ const SpecializationLibraryView: React.FC = () => {
                                     ))}
                                 </div>
                                 {editingEntry.skillIds.length > 0 && (
-                                    <div className="mt-1 text-[9px] text-gray-400 italic">
+                                    <div className="mt-1 text-[9px] text-[#5c4d41]/60 italic">
                                         {editingEntry.skillIds.length} compétence(s) sélectionnée(s)
                                     </div>
                                 )}
@@ -346,7 +346,7 @@ const SpecializationLibraryView: React.FC = () => {
                                     value={editingEntry.defaultMinLevel}
                                     onChange={(e) => setEditingEntry({ ...editingEntry, defaultMinLevel: parseInt(e.target.value) || 0 })}
                                 />
-                                <p className="text-[10px] text-gray-400 mt-1 italic">Ce seuil sera appliqué automatiquement lors de l'ajout en mode "Imposée".</p>
+                                <p className="text-[10px] text-[#5c4d41]/60 mt-1 italic">Ce seuil sera appliqué automatiquement lors de l'ajout en mode "Imposée".</p>
                             </div>
 
                             <div>

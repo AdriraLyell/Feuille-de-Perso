@@ -3,6 +3,7 @@ import React from 'react';
 import { LibraryEntry, TraitEffect } from '../../types';
 import { Edit2, Plus, X, AlignLeft, Save, AlertCircle } from 'lucide-react';
 import TraitEffectEditor from './TraitEffectEditor';
+import ThematicModal from '../ui/ThematicModal';
 
 interface TraitFormProps {
     editForm: LibraryEntry;
@@ -42,100 +43,111 @@ const TraitForm: React.FC<TraitFormProps> = ({
     const isNew = !library.some(l => l.id === editForm.id);
 
     return (
-        <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
-
-                {/* Modal Header */}
-                <div className={`p-4 border-b flex justify-between items-center text-white ${editForm.type === 'avantage' ? 'bg-green-600' : 'bg-red-600'} transition-colors duration-300`}>
-                    <h3 className="font-bold text-lg flex items-center gap-2">
-                        {isNew ? <Plus size={20} /> : <Edit2 size={20} />}
-                        {isNew ? 'Nouveau Trait' : 'Éditer le Trait'}
-                    </h3>
-                    <button onClick={onClose} className="hover:bg-white/20 p-1 rounded transition-colors">
-                        <X size={24} />
+        <ThematicModal
+            isOpen={true}
+            onClose={onClose}
+            title={isNew ? 'Nouveau Trait' : 'Éditer le Trait'}
+            icon={isNew ? <Plus size={20} /> : <Edit2 size={20} />}
+            size="md"
+            footer={
+                <>
+                    <button
+                        onClick={onClose}
+                        className="px-5 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold transition-colors"
+                    >
+                        Annuler
                     </button>
+                    <button
+                        onClick={onSave}
+                        className={`px-6 py-2 text-white rounded-sm font-bold shadow-md flex items-center gap-2 transition-transform hover:scale-105 ${editForm.type === 'avantage' ? 'bg-[#2d5a27] hover:bg-[#1e3d1a]' : 'bg-[#8b2e2e] hover:bg-[#6a2424]'}`}
+                    >
+                        <Save size={18} />
+                        Enregistrer
+                    </button>
+                </>
+            }
+        >
+            <div className="flex flex-col gap-6 py-2">
+
+                {/* Type Switcher */}
+                <div className="flex justify-center mb-2">
+                    <div className="bg-stone-200/50 p-1 rounded-sm flex shadow-inner border border-[#bfae85]/30">
+                        <button
+                            onClick={() => setEditForm({ ...editForm, type: 'avantage' })}
+                            className={`px-6 py-2 rounded-sm text-xs font-serif font-black uppercase tracking-widest transition-all ${editForm.type === 'avantage' ? 'bg-[#2d5a27] text-white shadow-md' : 'text-[#5c4d41] hover:text-stone-800'}`}
+                        >
+                            Avantage
+                        </button>
+                        <button
+                            onClick={() => setEditForm({ ...editForm, type: 'desavantage' })}
+                            className={`px-6 py-2 rounded-sm text-xs font-serif font-black uppercase tracking-widest transition-all ${editForm.type === 'desavantage' ? 'bg-[#8b2e2e] text-white shadow-md' : 'text-[#5c4d41] hover:text-stone-800'}`}
+                        >
+                            Désavantage
+                        </button>
+                    </div>
                 </div>
 
-                <div className="flex-grow overflow-y-auto p-6 bg-gray-50 flex flex-col gap-5">
-
-                    {/* Type Switcher */}
-                    <div className="flex justify-center">
-                        <div className="bg-gray-200 p-1 rounded-lg flex shadow-inner">
-                            <button
-                                onClick={() => setEditForm({ ...editForm, type: 'avantage' })}
-                                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${editForm.type === 'avantage' ? 'bg-white text-green-700 shadow' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                Avantage
-                            </button>
-                            <button
-                                onClick={() => setEditForm({ ...editForm, type: 'desavantage' })}
-                                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${editForm.type === 'desavantage' ? 'bg-white text-red-700 shadow' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                Désavantage
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Name & Cost */}
-                    <div className="grid grid-cols-4 gap-4">
-                        <div className="col-span-3">
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Nom du Trait</label>
-                            <input
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 font-bold text-gray-900 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none placeholder-gray-400"
-                                value={editForm.name}
-                                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                placeholder="Ex: Chance, Ennemi..."
-                                autoFocus
-                            />
-                        </div>
-                        <div className="col-span-1">
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Coût</label>
-                            <input
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 font-mono text-center focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-gray-900 bg-white"
-                                value={editForm.cost}
-                                onChange={(e) => setEditForm({ ...editForm, cost: e.target.value })}
-                                placeholder="Pt"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Description */}
-                    <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1 flex items-center gap-1"><AlignLeft size={12} /> Description</label>
-                        <textarea
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white min-h-[100px] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none resize-y placeholder-gray-400"
-                            value={editForm.description}
-                            onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                            placeholder="Décrivez les effets narratifs ou les conditions d'utilisation..."
+                {/* Name & Cost */}
+                <div className="grid grid-cols-4 gap-4">
+                    <div className="col-span-3">
+                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest">Nom du Trait</label>
+                        <input
+                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm placeholder-stone-300"
+                            value={editForm.name}
+                            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                            placeholder="Ex: Chance, Ennemi..."
+                            autoFocus
                         />
                     </div>
-
-                    {/* Tags */}
-                    <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Tags (Catégories)</label>
-                        <div className="flex gap-2 mb-2">
-                            <input
-                                className="flex-grow border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:border-blue-500 outline-none"
-                                value={tagInput}
-                                onChange={(e) => setTagInput(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                                placeholder="Ajouter un tag..."
-                            />
-                            <button onClick={addTag} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-lg text-sm font-bold">
-                                +
-                            </button>
-                        </div>
-                        <div className="flex flex-wrap gap-1">
-                            {(editForm.tags || []).map(tag => (
-                                <span key={tag} className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs flex items-center gap-1 border border-blue-200">
-                                    {tag}
-                                    <button onClick={() => removeTag(tag)} className="hover:text-red-500"><X size={12} /></button>
-                                </span>
-                            ))}
-                        </div>
+                    <div className="col-span-1">
+                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest">Coût</label>
+                        <input
+                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-mono text-center focus:border-amber-500 outline-none text-[#1c1917] bg-white/50 shadow-sm font-bold"
+                            value={editForm.cost}
+                            onChange={(e) => setEditForm({ ...editForm, cost: e.target.value })}
+                            placeholder="Pt"
+                        />
                     </div>
+                </div>
 
-                    {/* Effects Section */}
+                {/* Description */}
+                <div>
+                    <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest flex items-center gap-1"><AlignLeft size={12} /> Description Narrative</label>
+                    <textarea
+                        className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-3 text-sm text-[#1c1917] bg-white/50 min-h-[100px] focus:border-amber-500 outline-none resize-y placeholder-stone-300 italic leading-relaxed shadow-sm"
+                        value={editForm.description}
+                        onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                        placeholder="Décrivez les effets narratifs ou les conditions d'utilisation..."
+                    />
+                </div>
+
+                {/* Tags */}
+                <div>
+                    <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest">Catégories (Tags)</label>
+                    <div className="flex gap-2 mb-3">
+                        <input
+                            className="flex-grow border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm"
+                            value={tagInput}
+                            onChange={(e) => setTagInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                            placeholder="Ajouter une catégorie..."
+                        />
+                        <button onClick={addTag} className="bg-stone-200 hover:bg-stone-300 text-[#5c4d41] px-4 py-2 rounded-sm text-sm font-bold transition-colors">
+                            +
+                        </button>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                        {(editForm.tags || []).map(tag => (
+                            <span key={tag} className="bg-amber-100/50 text-[#845d3e] px-2.5 py-1 rounded-sm text-[10px] font-bold flex items-center gap-1.5 border border-amber-200/50 shadow-sm">
+                                {tag}
+                                <button onClick={() => removeTag(tag)} className="hover:text-[#8b2e2e] transition-colors"><X size={12} /></button>
+                            </span>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Effects Section */}
+                <div className="border border-[#bfae85]/20 rounded-sm bg-white/30">
                     <TraitEffectEditor
                         effects={editForm.effects || []}
                         allSkills={allSkills}
@@ -144,34 +156,17 @@ const TraitForm: React.FC<TraitFormProps> = ({
                         onUpdate={updateEffect}
                         onRemove={removeEffect}
                     />
-
-                    {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-3 text-sm font-bold animate-pulse">
-                            <AlertCircle size={20} />
-                            <span>{error}</span>
-                        </div>
-                    )}
-
                 </div>
 
-                {/* Modal Footer */}
-                <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
-                    <button
-                        onClick={onClose}
-                        className="px-5 py-2 text-gray-600 hover:bg-gray-200 rounded-lg font-bold transition-colors"
-                    >
-                        Annuler
-                    </button>
-                    <button
-                        onClick={onSave}
-                        className={`px-6 py-2 text-white rounded-lg font-bold shadow-md flex items-center gap-2 transition-transform hover:scale-105 ${editForm.type === 'avantage' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
-                    >
-                        <Save size={18} />
-                        Enregistrer
-                    </button>
-                </div>
+                {error && (
+                    <div className="bg-[#8b2e2e]/5 border border-[#8b2e2e]/20 text-[#8b2e2e] px-4 py-3 rounded-sm flex items-center gap-3 text-xs font-bold animate-shake">
+                        <AlertCircle size={18} />
+                        <span>{error}</span>
+                    </div>
+                )}
+
             </div>
-        </div>
+        </ThematicModal>
     );
 };
 

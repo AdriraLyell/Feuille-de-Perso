@@ -1,12 +1,14 @@
 
 import React, { useState, useMemo } from 'react';
 import { CharacterSheetData, LibrarySkillEntry } from '../types';
-import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, X, Save, CheckCircle2, Download, AlertTriangle, HelpCircle, AlertOctagon, Award } from 'lucide-react';
+import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, X, Save, CheckCircle2, Download, AlertTriangle, HelpCircle, AlertOctagon, Award, ArrowRight } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import SpecializationLibraryView from './specialization-library/SpecializationLibraryView';
 import { useCharacter } from '../context/CharacterContext'; // Import Context
 import { useNotification } from '../context/NotificationContext';
 import { smartIncludes } from '../utils/stringUtils';
+import ThematicModal from './ui/ThematicModal';
+import { AlertCircle } from 'lucide-react';
 
 const CATEGORY_HELP = [
     { code: 'talents', label: 'Talents', loc: 'Colonne 1 (Gauche)' },
@@ -29,6 +31,7 @@ const LibraryView: React.FC = () => {
     const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
     const [editingSkill, setEditingSkill] = useState<LibrarySkillEntry | null>(null);
     const [skillError, setSkillError] = useState<string | null>(null);
+    const [showRenameConfirm, setShowRenameConfirm] = useState<{ oldName: string, newSkill: LibrarySkillEntry } | null>(null);
 
     // Import Confirmation Modal State
     const [showImportConfirm, setShowImportConfirm] = useState(false);
@@ -96,18 +99,55 @@ const LibraryView: React.FC = () => {
             return;
         }
 
-        const exists = skillsList.some(s => s.id === editingSkill.id);
-        let newLibrary;
-        if (exists) {
-            newLibrary = skillsList.map(s => s.id === editingSkill.id ? editingSkill : s);
-        } else {
-            newLibrary = [...skillsList, editingSkill];
+        const existing = skillsList.find(s => s.id === editingSkill.id);
+        const nameChanged = existing && existing.name.trim().toLowerCase() !== editingSkill.name.trim().toLowerCase();
+        const isUsed = existing && usedSkillNames.has(existing.name.trim().toLowerCase());
+
+        // If name changed and skill is used, ask for confirmation
+        if (nameChanged && isUsed) {
+            setShowRenameConfirm({ oldName: existing.name, newSkill: editingSkill });
+            return;
         }
 
-        onUpdate({ ...data, skillLibrary: newLibrary });
-        addLog(`Compétence "${editingSkill.name}" enregistrée dans la réserve.`, 'success', 'settings');
+        finalizeSaveSkill(editingSkill);
+    };
+
+    const finalizeSaveSkill = (skillToSave: LibrarySkillEntry, renameOnSheet: boolean = false) => {
+        const exists = skillsList.some(s => s.id === skillToSave.id);
+        let newLibrary;
+        if (exists) {
+            newLibrary = skillsList.map(s => s.id === skillToSave.id ? skillToSave : s);
+        } else {
+            newLibrary = [...skillsList, skillToSave];
+        }
+
+        let newData = { ...data, skillLibrary: newLibrary };
+
+        // Handle global rename on sheet if requested
+        if (renameOnSheet && showRenameConfirm) {
+            const oldName = showRenameConfirm.oldName.trim().toLowerCase();
+            const newName = skillToSave.name.trim();
+
+            const updatedSkills = { ...data.skills };
+            Object.keys(updatedSkills).forEach(cat => {
+                // @ts-ignore
+                if (Array.isArray(updatedSkills[cat])) {
+                    // @ts-ignore
+                    updatedSkills[cat] = updatedSkills[cat].map(s =>
+                        (s.name && s.name.trim().toLowerCase() === oldName)
+                            ? { ...s, name: newName }
+                            : s
+                    );
+                }
+            });
+            newData.skills = updatedSkills;
+        }
+
+        onUpdate(newData);
+        addLog(`Compétence "${skillToSave.name}" enregistrée dans la réserve.`, 'success', 'settings');
         setIsSkillModalOpen(false);
         setEditingSkill(null);
+        setShowRenameConfirm(null);
     };
 
     const handleDeleteRequest = (skill: LibrarySkillEntry) => {
@@ -160,15 +200,15 @@ const LibraryView: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-white rounded shadow-sm border border-gray-200 overflow-hidden relative">
+        <div className="flex flex-col h-full bg-[#fdfbf7] rounded-sm shadow-sm border border-[#bfae85]/50 overflow-hidden relative">
 
             {/* Tabs Header */}
             <div className="flex border-b border-gray-200 bg-gray-50 shrink-0">
                 <button
                     onClick={() => setActiveTab('traits')}
                     className={`flex-1 py-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'traits'
-                        ? 'border-blue-600 text-blue-700 bg-white'
-                        : 'border-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                        ? 'border-[#8b2e2e] text-[#8b2e2e] bg-white/50'
+                        : 'border-transparent text-gray-500 hover:bg-stone-100 hover:text-gray-700'
                         }`}
                 >
                     <BookOpen size={18} />
@@ -177,8 +217,8 @@ const LibraryView: React.FC = () => {
                 <button
                     onClick={() => setActiveTab('skills')}
                     className={`flex-1 py-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'skills'
-                        ? 'border-purple-600 text-purple-700 bg-white'
-                        : 'border-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                        ? 'border-[#5c4d41] text-[#5c4d41] bg-white/50'
+                        : 'border-transparent text-gray-500 hover:bg-stone-100 hover:text-gray-700'
                         }`}
                 >
                     <GraduationCap size={18} />
@@ -187,8 +227,8 @@ const LibraryView: React.FC = () => {
                 <button
                     onClick={() => setActiveTab('specializations')}
                     className={`flex-1 py-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'specializations'
-                        ? 'border-amber-600 text-amber-700 bg-white'
-                        : 'border-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                        ? 'border-amber-600 text-amber-700 bg-white/50'
+                        : 'border-transparent text-gray-500 hover:bg-stone-100 hover:text-gray-700'
                         }`}
                 >
                     <Award size={18} />
@@ -206,40 +246,42 @@ const LibraryView: React.FC = () => {
                 )}
 
                 {activeTab === 'skills' && (
-                    <div className="absolute inset-0 flex flex-col bg-white">
+                    <div className="absolute inset-0 flex flex-col bg-[#fdfbf7]">
                         {/* Skill Toolbar */}
-                        <div className="p-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0">
-                            <div className="relative flex-grow max-w-md w-full flex gap-2">
-                                <div className="relative flex-grow">
-                                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                    <input
-                                        className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:border-purple-500 outline-none text-gray-800 placeholder-gray-400 bg-white"
-                                        placeholder="Rechercher une compétence..."
-                                        value={skillSearch}
-                                        onChange={(e) => setSkillSearch(e.target.value)}
-                                    />
-                                </div>
-                                <button
-                                    onClick={() => setShowCategoryHelp(true)}
-                                    className="bg-white border border-gray-300 text-gray-500 hover:text-purple-600 hover:border-purple-300 px-2 rounded flex items-center justify-center transition-colors shadow-sm"
-                                    title="Aide sur les catégories"
-                                >
-                                    <HelpCircle size={18} />
-                                </button>
+                        <div className="p-3 bg-stone-100/30 border-b border-[#bfae85]/30 grid grid-cols-1 lg:grid-cols-3 items-center gap-4 shrink-0">
+                            {/* Search Bar - Left */}
+                            <div className="relative w-full max-w-sm">
+                                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
+                                <input
+                                    className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
+                                    placeholder="Rechercher une compétence..."
+                                    value={skillSearch}
+                                    onChange={(e) => setSkillSearch(e.target.value)}
+                                />
                             </div>
-                            <div className="flex gap-2 w-full sm:w-auto">
+
+                            {/* Shared Legend - Center */}
+                            <div className="flex justify-center">
+                                <div className="flex items-center gap-2 px-3 py-1 bg-green-50/50 border border-green-200/50 rounded-full w-fit">
+                                    <CheckCircle2 size={12} className="text-green-600" />
+                                    <span className="text-[10px] font-bold text-green-800/70 uppercase tracking-tight whitespace-nowrap">Présent dans la Fiche</span>
+                                </div>
+                            </div>
+
+                            {/* Actions - Right */}
+                            <div className="flex gap-2 justify-end">
                                 <button
                                     onClick={() => setShowImportConfirm(true)}
-                                    className="bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 hover:text-gray-800 px-3 py-1.5 rounded text-sm font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
+                                    className="bg-white/80 border border-[#bfae85]/50 text-[#5c4d41] hover:bg-stone-50 hover:text-[#1c1917] px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
                                     title="Ajouter toutes les compétences de la fiche à la réserve"
                                 >
-                                    <Download size={16} /> Importer de la fiche
+                                    <Download size={14} /> Importer
                                 </button>
                                 <button
                                     onClick={handleOpenNewSkill}
-                                    className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded text-sm font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
+                                    className="bg-[#5c4d41] hover:bg-[#4a3b32] text-white px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
                                 >
-                                    <Plus size={16} /> Créer
+                                    <Plus size={14} /> Créer
                                 </button>
                             </div>
                         </div>
@@ -247,16 +289,16 @@ const LibraryView: React.FC = () => {
                         {/* Skill List */}
                         <div className="flex-grow overflow-y-auto p-4 custom-scrollbar">
                             {skillsList.length === 0 ? (
-                                <div className="text-center text-gray-400 py-10 italic px-4 text-sm flex flex-col items-center">
+                                <div className="text-center text-[#5c4d41]/60 py-10 italic px-4 text-sm flex flex-col items-center">
                                     <GraduationCap size={48} className="opacity-20 mb-2" />
                                     <p>La réserve de compétences est vide.</p>
-                                    <p className="text-xs mt-2">
+                                    <p className="text-xs mt-2 text-[#5c4d41]/80 italic">
                                         Utilisez le bouton <strong>"Importer de la fiche"</strong> pour la remplir automatiquement <br />
                                         avec vos compétences actuelles.
                                     </p>
                                 </div>
                             ) : filteredSkills.length === 0 ? (
-                                <div className="text-center text-gray-400 py-10 italic">Aucune compétence trouvée.</div>
+                                <div className="text-center text-[#5c4d41]/60 py-10 italic">Aucune compétence trouvée.</div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                     {filteredSkills.map(skill => {
@@ -265,34 +307,33 @@ const LibraryView: React.FC = () => {
                                         return (
                                             <div
                                                 key={skill.id}
-                                                className={`border rounded-lg p-3 transition-all bg-white group flex flex-col justify-between ${isUsed
-                                                    ? 'border-green-200 bg-green-50/30'
-                                                    : 'border-gray-200 hover:shadow-md hover:border-purple-300'
+                                                className={`border rounded-sm p-2 group flex flex-col justify-between transition-all bg-white/60 ${isUsed
+                                                    ? 'border-green-300/40 bg-green-50/10'
+                                                    : 'border-[#bfae85]/30 hover:border-amber-400/50 hover:shadow-sm'
                                                     }`}
                                             >
-                                                <div>
-                                                    <div className="flex justify-between items-start mb-1">
-                                                        <span className={`font-bold text-sm ${isUsed ? 'text-green-800' : 'text-gray-800'}`}>
-                                                            {skill.name}
-                                                        </span>
-
-                                                        {isUsed ? (
-                                                            <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full flex items-center gap-1 font-bold border border-green-200">
-                                                                <CheckCircle2 size={10} /> Sur la fiche
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex justify-between items-center gap-2">
+                                                        <div className="flex items-center gap-1.5 min-w-0">
+                                                            {isUsed && <CheckCircle2 size={10} className="text-green-600 shrink-0" />}
+                                                            <span className={`font-serif font-black uppercase text-[11px] tracking-wide truncate ${isUsed ? 'text-green-800' : 'text-[#4a3b32]'}`}>
+                                                                {skill.name}
                                                             </span>
-                                                        ) : (
-                                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <button onClick={() => handleOpenEditSkill(skill)} className="text-blue-500 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
-                                                                <button onClick={() => handleDeleteRequest(skill)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
-                                                            </div>
-                                                        )}
+                                                        </div>
+
+                                                        <div className="flex gap-1 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity">
+                                                            <button onClick={() => handleOpenEditSkill(skill)} className="text-blue-500 hover:bg-blue-50 p-1 rounded" title="Éditer"><Edit2 size={12} /></button>
+                                                            {!isUsed && (
+                                                                <button onClick={() => handleDeleteRequest(skill)} className="text-red-500 hover:bg-red-50 p-1 rounded" title="Supprimer"><Trash2 size={12} /></button>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                     {skill.description && (
-                                                        <p className="text-xs text-gray-500 line-clamp-2" title={skill.description}>{skill.description}</p>
+                                                        <p className="text-[10px] text-[#5c4d41] italic line-clamp-1 leading-tight opacity-70" title={skill.description}>{skill.description}</p>
                                                     )}
                                                 </div>
                                                 {skill.defaultCategory && (
-                                                    <span className="text-[9px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded self-start mt-2">
+                                                    <span className="text-[8px] text-amber-800/50 font-mono bg-amber-100/20 px-1 py-0.5 rounded-sm self-start mt-1 border border-amber-200/10">
                                                         {skill.defaultCategory}
                                                     </span>
                                                 )}
@@ -311,44 +352,6 @@ const LibraryView: React.FC = () => {
             </div>
 
             {/* Category Help Modal */}
-            {
-                showCategoryHelp && (
-                    <div className="fixed inset-0 z-[130] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in zoom-in duration-200">
-                            <div className="p-4 border-b border-gray-200 bg-purple-50 flex justify-between items-center">
-                                <h3 className="font-bold text-purple-900 flex items-center gap-2">
-                                    <HelpCircle size={20} /> Codes des Catégories
-                                </h3>
-                                <button onClick={() => setShowCategoryHelp(false)} className="text-gray-400 hover:text-gray-700 p-1 rounded"><X size={20} /></button>
-                            </div>
-                            <div className="p-0 overflow-hidden">
-                                <table className="w-full text-sm text-left">
-                                    <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
-                                        <tr>
-                                            <th className="px-4 py-3 font-bold">Code Technique</th>
-                                            <th className="px-4 py-3 font-bold">Emplacement sur la fiche</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        {CATEGORY_HELP.map((cat, i) => (
-                                            <tr key={i} className="hover:bg-gray-50">
-                                                <td className="px-4 py-2 font-mono text-purple-700 font-bold text-xs">{cat.code}</td>
-                                                <td className="px-4 py-2 text-gray-700">
-                                                    <div className="font-bold">{cat.label}</div>
-                                                    <div className="text-[10px] text-gray-400">{cat.loc}</div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div className="p-3 bg-gray-50 text-xs text-gray-500 border-t border-gray-200">
-                                Ces codes permettent de trier automatiquement les compétences lorsqu'elles sont importées sur la fiche.
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
 
             {/* Delete Confirmation Modal */}
             {
@@ -363,7 +366,7 @@ const LibraryView: React.FC = () => {
                                 <div className="bg-gray-50 p-3 rounded border border-gray-200 mb-4">
                                     <span className="block font-bold text-gray-800 text-lg">{skillToDelete.name}</span>
                                 </div>
-                                <p className="text-gray-500 text-sm leading-relaxed">
+                                <p className="text-[#5c4d41] text-sm leading-relaxed">
                                     Cette action est irréversible. La compétence sera retirée de la réserve.
                                 </p>
                             </div>
@@ -426,51 +429,167 @@ const LibraryView: React.FC = () => {
             {/* Skill Edit Modal */}
             {
                 isSkillModalOpen && editingSkill && (
-                    <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
-                            <div className="p-4 border-b flex justify-between items-center text-white bg-purple-700">
-                                <h3 className="font-bold text-lg flex items-center gap-2">
-                                    <GraduationCap size={20} />
-                                    {skillsList.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence'}
-                                </h3>
-                                <button onClick={() => setIsSkillModalOpen(false)} className="hover:bg-white/20 p-1 rounded transition-colors">
-                                    <X size={24} />
+                    <ThematicModal
+                        isOpen={isSkillModalOpen}
+                        onClose={() => setIsSkillModalOpen(false)}
+                        title={skillsList.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence'}
+                        icon={<GraduationCap size={20} />}
+                        size={showCategoryHelp ? 'lg' : 'md'}
+                        footer={
+                            <>
+                                <button onClick={() => setIsSkillModalOpen(false)} className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold">Annuler</button>
+                                <button onClick={handleSaveSkill} className="px-6 py-2 bg-[#5c4d41] text-white rounded-sm font-bold shadow-md hover:bg-[#4a3b32] flex items-center gap-2">
+                                    <Save size={16} /> Enregistrer
                                 </button>
-                            </div>
-
-                            <div className="p-6 bg-gray-50 flex flex-col gap-4">
+                            </>
+                        }
+                    >
+                        <div className="flex flex-col lg:flex-row gap-8 py-2">
+                            {/* Editor Form */}
+                            <div className="flex-grow flex flex-col gap-5">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom</label>
+                                    <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Nom de la compétence</label>
                                     <input
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 font-bold text-gray-900 bg-white focus:border-purple-500 outline-none"
+                                        className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm"
                                         value={editingSkill.name}
                                         onChange={(e) => setEditingSkill({ ...editingSkill, name: e.target.value })}
                                         autoFocus
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description (Optionnelle)</label>
+                                    <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Description (Narrative)</label>
                                     <textarea
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white min-h-[80px] focus:border-purple-500 outline-none resize-none"
+                                        className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-3 text-sm text-[#1c1917] bg-white/50 min-h-[120px] focus:border-amber-500 outline-none resize-none shadow-sm italic leading-relaxed"
                                         value={editingSkill.description || ''}
                                         onChange={(e) => setEditingSkill({ ...editingSkill, description: e.target.value })}
                                     />
                                 </div>
+                                <div>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase tracking-widest">Catégorie de placement par défaut</label>
+                                        {!showCategoryHelp && (
+                                            <button
+                                                onClick={() => setShowCategoryHelp(true)}
+                                                className="text-[#5c4d41] hover:text-[#8b2e2e] transition-colors flex items-center gap-1 text-[9px] font-bold"
+                                                title="Voir l'aide sur les catégories"
+                                            >
+                                                <HelpCircle size={14} /> Aide
+                                            </button>
+                                        )}
+                                    </div>
+                                    <select
+                                        className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm font-bold"
+                                        value={editingSkill.defaultCategory || ''}
+                                        onChange={(e) => setEditingSkill({ ...editingSkill, defaultCategory: e.target.value })}
+                                    >
+                                        <option value="">-- Placement libre --</option>
+                                        {CATEGORY_HELP.map(cat => (
+                                            <option key={cat.code} value={cat.code}>{cat.label}</option>
+                                        ))}
+                                    </select>
+                                    <p className="text-[10px] text-[#5c4d41] mt-1.5 italic px-1">Définit dans quelle section de la fiche cette compétence sera rangée lors de l'importation.</p>
+                                </div>
                                 {skillError && (
-                                    <div className="bg-red-50 text-red-600 text-xs p-2 rounded border border-red-200 font-bold">
-                                        {skillError}
+                                    <div className="bg-red-50 text-red-800 text-[11px] p-3 rounded-sm border border-red-200 font-bold flex items-center gap-2 animate-shake">
+                                        <AlertOctagon size={16} /> {skillError}
                                     </div>
                                 )}
                             </div>
 
-                            <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
-                                <button onClick={() => setIsSkillModalOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded font-bold">Annuler</button>
-                                <button onClick={handleSaveSkill} className="px-6 py-2 bg-purple-600 text-white rounded font-bold shadow-md hover:bg-purple-700 flex items-center gap-2">
-                                    <Save size={16} /> Enregistrer
+                            {/* Side Help Panel */}
+                            {showCategoryHelp && (
+                                <div className="w-full lg:w-72 shrink-0 animate-in slide-in-from-right-4 duration-300">
+                                    <div className="flex justify-between items-center mb-2 border-b border-[#bfae85]/30 pb-1">
+                                        <span className="text-[10px] font-serif font-black uppercase text-[#8b2e2e] tracking-widest flex items-center gap-1">
+                                            <HelpCircle size={12} /> Aide aux catégories
+                                        </span>
+                                        <button
+                                            onClick={() => setShowCategoryHelp(false)}
+                                            className="text-[#5c4d41] hover:text-[#8b2e2e] p-0.5 rounded"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </div>
+                                    <div className="p-0 overflow-hidden bg-white/30 rounded-sm border border-[#bfae85]/30 relative">
+                                        <table className="w-full text-[10px] text-left border-collapse">
+                                            <thead className="bg-[#fdfbf7] border-b border-[#bfae85]/50 transition-colors">
+                                                <tr>
+                                                    <th className="px-3 py-2 font-black tracking-widest text-[#8b2e2e]">Code</th>
+                                                    <th className="px-3 py-2 font-black tracking-widest text-[#8b2e2e]">Emplacement</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-[#bfae85]/20">
+                                                {CATEGORY_HELP.map((cat, i) => (
+                                                    <tr key={i} className="hover:bg-amber-50/30 transition-colors">
+                                                        <td className="px-3 py-1.5 font-mono text-[#8b2e2e] font-bold">{cat.code}</td>
+                                                        <td className="px-3 py-1.5 text-[#4a3b32]">
+                                                            <div className="font-bold leading-tight">{cat.label}</div>
+                                                            <div className="text-[8px] text-[#5c4d41]/70 italic leading-tight">{cat.loc}</div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p className="mt-3 text-[9px] text-[#5c4d41]/70 leading-relaxed italic border-l-2 border-[#bfae85]/30 pl-2">
+                                        Conseil : Copiez-collez le code technique exact pour un tri automatique parfait.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </ThematicModal>
+                )
+            }
+
+            {/* Rename Confirmation Modal */}
+            {
+                showRenameConfirm && (
+                    <ThematicModal
+                        isOpen={!!showRenameConfirm}
+                        onClose={() => setShowRenameConfirm(null)}
+                        title="Renommer la compétence ?"
+                        icon={<AlertTriangle size={24} className="text-[#8b2e2e]" />}
+                        size="md"
+                        footer={
+                            <>
+                                <button
+                                    onClick={() => setShowRenameConfirm(null)}
+                                    className="flex-1 px-4 py-2 border border-[#bfae85]/50 rounded-sm text-[#5c4d41] font-bold hover:bg-stone-200/50 transition-colors"
+                                >
+                                    Non, annuler
                                 </button>
+                                <button
+                                    onClick={() => finalizeSaveSkill(showRenameConfirm.newSkill, true)}
+                                    className="flex-1 px-4 py-2 bg-[#8b2e2e] text-white rounded-sm font-bold shadow-md hover:bg-[#6a2424] transition-colors"
+                                >
+                                    Oui, renommer partout
+                                </button>
+                            </>
+                        }
+                    >
+                        <div className="flex flex-col items-center text-center space-y-5 py-4">
+                            <div className="w-16 h-16 bg-[#8b2e2e]/10 text-[#8b2e2e] rounded-full flex items-center justify-center shadow-inner">
+                                <Edit2 size={32} />
+                            </div>
+                            <div className="space-y-3">
+                                <p className="text-sm text-[#5c4d41] leading-relaxed max-w-sm">
+                                    Cette modification sera répercutée sur **toutes les instances** de cette compétence présentes sur votre fiche.
+                                </p>
+                                <div className="flex items-center justify-center gap-3 text-sm font-serif bg-stone-100/50 px-4 py-2 rounded-sm border border-[#bfae85]/30">
+                                    <span className="line-through text-red-700/60 opacity-60 uppercase tracking-wider">{showRenameConfirm.oldName}</span>
+                                    <ArrowRight size={14} className="text-[#bfae85]" />
+                                    <span className="font-black text-green-800 uppercase tracking-widest">{showRenameConfirm.newSkill.name}</span>
+                                </div>
+                            </div>
+
+                            <div className="bg-amber-50/50 border border-amber-200/50 p-4 rounded-sm flex gap-3 text-left">
+                                <AlertCircle className="text-amber-700 shrink-0" size={18} />
+                                <p className="text-[10px] text-amber-900 leading-tight">
+                                    <strong>Notes :</strong> Vos points acquis, l'expérience dépensée et les spécialisations déjà saisies seront intégralement conservés sous le nouveau nom.
+                                </p>
                             </div>
                         </div>
-                    </div>
+                    </ThematicModal>
                 )
             }
         </div >

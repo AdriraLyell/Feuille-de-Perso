@@ -13,6 +13,8 @@ interface SpecializationOmnibarProps {
     placeholder?: string;
     className?: string;
     skillId?: string; // Si fourni, filtre les suggestions pour cette compétence
+    variant?: 'default' | 'sheet';
+    showPlaceholder?: boolean;
 }
 
 const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
@@ -22,7 +24,9 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
     onBlur,
     placeholder = "Saisir une spécialisation...",
     className = "",
-    skillId
+    skillId,
+    variant = 'default',
+    showPlaceholder = true
 }) => {
     const data = useCharacterData();
     const [isOpen, setIsOpen] = useState(false);
@@ -91,8 +95,11 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
                         if (onBlur) onBlur(value);
                     }}
                     onKeyDown={handleKeyDown}
-                    placeholder={placeholder}
-                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:border-amber-500 outline-none transition-colors"
+                    placeholder={showPlaceholder ? placeholder : ""}
+                    className={variant === 'sheet'
+                        ? "w-full bg-transparent border-none text-[10px] h-4 px-1 focus:outline-none font-handwriting text-amber-900 placeholder-transparent"
+                        : "w-full border border-[#bfae85]/50 bg-[#fefaf2] rounded-sm px-2 py-1 text-sm text-[#1c1917] font-bold focus:border-amber-600 outline-none transition-colors shadow-sm placeholder-[#bfae85]/60"
+                    }
                 />
                 {suggestions.length > 0 && isOpen && (
                     <div className="absolute z-[100] left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-100">

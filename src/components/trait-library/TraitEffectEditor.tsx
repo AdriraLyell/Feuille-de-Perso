@@ -21,15 +21,15 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
     onRemove
 }) => {
     return (
-        <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 shadow-sm">
+        <div className="p-4 bg-stone-100/5 backdrop-blur-sm">
             <div className="flex justify-between items-center mb-4">
-                <h5 className="font-bold text-amber-900 text-sm flex items-center gap-2">
-                    <Zap size={16} className="text-amber-600 fill-amber-600" />
-                    Effets Mécaniques (Automatisés)
+                <h5 className="font-serif font-black uppercase text-[10px] text-[#bfae85] tracking-widest flex items-center gap-2">
+                    <Zap size={14} className="text-amber-600/60" />
+                    Effets Mécaniques
                 </h5>
                 <button
                     onClick={onAdd}
-                    className="text-xs bg-white border border-amber-300 hover:bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-bold transition-colors shadow-sm"
+                    className="text-[10px] bg-white/50 border border-[#bfae85]/30 hover:bg-amber-50 text-[#5c4d41] px-3 py-1 rounded-sm font-bold transition-colors shadow-sm"
                 >
                     + Ajouter
                 </button>
@@ -49,20 +49,20 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                     let bgColor = 'bg-white';
 
                     if (effect.type === 'xp_bonus') {
-                        typeIcon = <Star size={16} />;
-                        themeColor = 'text-amber-700';
-                        borderColor = 'border-amber-300';
-                        bgColor = 'bg-amber-50/50';
+                        typeIcon = <Star size={14} />;
+                        themeColor = 'text-amber-800';
+                        borderColor = 'border-amber-400/30';
+                        bgColor = 'bg-amber-50/40';
                     } else if (effect.type === 'free_skill_rank') {
-                        typeIcon = <GraduationCap size={16} />;
-                        themeColor = 'text-blue-700';
-                        borderColor = 'border-blue-300';
-                        bgColor = 'bg-blue-50/50';
+                        typeIcon = <GraduationCap size={14} />;
+                        themeColor = 'text-blue-800';
+                        borderColor = 'border-blue-400/30';
+                        bgColor = 'bg-blue-50/40';
                     } else if (effect.type === 'attribute_bonus') {
-                        typeIcon = <Dumbbell size={16} />;
-                        themeColor = 'text-rose-700';
-                        borderColor = 'border-rose-300';
-                        bgColor = 'bg-rose-50/50';
+                        typeIcon = <Dumbbell size={14} />;
+                        themeColor = 'text-[#8b2e2e]';
+                        borderColor = 'border-[#8b2e2e]/30';
+                        bgColor = 'bg-[#8b2e2e]/5';
                     }
 
                     return (
@@ -96,66 +96,66 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                             <div className="p-3">
                                 {effect.type === 'xp_bonus' ? (
                                     <div className="flex items-center gap-2">
-                                        <span className="text-xs font-bold text-gray-500">Montant XP :</span>
+                                        <span className="text-[10px] font-bold text-[#5c4d41] uppercase tracking-wide">Montant XP :</span>
                                         <input
                                             type="number"
-                                            className="flex-grow border border-gray-300 rounded px-2 py-1 text-sm font-mono text-center focus:border-amber-500 outline-none"
+                                            className="flex-grow border border-[#bfae85]/30 rounded-sm px-2 py-1 text-sm font-mono text-center focus:border-amber-500 outline-none bg-white/80 text-[#1c1917] font-bold"
                                             placeholder="0"
                                             value={effect.value}
                                             onChange={(e) => onUpdate(effect.id, 'value', parseInt(e.target.value) || 0)}
                                         />
                                     </div>
                                 ) : effect.type === 'free_skill_rank' ? (
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <div className="grid grid-cols-3 gap-3">
                                         <div className="col-span-2">
-                                            <label className="block text-[10px] font-bold text-gray-400 mb-0.5 uppercase">Compétence Ciblée</label>
+                                            <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest">Compétence</label>
                                             <div className="relative">
                                                 <select
-                                                    className="w-full text-xs border border-gray-300 rounded px-2 py-1.5 appearance-none focus:border-blue-500 outline-none bg-white text-gray-900"
+                                                    className="w-full text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1.5 appearance-none focus:border-blue-500 outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm"
                                                     value={effect.target || ''}
                                                     onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
                                                 >
-                                                    <option value="" className="text-gray-400">-- Choisir --</option>
+                                                    <option value="" className="text-stone-300">-- Choisir --</option>
                                                     {allSkills.map(s => (
-                                                        <option key={s.id} value={s.name} className="text-gray-900 bg-white">{s.name}</option>
+                                                        <option key={s.id} value={s.name}>{s.name}</option>
                                                     ))}
                                                 </select>
-                                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" />
+                                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-blue-800/40" />
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="block text-[10px] font-bold text-gray-400 mb-0.5 uppercase">Rang Max</label>
+                                            <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest text-center">Rang Offert</label>
                                             <input
                                                 type="number"
-                                                className="w-full text-xs border border-gray-300 rounded px-2 py-1.5 text-center focus:border-blue-500 outline-none"
+                                                className="w-full text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1.5 text-center focus:border-blue-500 outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm font-mono"
                                                 value={effect.value}
                                                 onChange={(e) => onUpdate(effect.id, 'value', parseInt(e.target.value) || 0)}
                                             />
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <div className="grid grid-cols-3 gap-3">
                                         <div className="col-span-2">
-                                            <label className="block text-[10px] font-bold text-gray-400 mb-0.5 uppercase">Attribut Ciblé</label>
+                                            <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest">Attribut</label>
                                             <div className="relative">
                                                 <select
-                                                    className="w-full text-xs border border-gray-300 rounded px-2 py-1.5 appearance-none focus:border-rose-500 outline-none bg-white text-gray-900"
+                                                    className="w-full text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1.5 appearance-none focus:border-[#8b2e2e] outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm"
                                                     value={effect.target || ''}
                                                     onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
                                                 >
-                                                    <option value="" className="text-gray-400">-- Choisir --</option>
+                                                    <option value="" className="text-stone-300">-- Choisir --</option>
                                                     {allAttributes.map(a => (
-                                                        <option key={a.id} value={a.name} className="text-gray-900 bg-white">{a.name}</option>
+                                                        <option key={a.id} value={a.name}>{a.name}</option>
                                                     ))}
                                                 </select>
-                                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" />
+                                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-[#8b2e2e]/40" />
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="block text-[10px] font-bold text-gray-400 mb-0.5 uppercase">Bonus (+)</label>
+                                            <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest text-center">Bonus (+)</label>
                                             <input
                                                 type="number"
-                                                className="w-full text-xs border border-gray-300 rounded px-2 py-1.5 text-center focus:border-rose-500 outline-none"
+                                                className="w-full text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1.5 text-center focus:border-[#8b2e2e] outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm font-mono"
                                                 value={effect.value}
                                                 onChange={(e) => onUpdate(effect.id, 'value', parseInt(e.target.value) || 0)}
                                             />

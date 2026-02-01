@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { CharacterSheetData } from '../../types';
-import { Sliders, List, PieChart, CreditCard, Info } from 'lucide-react';
+import { Sliders, List, PieChart, CreditCard, Info, AlertCircle } from 'lucide-react';
 
 interface CreationConfigEditorProps {
     data: CharacterSheetData;
@@ -23,7 +23,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
         });
         onAddLog(`Config Création modifiée : ${field}`, 'info', 'settings');
     };
-    
+
     const updatePointsBuckets = (bucket: 'attributes' | 'skills' | 'backgrounds', value: number) => {
         onUpdate({
             ...data,
@@ -36,7 +36,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
             }
         });
     };
-    
+
     const updateCardConfig = (field: string, value: any) => {
         onUpdate({
             ...data,
@@ -65,29 +65,29 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
 
     return (
         <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            
+
             {/* Configuration Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                
+
                 {/* General Settings */}
-                <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
-                    <h4 className="font-bold text-gray-800 border-b pb-2 mb-4 flex items-center gap-2">
-                        <Sliders size={18} /> Paramètres de Création
+                <div className="bg-[#fdfbf7]/80 backdrop-blur-sm p-6 rounded-sm shadow-md border border-[#bfae85]/30">
+                    <h4 className="font-bold text-[#5c4d41] border-b border-[#bfae85]/30 pb-2 mb-4 flex items-center gap-2 uppercase tracking-widest text-sm">
+                        <Sliders size={18} className="text-[#8b2e2e]" /> Paramètres de Création
                     </h4>
-                    
+
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Méthode de Création</label>
-                            <div className="flex bg-gray-100 p-1 rounded-lg">
-                                <button 
+                            <label className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest mb-1.5">Méthode de Création</label>
+                            <div className="flex bg-stone-200/50 p-1 rounded-sm border border-stone-300/30">
+                                <button
                                     onClick={() => updateCreationConfig('mode', 'rangs')}
-                                    className={`flex-1 py-1.5 text-sm font-bold rounded-md transition-all ${config.mode === 'rangs' ? 'bg-white text-blue-700 shadow' : 'text-gray-500 hover:text-gray-700'}`}
+                                    className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-sm transition-all ${config.mode === 'rangs' ? 'bg-[#8b2e2e] text-white shadow-md' : 'text-[#5c4d41]/60 hover:text-[#5c4d41]'}`}
                                 >
                                     Par Rangs
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => updateCreationConfig('mode', 'points')}
-                                    className={`flex-1 py-1.5 text-sm font-bold rounded-md transition-all ${config.mode === 'points' ? 'bg-white text-blue-700 shadow' : 'text-gray-500 hover:text-gray-700'}`}
+                                    className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-sm transition-all ${config.mode === 'points' ? 'bg-[#8b2e2e] text-white shadow-md' : 'text-[#5c4d41]/60 hover:text-[#5c4d41]'}`}
                                 >
                                     Par Points (XP)
                                 </button>
@@ -98,17 +98,17 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                             <div className="space-y-4">
                                 {/* Sub-mode selector */}
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Type de Répartition</label>
-                                    <div className="flex bg-gray-100 p-1 rounded-lg">
-                                        <button 
+                                    <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-tighter">Type de Répartition</label>
+                                    <div className="flex bg-stone-200/50 p-1 rounded-sm border border-stone-300/30">
+                                        <button
                                             onClick={() => updateCreationConfig('pointsDistributionMode', 'global')}
-                                            className={`flex-1 py-1 text-xs font-bold rounded-md transition-all ${(!config.pointsDistributionMode || config.pointsDistributionMode === 'global') ? 'bg-white text-blue-600 shadow' : 'text-gray-500 hover:text-gray-700'}`}
+                                            className={`flex-1 py-1 text-[9px] font-bold uppercase rounded-sm transition-all ${(!config.pointsDistributionMode || config.pointsDistributionMode === 'global') ? 'bg-[#5c4d41] text-white shadow-sm' : 'text-[#5c4d41]/60 hover:text-[#5c4d41]'}`}
                                         >
                                             Pot Commun
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={() => updateCreationConfig('pointsDistributionMode', 'buckets')}
-                                            className={`flex-1 py-1 text-xs font-bold rounded-md transition-all ${config.pointsDistributionMode === 'buckets' ? 'bg-white text-blue-600 shadow' : 'text-gray-500 hover:text-gray-700'}`}
+                                            className={`flex-1 py-1 text-[9px] font-bold uppercase rounded-sm transition-all ${config.pointsDistributionMode === 'buckets' ? 'bg-[#5c4d41] text-white shadow-sm' : 'text-[#5c4d41]/60 hover:text-[#5c4d41]'}`}
                                         >
                                             Budgets Séparés
                                         </button>
@@ -118,8 +118,8 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                 {(!config.pointsDistributionMode || config.pointsDistributionMode === 'global') ? (
                                     <div className="animate-in fade-in slide-in-from-top-2">
                                         <label className="block text-sm font-bold text-gray-700 mb-1">XP de Départ (Global)</label>
-                                        <input 
-                                            type="number" 
+                                        <input
+                                            type="number"
                                             value={config.startingXP || 0}
                                             onChange={(e) => updateCreationConfig('startingXP', parseInt(e.target.value) || 0)}
                                             className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none font-mono font-bold text-lg"
@@ -129,8 +129,8 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                     <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
                                         <div>
                                             <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">XP Attributs</label>
-                                            <input 
-                                                type="number" 
+                                            <input
+                                                type="number"
                                                 value={config.pointsBuckets?.attributes || 0}
                                                 onChange={(e) => updatePointsBuckets('attributes', parseInt(e.target.value) || 0)}
                                                 className="w-full border border-gray-300 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
@@ -138,8 +138,8 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                         </div>
                                         <div>
                                             <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">XP Compétences</label>
-                                            <input 
-                                                type="number" 
+                                            <input
+                                                type="number"
                                                 value={config.pointsBuckets?.skills || 0}
                                                 onChange={(e) => updatePointsBuckets('skills', parseInt(e.target.value) || 0)}
                                                 className="w-full border border-gray-300 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
@@ -147,8 +147,8 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                         </div>
                                         <div>
                                             <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">XP Arrière-plans</label>
-                                            <input 
-                                                type="number" 
+                                            <input
+                                                type="number"
                                                 value={config.pointsBuckets?.backgrounds || 0}
                                                 onChange={(e) => updatePointsBuckets('backgrounds', parseInt(e.target.value) || 0)}
                                                 className="w-full border border-gray-300 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
@@ -163,8 +163,8 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                             <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Pts Attributs</label>
-                                    <input 
-                                        type="number" 
+                                    <input
+                                        type="number"
                                         value={config.attributePoints || 0}
                                         onChange={(e) => updateCreationConfig('attributePoints', parseInt(e.target.value) || 0)}
                                         className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
@@ -172,8 +172,8 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1">Pts Arr. Plans</label>
-                                    <input 
-                                        type="number" 
+                                    <input
+                                        type="number"
                                         value={config.backgroundPoints || 0}
                                         onChange={(e) => updateCreationConfig('backgroundPoints', parseInt(e.target.value) || 0)}
                                         className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
@@ -182,23 +182,23 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                             </div>
                         )}
 
-                        <div className="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded border border-gray-200">
+                        <div className="grid grid-cols-2 gap-4 bg-[#bfae85]/10 p-3 rounded-sm border border-[#bfae85]/30">
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Attr. Min (Défaut -2)</label>
-                                <input 
-                                    type="number" 
+                                <label className="block text-[10px] font-bold text-[#5c4d41]/60 mb-1 uppercase tracking-widest">Attr. Min</label>
+                                <input
+                                    type="number"
                                     value={config.attributeMin ?? -2}
                                     onChange={(e) => updateCreationConfig('attributeMin', parseInt(e.target.value))}
-                                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-blue-500 outline-none"
+                                    className="w-full border border-[#bfae85]/40 rounded-sm px-2 py-1 text-xs focus:border-[#8b2e2e] outline-none bg-white font-bold text-[#2c241b]"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Attr. Max (Défaut 3)</label>
-                                <input 
-                                    type="number" 
+                                <label className="block text-[10px] font-bold text-[#5c4d41]/60 mb-1 uppercase tracking-widest">Attr. Max</label>
+                                <input
+                                    type="number"
                                     value={config.attributeMax ?? 3}
                                     onChange={(e) => updateCreationConfig('attributeMax', parseInt(e.target.value))}
-                                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-blue-500 outline-none"
+                                    className="w-full border border-[#bfae85]/40 rounded-sm px-2 py-1 text-xs focus:border-[#8b2e2e] outline-none bg-white font-bold text-[#2c241b]"
                                 />
                             </div>
                         </div>
@@ -219,7 +219,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                     <div key={rank} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
                                         <span className="font-bold text-gray-600">Rang {rank}</span>
                                         <div className="flex items-center gap-2">
-                                            <input 
+                                            <input
                                                 type="number"
                                                 // @ts-ignore
                                                 value={config.rankSlots[rank] || 0}
@@ -268,43 +268,43 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
             </div>
 
             {/* Separator */}
-            <hr className="border-gray-200" />
+            <hr className="border-[#bfae85]/30 mx-10" />
 
             {/* Card System Configuration - INDEPENDENT FROM CREATION MODE */}
-            <div className="bg-white p-6 rounded-xl shadow border border-gray-200">
-                <div className="flex items-center justify-between border-b pb-2 mb-4">
-                    <h4 className="font-bold text-gray-800 flex items-center gap-2">
-                        <CreditCard size={18} /> Système de Carte (Calcul Automatique)
+            <div className="bg-[#fdfbf7]/80 backdrop-blur-sm p-6 rounded-sm shadow-md border border-[#bfae85]/30">
+                <div className="flex items-center justify-between border-b border-[#bfae85]/30 pb-2 mb-4">
+                    <h4 className="font-bold text-[#5c4d41] flex items-center gap-2 uppercase tracking-widest text-sm">
+                        <CreditCard size={18} className="text-[#8b2e2e]" /> Système de Carte
                     </h4>
                     <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-gray-500">{config.cardConfig?.active ? 'ACTIF' : 'INACTIF'}</span>
-                        <button 
+                        <span className="text-[10px] font-black text-[#5c4d41]/40 tracking-widest">{config.cardConfig?.active ? 'ACTIF' : 'INACTIF'}</span>
+                        <button
                             onClick={() => updateCardConfig('active', !config.cardConfig?.active)}
-                            className={`w-10 h-5 rounded-full p-0.5 transition-colors ${config.cardConfig?.active ? 'bg-blue-500' : 'bg-gray-300'}`}
+                            className={`w-10 h-5 rounded-full p-0.5 transition-colors ${config.cardConfig?.active ? 'bg-[#166534]' : 'bg-stone-300'}`}
                         >
-                            <div className={`bg-white w-4 h-4 rounded-full shadow transform transition-transform ${config.cardConfig?.active ? 'translate-x-5' : ''}`} />
+                            <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${config.cardConfig?.active ? 'translate-x-5' : ''}`} />
                         </button>
                     </div>
                 </div>
 
-                <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 transition-opacity ${config.cardConfig?.active ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
+                <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 transition-opacity ${config.cardConfig?.active ? 'opacity-100' : 'opacity-40 pointer-events-none grayscale'}`}>
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Compétences à retenir</label>
+                        <label className="block text-[10px] font-bold text-[#bfae85] mb-1 uppercase tracking-tighter">Compétences retenues</label>
                         <div className="flex items-center gap-2">
-                            <input 
+                            <input
                                 type="number"
                                 value={config.cardConfig?.bestSkillsCount ?? 6}
                                 onChange={(e) => updateCardConfig('bestSkillsCount', parseInt(e.target.value))}
-                                className="w-full border border-gray-300 rounded px-3 py-2 focus:border-blue-500 outline-none"
+                                className="w-full border border-[#bfae85]/40 rounded-sm px-3 py-1.5 focus:border-[#8b2e2e] outline-none bg-white font-bold"
                             />
                             <div title="Nombre de meilleures compétences utilisées pour la moyenne">
-                                <Info size={16} className="text-gray-400" />
+                                <Info size={16} className="text-[#bfae85]" />
                             </div>
                         </div>
                     </div>
                     <div>
                         <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Incrément par Palier</label>
-                        <input 
+                        <input
                             type="number"
                             step="0.1"
                             value={config.cardConfig?.increment ?? 0.5}
@@ -314,7 +314,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                     </div>
                     <div>
                         <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Seuil de Base (Valet)</label>
-                        <input 
+                        <input
                             type="number"
                             step="0.1"
                             value={config.cardConfig?.baseStart ?? 2}
