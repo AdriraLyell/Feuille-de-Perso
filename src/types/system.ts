@@ -4,16 +4,16 @@ import { TraitEffect } from './primitives';
 export interface CreationConfig {
   active: boolean;
   mode: 'points' | 'rangs';
-  
+
   // Pour le mode Points (XP)
   pointsDistributionMode?: 'global' | 'buckets'; // Nouveau : Choix du type de répartition
   startingXP: number; // Utilisé si 'global'
   pointsBuckets?: { // Utilisé si 'buckets'
-      attributes: number;
-      skills: number;
-      backgrounds: number;
+    attributes: number;
+    skills: number;
+    backgrounds: number;
   };
-  
+
   // Pour le mode Rangs
   attributePoints: number; // Points à dépenser dans les attributs
   attributeCost: number; // Coût en XP par point d'attribut (défaut 6)
@@ -30,16 +30,17 @@ export interface CreationConfig {
 
   // Configuration pour le calcul de la Carte
   cardConfig: {
-      active: boolean;
-      bestSkillsCount: number; // Défaut 6
-      increment: number; // Défaut 0.5
-      baseStart: number; // Défaut 2
+    active: boolean;
+    bestSkillsCount: number; // Défaut 6
+    increment: number; // Défaut 0.5
+    baseStart: number; // Défaut 2
   };
 }
 
 export interface ThemeConfig {
-    creationColor: string; // Couleur des points "acquis à la création"
-    xpColor: string;       // Couleur des points "acquis par XP"
+  creationColor: string; // Couleur des points "acquis à la création"
+  xpColor: string;       // Couleur des points "acquis par XP"
+  dotSymbol?: string;    // Forme des points de notation
 }
 
 export interface ExperienceData {
@@ -69,10 +70,19 @@ export interface LibraryEntry {
 
 // Nouveau : Entrée pour la réserve de compétences
 export interface LibrarySkillEntry {
-    id: string;
-    name: string;
-    description?: string;
-    defaultCategory?: string; // Hint for auto-placement (optional)
+  id: string;
+  name: string;
+  description?: string;
+  defaultCategory?: string; // Hint for auto-placement (optional)
+}
+
+// Nouveau : Entrée pour le catalogue des spécialisations
+export interface LibrarySpecializationEntry {
+  id: string;
+  name: string;
+  skillIds: string[];      // IDs des compétences parentes (ex: "competences_armes_feu")
+  defaultMinLevel: number; // Seuil minimum par défaut (0-5)
+  description?: string;
 }
 
 export interface LogEntry {
@@ -85,13 +95,13 @@ export interface LogEntry {
 }
 
 export interface ChangelogEntry {
-    version: string;
-    date: string;
-    changes: string[];
-    type: 'major' | 'minor' | 'patch';
+  version: string;
+  date: string;
+  changes: string[];
+  type: 'major' | 'minor' | 'patch';
 }
 
 export interface BonusInfo {
-    value: number;
-    sources: string[];
+  value: number;
+  sources: string[];
 }

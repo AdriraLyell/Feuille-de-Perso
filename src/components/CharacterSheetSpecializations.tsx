@@ -1,7 +1,10 @@
 
-import React from 'react';
 import { useCharacter } from '../context/CharacterContext';
 import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../types';
+import SpecializationOmnibar from './specialization-library/SpecializationOmnibar';
+import SpecializationLibraryDrawer from './specialization-library/SpecializationLibraryDrawer';
+import { Award, Book } from 'lucide-react';
+import { useState } from 'react';
 
 interface Props {
     isLandscape?: boolean;
@@ -15,6 +18,7 @@ const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
 
 const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false }) => {
     const { data, updateData: onChange, addLog: onAddLog } = useCharacter();
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     const getSkillName = (skillId: string): string => {
         for (const cat of Object.keys(data.skills)) {
@@ -49,19 +53,72 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         onAddLog(`Spécialisation modifiée (${skillName}) : ${value}`, 'info', 'sheet', `spec_${skillId}_${index}`);
     };
 
+    const handleDrop = (e: React.DragEvent, skillId: string) => {
+        e.preventDefault();
+        try {
+            const dragData = e.dataTransfer.getData('application/json');
+            if (dragData) {
+                const { name } = JSON.parse(dragData);
+                if (name) {
+                    // Find first empty slot
+                    const skill = findSkill(skillId);
+                    if (!skill) return;
+
+                    const userSpecs = data.specializations[skillId] || [];
+                    const firstEmptyIndex = Array.from({ length: skill.value }).findIndex((_, i) => !userSpecs[i]);
+
+                    if (firstEmptyIndex !== -1) {
+                        updateSpecialization(skillId, firstEmptyIndex, name);
+                    } else {
+                        // All slots full? Maybe add to the last one or do nothing
+                        onAddLog(`Plus d'emplacement disponible pour ${skill.name}`, 'danger', 'sheet');
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Drop failed", err);
+        }
+    };
+
+    const findSkill = (skillId: string): DotEntry | null => {
+        for (const cat of Object.keys(data.skills)) {
+            // @ts-ignore
+            const skill = data.skills[cat].find((s: DotEntry) => s.id === skillId);
+            if (skill) return skill;
+        }
+        return null;
+    };
+
     const renderSkillBox = (skill: DotEntry) => {
         // Determine how many inputs to show based on dot value
         const count = skill.value;
         // We check if there are imposed specializations OR if there are dots
-        const imposedSpecs = data.imposedSpecializations[skill.id] || [];
+        // GLOBAL FIX: Skill must be > 0 for ANY specialization to appear
+        const imposedSpecs = skill.value > 0
+            ? (data.imposedSpecializations[skill.id] || []).filter(spec => skill.value >= (spec.minLevel || 0))
+            : [];
 
         if (count <= 0 && imposedSpecs.length === 0) return null;
 
         const userSpecs = data.specializations[skill.id] || [];
 
         return (
-            <div key={skill.id} className="border border-stone-400 p-1 bg-white break-inside-avoid shadow-sm flex flex-col gap-0.5 rounded-sm">
-                <div className="font-bold text-[10px] border-b border-stone-300 mb-0.5 flex justify-between bg-stone-50 px-1 items-center text-stone-700">
+            <div
+                key={skill.id}
+                className="border border-stone-400 p-1 bg-white break-inside-avoid shadow-sm flex flex-col gap-0.5 rounded-sm group/skill hover:border-amber-300 transition-colors"
+                onDragOver={(e) => {
+                    e.preventDefault();
+                    e.currentTarget.classList.add('bg-amber-50');
+                }}
+                onDragLeave={(e) => {
+                    e.currentTarget.classList.remove('bg-amber-50');
+                }}
+                onDrop={(e) => {
+                    e.currentTarget.classList.remove('bg-amber-50');
+                    handleDrop(e, skill.id);
+                }}
+            >
+                <div className="font-bold text-[10px] border-b border-stone-300 mb-0.5 flex justify-between bg-stone-50 px-1 items-center text-stone-700 group-hover/skill:bg-amber-50 transition-colors">
                     <span className="truncate" title={skill.name}>{skill.name}</span>
                     <span className="text-stone-400 text-[9px] ml-1">({count})</span>
                 </div>
@@ -72,25 +129,20 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                         <input
                             key={`imposed-${i}`}
                             className="w-full bg-slate-100 border-b border-dotted border-stone-300 text-[10px] h-4 px-1 font-bold text-slate-700 focus:outline-none cursor-default font-handwriting"
-                            value={spec}
+                            value={spec.name}
                             readOnly
-                            title="Spécialisation imposée"
+                            title={`Spécialisation imposée (Niveau requis : ${spec.minLevel || 0})`}
                         />
                     ))}
 
                     {/* Render User Specializations (Count based on dots) */}
                     {Array.from({ length: count }).map((_, i) => (
-                        <input
+                        <SpecializationOmnibar
                             key={`user-${i}`}
-                            className="w-full bg-transparent border-b border-dotted border-stone-300 text-[10px] h-4 px-1 font-handwriting text-ink focus:bg-blue-50 focus:border-blue-500 focus:outline-none transition-colors placeholder-stone-300"
-                            placeholder={`Spec ${i + 1}`}
                             value={userSpecs[i] || ''}
-                            onChange={(e) => updateSpecialization(skill.id, i, e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.currentTarget.blur();
-                                }
-                            }}
+                            onChange={(val) => updateSpecialization(skill.id, i, val)}
+                            skillId={skill.id}
+                            className="w-full"
                         />
                     ))}
                 </div>
@@ -102,8 +154,8 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         // Show skill if it has dots OR imposed specializations
         const skills = data.skills[categoryKey].filter(s => {
             if (s.name.trim() === '') return false; // Skip spacers
-            const hasImposed = data.imposedSpecializations[s.id] && data.imposedSpecializations[s.id].length > 0;
-            return s.value > 0 || hasImposed;
+            // GLOBAL FIX: If skill value is 0, we don't show it (no specs visible at 0)
+            return s.value > 0;
         });
 
         if (skills.length === 0) return null;
@@ -131,16 +183,23 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         // @ts-ignore
         return data.skills[key].some((s: DotEntry) => {
             const hasDots = s.value > 0;
-            const hasImposed = data.imposedSpecializations[s.id] && data.imposedSpecializations[s.id].length > 0;
-            return hasDots || hasImposed;
+            const hasVisibleImposed = (data.imposedSpecializations[s.id] || [])
+                .some(spec => s.value >= (spec.minLevel || 0));
+            return hasDots || hasVisibleImposed;
         });
     });
 
     return (
         <div className={`sheet-container p-6 ${isLandscape ? 'landscape' : ''}`}>
 
-            <h1 className="text-3xl font-black text-center uppercase py-2 tracking-widest border-b-2 border-stone-800 mb-4 text-indigo-950 font-serif">
+            <h1 className="text-3xl font-black text-center uppercase py-2 tracking-widest border-b-2 border-stone-800 mb-4 text-indigo-950 font-serif relative">
                 Spécialisations
+                <button
+                    onClick={() => setIsDrawerOpen(true)}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold py-1 px-3 rounded shadow-sm transition-colors flex items-center gap-1 uppercase"
+                >
+                    <Award size={14} /> Catalogue
+                </button>
             </h1>
 
             <div className="flex-grow flex flex-col overflow-hidden">
@@ -163,6 +222,11 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                     {renderCategory("Autres", "autres")}
                 </div>
             </div>
+
+            <SpecializationLibraryDrawer
+                isOpen={isDrawerOpen}
+                onClose={() => setIsDrawerOpen(false)}
+            />
         </div>
     );
 };

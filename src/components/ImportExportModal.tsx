@@ -1,13 +1,15 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { CharacterSheetData, LibraryEntry, LibrarySkillEntry } from '../types';
-import { Download, Upload, AlertTriangle, BookOpen, User, LayoutTemplate, X, CheckCircle2, Merge, RefreshCw, FileBox, GraduationCap, Layers, Shield, Settings, ArrowRight, AlertOctagon, ArrowDown, Zap, Save } from 'lucide-react';
+import { CharacterSheetData, LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry } from '../types';
+import { Download, Upload, AlertTriangle, BookOpen, User, LayoutTemplate, X, CheckCircle2, Merge, RefreshCw, FileBox, GraduationCap, Layers, Shield, Settings, ArrowRight, AlertOctagon, ArrowDown, Zap, Save, Award } from 'lucide-react';
 import { useNotification } from '../context/NotificationContext';
 import { useCharacter } from '../context/CharacterContext';
 import ThematicModal from './ui/ThematicModal';
 import ThematicButton from './ui/ThematicButton';
 import { APP_VERSION } from '../constants';
 import { getImage, saveImage, blobToBase64, base64ToBlob } from '../imageDB';
+import ConflictResolver from './import-export/ConflictResolver';
+import ImportOptionsSection from './import-export/ImportOptionsSection';
 
 interface ImportExportModalProps {
     isOpen: boolean;
@@ -18,26 +20,25 @@ interface ImportExportModalProps {
 }
 
 // Updated Export Types to include new options
-type ExportType = 'full' | 'system' | 'template' | 'library_traits' | 'library_skills' | 'library_all';
+type ExportType = 'full' | 'system' | 'template' | 'library_traits' | 'library_skills' | 'library_specs' | 'library_all';
 
 interface FileAnalysis {
     hasHeader: boolean;
     hasStructure: boolean; // Skills, Attributes
     hasLibrary: boolean; // Traits
     hasSkillLibrary: boolean; // Skill Reserve
+    hasSpecLibrary: boolean; // Specialization Catalogue
     isFilled: boolean; // Guess if it's a played character (has values)
     fileVersion?: string;
     versionMismatch: boolean;
 }
 
-// Generic Conflict Interface
-interface DataConflict {
-    type: 'skill' | 'trait';
-    key: string; // Unique key for map (e.g. "skill_acrobatie")
-    name: string;
-    current: any;
-    incoming: any;
-}
+import {
+    createTemplateFromData,
+    detectConflicts,
+    smartMerge,
+    DataConflict
+} from '../utils/importExportUtils';
 
 const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, onExportSuccess, onImportSuccess, variant }) => {
     const { data, importData, addLog: onAddLog } = useCharacter();
@@ -79,73 +80,6 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
 
     const isGM = variant === 'gm';
 
-    // --- LOGIC: RESET / CLEANING ---
-    const createTemplateFromData = (source: CharacterSheetData): CharacterSheetData => {
-        const clean = JSON.parse(JSON.stringify(source));
-
-        // Reset Header
-        Object.keys(clean.header).forEach(k => clean.header[k] = "");
-
-        // Reset XP
-        clean.experience = { gain: '0', spent: '0', rest: '0' };
-        clean.xpLogs = [];
-        clean.appLogs = [];
-
-        // Reset Attributes Values
-        if (clean.attributes) {
-            Object.keys(clean.attributes).forEach(cat => {
-                if (Array.isArray(clean.attributes[cat])) {
-                    // @ts-ignore
-                    clean.attributes[cat].forEach((attr: any) => {
-                        attr.val1 = ""; attr.val2 = ""; attr.val3 = "";
-                        attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
-                    });
-                }
-            });
-        }
-
-        // Reset Skills Values
-        Object.keys(clean.skills).forEach(cat => {
-            // @ts-ignore
-            clean.skills[cat].forEach((skill: any) => {
-                skill.value = 0;
-                skill.creationValue = 0;
-                skill.current = 0;
-            });
-        });
-
-        // Reset Combat
-        clean.combat.weapons.forEach((w: any) => { w.weapon = ""; w.level = ""; w.init = ""; w.attack = ""; w.damage = ""; w.parry = ""; });
-        clean.combat.armor.forEach((a: any) => { a.type = ""; a.protection = ""; a.weight = ""; });
-        clean.combat.stats = { agility: '', dexterity: '', force: '', size: '' };
-
-        // Reset Page 2 Details
-        clean.page2.lieux_importants = "";
-        clean.page2.contacts = "";
-        clean.page2.reputation.fill({ reputation: '', lieu: '', valeur: '' });
-        clean.page2.connaissances = "";
-        clean.page2.valeurs_monetaires = "";
-        clean.page2.armes_list = "";
-        clean.page2.avantages.fill({ name: '', value: '' });
-        clean.page2.desavantages.fill({ name: '', value: '' });
-        clean.page2.equipement = "";
-        clean.page2.notes = "";
-        clean.page2.characterImage = "";
-        clean.page2.characterImageId = undefined;
-
-        // Reset Specializations
-        clean.specializations = {};
-
-        // Counters
-        clean.counters.volonte.value = 3; clean.counters.volonte.current = 0;
-        clean.counters.confiance.value = 3; clean.counters.confiance.current = 0;
-        clean.counters.custom.forEach((c: any) => { c.value = 0; c.current = 0; });
-
-        // Disable creation mode
-        clean.creationConfig.active = false;
-
-        return clean;
-    };
 
     // --- LOGIC: EXPORT ---
     const handleExport = async () => {
@@ -216,12 +150,14 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                 exportData = template;
                 exportData.library = data.library;
                 exportData.skillLibrary = data.skillLibrary;
+                exportData.specializationLibrary = data.specializationLibrary;
                 filename = `${timestamp}_Systeme_Jeu`;
                 break;
             case 'template':
                 exportData = template;
                 delete exportData.library;
                 delete exportData.skillLibrary;
+                delete exportData.specializationLibrary;
                 filename = `${timestamp}_Template_Structure`;
                 break;
             case 'library_traits':
@@ -232,8 +168,12 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                 exportData = { skillLibrary: data.skillLibrary, appVersion: APP_VERSION };
                 filename = `${timestamp}_Biblio_Competences`;
                 break;
+            case 'library_specs':
+                exportData = { specializationLibrary: data.specializationLibrary, appVersion: APP_VERSION };
+                filename = `${timestamp}_Biblio_Specialisations`;
+                break;
             case 'library_all':
-                exportData = { library: data.library, skillLibrary: data.skillLibrary, appVersion: APP_VERSION };
+                exportData = { library: data.library, skillLibrary: data.skillLibrary, specializationLibrary: data.specializationLibrary, appVersion: APP_VERSION };
                 filename = `${timestamp}_Biblio_Complete`;
                 break;
         }
@@ -267,18 +207,20 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                 const hasStructure = !!(json.skills && json.attributes);
                 const hasLibrary = !!(json.library && Array.isArray(json.library) && json.library.length > 0);
                 const hasSkillLibrary = !!(json.skillLibrary && Array.isArray(json.skillLibrary) && json.skillLibrary.length > 0);
+                const hasSpecLibrary = !!(json.specializationLibrary && Array.isArray(json.specializationLibrary) && json.specializationLibrary.length > 0);
 
                 const fileVersion = json.appVersion;
                 const versionMismatch = fileVersion !== APP_VERSION;
                 const isFilled = (json.header && json.header.name) || (json.experience && parseInt(json.experience.spent) > 0);
+                const hasAnyLib = hasLibrary || hasSkillLibrary || hasSpecLibrary;
 
-                if (!hasStructure && !hasLibrary && !hasSkillLibrary) {
+                if (!hasStructure && !hasAnyLib) {
                     alert("Ce fichier ne semble pas être compatible (aucune donnée reconnue).");
                     return;
                 }
 
                 setPendingFile(json);
-                setAnalysis({ hasHeader, hasStructure, hasLibrary, hasSkillLibrary, isFilled, fileVersion, versionMismatch });
+                setAnalysis({ hasHeader, hasStructure, hasLibrary, hasSkillLibrary, hasSpecLibrary, isFilled, fileVersion, versionMismatch });
 
                 // Auto-select action based on context
                 if (variant === 'player') {
@@ -297,99 +239,6 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
         reader.readAsText(file);
     };
 
-    // --- HELPER: Conflict Detection ---
-    const detectConflicts = (
-        currentSkills: LibrarySkillEntry[],
-        incomingSkills: LibrarySkillEntry[],
-        currentTraits: LibraryEntry[],
-        incomingTraits: LibraryEntry[]
-    ) => {
-        const conflicts: DataConflict[] = [];
-
-        // 1. Detect Skill Conflicts
-        const currentSkillMap = new Map(currentSkills.map(s => [s.name.trim().toLowerCase(), s]));
-        incomingSkills.forEach(newItem => {
-            const normName = newItem.name.trim().toLowerCase();
-            if (currentSkillMap.has(normName)) {
-                const existingItem = currentSkillMap.get(normName)!;
-                const desc1 = (existingItem.description || '').trim();
-                const desc2 = (newItem.description || '').trim();
-
-                if (desc1 !== desc2) {
-                    conflicts.push({
-                        type: 'skill',
-                        key: `skill_${normName}`,
-                        name: existingItem.name,
-                        current: existingItem,
-                        incoming: newItem
-                    });
-                }
-            }
-        });
-
-        // 2. Detect Trait Conflicts
-        const currentTraitMap = new Map(currentTraits.map(t => [t.name.trim().toLowerCase(), t]));
-        incomingTraits.forEach(newItem => {
-            const normName = newItem.name.trim().toLowerCase();
-            if (currentTraitMap.has(normName)) {
-                const existingItem = currentTraitMap.get(normName)!;
-
-                // Check significant differences: Description, Cost, Type, Effects
-                const diffDesc = (existingItem.description || '').trim() !== (newItem.description || '').trim();
-                const diffCost = existingItem.cost !== newItem.cost;
-                const diffType = existingItem.type !== newItem.type;
-                const diffEffects = JSON.stringify(existingItem.effects || []) !== JSON.stringify(newItem.effects || []);
-
-                if (diffDesc || diffCost || diffType || diffEffects) {
-                    conflicts.push({
-                        type: 'trait',
-                        key: `trait_${normName}`,
-                        name: existingItem.name,
-                        current: existingItem,
-                        incoming: newItem
-                    });
-                }
-            }
-        });
-
-        return conflicts;
-    };
-
-    // --- HELPER: Generic Smart Merge ---
-    const smartMerge = <T extends { name: string }>(
-        current: T[],
-        incoming: T[],
-        resolutions: Record<string, 'keep_current' | 'replace'>,
-        prefix: 'skill' | 'trait'
-    ) => {
-        const currentMap = new Map(current.map(s => [s.name.trim().toLowerCase(), s]));
-        const finalMap = new Map<string, T>();
-
-        // 1. Add all existing
-        current.forEach(s => {
-            finalMap.set(s.name.trim().toLowerCase(), s);
-        });
-
-        // 2. Process incoming
-        incoming.forEach(newItem => {
-            const normName = newItem.name.trim().toLowerCase();
-            const resolutionKey = `${prefix}_${normName}`;
-
-            if (finalMap.has(normName)) {
-                // Conflict or Duplicate
-                const decision = resolutions[resolutionKey];
-                if (decision === 'replace') {
-                    finalMap.set(normName, newItem); // Overwrite
-                }
-                // If decision is 'keep_current' or undefined (duplicate without conflict), do nothing
-            } else {
-                // New Item
-                finalMap.set(normName, newItem);
-            }
-        });
-
-        return Array.from(finalMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-    };
 
     const executeImport = async () => {
         if (!pendingFile || !importAction) return;
@@ -405,7 +254,10 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
             const currentTraits = checkTraits ? (data.library || []) : [];
             const incomingTraits = checkTraits ? (pendingFile.library || []) : [];
 
-            const detected = detectConflicts(currentSkills, incomingSkills, currentTraits, incomingTraits);
+            const currentSpecs = checkTraits ? (data.specializationLibrary || []) : []; // Or checkSpecs...
+            const incomingSpecs = checkTraits ? (pendingFile.specializationLibrary || []) : [];
+
+            const detected = detectConflicts(currentSkills, incomingSkills, currentTraits, incomingTraits, currentSpecs, incomingSpecs);
 
             if (detected.length > 0) {
                 setConflicts(detected);
@@ -465,6 +317,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
             finalData = await processImportedData(pendingFile);
             if (!finalData.library) finalData.library = [];
             if (!finalData.skillLibrary) finalData.skillLibrary = [];
+            if (!finalData.specializationLibrary) finalData.specializationLibrary = [];
             logMsg = "Remplacement complet du personnage.";
         }
         else if (importAction === 'system') {
@@ -474,6 +327,8 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
             else finalData.library = [];
             if (pendingFile.skillLibrary) finalData.skillLibrary = pendingFile.skillLibrary;
             else finalData.skillLibrary = [];
+            if (pendingFile.specializationLibrary) finalData.specializationLibrary = pendingFile.specializationLibrary;
+            else finalData.specializationLibrary = [];
 
             logMsg = "Chargement du Système (Template + Bibliothèques).";
         }
@@ -482,6 +337,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
             finalData = template;
             finalData.library = data.library || [];
             finalData.skillLibrary = data.skillLibrary || [];
+            finalData.specializationLibrary = data.specializationLibrary || [];
             logMsg = "Chargement du Template. Bibliothèques conservées.";
         }
 
@@ -505,10 +361,21 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
             logMsg = "Fusion de la Réserve de Compétences.";
         }
 
+        // SPECIALIZATION ACTIONS
+        else if (importAction === 'spec_lib_replace') {
+            finalData.specializationLibrary = pendingFile.specializationLibrary || [];
+            logMsg = "Remplacement du Catalogue de Spécialisations.";
+        }
+        else if (importAction === 'spec_lib_merge') {
+            finalData.specializationLibrary = smartMerge(data.specializationLibrary || [], pendingFile.specializationLibrary || [], resolutionMap, 'specialization');
+            logMsg = "Fusion du Catalogue de Spécialisations.";
+        }
+
         // COMBINED ACTIONS
         else if (importAction === 'all_libs_replace') {
             if (pendingFile.library) finalData.library = pendingFile.library;
             if (pendingFile.skillLibrary) finalData.skillLibrary = pendingFile.skillLibrary;
+            if (pendingFile.specializationLibrary) finalData.specializationLibrary = pendingFile.specializationLibrary;
             logMsg = "Remplacement de toutes les bibliothèques.";
         }
         else if (importAction === 'all_libs_merge') {
@@ -517,6 +384,9 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
             }
             if (pendingFile.skillLibrary) {
                 finalData.skillLibrary = smartMerge(data.skillLibrary || [], pendingFile.skillLibrary || [], resolutionMap, 'skill');
+            }
+            if (pendingFile.specializationLibrary) {
+                finalData.specializationLibrary = smartMerge(data.specializationLibrary || [], pendingFile.specializationLibrary || [], resolutionMap, 'specialization');
             }
             logMsg = "Fusion de toutes les bibliothèques.";
         }
@@ -546,253 +416,9 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
     };
 
     const resolveAll = (choice: 'keep_current' | 'replace') => {
-        const newMap = { ...resolutionMap };
+        const newMap: Record<string, 'keep_current' | 'replace'> = {};
         conflicts.forEach(c => newMap[c.key] = choice);
         setResolutionMap(newMap);
-    };
-
-    const renderConflictResolution = () => {
-        return (
-            <div className="flex flex-col h-full overflow-hidden animate-in fade-in slide-in-from-right-4 duration-300">
-                <div className="bg-amber-50 p-4 border-b border-amber-200">
-                    <h4 className="font-bold text-amber-900 flex items-center gap-2 mb-2">
-                        <AlertOctagon size={20} />
-                        Conflits détectés ({conflicts.length})
-                    </h4>
-                    <p className="text-xs text-amber-800 mb-3">
-                        Des éléments portent le même nom mais ont des propriétés différentes. Choisissez quelle version conserver.
-                    </p>
-                    <div className="flex gap-2">
-                        <button onClick={() => resolveAll('keep_current')} className="text-xs bg-white border border-amber-300 text-amber-900 px-3 py-1 rounded hover:bg-amber-100 transition-colors">
-                            Tout garder (Ma version)
-                        </button>
-                        <button onClick={() => resolveAll('replace')} className="text-xs bg-white border border-amber-300 text-amber-900 px-3 py-1 rounded hover:bg-amber-100 transition-colors">
-                            Tout remplacer (Import)
-                        </button>
-                    </div>
-                </div>
-
-                <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-slate-50 custom-scrollbar">
-                    {conflicts.map((conflict, idx) => {
-                        const choice = resolutionMap[conflict.key] || 'keep_current';
-
-                        return (
-                            <div key={idx} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                                <div className="bg-gray-100 px-4 py-2 font-bold text-sm text-gray-700 border-b border-gray-200 flex justify-between items-center">
-                                    <div className="flex items-center gap-2">
-                                        {conflict.type === 'skill'
-                                            ? <GraduationCap size={16} className="text-purple-600" />
-                                            : <BookOpen size={16} className="text-blue-600" />
-                                        }
-                                        <span>{conflict.name}</span>
-                                    </div>
-                                    {conflict.type === 'trait' && (
-                                        <span className="text-[10px] text-gray-500 uppercase tracking-wide">
-                                            Trait : {conflict.current.type}
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="grid grid-cols-2 divide-x divide-gray-200">
-                                    {/* Current */}
-                                    <div
-                                        className={`p-3 cursor-pointer transition-colors ${choice === 'keep_current' ? 'bg-blue-50 ring-2 ring-inset ring-blue-300' : 'hover:bg-gray-50'}`}
-                                        onClick={() => handleResolutionChoice(conflict.key, 'keep_current')}
-                                    >
-                                        <div className="flex justify-between items-center mb-2">
-                                            <span className="text-xs font-bold text-gray-500 uppercase">Ma Version</span>
-                                            {choice === 'keep_current' && <CheckCircle2 size={16} className="text-blue-600" />}
-                                        </div>
-
-                                        {/* Detail Display */}
-                                        <div className="text-xs text-gray-700 space-y-1">
-                                            {conflict.current.description && <p className="italic">"{conflict.current.description}"</p>}
-                                            {conflict.type === 'trait' && (
-                                                <>
-                                                    <p className="font-mono bg-gray-100 inline-block px-1 rounded">Coût: {conflict.current.cost}</p>
-                                                    {conflict.current.effects?.length > 0 && (
-                                                        <p className="text-amber-600 flex items-center gap-1"><Zap size={10} /> {conflict.current.effects.length} effet(s)</p>
-                                                    )}
-                                                </>
-                                            )}
-                                            {conflict.type === 'skill' && !conflict.current.description && (
-                                                <p className="text-gray-400">(Pas de description)</p>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Incoming */}
-                                    <div
-                                        className={`p-3 cursor-pointer transition-colors ${choice === 'replace' ? 'bg-orange-50 ring-2 ring-inset ring-orange-300' : 'hover:bg-gray-50'}`}
-                                        onClick={() => handleResolutionChoice(conflict.key, 'replace')}
-                                    >
-                                        <div className="flex justify-between items-center mb-2">
-                                            <span className="text-xs font-bold text-gray-500 uppercase">Import</span>
-                                            {choice === 'replace' && <CheckCircle2 size={16} className="text-orange-600" />}
-                                        </div>
-
-                                        {/* Detail Display */}
-                                        <div className="text-xs text-gray-700 space-y-1">
-                                            {conflict.incoming.description && <p className="italic">"{conflict.incoming.description}"</p>}
-                                            {conflict.type === 'trait' && (
-                                                <>
-                                                    <p className="font-mono bg-gray-100 inline-block px-1 rounded">Coût: {conflict.incoming.cost}</p>
-                                                    {conflict.incoming.effects?.length > 0 && (
-                                                        <p className="text-amber-600 flex items-center gap-1"><Zap size={10} /> {conflict.incoming.effects.length} effet(s)</p>
-                                                    )}
-                                                </>
-                                            )}
-                                            {conflict.type === 'skill' && !conflict.incoming.description && (
-                                                <p className="text-gray-400">(Pas de description)</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-
-                <div className="p-4 border-t border-gray-200 bg-white flex justify-end gap-3 shrink-0">
-                    <button onClick={() => setIsResolvingConflicts(false)} className="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg font-bold hover:bg-gray-50">Annuler</button>
-                    <button
-                        onClick={executeImport}
-                        className="px-6 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 shadow-md flex items-center gap-2"
-                    >
-                        Confirmer la fusion <ArrowRight size={16} />
-                    </button>
-                </div>
-            </div>
-        );
-    };
-
-    const renderImportOptions = () => {
-        if (!analysis) return null;
-
-        // Simple Mode for Players: Only full replacement is relevant usually
-        if (variant === 'player') {
-            return (
-                <div className="bg-orange-50 border border-orange-200 rounded p-4 text-center">
-                    <User size={32} className="mx-auto text-orange-600 mb-2" />
-                    <p className="font-bold text-orange-900 text-sm mb-1">Prêt à charger</p>
-                    <p className="text-xs text-orange-800">
-                        Ce fichier va remplacer votre personnage actuel.
-                    </p>
-                </div>
-            );
-        }
-
-        const options = [];
-
-        // 1. STRUCTURE IMPORTS
-        if (analysis.hasStructure) {
-            options.push(
-                <div key="group_struct" className="mb-4">
-                    <div className="text-xs font-bold text-gray-400 uppercase mb-2">Structure & Personnage</div>
-                    <div className="space-y-2">
-                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'replace_all' ? 'bg-red-50 border-red-500 ring-1 ring-red-500' : 'border-gray-200 hover:bg-gray-50'}`}>
-                            <input type="radio" name="importAction" checked={importAction === 'replace_all'} onChange={() => setImportAction('replace_all')} className="mt-1" />
-                            <div>
-                                <span className="font-bold text-gray-800 flex items-center gap-2"><User size={16} /> Tout remplacer (Clone)</span>
-                                <span className="text-xs text-red-600 block mt-1"><AlertTriangle size={12} className="inline mr-1" />Toutes vos données actuelles seront perdues.</span>
-                            </div>
-                        </label>
-                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'system' ? 'bg-orange-50 border-orange-500 ring-1 ring-orange-500' : 'border-gray-200 hover:bg-gray-50'}`}>
-                            <input type="radio" name="importAction" checked={importAction === 'system'} onChange={() => setImportAction('system')} className="mt-1" />
-                            <div>
-                                <span className="font-bold text-gray-800 flex items-center gap-2"><FileBox size={16} /> Système de Jeu (MJ)</span>
-                                <span className="text-xs text-orange-600 block mt-1">Écrase structure et bibliothèques. Réinitialise les valeurs.</span>
-                            </div>
-                        </label>
-                        {!analysis.hasLibrary && !analysis.hasSkillLibrary && (
-                            <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'template' ? 'bg-orange-50 border-orange-500 ring-1 ring-orange-500' : 'border-gray-200 hover:bg-gray-50'}`}>
-                                <input type="radio" name="importAction" checked={importAction === 'template'} onChange={() => setImportAction('template')} className="mt-1" />
-                                <div>
-                                    <span className="font-bold text-gray-800 flex items-center gap-2"><LayoutTemplate size={16} /> Structure Seule</span>
-                                    <span className="text-xs text-orange-600 block mt-1">Structure uniquement. Vos bibliothèques sont conservées.</span>
-                                </div>
-                            </label>
-                        )}
-                    </div>
-                </div>
-            );
-        }
-
-        // 2. COMBINED LIBRARY IMPORTS
-        if (analysis.hasLibrary && analysis.hasSkillLibrary) {
-            options.push(
-                <div key="group_all_libs" className="mb-4">
-                    <div className="text-xs font-bold text-gray-400 uppercase mb-2">Toutes les Bibliothèques</div>
-                    <div className="space-y-2">
-                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'all_libs_merge' ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : 'border-gray-200 hover:bg-gray-50'}`}>
-                            <input type="radio" name="importAction" checked={importAction === 'all_libs_merge'} onChange={() => setImportAction('all_libs_merge')} className="mt-1" />
-                            <div>
-                                <span className="font-bold text-gray-800 flex items-center gap-2"><Merge size={16} /> Tout Fusionner (Traits + Compétences)</span>
-                                <span className="text-xs text-gray-600 block mt-1">Ajoute le contenu sans toucher à votre fiche.</span>
-                            </div>
-                        </label>
-                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'all_libs_replace' ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'border-gray-200 hover:bg-gray-50'}`}>
-                            <input type="radio" name="importAction" checked={importAction === 'all_libs_replace'} onChange={() => setImportAction('all_libs_replace')} className="mt-1" />
-                            <div>
-                                <span className="font-bold text-gray-800 flex items-center gap-2"><RefreshCw size={16} /> Tout Remplacer (Traits + Compétences)</span>
-                                <span className="text-xs text-gray-600 block mt-1">Remplace vos bibliothèques par celles du fichier.</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-            );
-        }
-
-        // 3. SKILL LIBRARY IMPORTS (Individual)
-        if (analysis.hasSkillLibrary) {
-            options.push(
-                <div key="group_skill_lib" className="mb-4">
-                    <div className="text-xs font-bold text-gray-400 uppercase mb-2">Réserve de Compétences</div>
-                    <div className="space-y-2">
-                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'skill_lib_merge' ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : 'border-gray-200 hover:bg-gray-50'}`}>
-                            <input type="radio" name="importAction" checked={importAction === 'skill_lib_merge'} onChange={() => setImportAction('skill_lib_merge')} className="mt-1" />
-                            <div>
-                                <span className="font-bold text-gray-800 flex items-center gap-2"><Merge size={16} /> Fusionner Compétences</span>
-                                <span className="text-xs text-gray-600 block mt-1">Ajoute les nouvelles compétences à votre réserve.</span>
-                            </div>
-                        </label>
-                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'skill_lib_replace' ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'border-gray-200 hover:bg-gray-50'}`}>
-                            <input type="radio" name="importAction" checked={importAction === 'skill_lib_replace'} onChange={() => setImportAction('skill_lib_replace')} className="mt-1" />
-                            <div>
-                                <span className="font-bold text-gray-800 flex items-center gap-2"><RefreshCw size={16} /> Remplacer Compétences</span>
-                                <span className="text-xs text-gray-600 block mt-1">Écrase votre réserve actuelle.</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-            );
-        }
-
-        // 4. TRAIT LIBRARY IMPORTS (Individual)
-        if (analysis.hasLibrary) {
-            options.push(
-                <div key="group_trait_lib" className="mb-4">
-                    <div className="text-xs font-bold text-gray-400 uppercase mb-2">Bibliothèque de Traits</div>
-                    <div className="space-y-2">
-                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'lib_merge' ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : 'border-gray-200 hover:bg-gray-50'}`}>
-                            <input type="radio" name="importAction" checked={importAction === 'lib_merge'} onChange={() => setImportAction('lib_merge')} className="mt-1" />
-                            <div>
-                                <span className="font-bold text-gray-800 flex items-center gap-2"><Merge size={16} /> Fusionner Traits</span>
-                                <span className="text-xs text-gray-600 block mt-1">Ajoute les nouveaux Avantages/Désavantages.</span>
-                            </div>
-                        </label>
-                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'lib_replace' ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'border-gray-200 hover:bg-gray-50'}`}>
-                            <input type="radio" name="importAction" checked={importAction === 'lib_replace'} onChange={() => setImportAction('lib_replace')} className="mt-1" />
-                            <div>
-                                <span className="font-bold text-gray-800 flex items-center gap-2"><RefreshCw size={16} /> Remplacer Traits</span>
-                                <span className="text-xs text-gray-600 block mt-1">Écrase votre bibliothèque de traits actuelle.</span>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-            );
-        }
-
-        return <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">{options}</div>;
     };
 
     // -- Render Helpers --
@@ -836,9 +462,14 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
 
                 {/* --- CONFLICT RESOLUTION OVERLAY --- */}
                 {isResolvingConflicts && (
-                    <div className="flex-1 bg-white relative">
-                        {renderConflictResolution()}
-                    </div>
+                    <ConflictResolver
+                        conflicts={conflicts}
+                        resolutionMap={resolutionMap}
+                        onResolutionChoice={handleResolutionChoice}
+                        onResolveAll={resolveAll}
+                        onCancel={() => setIsResolvingConflicts(false)}
+                        onConfirm={executeImport}
+                    />
                 )}
 
                 {/* --- EXPORT TAB CONTENT --- */}
@@ -895,7 +526,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                                             <input type="radio" name="exportType" checked={exportType === 'library_all'} onChange={() => setExportType('library_all')} className="mt-1 accent-blue-600" />
                                             <div>
                                                 <span className="font-bold text-slate-800 flex items-center gap-2"><Layers size={16} /> Bibliothèques Complètes</span>
-                                                <span className="text-xs text-slate-500 block mt-1">Traits (Avantages/Défauts) + Réserve de Compétences.</span>
+                                                <span className="text-xs text-slate-500 block mt-1">Traits + Compétences + Catalogue de Spés.</span>
                                             </div>
                                         </label>
 
@@ -911,8 +542,16 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                                             <label className={`flex items-start gap-2 p-3 rounded-lg border cursor-pointer transition-all ${exportType === 'library_skills' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
                                                 <input type="radio" name="exportType" checked={exportType === 'library_skills'} onChange={() => setExportType('library_skills')} className="mt-1 accent-blue-600" />
                                                 <div>
-                                                    <span className="font-bold text-slate-800 flex items-center gap-1 text-sm"><GraduationCap size={14} /> Compétences</span>
-                                                    <span className="text-[10px] text-slate-500 block">Réserve de compétences seule.</span>
+                                                    <span className="font-bold text-slate-800 flex items-center gap-1 text-sm"><GraduationCap size={14} /> Skills</span>
+                                                    <span className="text-[10px] text-slate-500 block">Réserve seule.</span>
+                                                </div>
+                                            </label>
+
+                                            <label className={`flex items-start gap-2 p-3 rounded-lg border cursor-pointer transition-all ${exportType === 'library_specs' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
+                                                <input type="radio" name="exportType" checked={exportType === 'library_specs'} onChange={() => setExportType('library_specs')} className="mt-1 accent-blue-600" />
+                                                <div>
+                                                    <span className="font-bold text-slate-800 flex items-center gap-1 text-sm"><Award size={14} /> Spés</span>
+                                                    <span className="text-[10px] text-slate-500 block">Catalogue seul.</span>
                                                 </div>
                                             </label>
                                         </div>
@@ -973,6 +612,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                                                 {analysis?.hasStructure && <span className="bg-white border border-blue-200 px-2 py-1 rounded flex items-center gap-1 shadow-sm"><LayoutTemplate size={12} /> Structure</span>}
                                                 {analysis?.hasLibrary && <span className="bg-white border border-blue-200 px-2 py-1 rounded flex items-center gap-1 shadow-sm"><BookOpen size={12} /> Traits</span>}
                                                 {analysis?.hasSkillLibrary && <span className="bg-white border border-blue-200 px-2 py-1 rounded flex items-center gap-1 shadow-sm"><GraduationCap size={12} /> Compétences</span>}
+                                                {analysis?.hasSpecLibrary && <span className="bg-white border border-blue-200 px-2 py-1 rounded flex items-center gap-1 shadow-sm"><Award size={12} /> Spécialisations</span>}
                                                 {analysis?.isFilled && <span className="bg-white border border-blue-200 px-2 py-1 rounded flex items-center gap-1 shadow-sm"><User size={12} /> Données Joueur</span>}
                                             </div>
                                         </div>
@@ -993,7 +633,12 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                                 )}
 
                                 <div className="flex-grow overflow-y-auto pr-1">
-                                    {renderImportOptions()}
+                                    <ImportOptionsSection
+                                        analysis={analysis}
+                                        variant={variant}
+                                        importAction={importAction}
+                                        onActionChange={setImportAction}
+                                    />
                                 </div>
 
                                 <div className="mt-4 pt-4 border-t border-slate-200">

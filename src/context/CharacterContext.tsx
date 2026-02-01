@@ -1,29 +1,64 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { CharacterSheetData, LogEntry } from '../types';
 import { INITIAL_DATA } from '../data/initialState';
 import { migrateData } from '../utils/migrations';
 import { calculateExperienceResults } from '../utils/mechanics';
+import { validateCharacterData } from '../schemas/characterSchema';
 
-// --- Context Definition ---
+// --- Context Definitions ---
 
-interface CharacterContextType {
+interface CharacterStateContextType {
     data: CharacterSheetData;
+}
+
+interface CharacterActionsContextType {
     updateData: (newData: CharacterSheetData | ((prev: CharacterSheetData) => CharacterSheetData)) => void;
     addLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', deduplicationId?: string) => void;
     resetData: () => void;
     importData: (newData: CharacterSheetData) => void;
 }
 
-const CharacterContext = createContext<CharacterContextType | undefined>(undefined);
+const CharacterStateContext = createContext<CharacterStateContextType | undefined>(undefined);
+const CharacterActionsContext = createContext<CharacterActionsContextType | undefined>(undefined);
 
-// --- Hook ---
+// --- Hooks ---
 
-export const useCharacter = () => {
-    const context = useContext(CharacterContext);
+/**
+ * Hook pour accéder aux données du personnage.
+ * Provoque un re-rendu quand les données changent.
+ */
+export const useCharacterData = () => {
+    const context = useContext(CharacterStateContext);
     if (!context) {
-        throw new Error('useCharacter must be used within a CharacterProvider');
+        throw new Error('useCharacterData must be used within a CharacterProvider');
+    }
+    return context.data;
+};
+
+/**
+ * Hook pour accéder aux actions de modification.
+ * Ne provoque PAS de re-rendu quand les données changent (fonctions stables).
+ */
+export const useCharacterActions = () => {
+    const context = useContext(CharacterActionsContext);
+    if (!context) {
+        throw new Error('useCharacterActions must be used within a CharacterProvider');
     }
     return context;
+};
+
+/**
+ * Hook Legacy (compatibilité).
+ * Regroupe données et actions.
+ */
+export const useCharacter = () => {
+    const data = useCharacterData();
+    const actions = useCharacterActions();
+
+    return useMemo(() => ({
+        data,
+        ...actions
+    }), [data, actions]);
 };
 
 // --- Provider ---
@@ -39,20 +74,22 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         if (saved) {
             try {
                 const migrated = migrateData(JSON.parse(saved));
-                // Ensure creation mode isn't accidentally active on reload if undesired
-                // (Optional choice, keeping faithful to App.tsx logic)
-                if (migrated.creationConfig) {
-                    // We might want to keep it false to prevent accidents, or true if user was working.
-                    // App.tsx set it to false.
-                    migrated.creationConfig.active = false;
+                // Validate after migration
+                const validated = validateCharacterData(migrated);
+                if (validated.creationConfig) {
+                    validated.creationConfig.active = false;
                 }
-                return migrated;
+                return validated;
             } catch (e) {
-                console.error("Error migrating data", e);
-                return INITIAL_DATA;
+                console.error("Error loading/validating data", e);
+                // Try to just migrate if validation fails, or fallback to initial
+                try {
+                    return migrateData(JSON.parse(saved));
+                } catch (migrateError) {
+                    return INITIAL_DATA;
+                }
             }
         }
-        // New User
         return migrateData(JSON.parse(JSON.stringify(INITIAL_DATA)));
     });
 
@@ -61,7 +98,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         localStorage.setItem('rpg-sheet-data', JSON.stringify(data));
     }, [data]);
 
-    // 3. XP Calculation Effect
+    // 3. XP Calculation Effect (Remains here as it depends on data and changes data)
     useEffect(() => {
         const newExpState = calculateExperienceResults(data);
 
@@ -92,7 +129,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         data.library
     ]);
 
-    // 4. Actions
+    // 4. Actions (Stable references via useCallback)
     const updateData = useCallback((newData: CharacterSheetData | ((prev: CharacterSheetData) => CharacterSheetData)) => {
         setData(newData);
     }, []);
@@ -102,7 +139,6 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
             const logs = prev.appLogs || [];
             const lastLog = logs[0];
 
-            // Deduplication logic
             if (deduplicationId && lastLog && lastLog.deduplicationId === deduplicationId) {
                 const updatedLog = {
                     ...lastLog,
@@ -131,21 +167,31 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
     }, [addLog]);
 
     const importData = useCallback((newData: CharacterSheetData) => {
-        setData(newData);
-        addLog("Données importées avec succès", 'success', 'settings');
+        try {
+            const validated = validateCharacterData(newData);
+            setData(validated);
+            addLog("Données importées avec succès", 'success', 'settings');
+        } catch (e) {
+            console.error("Import validation failed", e);
+            addLog("Échec de l'import : les données sont malformées ou incompatibles", 'danger', 'settings');
+            // Show detail in console but don't crash the app
+        }
     }, [addLog]);
 
-    const value = {
-        data,
+    // 5. Providers Wrapper
+    const stateValue = useMemo(() => ({ data }), [data]);
+    const actionsValue = useMemo(() => ({
         updateData,
         addLog,
         resetData,
         importData
-    };
+    }), [updateData, addLog, resetData, importData]);
 
     return (
-        <CharacterContext.Provider value={value}>
-            {children}
-        </CharacterContext.Provider>
+        <CharacterStateContext.Provider value={stateValue}>
+            <CharacterActionsContext.Provider value={actionsValue}>
+                {children}
+            </CharacterActionsContext.Provider>
+        </CharacterStateContext.Provider>
     );
 };

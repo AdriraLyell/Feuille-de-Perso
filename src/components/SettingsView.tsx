@@ -14,6 +14,7 @@ import SpecializationsEditor from './settings/SpecializationsEditor';
 import CreationConfigEditor from './settings/CreationConfigEditor';
 import AppearanceEditor from './settings/AppearanceEditor';
 import LibrarySidebar from './settings/LibrarySidebar';
+import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
 
 interface SettingsViewProps {
   onClose: () => void;
@@ -75,14 +76,14 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
   return (
     <div className="px-6 pb-20 max-w-[1600px] mx-auto relative flex">
       {/* --- LEFT COLUMN: Main Content --- */}
-      <div className={`flex-grow transition-all duration-300 ${activeTab === 'skills' ? 'mr-80' : ''}`}>
+      <div className={`flex-grow transition-all duration-300 ${(activeTab === 'skills' || activeTab === 'specializations') ? 'mr-80' : ''}`}>
 
         {/* Header Navigation */}
         <div className="sticky top-14 z-40 mb-8 flex justify-center no-print pointer-events-none">
           <div className="pointer-events-auto flex gap-2 bg-white/90 backdrop-blur p-1.5 rounded-full shadow-lg border border-gray-200 items-center animate-in fade-in slide-in-from-top-4 duration-300 flex-wrap justify-center">
             <button onClick={() => setActiveTab('attributes')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'attributes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><LayoutGrid size={16} /> Attributs</button>
             <button onClick={() => setActiveTab('skills')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'skills' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><List size={16} /> Compétences</button>
-            <button onClick={() => setActiveTab('specializations')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'specializations' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Tag size={16} /> Spécialisations Imposées</button>
+            <button onClick={() => setActiveTab('specializations')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'specializations' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Tag size={16} /> Spécialisations Automatiques</button>
             <button onClick={() => setActiveTab('creation')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'creation' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><UserPlus size={16} /> Paramètres</button>
             <button onClick={() => setActiveTab('appearance')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${activeTab === 'appearance' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Palette size={16} /> Apparence</button>
           </div>
@@ -169,6 +170,14 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
           onAddLog={onAddLog}
           draggedItem={draggedItem}
           setDraggedItem={setDraggedItem}
+        />
+      )}
+
+      {activeTab === 'specializations' && (
+        <SpecializationLibrarySidebar
+          data={localData}
+          onUpdate={handleLocalUpdate}
+          onAddLog={onAddLog}
         />
       )}
 

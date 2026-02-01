@@ -1,10 +1,12 @@
 
 import React, { useState, useMemo } from 'react';
 import { CharacterSheetData, LibrarySkillEntry } from '../types';
-import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, X, Save, CheckCircle2, Download, AlertTriangle, HelpCircle, AlertOctagon } from 'lucide-react';
+import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, X, Save, CheckCircle2, Download, AlertTriangle, HelpCircle, AlertOctagon, Award } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
+import SpecializationLibraryView from './specialization-library/SpecializationLibraryView';
 import { useCharacter } from '../context/CharacterContext'; // Import Context
 import { useNotification } from '../context/NotificationContext';
+import { smartIncludes } from '../utils/stringUtils';
 
 const CATEGORY_HELP = [
     { code: 'talents', label: 'Talents', loc: 'Colonne 1 (Gauche)' },
@@ -19,7 +21,7 @@ const CATEGORY_HELP = [
 
 const LibraryView: React.FC = () => {
     const { data, updateData: onUpdate } = useCharacter(); // Use Context
-    const [activeTab, setActiveTab] = useState<'traits' | 'skills'>('traits');
+    const [activeTab, setActiveTab] = useState<'traits' | 'skills' | 'specializations'>('traits');
     const addLog = useNotification(); // Use Context
 
     // -- Skill Library Logic --
@@ -57,8 +59,8 @@ const LibraryView: React.FC = () => {
     }, [data.skills]);
 
     const filteredSkills = skillsList.filter(s =>
-        s.name.toLowerCase().includes(skillSearch.toLowerCase()) ||
-        (s.description && s.description.toLowerCase().includes(skillSearch.toLowerCase()))
+        smartIncludes(s.name, skillSearch) ||
+        (s.description && smartIncludes(s.description, skillSearch))
     ).sort((a, b) => a.name.localeCompare(b.name));
 
     const handleOpenNewSkill = () => {
@@ -182,6 +184,16 @@ const LibraryView: React.FC = () => {
                     <GraduationCap size={18} />
                     Réserve de Compétences
                 </button>
+                <button
+                    onClick={() => setActiveTab('specializations')}
+                    className={`flex-1 py-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'specializations'
+                        ? 'border-amber-600 text-amber-700 bg-white'
+                        : 'border-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                        }`}
+                >
+                    <Award size={18} />
+                    Bibliothèque de Spécialisations
+                </button>
             </div>
 
             {/* Content */}
@@ -292,164 +304,176 @@ const LibraryView: React.FC = () => {
                         </div>
                     </div>
                 )}
+
+                {activeTab === 'specializations' && (
+                    <SpecializationLibraryView />
+                )}
             </div>
 
             {/* Category Help Modal */}
-            {showCategoryHelp && (
-                <div className="fixed inset-0 z-[130] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in zoom-in duration-200">
-                        <div className="p-4 border-b border-gray-200 bg-purple-50 flex justify-between items-center">
-                            <h3 className="font-bold text-purple-900 flex items-center gap-2">
-                                <HelpCircle size={20} /> Codes des Catégories
-                            </h3>
-                            <button onClick={() => setShowCategoryHelp(false)} className="text-gray-400 hover:text-gray-700 p-1 rounded"><X size={20} /></button>
-                        </div>
-                        <div className="p-0 overflow-hidden">
-                            <table className="w-full text-sm text-left">
-                                <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
-                                    <tr>
-                                        <th className="px-4 py-3 font-bold">Code Technique</th>
-                                        <th className="px-4 py-3 font-bold">Emplacement sur la fiche</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {CATEGORY_HELP.map((cat, i) => (
-                                        <tr key={i} className="hover:bg-gray-50">
-                                            <td className="px-4 py-2 font-mono text-purple-700 font-bold text-xs">{cat.code}</td>
-                                            <td className="px-4 py-2 text-gray-700">
-                                                <div className="font-bold">{cat.label}</div>
-                                                <div className="text-[10px] text-gray-400">{cat.loc}</div>
-                                            </td>
+            {
+                showCategoryHelp && (
+                    <div className="fixed inset-0 z-[130] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in zoom-in duration-200">
+                            <div className="p-4 border-b border-gray-200 bg-purple-50 flex justify-between items-center">
+                                <h3 className="font-bold text-purple-900 flex items-center gap-2">
+                                    <HelpCircle size={20} /> Codes des Catégories
+                                </h3>
+                                <button onClick={() => setShowCategoryHelp(false)} className="text-gray-400 hover:text-gray-700 p-1 rounded"><X size={20} /></button>
+                            </div>
+                            <div className="p-0 overflow-hidden">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
+                                        <tr>
+                                            <th className="px-4 py-3 font-bold">Code Technique</th>
+                                            <th className="px-4 py-3 font-bold">Emplacement sur la fiche</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="p-3 bg-gray-50 text-xs text-gray-500 border-t border-gray-200">
-                            Ces codes permettent de trier automatiquement les compétences lorsqu'elles sont importées sur la fiche.
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {CATEGORY_HELP.map((cat, i) => (
+                                            <tr key={i} className="hover:bg-gray-50">
+                                                <td className="px-4 py-2 font-mono text-purple-700 font-bold text-xs">{cat.code}</td>
+                                                <td className="px-4 py-2 text-gray-700">
+                                                    <div className="font-bold">{cat.label}</div>
+                                                    <div className="text-[10px] text-gray-400">{cat.loc}</div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="p-3 bg-gray-50 text-xs text-gray-500 border-t border-gray-200">
+                                Ces codes permettent de trier automatiquement les compétences lorsqu'elles sont importées sur la fiche.
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Delete Confirmation Modal */}
-            {skillToDelete && (
-                <div className="fixed inset-0 z-[130] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col animate-in zoom-in duration-200 border-2 border-red-100">
-                        <div className="p-6 text-center">
-                            <div className="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                                <Trash2 size={28} />
+            {
+                skillToDelete && (
+                    <div className="fixed inset-0 z-[130] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col animate-in zoom-in duration-200 border-2 border-red-100">
+                            <div className="p-6 text-center">
+                                <div className="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                    <Trash2 size={28} />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">Supprimer la compétence ?</h3>
+                                <div className="bg-gray-50 p-3 rounded border border-gray-200 mb-4">
+                                    <span className="block font-bold text-gray-800 text-lg">{skillToDelete.name}</span>
+                                </div>
+                                <p className="text-gray-500 text-sm leading-relaxed">
+                                    Cette action est irréversible. La compétence sera retirée de la réserve.
+                                </p>
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Supprimer la compétence ?</h3>
-                            <div className="bg-gray-50 p-3 rounded border border-gray-200 mb-4">
-                                <span className="block font-bold text-gray-800 text-lg">{skillToDelete.name}</span>
+                            <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-200">
+                                <button
+                                    onClick={() => setSkillToDelete(null)}
+                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-white transition-colors"
+                                >
+                                    Annuler
+                                </button>
+                                <button
+                                    onClick={executeDeleteSkill}
+                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 shadow-sm transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <Trash2 size={16} /> Supprimer
+                                </button>
                             </div>
-                            <p className="text-gray-500 text-sm leading-relaxed">
-                                Cette action est irréversible. La compétence sera retirée de la réserve.
-                            </p>
-                        </div>
-                        <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-200">
-                            <button
-                                onClick={() => setSkillToDelete(null)}
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-white transition-colors"
-                            >
-                                Annuler
-                            </button>
-                            <button
-                                onClick={executeDeleteSkill}
-                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 shadow-sm transition-colors flex items-center justify-center gap-2"
-                            >
-                                <Trash2 size={16} /> Supprimer
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Import Confirmation Modal */}
-            {showImportConfirm && (
-                <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in zoom-in duration-200">
-                        <div className="p-6 text-center">
-                            <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
-                                <Download size={28} />
+            {
+                showImportConfirm && (
+                    <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in zoom-in duration-200">
+                            <div className="p-6 text-center">
+                                <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
+                                    <Download size={28} />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">Importer depuis la fiche ?</h3>
+                                <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                                    Cette action va scanner votre fiche de personnage et ajouter toutes les compétences trouvées à la réserve.
+                                </p>
+                                <div className="bg-yellow-50 text-yellow-800 text-xs p-3 rounded-lg border border-yellow-200 text-left flex gap-2">
+                                    <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+                                    <span>Les doublons (compétences portant le même nom) seront ignorés pour éviter les répétitions.</span>
+                                </div>
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Importer depuis la fiche ?</h3>
-                            <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                                Cette action va scanner votre fiche de personnage et ajouter toutes les compétences trouvées à la réserve.
-                            </p>
-                            <div className="bg-yellow-50 text-yellow-800 text-xs p-3 rounded-lg border border-yellow-200 text-left flex gap-2">
-                                <AlertTriangle size={16} className="shrink-0 mt-0.5" />
-                                <span>Les doublons (compétences portant le même nom) seront ignorés pour éviter les répétitions.</span>
+                            <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-200">
+                                <button
+                                    onClick={() => setShowImportConfirm(false)}
+                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-white transition-colors"
+                                >
+                                    Annuler
+                                </button>
+                                <button
+                                    onClick={executeImportFromSheet}
+                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-sm transition-colors"
+                                >
+                                    Confirmer
+                                </button>
                             </div>
-                        </div>
-                        <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-200">
-                            <button
-                                onClick={() => setShowImportConfirm(false)}
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-white transition-colors"
-                            >
-                                Annuler
-                            </button>
-                            <button
-                                onClick={executeImportFromSheet}
-                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-sm transition-colors"
-                            >
-                                Confirmer
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Skill Edit Modal */}
-            {isSkillModalOpen && editingSkill && (
-                <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
-                        <div className="p-4 border-b flex justify-between items-center text-white bg-purple-700">
-                            <h3 className="font-bold text-lg flex items-center gap-2">
-                                <GraduationCap size={20} />
-                                {skillsList.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence'}
-                            </h3>
-                            <button onClick={() => setIsSkillModalOpen(false)} className="hover:bg-white/20 p-1 rounded transition-colors">
-                                <X size={24} />
-                            </button>
-                        </div>
+            {
+                isSkillModalOpen && editingSkill && (
+                    <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+                            <div className="p-4 border-b flex justify-between items-center text-white bg-purple-700">
+                                <h3 className="font-bold text-lg flex items-center gap-2">
+                                    <GraduationCap size={20} />
+                                    {skillsList.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence'}
+                                </h3>
+                                <button onClick={() => setIsSkillModalOpen(false)} className="hover:bg-white/20 p-1 rounded transition-colors">
+                                    <X size={24} />
+                                </button>
+                            </div>
 
-                        <div className="p-6 bg-gray-50 flex flex-col gap-4">
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom</label>
-                                <input
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 font-bold text-gray-900 bg-white focus:border-purple-500 outline-none"
-                                    value={editingSkill.name}
-                                    onChange={(e) => setEditingSkill({ ...editingSkill, name: e.target.value })}
-                                    autoFocus
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description (Optionnelle)</label>
-                                <textarea
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white min-h-[80px] focus:border-purple-500 outline-none resize-none"
-                                    value={editingSkill.description || ''}
-                                    onChange={(e) => setEditingSkill({ ...editingSkill, description: e.target.value })}
-                                />
-                            </div>
-                            {skillError && (
-                                <div className="bg-red-50 text-red-600 text-xs p-2 rounded border border-red-200 font-bold">
-                                    {skillError}
+                            <div className="p-6 bg-gray-50 flex flex-col gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom</label>
+                                    <input
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 font-bold text-gray-900 bg-white focus:border-purple-500 outline-none"
+                                        value={editingSkill.name}
+                                        onChange={(e) => setEditingSkill({ ...editingSkill, name: e.target.value })}
+                                        autoFocus
+                                    />
                                 </div>
-                            )}
-                        </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description (Optionnelle)</label>
+                                    <textarea
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white min-h-[80px] focus:border-purple-500 outline-none resize-none"
+                                        value={editingSkill.description || ''}
+                                        onChange={(e) => setEditingSkill({ ...editingSkill, description: e.target.value })}
+                                    />
+                                </div>
+                                {skillError && (
+                                    <div className="bg-red-50 text-red-600 text-xs p-2 rounded border border-red-200 font-bold">
+                                        {skillError}
+                                    </div>
+                                )}
+                            </div>
 
-                        <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
-                            <button onClick={() => setIsSkillModalOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded font-bold">Annuler</button>
-                            <button onClick={handleSaveSkill} className="px-6 py-2 bg-purple-600 text-white rounded font-bold shadow-md hover:bg-purple-700 flex items-center gap-2">
-                                <Save size={16} /> Enregistrer
-                            </button>
+                            <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
+                                <button onClick={() => setIsSkillModalOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded font-bold">Annuler</button>
+                                <button onClick={handleSaveSkill} className="px-6 py-2 bg-purple-600 text-white rounded font-bold shadow-md hover:bg-purple-700 flex items-center gap-2">
+                                    <Save size={16} /> Enregistrer
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 

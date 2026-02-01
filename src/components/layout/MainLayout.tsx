@@ -130,7 +130,7 @@ const MainLayout: React.FC = () => {
                 {/* NEW: Diegetic Navigation (Styled as Classic) */}
                 <DiegeticNavigation
                     currentMode={mode}
-                    setMode={setMode}
+                    onModeChange={handleSwitchMode}
                     onOpenImportExport={() => setShowImportExport(true)}
                     onPrintRequest={handlePrintRequest}
                     onToggleLandscape={() => setIsLandscape(!isLandscape)}
@@ -202,7 +202,7 @@ const MainLayout: React.FC = () => {
                             </div>
                         ) : (
                             <SettingsView
-                                onClose={() => setMode('sheet')}
+                                onClose={() => handleSwitchMode('sheet')}
                                 onDirtyChange={setIsSettingsDirty}
                             />
                         )}

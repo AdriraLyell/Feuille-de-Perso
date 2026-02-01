@@ -5,7 +5,7 @@ import { CharacterSheetData } from '../../types';
 
 interface DiegeticNavigationProps {
     currentMode: 'sheet' | 'settings' | 'library';
-    setMode: (mode: 'sheet' | 'settings' | 'library') => void;
+    onModeChange: (mode: 'sheet' | 'settings' | 'library') => void;
     onOpenImportExport: () => void;
     onPrintRequest: () => void;
     onToggleLandscape: () => void;
@@ -18,7 +18,7 @@ interface DiegeticNavigationProps {
 }
 
 const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
-    currentMode, setMode, onOpenImportExport,
+    currentMode, onModeChange, onOpenImportExport,
     onPrintRequest, onToggleLandscape, isLandscape,
     onShowLogs, showLogs, onShowUserGuide, onShowChangelog, appVersion
 }) => {
@@ -45,7 +45,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                     {/* Sheet Button */}
                     <button
-                        onClick={() => setMode('sheet')}
+                        onClick={() => onModeChange('sheet')}
                         className={`px-4 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-2 ${currentMode === 'sheet'
                             ? 'bg-blue-600 text-white shadow-sm'
                             : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
@@ -69,7 +69,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                     {/* Navigation Buttons (Moved to Right) */}
                     <div className="hidden md:flex items-center gap-2 mr-4 border-r border-gray-600 pr-4">
                         <button
-                            onClick={() => setMode('library')}
+                            onClick={() => onModeChange('library')}
                             className={`px-4 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-2 ${currentMode === 'library'
                                 ? 'bg-blue-600 text-white shadow-sm'
                                 : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
@@ -77,7 +77,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                             <BookOpen size={16} /> Bibliothèque
                         </button>
                         <button
-                            onClick={() => setMode('settings')}
+                            onClick={() => onModeChange('settings')}
                             className={`px-4 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-2 ${currentMode === 'settings'
                                 ? 'bg-blue-600 text-white shadow-sm'
                                 : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}

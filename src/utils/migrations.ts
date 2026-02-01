@@ -29,17 +29,17 @@ export const migrateData = (parsed: any): CharacterSheetData => {
 
     // Fix: Ensure correct array lengths if old data was shorter
     if (parsed.page2.avantages && parsed.page2.avantages.length < 28) {
-            const diff = 28 - parsed.page2.avantages.length;
-            parsed.page2.avantages = [...parsed.page2.avantages, ...Array(diff).fill(null).map(() => ({ name: '', value: '' }))];
+        const diff = 28 - parsed.page2.avantages.length;
+        parsed.page2.avantages = [...parsed.page2.avantages, ...Array(diff).fill(null).map(() => ({ name: '', value: '' }))];
     } else if (!parsed.page2.avantages) {
-            parsed.page2.avantages = Array(28).fill(null).map(() => ({ name: '', value: '' }));
+        parsed.page2.avantages = Array(28).fill(null).map(() => ({ name: '', value: '' }));
     }
 
     if (parsed.page2.desavantages && parsed.page2.desavantages.length < 28) {
-            const diff = 28 - parsed.page2.desavantages.length;
-            parsed.page2.desavantages = [...parsed.page2.desavantages, ...Array(diff).fill(null).map(() => ({ name: '', value: '' }))];
+        const diff = 28 - parsed.page2.desavantages.length;
+        parsed.page2.desavantages = [...parsed.page2.desavantages, ...Array(diff).fill(null).map(() => ({ name: '', value: '' }))];
     } else if (!parsed.page2.desavantages) {
-            parsed.page2.desavantages = Array(28).fill(null).map(() => ({ name: '', value: '' }));
+        parsed.page2.desavantages = Array(28).fill(null).map(() => ({ name: '', value: '' }));
     }
 
     // Migration 3: Convert old counters structure to new DotEntry structure
@@ -51,7 +51,7 @@ export const migrateData = (parsed: any): CharacterSheetData => {
             custom: INITIAL_DATA.counters.custom // Reset custom/valets to default new structure
         };
     }
-    
+
     // Migration 3b: Ensure counters have 'current' property (for squares)
     if (parsed.counters) {
         if (typeof parsed.counters.volonte.current === 'undefined') parsed.counters.volonte.current = 0;
@@ -63,10 +63,10 @@ export const migrateData = (parsed: any): CharacterSheetData => {
             }));
         }
     }
-    
+
     // Migration 17: Remove "Valets / Dames / Rois" if present (User requested removal)
     if (parsed.counters && parsed.counters.custom) {
-        parsed.counters.custom = parsed.counters.custom.filter((c: any) => 
+        parsed.counters.custom = parsed.counters.custom.filter((c: any) =>
             c.name !== "Valets / Dames / Rois"
         );
     }
@@ -125,11 +125,11 @@ export const migrateData = (parsed: any): CharacterSheetData => {
             }
         }
     }
-    
+
     if (!parsed.attributeSettings) {
         parsed.attributeSettings = INITIAL_DATA.attributeSettings;
     }
-    
+
     if (!parsed.attributes) {
         parsed.attributes = {};
     }
@@ -156,40 +156,40 @@ export const migrateData = (parsed: any): CharacterSheetData => {
 
     const notebookFields = ['lieux_importants', 'contacts', 'connaissances', 'valeurs_monetaires'];
     notebookFields.forEach(field => {
-            if (Array.isArray(parsed.page2[field])) {
-                parsed.page2[field] = parsed.page2[field].filter((x:any) => x && x.trim() !== '').join('\n');
-            } 
-            else if (typeof parsed.page2[field] !== 'string') {
-                parsed.page2[field] = '';
-            }
+        if (Array.isArray(parsed.page2[field])) {
+            parsed.page2[field] = parsed.page2[field].filter((x: any) => x && x.trim() !== '').join('\n');
+        }
+        else if (typeof parsed.page2[field] !== 'string') {
+            parsed.page2[field] = '';
+        }
     });
 
     if (parsed.page2.personalite) {
-            delete parsed.page2.personalite;
+        delete parsed.page2.personalite;
     }
 
     if (parsed.page2.reputation) {
-            if (parsed.page2.reputation.length < 7) {
-                const diff = 7 - parsed.page2.reputation.length;
-                parsed.page2.reputation = [
-                    ...parsed.page2.reputation, 
-                    ...Array(diff).fill({ reputation: '', lieu: '', valeur: '' })
-                ];
-            }
+        if (parsed.page2.reputation.length < 7) {
+            const diff = 7 - parsed.page2.reputation.length;
+            parsed.page2.reputation = [
+                ...parsed.page2.reputation,
+                ...Array(diff).fill({ reputation: '', lieu: '', valeur: '' })
+            ];
+        }
     } else {
-            parsed.page2.reputation = Array(7).fill({ reputation: '', lieu: '', valeur: '' });
+        parsed.page2.reputation = Array(7).fill({ reputation: '', lieu: '', valeur: '' });
     }
 
     if (Array.isArray(parsed.page2.notes)) {
-            parsed.page2.notes = parsed.page2.notes.filter((n: string) => n && n.trim() !== '').join('\n');
+        parsed.page2.notes = parsed.page2.notes.filter((n: string) => n && n.trim() !== '').join('\n');
     } else if (typeof parsed.page2.notes !== 'string') {
-            parsed.page2.notes = '';
+        parsed.page2.notes = '';
     }
 
     if (Array.isArray(parsed.page2.equipement)) {
-            parsed.page2.equipement = parsed.page2.equipement.filter((n: string) => n && n.trim() !== '').join('\n');
+        parsed.page2.equipement = parsed.page2.equipement.filter((n: string) => n && n.trim() !== '').join('\n');
     } else if (typeof parsed.page2.equipement !== 'string') {
-            parsed.page2.equipement = '';
+        parsed.page2.equipement = '';
     }
 
     if (typeof parsed.page2.characterImage === 'undefined') {
@@ -211,30 +211,38 @@ export const migrateData = (parsed: any): CharacterSheetData => {
     }
 
     if (parsed.xpLogs && parsed.xpLogs.length > 0) {
-            parsed.xpLogs = parsed.xpLogs.map((log: any) => {
-                const newLog = { ...log };
-                if (typeof newLog.mj === 'undefined') {
-                    newLog.mj = '';
-                }
-                if (typeof newLog.spendingLocation === 'undefined') {
-                    newLog.spendingLocation = '';
-                }
-                return newLog;
-            });
+        parsed.xpLogs = parsed.xpLogs.map((log: any) => {
+            const newLog = { ...log };
+            if (typeof newLog.mj === 'undefined') {
+                newLog.mj = '';
+            }
+            if (typeof newLog.spendingLocation === 'undefined') {
+                newLog.spendingLocation = '';
+            }
+            return newLog;
+        });
     }
-    
-    if (!parsed.imposedSpecializations) {
-        parsed.imposedSpecializations = {};
+
+    if (parsed.imposedSpecializations) {
+        Object.keys(parsed.imposedSpecializations).forEach(skillId => {
+            const list = parsed.imposedSpecializations[skillId];
+            if (Array.isArray(list) && list.length > 0 && typeof list[0] === 'string') {
+                parsed.imposedSpecializations[skillId] = list.map((s: string) => ({
+                    name: s,
+                    minLevel: 0
+                }));
+            }
+        });
     }
 
     if (!parsed.appLogs) {
         parsed.appLogs = [];
     }
-    
+
     if (!parsed.creationConfig) {
         parsed.creationConfig = INITIAL_DATA.creationConfig;
     }
-    
+
     if (!parsed.theme) {
         parsed.theme = INITIAL_DATA.theme;
     }
@@ -248,11 +256,11 @@ export const migrateData = (parsed: any): CharacterSheetData => {
     if (typeof parsed.creationConfig.attributeCost === 'undefined') {
         parsed.creationConfig.attributeCost = INITIAL_DATA.creationConfig.attributeCost;
     }
-    
+
     if (!parsed.creationConfig.cardConfig) {
         parsed.creationConfig.cardConfig = INITIAL_DATA.creationConfig.cardConfig;
     }
-    
+
     if (!parsed.library) {
         parsed.library = [];
     }
@@ -275,7 +283,7 @@ export const migrateData = (parsed: any): CharacterSheetData => {
         // Ensure skills object exists before iterating
         if (parsed.skills) {
             Object.keys(parsed.skills).forEach(cat => {
-                if (cat === 'arrieres_plans') return; 
+                if (cat === 'arrieres_plans') return;
                 // @ts-ignore
                 const skills = parsed.skills[cat] || [];
                 skills.forEach((skill: any) => {
@@ -321,7 +329,7 @@ export const migrateData = (parsed: any): CharacterSheetData => {
     if (!parsed.partyNotes) {
         parsed.partyNotes = INITIAL_DATA.partyNotes;
     }
-    
+
     if (parsed.partyNotes && !parsed.partyNotes.staticColWidths) {
         parsed.partyNotes.staticColWidths = INITIAL_DATA.partyNotes.staticColWidths;
     }
@@ -329,12 +337,12 @@ export const migrateData = (parsed: any): CharacterSheetData => {
     if (!parsed.skills) {
         parsed.skills = {};
     }
-    
+
     const requiredSkillCats: SkillCategoryKey[] = [
         'talents', 'competences', 'competences_col_2', 'connaissances',
         'competences2', 'autres_competences', 'autres', 'arrieres_plans'
     ];
-    
+
     requiredSkillCats.forEach(cat => {
         if (!parsed.skills[cat]) {
             // @ts-ignore
@@ -348,11 +356,11 @@ export const migrateData = (parsed: any): CharacterSheetData => {
             return item;
         });
     };
-    
+
     Object.keys(parsed.skills).forEach(key => {
         parsed.skills[key] = ensureCreationValue(parsed.skills[key]);
     });
-    
+
     if (parsed.counters) {
         if (typeof parsed.counters.volonte.creationValue === 'undefined') parsed.counters.volonte.creationValue = 3;
         if (typeof parsed.counters.confiance.creationValue === 'undefined') parsed.counters.confiance.creationValue = 3;

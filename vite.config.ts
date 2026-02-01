@@ -1,10 +1,15 @@
-
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
 export default defineConfig({
   plugins: [react(), viteSingleFile()],
+  // @ts-ignore
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+  },
   base: './',
   build: {
     outDir: 'dist',
@@ -16,9 +21,9 @@ export default defineConfig({
     chunkSizeWarningLimit: 100000000,
     cssCodeSplit: false,
     rollupOptions: {
-        output: {
-            inlineDynamicImports: true, // Empêche la création de "chunks" séparés
-        },
+      output: {
+        inlineDynamicImports: true, // Empêche la création de "chunks" séparés
+      },
     },
   }
 });

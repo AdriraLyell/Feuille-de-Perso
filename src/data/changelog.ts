@@ -3,6 +3,140 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG: ChangelogEntry[] = [
     {
+        version: "2.7.6",
+        date: "01/02/2026 15:15",
+        type: 'patch',
+        changes: [
+            "UX : Dans la modale d'édition, les compétences cochées restent désormais visibles même si elles ne correspondent pas au terme de recherche actuel.",
+            "UX : Une compétence décochée qui ne correspond pas au filtre disparaît immédiatement de la vue."
+        ]
+    },
+    {
+        version: "2.7.5",
+        date: "01/02/2026 15:05",
+        type: 'patch',
+        changes: [
+            "Recherche : Implémentation de la recherche intelligente (insensible aux accents et à la casse).",
+            "Filtres : Uniformisation du comportement de recherche dans toutes les bibliothèques et l'Omnibar.",
+            "Technique : Centralisation de la normalisation de texte via un nouvel utilitaire stringUtils."
+        ]
+    },
+    {
+        version: "2.7.4",
+        date: "01/02/2026 14:55",
+        type: 'patch',
+        changes: [
+            "Bibliothèque : Ajout d'un champ de recherche pour filtrer les compétences lors de l'édition d'une spécialisation.",
+            "Bibliothèque : Tri alphabétique automatique de la liste des compétences parentes.",
+            "UX : Amélioration visuelle de la sélection des compétences (surbrillance et indicateur de nombre)."
+        ]
+    },
+    {
+        version: "2.7.3",
+        date: "01/02/2026 14:45",
+        type: 'patch',
+        changes: [
+            "Sécurité : Alerte de confirmation avant de quitter les réglages si des modifications ne sont pas enregistrées.",
+            "Fiabilisation : Correction du bug de pollution des bibliothèques (synchronisation déportée sur le 'onBlur').",
+            "Automatisation : Synchronisation bidirectionnelle automatique entre la configuration MJ et les catalogues globaux.",
+            "UI : Renommage des 'Spécialisations Imposées' en 'Spécialisations Automatiques' pour plus de clarté."
+        ]
+    },
+    {
+        version: "2.7.0",
+        date: "01/02/2026 14:00",
+        type: 'minor',
+        changes: [
+            "Bibliothèque : Création du Catalogue de Spécialisations centralisé.",
+            "Ergonomie : Nouvel Omnibar de recherche intelligente pour les spécialisations.",
+            "Drag-and-Drop : Support du glisser-déposer depuis le catalogue vers la fiche ou les réglages MJ.",
+            "Import/Export : Support complet du catalogue de spécialisations avec fusion intelligente et résolution de conflits."
+        ]
+    },
+    {
+        version: "2.6.0",
+        date: "01/02/2026 13:00",
+        type: 'minor',
+        changes: [
+            "Architecture : Refonte technique majeure des composants cœurs pour une meilleure modularité.",
+            "TraitLibrary : Fragmentation du composant monolithique en sous-composants spécialisés (TraitCard, TraitForm, TraitEffectEditor).",
+            "CharacterSheet : Découpage chirurgical du fichier principal (Header, ExperienceSummary, CreationModeModal).",
+            "Performance : Optimisation du cycle de rendu React grâce à des composants plus petits et isolés.",
+            "Maintenance : Extraction de la logique complexe de mise en page dans un hook dédié (useSheetLayout).",
+            "Code Quality : Réduction significative de la complexité cyclomatique des fichiers principaux."
+        ]
+    },
+    {
+        version: "2.5.1",
+        date: "01/02/2026 12:35",
+        type: 'patch',
+        changes: [
+            "Spécialisations : Application d'une règle globale de visibilité (minimum 1 point dans la compétence requis).",
+            "Fiche : Les spécialisations imposées sont désormais masquées tant que la compétence racine est à 0."
+        ]
+    },
+    {
+        version: "2.5.0",
+        date: "01/02/2026 12:35",
+        type: 'minor',
+        changes: [
+            "Spécialisations : Introduction des seuils de niveau pour les spécialisations imposées.",
+            "MJ : Possibilité de définir un niveau minimum requis dans une compétence pour activer une spécialisation offerte.",
+            "UI : Nouvel éditeur de seuils intégré dans les paramètres de spécialisation.",
+            "Fiche : Masquage automatique des spécialisations (et de l'étoile indicative) tant que le niveau requis n'est pas atteint.",
+            "Architecture : Migration structurelle des données de spécialisation pour supporter les métadonnées de seuil."
+        ]
+    },
+    {
+        version: "2.4.0",
+        date: "01/02/2026 12:08",
+        type: 'minor',
+        changes: [
+            "UI : Expansion majeure du catalogue de symboles de notation (32 symboles disponibles).",
+            "UI : Ajout de symboles thématiques RPG (Couronne, Fantôme, Hache, Épée, etc.).",
+            "UI : Optimisation du rendu visuel des symboles avec gestion native du remplissage (stroke/fill).",
+            "Architecture : Résolution de l'erreur de configuration TypeScript (types Node.js).",
+            "Version : Passage à la version 2.4.0 pour marquer l'introduction de la personnalisation visuelle avancée."
+        ]
+    },
+    {
+        version: "2.3.0",
+        date: "01/02/2026 11:53",
+        type: 'minor',
+        changes: [
+            "Robustesse : Ajout d'une couche de validation de données (Zod) pour sécuriser le chargement et l'import.",
+            "Qualité : Mise en place de l'environnement de tests unitaires avec Vitest.",
+            "Tests : Validation automatisée de la logique de calcul d'XP, des migrations de données et des hooks de bonus.",
+            "UI : Personnalisation des symboles de notation (Cercle, Carré, Étoile, etc.) via l'onglet Apparence.",
+            "Correction : Optimisation visuelle des symboles (mode vide/plein) pour une meilleure lisibilité.",
+            "UI : Ajout d'une alerte visuelle de décalage de version lors de l'importation de fichiers.",
+            "Maintenance : Refonte chirurgicale du module d'Import/Export (découpage en composants et extraction de la logique métier).",
+            "Sécurité : Protection contre les sauvegardes corrompues avec fallback automatique vers l'état initial sain."
+        ]
+    },
+    {
+        version: "2.2.0",
+        date: "01/02/2026 10:45",
+        type: 'minor',
+        changes: [
+            "Performance : Optimisation majeure des re-rendus React.",
+            "Architecture : Séparation du CharacterContext en État (données) et Actions (fonctions) pour une meilleure fluidité.",
+            "Stabilité : Stabilisation des fonctions de modification (useCallback + Functional Updates) pour éviter les calculs inutiles.",
+            "Optimisation : Mémoïsation des composants de section (Attributs, Compétences, Combat, Compteurs) via React.memo."
+        ]
+    },
+    {
+        version: "2.1.0",
+        date: "01/02/2026 10:20",
+        type: 'minor',
+        changes: [
+            "Architecture : Refactorisation structurelle majeure pour améliorer la maintenabilité.",
+            "Code : Extraction de la logique métier (calculs de bonus, mode création) dans des Custom Hooks dédiés (useCharacterBonuses, useCreationMode).",
+            "Organisation : Réorganisation des composants UI (migration de DotRating vers le dossier dédié).",
+            "Performance : Séparation de la logique de calcul de la couche de présentation (JSX) pour une meilleure clarté."
+        ]
+    },
+    {
         version: "2.0.5",
         date: "31/01/2026 23:15",
         type: 'patch',
