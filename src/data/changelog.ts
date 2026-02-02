@@ -1,7 +1,264 @@
 
 import { ChangelogEntry } from '../types';
 
-export const CHANGELOG: ChangelogEntry[] = [
+export const CHANGELOG = [
+    {
+        version: '2.12.35',
+        date: '2026-02-02',
+        changes: [
+            'Correctif : Amélioration de la zone de saisie "Notes" pour garantir qu\'on puisse écrire jusqu\'en bas.'
+        ]
+    },
+    {
+        version: '2.12.34',
+        date: '2026-02-02',
+        changes: [
+            'Correctif : La zone de saisie "Notes" occupe bien toute la hauteur disponible du cadre.'
+        ]
+    },
+    {
+        version: '2.12.33',
+        date: '2026-02-02',
+        changes: [
+            'Correctif : Restauration de la taille de la zone "Notes" en bas de la page "Détails & Équipement".'
+        ]
+    },
+    {
+        version: '2.12.32',
+        date: '2026-02-02',
+        changes: [
+            'Correctif Critique : Le défilement de la page n\'est plus bloqué après avoir validé ou fermé une fenêtre modale.'
+        ]
+    },
+    {
+        version: '2.12.31',
+        date: '2026-02-02',
+        changes: [
+            'Correctif : Suppression des logs de débogage dans la console.',
+            'Ergonomie : La fiche s\'agrandit désormais automatiquement en hauteur si vous ajoutez beaucoup de compétences, débloquant le défilement.'
+        ]
+    },
+    {
+        version: '2.12.30',
+        date: '2026-02-02',
+        changes: [
+            'Ergonomie : Les compétences à variations (Artisanat : ...) sont maintenant cliquables directement sur la fiche.',
+            'Fonctionnalité : Remplir une variante ajoute automatiquement une nouvelle ligne vide en dessous pour des ajouts rapides.'
+        ]
+    },
+    {
+        version: '2.12.29',
+        date: '2026-02-02',
+        changes: [
+            'Nettoyage : Suppression des traces de débogage de la migration, le correctif étant confirmé.'
+        ]
+    },
+    {
+        version: '2.12.28',
+        date: '2026-02-02',
+        changes: [
+            'Correction Critique : Mise à jour du schéma de validation pour autoriser le champ "variante" (empêche sa suppression automatique).'
+        ]
+    },
+    {
+        version: '2.12.27',
+        date: '2026-02-02',
+        changes: [
+            'Correction d\'urgence : Réparation automatique des conflits de nommage dans les données sauvegardées (skilllibrary vs skillLibrary).'
+        ]
+    },
+    {
+        version: '2.12.26',
+        date: '2026-02-02',
+        changes: [
+            'Correction : Application rétroactive du statut "Variable" aux compétences déjà présentes sur la fiche (restauration des champs de saisie).'
+        ]
+    },
+    {
+        version: '2.12.25',
+        date: '2026-02-02',
+        changes: [
+            'Diagnostic : Ajout de traces détaillées dans le processus de migration de la bibliothèque.'
+        ]
+    },
+    {
+        version: '2.12.24',
+        date: '2026-02-02',
+        changes: [
+            'Correction d\'initialisation : Forçage de la mise à jour des indicateurs "Variable" pour les bibliothèques existantes (Artisanat, Jouer, Art Martial).'
+        ]
+    },
+    {
+        version: '2.12.23',
+        date: '2026-02-02',
+        changes: [
+            'Ajout de traces pour diagnostic approfondi de l\'initialisation.'
+        ]
+    },
+    {
+        version: '2.12.22',
+        date: '2026-02-02',
+        changes: [
+            'Correction définitive de l\'initialisation : Le premier lancement charge désormais strictement les données par défaut, garantissant l\'intégrité de la bibliothèque et des valeurs.',
+        ]
+    },
+    {
+        version: '2.12.21',
+        date: '2026-02-02',
+        changes: [
+            'Correction critique : La bibliothèque de compétences se charge désormais correctement lors de la première ouverture (ou mise à jour depuis une ancienne version).',
+            'Correction interne : La propriété "Variable" est maintenant correctement validée et conservée.'
+        ]
+    },
+    {
+        version: '2.12.20',
+        date: '2026-02-02',
+        changes: [
+            'Ajustement : Déplacement de l\'icône "Variable" à côté de l\'indicateur de présence sur les cartes de compétence.'
+        ]
+    },
+    {
+        version: '2.12.19',
+        date: '2026-02-02',
+        changes: [
+            'Polissage visuel de la bibliothèque de compétences (icônes "Variable" et "Présent").',
+            'Ajout d\'une légende explicative dans la vue principale de la bibliothèque.'
+        ]
+    },
+    {
+        version: '2.12.18',
+        date: '2026-02-02',
+        changes: [
+            'Correction : Les compétences variables ajoutées sans précision affichent bien " : ..." au lieu de rien.',
+            'Assurance que la propriété "variante" est bien conservée même vide.'
+        ]
+    },
+    {
+        version: '2.12.17',
+        date: '2026-02-02',
+        changes: [
+            'Ajout d\'un indicateur visuel (" : ...") pour les compétences variables sans spécialité définie sur la fiche.',
+            'Amélioration de la lisibilité des compétences vides.'
+        ]
+    },
+    {
+        version: '2.12.16',
+        date: '2026-02-02',
+        changes: [
+            'Configuration par défaut : Artisanat, Jouer et Art Martial sont désormais initialisés comme variables.',
+            'Ceci permet de spécifier directement la spécialité lors de la création d\'un nouveau personnage.'
+        ]
+    },
+    {
+        version: '2.12.15',
+        date: '2026-02-02',
+        changes: [
+            'Les compétences "variables" resten désomais dans la réserve après ajout, pour permettre des ajouts multiples (ex: plusieurs Artisanats).',
+            'Correction mineure de l\'affichage de la réserve.'
+        ]
+    },
+    {
+        version: '2.12.14',
+        date: '2026-02-02',
+        changes: [
+            'Remplacement de la modale native par une modale thématique lors de l\'ajout de compétences variables.',
+            'Amélioration de l\'UX lors du glisser-déposer de compétences.'
+        ]
+    },
+    {
+        version: '2.12.13',
+        date: '2026-02-02',
+        changes: [
+            'Ajout du système de Compétences Variables (ex: Artisanat : Forge).',
+            'La bibliothèque permet de marquer une compétence comme variable.',
+            'À l\'ajout, une boîte de dialogue demande de préciser la spécialité.',
+            'L\'éditeur de configuration permet de modifier la variante ultérieurement.'
+        ]
+    },
+    {
+        version: "2.12.12",
+        date: "2026-02-01",
+        changes: [
+            "Ajout du système de Traits Variables (ex: Allergie : Chats).",
+            "Mise à jour de l'éditeur de traits (Page 2) pour supporter les variantes et compléments.",
+            "Mise à jour de la Bibliothèque pour permettre la configuration de traits variables."
+        ]
+    },
+    {
+        version: "2.12.11",
+        date: "2026-02-01",
+        changes: [
+            "Harmonisation des boutons d'action (Importer/Créer) sur l'ensemble des bibliothèques.",
+            "Standardisation de la taille des textes et des icônes d'action."
+        ]
+    },
+    {
+        version: "2.12.10",
+        date: "2026-02-01",
+        changes: [
+            "Harmonisation visuelle des onglets de bibliothèque (Style Premium RPG).",
+            "Unification du thème (Sépia/Papier) pour Traits et Spécialisations.",
+            "Ajout de badges 'Utilisé' sur les cartes de Traits."
+        ]
+    },
+    {
+        version: "2.12.9",
+        date: "2026-02-01",
+        type: 'patch',
+        changes: [
+            "UI : Synchronisation du numéro de version affiché dans l'interface (2.9.11 -> 2.12.9)."
+        ]
+    },
+    {
+        version: "2.12.0",
+        date: "2026-02-01",
+        type: 'minor',
+        changes: [
+            "Feature : L'éditeur de traits (page Détails & Equipement) permet maintenant de saisir une description et un tag/catégorie.",
+            "Feature : Lors de la sélection d'un trait depuis la bibliothèque, la description et le tag sont automatiquement remplis."
+        ]
+    },
+    {
+        version: "2.11.5",
+        date: "2026-02-01",
+        type: 'patch',
+        changes: [
+            "UI : Agrandissement de la zone de la bibliothèque dans les réglages pour maximiser l'espace utilisable."
+        ]
+    },
+    {
+        version: "2.11.4",
+        date: "2026-02-01",
+        type: 'patch',
+        changes: [
+            "Bug Fix : Correction d'une erreur (ReferenceError) lors de l'ouverture des réglages due à des imports manquants."
+        ]
+    },
+    {
+        version: "2.11.3",
+        date: "2026-02-01",
+        type: 'patch',
+        changes: [
+            "UI : Le bouton 'Bibliothèque' a été déplacé du menu principal vers l'onglet dédié dans les Réglages."
+        ]
+    },
+    {
+        version: "2.11.2",
+        date: "2026-02-01",
+        type: 'patch',
+        changes: [
+            "Correction : Le rapport de migration (et la recommandation de sauvegarde) s'affiche désormais correctement après un import."
+        ]
+    },
+    {
+        version: "2.11.1",
+        date: "2026-02-01",
+        type: 'patch',
+        changes: [
+            "Code : Refactoring majeur du module Import/Export (Découpage en sous-composants).",
+            "Maintenance : Amélioration de la structure du code pour faciliter les évolutions futures."
+        ]
+    },
     {
         version: "2.9.11",
         date: "2026-02-01",

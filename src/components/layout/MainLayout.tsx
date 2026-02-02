@@ -18,7 +18,6 @@ import PrintSelectionModal from '../PrintSelectionModal';
 import ChangelogModal from '../ChangelogModal';
 import UserGuideModal from '../UserGuideModal';
 import CreationHUD from '../CreationHUD';
-import LibraryView from '../LibraryView';
 import UpdateNotifier from '../UpdateNotifier';
 import DiegeticNavigation from './DiegeticNavigation';
 
@@ -31,8 +30,8 @@ const MainLayout: React.FC = () => {
 
     // UI State
     const [lastSavedState, setLastSavedState] = useState<string>("");
-    const [mode, setMode] = useState<'sheet' | 'settings' | 'library'>('sheet');
-    const [pendingMode, setPendingMode] = useState<'sheet' | 'settings' | 'library' | null>(null);
+    const [mode, setMode] = useState<'sheet' | 'settings'>('sheet');
+    const [pendingMode, setPendingMode] = useState<'sheet' | 'settings' | null>(null);
     const [sheetTab, setSheetTab] = useState<'p1' | 'specs' | 'p2' | 'xp' | 'notes'>('p1');
     const [isLandscape, setIsLandscape] = useState(false);
     const [isSettingsDirty, setIsSettingsDirty] = useState(false);
@@ -92,7 +91,7 @@ const MainLayout: React.FC = () => {
         }, 500);
     };
 
-    const handleSwitchMode = (targetMode: 'sheet' | 'settings' | 'library') => {
+    const handleSwitchMode = (targetMode: 'sheet' | 'settings') => {
         if (mode === targetMode) return;
         if (mode === 'settings' && isSettingsDirty) {
             setPendingMode(targetMode);
@@ -195,11 +194,6 @@ const MainLayout: React.FC = () => {
 
                                 {data.creationConfig?.active && (<CreationHUD />)}
                             </>
-                        ) : mode === 'library' ? (
-                            <div className="max-w-5xl mx-auto w-full p-4 h-[calc(100vh-80px)]">
-                                {/* NEW: Using LibraryView instead of TraitLibrary directly */}
-                                <LibraryView />
-                            </div>
                         ) : (
                             <SettingsView
                                 onClose={() => handleSwitchMode('sheet')}
@@ -219,7 +213,7 @@ const MainLayout: React.FC = () => {
                     <ImportExportModal
                         isOpen={showImportExport}
                         onClose={() => setShowImportExport(false)}
-                        onImportSuccess={(newData) => { const migrated = migrateData(newData); setData(migrated); setShowImportExport(false); setMode('sheet'); setIsSettingsDirty(false); setLastSavedState(JSON.stringify(newData)); }}
+                        onImportSuccess={(newData) => { const migrated = migrateData(newData); setData(migrated); setMode('sheet'); setIsSettingsDirty(false); setLastSavedState(JSON.stringify(newData)); }}
                         onExportSuccess={() => { setLastSavedState(JSON.stringify(data)); }}
                         variant={mode === 'settings' ? 'gm' : 'player'}
                     />

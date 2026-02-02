@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { CharacterSheetData } from '../../types';
 import { Zap, Play, CheckSquare, Info, LayoutGrid } from 'lucide-react';
+import ThematicModal from '../ui/ThematicModal';
 
 interface AttributesEditorProps {
     data: CharacterSheetData;
@@ -304,8 +305,8 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
                                 key={n}
                                 onClick={() => handleCategoryCountChange(n)}
                                 className={`w-10 h-10 rounded-full font-black text-base transition-all ${count === n
-                                        ? 'bg-[#8b2e2e] text-white shadow-lg ring-2 ring-[#8b2e2e]/20 scale-110'
-                                        : 'bg-white border border-[#bfae85]/30 text-[#5c4d41]/50 hover:bg-[#8b2e2e]/5 hover:text-[#8b2e2e]'
+                                    ? 'bg-[#8b2e2e] text-white shadow-lg ring-2 ring-[#8b2e2e]/20 scale-110'
+                                    : 'bg-white border border-[#bfae85]/30 text-[#5c4d41]/50 hover:bg-[#8b2e2e]/5 hover:text-[#8b2e2e]'
                                     }`}
                             >
                                 {n}
@@ -323,8 +324,8 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
                                 key={n}
                                 onClick={() => handleGlobalAttributeCountChange(n)}
                                 className={`w-10 h-10 rounded-full font-black text-base transition-all ${globalAttrCount === n
-                                        ? 'bg-[#8b2e2e] text-white shadow-lg ring-2 ring-[#8b2e2e]/20 scale-110'
-                                        : 'bg-white border border-[#bfae85]/30 text-[#5c4d41]/50 hover:bg-[#8b2e2e]/5 hover:text-[#8b2e2e]'
+                                    ? 'bg-[#8b2e2e] text-white shadow-lg ring-2 ring-[#8b2e2e]/20 scale-110'
+                                    : 'bg-white border border-[#bfae85]/30 text-[#5c4d41]/50 hover:bg-[#8b2e2e]/5 hover:text-[#8b2e2e]'
                                     }`}
                             >
                                 {n}

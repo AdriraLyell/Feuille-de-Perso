@@ -14,6 +14,7 @@ import {
   ExperienceData,
   LibraryEntry,
   LibrarySkillEntry,
+  LibrarySpecializationEntry,
   XPEntry,
   LogEntry
 } from './system';
@@ -21,8 +22,7 @@ import {
   CampaignNoteEntry,
   PartyMemberEntry,
   PartyColumn,
-  ImposedSpecialization,
-  LibrarySpecializationEntry
+  ImposedSpecialization
 } from './campaign';
 
 export interface Page2Data {

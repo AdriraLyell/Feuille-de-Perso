@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
 import { CharacterSheetData, DotEntry, SkillCategoryKey, LibrarySkillEntry } from '../../types';
-import { Minus, Plus, GripVertical, Trash2 } from 'lucide-react';
+import { Minus, Plus, GripVertical, Trash2, Save, GraduationCap } from 'lucide-react';
+import ThematicModal from '../ui/ThematicModal';
 
 interface SkillsEditorProps {
     data: CharacterSheetData;
@@ -14,6 +15,15 @@ interface SkillsEditorProps {
 const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, draggedItem, setDraggedItem }) => {
     const [focusedValue, setFocusedValue] = useState<string | null>(null);
     const [newlyAddedId, setNewlyAddedId] = useState<string | null>(null);
+
+    // State for Variable Skill Modal
+    const [variantModalOpen, setVariantModalOpen] = useState(false);
+    const [pendingSkillDrop, setPendingSkillDrop] = useState<{
+        libItem: LibrarySkillEntry;
+        category: string;
+        index: number;
+    } | null>(null);
+    const [variantInput, setVariantInput] = useState("");
 
     const getCategoryLabel = (cat: string) => {
         switch (cat) {
@@ -41,6 +51,19 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
             skills: {
                 ...data.skills,
                 [category]: list.map(item => item.id === id ? { ...item, name: newName } : item)
+            }
+        });
+    };
+
+    const updateSkillVariant = (category: SkillCategoryKey, id: string, newVariant: string) => {
+        const list = data.skills[category];
+        if (!list) return;
+
+        onUpdate({
+            ...data,
+            skills: {
+                ...data.skills,
+                [category]: list.map(item => item.id === id ? { ...item, variant: newVariant } : item)
             }
         });
     };
@@ -240,12 +263,29 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
             const libItem = draggedItem.data as LibrarySkillEntry;
 
             // Create new Sheet Entry
+            let variant: string | undefined;
+
+            // Handle Variable Skills (Option 1)
+            if (libItem.isVariable) {
+                // Open Custom Modal instead of window.prompt
+                setPendingSkillDrop({
+                    libItem,
+                    category: targetCategory,
+                    index: targetIndex
+                });
+                setVariantInput("");
+                setVariantModalOpen(true);
+                setDraggedItem(null); // Clear drag state
+                return;
+            }
+
             const newSkillEntry: DotEntry = {
                 id: Math.random().toString(36).substr(2, 9),
                 name: libItem.name,
                 value: 0,
                 creationValue: 0,
-                max: 5
+                max: 5,
+                variant: variant
             };
 
             const newSkills = { ...data.skills };
@@ -259,6 +299,42 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
         }
 
         setDraggedItem(null);
+    };
+
+    const confirmVariableSkill = () => {
+        if (!pendingSkillDrop) return;
+
+        const { libItem, category, index } = pendingSkillDrop;
+        const variant = variantInput.trim();
+
+        // Even if empty, we might allow it (or force it? let's allow empty but maybe warn?)
+        // User request didn't specify validation, but usually variant needs a value.
+        // Let's assume it's optional but recommended.
+
+        const newSkillEntry: DotEntry = {
+            id: Math.random().toString(36).substr(2, 9),
+            name: libItem.name,
+            value: 0,
+            creationValue: 0,
+            max: 5,
+            variant: variant
+        };
+
+        const newSkills = { ...data.skills };
+        const targetList = [...(newSkills[category as SkillCategoryKey] || [])];
+
+        targetList.splice(index, 0, newSkillEntry);
+        newSkills[category as SkillCategoryKey] = targetList;
+
+        onUpdate({ ...data, skills: newSkills });
+        const logMsg = variant
+            ? `Importation : "${libItem.name} : ${variant}" depuis la réserve`
+            : `Importation : "${libItem.name}" depuis la réserve`;
+
+        onAddLog(logMsg, 'success', 'settings');
+
+        setVariantModalOpen(false);
+        setPendingSkillDrop(null);
     };
 
     const renderCategoryEditor = (title: string, category: string, heightClass = 'h-full', defaultItemName = 'Nouvelle Compétence') => {
@@ -319,39 +395,55 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                                         Espaceur
                                     </div>
                                 ) : (
-                                    <input
-                                        type="text"
-                                        autoFocus={item.id === newlyAddedId}
-                                        value={item.name}
-                                        onFocus={(e) => {
-                                            setFocusedValue(e.target.value);
-                                            if (e.target.value === defaultItemName) {
-                                                e.target.select();
-                                            }
-                                        }}
-                                        onBlur={(e) => {
-                                            if (item.id === newlyAddedId) {
-                                                setNewlyAddedId(null);
-                                            }
-                                            if (focusedValue !== null && e.target.value !== focusedValue) {
-                                                const label = isCounters ? "Compteurs" : getCategoryLabel(category);
-                                                onAddLog(`Modification : "${focusedValue}" renommé en "${e.target.value}" dans [${label}]`, 'info', 'settings');
-
-                                                // SYNC WITH LIBRARY ON BLUR
-                                                if (!isCounters) {
-                                                    syncSkillWithLibrary(e.target.value, category as SkillCategoryKey);
+                                    <div className="flex-grow flex items-center gap-1">
+                                        <input
+                                            type="text"
+                                            autoFocus={item.id === newlyAddedId}
+                                            value={item.name}
+                                            readOnly={!!item.variant} // Lock name if variant exists (Option 1)
+                                            title={item.variant ? "Le nom racine ne peut pas être modifié pour une compétence variable" : undefined}
+                                            onFocus={(e) => {
+                                                setFocusedValue(e.target.value);
+                                                if (e.target.value === defaultItemName) {
+                                                    e.target.select();
                                                 }
-                                            }
-                                            setFocusedValue(null);
-                                        }}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.currentTarget.blur();
-                                            }
-                                        }}
-                                        onChange={(e) => isCounters ? updateCounterName(item.id, e.target.value) : updateSkillName(category as SkillCategoryKey, item.id, e.target.value)}
-                                        className="border border-[#bfae85]/30 p-1 rounded-sm w-full focus:border-[#8b2e2e] outline-none bg-white/50 text-xs font-bold text-[#2c241b] transition-all"
-                                    />
+                                            }}
+                                            onBlur={(e) => {
+                                                if (item.id === newlyAddedId) {
+                                                    setNewlyAddedId(null);
+                                                }
+                                                if (focusedValue !== null && e.target.value !== focusedValue) {
+                                                    const label = isCounters ? "Compteurs" : getCategoryLabel(category);
+                                                    onAddLog(`Modification : "${focusedValue}" renommé en "${e.target.value}" dans [${label}]`, 'info', 'settings');
+
+                                                    // SYNC WITH LIBRARY ON BLUR
+                                                    if (!isCounters) {
+                                                        syncSkillWithLibrary(e.target.value, category as SkillCategoryKey);
+                                                    }
+                                                }
+                                                setFocusedValue(null);
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.currentTarget.blur();
+                                                }
+                                            }}
+                                            onChange={(e) => isCounters ? updateCounterName(item.id, e.target.value) : updateSkillName(category as SkillCategoryKey, item.id, e.target.value)}
+                                            className={`border border-[#bfae85]/30 p-1 rounded-sm w-full focus:border-[#8b2e2e] outline-none bg-white/50 text-xs font-bold text-[#2c241b] transition-all ${item.variant ? 'bg-stone-100 text-stone-500 italic' : ''}`}
+                                        />
+                                        {item.variant !== undefined && (
+                                            <>
+                                                <span className="text-[#5c4d41] font-bold">:</span>
+                                                <input
+                                                    type="text"
+                                                    value={item.variant}
+                                                    placeholder="Spécialité..."
+                                                    onChange={(e) => updateSkillVariant(category as SkillCategoryKey, item.id, e.target.value)}
+                                                    className="border border-[#bfae85]/30 p-1 rounded-sm w-full focus:border-[#8b2e2e] outline-none bg-white/50 text-xs font-bold text-[#8b2e2e] transition-all"
+                                                />
+                                            </>
+                                        )}
+                                    </div>
                                 )}
                                 <button
                                     onClick={() => isCounters ? removeCounter(item.id) : removeSkill(category as SkillCategoryKey, item.id)}
@@ -391,6 +483,54 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                     {renderCategoryEditor("Compteurs", "counters", "h-full", "Nouveau Compteur")}
                 </div>
             </div>
+
+            {/* Variable Skill Modal */}
+            {variantModalOpen && pendingSkillDrop && (
+                <ThematicModal
+                    isOpen={variantModalOpen}
+                    onClose={() => { setVariantModalOpen(false); setPendingSkillDrop(null); }}
+                    title="Précision requise"
+                    icon={<GraduationCap size={24} />}
+                    size="md"
+                    footer={
+                        <>
+                            <button
+                                onClick={() => { setVariantModalOpen(false); setPendingSkillDrop(null); }}
+                                className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={confirmVariableSkill}
+                                className="px-6 py-2 bg-[#5c4d41] text-white rounded-sm font-bold shadow-md hover:bg-[#4a3b32] flex items-center gap-2"
+                            >
+                                <Save size={16} /> Confirmer
+                            </button>
+                        </>
+                    }
+                >
+                    <div className="flex flex-col gap-4 py-2">
+                        <div className="bg-amber-50/50 border border-amber-200/50 p-3 rounded-sm text-sm text-[#5c4d41]">
+                            Vous ajoutez la compétence <strong>{pendingSkillDrop.libItem.name}</strong>.
+                            <br />
+                            Cette compétence nécessite une précision (variante).
+                        </div>
+
+                        <div>
+                            <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">
+                                Spécialité / Variante (ex: Forge, Histoire, Épées...)
+                            </label>
+                            <input
+                                className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm text-lg"
+                                value={variantInput}
+                                onChange={(e) => setVariantInput(e.target.value)}
+                                autoFocus
+                                onKeyDown={(e) => e.key === 'Enter' && confirmVariableSkill()}
+                            />
+                        </div>
+                    </div>
+                </ThematicModal>
+            )}
         </div>
     );
 };

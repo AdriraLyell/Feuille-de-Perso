@@ -49,20 +49,21 @@ body {
   position: relative;
   box-sizing: border-box;
   color: #1c1917; /* Stone 900 Text */
-  overflow: hidden;
+  /* BUGFIX: Removed overflow hidden to allow scrolling when adding new skills */
+  /* overflow: hidden; */ 
   transition: width 0.3s ease, height 0.3s ease;
 }
 
 /* Portrait (Default) - A4 Ratio */
 .sheet-container:not(.landscape) {
   width: 1100px;
-  height: 1560px;
+  min-height: 1560px; /* Changed height to min-height */
 }
 
 /* Landscape - A4 Ratio Inverted */
 .sheet-container.landscape {
   width: 1560px;
-  height: 1100px;
+  min-height: 1100px; /* Changed height to min-height */
 }
 
 /* 

@@ -8,7 +8,8 @@ export const DotEntrySchema = z.object({
     value: z.number(),
     creationValue: z.number().optional(),
     current: z.number().optional(),
-    max: z.number()
+    max: z.number(),
+    variant: z.string().optional()
 });
 
 export const AttributeEntrySchema = z.object({
@@ -137,7 +138,8 @@ export const LibrarySkillEntrySchema = z.object({
     id: z.string(),
     name: z.string(),
     description: z.string().optional(),
-    defaultCategory: z.string().optional()
+    defaultCategory: z.string().optional(),
+    isVariable: z.boolean().optional()
 });
 
 export const LibrarySpecializationEntrySchema = z.object({

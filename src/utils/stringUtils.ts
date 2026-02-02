@@ -5,7 +5,7 @@
  * @returns Le texte sans accents, en minuscules et trimé.
  */
 export const normalizeText = (text: string): string => {
-    if (!text) return "";
+    if (!text || typeof text !== 'string') return "";
     return text
         .trim()
         .toLowerCase()

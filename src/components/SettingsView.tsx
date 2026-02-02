@@ -4,7 +4,6 @@ import { CharacterSheetData } from '../types';
 import { INITIAL_DATA } from '../data/initialState';
 import ThematicButton from './ui/ThematicButton';
 import ThematicModal from './ui/ThematicModal';
-import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, Palette, RefreshCw, X, AlertCircle } from 'lucide-react';
 import { useCharacter } from '../context/CharacterContext';
 import { useNotification } from '../context/NotificationContext';
 
@@ -16,6 +15,8 @@ import CreationConfigEditor from './settings/CreationConfigEditor';
 import AppearanceEditor from './settings/AppearanceEditor';
 import LibrarySidebar from './settings/LibrarySidebar';
 import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
+import LibraryView from './LibraryView';
+import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, Palette, RefreshCw, X, AlertCircle, BookOpen } from 'lucide-react';
 
 interface SettingsViewProps {
   onClose: () => void;
@@ -87,6 +88,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
             <button onClick={() => setActiveTab('specializations')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'specializations' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><Tag size={16} /> Spécialisations</button>
             <button onClick={() => setActiveTab('creation')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'creation' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><UserPlus size={16} /> Paramètres</button>
             <button onClick={() => setActiveTab('appearance')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'appearance' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><Palette size={16} /> Apparence</button>
+            <button onClick={() => setActiveTab('library')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'library' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><BookOpen size={16} /> Bibliothèque</button>
           </div>
         </div>
 
@@ -159,6 +161,12 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
               onUpdate={handleLocalUpdate}
               onAddLog={onAddLog}
             />
+          )}
+
+          {activeTab === 'library' && (
+            <div className="h-[calc(100vh-250px)] min-h-[600px] border border-[#bfae85]/30 rounded-sm overflow-hidden shadow-sm">
+              <LibraryView data={localData} onUpdate={handleLocalUpdate} />
+            </div>
           )}
         </div>
       </div>

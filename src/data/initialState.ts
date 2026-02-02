@@ -36,7 +36,9 @@ const INITIAL_SKILLS = {
     createDotEntry(''), // Spacer
     createDotEntry('Animaux'), createDotEntry('Pistage'), createDotEntry('Survie'),
     createDotEntry(''), // Spacer
-    createDotEntry('Jouer : '), createDotEntry('Jouer : '),
+    createDotEntry('Animaux'), createDotEntry('Pistage'), createDotEntry('Survie'),
+    createDotEntry(''), // Spacer
+    createDotEntry('Jouer', 0, ''),
     createDotEntry(''), // Spacer
   ],
   competences_col_2: [
@@ -52,7 +54,9 @@ const INITIAL_SKILLS = {
     createDotEntry(''), // Spacer
     createDotEntry('Mêlée'), createDotEntry('Bagarre'), createDotEntry('Lancé'), createDotEntry('Tir'),
     createDotEntry(''), // Spacer
-    createDotEntry('Art Martial : '), createDotEntry('Art Martial : '),
+    createDotEntry('Mêlée'), createDotEntry('Bagarre'), createDotEntry('Lancé'), createDotEntry('Tir'),
+    createDotEntry(''), // Spacer
+    createDotEntry('Art Martial', 0, ''),
   ],
   connaissances: [
     createDotEntry('Biologie'), createDotEntry('Droit'),
@@ -70,7 +74,8 @@ const INITIAL_SKILLS = {
   ],
   autres_competences: [
     createDotEntry('Pilotage'), createDotEntry('Conduite'), createDotEntry('Photo'),
-    createDotEntry('Communication'), createDotEntry('Artisanat : '), createDotEntry('Artisanat : '),
+    createDotEntry('Pilotage'), createDotEntry('Conduite'), createDotEntry('Photo'),
+    createDotEntry('Communication'), createDotEntry('Artisanat', 0, ''),
     createDotEntry('Féerie'), createDotEntry('Bestiaire'), createDotEntry('Horlogerie'),
     createDotEntry('Automate'),
   ],
@@ -92,6 +97,9 @@ const generateDefaultSkillLibrary = (): LibrarySkillEntry[] => {
   const lib: LibrarySkillEntry[] = [];
   const seenNames = new Set<string>();
 
+  // Skills that are variable by default
+  const defaultVariableSkills = ['artisanat', 'jouer', 'art martial'];
+
   Object.keys(INITIAL_SKILLS).forEach(key => {
     if (key === 'arrieres_plans') return; // Skip backgrounds in default library
     // @ts-ignore
@@ -104,7 +112,8 @@ const generateDefaultSkillLibrary = (): LibrarySkillEntry[] => {
             id: generateId(),
             name: skill.name,
             defaultCategory: key,
-            description: ""
+            description: "",
+            isVariable: defaultVariableSkills.includes(normalized)
           });
         }
       }

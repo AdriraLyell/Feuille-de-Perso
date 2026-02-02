@@ -1,30 +1,32 @@
 
 import React, { useState, useMemo } from 'react';
 import { CharacterSheetData, LibrarySkillEntry } from '../types';
-import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, X, Save, CheckCircle2, Download, AlertTriangle, HelpCircle, AlertOctagon, Award, ArrowRight } from 'lucide-react';
+import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, X, Save, CheckCircle2, Download, AlertTriangle, HelpCircle, AlertOctagon, Award, ArrowRight, AlertCircle, Layers } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import SpecializationLibraryView from './specialization-library/SpecializationLibraryView';
-import { useCharacter } from '../context/CharacterContext'; // Import Context
+import { useCharacter } from '../context/CharacterContext';
 import { useNotification } from '../context/NotificationContext';
 import { smartIncludes } from '../utils/stringUtils';
 import ThematicModal from './ui/ThematicModal';
-import { AlertCircle } from 'lucide-react';
+import { CATEGORY_HELP } from '../data/constants';
+// ... other imports
 
-const CATEGORY_HELP = [
-    { code: 'talents', label: 'Talents', loc: 'Colonne 1 (Gauche)' },
-    { code: 'competences', label: 'Compétences', loc: 'Colonne 2 (Centre-Gauche)' },
-    { code: 'competences_col_2', label: 'Compétences (Suite)', loc: 'Colonne 3 (Centre-Droite)' },
-    { code: 'connaissances', label: 'Connaissances', loc: 'Colonne 4 (Droite)' },
-    { code: 'autres_competences', label: 'Autres Compétences', loc: 'Bas de page (Gauche)' },
-    { code: 'competences2', label: 'Compétences Secondaires', loc: 'Bas de page (Centre)' },
-    { code: 'autres', label: 'Autres', loc: 'Bas de page (Droite)' },
-    { code: 'arrieres_plans', label: 'Arrières-Plans', loc: 'Bas de page (Droite)' },
-];
+interface LibraryViewProps {
+    data?: CharacterSheetData; // Optional to support standalone use if needed, but we will pass it
+    onUpdate?: (newData: CharacterSheetData) => void;
+}
 
-const LibraryView: React.FC = () => {
-    const { data, updateData: onUpdate } = useCharacter(); // Use Context
+const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: propUpdate }) => {
+    // Fallback to context if not provided (for backward compatibility if used elsewhere)
+    const { data: contextData, updateData: contextUpdate } = useCharacter();
+
+    const data = propData || contextData;
+    const onUpdate = propUpdate || contextUpdate;
+
+    if (!data) return <div className="p-4 text-gray-500 italic">Chargement des données...</div>;
+
     const [activeTab, setActiveTab] = useState<'traits' | 'skills' | 'specializations'>('traits');
-    const addLog = useNotification(); // Use Context
+    const addLog = useNotification();
 
     // -- Skill Library Logic --
     const [skillSearch, setSkillSearch] = useState('');
@@ -203,12 +205,12 @@ const LibraryView: React.FC = () => {
         <div className="flex flex-col h-full bg-[#fdfbf7] rounded-sm shadow-sm border border-[#bfae85]/50 overflow-hidden relative">
 
             {/* Tabs Header */}
-            <div className="flex border-b border-gray-200 bg-gray-50 shrink-0">
+            <div className="flex border-b border-[#bfae85]/30 bg-stone-100/30 shrink-0">
                 <button
                     onClick={() => setActiveTab('traits')}
                     className={`flex-1 py-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'traits'
                         ? 'border-[#8b2e2e] text-[#8b2e2e] bg-white/50'
-                        : 'border-transparent text-gray-500 hover:bg-stone-100 hover:text-gray-700'
+                        : 'border-transparent text-[#5c4d41]/60 hover:bg-stone-200/50 hover:text-[#5c4d41]'
                         }`}
                 >
                     <BookOpen size={18} />
@@ -218,7 +220,7 @@ const LibraryView: React.FC = () => {
                     onClick={() => setActiveTab('skills')}
                     className={`flex-1 py-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'skills'
                         ? 'border-[#5c4d41] text-[#5c4d41] bg-white/50'
-                        : 'border-transparent text-gray-500 hover:bg-stone-100 hover:text-gray-700'
+                        : 'border-transparent text-[#5c4d41]/60 hover:bg-stone-200/50 hover:text-[#5c4d41]'
                         }`}
                 >
                     <GraduationCap size={18} />
@@ -228,7 +230,7 @@ const LibraryView: React.FC = () => {
                     onClick={() => setActiveTab('specializations')}
                     className={`flex-1 py-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'specializations'
                         ? 'border-amber-600 text-amber-700 bg-white/50'
-                        : 'border-transparent text-gray-500 hover:bg-stone-100 hover:text-gray-700'
+                        : 'border-transparent text-[#5c4d41]/60 hover:bg-stone-200/50 hover:text-[#5c4d41]'
                         }`}
                 >
                     <Award size={18} />
@@ -261,10 +263,14 @@ const LibraryView: React.FC = () => {
                             </div>
 
                             {/* Shared Legend - Center */}
-                            <div className="flex justify-center">
-                                <div className="flex items-center gap-2 px-3 py-1 bg-green-50/50 border border-green-200/50 rounded-full w-fit">
-                                    <CheckCircle2 size={12} className="text-green-600" />
-                                    <span className="text-[10px] font-bold text-green-800/70 uppercase tracking-tight whitespace-nowrap">Présent dans la Fiche</span>
+                            <div className="flex justify-center gap-3">
+                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-green-50/50 border border-green-200/50 rounded-full w-fit">
+                                    <CheckCircle2 size={10} className="text-green-600" />
+                                    <span className="text-[9px] font-bold text-green-800/70 uppercase tracking-tight whitespace-nowrap">Présent</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50/50 border border-blue-200/50 rounded-full w-fit">
+                                    <Layers size={10} className="text-blue-600" />
+                                    <span className="text-[9px] font-bold text-blue-800/70 uppercase tracking-tight whitespace-nowrap">À Variations</span>
                                 </div>
                             </div>
 
@@ -315,7 +321,16 @@ const LibraryView: React.FC = () => {
                                                 <div className="flex flex-col gap-1">
                                                     <div className="flex justify-between items-center gap-2">
                                                         <div className="flex items-center gap-1.5 min-w-0">
-                                                            {isUsed && <CheckCircle2 size={10} className="text-green-600 shrink-0" />}
+                                                            {skill.isVariable && (
+                                                                <span title="Compétence à variations">
+                                                                    <Layers size={10} className="text-blue-600 shrink-0" />
+                                                                </span>
+                                                            )}
+                                                            {isUsed && (
+                                                                <span title="Présent dans la fiche">
+                                                                    <CheckCircle2 size={10} className="text-green-600 shrink-0" />
+                                                                </span>
+                                                            )}
                                                             <span className={`font-serif font-black uppercase text-[11px] tracking-wide truncate ${isUsed ? 'text-green-800' : 'text-[#4a3b32]'}`}>
                                                                 {skill.name}
                                                             </span>
@@ -337,6 +352,7 @@ const LibraryView: React.FC = () => {
                                                         {skill.defaultCategory}
                                                     </span>
                                                 )}
+
                                             </div>
                                         );
                                     })}
@@ -347,7 +363,9 @@ const LibraryView: React.FC = () => {
                 )}
 
                 {activeTab === 'specializations' && (
-                    <SpecializationLibraryView />
+                    <div className="absolute inset-0">
+                        <SpecializationLibraryView data={data} onUpdate={onUpdate} />
+                    </div>
                 )}
             </div>
 
@@ -488,6 +506,19 @@ const LibraryView: React.FC = () => {
                                         ))}
                                     </select>
                                     <p className="text-[10px] text-[#5c4d41] mt-1.5 italic px-1">Définit dans quelle section de la fiche cette compétence sera rangée lors de l'importation.</p>
+                                </div>
+                                <div className="bg-amber-50/50 border border-amber-200/50 rounded-sm p-3 flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        id="isVariableSkill"
+                                        className="w-4 h-4 accent-amber-600 cursor-pointer"
+                                        checked={editingSkill.isVariable || false}
+                                        onChange={(e) => setEditingSkill({ ...editingSkill, isVariable: e.target.checked })}
+                                    />
+                                    <label htmlFor="isVariableSkill" className="cursor-pointer select-none">
+                                        <span className="block text-xs font-bold text-[#5c4d41] uppercase tracking-wide">Compétence à Spécialité / Variable</span>
+                                        <span className="block text-[10px] text-[#5c4d41]/70 italic mt-0.5">Cochez si le joueur doit préciser quelque chose (ex: "Artisanat : Forge"). Permet d'avoir plusieurs fois cette compétence.</span>
+                                    </label>
                                 </div>
                                 {skillError && (
                                     <div className="bg-red-50 text-red-800 text-[11px] p-3 rounded-sm border border-red-200 font-bold flex items-center gap-2 animate-shake">

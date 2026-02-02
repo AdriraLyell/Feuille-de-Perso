@@ -6,6 +6,7 @@ export interface DotEntry {
   creationValue?: number; // Valeur acquise à la création (coût 0 XP)
   current?: number; // Valeur temporaire (Utilisé / Carrés)
   max: number;
+  variant?: string; // Précision pour les compétences variables (ex: "Artisanat : Forge")
 }
 
 export interface AttributeEntry {
@@ -21,8 +22,8 @@ export interface AttributeEntry {
 }
 
 export interface AttributeCategoryDef {
-    id: string;
-    label: string;
+  id: string;
+  label: string;
 }
 
 export interface SectionData {
@@ -65,13 +66,16 @@ export interface ReputationEntry {
 export interface TraitEntry {
   name: string;
   value: string;
+  description?: string;
+  tag?: string;
+  variant?: string; // Précision (ex: pour "Allergie", variant="Chats")
 }
 
 export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus';
 
 export interface TraitEffect {
-    id: string;
-    type: EffectType;
-    value: number; // Montant XP ou Rang Max Gratuit
-    target?: string; // Nom de la compétence ciblée (pour free_skill_rank)
+  id: string;
+  type: EffectType;
+  value: number; // Montant XP ou Rang Max Gratuit
+  target?: string; // Nom de la compétence ciblée (pour free_skill_rank)
 }

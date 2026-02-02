@@ -146,6 +146,21 @@ const TraitForm: React.FC<TraitFormProps> = ({
                     </div>
                 </div>
 
+                {/* Configuration: Variable Trait */}
+                <div className="bg-[#bfae85]/10 border border-[#bfae85]/30 rounded-sm p-3 flex items-center gap-3">
+                    <input
+                        type="checkbox"
+                        id="isVariable"
+                        className="w-4 h-4 accent-amber-600 cursor-pointer"
+                        checked={editForm.isVariable || false}
+                        onChange={(e) => setEditForm({ ...editForm, isVariable: e.target.checked })}
+                    />
+                    <label htmlFor="isVariable" className="cursor-pointer select-none">
+                        <span className="block text-sm font-bold text-[#5c4d41]">Trait à Complément / Variable</span>
+                        <span className="block text-[10px] text-[#5c4d41]/70 italic">Cochez si le joueur doit préciser quelque chose à la sélection (ex: "Allergie : Chats").</span>
+                    </label>
+                </div>
+
                 {/* Effects Section */}
                 <div className="border border-[#bfae85]/20 rounded-sm bg-white/30">
                     <TraitEffectEditor

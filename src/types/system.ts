@@ -65,6 +65,7 @@ export interface LibraryEntry {
   cost: string;
   description: string;
   tags?: string[];
+  isVariable?: boolean; // Si vrai, demande une précision (variant) à l'ajout
   effects?: TraitEffect[]; // New Effects System
 }
 
@@ -74,6 +75,7 @@ export interface LibrarySkillEntry {
   name: string;
   description?: string;
   defaultCategory?: string; // Hint for auto-placement (optional)
+  isVariable?: boolean; // Si vrai, permet les doublons avec des variants différents (ex: "Artisanat : Forge")
 }
 
 // Nouveau : Entrée pour le catalogue des spécialisations

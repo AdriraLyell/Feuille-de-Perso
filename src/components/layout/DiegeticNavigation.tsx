@@ -4,8 +4,8 @@ import { useCharacter } from '../../context/CharacterContext';
 import { CharacterSheetData } from '../../types';
 
 interface DiegeticNavigationProps {
-    currentMode: 'sheet' | 'settings' | 'library';
-    onModeChange: (mode: 'sheet' | 'settings' | 'library') => void;
+    currentMode: 'sheet' | 'settings';
+    onModeChange: (mode: 'sheet' | 'settings') => void;
     onOpenImportExport: () => void;
     onPrintRequest: () => void;
     onToggleLandscape: () => void;
@@ -68,14 +68,6 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                     {/* Navigation Buttons (Moved to Right) */}
                     <div className="hidden md:flex items-center gap-2 mr-4 border-r border-gray-600 pr-4">
-                        <button
-                            onClick={() => onModeChange('library')}
-                            className={`px-4 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-2 ${currentMode === 'library'
-                                ? 'bg-blue-600 text-white shadow-sm'
-                                : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
-                        >
-                            <BookOpen size={16} /> Bibliothèque
-                        </button>
                         <button
                             onClick={() => onModeChange('settings')}
                             className={`px-4 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-2 ${currentMode === 'settings'

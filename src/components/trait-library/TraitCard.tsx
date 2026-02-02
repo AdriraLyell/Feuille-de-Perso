@@ -24,9 +24,11 @@ const TraitCard: React.FC<TraitCardProps> = ({
     onDelete,
     showMultiSelect
 }) => {
+    if (!entry) return null;
+
     return (
         <div
-            className={`p-3 hover:bg-gray-50 transition-colors group cursor-pointer select-none ${isSelected ? 'bg-blue-50 hover:bg-blue-100' : ''}`}
+            className={`p-3 hover:bg-stone-100/50 transition-colors group cursor-pointer select-none ${isSelected ? 'bg-amber-50/50 hover:bg-amber-100/50' : ''}`}
             onClick={() => {
                 if (showMultiSelect && onMultiSelect) {
                     onMultiSelect(entry.id);
@@ -38,35 +40,35 @@ const TraitCard: React.FC<TraitCardProps> = ({
             <div className="flex items-start gap-3">
                 {/* Multi-Select Checkbox */}
                 {showMultiSelect && (
-                    <div className="mt-1 text-blue-600 shrink-0">
-                        {isSelected ? <CheckSquare size={18} /> : <Square size={18} className="text-gray-300" />}
+                    <div className="mt-1 text-[#8b2e2e] shrink-0">
+                        {isSelected ? <CheckSquare size={18} /> : <Square size={18} className="text-[#bfae85]" />}
                     </div>
                 )}
 
-                <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${entry.type === 'avantage' ? 'bg-green-500' : 'bg-red-500'}`} title={entry.type === 'avantage' ? 'Avantage' : 'Désavantage'} />
+                <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${entry.type === 'avantage' ? 'bg-green-600' : 'bg-[#8b2e2e]'}`} title={entry.type === 'avantage' ? 'Avantage' : 'Désavantage'} />
 
                 <div className="flex-grow">
                     <div className="flex justify-between items-baseline mb-1">
                         <div className="flex items-center gap-2">
-                            <span className={`font-bold text-sm ${isSelected ? 'text-blue-800' : 'text-gray-800'}`}>{entry.name}</span>
+                            <span className={`font-bold text-sm ${isSelected ? 'text-amber-900' : 'text-[#4a3b32]'}`}>{entry.name}</span>
                             {/* Effect Indicator */}
                             {entry.effects && entry.effects.length > 0 && (
                                 <div title="Ce trait possède des effets mécaniques">
-                                    <Zap size={12} className="text-amber-500 fill-amber-500" />
+                                    <Zap size={12} className="text-amber-600 fill-amber-600" />
                                 </div>
                             )}
                         </div>
-                        <span className="text-xs font-mono font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">{entry.cost} pts</span>
+                        <span className="text-xs font-mono font-bold text-[#5c4d41] bg-[#bfae85]/20 px-1.5 py-0.5 rounded-sm border border-[#bfae85]/30">{entry.cost} pts</span>
                     </div>
-                    <p className="text-xs text-gray-600 leading-relaxed mb-1.5">
-                        {entry.description || <span className="italic text-gray-300">Pas de description</span>}
+                    <p className="text-xs text-[#5c4d41]/90 leading-relaxed mb-1.5">
+                        {entry.description || <span className="italic text-[#5c4d41]/40">Pas de description</span>}
                     </p>
 
                     {/* Display Tags */}
                     {entry.tags && entry.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                             {entry.tags.map(tag => (
-                                <span key={tag} className="text-[9px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded border border-gray-200">
+                                <span key={tag} className="text-[9px] bg-stone-200/50 text-[#5c4d41] px-1.5 py-0.5 rounded-sm border border-[#bfae85]/30">
                                     #{tag}
                                 </span>
                             ))}
@@ -77,10 +79,10 @@ const TraitCard: React.FC<TraitCardProps> = ({
                 <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {isEditable && (
                         <>
-                            <button onClick={(e) => { e.stopPropagation(); onEdit(entry); }} className="p-1.5 text-blue-600 hover:bg-blue-100 rounded" title="Éditer">
+                            <button onClick={(e) => { e.stopPropagation(); onEdit(entry); }} className="p-1.5 text-[#5c4d41] hover:bg-stone-200/50 rounded" title="Éditer">
                                 <Edit2 size={14} />
                             </button>
-                            <button onClick={(e) => { e.stopPropagation(); onDelete(entry.id); }} className="p-1.5 text-red-600 hover:bg-red-100 rounded" title="Supprimer">
+                            <button onClick={(e) => { e.stopPropagation(); onDelete(entry.id); }} className="p-1.5 text-red-600 hover:bg-red-50 rounded" title="Supprimer">
                                 <Trash2 size={14} />
                             </button>
                         </>
@@ -88,7 +90,7 @@ const TraitCard: React.FC<TraitCardProps> = ({
                     {onSelect && !showMultiSelect && (
                         <button
                             onClick={(e) => { e.stopPropagation(); onSelect(entry); }}
-                            className="p-1.5 text-green-600 hover:bg-green-100 rounded border border-green-200 shadow-sm bg-white"
+                            className="p-1.5 text-green-700 hover:bg-green-50 rounded border border-green-200 shadow-sm bg-white"
                             title="Ajouter à la fiche"
                         >
                             <Plus size={14} />

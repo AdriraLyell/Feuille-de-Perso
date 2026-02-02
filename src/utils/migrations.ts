@@ -344,14 +344,23 @@ export const migrateData = (parsed: any): CharacterSheetData => {
         parsed.specializationLibrary = initialSpecList;
     }
 
-    // --- MIGRATION: SKILL LIBRARY PRE-FILL ---
-    if (!parsed.skillLibrary) {
-        parsed.skillLibrary = [];
-        // Harvest skills from the CURRENT sheet data (parsed) to populate library
-        const initialSkillList: LibrarySkillEntry[] = [];
-        const seenNames = new Set<string>();
+    // --- MIGRATION: FIX KEY CASING ---
+    // Handle potential lowercase typo from old versions or manual edits
+    // @ts-ignore
+    if (parsed.skilllibrary && !parsed.skillLibrary) {
+        // @ts-ignore
+        parsed.skillLibrary = parsed.skilllibrary;
+        // @ts-ignore
+        delete parsed.skilllibrary;
+    }
 
-        // Ensure skills object exists before iterating
+    // --- MIGRATION: SKILL LIBRARY PRE-FILL ---
+    if (!parsed.skillLibrary || parsed.skillLibrary.length === 0) {
+        // Start with the full default library
+        const initialSkillList: LibrarySkillEntry[] = [...INITIAL_DATA.skillLibrary];
+        const seenNames = new Set<string>(initialSkillList.map(s => s.name.trim().toLowerCase()));
+
+        // Harvest additional skills from the CURRENT sheet data (parsed)
         if (parsed.skills) {
             Object.keys(parsed.skills).forEach(cat => {
                 if (cat === 'arrieres_plans') return;
@@ -366,7 +375,8 @@ export const migrateData = (parsed: any): CharacterSheetData => {
                                 id: Math.random().toString(36).substr(2, 9),
                                 name: skill.name,
                                 defaultCategory: cat,
-                                description: ""
+                                description: "",
+                                isVariable: false
                             });
                         }
                     }
@@ -375,6 +385,26 @@ export const migrateData = (parsed: any): CharacterSheetData => {
         }
         initialSkillList.sort((a, b) => a.name.localeCompare(b.name));
         parsed.skillLibrary = initialSkillList;
+    }
+
+    // --- MIGRATION: UPDATE EXISTING LIBRARY ENTRIES ---
+    // Ensure all entries (new or existing) have the correct 'isVariable' flag
+    // based on the default configuration.
+    if (parsed.skillLibrary) {
+        const defaultVariableSkills = ['artisanat', 'jouer', 'art martial'];
+        parsed.skillLibrary = parsed.skillLibrary.map((skill: LibrarySkillEntry) => {
+            const normalized = skill.name.trim().toLowerCase();
+            // Check if it should be variable
+            const shouldBeVariable = defaultVariableSkills.some(v => normalized === v || normalized.startsWith(v + ' :'));
+
+            // Only update if strictly needed to avoid overriding user customization if we imply it later
+            // But here we want to enforce defaults for the base skills
+            if (defaultVariableSkills.includes(normalized)) {
+                return { ...skill, isVariable: true };
+            }
+            // Preserve existing isVariable if it was set, otherwise default to false
+            return { ...skill, isVariable: skill.isVariable ?? false };
+        });
     }
 
     if (!parsed.campaignNotes) {
@@ -431,6 +461,30 @@ export const migrateData = (parsed: any): CharacterSheetData => {
     Object.keys(parsed.skills).forEach(key => {
         parsed.skills[key] = ensureCreationValue(parsed.skills[key]);
     });
+
+    // --- MIGRATION: FIX VARIABLE SKILLS ON SHEET ---
+    // Ensure active skills that should be variable have the variant property initialized
+    const defaultVariableSkills = ['artisanat', 'jouer', 'art martial'];
+    if (parsed.skills) {
+        Object.keys(parsed.skills).forEach(key => {
+            // @ts-ignore
+            if (Array.isArray(parsed.skills[key])) {
+                // @ts-ignore
+                parsed.skills[key] = parsed.skills[key].map(skill => {
+                    const normalized = skill.name.trim().toLowerCase();
+                    // Debug log for target skills
+                    if (defaultVariableSkills.includes(normalized)) {
+                        // console.log(`[Migration] Checking Sheet Skill: ${skill.name} (variant: ${skill.variant})`);
+                    }
+
+                    if (defaultVariableSkills.includes(normalized) && typeof skill.variant === 'undefined') {
+                        return { ...skill, variant: "" };
+                    }
+                    return skill;
+                });
+            }
+        });
+    }
 
     if (parsed.counters) {
         if (typeof parsed.counters.volonte.creationValue === 'undefined') parsed.counters.volonte.creationValue = 3;

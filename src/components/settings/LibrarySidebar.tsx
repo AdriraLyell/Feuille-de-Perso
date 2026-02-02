@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { CharacterSheetData, LibrarySkillEntry, SkillCategoryKey } from '../../types';
-import { BookOpen, Archive, GripVertical, ArrowRight } from 'lucide-react';
+import { BookOpen, Archive, GripVertical, ArrowRight, Layers, CheckCircle2 } from 'lucide-react';
 
 interface LibrarySidebarProps {
     data: CharacterSheetData;
@@ -32,7 +32,7 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ data, onUpdate, onAddLo
         if (draggedItem.type === 'sheet_skill' && draggedItem.category !== 'counters') {
             const catKey = draggedItem.category as SkillCategoryKey;
             const index = draggedItem.index!;
-            
+
             const newSkills = { ...data.skills };
             const list = [...(newSkills[catKey] || [])];
             const [removedItem] = list.splice(index, 1);
@@ -42,7 +42,7 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ data, onUpdate, onAddLo
             // Check duplicate name first to be safe
             const existingInLib = (data.skillLibrary || []).find(l => l.name === removedItem.name);
             let newLib = [...(data.skillLibrary || [])];
-            
+
             if (!existingInLib && removedItem.name.trim() !== '') {
                 const newLibEntry: LibrarySkillEntry = {
                     id: Math.random().toString(36).substr(2, 9),
@@ -73,25 +73,25 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ data, onUpdate, onAddLo
     Object.keys(data.skills).forEach(cat => {
         // @ts-ignore
         data.skills[cat].forEach(s => {
-            if(s.name) currentSkillNames.add(s.name.trim().toLowerCase());
+            if (s.name) currentSkillNames.add(s.name.trim().toLowerCase());
         });
     });
 
-    const visibleLibrary = (data.skillLibrary || []).filter(libItem => 
-        !currentSkillNames.has(libItem.name.trim().toLowerCase())
+    const visibleLibrary = (data.skillLibrary || []).filter(libItem =>
+        libItem.isVariable || !currentSkillNames.has(libItem.name.trim().toLowerCase())
     );
 
     return (
-        <div 
-          className={`w-80 bg-slate-100 border-l border-gray-300 flex flex-col fixed right-0 top-14 bottom-0 z-30 transition-colors ${draggedItem?.type === 'sheet_skill' ? 'bg-orange-50 border-orange-300' : ''}`}
-          onDragOver={handleDragOver}
-          onDrop={handleDropOnLibrary}
+        <div
+            className={`w-80 bg-slate-100 border-l border-gray-300 flex flex-col fixed right-0 top-14 bottom-0 z-30 transition-colors ${draggedItem?.type === 'sheet_skill' ? 'bg-orange-50 border-orange-300' : ''}`}
+            onDragOver={handleDragOver}
+            onDrop={handleDropOnLibrary}
         >
             <div className="p-4 bg-slate-200 border-b border-gray-300 font-bold text-slate-700 flex items-center gap-2 shadow-sm">
                 <BookOpen size={18} />
                 Réserve de Compétences
             </div>
-            
+
             {draggedItem?.type === 'sheet_skill' && draggedItem.category !== 'counters' && (
                 <div className="absolute inset-0 bg-orange-100/90 z-50 flex flex-col items-center justify-center border-4 border-dashed border-orange-400 m-2 rounded-xl pointer-events-none">
                     <Archive size={48} className="text-orange-600 mb-2" />
@@ -101,32 +101,59 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ data, onUpdate, onAddLo
             )}
 
             <div className="p-3 text-xs text-slate-500 border-b border-slate-200 bg-slate-50">
-                Glissez des compétences ici vers la fiche pour les ajouter. 
+                Glissez des compétences ici vers la fiche pour les ajouter.
                 Glissez une compétence de la fiche ici pour la ranger.
             </div>
 
             <div className="flex-grow overflow-y-auto p-3 space-y-2 custom-scrollbar">
                 {visibleLibrary.length === 0 ? (
                     <div className="text-center text-slate-400 italic mt-10 px-4">
-                        {(data.skillLibrary || []).length > 0 
-                          ? "Toutes les compétences de la réserve sont déjà sur la fiche."
-                          : "La réserve est vide."}
+                        {(data.skillLibrary || []).length > 0
+                            ? "Toutes les compétences de la réserve sont déjà sur la fiche."
+                            : "La réserve est vide."}
                     </div>
                 ) : (
-                    visibleLibrary.map(item => (
-                        <div 
-                          key={item.id}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, 'lib_skill', { data: item })}
-                          className="bg-white p-2 rounded border border-gray-300 shadow-sm cursor-grab active:cursor-grabbing hover:border-purple-400 hover:shadow-md transition-all flex justify-between items-center group"
-                        >
-                            <div className="flex items-center gap-2">
-                                <GripVertical size={14} className="text-gray-300" />
-                                <span className="font-bold text-sm text-slate-700">{item.name}</span>
+                    visibleLibrary.map(item => {
+                        const isPresent = currentSkillNames.has(item.name.trim().toLowerCase());
+
+                        return (
+                            <div
+                                key={item.id}
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, 'lib_skill', { data: item })}
+                                className={`p-2 rounded border shadow-sm cursor-grab active:cursor-grabbing transition-all flex justify-between items-center group ${isPresent
+                                        ? 'bg-green-50/30 border-green-200/60 hover:border-green-400'
+                                        : 'bg-white border-gray-300 hover:border-purple-400 hover:shadow-md'
+                                    }`}
+                            >
+                                <div className="flex items-center gap-2 overflow-hidden">
+                                    <GripVertical size={14} className="text-gray-300 shrink-0" />
+                                    <div className="flex flex-col min-w-0">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className={`font-bold text-sm truncate ${isPresent ? 'text-green-800' : 'text-slate-700'}`}>
+                                                {item.name}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            {item.isVariable && (
+                                                <div className="flex items-center gap-0.5 text-[10px] text-blue-600 bg-blue-50 px-1 rounded-sm border border-blue-100">
+                                                    <Layers size={10} />
+                                                    <span className="font-semibold" title="Compétence à variations">Variable</span>
+                                                </div>
+                                            )}
+                                            {isPresent && (
+                                                <div className="flex items-center gap-0.5 text-[10px] text-green-700 bg-green-50 px-1 rounded-sm border border-green-100">
+                                                    <CheckCircle2 size={10} />
+                                                    <span className="font-semibold">Présent</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <ArrowRight size={14} className="text-gray-300 opacity-0 group-hover:opacity-100 shrink-0 mx-1" />
                             </div>
-                            <ArrowRight size={14} className="text-gray-300 opacity-0 group-hover:opacity-100" />
-                        </div>
-                    ))
+                        );
+                    })
                 )}
             </div>
         </div>

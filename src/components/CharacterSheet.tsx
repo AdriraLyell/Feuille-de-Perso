@@ -19,6 +19,9 @@ import { useCharacterBonuses } from '../hooks/useCharacterBonuses';
 import { useCreationMode } from '../hooks/useCreationMode';
 import { useSheetLayout } from '../hooks/useSheetLayout';
 
+import ThematicModal from './ui/ThematicModal';
+import { Layers, Save } from 'lucide-react';
+
 interface Props {
     isLandscape?: boolean;
 }
@@ -26,6 +29,15 @@ interface Props {
 const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
     const data = useCharacterData();
     const { updateData: onChange, addLog: onAddLog } = useCharacterActions();
+
+    // --- State for Variable Skill Definition ---
+    const [variantModalState, setVariantModalState] = React.useState<{
+        isOpen: boolean;
+        category: string;
+        id: string;
+        skillName: string;
+        inputValue: string;
+    }>({ isOpen: false, category: '', id: '', skillName: '', inputValue: '' });
 
     // --- Hooks logic ---
     const attributeBonuses = useCharacterBonuses(
@@ -78,6 +90,67 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
             };
         });
     }, [onChange, onAddLog]);
+
+    // --- Variable Skill Logic ---
+    const handleDefineVariant = useCallback((category: string, id: string, name: string) => {
+        setVariantModalState({
+            isOpen: true,
+            category,
+            id,
+            skillName: name,
+            inputValue: ''
+        });
+    }, []);
+
+    const finalizeVariantDefinition = () => {
+        const { category, id, inputValue } = variantModalState;
+        if (!inputValue.trim()) return;
+
+        onChange(prev => {
+            // @ts-ignore
+            const list = prev.skills[category] as DotEntry[];
+            if (!list) return prev;
+
+            const index = list.findIndex(s => s.id === id);
+            if (index === -1) return prev;
+
+            const newList = [...list];
+
+            // 1. Update existing item (Define the variant)
+            newList[index] = {
+                ...newList[index],
+                variant: inputValue.trim()
+            };
+
+            // 2. Clone and Insert new empty variable skill below
+            // We clone basic properties but generate new ID and reset variant to "" (empty)
+            // Ideally we check if there is space? Infinite list? user didn't specify limit, so just insert.
+            const newItem: DotEntry = {
+                id: Math.random().toString(36).substr(2, 9),
+                name: newList[index].name,
+                value: 0,
+                creationValue: 0,
+                max: 5,
+                variant: "" // Ready for next input
+            };
+
+            // Insert at index + 1
+            newList.splice(index + 1, 0, newItem);
+
+            onAddLog(`Définition variante : ${newList[index].name} : ${newList[index].variant}`, 'success', 'sheet');
+
+            return {
+                ...prev,
+                skills: {
+                    // @ts-ignore
+                    ...prev.skills,
+                    [category]: newList
+                }
+            };
+        });
+
+        setVariantModalState(prev => ({ ...prev, isOpen: false }));
+    };
 
     const updateAttribute = useCallback((category: string, id: string, field: 'val1' | 'val2' | 'val3', value: string) => {
         onChange(prev => {
@@ -233,6 +306,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                         userSpecs={data.specializations}
                                         imposedSpecs={data.imposedSpecializations}
                                         theme={data.theme}
+                                        onDefineVariant={handleDefineVariant}
                                     />
                                 </div>
                             ))}
@@ -250,6 +324,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                 userSpecs={data.specializations}
                                 imposedSpecs={data.imposedSpecializations}
                                 theme={data.theme}
+                                onDefineVariant={handleDefineVariant}
                             />
                         </div>
                         <div className="flex-none border-b border-stone-400 overflow-hidden">
@@ -265,31 +340,31 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 <>
                     <div className="grid grid-cols-4 border-b-2 border-stone-800 h-auto">
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Talents" items={data.skills.talents || []} cat="talents" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
+                            <SkillBlock title="Talents" items={data.skills.talents || []} cat="talents" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
                         </div>
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Compétences" items={data.skills.competences || []} cat="competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
+                            <SkillBlock title="Compétences" items={data.skills.competences || []} cat="competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
                         </div>
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Compétences" items={data.skills.competences_col_2 || []} cat="competences_col_2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
+                            <SkillBlock title="Compétences" items={data.skills.competences_col_2 || []} cat="competences_col_2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
                         </div>
                         <div>
-                            <SkillBlock title="Connaissances" items={data.skills.connaissances || []} cat="connaissances" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
+                            <SkillBlock title="Connaissances" items={data.skills.connaissances || []} cat="connaissances" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-4 border-b-2 border-stone-800 flex-grow min-h-[200px]">
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Autres Compétences" items={data.skills.autres_competences || []} cat="autres_competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
+                            <SkillBlock title="Autres Compétences" items={data.skills.autres_competences || []} cat="autres_competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
                         </div>
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Compétences Secondaires" items={data.skills.competences2 || []} cat="competences2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
+                            <SkillBlock title="Compétences Secondaires" items={data.skills.competences2 || []} cat="competences2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
                         </div>
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Autres" items={data.skills.autres || []} cat="autres" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
+                            <SkillBlock title="Autres" items={data.skills.autres || []} cat="autres" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
                         </div>
                         <div>
-                            <SkillBlock title="Arrières Plans" items={data.skills.arrieres_plans || []} cat="arrieres_plans" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} />
+                            <SkillBlock title="Arrières Plans" items={data.skills.arrieres_plans || []} cat="arrieres_plans" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
                         </div>
                     </div>
 
@@ -312,6 +387,52 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                     onConfirm={executeCreationActivation}
                 />
             )}
+
+            {/* Variable Skill Definition Modal */}
+            <ThematicModal
+                isOpen={variantModalState.isOpen}
+                onClose={() => setVariantModalState(prev => ({ ...prev, isOpen: false }))}
+                title="Préciser la compétence"
+                icon={<Layers size={24} />}
+                size="md"
+                footer={
+                    <>
+                        <button
+                            onClick={() => setVariantModalState(prev => ({ ...prev, isOpen: false }))}
+                            className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold"
+                        >
+                            Annuler
+                        </button>
+                        <button
+                            onClick={finalizeVariantDefinition}
+                            className="px-6 py-2 bg-[#5c4d41] text-white rounded-sm font-bold shadow-md hover:bg-[#4a3b32] flex items-center gap-2"
+                        >
+                            <Save size={16} /> Valider
+                        </button>
+                    </>
+                }
+            >
+                <div className="flex flex-col gap-4 py-2">
+                    <div className="bg-amber-50/50 border border-amber-200/50 p-3 rounded-sm text-sm text-[#5c4d41]">
+                        Vous définissez une variante pour la compétence <strong>{variantModalState.skillName}</strong>.
+                        <br />
+                        <span className="text-xs italic mt-1 block">Une nouvelle ligne vide sera créée automatiquement en dessous pour d'autres variantes.</span>
+                    </div>
+
+                    <div>
+                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">
+                            Spécialité / Variante (ex: Forge, Histoire, Épées...)
+                        </label>
+                        <input
+                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm text-lg"
+                            value={variantModalState.inputValue}
+                            onChange={(e) => setVariantModalState(prev => ({ ...prev, inputValue: e.target.value }))}
+                            autoFocus
+                            onKeyDown={(e) => e.key === 'Enter' && finalizeVariantDefinition()}
+                        />
+                    </div>
+                </div>
+            </ThematicModal>
         </div>
     );
 };

@@ -1,13 +1,17 @@
 
 import React, { useState, useMemo } from 'react';
 import { Search, Plus, Award, CheckCircle2, Edit2, Trash2, Download, HelpCircle, Save, X, AlertTriangle } from 'lucide-react';
-import { useCharacter } from '../../context/CharacterContext';
+import { CharacterSheetData } from '../../types';
 import { useNotification } from '../../context/NotificationContext';
 import { LibrarySpecializationEntry } from '../../types';
 import { smartIncludes } from '../../utils/stringUtils';
 
-const SpecializationLibraryView: React.FC = () => {
-    const { data, updateData: onUpdate } = useCharacter();
+interface SpecializationLibraryViewProps {
+    data: CharacterSheetData;
+    onUpdate: (newData: CharacterSheetData) => void;
+}
+
+const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ data, onUpdate }) => {
     const addLog = useNotification();
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -17,6 +21,8 @@ const SpecializationLibraryView: React.FC = () => {
     const [showImportConfirm, setShowImportConfirm] = useState(false);
     const [entryToDelete, setEntryToDelete] = useState<LibrarySpecializationEntry | null>(null);
     const [skillSearch, setSkillSearch] = useState('');
+
+    if (!data) return <div className="p-4 text-gray-500 italic">Chargement des données...</div>;
 
     const library = data.specializationLibrary || [];
 
@@ -53,10 +59,10 @@ const SpecializationLibraryView: React.FC = () => {
     // Déterminer quelles spécialisations sont déjà utilisées sur la fiche
     const usedSpecializations = useMemo(() => {
         const names = new Set<string>();
-        Object.values(data.specializations).forEach(spes => {
+        Object.values(data.specializations || {}).forEach(spes => {
             spes.forEach(s => names.add(s.trim().toLowerCase()));
         });
-        Object.values(data.imposedSpecializations).forEach(spes => {
+        Object.values(data.imposedSpecializations || {}).forEach(spes => {
             spes.forEach(s => names.add(s.name.trim().toLowerCase()));
         });
         return names;
@@ -175,13 +181,13 @@ const SpecializationLibraryView: React.FC = () => {
     };
 
     return (
-        <div className="absolute inset-0 flex flex-col bg-white">
+        <div className="absolute inset-0 flex flex-col bg-[#fdfbf7]">
             {/* Toolbar */}
-            <div className="p-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0">
+            <div className="p-4 bg-stone-100/30 border-b border-[#bfae85]/30 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0">
                 <div className="relative flex-grow max-w-md w-full">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#5c4d41]/60" />
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
                     <input
-                        className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:border-amber-500 outline-none text-gray-800 placeholder-gray-400 bg-white"
+                        className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
                         placeholder="Rechercher une spécialisation..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -190,15 +196,15 @@ const SpecializationLibraryView: React.FC = () => {
                 <div className="flex gap-2 w-full sm:w-auto">
                     <button
                         onClick={() => setShowImportConfirm(true)}
-                        className="bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 hover:text-gray-800 px-3 py-1.5 rounded text-sm font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
+                        className="bg-white/80 border border-[#bfae85]/50 text-[#5c4d41] hover:bg-stone-50 hover:text-[#1c1917] px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
                     >
-                        <Download size={16} /> Importer
+                        <Download size={14} /> Importer
                     </button>
                     <button
                         onClick={handleOpenNew}
-                        className="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded text-sm font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
+                        className="bg-[#5c4d41] hover:bg-[#4a3b32] text-white px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
                     >
-                        <Plus size={16} /> Créer
+                        <Plus size={14} /> Créer
                     </button>
                 </div>
             </div>
@@ -209,7 +215,7 @@ const SpecializationLibraryView: React.FC = () => {
                     <div className="text-center text-[#5c4d41]/60 py-10 italic px-4 text-sm flex flex-col items-center">
                         <Award size={48} className="opacity-20 mb-2" />
                         <p>La bibliothèque de spécialisations est vide.</p>
-                        <p className="text-xs mt-2">Peuplez-la manuellement ou importez l'existant.</p>
+                        <p className="text-xs mt-2 text-[#5c4d41]/80 italic">Peuplez-la manuellement ou importez l'existant.</p>
                     </div>
                 ) : filteredLibrary.length === 0 ? (
                     <div className="text-center text-[#5c4d41]/60 py-10 italic">Aucun résultat.</div>
@@ -220,18 +226,18 @@ const SpecializationLibraryView: React.FC = () => {
                             return (
                                 <div
                                     key={entry.id}
-                                    className={`border rounded-lg p-3 transition-all bg-white group flex flex-col justify-between ${isUsed
-                                        ? 'border-green-200 bg-green-50/30'
-                                        : 'border-gray-200 hover:shadow-md hover:border-amber-300'
+                                    className={`border rounded-sm p-3 transition-all bg-white/60 group flex flex-col justify-between ${isUsed
+                                        ? 'border-green-300/40 bg-green-50/10'
+                                        : 'border-[#bfae85]/30 hover:border-amber-400/50 hover:shadow-sm'
                                         }`}
                                 >
                                     <div>
                                         <div className="flex justify-between items-start mb-1">
-                                            <span className={`font-bold text-sm ${isUsed ? 'text-green-800' : 'text-gray-800'}`}>
+                                            <span className={`font-serif font-black uppercase text-xs tracking-wide ${isUsed ? 'text-green-800' : 'text-[#4a3b32]'}`}>
                                                 {entry.name}
                                             </span>
                                             {isUsed && (
-                                                <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full flex items-center gap-1 font-bold border border-green-200">
+                                                <span className="text-[9px] bg-green-100/50 text-green-800/80 px-1.5 py-0.5 rounded-sm flex items-center gap-1 font-bold border border-green-200/50 uppercase tracking-tight">
                                                     <CheckCircle2 size={10} /> Utilisée
                                                 </span>
                                             )}
@@ -243,21 +249,21 @@ const SpecializationLibraryView: React.FC = () => {
                                             )}
                                         </div>
                                         {entry.description && (
-                                            <p className="text-xs text-gray-500 line-clamp-2 mb-2">{entry.description}</p>
+                                            <p className="text-[10px] text-[#5c4d41] italic line-clamp-2 mb-2 leading-tight opacity-80">{entry.description}</p>
                                         )}
                                         <div className="flex flex-wrap gap-1 mt-1">
                                             {entry.skillIds.map(sid => {
                                                 const s = allSkills.find(sk => sk.id === sid);
                                                 return (
-                                                    <span key={sid} className="text-[9px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded border border-gray-200">
+                                                    <span key={sid} className="text-[9px] bg-stone-100/50 text-[#5c4d41] px-1.5 py-0.5 rounded-sm border border-[#bfae85]/20">
                                                         {s ? s.name : sid}
                                                     </span>
                                                 );
                                             })}
                                         </div>
                                     </div>
-                                    <div className="mt-2 text-[10px] text-[#5c4d41]/60 flex justify-between items-center">
-                                        <span>Seuil MJ : <span className="font-bold text-amber-600">{entry.defaultMinLevel}</span></span>
+                                    <div className="mt-2 text-[10px] text-[#5c4d41]/60 flex justify-between items-center border-t border-[#bfae85]/20 pt-1">
+                                        <span>Seuil MJ : <span className="font-bold text-amber-700">{entry.defaultMinLevel}</span></span>
                                     </div>
                                 </div>
                             );
@@ -269,9 +275,9 @@ const SpecializationLibraryView: React.FC = () => {
             {/* Modals ... (à implémenter ou intégrer) */}
             {isModalOpen && editingEntry && (
                 <div className="fixed inset-0 z-[150] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in zoom-in duration-200">
-                        <div className="p-4 border-b flex justify-between items-center text-white bg-amber-700">
-                            <h3 className="font-bold text-lg flex items-center gap-2">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in zoom-in duration-200 border-2 border-[#bfae85]/50">
+                        <div className="p-4 border-b border-[#bfae85]/50 flex justify-between items-center text-white bg-amber-700/90">
+                            <h3 className="font-bold text-lg flex items-center gap-2 font-serif tracking-wide">
                                 <Award size={20} />
                                 {library.some(e => e.id === editingEntry.id) ? 'Éditer Spécialisation' : 'Nouvelle Spécialisation'}
                             </h3>
@@ -280,22 +286,22 @@ const SpecializationLibraryView: React.FC = () => {
                             </button>
                         </div>
 
-                        <div className="p-6 bg-gray-50 flex flex-col gap-4 overflow-y-auto max-h-[70vh]">
+                        <div className="p-6 bg-[#fdfbf7] flex flex-col gap-4 overflow-y-auto max-h-[70vh]">
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom</label>
+                                <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Nom</label>
                                 <input
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 font-bold text-gray-900 bg-white focus:border-amber-500 outline-none"
+                                    className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-black font-serif text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm"
                                     value={editingEntry.name}
                                     onChange={(e) => setEditingEntry({ ...editingEntry, name: e.target.value })}
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Compétences associées</label>
+                                <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Compétences associées</label>
                                 <div className="relative mb-2">
                                     <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-[#5c4d41]/60" />
                                     <input
-                                        className="w-full pl-7 pr-2 py-1 text-[11px] border border-gray-200 rounded focus:border-amber-500 outline-none"
+                                        className="w-full pl-7 pr-2 py-1 text-[11px] border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none bg-white/50"
                                         placeholder="Filtrer les compétences..."
                                         value={skillSearch}
                                         onChange={(e) => setSkillSearch(e.target.value)}
@@ -309,11 +315,11 @@ const SpecializationLibraryView: React.FC = () => {
                                         </button>
                                     )}
                                 </div>
-                                <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded p-2 bg-white custom-scrollbar">
+                                <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-[#bfae85]/50 rounded-sm p-2 bg-white/30 custom-scrollbar">
                                     {filteredSkillsForModal.length === 0 ? (
                                         <div className="col-span-2 text-center py-2 text-[10px] text-[#5c4d41]/60 italic">Aucun résultat.</div>
                                     ) : filteredSkillsForModal.map(skill => (
-                                        <label key={skill.id} className={`flex items-center gap-2 text-xs cursor-pointer hover:bg-gray-50 p-1 rounded transition-colors ${editingEntry.skillIds.includes(skill.id) ? 'bg-amber-50/50' : ''}`}>
+                                        <label key={skill.id} className={`flex items-center gap-2 text-xs cursor-pointer hover:bg-stone-100/50 p-1 rounded transition-colors ${editingEntry.skillIds.includes(skill.id) ? 'bg-amber-100/30' : ''}`}>
                                             <input
                                                 type="checkbox"
                                                 checked={editingEntry.skillIds.includes(skill.id)}
@@ -323,9 +329,9 @@ const SpecializationLibraryView: React.FC = () => {
                                                         : editingEntry.skillIds.filter(id => id !== skill.id);
                                                     setEditingEntry({ ...editingEntry, skillIds: ids });
                                                 }}
-                                                className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                                                className="rounded border-[#bfae85]/50 text-amber-600 focus:ring-amber-500"
                                             />
-                                            <span className={`truncate ${editingEntry.skillIds.includes(skill.id) ? 'font-bold text-amber-900' : 'text-gray-700'}`}>{skill.name}</span>
+                                            <span className={`truncate ${editingEntry.skillIds.includes(skill.id) ? 'font-bold text-amber-900' : 'text-[#4a3b32]'}`}>{skill.name}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -337,12 +343,12 @@ const SpecializationLibraryView: React.FC = () => {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Seuil minimum par défaut (MJ)</label>
+                                <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Seuil minimum par défaut (MJ)</label>
                                 <input
                                     type="number"
                                     min="0"
                                     max="5"
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:border-amber-500 outline-none"
+                                    className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm bg-white/50 focus:border-amber-500 outline-none shadow-sm"
                                     value={editingEntry.defaultMinLevel}
                                     onChange={(e) => setEditingEntry({ ...editingEntry, defaultMinLevel: parseInt(e.target.value) || 0 })}
                                 />
@@ -350,9 +356,9 @@ const SpecializationLibraryView: React.FC = () => {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+                                <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Description</label>
                                 <textarea
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white min-h-[80px] focus:border-amber-500 outline-none resize-none"
+                                    className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm bg-white/50 min-h-[80px] focus:border-amber-500 outline-none resize-none shadow-sm italic text-[#4a3b32]"
                                     value={editingEntry.description || ''}
                                     onChange={(e) => setEditingEntry({ ...editingEntry, description: e.target.value })}
                                 />
@@ -365,9 +371,9 @@ const SpecializationLibraryView: React.FC = () => {
                             )}
                         </div>
 
-                        <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
-                            <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded font-bold">Annuler</button>
-                            <button onClick={handleSave} className="px-6 py-2 bg-amber-600 text-white rounded font-bold shadow-md hover:bg-amber-700 flex items-center gap-2">
+                        <div className="p-4 border-t border-[#bfae85]/30 bg-stone-100/30 flex justify-end gap-3">
+                            <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold">Annuler</button>
+                            <button onClick={handleSave} className="px-6 py-2 bg-[#5c4d41] text-white rounded-sm font-bold shadow-md hover:bg-[#4a3b32] flex items-center gap-2">
                                 <Save size={16} /> Enregistrer
                             </button>
                         </div>

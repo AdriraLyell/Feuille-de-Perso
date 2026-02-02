@@ -35,6 +35,11 @@ const ThematicModal: React.FC<ThematicModalProps> = ({
             document.body.style.overflow = 'unset';
             return () => clearTimeout(timer);
         }
+
+        // Cleanup on unmount to ensure scroll is restored
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
     }, [isOpen]);
 
     if (!isVisible && !isOpen) return null;

@@ -71,26 +71,33 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
     // 1. Initialize State from LocalStorage
     const [data, setData] = useState<CharacterSheetData>(() => {
         const saved = localStorage.getItem('rpg-sheet-data');
+
         if (saved) {
             try {
-                const migrated = migrateData(JSON.parse(saved));
+                const parsed = JSON.parse(saved);
+                const migrated = migrateData(parsed);
+
                 // Validate after migration
                 const validated = validateCharacterData(migrated);
+
                 if (validated.creationConfig) {
                     validated.creationConfig.active = false;
                 }
                 return validated;
             } catch (e) {
-                console.error("Error loading/validating data", e);
+                console.error("[Init] Error loading/validating data", e);
                 // Try to just migrate if validation fails, or fallback to initial
                 try {
                     return migrateData(JSON.parse(saved));
                 } catch (migrateError) {
+                    console.error("[Init] Migration fallback failed", migrateError);
                     return INITIAL_DATA;
                 }
             }
         }
-        return migrateData(JSON.parse(JSON.stringify(INITIAL_DATA)));
+
+        // For fresh initialization, use INITIAL_DATA directly without migration
+        return JSON.parse(JSON.stringify(INITIAL_DATA));
     });
 
     // 2. Persistence Effect
