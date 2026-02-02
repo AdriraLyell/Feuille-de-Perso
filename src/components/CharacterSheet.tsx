@@ -262,6 +262,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
 
     const cardValue = calculateCardValue(data);
     const creationActive = data.creationConfig?.active;
+    const allowExtendedSkills = data.creationConfig?.extendedSkills || false;
 
     return (
         <div className={`sheet-container ${isLandscape ? 'landscape' : ''}`}>
@@ -307,6 +308,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                         imposedSpecs={data.imposedSpecializations}
                                         theme={data.theme}
                                         onDefineVariant={handleDefineVariant}
+                                        allowExtendedSkills={allowExtendedSkills}
                                     />
                                 </div>
                             ))}
@@ -325,6 +327,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                 imposedSpecs={data.imposedSpecializations}
                                 theme={data.theme}
                                 onDefineVariant={handleDefineVariant}
+                                allowExtendedSkills={allowExtendedSkills}
                             />
                         </div>
                         <div className="flex-none border-b border-stone-400 overflow-hidden">
@@ -340,31 +343,31 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 <>
                     <div className="grid grid-cols-4 border-b-2 border-stone-800 h-auto">
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Talents" items={data.skills.talents || []} cat="talents" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
+                            <SkillBlock title="Talents" items={data.skills.talents || []} cat="talents" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
                         </div>
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Compétences" items={data.skills.competences || []} cat="competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
+                            <SkillBlock title="Compétences" items={data.skills.competences || []} cat="competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
                         </div>
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Compétences" items={data.skills.competences_col_2 || []} cat="competences_col_2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
+                            <SkillBlock title="Compétences" items={data.skills.competences_col_2 || []} cat="competences_col_2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
                         </div>
                         <div>
-                            <SkillBlock title="Connaissances" items={data.skills.connaissances || []} cat="connaissances" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
+                            <SkillBlock title="Connaissances" items={data.skills.connaissances || []} cat="connaissances" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-4 border-b-2 border-stone-800 flex-grow min-h-[200px]">
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Autres Compétences" items={data.skills.autres_competences || []} cat="autres_competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
+                            <SkillBlock title="Autres Compétences" items={data.skills.autres_competences || []} cat="autres_competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
                         </div>
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Compétences Secondaires" items={data.skills.competences2 || []} cat="competences2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
+                            <SkillBlock title="Compétences Secondaires" items={data.skills.competences2 || []} cat="competences2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
                         </div>
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Autres" items={data.skills.autres || []} cat="autres" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
+                            <SkillBlock title="Autres" items={data.skills.autres || []} cat="autres" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
                         </div>
                         <div>
-                            <SkillBlock title="Arrières Plans" items={data.skills.arrieres_plans || []} cat="arrieres_plans" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} />
+                            <SkillBlock title="Arrières Plans" items={data.skills.arrieres_plans || []} cat="arrieres_plans" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
                         </div>
                     </div>
 

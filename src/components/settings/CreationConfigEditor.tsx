@@ -76,6 +76,20 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                     </h4>
 
                     <div className="space-y-4">
+                        {/* Extended Skills Toggle */}
+                        <div className="flex items-center justify-between bg-[#bfae85]/10 p-2 rounded-sm border border-[#bfae85]/20 mb-4">
+                            <label className="text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest">Rangs Étendus (6+)</label>
+                            <div className="flex items-center gap-2">
+                                <span className="text-[9px] font-bold text-[#5c4d41]/60 tracking-widest">{config.extendedSkills ? 'ACTIF' : 'INACTIF'}</span>
+                                <button
+                                    onClick={() => updateCreationConfig('extendedSkills', !config.extendedSkills)}
+                                    className={`w-8 h-4 rounded-full p-0.5 transition-colors ${config.extendedSkills ? 'bg-[#8b2e2e]' : 'bg-stone-300'}`}
+                                >
+                                    <div className={`bg-white w-3 h-3 rounded-full shadow-sm transform transition-transform ${config.extendedSkills ? 'translate-x-4' : ''}`} />
+                                </button>
+                            </div>
+                        </div>
+
                         <div>
                             <label className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest mb-1.5">Méthode de Création</label>
                             <div className="flex bg-stone-200/50 p-1 rounded-sm border border-stone-300/30">

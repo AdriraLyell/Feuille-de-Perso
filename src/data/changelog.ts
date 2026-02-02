@@ -3,6 +3,38 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG = [
     {
+        version: '2.12.39',
+        date: '2026-02-02',
+        changes: [
+            'Nouvelle Fonctionnalité : Support des "Rangs Étendus" pour les compétences. Vous pouvez désormais monter jusqu\'à 10 (coût en XP linéaire).',
+            'Configuration : Ajout d\'une option pour activer/désactiver les rangs étendus dans les paramètres de création.',
+            'Interface : Affichage dynamique des rangs > 5 (les bulles supplémentaires s\'affichent au besoin).'
+        ]
+    },
+    {
+        version: '2.12.38',
+        date: '2026-02-02',
+        changes: [
+            'Interface : L\'éditeur d\'Apparence (Couleurs & Thèmes) est maintenant accessible directement depuis la barre de navigation principale (icône palette), à gauche des Réglages.',
+            'Interface : Retrait de l\'onglet Apparence de la fenêtre de configuration pour simplifier.'
+        ]
+    },
+    {
+        version: '2.12.37',
+        date: '2026-02-02',
+        changes: [
+            'Migration : La synchronisation des compétences variables respecte désormais vos choix personnalisés (si vous avez désactivé une variable, elle le restera).',
+            'Interface : Renommage des onglets "Exportation/Importation" en "Sauvegarde/Chargement" pour plus de clarté.'
+        ]
+    },
+    {
+        version: '2.12.36',
+        date: '2026-02-02',
+        changes: [
+            'Migration : Synchronisation automatique des compétences "variables" (Bibliothèque Système -> Bibliothèque Personnage -> Fiche).'
+        ]
+    },
+    {
         version: '2.12.35',
         date: '2026-02-02',
         changes: [

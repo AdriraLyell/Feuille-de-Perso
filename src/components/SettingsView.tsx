@@ -12,11 +12,11 @@ import AttributesEditor from './settings/AttributesEditor';
 import SkillsEditor from './settings/SkillsEditor';
 import SpecializationsEditor from './settings/SpecializationsEditor';
 import CreationConfigEditor from './settings/CreationConfigEditor';
-import AppearanceEditor from './settings/AppearanceEditor';
+
 import LibrarySidebar from './settings/LibrarySidebar';
 import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
 import LibraryView from './LibraryView';
-import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, Palette, RefreshCw, X, AlertCircle, BookOpen } from 'lucide-react';
+import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen } from 'lucide-react';
 
 interface SettingsViewProps {
   onClose: () => void;
@@ -42,7 +42,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
   // Modal States
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'specializations' | 'creation' | 'appearance' | 'library'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'specializations' | 'creation' | 'library'>('general');
   const [isDirty, setIsDirty] = useState(false);
 
   // Helper to compare data excluding volatile/computed fields
@@ -87,7 +87,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
             <button onClick={() => setActiveTab('skills')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'skills' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><List size={16} /> Compétences</button>
             <button onClick={() => setActiveTab('specializations')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'specializations' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><Tag size={16} /> Spécialisations</button>
             <button onClick={() => setActiveTab('creation')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'creation' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><UserPlus size={16} /> Paramètres</button>
-            <button onClick={() => setActiveTab('appearance')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'appearance' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><Palette size={16} /> Apparence</button>
+
             <button onClick={() => setActiveTab('library')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'library' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><BookOpen size={16} /> Bibliothèque</button>
           </div>
         </div>
@@ -155,13 +155,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
             />
           )}
 
-          {activeTab === 'appearance' && (
-            <AppearanceEditor
-              data={localData}
-              onUpdate={handleLocalUpdate}
-              onAddLog={onAddLog}
-            />
-          )}
+
 
           {activeTab === 'library' && (
             <div className="h-[calc(100vh-250px)] min-h-[600px] border border-[#bfae85]/30 rounded-sm overflow-hidden shadow-sm">

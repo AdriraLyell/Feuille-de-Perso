@@ -1,0 +1,40 @@
+
+import React from 'react';
+import ThematicModal from './ui/ThematicModal';
+import AppearanceEditor from './settings/AppearanceEditor';
+import { Palette, X } from 'lucide-react';
+import { CharacterSheetData } from '../types';
+import ThematicButton from './ui/ThematicButton';
+
+interface AppearanceModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    data: CharacterSheetData;
+    onUpdate: (newData: CharacterSheetData) => void;
+}
+
+const AppearanceModal: React.FC<AppearanceModalProps> = ({ isOpen, onClose, data, onUpdate }) => {
+    return (
+        <ThematicModal
+            isOpen={isOpen}
+            onClose={onClose}
+            title="Apparence & Thème"
+            icon={<Palette size={24} />}
+            size="lg"
+            footer={
+                <div className="flex justify-end w-full">
+                    <ThematicButton onClick={onClose} variant="primary" leftIcon={<X size={16} />}>
+                        Fermer
+                    </ThematicButton>
+                </div>
+            }
+        >
+            <div className="p-4">
+                {/* Reuse existing logic directly from AppearanceEditor */}
+                <AppearanceEditor data={data} onUpdate={onUpdate} onAddLog={() => { }} />
+            </div>
+        </ThematicModal>
+    );
+};
+
+export default AppearanceModal;

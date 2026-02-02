@@ -230,7 +230,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                     className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-all font-bold flex items-center justify-center gap-2 shadow-lg hover:-translate-y-0.5"
                 >
                     <Download size={20} />
-                    Télécharger le fichier
+                    Sauvegarder
                 </button>
             </div>
         </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Book, Settings, FileText, Layout, Save, Upload, Feather, LogOut, Printer, Monitor, Smartphone, History, HelpCircle, ScrollText, ArrowRightLeft, BookOpen, Download, RectangleVertical, RectangleHorizontal } from 'lucide-react';
+import { Book, Settings, FileText, Layout, Save, Upload, Feather, LogOut, Printer, Monitor, Smartphone, History, HelpCircle, ScrollText, ArrowRightLeft, BookOpen, Download, RectangleVertical, RectangleHorizontal, Palette } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { CharacterSheetData } from '../../types';
 
@@ -14,13 +14,14 @@ interface DiegeticNavigationProps {
     showLogs: boolean;
     onShowUserGuide: () => void;
     onShowChangelog: () => void;
+    onOpenAppearance: () => void;
     appVersion: string;
 }
 
 const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     currentMode, onModeChange, onOpenImportExport,
     onPrintRequest, onToggleLandscape, isLandscape,
-    onShowLogs, showLogs, onShowUserGuide, onShowChangelog, appVersion
+    onShowLogs, showLogs, onShowUserGuide, onShowChangelog, onOpenAppearance, appVersion
 }) => {
     const { data } = useCharacter();
 
@@ -68,6 +69,13 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                     {/* Navigation Buttons (Moved to Right) */}
                     <div className="hidden md:flex items-center gap-2 mr-4 border-r border-gray-600 pr-4">
+                        <button
+                            onClick={onOpenAppearance}
+                            className="px-4 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-2 text-gray-300 hover:text-white hover:bg-gray-700"
+                            title="Changer l'apparence"
+                        >
+                            <Palette size={16} /> Thème
+                        </button>
                         <button
                             onClick={() => onModeChange('settings')}
                             className={`px-4 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-2 ${currentMode === 'settings'

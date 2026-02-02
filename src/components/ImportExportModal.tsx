@@ -46,7 +46,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                     >
                         <div className="flex items-center gap-2">
                             <Download size={20} />
-                            Exportation
+                            Sauvegarde
                         </div>
                     </button>
                     <button
@@ -55,7 +55,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                     >
                         <div className="flex items-center gap-2">
                             <Upload size={20} />
-                            Importation
+                            Chargement
                         </div>
                     </button>
                 </div>

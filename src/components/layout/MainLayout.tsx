@@ -19,6 +19,7 @@ import ChangelogModal from '../ChangelogModal';
 import UserGuideModal from '../UserGuideModal';
 import CreationHUD from '../CreationHUD';
 import UpdateNotifier from '../UpdateNotifier';
+import AppearanceModal from '../AppearanceModal';
 import DiegeticNavigation from './DiegeticNavigation';
 
 // Icons
@@ -43,6 +44,8 @@ const MainLayout: React.FC = () => {
     const [showUserGuide, setShowUserGuide] = useState(false);
     const [showLogs, setShowLogs] = useState(false);
     const [historyTab, setHistoryTab] = useState<'sheet' | 'settings'>('sheet');
+
+    const [showAppearance, setShowAppearance] = useState(false);
 
     // Initialize Reference State for Unsaved Indicator
     useEffect(() => {
@@ -138,6 +141,7 @@ const MainLayout: React.FC = () => {
                     showLogs={showLogs}
                     onShowUserGuide={() => setShowUserGuide(true)}
                     onShowChangelog={() => setShowChangelog(true)}
+                    onOpenAppearance={() => setShowAppearance(true)}
                     appVersion={APP_VERSION}
                 />
 
@@ -235,6 +239,12 @@ const MainLayout: React.FC = () => {
                     )}
                     <ChangelogModal isOpen={showChangelog} onClose={() => setShowChangelog(false)} />
                     <UserGuideModal isOpen={showUserGuide} onClose={() => setShowUserGuide(false)} />
+                    <AppearanceModal
+                        isOpen={showAppearance}
+                        onClose={() => setShowAppearance(false)}
+                        data={data}
+                        onUpdate={(newData) => setData(newData)}
+                    />
                 </div>
             </div>
         </NotificationProvider>

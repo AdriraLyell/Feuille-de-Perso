@@ -144,7 +144,8 @@ export const INITIAL_DATA: CharacterSheetData = {
       bestSkillsCount: 6,
       increment: 0.5,
       baseStart: 2
-    }
+    },
+    extendedSkills: false
   },
   theme: DEFAULT_THEME,
   header: {

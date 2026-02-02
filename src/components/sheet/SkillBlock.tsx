@@ -12,7 +12,8 @@ const DotRow: React.FC<{
     theme?: { creationColor: string, xpColor: string, dotSymbol?: string };
     imposedSpecs?: { name: string, minLevel: number }[];
     onDefineVariant?: (category: string, id: string, name: string) => void;
-}> = ({ entry, category, onUpdate, specializations = [], theme, imposedSpecs = [], onDefineVariant }) => {
+    allowExtendedSkills?: boolean;
+}> = ({ entry, category, onUpdate, specializations = [], theme, imposedSpecs = [], onDefineVariant, allowExtendedSkills = false }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     // Spacer logic
@@ -32,6 +33,15 @@ const DotRow: React.FC<{
     const hasSpecs = combinedValidSpecs.length > 0;
     const isUndefinedVariable = entry.variant === "";
 
+    // Dynamic Max Logic
+    // If not extended, max is 5.
+    // If extended, we always show at least 5.
+    // If rank is 5, we show 6 (5 filled + 1 empty).
+    // If rank is 6, we show 7, etc.
+    const effectiveMax = allowExtendedSkills && entry.value >= 5
+        ? Math.min(entry.value + 1, 10)
+        : 5;
+
     const handleClick = () => {
         if (isUndefinedVariable && onDefineVariant) {
             onDefineVariant(category, entry.id, entry.name);
@@ -46,11 +56,13 @@ const DotRow: React.FC<{
             onMouseLeave={() => setIsOpen(false)}
         >
             <span
-                className={`text-xs truncate w-[60%] font-medium transition-colors ${isUndefinedVariable
+                className={`text-xs truncate font-medium transition-colors ${isUndefinedVariable
                     ? 'text-stone-500 cursor-pointer hover:text-amber-700 hover:underline'
                     : hasSpecs
                         ? 'text-blue-900 font-semibold cursor-help'
                         : 'text-stone-700 cursor-default'}`}
+                // Dynamic width adjustment to avoid overlap with extra bubbles
+                style={{ width: effectiveMax > 5 ? '40%' : '60%' }}
                 onClick={handleClick}
                 title={entry.variant ? `${entry.name} : ${entry.variant}` : entry.name}
             >
@@ -89,6 +101,7 @@ const DotRow: React.FC<{
                 creationColor={theme?.creationColor}
                 xpColor={theme?.xpColor}
                 symbol={theme?.dotSymbol}
+                max={effectiveMax}
             />
         </div >
     );
@@ -103,7 +116,8 @@ export const SkillBlock = React.memo<{
     imposedSpecs?: Record<string, { name: string, minLevel: number }[]>;
     theme?: { creationColor: string, xpColor: string, dotSymbol?: string };
     onDefineVariant?: (category: string, id: string, name: string) => void;
-}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant }) => (
+    allowExtendedSkills?: boolean;
+}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false }) => (
     <div className="flex flex-col h-full">
         <SectionHeader title={title} />
         <div className="flex-grow py-1">
@@ -124,6 +138,7 @@ export const SkillBlock = React.memo<{
                         imposedSpecs={iSpecs}
                         theme={theme}
                         onDefineVariant={onDefineVariant}
+                        allowExtendedSkills={allowExtendedSkills}
                     />
                 );
             })}

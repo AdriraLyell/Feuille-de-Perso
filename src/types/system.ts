@@ -35,6 +35,9 @@ export interface CreationConfig {
     increment: number; // Défaut 0.5
     baseStart: number; // Défaut 2
   };
+
+  // Nouvelle option pour autoriser les rangs > 5
+  extendedSkills?: boolean;
 }
 
 export interface ThemeConfig {

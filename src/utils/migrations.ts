@@ -389,24 +389,27 @@ export const migrateData = (parsed: any): CharacterSheetData => {
 
     // --- MIGRATION: UPDATE EXISTING LIBRARY ENTRIES ---
     // Ensure all entries (new or existing) have the correct 'isVariable' flag
-    // based on the default configuration.
+    // based on the INITIAL_DATA configuration (Source of Truth).
     if (parsed.skillLibrary) {
-        const defaultVariableSkills = ['artisanat', 'jouer', 'art martial'];
-        parsed.skillLibrary = parsed.skillLibrary.map((skill: LibrarySkillEntry) => {
-            const normalized = skill.name.trim().toLowerCase();
-            // Check if it should be variable
-            const shouldBeVariable = defaultVariableSkills.some(v => normalized === v || normalized.startsWith(v + ' :'));
-
-            // Only update if strictly needed to avoid overriding user customization if we imply it later
-            // But here we want to enforce defaults for the base skills
-            if (defaultVariableSkills.includes(normalized)) {
-                return { ...skill, isVariable: true };
+        // Create a map of default variable status from INITIAL_DATA
+        const defaultVariableStatus = new Map<string, boolean>();
+        INITIAL_DATA.skillLibrary.forEach(s => {
+            if (s.isVariable) {
+                defaultVariableStatus.set(s.name.trim().toLowerCase(), true);
             }
-            // Preserve existing isVariable if it was set, otherwise default to false
-            return { ...skill, isVariable: skill.isVariable ?? false };
+        });
+
+        // Use this map to update parsed.skillLibrary
+        // Only valid if the skill is in the default variable list AND currently undefined
+        parsed.skillLibrary.forEach((s: any) => {
+            const normalized = s.name.trim().toLowerCase();
+            if (defaultVariableStatus.has(normalized)) {
+                if (typeof s.isVariable === 'undefined') {
+                    s.isVariable = true;
+                }
+            }
         });
     }
-
     if (!parsed.campaignNotes) {
         parsed.campaignNotes = [];
     }
@@ -463,21 +466,25 @@ export const migrateData = (parsed: any): CharacterSheetData => {
     });
 
     // --- MIGRATION: FIX VARIABLE SKILLS ON SHEET ---
-    // Ensure active skills that should be variable have the variant property initialized
-    const defaultVariableSkills = ['artisanat', 'jouer', 'art martial'];
-    if (parsed.skills) {
+    // Use the now-updated Library as the Source of Truth
+    if (parsed.skills && parsed.skillLibrary) {
+        // Build Set of ALL variable skill names (Default + User Custom)
+        const variableSkillNames = new Set<string>();
+        parsed.skillLibrary.forEach((s: LibrarySkillEntry) => {
+            if (s.isVariable) {
+                variableSkillNames.add(s.name.trim().toLowerCase());
+            }
+        });
+
         Object.keys(parsed.skills).forEach(key => {
             // @ts-ignore
             if (Array.isArray(parsed.skills[key])) {
                 // @ts-ignore
                 parsed.skills[key] = parsed.skills[key].map(skill => {
                     const normalized = skill.name.trim().toLowerCase();
-                    // Debug log for target skills
-                    if (defaultVariableSkills.includes(normalized)) {
-                        // console.log(`[Migration] Checking Sheet Skill: ${skill.name} (variant: ${skill.variant})`);
-                    }
 
-                    if (defaultVariableSkills.includes(normalized) && typeof skill.variant === 'undefined') {
+                    // If the skill is known as variable in the library, ensure it has a variant field on the sheet
+                    if (variableSkillNames.has(normalized) && typeof skill.variant === 'undefined') {
                         return { ...skill, variant: "" };
                     }
                     return skill;
