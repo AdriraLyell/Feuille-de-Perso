@@ -244,6 +244,9 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
             } else {
                 // @ts-ignore
                 const current = prev.counters[String(id)];
+                // Guard against Array (should not happen for non-custom ID but types say DotEntry | DotEntry[])
+                if (Array.isArray(current)) return prev;
+
                 const newItem = { ...current };
 
                 if (field === 'value') {

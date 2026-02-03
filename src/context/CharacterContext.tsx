@@ -4,6 +4,8 @@ import { INITIAL_DATA } from '../data/initialState';
 import { migrateData } from '../utils/migrations';
 import { calculateExperienceResults } from '../utils/mechanics';
 import { validateCharacterData } from '../schemas/characterSchema';
+import { useRules } from './RulesContext';
+import { applyRulesToState } from '../utils/rulesAdapter';
 
 // --- Context Definitions ---
 
@@ -68,6 +70,8 @@ interface CharacterProviderProps {
 }
 
 export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }) => {
+    const { rules } = useRules();
+
     // 1. Initialize State from LocalStorage
     const [data, setData] = useState<CharacterSheetData>(() => {
         const saved = localStorage.getItem('rpg-sheet-data');
@@ -169,9 +173,18 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
     }, []);
 
     const resetData = useCallback(() => {
-        setData(JSON.parse(JSON.stringify(INITIAL_DATA)));
-        addLog("Réinitialisation complète des données", 'danger', 'settings');
-    }, [addLog]);
+        const base = JSON.parse(JSON.stringify(INITIAL_DATA));
+        // Apply rules if available
+        const newState = rules ? applyRulesToState(base, rules) : base;
+
+        setData(newState);
+
+        const logMsg = rules
+            ? `Réinitialisation complète (Règles chargées : v${rules.version})`
+            : "Réinitialisation complète des données (Règles par défaut)";
+
+        addLog(logMsg, 'danger', 'settings');
+    }, [addLog, rules]);
 
     const importData = useCallback((newData: CharacterSheetData) => {
         try {
@@ -181,7 +194,6 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         } catch (e) {
             console.error("Import validation failed", e);
             addLog("Échec de l'import : les données sont malformées ou incompatibles", 'danger', 'settings');
-            // Show detail in console but don't crash the app
         }
     }, [addLog]);
 

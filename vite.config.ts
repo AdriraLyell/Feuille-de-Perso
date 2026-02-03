@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
+// Main App Config
 export default defineConfig({
   plugins: [react(), viteSingleFile()],
   // @ts-ignore
@@ -13,7 +14,7 @@ export default defineConfig({
   base: './',
   build: {
     outDir: 'dist',
-    emptyOutDir: true,
+    emptyOutDir: true, // Clear dist before building main
     // Options pour forcer un fichier unique robuste
     modulePreload: false,
     target: 'esnext',
@@ -21,8 +22,11 @@ export default defineConfig({
     chunkSizeWarningLimit: 100000000,
     cssCodeSplit: false,
     rollupOptions: {
+      input: {
+        main: './index.html',
+      },
       output: {
-        inlineDynamicImports: true, // Empêche la création de "chunks" séparés
+        inlineDynamicImports: true,
       },
     },
   }

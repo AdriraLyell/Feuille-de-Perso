@@ -3,6 +3,77 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG = [
     {
+        version: '2.12.47',
+        date: '2026-02-02',
+        changes: [
+            'Admin : Ajout de l\'éditeur de bibliothèque de Spécialisations officielles.',
+            'Joueur : Intégration de la bibliothèque de spécialisations officielles (Vue hybride).',
+            'Système : Support amélioré de la liaison des spécialisations officielles avec les compétences (Lien par Nom et ID).'
+        ]
+    },
+    {
+        version: '2.12.46',
+        date: '2026-02-02',
+        changes: [
+            'Admin : Création de l\'éditeur de bibliothèques OFFICIELLES (Traits & Compétences).',
+            'Joueur : Intégration des bibliothèques officielles dans l\'application (vue hybride Locale + Officielle).',
+            'Joueur : Les éléments officiels apparaissent avec un badge "OFF" et sont protégés en écriture (clonage automatique à la modification).'
+        ]
+    },
+    {
+        version: '2.12.45',
+        date: '2026-02-02',
+        changes: [
+            'Admin : Nouvel onglet "Attributs" pour éditer les définitions d\'attributs (Primaires et Secondaires).',
+            'Admin : Correction de l\'édition des "espaceurs" (compétences vides) avec un placeholder.'
+        ]
+    },
+    {
+        version: '2.12.44',
+        date: '2026-02-02',
+        changes: [
+            'Admin : Suppression du paramètre "Départ" (inutile) pour les compteurs (défaut à 0).',
+            'Amélioration de typage.'
+        ]
+    },
+    {
+        version: '2.12.43',
+        date: '2026-02-02',
+        changes: [
+            'Ajout de la gestion dynamique des Compteurs (Volonté, Confiance...) dans l\'Admin.',
+            'Ajout de la gestion dynamique des Arrière-Plans dans l\'Admin.',
+            'Mise à jour du calcul d\'XP pour supporter les coûts variables des compteurs et arrière-plans.',
+            'Correction: Spacers préservés lors de l\'import/export.'
+        ]
+    },
+    {
+        version: '2.12.42',
+        date: '2026-02-02',
+        changes: [
+            'Support des spacers (champs vides) dans les listes de compétences.',
+            'Nettoyage de fichiers obsolètes (rules.json).'
+        ]
+    },
+    {
+        version: '2.12.41',
+        date: '2026-02-02',
+        changes: [
+            'Admin : Ajout d\'une fenêtre de résultat détaillée après l\'import d\'un template (Succès vs Avertissements).',
+            'Admin : Amélioration de la logique d\'import pour supporter les formats "Sauvegarde Complète" et "Fiche Unitaire".',
+            'Système : Lissage de l\'expérience utilisateur pour la synchronisation Joueur -> Admin.'
+        ]
+    },
+    {
+        version: '2.12.40',
+        date: '2026-02-02',
+        changes: [
+            'Admin : Refonte majeure du calcul des coûts d\'XP. Le système utilise une formule triangulaire pour les Compétences (Facteur 1.0) et Spécialisations (Facteur 0.5).',
+            'Admin : Les Attributs conservent une progression linéaire avec un coût configurable (Défaut : 6 XP / point).',
+            'Admin : Ajout de l\'éditeur "Coûts & Limites" permettant de définir ces facteurs.',
+            'Système : Mise à jour du moteur de règles pour supporter les facteurs de coûts dynamiques.'
+        ]
+    },
+    {
         version: '2.12.39',
         date: '2026-02-02',
         changes: [

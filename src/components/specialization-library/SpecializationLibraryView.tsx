@@ -5,6 +5,8 @@ import { CharacterSheetData } from '../../types';
 import { useNotification } from '../../context/NotificationContext';
 import { LibrarySpecializationEntry } from '../../types';
 import { smartIncludes } from '../../utils/stringUtils';
+import { useRules } from '../../context/RulesContext';
+import { mergeLibraries, MergedEntry } from '../../utils/libraryMerger';
 
 interface SpecializationLibraryViewProps {
     data: CharacterSheetData;
@@ -22,9 +24,18 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
     const [entryToDelete, setEntryToDelete] = useState<LibrarySpecializationEntry | null>(null);
     const [skillSearch, setSkillSearch] = useState('');
 
-    if (!data) return <div className="p-4 text-gray-500 italic">Chargement des données...</div>;
+    // OFFICIAL: Get Rules Context
+    const { rules } = useRules();
 
-    const library = data.specializationLibrary || [];
+    // MERGE: Compute Hybrid Specialization Library
+    const hybridSpecializations = useMemo(() => {
+        const local = data.specializationLibrary || [];
+        const official = rules?.libraries?.specializations || [];
+
+        return mergeLibraries(local, official);
+    }, [data.specializationLibrary, rules]);
+
+    const library = hybridSpecializations; // Now MergedEntry[]
 
     // Liste plate de toutes les compétences pour le mapping
     const allSkills = useMemo(() => {
@@ -50,10 +61,10 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
 
     // Filtrer et trier la bibliothèque
     const filteredLibrary = useMemo(() => {
-        return library.filter(entry =>
-            smartIncludes(entry.name, searchTerm) ||
-            (entry.description && smartIncludes(entry.description, searchTerm))
-        ).sort((a, b) => a.name.localeCompare(b.name));
+        return library.filter(m =>
+            smartIncludes(m.entry.name, searchTerm) ||
+            (m.entry.description && smartIncludes(m.entry.description, searchTerm))
+        ).sort((a, b) => a.entry.name.localeCompare(b.entry.name));
     }, [library, searchTerm]);
 
     // Déterminer quelles spécialisations sont déjà utilisées sur la fiche
@@ -81,10 +92,11 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
         setIsModalOpen(true);
     };
 
-    const handleOpenEdit = (entry: LibrarySpecializationEntry) => {
+    const handleOpenEdit = (merged: MergedEntry<LibrarySpecializationEntry>) => {
         setError(null);
         setSkillSearch('');
-        setEditingEntry({ ...entry });
+        // Force keep official ID to allow creating copy
+        setEditingEntry({ ...merged.entry });
         setIsModalOpen(true);
     };
 
@@ -95,22 +107,26 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
             return;
         }
 
-        const duplicate = library.find(e =>
-            e.id !== editingEntry.id &&
-            e.name.trim().toLowerCase() === editingEntry.name.trim().toLowerCase()
+        const duplicate = hybridSpecializations.find(m =>
+            m.source === 'local' && // Check duplication only against LOCAL items
+            m.entry.id !== editingEntry.id &&
+            m.entry.name.trim().toLowerCase() === editingEntry.name.trim().toLowerCase()
         );
 
         if (duplicate) {
-            setError("Une spécialisation portant ce nom existe déjà.");
+            setError("Une spécialisation locale portant ce nom existe déjà.");
             return;
         }
 
         let newLibrary;
-        const exists = library.some(e => e.id === editingEntry.id);
+        const localList = data.specializationLibrary || [];
+        const exists = localList.some(e => e.id === editingEntry.id);
+
         if (exists) {
-            newLibrary = library.map(e => e.id === editingEntry.id ? editingEntry : e);
+            newLibrary = localList.map(e => e.id === editingEntry.id ? editingEntry : e);
         } else {
-            newLibrary = [...library, editingEntry];
+            // New or cloned from official
+            newLibrary = [...localList, editingEntry];
         }
 
         onUpdate({ ...data, specializationLibrary: newLibrary });
@@ -120,8 +136,9 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
     };
 
     const executeImportFromSheet = () => {
-        const currentLib = [...library];
-        const existingNames = new Set(currentLib.map(e => e.name.trim().toLowerCase()));
+        // Import into LOCAL
+        const currentLib = JSON.parse(JSON.stringify(data.specializationLibrary || []));
+        const existingNames = new Set(currentLib.map((e: any) => e.name.trim().toLowerCase()));
         let addedCount = 0;
 
         // Scanner les spécialisations classiques
@@ -170,11 +187,20 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
         setShowImportConfirm(false);
     };
 
+    const handleDeleteRequest = (merged: MergedEntry<LibrarySpecializationEntry>) => {
+        if (merged.source === 'official') {
+            alert("Impossible de supprimer une spécialisation officielle.");
+            return;
+        }
+        setEntryToDelete(merged.entry);
+    };
+
     const executeDelete = () => {
         if (!entryToDelete) return;
+        const localList = data.specializationLibrary || [];
         onUpdate({
             ...data,
-            specializationLibrary: library.filter(e => e.id !== entryToDelete.id)
+            specializationLibrary: localList.filter(e => e.id !== entryToDelete.id)
         });
         addLog(`Spécialisation "${entryToDelete.name}" supprimée.`, 'info', 'settings');
         setEntryToDelete(null);
@@ -221,21 +247,30 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                     <div className="text-center text-[#5c4d41]/60 py-10 italic">Aucun résultat.</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {filteredLibrary.map(entry => {
+                        {filteredLibrary.map(merged => {
+                            const entry = merged.entry;
                             const isUsed = usedSpecializations.has(entry.name.trim().toLowerCase());
+                            const isOfficial = merged.source === 'official';
+
                             return (
                                 <div
                                     key={entry.id}
                                     className={`border rounded-sm p-3 transition-all bg-white/60 group flex flex-col justify-between ${isUsed
                                         ? 'border-green-300/40 bg-green-50/10'
-                                        : 'border-[#bfae85]/30 hover:border-amber-400/50 hover:shadow-sm'
+                                        : isOfficial ? 'border-blue-300/40 bg-blue-50/5' : 'border-[#bfae85]/30 hover:border-amber-400/50 hover:shadow-sm'
                                         }`}
                                 >
                                     <div>
                                         <div className="flex justify-between items-start mb-1">
-                                            <span className={`font-serif font-black uppercase text-xs tracking-wide ${isUsed ? 'text-green-800' : 'text-[#4a3b32]'}`}>
-                                                {entry.name}
-                                            </span>
+                                            <div className="flex flex-col">
+                                                <span className={`font-serif font-black uppercase text-xs tracking-wide ${isUsed ? 'text-green-800' : 'text-[#4a3b32]'}`}>
+                                                    {entry.name}
+                                                </span>
+                                                {isOfficial && (
+                                                    <span className="text-[8px] bg-blue-100 text-blue-700 px-1 rounded-sm border border-blue-200 font-bold w-fit mt-0.5">OFFICIEL</span>
+                                                )}
+                                            </div>
+
                                             {isUsed && (
                                                 <span className="text-[9px] bg-green-100/50 text-green-800/80 px-1.5 py-0.5 rounded-sm flex items-center gap-1 font-bold border border-green-200/50 uppercase tracking-tight">
                                                     <CheckCircle2 size={10} /> Utilisée
@@ -243,8 +278,10 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                                             )}
                                             {!isUsed && (
                                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={() => handleOpenEdit(entry)} className="text-blue-500 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
-                                                    <button onClick={() => setEntryToDelete(entry)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
+                                                    <button onClick={() => handleOpenEdit(merged)} className="text-blue-500 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
+                                                    {!isOfficial && (
+                                                        <button onClick={() => handleDeleteRequest(merged)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
@@ -279,7 +316,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                         <div className="p-4 border-b border-[#bfae85]/50 flex justify-between items-center text-white bg-amber-700/90">
                             <h3 className="font-bold text-lg flex items-center gap-2 font-serif tracking-wide">
                                 <Award size={20} />
-                                {library.some(e => e.id === editingEntry.id) ? 'Éditer Spécialisation' : 'Nouvelle Spécialisation'}
+                                {data.specializationLibrary?.some(e => e.id === editingEntry.id) ? 'Éditer Spécialisation' : 'Nouvelle Spécialisation (Copie)'}
                             </h3>
                             <button onClick={() => setIsModalOpen(false)} className="hover:bg-white/20 p-1 rounded transition-colors">
                                 <X size={24} />
@@ -322,11 +359,11 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                                         <label key={skill.id} className={`flex items-center gap-2 text-xs cursor-pointer hover:bg-stone-100/50 p-1 rounded transition-colors ${editingEntry.skillIds.includes(skill.id) ? 'bg-amber-100/30' : ''}`}>
                                             <input
                                                 type="checkbox"
-                                                checked={editingEntry.skillIds.includes(skill.id)}
+                                                checked={editingEntry.skillIds.includes(skill.id) || editingEntry.skillIds.includes(skill.name)}
                                                 onChange={(e) => {
                                                     const ids = e.target.checked
                                                         ? [...editingEntry.skillIds, skill.id]
-                                                        : editingEntry.skillIds.filter(id => id !== skill.id);
+                                                        : editingEntry.skillIds.filter(id => id !== skill.id && id !== skill.name);
                                                     setEditingEntry({ ...editingEntry, skillIds: ids });
                                                 }}
                                                 className="rounded border-[#bfae85]/50 text-amber-600 focus:ring-amber-500"

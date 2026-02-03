@@ -12,7 +12,8 @@ trigger: always_on
   1. Incrémenter la version dans [package.json](cci:7://file:///d:/Projet%20JdR/feuille-de-perso/package.json:0:0-0:0).
   2. Mettre à jour [src/data/changelog.ts](cci:7://file:///d:/Projet%20JdR/feuille-de-perso/src/data/changelog.ts:0:0-0:0) avec la même version
   3. Mettre à jour le texte sur le bouton du "journal des versions" avec la même version.
-  4. SEULEMENT ENSUITE : Lancer le build de vérification (`npm run build`).
+  4. Mettre à jour la version de l app admin également.
+  5. SEULEMENT ENSUITE : Lancer le build de vérification (`npm run build`).
 - Ne jamais livrer ou notifier une complétion sans avoir monté la version.
 
 # PROACTIVITÉ & INITIATIVE

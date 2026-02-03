@@ -1,10 +1,12 @@
 {
   "name": "rpg-sheet-manager",
-  "version": "2.12.39",
+  "version": "2.12.47",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build:main": "vite build",
+    "build:admin": "vite build --config vite.admin.config.ts",
+    "build": "tsc && npm run build:main && npm run build:admin",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",

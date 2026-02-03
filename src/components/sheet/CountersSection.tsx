@@ -74,8 +74,13 @@ export const CountersSection = React.memo<CountersSectionProps>(({ data, updateC
             <SectionHeader title="Compteurs" />
             <div className="p-1 flex-grow overflow-y-auto bg-stone-50/30">
                 <div className={`grid gap-1 ${isLandscape ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                    {renderCounterItem(data.counters.volonte, false)}
-                    {renderCounterItem(data.counters.confiance, false)}
+                    {/* Dynamic System Counters */}
+                    {Object.values(data.counters).map((counter: any) => {
+                        if (Array.isArray(counter)) return null; // Skip 'custom' array
+                        return renderCounterItem(counter, false);
+                    })}
+
+                    {/* Legacy Custom Counters array (if any) */}
                     {(data.counters.custom || []).map(c => renderCounterItem(c, true))}
                 </div>
             </div>

@@ -36,6 +36,7 @@ export interface CreationConfig {
     baseStart: number; // Défaut 2
   };
 
+  backgroundCost?: number; // Default 2
   // Nouvelle option pour autoriser les rangs > 5
   extendedSkills?: boolean;
 }

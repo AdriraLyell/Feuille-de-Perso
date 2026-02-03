@@ -16,7 +16,35 @@ import CreationConfigEditor from './settings/CreationConfigEditor';
 import LibrarySidebar from './settings/LibrarySidebar';
 import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
 import LibraryView from './LibraryView';
-import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen } from 'lucide-react';
+import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Settings } from 'lucide-react';
+
+// Rules Integration
+import { useRules } from '../context/RulesContext';
+import { applyRulesToState } from '../utils/rulesAdapter';
+
+// Version and App Info
+// Note: APP_VERSION might be global or imported, assuming it was used in previous context but not shown in imports?
+// Re-checking previous file content at step 438/447/536. 
+// Ah, step 438 showed me adding APP_VERSION usage in header? 
+// Actually step 536 content didn't show APP_VERSION import. It was relying on previous code?
+// Let's assume standard imports. If APP_VERSION is missing, I'll define it or omit it for now?
+// Step 447 added specific debugging header. I should include that too!
+// Wait, step 447 tried to add debug header but failed? 
+// Step 452 succeeded in build. 
+// Let's look at the header in Step 536. 
+// It shows:
+/*
+        <div className="sticky top-14 z-40 mb-8 flex justify-center no-print pointer-events-none">
+          <div className="pointer-events-auto flex gap-2 ...">
+*/
+// It DOES NOT show the debug header I tried to add in step 438/447. 
+// Step 447 failed because "SettingsView.tsx does not exist".
+// Step 447 retry was on `src\components\SettingsView.tsx` (capital S).
+// Step 536 shows `src\components\SettingsView.tsx`.
+// But I don't see the debug header in Step 536 content!
+// It seems my previous attempt to add the debug header might have failed or I am misremembering where I verified it.
+// NEVERMIND the debug header. The important part is the RESET LOGIC.
+// I will stick to the content from Step 536 but with the fix.
 
 interface SettingsViewProps {
   onClose: () => void;
@@ -34,6 +62,7 @@ export interface DragItemType {
 
 const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) => {
   const { data, updateData: onUpdate, addLog: onAddLog } = useCharacter();
+  const { rules } = useRules(); // Added Hook
   const [localData, setLocalData] = useState<CharacterSheetData>(data);
 
   // Drag State (Shared between SkillsEditor and LibrarySidebar)
@@ -66,9 +95,19 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
   }, [localData, data, onDirtyChange]);
 
   const performReset = () => {
-    setLocalData(JSON.parse(JSON.stringify(INITIAL_DATA)));
+    // FIX: Use applyRulesToState instead of raw INITIAL_DATA
+    const base = JSON.parse(JSON.stringify(INITIAL_DATA));
+    const newState = rules ? applyRulesToState(base, rules) : base;
+
+    setLocalData(newState);
+    onUpdate(newState); // Also update global context to match
+
     setShowResetConfirm(false);
-    onAddLog("Réinitialisation complète de la fiche aux valeurs par défaut", 'danger', 'settings');
+
+    const logMsg = rules
+      ? `Réinitialisation complète (Règles chargées : v${rules.version})`
+      : "Réinitialisation complète des données (Règles par défaut)";
+    onAddLog(logMsg, 'danger', 'settings');
   };
 
   const handleLocalUpdate = (newData: CharacterSheetData) => {
@@ -154,8 +193,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
               onAddLog={onAddLog}
             />
           )}
-
-
 
           {activeTab === 'library' && (
             <div className="h-[calc(100vh-250px)] min-h-[600px] border border-[#bfae85]/30 rounded-sm overflow-hidden shadow-sm">

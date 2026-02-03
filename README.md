@@ -1,20 +1,41 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Seigneurs des Mystères - Gestionnaire de Fiche
 
-# Run and deploy your AI Studio app
+Application React (Vite) pour gérer les fiches de personnage du JDR **Seigneurs des Mystères**.
 
-This contains everything you need to run your app locally.
+## 🚀 Fonctionnalités
+- Gestion complète de fiche (Attributs, Compétences, Inventaire).
+- Application **Admin** séparée pour configurer le système (`rules.js`).
+- Mode "Hors-Ligne" (PWA / SingleFile).
+- Système de sauvegarde local et export JSON.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1C6b0bK9KSznGaaTYZTOezYhIexTCwFAQ
+## 🛠️ Installation & Développement
 
-## Run Locally
+```bash
+# Installation
+npm install
 
-**Prerequisites:**  Node.js
+# Lancer le mode développement (Accès à Fiche + Admin)
+npm run dev
+```
 
+## 📦 Build & Déploiement
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### Déploiement Automatique (GitHub Pages)
+Ce projet est configuré pour se déployer automatiquement via **GitHub Actions**.
+1. Poussez le code sur la branche `main`.
+2. Allez dans **Settings > Pages** sur GitHub.
+3. Source : **GitHub Actions**.
+4. Le workflow (`.github/workflows/deploy.yml`) construira et déploiera le site.
+
+### Build Manuel
+Pour générer les fichiers HTML autonomes (distribuables par clé USB/Discord) :
+
+```bash
+npm run build
+```
+
+Vous obtiendrez dans le dossier `dist/` :
+- `index.html` : La fiche personnage.
+- `admin.html` : L'interface d'administration (MJ).
+
+Note : L'application Admin chargera automatiquement une configuration par défaut si aucun fichier `rules.js` externe n'est détecté.

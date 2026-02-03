@@ -6,6 +6,8 @@ import TraitCard from './trait-library/TraitCard';
 import TraitForm from './trait-library/TraitForm';
 import TraitImportModal from './trait-library/TraitImportModal';
 import { smartIncludes } from '../utils/stringUtils';
+import { useRules } from '../context/RulesContext';
+import { mergeLibraries, MergedEntry } from '../utils/libraryMerger';
 
 interface TraitLibraryProps {
     data: CharacterSheetData;
@@ -20,13 +22,21 @@ type SortOption = 'name' | 'cost' | 'type';
 type SortOrder = 'asc' | 'desc';
 
 const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, onMultiSelect, isEditable = true, defaultFilter = 'all' }) => {
-    // Guard against missing data and ensure library is an array
-    const rawLibrary = (data && Array.isArray(data.library)) ? data.library : [];
-    // Filter out potential null/undefined entries to prevent crashes
-    const library = rawLibrary.filter(entry => entry && typeof entry === 'object');
 
-    // Hooks must be called before any conditional return that depends on props if we want to be strict,
-    // but here we just ensure 'library' is safe.
+    // 1. Get Official Rules
+    const { rules } = useRules();
+
+    // 2. Compute Hybrid Library (Merges Local + Official)
+    const hybridList = useMemo(() => {
+        const local = (data && Array.isArray(data.library)) ? data.library.filter(entry => entry && typeof entry === 'object') : [];
+        const official = rules?.libraries?.traits || [];
+
+        return mergeLibraries(local, official);
+    }, [data.library, rules]);
+
+    // Helper: Find actual entry object from ID (for actions)
+    const findEntry = (id: string) => hybridList.find(m => m.entry.id === id);
+
 
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<'all' | 'avantage' | 'desavantage'>(defaultFilter);
@@ -58,7 +68,10 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
 
     const handleConfirmMultiSelect = () => {
         if (onMultiSelect) {
-            const selectedEntries = library.filter(l => selectedIds.includes(l.id));
+            // Must map back to LibraryEntry for parent consumers
+            const selectedEntries = hybridList
+                .filter(m => selectedIds.includes(m.entry.id))
+                .map(m => m.entry);
             onMultiSelect(selectedEntries);
             setSelectedIds([]);
         }
@@ -109,31 +122,53 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
         setIsModalOpen(true);
     };
 
-    const handleOpenEdit = (entry: LibraryEntry) => {
+    const handleOpenEdit = (merged: MergedEntry<LibraryEntry> | LibraryEntry) => {
+        // Support both direct entry (from list) or merged wrapper
+        const entry = 'entry' in merged ? merged.entry : merged;
+        const source = 'source' in merged ? merged.source : 'local';
+
         setError(null);
         setTagInput('');
         setEditForm({
             ...entry,
+            id: source === 'official' ? entry.id : entry.id, // Keep ID even if official for now
             tags: [...(entry.tags || [])],
             effects: (entry.effects || []).map(e => ({ ...e }))
         });
         setIsModalOpen(true);
     };
 
-    const handleDelete = (id: string) => {
-        if (confirm('Supprimer ce trait de la bibliothèque ?')) {
-            onUpdate({ ...data, library: library.filter(l => l.id !== id) });
+    const handleDelete = (id: string, source: string) => {
+        if (source === 'official') {
+            alert("Impossible de supprimer un trait officiel. Vous ne pouvez supprimer que vos copies locales.");
+            return;
+        }
+        if (confirm('Supprimer ce trait de votre bibliothèque locale ?')) {
+            // Access raw local library from data
+            const local = (data && Array.isArray(data.library)) ? data.library : [];
+            onUpdate({ ...data, library: local.filter(l => l.id !== id) });
         }
     };
 
     const handleSave = () => {
         if (!editForm) return;
         if (!editForm.name.trim()) { setError("Le nom du trait ne peut pas être vide."); return; }
-        const duplicate = library.find(l => l.id !== editForm.id && l.name.trim().toLowerCase() === editForm.name.trim().toLowerCase());
-        if (duplicate) { setError("Un trait portant ce nom existe déjà."); return; }
 
-        const exists = library.some(l => l.id === editForm.id);
-        const newLibrary = exists ? library.map(l => l.id === editForm.id ? editForm : l) : [editForm, ...library];
+        // Check for duplicates in LOCAL library specifically
+        const local = (data && Array.isArray(data.library)) ? data.library : [];
+        const duplicate = local.find(l => l.id !== editForm.id && l.name.trim().toLowerCase() === editForm.name.trim().toLowerCase());
+
+        if (duplicate) { setError("Un trait personnel portant ce nom existe déjà."); return; }
+
+        // Logic:
+        // If ID exists in Local -> Update it.
+        // If ID does NOT exist in Local (was official or new) -> Add to Local.
+        // This effectively "Clones" official items to local on edit.
+
+        const existsLocally = local.some(l => l.id === editForm.id);
+        const newLibrary = existsLocally
+            ? local.map(l => l.id === editForm.id ? editForm : l)
+            : [editForm, ...local]; // Add new or cloned official to top
 
         onUpdate({ ...data, library: newLibrary });
         setIsModalOpen(false);
@@ -142,7 +177,9 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
 
     // --- Form Action Handlers ---
     const handleImportTraits = (importedEntries: LibraryEntry[]) => {
-        let newLibrary = [...library];
+        // When importing from Sheet, we add to LOCAL library
+        const local = (data && Array.isArray(data.library)) ? data.library : [];
+        let newLibrary = [...local];
         let addedCount = 0;
         let updatedCount = 0;
 
@@ -200,7 +237,8 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
     };
 
     const processedList = useMemo(() => {
-        let list = library.filter(entry => {
+        let list = hybridList.filter(m => {
+            const entry = m.entry;
             const entryTags = entry.tags || [];
             const matchesSearch = smartIncludes(entry.name, searchTerm) ||
                 smartIncludes(entry.description, searchTerm) ||
@@ -213,23 +251,26 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
         });
 
         list.sort((a, b) => {
-            let comparison = 0;
-            if (sortBy === 'name') comparison = a.name.localeCompare(b.name);
-            else if (sortBy === 'cost') comparison = (parseInt(a.cost) || 0) - (parseInt(b.cost) || 0);
-            else if (sortBy === 'type') comparison = a.type.localeCompare(b.type);
+            const ea = a.entry;
+            const eb = b.entry;
 
-            if (comparison === 0) return a.name.localeCompare(b.name);
+            let comparison = 0;
+            if (sortBy === 'name') comparison = ea.name.localeCompare(eb.name);
+            else if (sortBy === 'cost') comparison = (parseInt(ea.cost) || 0) - (parseInt(eb.cost) || 0);
+            else if (sortBy === 'type') comparison = ea.type.localeCompare(eb.type);
+
+            if (comparison === 0) return ea.name.localeCompare(eb.name);
             return sortOrder === 'asc' ? comparison : -comparison;
         });
 
         return list;
-    }, [library, searchTerm, filterType, selectedTags, sortBy, sortOrder]);
+    }, [hybridList, searchTerm, filterType, selectedTags, sortBy, sortOrder]);
 
     const allAvailableTags = useMemo(() => {
         const tags = new Set<string>();
-        library.forEach(l => (l.tags || []).forEach(t => tags.add(t)));
+        hybridList.forEach(m => (m.entry.tags || []).forEach(t => tags.add(t)));
         return Array.from(tags).sort();
-    }, [library]);
+    }, [hybridList]);
 
     const handleSortChange = (criteria: SortOption) => {
         if (sortBy === criteria) setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
@@ -321,27 +362,28 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
 
             {/* List Content */}
             <div className={`flex-grow overflow-y-auto p-0 min-h-0 ${showFooter ? 'pb-16' : ''}`}>
-                {library.length === 0 && (
+                {hybridList.length === 0 && (
                     <div className="text-center text-[#5c4d41]/60 py-10 italic px-4 text-sm">
                         {isEditable ? "La bibliothèque est vide. Ajoutez des avantages et désavantages ici pour les réutiliser facilement." : "La bibliothèque est vide."}
                     </div>
                 )}
-                {library.length > 0 && processedList.length === 0 && (
+                {hybridList.length > 0 && processedList.length === 0 && (
                     <div className="text-center text-[#5c4d41]/60 py-10 italic px-4">Aucun trait ne correspond à votre recherche.</div>
                 )}
 
                 <div className="divide-y divide-[#bfae85]/20">
-                    {processedList.map(entry => (
+                    {processedList.map(merged => (
                         <TraitCard
-                            key={entry.id}
-                            entry={entry}
-                            isEditable={isEditable}
-                            isSelected={selectedIds.includes(entry.id)}
-                            onSelect={onSelect}
+                            key={merged.entry.id}
+                            entry={merged.entry}
+                            isEditable={isEditable} // Always allow opening edit modal (it acts as view/clone for official)
+                            isSelected={selectedIds.includes(merged.entry.id)}
+                            onSelect={onSelect ? (entry) => onSelect(entry) : undefined}
                             onMultiSelect={toggleSelection}
-                            onEdit={handleOpenEdit}
-                            onDelete={handleDelete}
+                            onEdit={() => handleOpenEdit(merged)}
+                            onDelete={(id) => handleDelete(id, merged.source)}
                             showMultiSelect={!!onMultiSelect}
+                            source={merged.source}
                         />
                     ))}
                 </div>
@@ -374,7 +416,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
             {isModalOpen && editForm && (
                 <TraitForm
                     editForm={editForm}
-                    library={library}
+                    library={[]} // Not used in form validation as heavily anymore, safe to pass empty or local
                     allSkills={allSkills}
                     allAttributes={allAttributes}
                     tagInput={tagInput}

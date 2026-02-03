@@ -9,6 +9,8 @@ import { useNotification } from '../context/NotificationContext';
 import { smartIncludes } from '../utils/stringUtils';
 import ThematicModal from './ui/ThematicModal';
 import { CATEGORY_HELP } from '../data/constants';
+import { useRules } from '../context/RulesContext';
+import { mergeLibraries, MergedEntry } from '../utils/libraryMerger';
 // ... other imports
 
 interface LibraryViewProps {
@@ -44,7 +46,19 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
     // Delete Confirmation Modal State
     const [skillToDelete, setSkillToDelete] = useState<LibrarySkillEntry | null>(null);
 
-    const skillsList = data.skillLibrary || [];
+    // OFFICIAL: Get Rules Context
+    const { rules } = useRules();
+
+    // MERGE: Compute Hybrid Skill Library
+    const hybridSkills = useMemo(() => {
+        const local = data.skillLibrary || [];
+        const official = rules?.libraries?.skills || [];
+
+        // We use the same merger logic, works for {id, ...} objects
+        return mergeLibraries(local, official);
+    }, [data.skillLibrary, rules]);
+
+    const skillsList = hybridSkills; // Now we work with MergedEntry<LibrarySkillEntry>[]
 
     // Determine which skills are currently on the sheet
     const usedSkillNames = useMemo(() => {
@@ -63,10 +77,11 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         return names;
     }, [data.skills]);
 
-    const filteredSkills = skillsList.filter(s =>
-        smartIncludes(s.name, skillSearch) ||
-        (s.description && smartIncludes(s.description, skillSearch))
-    ).sort((a, b) => a.name.localeCompare(b.name));
+    const filteredSkills = skillsList.filter(m => {
+        const s = m.entry;
+        return smartIncludes(s.name, skillSearch) ||
+            (s.description && smartIncludes(s.description, skillSearch));
+    }).sort((a, b) => a.entry.name.localeCompare(b.entry.name));
 
     const handleOpenNewSkill = () => {
         setSkillError(null);
@@ -78,9 +93,10 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         setIsSkillModalOpen(true);
     };
 
-    const handleOpenEditSkill = (skill: LibrarySkillEntry) => {
+    const handleOpenEditSkill = (merged: MergedEntry<LibrarySkillEntry>) => {
         setSkillError(null);
-        setEditingSkill({ ...skill });
+        // Force keep official ID to allow creating copy
+        setEditingSkill({ ...merged.entry });
         setIsSkillModalOpen(true);
     };
 
@@ -91,9 +107,10 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
             return;
         }
 
-        const duplicate = skillsList.find(s =>
-            s.id !== editingSkill.id &&
-            s.name.trim().toLowerCase() === editingSkill.name.trim().toLowerCase()
+        const duplicate = hybridSkills.find(m =>
+            m.source === 'local' && // Check duplication only against LOCAL items
+            m.entry.id !== editingSkill.id &&
+            m.entry.name.trim().toLowerCase() === editingSkill.name.trim().toLowerCase()
         );
 
         if (duplicate) {
@@ -101,7 +118,8 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
             return;
         }
 
-        const existing = skillsList.find(s => s.id === editingSkill.id);
+        const existingMerged = skillsList.find(m => m.entry.id === editingSkill.id);
+        const existing = existingMerged ? existingMerged.entry : null;
         const nameChanged = existing && existing.name.trim().toLowerCase() !== editingSkill.name.trim().toLowerCase();
         const isUsed = existing && usedSkillNames.has(existing.name.trim().toLowerCase());
 
@@ -115,12 +133,15 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
     };
 
     const finalizeSaveSkill = (skillToSave: LibrarySkillEntry, renameOnSheet: boolean = false) => {
-        const exists = skillsList.some(s => s.id === skillToSave.id);
+        const localList = data.skillLibrary || [];
+        const exists = localList.some(s => s.id === skillToSave.id);
+
         let newLibrary;
         if (exists) {
-            newLibrary = skillsList.map(s => s.id === skillToSave.id ? skillToSave : s);
+            newLibrary = localList.map(s => s.id === skillToSave.id ? skillToSave : s);
         } else {
-            newLibrary = [...skillsList, skillToSave];
+            // New or cloned from official
+            newLibrary = [...localList, skillToSave];
         }
 
         let newData = { ...data, skillLibrary: newLibrary };
@@ -152,22 +173,28 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         setShowRenameConfirm(null);
     };
 
-    const handleDeleteRequest = (skill: LibrarySkillEntry) => {
-        setSkillToDelete(skill);
+    const handleDeleteRequest = (merged: MergedEntry<LibrarySkillEntry>) => {
+        if (merged.source === 'official') {
+            alert("Impossible de supprimer une compétence officielle.");
+            return;
+        }
+        setSkillToDelete(merged.entry);
     };
 
     const executeDeleteSkill = () => {
         if (!skillToDelete) return;
 
-        onUpdate({ ...data, skillLibrary: skillsList.filter(s => s.id !== skillToDelete.id) });
+        const localList = data.skillLibrary || [];
+        onUpdate({ ...data, skillLibrary: localList.filter(s => s.id !== skillToDelete.id) });
         addLog(`Compétence "${skillToDelete.name}" supprimée de la réserve.`, 'info', 'settings');
         setSkillToDelete(null);
     };
 
     // Logic to import skills currently on the sheet into the library
     const executeImportFromSheet = () => {
-        const currentLib = [...skillsList];
-        const existingNames = new Set(currentLib.map(s => s.name.trim().toLowerCase()));
+        // Import into LOCAL
+        const currentLib = JSON.parse(JSON.stringify(data.skillLibrary || []));
+        const existingNames = new Set(currentLib.map((s: any) => s.name.trim().toLowerCase()));
         let addedCount = 0;
 
         Object.keys(data.skills).forEach(key => {
@@ -307,15 +334,17 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                                 <div className="text-center text-[#5c4d41]/60 py-10 italic">Aucune compétence trouvée.</div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    {filteredSkills.map(skill => {
+                                    {filteredSkills.map(merged => {
+                                        const skill = merged.entry;
                                         const isUsed = usedSkillNames.has(skill.name.trim().toLowerCase());
+                                        const isOfficial = merged.source === 'official';
 
                                         return (
                                             <div
                                                 key={skill.id}
                                                 className={`border rounded-sm p-2 group flex flex-col justify-between transition-all bg-white/60 ${isUsed
                                                     ? 'border-green-300/40 bg-green-50/10'
-                                                    : 'border-[#bfae85]/30 hover:border-amber-400/50 hover:shadow-sm'
+                                                    : isOfficial ? 'border-blue-300/40 bg-blue-50/5' : 'border-[#bfae85]/30 hover:border-amber-400/50 hover:shadow-sm'
                                                     }`}
                                             >
                                                 <div className="flex flex-col gap-1">
@@ -325,6 +354,9 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                                                                 <span title="Compétence à variations">
                                                                     <Layers size={10} className="text-blue-600 shrink-0" />
                                                                 </span>
+                                                            )}
+                                                            {isOfficial && (
+                                                                <span title="Compétence Officielle" className="text-[9px] bg-blue-100 text-blue-700 px-1 rounded-sm border border-blue-200 font-bold shrink-0">OFF</span>
                                                             )}
                                                             {isUsed && (
                                                                 <span title="Présent dans la fiche">
@@ -337,9 +369,9 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                                                         </div>
 
                                                         <div className="flex gap-1 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity">
-                                                            <button onClick={() => handleOpenEditSkill(skill)} className="text-blue-500 hover:bg-blue-50 p-1 rounded" title="Éditer"><Edit2 size={12} /></button>
-                                                            {!isUsed && (
-                                                                <button onClick={() => handleDeleteRequest(skill)} className="text-red-500 hover:bg-red-50 p-1 rounded" title="Supprimer"><Trash2 size={12} /></button>
+                                                            <button onClick={() => handleOpenEditSkill(merged)} className="text-blue-500 hover:bg-blue-50 p-1 rounded" title="Éditer/Voir"><Edit2 size={12} /></button>
+                                                            {!isUsed && !isOfficial && (
+                                                                <button onClick={() => handleDeleteRequest(merged)} className="text-red-500 hover:bg-red-50 p-1 rounded" title="Supprimer"><Trash2 size={12} /></button>
                                                             )}
                                                         </div>
                                                     </div>
@@ -450,7 +482,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                     <ThematicModal
                         isOpen={isSkillModalOpen}
                         onClose={() => setIsSkillModalOpen(false)}
-                        title={skillsList.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence'}
+                        title={data.skillLibrary?.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence (Copie)'}
                         icon={<GraduationCap size={20} />}
                         size={showCategoryHelp ? 'lg' : 'md'}
                         footer={

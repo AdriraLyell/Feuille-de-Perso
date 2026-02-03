@@ -9,6 +9,10 @@ export const DEFAULT_THEME = {
 };
 
 // Define initial skills first to use them for Library generation
+// [!IMPORTANT]
+// CE FICHIER CONTIENT DES DONNÉES DE REPLI (FALLBACK).
+// Dans l'application normale, ces données sont écrasées par le chargement dynamique des règles (rules.js).
+// Ne pas supprimer ce fichier sous peine de briser le typage ou le mode hors-ligne initial.
 const INITIAL_SKILLS = {
   talents: [
     createDotEntry('Vigilance'), createDotEntry('Repérage'), createDotEntry('T.O.C'),

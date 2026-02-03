@@ -79,11 +79,15 @@ export interface CharacterSheetData {
     }
   };
   counters: {
-    volonte: DotEntry;
-    confiance: DotEntry;
+    [key: string]: DotEntry | DotEntry[]; // Allow dynamic counters
     custom: DotEntry[];
   };
   experience: ExperienceData;
+  xpCosts?: {
+    attributeFactor: number;
+    skillFactor: number;
+    specializationFactor: number;
+  };
   page2: Page2Data;
   // Key is skill ID, Value is array of specialization strings (Player defined based on dots)
   specializations: Record<string, string[]>;

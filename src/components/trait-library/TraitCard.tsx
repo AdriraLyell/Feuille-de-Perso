@@ -12,6 +12,7 @@ interface TraitCardProps {
     onEdit: (entry: LibraryEntry) => void;
     onDelete: (id: string) => void;
     showMultiSelect: boolean;
+    source?: 'local' | 'official' | 'modified';
 }
 
 const TraitCard: React.FC<TraitCardProps> = ({
@@ -22,13 +23,14 @@ const TraitCard: React.FC<TraitCardProps> = ({
     onMultiSelect,
     onEdit,
     onDelete,
-    showMultiSelect
+    showMultiSelect,
+    source = 'local'
 }) => {
     if (!entry) return null;
 
     return (
         <div
-            className={`p-3 hover:bg-stone-100/50 transition-colors group cursor-pointer select-none ${isSelected ? 'bg-amber-50/50 hover:bg-amber-100/50' : ''}`}
+            className={`p-3 hover:bg-stone-100/50 transition-colors group cursor-pointer select-none ${isSelected ? 'bg-amber-50/50 hover:bg-amber-100/50' : ''} ${source === 'official' ? 'border-l-2 border-l-blue-400 bg-blue-50/5' : ''}`}
             onClick={() => {
                 if (showMultiSelect && onMultiSelect) {
                     onMultiSelect(entry.id);
@@ -50,6 +52,9 @@ const TraitCard: React.FC<TraitCardProps> = ({
                 <div className="flex-grow">
                     <div className="flex justify-between items-baseline mb-1">
                         <div className="flex items-center gap-2">
+                            {source === 'official' && (
+                                <span title="Trait Officiel" className="text-[10px] bg-blue-100 text-blue-700 px-1 rounded-sm border border-blue-200 font-bold shrink-0">OFF</span>
+                            )}
                             <span className={`font-bold text-sm ${isSelected ? 'text-amber-900' : 'text-[#4a3b32]'}`}>{entry.name}</span>
                             {/* Effect Indicator */}
                             {entry.effects && entry.effects.length > 0 && (
