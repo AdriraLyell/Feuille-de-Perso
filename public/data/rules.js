@@ -63,30 +63,20 @@ window.EXTERNAL_RULES = {
             "physique": [
                 "Force",
                 "Constitution",
-                "Agilité",
                 "Dextérité",
-                "Perception"
+                "Agilité"
             ],
             "mental": [
-                "Volonté",
-                "Stabilité",
-                "Astuce/Subtilité",
                 "Intellect",
-                "Intuition"
+                "Volonté",
+                "Intuition",
+                "Perception"
             ],
             "social": [
                 "Charisme",
-                "Calme",
-                "Mimétisme",
-                "Communication",
-                "Empathie"
-            ],
-            "mystique": [
-                "Puissance",
-                "Résistance",
-                "Souplesse",
-                "Précision",
-                "Sensibilité"
+                "Empathie",
+                "Apparence",
+                "Communication"
             ]
         },
         "secondaryAttributes": {
