@@ -8,7 +8,8 @@ window.EXTERNAL_RULES = {
     "configurations": {
         "global": {
             "maxAttributeScore": 5,
-            "maxSkillScore": 5
+            "maxSkillScore": 5,
+            "secondaryAttributes": true
         },
         "creation": {
             "mode": "rangs",
@@ -62,20 +63,30 @@ window.EXTERNAL_RULES = {
             "physique": [
                 "Force",
                 "Constitution",
+                "Agilité",
                 "Dextérité",
-                "Agilité"
+                "Perception"
             ],
             "mental": [
-                "Intellect",
                 "Volonté",
-                "Intuition",
-                "Perception"
+                "Stabilité",
+                "Astuce/Subtilité",
+                "Intellect",
+                "Intuition"
             ],
             "social": [
                 "Charisme",
-                "Empathie",
-                "Apparence",
-                "Communication"
+                "Calme",
+                "Mimétisme",
+                "Communication",
+                "Empathie"
+            ],
+            "mystique": [
+                "Puissance",
+                "Résistance",
+                "Souplesse",
+                "Précision",
+                "Sensibilité"
             ]
         },
         "secondaryAttributes": {
@@ -208,7 +219,11 @@ window.EXTERNAL_RULES = {
             "connaissances": "Connaissances",
             "competences2": "Compétences Secondaires",
             "autres_competences": "Autres Compétences",
-            "autres": "Autres"
+            "autres": "Autres",
+            "physique": "Physique",
+            "mental": "Mental",
+            "social": "Social",
+            "mystique": "Mystique"
         }
     },
     "libraries": {
@@ -216,4 +231,4 @@ window.EXTERNAL_RULES = {
         "skills": [],
         "specializations": []
     }
-}
+};
