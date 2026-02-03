@@ -8,12 +8,13 @@ window.EXTERNAL_RULES = {
     "configurations": {
         "global": {
             "maxAttributeScore": 5,
-            "maxSkillScore": 5
+            "maxSkillScore": 5,
+            "secondaryAttributes": true
         },
         "creation": {
-            "mode": "rangs",
+            "mode": "points",
             "startingXP": 350,
-            "pointsDistributionMode": "buckets",
+            "pointsDistributionMode": "global",
             "pointsBuckets": {
                 "attributes": 60,
                 "skills": 140,
@@ -62,30 +63,20 @@ window.EXTERNAL_RULES = {
             "physique": [
                 "Force",
                 "Constitution",
-                "Agilité",
                 "Dextérité",
-                "Perception"
+                "Agilité"
             ],
             "mental": [
-                "Volonté",
-                "Stabilité",
-                "Astuce/Subtilité",
                 "Intellect",
-                "Intuition"
+                "Volonté",
+                "Intuition",
+                "Perception"
             ],
             "social": [
                 "Charisme",
-                "Calme",
-                "Mimétisme",
-                "Communication",
-                "Empathie"
-            ],
-            "mystique": [
-                "Puissance",
-                "Résistance",
-                "Souplesse",
-                "Précision",
-                "Sensibilité"
+                "Empathie",
+                "Apparence",
+                "Communication"
             ]
         },
         "secondaryAttributes": {
