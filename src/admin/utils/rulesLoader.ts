@@ -60,12 +60,7 @@ export const generateDefaultRules = (): RulesData => {
         : [];
 
     return {
-        metadata: {
-            title: "Système par Défaut",
-            version: "1.0.0",
-            author: "Système",
-            description: "Configuration générée depuis les données par défaut de l'application."
-        },
+        version: "2.12.47",
         theme: data.theme,
         configurations: {
             creation: data.creationConfig,
