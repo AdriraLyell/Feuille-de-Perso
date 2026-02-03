@@ -12,7 +12,7 @@ window.EXTERNAL_RULES = {
             "secondaryAttributes": false
         },
         "creation": {
-            "mode": "points",
+            "mode": "rangs",
             "startingXP": 350,
             "pointsDistributionMode": "global",
             "pointsBuckets": {
