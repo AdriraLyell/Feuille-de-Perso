@@ -1,4 +1,5 @@
 import { RulesData } from '../types/rules';
+import { RAW_RULES_URL } from '../constants';
 
 // @ts-ignore
 declare global {
@@ -20,21 +21,28 @@ export const loadRules = async (): Promise<RulesData | null> => {
 
         if (isOnline) {
             try {
-                // Fetch with cache busting
+                // Fetch from RAW GitHub (Instant Update, bypasses Pages Build)
                 const timestamp = new Date().getTime();
-                // Note: We use the correct path 'data/rules.js' relative to root
-                // Assuming SPA is at root
-                const response = await fetch(`./data/rules.js?v=${timestamp}`);
+                const rawUrlCacheBusted = `${RAW_RULES_URL}?v=${timestamp}`;
+
+                console.log('[RulesLoader] Attempting to fetch RAW rules from:', rawUrlCacheBusted);
+
+                let response = await fetch(rawUrlCacheBusted);
+
+                // Fallback to relative path if RAW fails (e.g. network block)
+                if (!response.ok) {
+                    console.warn('[RulesLoader] RAW fetch failed, falling back to relative path.');
+                    response = await fetch(`./data/rules.js?v=${timestamp}`);
+                }
 
                 if (response.ok) {
                     const text = await response.text();
                     // rules.js content is: window.EXTERNAL_RULES = {...};
-                    // We need to extract the JSON part.
-                    // This is safer than eval()
+                    // Extract JSON
                     const jsonMatch = text.match(/window\.EXTERNAL_RULES\s*=\s*(\{[\s\S]*\});?/);
                     if (jsonMatch && jsonMatch[1]) {
                         const parsedRules = JSON.parse(jsonMatch[1]);
-                        console.log('[RulesLoader] Fresh rules loaded via Fetch (Cache Busted)', parsedRules);
+                        console.log('[RulesLoader] Fresh rules loaded', parsedRules);
                         // Update global for consistency
                         window.EXTERNAL_RULES = parsedRules;
                         return parsedRules;

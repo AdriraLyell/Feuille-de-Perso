@@ -1,6 +1,8 @@
 
 export const APP_VERSION = '2.12.49';
 
-// REMPLACEZ CECI PAR L'URL DE VOTRE GITHUB PAGES (DOSSIER RACINE)
-// Exemple : "https://username.github.io/repo-name/version.json"
+export const REPO_OWNER = 'AdriraLyell';
+export const REPO_NAME = 'Feuille-de-Perso';
+export const RAW_RULES_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/public/data/rules.js`;
+
 export const REMOTE_MANIFEST_URL = "https://adriralyell.github.io/Feuille-de-Perso/version.json";
