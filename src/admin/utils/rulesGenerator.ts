@@ -1,4 +1,5 @@
 import { APP_VERSION } from '../../constants';
+import { RulesData } from '../../types/rules';
 
 /**
  * Generates the JavaScript content for the rules.js file.

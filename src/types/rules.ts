@@ -50,6 +50,7 @@ export interface RulesCounterDefinition {
 
 export interface RulesData {
     version: string;
+    lastUpdated?: number;
     configurations: {
         global: {
             maxAttributeScore: number;
