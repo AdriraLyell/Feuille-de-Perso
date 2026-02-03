@@ -3,6 +3,15 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG = [
     {
+        version: '2.12.51',
+        date: '2026-02-03',
+        changes: [
+            'Système : Amélioration de la détection des mises à jour de règles. Les requêtes ignorent désormais agressivement le cache navigateur (no-store).',
+            'UI : Ajout d\'un indicateur de version des règles dans l\'en-tête de la fiche.',
+            'UI : Ajout d\'un bouton "Rafraîchir les Règles" à côté de la version pour forcer le rechargement manuel en cas de doute.'
+        ]
+    },
+    {
         version: '2.12.50',
         date: '2026-02-03',
         changes: [

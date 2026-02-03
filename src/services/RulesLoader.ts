@@ -27,12 +27,12 @@ export const loadRules = async (): Promise<RulesData | null> => {
 
                 console.log('[RulesLoader] Attempting to fetch RAW rules from:', rawUrlCacheBusted);
 
-                let response = await fetch(rawUrlCacheBusted);
+                let response = await fetch(rawUrlCacheBusted, { cache: 'no-store' });
 
                 // Fallback to relative path if RAW fails (e.g. network block)
                 if (!response.ok) {
                     console.warn('[RulesLoader] RAW fetch failed, falling back to relative path.');
-                    response = await fetch(`./data/rules.js?v=${timestamp}`);
+                    response = await fetch(`./data/rules.js?v=${timestamp}`, { cache: 'no-store' });
                 }
 
                 if (response.ok) {
