@@ -3,6 +3,15 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG = [
     {
+        version: '2.12.48',
+        date: '2026-02-03',
+        changes: [
+            'Admin : Nouvelle fonctionnalité "Publier" permettant de mettre à jour le système en ligne directement depuis l\'interface (GitHub Pages).',
+            'Admin : Le fichier rules.js est désormais généré à la volée pour l\'export et le déploiement.',
+            'Admin : Support de l\'authentification GitHub par Token personnel pour le déploiement sécurisé.'
+        ]
+    },
+    {
         version: '2.12.47',
         date: '2026-02-02',
         changes: [

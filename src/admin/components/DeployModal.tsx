@@ -14,7 +14,7 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
     const [token, setToken] = useState<string>(localStorage.getItem('GITHUB_TOKEN') || '');
     const [repoOwner, setRepoOwner] = useState<string>(localStorage.getItem('GITHUB_OWNER') || 'AdriraLyell');
     const [repoName, setRepoName] = useState<string>(localStorage.getItem('GITHUB_REPO') || 'Feuille-de-Perso');
-    const [filePath, setFilePath] = useState<string>('public/rules.js');
+    const [filePath, setFilePath] = useState<string>('public/data/rules.js');
     const [branch, setBranch] = useState<string>('main');
 
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
