@@ -1,5 +1,5 @@
 window.EXTERNAL_RULES = {
-    "version": "2.12.38",
+    "version": "2.12.51",
     "theme": {
         "creationColor": "#2563eb",
         "xpColor": "#292524",
@@ -230,5 +230,6 @@ window.EXTERNAL_RULES = {
         "traits": [],
         "skills": [],
         "specializations": []
-    }
+    },
+    "lastUpdated": 1770155667451
 };
