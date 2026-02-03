@@ -23,9 +23,8 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
     newState.creationConfig = {
         ...newState.creationConfig,
         ...rules.configurations.creation,
-        // Preserve 'active' state if it was toggled by user? 
-        // Usually creation config is static rule, but 'active' might be user choice in some flows.
-        // For now, we trust rules for config.
+        // Force cast for rankSlots as generic Record<string> is not assignable to strict keys {1:number...}
+        rankSlots: rules.configurations.creation.rankSlots as any
     };
 
     // 2. Reconcile Attributes
