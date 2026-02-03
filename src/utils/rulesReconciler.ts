@@ -65,6 +65,54 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
         newState.attributes = newAttributes;
     }
 
+    // 2b. Reconcile Attribute Settings (Labels & Order)
+    // We must ensure the sheet's metadata matches the rules structure.
+    if (ruleAttributes) {
+        const labels = rules.definitions.labels || {};
+        newState.attributeSettings = Object.keys(ruleAttributes).map(key => ({
+            id: key,
+            label: labels[key] || key.charAt(0).toUpperCase() + key.slice(1)
+        }));
+    }
+
+    // 2c. Reconcile Secondary Attributes
+    // Check if rules define secondary attributes logic
+    // Even if empty, we should clean up stale entries if the category no longer exists
+    const ruleSecondary = rules.definitions.secondaryAttributes || {};
+    // If not defined in rules, maybe we should clear it if global config says so?
+    // But let's assume if it's there, we reconcile it.
+
+    // We iterate based on PRIMARY categories (since secondary are attached to them)
+    // OR based on defined secondary attributes keys? 
+    // Usually they match primary keys.
+    const newSecondary: any = {};
+
+    // Only process categories that exist in primary attributes (source of truth for blocks)
+    Object.keys(ruleAttributes || {}).forEach(category => {
+        const definedNames = ruleSecondary[category] || []; // Might be empty
+        const existingEntries = currentState.secondaryAttributes?.[category] || [];
+
+        newSecondary[category] = definedNames.map(name => {
+            const existing = existingEntries.find(e => e.name === name);
+            if (existing) {
+                return { ...existing, name: name };
+            } else {
+                return {
+                    id: generateId(),
+                    name: name,
+                    val1: "", val2: "", val3: "",
+                    creationVal1: 0, creationVal2: 0, creationVal3: 0
+                };
+            }
+        });
+    });
+    newState.secondaryAttributes = newSecondary;
+
+    // 2d. Sync 'secondaryAttributesActive' config
+    if (rules.configurations.global.secondaryAttributes !== undefined) {
+        newState.secondaryAttributesActive = rules.configurations.global.secondaryAttributes;
+    }
+
     // 3. Reconcile Skills
     const ruleSkills = rules.definitions.skills;
     if (ruleSkills) {
