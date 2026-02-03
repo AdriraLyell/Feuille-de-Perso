@@ -8,7 +8,8 @@ window.EXTERNAL_RULES = {
     "configurations": {
         "global": {
             "maxAttributeScore": 5,
-            "maxSkillScore": 5
+            "maxSkillScore": 5,
+            "secondaryAttributes": true
         },
         "creation": {
             "mode": "points",
