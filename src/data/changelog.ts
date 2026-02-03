@@ -3,6 +3,15 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG = [
     {
+        version: '2.12.50',
+        date: '2026-02-03',
+        changes: [
+            'Système : Activation du mode "Mise à jour Instantanée". Les règles sont désormais lues directement depuis le dépôt (Raw), contournant le délai de déploiement GitHub Pages.',
+            'Bugfix : Correction d\'un problème où des "Attributs Secondaires Fantômes" restaient affichés après la suppression d\'un pavé d\'attributs. La réconciliation nettoie désormais correctement les données orphelines.',
+            'Admin : Ajout d\'un lien de vérification directe du fichier après publication.'
+        ]
+    },
+    {
         version: '2.12.49',
         date: '2026-02-03',
         changes: [
