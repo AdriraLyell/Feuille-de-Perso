@@ -74,8 +74,14 @@ export const generateDefaultRules = (): RulesData => {
                 skillFactor: 1,
                 specializationFactor: 0.5
             },
-            cards: data.creationConfig.cardConfig,
+            cards: {
+                ...data.creationConfig.cardConfig,
+                ranks: ['Valet', 'Dame', 'Roi'],
+                counts: ['Un', 'Deux', 'Trois', 'Quatre'],
+                maxLabel: 'Quatre Rois (Max)'
+            },
             global: {
+                maxAttributeScore: 5,
                 maxSkillScore: 5,
                 secondaryAttributes: data.secondaryAttributesActive
             }
