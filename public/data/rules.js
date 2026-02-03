@@ -13,7 +13,7 @@ window.EXTERNAL_RULES = {
         },
         "creation": {
             "mode": "points",
-            "startingXP": 350,
+            "startingXP": 15000,
             "pointsDistributionMode": "global",
             "pointsBuckets": {
                 "attributes": 60,
@@ -63,20 +63,30 @@ window.EXTERNAL_RULES = {
             "physique": [
                 "Force",
                 "Constitution",
+                "Agilité",
                 "Dextérité",
-                "Agilité"
+                "Perception"
             ],
             "mental": [
-                "Intellect",
                 "Volonté",
-                "Intuition",
-                "Perception"
+                "Stabilité",
+                "Astuce/Subtilité",
+                "Intellect",
+                "Intuition"
             ],
             "social": [
                 "Charisme",
-                "Empathie",
-                "Apparence",
-                "Communication"
+                "Calme",
+                "Mimétisme",
+                "Communication",
+                "Empathie"
+            ],
+            "mystique": [
+                "Puissance",
+                "Résistance",
+                "Souplesse",
+                "Précision",
+                "Sensibilité"
             ]
         },
         "secondaryAttributes": {
