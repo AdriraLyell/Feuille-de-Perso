@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { generateRulesJSContent } from '../../utils/rulesGenerator';
-import { RulesData } from '../../../types/rules';
+import { generateRulesJSContent } from '../utils/rulesGenerator';
+import { RulesData } from '../../types/rules';
 import { Save, AlertTriangle, CheckCircle, Loader2, Github } from 'lucide-react';
 
 interface DeployToGithubModalProps {
