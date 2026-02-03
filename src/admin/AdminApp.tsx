@@ -161,11 +161,13 @@ const AdminApp: React.FC = () => {
                 </div>
             </header>
 
-            <DeployToGithubModal
-                isOpen={showDeployModal}
-                onClose={() => setShowDeployModal(false)}
-                rules={rules}
-            />
+            {showDeployModal && rules && (
+                <DeployToGithubModal
+                    isOpen={showDeployModal}
+                    onClose={() => setShowDeployModal(false)}
+                    rules={rules}
+                />
+            )}
 
             {/* Tabs Navigation */}
             <nav className="bg-white border-b border-gray-200 mt-0 sticky top-16 z-40">
