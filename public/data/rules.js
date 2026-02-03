@@ -9,11 +9,11 @@ window.EXTERNAL_RULES = {
         "global": {
             "maxAttributeScore": 5,
             "maxSkillScore": 5,
-            "secondaryAttributes": false
+            "secondaryAttributes": true
         },
         "creation": {
-            "mode": "rangs",
-            "startingXP": 350,
+            "mode": "points",
+            "startingXP": 1000,
             "pointsDistributionMode": "global",
             "pointsBuckets": {
                 "attributes": 60,
