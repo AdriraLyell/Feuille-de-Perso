@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { generateRulesJSContent } from '../utils/rulesGenerator';
 import { RulesData } from '../../types/rules';
-import { Save, AlertTriangle, CheckCircle, Loader2, Github } from 'lucide-react';
+import { Save, AlertTriangle, CheckCircle, Loader2, Github, RefreshCw } from 'lucide-react';
+import { APP_VERSION, REMOTE_MANIFEST_URL } from '../../constants';
 
 interface DeployToGithubModalProps {
     isOpen: boolean;
@@ -19,6 +20,36 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
 
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [message, setMessage] = useState<string>('');
+
+    // Version Check State
+    const [remoteVersion, setRemoteVersion] = useState<string | null>(null);
+    const [isStale, setIsStale] = useState<boolean>(false);
+
+    // Check for "Stale Admin" on mount
+    React.useEffect(() => {
+        if (isOpen) {
+            checkRemoteVersion();
+        }
+    }, [isOpen]);
+
+    const checkRemoteVersion = async () => {
+        try {
+            const res = await fetch(`${REMOTE_MANIFEST_URL}?t=${Date.now()}`); // Burst cache
+            if (res.ok) {
+                const manifest = await res.json();
+                if (manifest.version && manifest.version !== APP_VERSION) {
+                    setRemoteVersion(manifest.version);
+                    // Simple string compare or semver? Assuming exact match needed for "freshness".
+                    // If remote is different, it's likely newer (or we rolled back).
+                    // Let's assume different = potential issue if remote > local.
+                    // For now, simpler: if different, warn.
+                    setIsStale(manifest.version > APP_VERSION);
+                }
+            }
+        } catch (e) {
+            console.warn("Utils: Version check failed", e);
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -119,6 +150,21 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
 
                 {/* Content */}
                 <div className="p-6 space-y-4">
+
+                    {isStale && (
+                        <div className="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-800 flex items-start gap-2 animate-pulse">
+                            <AlertTriangle size={20} className="mt-0.5 flex-shrink-0 text-red-600" />
+                            <div>
+                                <p className="font-bold">⚠️ Version Obsolète Détectée !</p>
+                                <p className="text-xs mt-1">
+                                    Vous utilisez l'Admin <strong>v{APP_VERSION}</strong> mais une version plus récente (<strong>v{remoteVersion}</strong>) est disponible en ligne.
+                                </p>
+                                <p className="text-xs mt-1 font-bold">
+                                    Veuillez rafraîchir cette page (F5) avant de publier pour éviter des erreurs de version.
+                                </p>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-800 flex items-start gap-2">
                         <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />

@@ -3,6 +3,14 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG = [
     {
+        version: '2.12.52',
+        date: '2026-02-03',
+        changes: [
+            'Admin : Ajout d\'une protection contre la "Double Mise à Jour". L\'application vérifie désormais si une version plus récente est disponible en ligne avant de vous laisser publier, affichant une alerte si nécessaire.',
+            'Système : Correction de l\'injection de version dans les règles générées.'
+        ]
+    },
+    {
         version: '2.12.51',
         date: '2026-02-03',
         changes: [
