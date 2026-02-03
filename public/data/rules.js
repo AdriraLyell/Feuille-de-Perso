@@ -231,5 +231,5 @@ window.EXTERNAL_RULES = {
         "skills": [],
         "specializations": []
     },
-    "lastUpdated": 1770155792758
+    "lastUpdated": 1770155908099
 };
