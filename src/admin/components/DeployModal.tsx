@@ -170,37 +170,44 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
                         </div>
                     )}
 
-                    {status === 'success' && (
-                        <div className="bg-green-50 text-green-700 p-3 rounded text-sm border border-green-200 flex items-center gap-2">
-                            <CheckCircle size={16} />
-                            {message}
-                        </div>
-                    )}
-
-                </div>
-
-                {/* Footer */}
-                <div className="bg-slate-50 p-4 flex justify-end gap-3 border-t border-slate-200">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded font-medium text-sm transition-colors"
-                    >
-                        Fermer
-                    </button>
-                    {status !== 'success' && (
-                        <button
-                            onClick={handleDeploy}
-                            disabled={status === 'loading'}
-                            className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 rounded font-bold text-sm transition-colors disabled:opacity-50"
+                    <div className="flex flex-col gap-1">
+                        <span className="font-bold flex items-center gap-2"><CheckCircle size={16} /> {message}</span>
+                        <a
+                            href={`https://github.com/${repoOwner}/${repoName}/blob/${branch}/${filePath}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs underline hover:text-green-900 ml-6"
                         >
-                            {status === 'loading' ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                            Publier
-                        </button>
-                    )}
+                            Vérifier le fichier sur GitHub
+                        </a>
+                    </div>
                 </div>
+                    )}
 
             </div>
+
+            {/* Footer */}
+            <div className="bg-slate-50 p-4 flex justify-end gap-3 border-t border-slate-200">
+                <button
+                    onClick={onClose}
+                    className="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded font-medium text-sm transition-colors"
+                >
+                    Fermer
+                </button>
+                {status !== 'success' && (
+                    <button
+                        onClick={handleDeploy}
+                        disabled={status === 'loading'}
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 rounded font-bold text-sm transition-colors disabled:opacity-50"
+                    >
+                        {status === 'loading' ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                        Publier
+                    </button>
+                )}
+            </div>
+
         </div>
+        </div >
     );
 };
 
