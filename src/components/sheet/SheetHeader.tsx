@@ -2,7 +2,6 @@
 import React from 'react';
 import { UserPlus } from 'lucide-react';
 import { HeaderInput } from './Shared';
-import RulesStatus from '../ui/RulesStatus';
 
 interface SheetHeaderProps {
     headerData: {
@@ -38,8 +37,7 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
                     Seigneurs des Mystères
                 </h1>
                 {/* Creation Mode Toggle Button */}
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-4 no-print">
-                    <RulesStatus />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center no-print">
                     <button
                         onClick={onToggleCreationMode}
                         className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold transition-all ${creationActive

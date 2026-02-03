@@ -2,6 +2,7 @@ import React from 'react';
 import { Book, Settings, FileText, Layout, Save, Upload, Feather, LogOut, Printer, Monitor, Smartphone, History, HelpCircle, ScrollText, ArrowRightLeft, BookOpen, Download, RectangleVertical, RectangleHorizontal, Palette } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { CharacterSheetData } from '../../types';
+import RulesStatus from '../ui/RulesStatus';
 
 interface DiegeticNavigationProps {
     currentMode: 'sheet' | 'settings';
@@ -123,6 +124,10 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                     >
                         <HelpCircle size={18} />
                     </button>
+
+                    <div className="mr-2 h-8 flex items-center border-r border-gray-600 pr-2">
+                        <RulesStatus />
+                    </div>
 
                     <button
                         onClick={onShowChangelog}

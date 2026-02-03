@@ -77,3 +77,33 @@ export const loadRules = async (): Promise<RulesData | null> => {
         return null;
     }
 };
+
+export const checkForUpdate = async (currentRules: RulesData | null): Promise<boolean> => {
+    if (!currentRules) return false;
+
+    try {
+        const rawUrlCacheBusted = `${RAW_RULES_URL}?v=${Date.now()}`;
+        const response = await fetch(rawUrlCacheBusted, { cache: 'no-store' }); // Head request might be enough if we trusted headers, but we need body for timestamp
+
+        if (response.ok) {
+            const text = await response.text();
+            const jsonMatch = text.match(/window\.EXTERNAL_RULES\s*=\s*(\{[\s\S]*\});?/);
+            if (jsonMatch && jsonMatch[1]) {
+                const remoteRules = JSON.parse(jsonMatch[1]) as RulesData;
+
+                // Compare Timestamps (Precise)
+                if (remoteRules.lastUpdated && currentRules.lastUpdated) {
+                    return remoteRules.lastUpdated > currentRules.lastUpdated;
+                }
+
+                // Fallback to Version (Legacy)
+                if (remoteRules.version !== currentRules.version) {
+                    return remoteRules.version > currentRules.version; // String Comparison is weak but okay for now
+                }
+            }
+        }
+    } catch (e) {
+        console.warn("[RulesLoader] Check update failed", e);
+    }
+    return false;
+};
