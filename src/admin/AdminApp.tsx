@@ -13,6 +13,7 @@ import AdminCountersEditor from './components/AdminCountersEditor';
 import AdminBackgroundsEditor from './components/AdminBackgroundsEditor';
 import ImportResultModal from './components/ImportResultModal';
 import ChangelogModal from '../components/ChangelogModal';
+import DeploymentMonitor from './components/DeploymentMonitor';
 import ImportWizardModal from './components/import-wizard/ImportWizardModal';
 import AdminTraitLibrary from './components/libraries/AdminTraitLibrary';
 import AdminSkillLibrary from './components/libraries/AdminSkillLibrary';

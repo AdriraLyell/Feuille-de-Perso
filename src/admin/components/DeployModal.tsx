@@ -9,9 +9,10 @@ interface DeployToGithubModalProps {
     isOpen: boolean;
     onClose: () => void;
     rules: RulesData;
+    onDeploySuccess?: (sha: string, token: string) => void;
 }
 
-const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClose, rules }) => {
+const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClose, rules, onDeploySuccess }) => {
     const [token, setToken] = useState<string>(localStorage.getItem('GITHUB_TOKEN') || '');
     const [repoOwner, setRepoOwner] = useState<string>(localStorage.getItem('GITHUB_OWNER') || 'AdriraLyell');
     const [repoName, setRepoName] = useState<string>(localStorage.getItem('GITHUB_REPO') || 'Feuille-de-Perso');
@@ -124,8 +125,15 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
                 throw new Error(errData.message || 'Erreur lors du déploiement');
             }
 
+            const successData = await pushRes.json();
+            const newCommitSha = successData.commit?.sha;
+
             setStatus('success');
             setMessage('Fichier rules.js mis à jour avec succès ! Le déploiement GitHub Pages devrait démarrer.');
+
+            if (onDeploySuccess && newCommitSha) {
+                onDeploySuccess(newCommitSha, token);
+            }
 
         } catch (error) {
             setStatus('error');

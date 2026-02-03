@@ -3,6 +3,13 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG = [
     {
+        version: '2.12.53',
+        date: '2026-02-03',
+        changes: [
+            'Admin : Ajout du "Moniteur de Déploiement". Une fois la publication lancée, une barre de progression en bas d\'écran vous informe en temps réel de l\'avancement du build sur GitHub Actions (En attente -> Construction -> Terminé).',
+        ]
+    },
+    {
         version: '2.12.52',
         date: '2026-02-03',
         changes: [
