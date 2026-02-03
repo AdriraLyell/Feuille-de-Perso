@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { extractRulesFromCharacter } from './utils/templateImporter';
 import { loadRules } from './utils/rulesLoader';
+import { generateRulesJSContent } from './utils/rulesGenerator';
 import { Settings, Save, Download, Upload } from 'lucide-react';
 import { RulesData } from '../types/rules';
 import { APP_VERSION } from '../constants';
@@ -16,10 +17,12 @@ import ImportWizardModal from './components/import-wizard/ImportWizardModal';
 import AdminTraitLibrary from './components/libraries/AdminTraitLibrary';
 import AdminSkillLibrary from './components/libraries/AdminSkillLibrary';
 import AdminSpecializationLibrary from './components/libraries/AdminSpecializationLibrary';
+import DeployToGithubModal from './components/DeployModal';
 import { BookOpen } from 'lucide-react';
 
 const AdminApp: React.FC = () => {
     const [rules, setRules] = useState<RulesData | null>(null);
+    const [showDeployModal, setShowDeployModal] = useState(false);
     const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'costs' | 'counters' | 'backgrounds' | 'libraries'>('general');
     const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations'>('traits');
 
@@ -49,7 +52,7 @@ const AdminApp: React.FC = () => {
 
     const handleExport = () => {
         if (!rules) return;
-        const ruleString = `window.EXTERNAL_RULES = ${JSON.stringify(rules, null, 4)};`;
+        const ruleString = generateRulesJSContent(rules);
         const blob = new Blob([ruleString], { type: 'text/javascript' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -142,12 +145,27 @@ const AdminApp: React.FC = () => {
                         <button
                             onClick={handleExport}
                             className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-bold transition-colors"
+                            title="Télécharger rules.js (Manuel)"
                         >
                             <Download size={16} /> Export
+                        </button>
+
+                        <button
+                            onClick={() => setShowDeployModal(true)}
+                            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded font-bold transition-colors shadow-lg shadow-purple-900/20"
+                            title="Publier directement sur GitHub"
+                        >
+                            <Upload size={16} /> Publier
                         </button>
                     </div>
                 </div>
             </header>
+
+            <DeployToGithubModal
+                isOpen={showDeployModal}
+                onClose={() => setShowDeployModal(false)}
+                rules={rules}
+            />
 
             {/* Tabs Navigation */}
             <nav className="bg-white border-b border-gray-200 mt-0 sticky top-16 z-40">
