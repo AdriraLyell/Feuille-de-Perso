@@ -13,7 +13,7 @@ window.EXTERNAL_RULES = {
         },
         "creation": {
             "mode": "points",
-            "startingXP": 450000,
+            "startingXP": 45000,
             "pointsDistributionMode": "global",
             "pointsBuckets": {
                 "attributes": 60,
@@ -231,5 +231,5 @@ window.EXTERNAL_RULES = {
         "skills": [],
         "specializations": []
     },
-    "lastUpdated": 1770155908099
+    "lastUpdated": 1770156769092
 };
