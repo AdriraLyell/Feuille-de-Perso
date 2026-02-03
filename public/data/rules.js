@@ -11,9 +11,9 @@ window.EXTERNAL_RULES = {
             "maxSkillScore": 5
         },
         "creation": {
-            "mode": "rangs",
+            "mode": "points",
             "startingXP": 350,
-            "pointsDistributionMode": "global",
+            "pointsDistributionMode": "buckets",
             "pointsBuckets": {
                 "attributes": 60,
                 "skills": 140,
@@ -216,4 +216,4 @@ window.EXTERNAL_RULES = {
         "skills": [],
         "specializations": []
     }
-}
+};
