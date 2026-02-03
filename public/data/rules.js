@@ -13,7 +13,7 @@ window.EXTERNAL_RULES = {
         },
         "creation": {
             "mode": "points",
-            "startingXP": 15000,
+            "startingXP": 450,
             "pointsDistributionMode": "global",
             "pointsBuckets": {
                 "attributes": 60,
