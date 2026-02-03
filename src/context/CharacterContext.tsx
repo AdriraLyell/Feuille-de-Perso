@@ -6,6 +6,7 @@ import { calculateExperienceResults } from '../utils/mechanics';
 import { validateCharacterData } from '../schemas/characterSchema';
 import { useRules } from './RulesContext';
 import { applyRulesToState } from '../utils/rulesAdapter';
+import { reconcileRulesWithState } from '../utils/rulesReconciler';
 
 // --- Context Definitions ---
 
@@ -108,6 +109,35 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
     useEffect(() => {
         localStorage.setItem('rpg-sheet-data', JSON.stringify(data));
     }, [data]);
+
+    // 2b. Auto-Update Effect (Smart Re-Hydration)
+    // When rules are loaded (and not null), we reconcile them with the current data.
+    // This ensures that if the admin updated the rules (e.g. new skills), the user gets them
+    // without needing a full reset.
+    useEffect(() => {
+        if (!rules) return;
+
+        // We only want to run this if the data "needs" updating?
+        // Actually, running it once when rules load is safe because reconciliation is non-destructive
+        // for values, but it re-aligns structure.
+        // However, we must be careful not to create an infinite loop if `setData` triggers this again.
+        // `rules` is stable unless reloaded.
+
+        setData(currentData => {
+            // Check if we need to reconcile?
+            // Simple check: compare versions or just do it.
+            // "reconcileRulesWithState" creates a new object only if needed? 
+            // Actually it always clones.
+            // Let's rely on React state optimization if logic is sound.
+
+            // To be safer and avoid unnecessary renders, we could check a version flag in data?
+            // But reconciler is fast.
+
+            console.log("[CharacterContext] Reconciling data with loaded rules...");
+            return reconcileRulesWithState(currentData, rules);
+        });
+
+    }, [rules]);
 
     // 3. XP Calculation Effect (Remains here as it depends on data and changes data)
     useEffect(() => {
