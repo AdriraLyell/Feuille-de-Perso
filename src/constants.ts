@@ -1,5 +1,5 @@
 
-export const APP_VERSION = '2.12.48';
+export const APP_VERSION = '2.12.49';
 
 // REMPLACEZ CECI PAR L'URL DE VOTRE GITHUB PAGES (DOSSIER RACINE)
 // Exemple : "https://username.github.io/repo-name/version.json"

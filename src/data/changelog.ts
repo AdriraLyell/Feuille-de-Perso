@@ -3,6 +3,15 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG = [
     {
+        version: '2.12.49',
+        date: '2026-02-03',
+        changes: [
+            'Système : Implémentation du "Smart Fetching" pour contourner le cache navigateur et garantir le chargement des dernières règles.',
+            'Système : Ajout de la "Réconciliation Automatique". Les mises à jour de règles (nouvelles compétences, coûts) s\'appliquent désormais automatiquement au lancement de la fiche, sans besoin de Reset, tout en préservant les données du joueur.',
+            'Admin : Correction de l\'interface de publication (réinitialisation correcte de la fenêtre après upload).'
+        ]
+    },
+    {
         version: '2.12.48',
         date: '2026-02-03',
         changes: [
