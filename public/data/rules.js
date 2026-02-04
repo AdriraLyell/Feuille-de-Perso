@@ -1,5 +1,5 @@
 window.EXTERNAL_RULES = {
-    "version": "2.12.53",
+    "version": "2.12.54",
     "theme": {
         "creationColor": "#2563eb",
         "xpColor": "#292524",
@@ -9,7 +9,7 @@ window.EXTERNAL_RULES = {
         "global": {
             "maxAttributeScore": 5,
             "maxSkillScore": 5,
-            "secondaryAttributes": true
+            "secondaryAttributes": false
         },
         "creation": {
             "mode": "points",
@@ -63,30 +63,20 @@ window.EXTERNAL_RULES = {
             "physique": [
                 "Force",
                 "Constitution",
-                "Agilité",
                 "Dextérité",
-                "Perception"
+                "Agilité"
             ],
             "mental": [
-                "Volonté",
-                "Stabilité",
-                "Astuce/Subtilité",
                 "Intellect",
-                "Intuition"
+                "Volonté",
+                "Intuition",
+                "Perception"
             ],
             "social": [
                 "Charisme",
-                "Calme",
-                "Mimétisme",
-                "Communication",
-                "Empathie"
-            ],
-            "mystique": [
-                "Puissance",
-                "Résistance",
-                "Souplesse",
-                "Précision",
-                "Sensibilité"
+                "Empathie",
+                "Apparence",
+                "Communication"
             ]
         },
         "secondaryAttributes": {
@@ -231,5 +221,5 @@ window.EXTERNAL_RULES = {
         "skills": [],
         "specializations": []
     },
-    "lastUpdated": 1770191720208
+    "lastUpdated": 1770197345197
 };
