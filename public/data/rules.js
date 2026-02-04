@@ -1,5 +1,5 @@
 window.EXTERNAL_RULES = {
-    "version": "2.12.54",
+    "version": "2.12.55",
     "theme": {
         "creationColor": "#2563eb",
         "xpColor": "#292524",
@@ -1250,5 +1250,5 @@ window.EXTERNAL_RULES = {
         ],
         "specializations": []
     },
-    "lastUpdated": 1770197567035
+    "lastUpdated": 1770199245415
 };
