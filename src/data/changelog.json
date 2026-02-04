@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.13.2",
+        "date": "2026-02-04",
+        "type": "patch",
+        "changes": [
+            "UI (Admin) : Harmonisation de l'éditeur de compétences avec le style 'Réglages'. Ajout d'ascenseurs verticaux (Scroll) et ajustement des hauteurs.",
+            "UX (Admin) : Correction du Drag & Drop pour les 'Espaceurs' (lignes vides) qui étaient inamovibles."
+        ]
+    },
+    {
         "version": "2.13.1",
         "date": "2026-02-04",
         "type": "patch",
