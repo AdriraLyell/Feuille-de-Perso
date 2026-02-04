@@ -66,7 +66,7 @@ const DeploymentMonitor: React.FC = () => {
                             setTimeout(() => setIsVisible(false), 10000); // Hide after 10s
                         } else if (run.status === 'completed' && run.conclusion === 'failure') {
                             playSound('error');
-                            setNotification({ type: 'error', message: 'Échec du déploiement.' });
+                            setNotification({ type: 'error', message: `Échec du build GitHub (Run #${run.id}). Vérifiez les logs.` });
                         }
                     }
                 }

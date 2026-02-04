@@ -24,7 +24,16 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
     const [message, setMessage] = useState<string>('');
     const [statusDetail, setStatusDetail] = useState<string>('');
 
-    // ... (rest of the file until handleDeploy)
+    // Restore saveCredentials
+    const saveCredentials = () => {
+        localStorage.setItem('GITHUB_TOKEN', token);
+        localStorage.setItem('GITHUB_OWNER', repoOwner);
+        localStorage.setItem('GITHUB_REPO', repoName);
+    };
+
+    if (!isOpen) return null;
+
+    // ... (rest of the file)
 
     const handleDeploy = async () => {
         if (!token || !repoOwner || !repoName) {
@@ -133,21 +142,6 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
 
                 {/* Content */}
                 <div className="p-6 space-y-4">
-
-                    {isStale && (
-                        <div className="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-800 flex items-start gap-2 animate-pulse">
-                            <AlertTriangle size={20} className="mt-0.5 flex-shrink-0 text-red-600" />
-                            <div>
-                                <p className="font-bold">⚠️ Version Obsolète Détectée !</p>
-                                <p className="text-xs mt-1">
-                                    Vous utilisez l'Admin <strong>v{APP_VERSION}</strong> mais une version plus récente (<strong>v{remoteVersion}</strong>) est disponible en ligne.
-                                </p>
-                                <p className="text-xs mt-1 font-bold">
-                                    Veuillez rafraîchir cette page (F5) avant de publier pour éviter des erreurs de version.
-                                </p>
-                            </div>
-                        </div>
-                    )}
 
                     <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-800 flex items-start gap-2">
                         <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
