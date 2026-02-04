@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.12.59",
+        "date": "2026-02-04",
+        "changes": [
+            "UI : Finalisation de la migration des alertes navigateur vers des modales thématiques (Bibliothèques Joueur, Imports, Images).",
+            "Maintenance : Harmonisation globale des dialogues de confirmation."
+        ]
+    },
+    {
         "version": "2.12.58",
         "date": "2026-02-04",
         "changes": [

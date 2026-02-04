@@ -175,7 +175,9 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
 
     const handleDeleteRequest = (merged: MergedEntry<LibrarySkillEntry>) => {
         if (merged.source === 'official') {
-            alert("Impossible de supprimer une compétence officielle.");
+            // Cannot delete official.
+            // Silent or use a small info toast if we had access to addLog here (we do).
+            addLog("Impossible de supprimer une compétence officielle.", "info", "settings");
             return;
         }
         setSkillToDelete(merged.entry);

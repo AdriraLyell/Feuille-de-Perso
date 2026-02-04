@@ -222,7 +222,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
 
     const handleDeleteRequest = (merged: MergedEntry<LibrarySpecializationEntry>) => {
         if (merged.source === 'official') {
-            alert("Impossible de supprimer une spécialisation officielle.");
+            addLog("Impossible de supprimer une spécialisation officielle.", 'info', 'settings');
             return;
         }
         setEntryToDelete(merged.entry);
@@ -458,50 +458,25 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                 </div>
             )}
 
-            {/* Import Confirm */}
-            {showImportConfirm && (
-                <div className="fixed inset-0 z-[150] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in duration-200">
-                        <div className="p-6 text-center">
-                            <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
-                                <Download size={28} />
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Importer les spécialisations ?</h3>
-                            <p className="text-gray-600 text-sm mb-4">
-                                Scanne toutes les spécialisations (Joueur & MJ) présentes sur la fiche pour les ajouter à la bibliothèque.
-                            </p>
-                            <div className="bg-amber-50 text-amber-800 text-xs p-3 rounded-lg border border-amber-200 text-left flex gap-2">
-                                <AlertTriangle size={16} className="shrink-0 mt-0.5" />
-                                <span>Les spécialisations portant le même nom seront ignorées.</span>
-                            </div>
-                        </div>
-                        <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-200">
-                            <button onClick={() => setShowImportConfirm(false)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-white transition-colors">Annuler</button>
-                            <button onClick={executeImportFromSheet} className="flex-1 px-4 py-2 bg-amber-600 text-white rounded-lg font-bold hover:bg-amber-700 shadow-sm transition-colors">Confirmer</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmationModal
+                isOpen={showImportConfirm}
+                onClose={() => setShowImportConfirm(false)}
+                onConfirm={executeImportFromSheet}
+                title="Importer les spécialisations ?"
+                message="Scanne toutes les spécialisations (Joueur & MJ) présentes sur la fiche pour les ajouter à la bibliothèque. Les doublons seront ignorés."
+                confirmLabel="Confirmer l'import"
+                type="info"
+            />
 
-            {/* Delete Confirm */}
-            {entryToDelete && (
-                <div className="fixed inset-0 z-[150] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden border-2 border-red-100">
-                        <div className="p-6 text-center">
-                            <div className="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 scale-110">
-                                <Trash2 size={24} />
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Supprimer ?</h3>
-                            <p className="text-gray-800 font-bold mb-4">{entryToDelete.name}</p>
-                            <p className="text-gray-500 text-sm">Cette action retirera la spécialisation de la bibliothèque (sans l'effacer de la fiche).</p>
-                        </div>
-                        <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t">
-                            <button onClick={() => setEntryToDelete(null)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-white transition-colors">Annuler</button>
-                            <button onClick={executeDelete} className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors">Supprimer</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmationModal
+                isOpen={!!entryToDelete}
+                onClose={() => setEntryToDelete(null)}
+                onConfirm={executeDelete}
+                title="Supprimer ?"
+                message={`Voulez-vous vraiment supprimer "${entryToDelete?.name}" de la bibliothèque ?`}
+                confirmLabel="Supprimer"
+                type="danger"
+            />
 
             <ConfirmationModal
                 isOpen={showOfficialUpdateConfirm}

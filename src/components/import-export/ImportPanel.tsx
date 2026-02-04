@@ -72,7 +72,7 @@ const ImportPanel: React.FC<ImportPanelProps> = ({ data, variant, onImportSucces
                 const hasAnyLib = hasLibrary || hasSkillLibrary || hasSpecLibrary;
 
                 if (!hasStructure && !hasAnyLib) {
-                    alert("Ce fichier ne semble pas être compatible (aucune donnée reconnue).");
+                    addLog("Ce fichier ne semble pas être compatible (aucune donnée reconnue).", 'danger', 'both');
                     return;
                 }
 
@@ -90,7 +90,7 @@ const ImportPanel: React.FC<ImportPanelProps> = ({ data, variant, onImportSucces
 
             } catch (error) {
                 console.error(error);
-                alert("Erreur de lecture du fichier JSON.");
+                addLog("Erreur de lecture du fichier JSON.", 'danger', 'both');
             }
         };
         reader.readAsText(file);

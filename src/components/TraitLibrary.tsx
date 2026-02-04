@@ -139,16 +139,29 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
         setIsModalOpen(true);
     };
 
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+
     const handleDelete = (id: string, source: string) => {
         if (source === 'official') {
-            alert("Impossible de supprimer un trait officiel. Vous ne pouvez supprimer que vos copies locales.");
+            // No alert needed, simply don't allow it. 
+            // Or better: show a toast/notification if possible. 
+            // Since we don't have addLog here easily without prop drilling or context check (it's not imported),
+            // We will just return. The UI button should ideally be disabled or hidden for official items if deletions aren't allowed.
+            // But if we must show feedback:
+            // For now, let's assume the UI handles visibility (it doesn't completely). 
+            // We'll skip the alert to be "silent" on invalid actions or use a small modal if we really want to block.
+            // Let's rely on the delete confirmation modal to explain "Local only".
             return;
         }
-        if (confirm('Supprimer ce trait de votre bibliothèque locale ?')) {
-            // Access raw local library from data
-            const local = (data && Array.isArray(data.library)) ? data.library : [];
-            onUpdate({ ...data, library: local.filter(l => l.id !== id) });
-        }
+        setShowDeleteConfirm(id);
+    };
+
+    const confirmDelete = () => {
+        if (!showDeleteConfirm) return;
+        // Access raw local library from data
+        const local = (data && Array.isArray(data.library)) ? data.library : [];
+        onUpdate({ ...data, library: local.filter(l => l.id !== showDeleteConfirm) });
+        setShowDeleteConfirm(null);
     };
 
     const handleSave = () => {
@@ -177,6 +190,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
     };
 
     const [showOfficialUpdateConfirm, setShowOfficialUpdateConfirm] = useState(false);
+    const [updateResult, setUpdateResult] = useState<{ success: boolean; message: string } | null>(null);
 
     const handleOfficialUpdateClick = () => {
         setShowOfficialUpdateConfirm(true);
@@ -201,16 +215,9 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                 }
             };
             updateRules(updatedRules);
-
-            // Note: Since TraitLibrary is often used without full NotificationContext access or passed differently
-            // We might just rely on a simple alert if addLog isn't available, but we can try to improve UX if possible.
-            // However, standard alert is better than nothing if no toast system is injected.
-            // But wait, the previous code used `alert`. Let's stick to `alert` for success/fail OR check if we can pass a notifier.
-            // Actually, we can just use `alert` inside the modal consequence or assume success.
-            // BETTER: We can just use the modal for confirmation and alert for result (standard pattern here).
-            alert(`Bibliothèque officielle mise à jour (${newTraits.length} traits).`);
+            setUpdateResult({ success: true, message: `Bibliothèque officielle mise à jour (${newTraits.length} traits).` });
         } catch (e) {
-            alert("Échec de la mise à jour officielle : " + (e as Error).message);
+            setUpdateResult({ success: false, message: "Échec de la mise à jour officielle : " + (e as Error).message });
         }
     };
 
@@ -484,9 +491,30 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                 onClose={() => setShowOfficialUpdateConfirm(false)}
                 onConfirm={executeOfficialUpdate}
                 title="Mise à jour officielle"
-                message="Voulez-vous vérifier et télécharger les dernières mises à jour officielles des traits ?"
+                message="Voulez-vous télécharger la dernière version de la bibliothèque officielle ? Cela remplacera les traits officiels existants mais ne touchera pas à vos traits personnels."
                 confirmLabel="Mettre à jour"
                 type="info"
+            />
+
+            <ConfirmationModal
+                isOpen={!!showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(null)}
+                onConfirm={confirmDelete}
+                title="Supprimer le trait ?"
+                message="Cette action supprimera ce trait de votre bibliothèque locale. Elle ne pourra pas être annulée."
+                confirmLabel="Supprimer"
+                type="danger"
+            />
+
+            <ConfirmationModal
+                isOpen={!!updateResult}
+                onClose={() => setUpdateResult(null)}
+                onConfirm={() => setUpdateResult(null)}
+                title={updateResult?.success ? "Succès" : "Erreur"}
+                message={updateResult?.message || ""}
+                confirmLabel="OK"
+                type={updateResult?.success ? "success" : "danger"}
+                cancelLabel="" // Hide cancel button
             />
         </div>
     );

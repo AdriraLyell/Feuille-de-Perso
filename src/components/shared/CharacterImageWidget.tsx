@@ -2,6 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Upload, Trash2, Image as ImageIcon } from 'lucide-react';
 import { saveImage, getImage, deleteImage, base64ToBlob } from '../../imageDB';
+import ConfirmationModal from '../ui/ConfirmationModal';
 
 interface CharacterImageWidgetProps {
     imageId: string | undefined;
@@ -78,7 +79,7 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
 
     return (
         <>
-            <div 
+            <div
                 className="w-full h-full flex flex-col items-center justify-center relative group cursor-pointer bg-stone-50/30 overflow-hidden"
                 onClick={() => !imageUrl && !loading && fileInputRef.current?.click()}
             >
@@ -102,18 +103,15 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
                     </div>
                 )}
             </div>
-            {showDeleteConfirm && (
-                <div className="fixed inset-0 z-[200] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 animate-in zoom-in duration-200 text-center">
-                        <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4"><Trash2 size={24} /></div>
-                        <h3 className="font-bold text-lg text-stone-800">Supprimer l'image ?</h3>
-                        <div className="flex gap-3 w-full mt-4">
-                            <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 py-2 border border-stone-300 rounded-lg font-bold text-stone-600 hover:bg-stone-50">Annuler</button>
-                            <button onClick={confirmRemove} className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold shadow-md">Supprimer</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmationModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={confirmRemove}
+                title="Supprimer l'image ?"
+                message="Cette action est irréversible."
+                confirmLabel="Supprimer"
+                type="danger"
+            />
         </>
     );
 };
