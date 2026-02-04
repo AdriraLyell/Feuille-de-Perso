@@ -334,7 +334,7 @@ const AdminApp: React.FC = () => {
             </nav>
 
             {/* Main Content */}
-            <main className="max-w-7xl mx-auto p-6">
+            <main className={`mx-auto p-6 transition-all duration-300 ${activeTab === 'skills' ? 'max-w-[1600px]' : 'max-w-7xl'}`}>
 
                 {activeTab === 'general' && (
                     <div className="bg-white p-8 rounded-lg shadow-sm border border-slate-200 animate-in fade-in slide-in-from-bottom-4">

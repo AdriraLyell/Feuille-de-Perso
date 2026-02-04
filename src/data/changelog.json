@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.13.5",
+        "date": "2026-02-04",
+        "type": "patch",
+        "changes": [
+            "UI (Admin) : Élargissement de la vue 'Compétences' (1600px) pour compenser la barre latérale et garantir que les colonnes conservent la même largeur que sur la fiche joueur.",
+            "UI (Admin) : Conversion de la barre latérale de réserve en mode 'Sticky' pour un meilleur comportement de défilement."
+        ]
+    },
+    {
         "version": "2.13.4",
         "date": "2026-02-04",
         "type": "patch",

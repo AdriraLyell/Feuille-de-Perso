@@ -235,7 +235,7 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
 
     return (
         <div className="flex relative items-start gap-4">
-            <div className="flex-grow space-y-8 pr-80"> {/* Main Content */}
+            <div className="flex-grow space-y-8"> {/* Main Content */}
 
                 <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
                     <div className="flex items-start gap-3">
