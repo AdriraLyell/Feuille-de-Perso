@@ -64,12 +64,14 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     </p>
                 </div>
                 <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-200">
-                    <button
-                        onClick={onClose}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-white transition-colors text-sm"
-                    >
-                        {cancelLabel}
-                    </button>
+                    {cancelLabel && (
+                        <button
+                            onClick={onClose}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-white transition-colors text-sm"
+                        >
+                            {cancelLabel}
+                        </button>
+                    )}
                     <button
                         onClick={() => { onConfirm(); onClose(); }}
                         className={`flex-1 px-4 py-2 text-white rounded-lg font-bold shadow-sm transition-colors text-sm ${getBtnColor()}`}

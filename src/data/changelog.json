@@ -1,5 +1,12 @@
 [
     {
+        "version": "2.12.61",
+        "date": "2026-02-04",
+        "changes": [
+            "UI : Correction cosmetique de la modale de confirmation (disparition du bouton 'annuler' vide pour les messages d'information)."
+        ]
+    },
+    {
         "version": "2.12.60",
         "date": "2026-02-04",
         "changes": [
