@@ -7,10 +7,11 @@ import { defaultRules } from '../../data/defaultRules'; // We might need a defau
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 
 interface AdminDashboardProps {
-    onSelectSetting: (id: string, rules: RulesData) => void;
+    onSelectSetting: (id: string, name: string, rules: RulesData) => void;
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
+    // ... (state lines 14-19 are unchanged, but we need to include them in context or skip safely)
     const [settings, setSettings] = useState<GameSettingSummary[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isCreating, setIsCreating] = useState(false);
@@ -50,8 +51,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
     const handleSelect = async (id: string) => {
         setIsLoading(true);
         const rules = await AdminService.loadSetting(id);
+        const settingName = settings.find(s => s.id === id)?.name || "Campagne";
+
         if (rules) {
-            onSelectSetting(id, rules);
+            onSelectSetting(id, settingName, rules);
         } else {
             alert("Erreur lors du chargement de la campagne.");
         }
