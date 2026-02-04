@@ -185,7 +185,8 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
 
     return (
         <div className="flex relative">
-            <div className="flex-grow pr-80 p-1"> {/* Spacing for Sidebar */}
+            <div className="flex-grow pr-80 p-1 space-y-8"> {/* Main Content with Spacing */}
+
                 <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
                     <div className="flex items-start gap-3">
                         <AlertCircle className="text-blue-500 mt-0.5" size={20} />
@@ -199,9 +200,33 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                    {categories.map(cat => renderColumn(cat))}
+                {/* ROW 1 : Standard Columns */}
+                <div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {renderColumn("talents")}
+                        {renderColumn("competences")}
+                        {renderColumn("competences_col_2")}
+                        {renderColumn("connaissances")}
+                    </div>
                 </div>
+
+                {/* ROW 2 : Secondary & Backgrounds */}
+                <div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {renderColumn("autres_competences")}
+                        {renderColumn("competences2")}
+                        {renderColumn("autres")}
+                        {renderColumn("arrieres_plans")}
+                    </div>
+                </div>
+
+                {/* ROW 3 : Counters */}
+                <div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {renderColumn("counters")}
+                    </div>
+                </div>
+
             </div>
 
             {/* Sidebar */}
