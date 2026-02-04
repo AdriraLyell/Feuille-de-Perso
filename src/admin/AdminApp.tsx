@@ -27,12 +27,35 @@ import AdminDashboard from './components/AdminDashboard';
 import { AdminService } from '../services/AdminService';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
 import { useNotification } from '../context/NotificationContext'; // Assuming we have this, or use alert for now
+import { supabase } from '../services/supabase';
+import { Session } from '@supabase/supabase-js';
+import LoginScreen from './components/LoginScreen';
+import { LogOut } from 'lucide-react';
 
 const AdminApp: React.FC = () => {
+    // Auth State
+    const [session, setSession] = useState<Session | null>(null);
+
     // Mode: 'dashboard' | 'editor'
     const [viewMode, setViewMode] = useState<'dashboard' | 'editor'>('dashboard');
     const [currentSettingId, setCurrentSettingId] = useState<string | null>(null);
     const [currentSettingName, setCurrentSettingName] = useState<string>("");
+
+    useEffect(() => {
+        // Get initial session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+        });
+
+        // Listen for changes
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     const [rules, setRules] = useState<RulesData | null>(null);
     const [showDeployModal, setShowDeployModal] = useState(false);
@@ -169,6 +192,10 @@ const AdminApp: React.FC = () => {
     };
 
 
+    if (!session) {
+        return <LoginScreen />;
+    }
+
     if (viewMode === 'dashboard') {
         return <AdminDashboard onSelectSetting={handleSelectSetting} />;
     }
@@ -236,6 +263,14 @@ const AdminApp: React.FC = () => {
                             title="Publier / Exporter le fichier"
                         >
                             <Upload size={16} /> Publier
+                        </button>
+
+                        <button
+                            onClick={() => supabase.auth.signOut()}
+                            className="bg-slate-800 p-2 rounded hover:bg-red-900 text-slate-400 hover:text-white transition-colors"
+                            title="Se déconnecter"
+                        >
+                            <LogOut size={20} />
                         </button>
                     </div>
 
