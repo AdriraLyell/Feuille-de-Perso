@@ -238,6 +238,14 @@ const AdminApp: React.FC = () => {
                         </button>
 
                         <button
+                            onClick={handleImportClick}
+                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-bold transition-colors shadow-lg shadow-blue-900/20"
+                            title="Importer un JSON (Personnage ou Règles)"
+                        >
+                            <UploadCloud size={16} className="rotate-180" /> Importer
+                        </button>
+
+                        <button
                             onClick={() => setShowDeployModal(true)}
                             className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded font-bold transition-colors shadow-lg shadow-purple-900/20"
                             title="Publier / Exporter le fichier"
@@ -252,6 +260,15 @@ const AdminApp: React.FC = () => {
                         >
                             <LogOut size={20} />
                         </button>
+
+                        {/* Hidden Input for File Upload */}
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            className="hidden"
+                            accept=".json"
+                        />
                     </div>
 
                 </div>
