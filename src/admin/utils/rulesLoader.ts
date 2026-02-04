@@ -60,7 +60,7 @@ export const generateDefaultRules = (): RulesData => {
         : [];
 
     return {
-        version: "2.12.54",
+        version: "2.12.55",
         theme: data.theme,
         configurations: {
             creation: data.creationConfig,

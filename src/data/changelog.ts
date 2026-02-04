@@ -3,6 +3,14 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG = [
     {
+        version: '2.12.55',
+        date: '2026-02-04',
+        changes: [
+            'Système : Correction de la boucle de rafraîchissement des règles. L\'application charge maintenant correctement la dernière version détectée via l\'API.',
+            'Affichage : Correction du bug où toutes les compétences apparaissaient comme "Variables" après une mise à jour. Désormais, seules les compétences configurées comme telles (ex: Artisanat) afficheront le champ de sous-type.'
+        ]
+    },
+    {
         version: '2.12.54',
         date: '2026-02-04',
         changes: [

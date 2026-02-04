@@ -14,22 +14,53 @@ const getQueryParam = (name: string) => {
     return urlParams.get(name);
 };
 
+// Helper to parse rules from JS text
+const parseRulesFromText = (text: string): RulesData | null => {
+    const jsonMatch = text.match(/window\.EXTERNAL_RULES\s*=\s*(\{[\s\S]*\});?/);
+    if (jsonMatch && jsonMatch[1]) {
+        return JSON.parse(jsonMatch[1]) as RulesData;
+    }
+    return null;
+};
+
 export const loadRules = async (): Promise<RulesData | null> => {
     try {
-        // 1. If we are ONLINE (http/https), try to fetch fresh content
         const isOnline = window.location.protocol.startsWith('http');
 
         if (isOnline) {
+            // STRATEGY 1: GitHub API (Instant Update)
             try {
-                // Fetch from RAW GitHub (Instant Update, bypasses Pages Build)
+                const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/public/data/rules.js?ref=main`;
+                console.log('[RulesLoader] Attempting to fetch rules via API:', apiUrl);
+
+                const apiResponse = await fetch(apiUrl, {
+                    headers: { 'Accept': 'application/vnd.github.v3.raw' },
+                    cache: 'no-store'
+                });
+
+                if (apiResponse.ok) {
+                    const text = await apiResponse.text();
+                    const parsedRules = parseRulesFromText(text);
+                    if (parsedRules) {
+                        console.log('[RulesLoader] Fresh rules loaded via API', parsedRules);
+                        window.EXTERNAL_RULES = parsedRules;
+                        return parsedRules;
+                    }
+                } else if (apiResponse.status === 403 || apiResponse.status === 429) {
+                    console.warn('[RulesLoader] API Rate Limit hit during load. Falling back to Raw CDN.');
+                }
+            } catch (apiErr) {
+                console.warn('[RulesLoader] API load failed, trying RAW.', apiErr);
+            }
+
+            // STRATEGY 2: Fallback to Raw CDN
+            try {
                 const timestamp = new Date().getTime();
                 const rawUrlCacheBusted = `${RAW_RULES_URL}?v=${timestamp}`;
-
-                console.log('[RulesLoader] Attempting to fetch RAW rules from:', rawUrlCacheBusted);
+                console.log('[RulesLoader] Falling back to RAW rules:', rawUrlCacheBusted);
 
                 let response = await fetch(rawUrlCacheBusted, { cache: 'no-store' });
 
-                // Fallback to relative path if RAW fails (e.g. network block)
                 if (!response.ok) {
                     console.warn('[RulesLoader] RAW fetch failed, falling back to relative path.');
                     response = await fetch(`./data/rules.js?v=${timestamp}`, { cache: 'no-store' });
@@ -37,13 +68,9 @@ export const loadRules = async (): Promise<RulesData | null> => {
 
                 if (response.ok) {
                     const text = await response.text();
-                    // rules.js content is: window.EXTERNAL_RULES = {...};
-                    // Extract JSON
-                    const jsonMatch = text.match(/window\.EXTERNAL_RULES\s*=\s*(\{[\s\S]*\});?/);
-                    if (jsonMatch && jsonMatch[1]) {
-                        const parsedRules = JSON.parse(jsonMatch[1]);
-                        console.log('[RulesLoader] Fresh rules loaded', parsedRules);
-                        // Update global for consistency
+                    const parsedRules = parseRulesFromText(text);
+                    if (parsedRules) {
+                        console.log('[RulesLoader] Fresh rules loaded (Content Fetch)', parsedRules);
                         window.EXTERNAL_RULES = parsedRules;
                         return parsedRules;
                     }
@@ -54,12 +81,6 @@ export const loadRules = async (): Promise<RulesData | null> => {
         }
 
         // 2. Fallback to Window Global (loaded via <script> tag)
-        // This handles:
-        // - File:// protocol (Offline)
-        // - Cached version if fetch failed
-        // - First load race conditions (though script is usually blocking)
-
-        // Wait a bit to ensure script is loaded (blocking scripts usually run before module execution, but just in case)
         if (!window.EXTERNAL_RULES) {
             await new Promise(resolve => setTimeout(resolve, 50));
         }
@@ -69,7 +90,7 @@ export const loadRules = async (): Promise<RulesData | null> => {
             return window.EXTERNAL_RULES;
         }
 
-        console.warn('[RulesLoader] No global rules found. Creating fallback or retrying fetch...');
+        console.warn('[RulesLoader] No global rules found.');
         return null;
 
     } catch (error) {

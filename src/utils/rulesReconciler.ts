@@ -145,16 +145,20 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
                         max: rules.configurations.global.maxSkillScore,
                         // Update Name (case correction)
                         name: name
+                        // Preserve existing variant state
                     };
                 } else {
                     // New Skill
+                    const libSkill = rules.libraries?.skills?.find(s => s.name === name);
+                    const isVariable = libSkill?.isVariable === true;
+
                     return {
                         id: generateId(),
                         name: name,
                         value: 0,
                         creationValue: 0,
                         max: rules.configurations.global.maxSkillScore,
-                        variant: ""
+                        variant: isVariable ? "" : undefined
                     };
                 }
             });
