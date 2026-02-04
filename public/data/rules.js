@@ -1,5 +1,5 @@
 window.EXTERNAL_RULES = {
-    "version": "2.12.55",
+    "version": "2.12.57",
     "theme": {
         "creationColor": "#2563eb",
         "xpColor": "#292524",
@@ -552,7 +552,7 @@ window.EXTERNAL_RULES = {
                 "name": "Action Supplémentaire",
                 "type": "avantage",
                 "cost": "5",
-                "description": "",
+                "description": "Action supplémentaire en combat",
                 "tags": [],
                 "effects": []
             }
@@ -1250,5 +1250,5 @@ window.EXTERNAL_RULES = {
         ],
         "specializations": []
     },
-    "lastUpdated": 1770199245415
+    "lastUpdated": 1770208884880
 };
