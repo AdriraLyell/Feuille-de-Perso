@@ -1,698 +1,877 @@
 {
   "meta": {
-    "version": "2.12.55",
-    "date": "2026-02-04T12:32:00.255Z",
+    "version": "1.0.0",
+    "date": "2026-02-04T22:06:02.992Z",
     "type": "skills"
   },
   "data": [
     {
-      "id": "nw7qt2gwg",
+      "id": "nfo8jxxtt",
       "name": "Acrobatie",
       "description": "",
-      "defaultCategory": "competences2"
+      "defaultCategory": "competences2",
+      "isVariable": false
     },
     {
-      "id": "mx9fzdotz",
+      "id": "grr2qykwl",
       "name": "Alchimie",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "y4pm3l9o9",
+      "id": "7dd0t6vl9",
+      "name": "Alliés",
+      "description": "",
+      "defaultCategory": "arrieres_plans",
+      "isVariable": false
+    },
+    {
+      "id": "htilolssw",
       "name": "An Yin Kung Fu",
       "description": "",
-      "defaultCategory": "autres"
+      "defaultCategory": "autres",
+      "isVariable": false
     },
     {
-      "id": "ucz0kd63z",
+      "id": "bg4wutojq",
       "name": "Animaux",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "is4l5llor",
+      "id": "l2bcx0l4k",
+      "name": "Arcane",
+      "description": "",
+      "defaultCategory": "arrieres_plans",
+      "isVariable": false
+    },
+    {
+      "id": "r0v4lpl5l",
       "name": "Armurerie",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "zhkaj4hrs",
-      "name": "Art Martial : ",
+      "id": "nvop3axwz",
+      "name": "Art Martial",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": true
     },
     {
-      "id": "b9chr4aej",
-      "name": "Artisanat : ",
+      "id": "aysvd5nmi",
+      "name": "Artisanat",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": true
     },
     {
-      "id": "ebk26fe1q",
-      "name": "Artisanat : Forge",
-      "description": "",
-      "defaultCategory": "autres_competences"
-    },
-    {
-      "id": "nfysnms0j",
+      "id": "6m3d7zjrs",
       "name": "Athlétisme",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "59je3ncwr",
+      "id": "xptle8bhd",
       "name": "Attelage",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "btb9hi0m0",
+      "id": "1pd78ss1b",
       "name": "Automate",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "9w5vnoken",
+      "id": "98b8n9xwv",
       "name": "Bagarre",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "ig9t3byyz",
+      "id": "flkqzytdj",
       "name": "Bestiaire",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "2gzohj9cg",
+      "id": "h4wzzovii",
       "name": "Biologie",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "ege2eaayn",
+      "id": "za52bj2ek",
       "name": "Bricolage",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "h3xlsv6oc",
+      "id": "60qa52bhi",
       "name": "Canotage",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "xzp9eq8dc",
+      "id": "lo4c76j84",
       "name": "Cartomancie",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "4u6jlwaxk",
+      "id": "daoq70w3g",
+      "name": "Célébrité",
+      "description": "",
+      "defaultCategory": "arrieres_plans",
+      "isVariable": false
+    },
+    {
+      "id": "117r1gqqb",
       "name": "Chant",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "pn95hfmib",
+      "id": "huqbdvkae",
       "name": "Charisme",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "lzi0an68i",
+      "id": "5jgbo8e6n",
       "name": "Charme",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "3cgvdi4ij",
+      "id": "qkxvdf1ju",
       "name": "Chi Hsuan Men",
       "description": "",
-      "defaultCategory": "autres"
+      "defaultCategory": "autres",
+      "isVariable": false
     },
     {
-      "id": "vf14gqc8r",
+      "id": "z7cmmb6g8",
       "name": "Chimie",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "drxxcqihk",
+      "id": "64igkl12b",
       "name": "Chirurgie",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "0un7zeq7r",
+      "id": "o0phjauc2",
       "name": "Comédie / Théâtre",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "qwcqyuspz",
+      "id": "834x8k0qn",
       "name": "Commander",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "bm25h1c0q",
+      "id": "miipnqfxm",
       "name": "Communication",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "dfa0e1087",
+      "id": "2432wrumg",
       "name": "Concentration",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "w9wuflmox",
+      "id": "ocxs31igz",
       "name": "Conduite",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "s5oeazxya",
+      "id": "g8f9xoj9y",
+      "name": "Contacts",
+      "description": "",
+      "defaultCategory": "arrieres_plans",
+      "isVariable": false
+    },
+    {
+      "id": "hie885pp9",
       "name": "Conte",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "p9nm6uqsq",
+      "id": "9kyrrju1p",
       "name": "Course",
       "description": "",
-      "defaultCategory": "competences2"
+      "defaultCategory": "competences2",
+      "isVariable": false
     },
     {
-      "id": "tp0me4d7u",
+      "id": "a6th4fgva",
       "name": "Cuisine",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "dwgajum1y",
+      "id": "kit7zqgry",
       "name": "Danse",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "yw1zmtm14",
+      "id": "eabe67i92",
       "name": "Déguisement",
       "description": "",
-      "defaultCategory": "competences2"
+      "defaultCategory": "competences2",
+      "isVariable": false
     },
     {
-      "id": "i7sesxlxu",
+      "id": "9vrte8jgo",
       "name": "Dessin",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "3gldq50re",
+      "id": "8m3rz9r9c",
       "name": "Diplomatie",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "7kamh10de",
+      "id": "f13nxgt1j",
       "name": "Discrétion",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "qwtrlqrpd",
+      "id": "unl343xq0",
       "name": "Droit",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "hd9sutdlm",
+      "id": "dv6jnoup4",
       "name": "Duperie",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "f64dino4h",
+      "id": "fdy8zzd7o",
       "name": "Ecclésiastique",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "3iy0kav2k",
+      "id": "37ie48pw9",
       "name": "Ecriture",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "fo0k9ywg9",
+      "id": "5cugwonuf",
       "name": "Ecriture Mystique",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "9v4whuq26",
+      "id": "iz6t85sve",
       "name": "Electricité",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "ceejs9t1v",
+      "id": "4oe4ahuwp",
       "name": "Empalmage",
       "description": "",
-      "defaultCategory": "competences2"
+      "defaultCategory": "competences2",
+      "isVariable": false
     },
     {
-      "id": "m2t699a2x",
+      "id": "xqg4a04hi",
       "name": "Entraînement",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "y3vify8e0",
+      "id": "o0t1t5wjj",
+      "name": "Equipement",
+      "description": "",
+      "defaultCategory": "arrieres_plans",
+      "isVariable": false
+    },
+    {
+      "id": "6cw6rk3ah",
       "name": "Equitation",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "mmk9z40qg",
+      "id": "7qndgznf3",
       "name": "Escalade",
       "description": "",
-      "defaultCategory": "competences2"
+      "defaultCategory": "competences2",
+      "isVariable": false
     },
     {
-      "id": "b5g9msw3e",
+      "id": "yweartbqb",
       "name": "Esquive",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "zw1or1kib",
+      "id": "aptjf69mn",
       "name": "Etiquette",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "87wq1bmb2",
+      "id": "h8t9z84ml",
       "name": "Evaluation",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "nl72wr5g5",
+      "id": "j50szk1d1",
       "name": "Explosifs",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "zcx88fp9q",
+      "id": "1o4xpmvfi",
       "name": "Falsification",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "anrqfwwkh",
+      "id": "ez7bp13xd",
       "name": "Féerie",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "55b538po9",
+      "id": "2ex9bns0j",
       "name": "Finance",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "j7ypzjhku",
+      "id": "igf92tqlh",
       "name": "Géographie",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "ers6wjdtt",
+      "id": "c4prfkdnm",
       "name": "Gui Long",
       "description": "",
-      "defaultCategory": "autres"
+      "defaultCategory": "autres",
+      "isVariable": false
     },
     {
-      "id": "tavzn8iea",
+      "id": "9d4co5qga",
       "name": "Herboristerie",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "6buup145t",
+      "id": "axv1yddfg",
       "name": "Histoire",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "xp14dmnj5",
+      "id": "2jg3vpr5p",
       "name": "Horlogerie",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "dcyj4mowa",
+      "id": "malpsot0w",
       "name": "Hydraulique",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "y9ejqdlg9",
+      "id": "0s89v7wv6",
+      "name": "Influence",
+      "description": "",
+      "defaultCategory": "arrieres_plans",
+      "isVariable": false
+    },
+    {
+      "id": "k39q3t175",
+      "name": "Ingrédients",
+      "description": "",
+      "defaultCategory": "arrieres_plans",
+      "isVariable": false
+    },
+    {
+      "id": "849p738wu",
       "name": "Instruction",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "w8kn8q4k9",
+      "id": "7irx2s439",
       "name": "Intimidation",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "1z7scs9o5",
+      "id": "g9cfpmmnp",
       "name": "Intrigue",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "ojkgvm5o5",
+      "id": "g4zwoej5u",
       "name": "Intuition",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "t9ih67mfu",
+      "id": "qrvjwjhec",
       "name": "Investigation",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "v6sa3xckw",
+      "id": "pyennaqcm",
       "name": "Japon",
       "description": "",
-      "defaultCategory": "competences2"
+      "defaultCategory": "competences2",
+      "isVariable": false
     },
     {
-      "id": "hm9be7702",
+      "id": "w65ljf7ey",
       "name": "Jeu",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "xia72wlly",
-      "name": "Jouer : ",
+      "id": "vf97efvku",
+      "name": "Jouer",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": true
     },
     {
-      "id": "j8q9dtrxb",
+      "id": "jiwh597ar",
       "name": "Lancé",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "5bc8sgx33",
+      "id": "6qssu6cyu",
       "name": "Légendes",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "1a6n3hzxn",
+      "id": "r05l7jket",
       "name": "Linguistique",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "w42ltj0l0",
+      "id": "3m94x0bf0",
       "name": "Maîtrise",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "avp7ietoj",
+      "id": "i8c9115w1",
       "name": "Manipulation des Poisons",
       "description": "",
-      "defaultCategory": "competences2"
+      "defaultCategory": "competences2",
+      "isVariable": false
     },
     {
-      "id": "mxd5y6ewm",
+      "id": "gx089z6ct",
       "name": "Mécanique",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "v1xith9xb",
+      "id": "c26zbexke",
       "name": "Médecine",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "s6tuzt9io",
+      "id": "genove53m",
       "name": "Méditation",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "pmqpizfkl",
+      "id": "8uncnrf0b",
       "name": "Mêlée",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "rvjcpwzk1",
+      "id": "jasfbmzty",
+      "name": "Mentor",
+      "description": "",
+      "defaultCategory": "arrieres_plans",
+      "isVariable": false
+    },
+    {
+      "id": "bnc93o57v",
       "name": "Mien-Ch'uan",
       "description": "",
-      "defaultCategory": "autres"
+      "defaultCategory": "autres",
+      "isVariable": false
     },
     {
-      "id": "px5i53pen",
+      "id": "y7ex7ul3u",
       "name": "Musique",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "jthplgnq7",
+      "id": "0iwm1wmsa",
       "name": "Mythologie",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "0fu43psjo",
+      "id": "vp91kuxg5",
       "name": "Natation",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "159ss5wfj",
+      "id": "jcvwztoy7",
       "name": "Navigation",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "hdkpfbne7",
+      "id": "ue7re15el",
       "name": "Ninjutsu",
       "description": "",
-      "defaultCategory": "autres"
+      "defaultCategory": "autres",
+      "isVariable": false
     },
     {
-      "id": "95ss3270a",
+      "id": "11oso9d3i",
       "name": "Occultisme",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "1lh9s6omc",
+      "id": "tt5nol2p8",
       "name": "Photo",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "o8quwercf",
+      "id": "5kc9v1y0b",
       "name": "Pilotage",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "e1xunk6uf",
+      "id": "zworbnlnz",
       "name": "Pistage",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "qvugd0e8y",
+      "id": "etwd1pbwe",
       "name": "Politique",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "7h1qmziqd",
+      "id": "h1s7sz4sl",
       "name": "Prestidigitation",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "a2ybn74ad",
+      "id": "px3wzfest",
       "name": "Psychologie",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "m3qfv1h3h",
+      "id": "s7spjgvdz",
       "name": "Région",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "r3zwx4yko",
+      "id": "k61j0ovd0",
       "name": "Repérage",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "qkuf0yd9n",
+      "id": "c5s911xtn",
+      "name": "Ressources",
+      "description": "",
+      "defaultCategory": "arrieres_plans",
+      "isVariable": false
+    },
+    {
+      "id": "58j2fvjes",
       "name": "Saltimbanque / Jongle",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "o09r8lrxf",
+      "id": "2l0tobsbt",
       "name": "Saut",
       "description": "",
-      "defaultCategory": "competences2"
+      "defaultCategory": "competences2",
+      "isVariable": false
     },
     {
-      "id": "1o9q1qrbq",
+      "id": "igniuldkv",
       "name": "Sc. Humaines",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "ktrjx403q",
+      "id": "vi1mgjzuj",
       "name": "Sc. Physiques",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "nqwyhvkkf",
+      "id": "gi6rrf9do",
       "name": "Sc. Sociales",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "e2vzf7ek4",
+      "id": "ypjjtgmp4",
       "name": "Serrures",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "i99ocf2pv",
+      "id": "1uibdyke9",
       "name": "Shinobi",
       "description": "",
-      "defaultCategory": "autres"
+      "defaultCategory": "autres",
+      "isVariable": false
     },
     {
-      "id": "wn3nb0bpf",
+      "id": "ios0l4ih0",
       "name": "Snake Style Kung Fu",
       "description": "",
-      "defaultCategory": "autres"
+      "defaultCategory": "autres",
+      "isVariable": false
     },
     {
-      "id": "pg7kycb0e",
+      "id": "epdcgv6vc",
+      "name": "Statut",
+      "description": "",
+      "defaultCategory": "arrieres_plans",
+      "isVariable": false
+    },
+    {
+      "id": "p3gi2ucnm",
       "name": "Streetwise",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "qetfs57gg",
+      "id": "pqeyf8xbv",
       "name": "Style",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "fdostemwi",
+      "id": "22r3sj82m",
       "name": "Survie",
       "description": "",
-      "defaultCategory": "competences"
+      "defaultCategory": "competences",
+      "isVariable": false
     },
     {
-      "id": "fky93vhv3",
+      "id": "rwwri9v6j",
       "name": "T.O.C",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "3ea8qjxia",
+      "id": "jkov0ubf7",
       "name": "Tai-Chi Ch'uan",
       "description": "",
-      "defaultCategory": "autres"
+      "defaultCategory": "autres",
+      "isVariable": false
     },
     {
-      "id": "097tl70qj",
+      "id": "ob4alqzs3",
       "name": "Taijutsu",
       "description": "",
-      "defaultCategory": "autres"
+      "defaultCategory": "autres",
+      "isVariable": false
     },
     {
-      "id": "ud87x78wc",
+      "id": "ej6umbdx7",
+      "name": "Talisman",
+      "description": "",
+      "defaultCategory": "arrieres_plans",
+      "isVariable": false
+    },
+    {
+      "id": "q05ybsems",
       "name": "Tenir Alcool",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "9kcabb191",
+      "id": "9r1u41too",
       "name": "Théologie",
       "description": "",
-      "defaultCategory": "connaissances"
+      "defaultCategory": "connaissances",
+      "isVariable": false
     },
     {
-      "id": "7nqwyo04a",
+      "id": "0b8opnygc",
       "name": "TIen-Hsueh",
       "description": "",
-      "defaultCategory": "autres"
+      "defaultCategory": "autres",
+      "isVariable": false
     },
     {
-      "id": "vw0ib5cr6",
+      "id": "c8cdf5fo7",
       "name": "Tir",
       "description": "",
-      "defaultCategory": "competences_col_2"
+      "defaultCategory": "competences_col_2",
+      "isVariable": false
     },
     {
-      "id": "2xghm67bw",
+      "id": "s1n4xafkf",
       "name": "Vigilance",
       "description": "",
-      "defaultCategory": "talents"
+      "defaultCategory": "talents",
+      "isVariable": false
     },
     {
-      "id": "3za6flhue",
+      "id": "vmatjabsn",
       "name": "Vision Féerique",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "q56s562uq",
+      "id": "lcbpr71b2",
       "name": "Vision Mystique",
       "description": "",
-      "defaultCategory": "autres_competences"
+      "defaultCategory": "autres_competences",
+      "isVariable": false
     },
     {
-      "id": "zhxyp3xvr",
+      "id": "a8vg624n9",
       "name": "Wui Wing Chun",
       "description": "",
-      "defaultCategory": "autres"
+      "defaultCategory": "autres",
+      "isVariable": false
     },
     {
-      "id": "r5v74jgod",
+      "id": "pnl8doarq",
       "name": "Zanji Shinjinken-Ryu",
       "description": "",
-      "defaultCategory": "autres"
-    },
-    {
-      "id": "46zm114ul",
-      "name": "AAAA",
-      "description": ""
+      "defaultCategory": "autres",
+      "isVariable": false
     }
   ]
 }
