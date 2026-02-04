@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.12.57",
+        "date": "2026-02-04",
+        "changes": [
+            "Technique : Refactoring global pour améliorer la maintenabilité (LibraryView, mechanics.ts).",
+            "Optimisation : Migration du journal des modifications vers un format léger (JSON) pour accélérer le chargement initial."
+        ]
+    },
+    {
         "version": "2.12.56",
         "date": "2026-02-04",
         "changes": [

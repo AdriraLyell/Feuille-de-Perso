@@ -1,5 +1,5 @@
 
-export const APP_VERSION = '2.12.56';
+export const APP_VERSION = '2.12.57';
 
 export const REPO_OWNER = 'AdriraLyell';
 export const REPO_NAME = 'Feuille-de-Perso';
