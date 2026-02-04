@@ -9,10 +9,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
     console.error('Missing Supabase Environment Variables. Please check .env file.');
 }
 
+
 export const supabase = createClient(
-    supabaseUrl || '',
-    supabaseAnonKey || ''
+    supabaseUrl || 'https://placeholder.supabase.co',
+    supabaseAnonKey || 'placeholder-key'
 );
+
 
 // Helper to check connection
 export const checkSupabaseConnection = async () => {
