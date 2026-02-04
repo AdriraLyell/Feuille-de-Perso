@@ -52,7 +52,45 @@ export const AdminService = {
             console.error('Error creating setting:', error);
             return null;
         }
-        return data.id;
+
+        const settingId = data.id;
+
+        // Persist Libraries if present
+        if (initialRules.libraries) {
+            try {
+                // A. Traits
+                if (initialRules.libraries.traits && initialRules.libraries.traits.length > 0) {
+                    const traitsPayload = initialRules.libraries.traits.map(t => ({
+                        setting_id: settingId,
+                        ...t
+                    }));
+                    await supabase.from('libraries_traits').insert(traitsPayload);
+                }
+
+                // B. Skills
+                if (initialRules.libraries.skills && initialRules.libraries.skills.length > 0) {
+                    const skillsPayload = initialRules.libraries.skills.map(s => ({
+                        setting_id: settingId,
+                        ...s
+                    }));
+                    await supabase.from('libraries_skills').insert(skillsPayload);
+                }
+
+                // C. Specializations
+                if (initialRules.libraries.specializations && initialRules.libraries.specializations.length > 0) {
+                    const specsPayload = initialRules.libraries.specializations.map(s => ({
+                        setting_id: settingId,
+                        ...s
+                    }));
+                    await supabase.from('libraries_specializations').insert(specsPayload);
+                }
+            } catch (libError) {
+                console.error("Error persisting initial libraries:", libError);
+                // We don't fail the whole creation, but we warn
+            }
+        }
+
+        return settingId;
     },
 
     /**

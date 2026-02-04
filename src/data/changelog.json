@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.13.6",
+        "date": "2026-02-04",
+        "type": "patch",
+        "changes": [
+            "Fix (Admin) : Correction de la persistance des bibliothèques lors de la création/import de campagne. Les données sont désormais correctement injectées dans les tables BDD.",
+            "UI (Admin) : Ajustement du sticky de la barre latérale pour éviter le chevauchement avec l'en-tête."
+        ]
+    },
+    {
         "version": "2.13.5",
         "date": "2026-02-04",
         "type": "patch",

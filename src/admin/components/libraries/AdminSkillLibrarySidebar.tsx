@@ -90,7 +90,7 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
 
     return (
         <div
-            className={`w-80 shrink-0 sticky top-20 h-[calc(100vh-6rem)] bg-slate-100 border-l border-y border-gray-300 flex flex-col transition-colors rounded-l-md shadow-sm ${draggedItem?.type === 'admin_sheet_skill' ? 'bg-orange-50 border-orange-300' : ''}`}
+            className={`w-80 shrink-0 sticky top-32 h-[calc(100vh-9rem)] bg-slate-100 border-l border-y border-gray-300 flex flex-col transition-colors rounded-l-md shadow-sm ${draggedItem?.type === 'admin_sheet_skill' ? 'bg-orange-50 border-orange-300' : ''}`}
             onDragOver={handleDragOver}
             onDrop={handleDropOnLibrary}
         >
