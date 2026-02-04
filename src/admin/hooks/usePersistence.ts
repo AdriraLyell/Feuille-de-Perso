@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { set, get, del } from 'idb-keyval';
 import { RulesData } from '../../types/rules';
-import { useNotification } from '../../context/NotificationContext';
 
 const DB_KEY = 'admin_rules_autosave';
 const AUTOSAVE_DELAY = 2000; // 2 seconds debounce
@@ -9,7 +8,8 @@ const AUTOSAVE_DELAY = 2000; // 2 seconds debounce
 interface PersistenceStatus {
     lastSaved: Date | null;
     hasUnsavedChanges: boolean;
-    isRestoring: boolean;
+    restoreAvailable: RulesData | null; // Rules waiting to be restored
+    isRestoring: boolean; // Initial check in progress
 }
 
 export const usePersistence = (
@@ -20,6 +20,7 @@ export const usePersistence = (
     const [status, setStatus] = useState<PersistenceStatus>({
         lastSaved: null,
         hasUnsavedChanges: false,
+        restoreAvailable: null,
         isRestoring: true
     });
 
@@ -27,13 +28,6 @@ export const usePersistence = (
     const rulesRef = useRef<RulesData | null>(currentRules);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const initialLoadDone = useRef(false);
-
-    // Notification context might not be available at top level app, 
-    // handle gracefully or invoke only if provided. 
-    // For AdminApp, we might not have NotificationProvider wrapping it yet?
-    // AdminApp wraps itself usually... let's check structure. 
-    // Assuming we pass a simple log function or toast if needed, 
-    // or just rely on console/internal state for now.
 
     useEffect(() => {
         rulesRef.current = currentRules;
@@ -45,38 +39,48 @@ export const usePersistence = (
             try {
                 const saved = await get<RulesData>(DB_KEY);
                 if (saved && saved.version) {
-                    // We found a backup.
-                    // Logic: If backup exists, we ask user. 
-                    const shouldRestore = window.confirm(
-                        `Une session précédente non sauvegardée a été trouvée (Version ${saved.version}).\nVoulez-vous la restaurer ?\n\nAnnuler chargera la version officielle (GitHub).`
-                    );
-
-                    if (shouldRestore) {
-                        onRestore(saved);
-                        console.log('[Persistence] Session restored from IDB');
-                    } else {
-                        // User declined, clear it to avoid nagging
-                        await del(DB_KEY);
-                        console.log('[Persistence] Stale session discarded');
-                    }
+                    // We found a backup. Expose it to UI.
+                    setStatus(s => ({ ...s, restoreAvailable: saved }));
+                } else {
+                    // No backup, proceed as normal
+                    initialLoadDone.current = true;
+                    onLoadComplete();
                 }
             } catch (err) {
                 console.warn('[Persistence] Failed to check for restore', err);
-            } finally {
-                setStatus(s => ({ ...s, isRestoring: false }));
                 initialLoadDone.current = true;
                 onLoadComplete();
+            } finally {
+                setStatus(s => ({ ...s, isRestoring: false }));
             }
         };
 
         checkRestore();
     }, []); // Run once on mount
 
+    // Public method to accept or reject restoration
+    const resolveRestore = useCallback(async (shouldRestore: boolean) => {
+        if (shouldRestore && status.restoreAvailable) {
+            onRestore(status.restoreAvailable);
+            console.log('[Persistence] Session restored from IDB');
+        } else {
+            // User declined, clear it
+            await del(DB_KEY);
+            console.log('[Persistence] Stale session discarded');
+        }
+
+        // Finalize
+        // We set restoreAvailable to null to close modal
+        setStatus(s => ({ ...s, restoreAvailable: null }));
+        initialLoadDone.current = true;
+        onLoadComplete();
+    }, [status.restoreAvailable, onRestore, onLoadComplete]);
+
     // 2. Auto-Save Logic
     useEffect(() => {
         if (!initialLoadDone.current || !currentRules) return;
 
-        // Mark as dirty immediately for UI feedback
+        // Mark as dirty immediately if we are past the initial load
         setStatus(s => ({ ...s, hasUnsavedChanges: true }));
 
         // Debounce save
@@ -85,7 +89,6 @@ export const usePersistence = (
         timeoutRef.current = setTimeout(async () => {
             try {
                 // Ensure structured cloning capable (JSON safe)
-                // idb-keyval handles structured clone, but let's be safe with JSON purely for rules
                 await set(DB_KEY, JSON.parse(JSON.stringify(currentRules)));
 
                 setStatus(s => ({
@@ -102,15 +105,15 @@ export const usePersistence = (
         return () => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
         };
-    }, [currentRules]); // Dependency on the rules object changing
+    }, [currentRules]);
 
     // 3. Window BeforeUnload Protection
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             if (status.hasUnsavedChanges) {
                 e.preventDefault();
-                e.returnValue = ''; // Legal standard for Chrome
-                return ''; // Legal standard for generic
+                e.returnValue = '';
+                return '';
             }
         };
 
@@ -118,5 +121,5 @@ export const usePersistence = (
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [status.hasUnsavedChanges]);
 
-    return status;
+    return { ...status, resolveRestore };
 };

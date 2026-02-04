@@ -19,8 +19,9 @@ import AdminTraitLibrary from './components/libraries/AdminTraitLibrary';
 import AdminSkillLibrary from './components/libraries/AdminSkillLibrary';
 import AdminSpecializationLibrary from './components/libraries/AdminSpecializationLibrary';
 import DeployToGithubModal from './components/DeployModal';
-import { BookOpen, Save as SaveIcon } from 'lucide-react';
+import { BookOpen, Save as SaveIcon, Cloud, AlertTriangle } from 'lucide-react';
 import { usePersistence } from './hooks/usePersistence';
+import RestoreSessionModal from './components/RestoreSessionModal';
 
 const AdminApp: React.FC = () => {
     const [rules, setRules] = useState<RulesData | null>(null);
@@ -40,7 +41,7 @@ const AdminApp: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Persistence Hook
-    const { hasUnsavedChanges, lastSaved, isRestoring } = usePersistence(
+    const { hasUnsavedChanges, lastSaved, isRestoring, restoreAvailable, resolveRestore } = usePersistence(
         rules,
         (restoredRules) => {
             setRules(restoredRules);
@@ -48,25 +49,13 @@ const AdminApp: React.FC = () => {
             window.EXTERNAL_RULES = restoredRules;
         },
         () => {
-            // Callback when persistence check is done (whether restored or not)
-            // If NOT restored, we ensure we have the default rules
-            // But wait, usePersistence runs ONCE.
-            // If it restores, it calls onRestore.
-            // If it doesn't, it calls nothing but sets isRestoring to false.
-            // So we need to ensure we load default rules if rules is still null after check.
+            // Callback when persistence flow is complete
         }
     );
 
     useEffect(() => {
-        // Only load default/remote rules IF we are not restoring from IDB
-        // We can check if rules is null. 
-        // But since usePersistence is async, we need to wait for it?
-        // Actually, simpler strategy:
-        // We let normal load happen. Then usePersistence (which runs on mount) might OVERWRITE it if user says "Restore".
-        // That's acceptable.
-
+        // Always load default rules initially so we have a version comparison
         const loaded = loadRules();
-        // Only set if we haven't already restored (rare race condition, but safe enough)
         setRules(prev => prev || loaded);
     }, []);
 
@@ -144,6 +133,20 @@ const AdminApp: React.FC = () => {
                     <div className="flex items-center gap-3">
                         <Settings className="text-blue-400" />
                         <h1 className="text-xl font-bold tracking-wide">Seigneurs des Mystères <span className="text-slate-400 font-normal">| Administration</span></h1>
+
+                        {/* Discrete Persistence Status */}
+                        <div className="ml-4 pl-4 border-l border-slate-700 flex items-center" title={hasUnsavedChanges ? "Modifications locales non publiées" : "Synchronisé avec GitHub"}>
+                            {hasUnsavedChanges ? (
+                                <div className="flex items-center gap-2 text-amber-400 animate-pulse">
+                                    <AlertTriangle size={20} />
+                                    <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Non Publié</span>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2 text-green-400/50">
+                                    <Cloud size={20} />
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <div className="flex items-center gap-4 text-sm">
                         <button
@@ -186,13 +189,7 @@ const AdminApp: React.FC = () => {
                         </button>
                     </div>
                 </div>
-                {/* Persistence Status Bar / Indicator */}
-                <div className={`h-1 transition-all duration-300 ${hasUnsavedChanges ? 'bg-amber-500 w-full' : 'bg-green-500 w-0'}`} />
-                {hasUnsavedChanges && (
-                    <div className="absolute top-20 right-4 z-50 bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded shadow-md border border-amber-200 animate-pulse">
-                        ⚠️ Modifications non publiées
-                    </div>
-                )}
+                {/* Persistence Status Bar Removed - Replaced by Header Icon */}
             </header>
 
             {showDeployModal && rules && (
@@ -351,6 +348,15 @@ const AdminApp: React.FC = () => {
                     }}
                 />
             )}
+
+            {/* Restore Session Modal */}
+            <RestoreSessionModal
+                isOpen={!!restoreAvailable}
+                restorableRules={restoreAvailable}
+                currentVersion={rules?.version || "Inconnue"}
+                onConfirm={() => resolveRestore(true)}
+                onDiscard={() => resolveRestore(false)}
+            />
         </div >
     );
 };

@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.12.63",
+        "date": "2026-02-04",
+        "changes": [
+            "UI (Admin) : Remplacement de l'alerte système native par une modale thématique (Style Grimoire) lors de la restauration de session.",
+            "UI (Admin) : Remplacement de la barre de notification intrusive par un indicateur discret (Nuage) dans l'en-tête pour le statut de sauvegarde."
+        ]
+    },
+    {
         "version": "2.12.62",
         "date": "2026-02-04",
         "changes": [
