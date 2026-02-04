@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.12.58",
+        "date": "2026-02-04",
+        "changes": [
+            "UI : Remplacement des alertes système (navigateur) par des modales thématiques (Design Grimoire) pour toutes les actions d'Import/Export de bibliothèques.",
+            "Admin : Harmonisation des dialogues de confirmation pour la publication."
+        ]
+    },
+    {
         "version": "2.12.57",
         "date": "2026-02-04",
         "changes": [

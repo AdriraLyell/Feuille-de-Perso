@@ -5,6 +5,7 @@ import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, 
 import TraitCard from './trait-library/TraitCard';
 import TraitForm from './trait-library/TraitForm';
 import TraitImportModal from './trait-library/TraitImportModal';
+import ConfirmationModal from './ui/ConfirmationModal';
 import { smartIncludes } from '../utils/stringUtils';
 import { useRules } from '../context/RulesContext';
 import { mergeLibraries, MergedEntry } from '../utils/libraryMerger';
@@ -175,9 +176,13 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
         setEditForm(null);
     };
 
-    const handleOfficialUpdate = async () => {
-        if (!confirm("Voulez-vous vérifier et télécharger les mises à jour officielles des TRAITS ?")) return;
+    const [showOfficialUpdateConfirm, setShowOfficialUpdateConfirm] = useState(false);
 
+    const handleOfficialUpdateClick = () => {
+        setShowOfficialUpdateConfirm(true);
+    };
+
+    const executeOfficialUpdate = async () => {
         try {
             const res = await fetch('./data/traits.json?t=' + Date.now());
             if (!res.ok) throw new Error("Fichier introuvable");
@@ -196,11 +201,13 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                 }
             };
             updateRules(updatedRules);
-            // We don't have addLog here, but onUpdate prop is for SHEET update.
-            // TraitsLibrary uses onUpdate for sheet data.
-            // We should use NotificationContext?
-            // NotificationContext hook is likely used in parent or available.
-            // Let's check imports. No useNotification imported.
+
+            // Note: Since TraitLibrary is often used without full NotificationContext access or passed differently
+            // We might just rely on a simple alert if addLog isn't available, but we can try to improve UX if possible.
+            // However, standard alert is better than nothing if no toast system is injected.
+            // But wait, the previous code used `alert`. Let's stick to `alert` for success/fail OR check if we can pass a notifier.
+            // Actually, we can just use `alert` inside the modal consequence or assume success.
+            // BETTER: We can just use the modal for confirmation and alert for result (standard pattern here).
             alert(`Bibliothèque officielle mise à jour (${newTraits.length} traits).`);
         } catch (e) {
             alert("Échec de la mise à jour officielle : " + (e as Error).message);
@@ -323,7 +330,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                     {isEditable && (
                         <div className="flex gap-2">
                             <button
-                                onClick={handleOfficialUpdate}
+                                onClick={handleOfficialUpdateClick}
                                 className="bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
                                 title="Mettre à jour depuis le serveur officiel"
                             >
@@ -471,6 +478,16 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                     removeEffect={removeEffect}
                 />
             )}
+
+            <ConfirmationModal
+                isOpen={showOfficialUpdateConfirm}
+                onClose={() => setShowOfficialUpdateConfirm(false)}
+                onConfirm={executeOfficialUpdate}
+                title="Mise à jour officielle"
+                message="Voulez-vous vérifier et télécharger les dernières mises à jour officielles des traits ?"
+                confirmLabel="Mettre à jour"
+                type="info"
+            />
         </div>
     );
 };

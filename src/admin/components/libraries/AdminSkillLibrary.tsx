@@ -7,6 +7,7 @@ import ThematicModal from '../../../components/ui/ThematicModal';
 import { CATEGORY_HELP } from '../../../data/constants';
 import { smartIncludes } from '../../../utils/stringUtils';
 import { publishFileToGitHub } from '../../../services/githubService';
+import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 
 interface AdminSkillLibraryProps {
     rules: RulesData;
@@ -28,6 +29,9 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
             .sort((a, b) => a.name.localeCompare(b.name));
     }, [list, searchTerm]);
 
+    const [showPublishConfirm, setShowPublishConfirm] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+
     const handleOpenNew = () => {
         setError(null);
         setEditingSkill({
@@ -47,12 +51,16 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
     };
 
     const handleDelete = (id: string) => {
-        if (confirm('Supprimer cette compétence de la réserve officielle ?')) {
-            onUpdate({
-                ...rules,
-                libraries: { ...rules.libraries, skills: list.filter(s => s.id !== id) }
-            });
-        }
+        setShowDeleteConfirm(id);
+    };
+
+    const confirmDelete = () => {
+        if (!showDeleteConfirm) return;
+        onUpdate({
+            ...rules,
+            libraries: { ...rules.libraries, skills: list.filter(s => s.id !== showDeleteConfirm) }
+        });
+        setShowDeleteConfirm(null);
     };
 
     const handleSave = () => {
@@ -77,7 +85,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
         setEditingSkill(null);
     };
 
-    const handlePublish = async () => {
+    const handlePublishClick = () => {
         const token = localStorage.getItem('GITHUB_TOKEN');
         const owner = localStorage.getItem('GITHUB_OWNER');
         const repo = localStorage.getItem('GITHUB_REPO');
@@ -87,7 +95,13 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
             return;
         }
 
-        if (!confirm("Voulez-vous publier la bibliothèque de COMPÉTENCES (skills.json) sur GitHub ?")) return;
+        setShowPublishConfirm(true);
+    };
+
+    const executePublish = async () => {
+        const token = localStorage.getItem('GITHUB_TOKEN') || '';
+        const owner = localStorage.getItem('GITHUB_OWNER') || '';
+        const repo = localStorage.getItem('GITHUB_REPO') || '';
 
         try {
             const content = JSON.stringify({
@@ -127,7 +141,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
                 </div>
                 <div className="flex gap-2">
                     <button
-                        onClick={handlePublish}
+                        onClick={handlePublishClick}
                         className="bg-purple-700 text-white px-3 py-2 rounded font-bold hover:bg-purple-800 transition-colors flex items-center gap-2 text-sm"
                         title="Publier skills.json"
                     >
@@ -279,6 +293,26 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
                     </div>
                 </ThematicModal>
             )}
+
+            <ConfirmationModal
+                isOpen={showPublishConfirm}
+                onClose={() => setShowPublishConfirm(false)}
+                onConfirm={executePublish}
+                title="Publier la bibliothèque ?"
+                message="Vous êtes sur le point de mettre à jour le fichier skills.json public. Cela rendra les nouvelles compétences accessibles à tous les joueurs."
+                confirmLabel="Publier maintenant"
+                type="warning"
+            />
+
+            <ConfirmationModal
+                isOpen={!!showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(null)}
+                onConfirm={confirmDelete}
+                title="Supprimer la compétence ?"
+                message="Cette action est irréversible pour la base de données (mais nécessitera une publication pour être effective en ligne)."
+                confirmLabel="Supprimer"
+                type="danger"
+            />
         </div>
     );
 };

@@ -7,6 +7,7 @@ import { LibrarySpecializationEntry } from '../../types';
 import { smartIncludes } from '../../utils/stringUtils';
 import { useRules } from '../../context/RulesContext';
 import { mergeLibraries, MergedEntry } from '../../utils/libraryMerger';
+import ConfirmationModal from '../ui/ConfirmationModal';
 
 interface SpecializationLibraryViewProps {
     data: CharacterSheetData;
@@ -135,9 +136,13 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
         setEditingEntry(null);
     };
 
-    const handleOfficialUpdate = async () => {
-        if (!confirm("Voulez-vous vérifier et télécharger les mises à jour officielles des SPÉCIALISATIONS ?")) return;
+    const [showOfficialUpdateConfirm, setShowOfficialUpdateConfirm] = useState(false);
 
+    const handleOfficialUpdateClick = () => {
+        setShowOfficialUpdateConfirm(true);
+    };
+
+    const executeOfficialUpdate = async () => {
         try {
             const res = await fetch('./data/specializations.json?t=' + Date.now());
             if (!res.ok) throw new Error("Fichier introuvable");
@@ -249,7 +254,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
                     <button
-                        onClick={handleOfficialUpdate}
+                        onClick={handleOfficialUpdateClick}
                         className="bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
                         title="Mettre à jour depuis le serveur officiel"
                     >
@@ -497,6 +502,16 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                     </div>
                 </div>
             )}
+
+            <ConfirmationModal
+                isOpen={showOfficialUpdateConfirm}
+                onClose={() => setShowOfficialUpdateConfirm(false)}
+                onConfirm={executeOfficialUpdate}
+                title="Mise à jour officielle"
+                message="Voulez-vous vérifier et télécharger les dernières spécialisations officielles ?"
+                confirmLabel="Mettre à jour"
+                type="info"
+            />
         </div>
     );
 };

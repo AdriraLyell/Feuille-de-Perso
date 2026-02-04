@@ -14,6 +14,7 @@ import LibrarySkillForm from './library/LibrarySkillForm';
 import LibraryDeleteModal from './library/LibraryDeleteModal';
 import LibraryImportModal from './library/LibraryImportModal';
 import LibraryRenameModal from './library/LibraryRenameModal';
+import ConfirmationModal from './ui/ConfirmationModal';
 
 interface LibraryViewProps {
     data?: CharacterSheetData; // Optional to support standalone use if needed, but we will pass it
@@ -189,9 +190,13 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         setSkillToDelete(null);
     };
 
-    const handleOfficialUpdate = async () => {
-        if (!confirm("Voulez-vous vérifier et télécharger les mises à jour officielles des COMPÉTENCES ?")) return;
+    const [showOfficialUpdateConfirm, setShowOfficialUpdateConfirm] = useState(false);
 
+    const handleOfficialUpdateClick = () => {
+        setShowOfficialUpdateConfirm(true);
+    };
+
+    const executeOfficialUpdate = async () => {
         try {
             const res = await fetch('./data/skills.json?t=' + Date.now());
             if (!res.ok) throw new Error("Fichier introuvable");
@@ -330,7 +335,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                             {/* Actions - Right */}
                             <div className="flex gap-2 justify-end">
                                 <button
-                                    onClick={handleOfficialUpdate}
+                                    onClick={handleOfficialUpdateClick}
                                     className="bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
                                     title="Mettre à jour depuis le serveur officiel"
                                 >

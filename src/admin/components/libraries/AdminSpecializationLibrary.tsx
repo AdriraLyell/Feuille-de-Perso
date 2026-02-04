@@ -6,6 +6,7 @@ import { smartIncludes } from '../../../utils/stringUtils';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import { useNotification } from '../../../context/NotificationContext';
 import { publishFileToGitHub } from '../../../services/githubService';
+import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 
 interface AdminSpecializationLibraryProps {
     rules: RulesData;
@@ -19,8 +20,9 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEntry, setEditingEntry] = useState<LibrarySpecializationEntry | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [entryToDelete, setEntryToDelete] = useState<LibrarySpecializationEntry | null>(null);
     const [skillSearch, setSkillSearch] = useState('');
+    const [showPublishConfirm, setShowPublishConfirm] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
     const library = rules.libraries.specializations || [];
 
@@ -65,14 +67,16 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         );
     }, [allSkills, skillSearch, editingEntry?.skillIds]);
 
-    // Filter and Sort Library
+    // Compute derived list
     const filteredLibrary = useMemo(() => {
-        return library.filter(entry =>
-            smartIncludes(entry.name, searchTerm) ||
-            (entry.description && smartIncludes(entry.description, searchTerm))
+        return (rules.libraries.specializations || []).filter(s =>
+            smartIncludes(s.name, searchTerm) ||
+            (s.description && smartIncludes(s.description, searchTerm))
         ).sort((a, b) => a.name.localeCompare(b.name));
-    }, [library, searchTerm]);
+    }, [rules.libraries.specializations, searchTerm]);
 
+
+    // Handlers
     const handleOpenNew = () => {
         setError(null);
         setEditingEntry({
@@ -93,16 +97,37 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         setIsModalOpen(true);
     };
 
+    const handleDelete = (id: string, name: string) => {
+        setShowDeleteConfirm(id);
+    };
+
+    const confirmDelete = () => {
+        if (!showDeleteConfirm) return;
+        const currentList = rules.libraries.specializations || [];
+        const deletedEntry = currentList.find(s => s.id === showDeleteConfirm);
+        onUpdate({
+            ...rules,
+            libraries: {
+                ...rules.libraries,
+                specializations: currentList.filter(s => s.id !== showDeleteConfirm)
+            }
+        });
+        addLog(`Spécialisation officielle "${deletedEntry?.name}" supprimée.`, 'info', 'settings');
+        setShowDeleteConfirm(null);
+    };
+
     const handleSave = () => {
         if (!editingEntry) return;
+
         if (!editingEntry.name.trim()) {
             setError("Le nom est requis.");
             return;
         }
 
-        const duplicate = library.find(e =>
-            e.id !== editingEntry.id &&
-            e.name.trim().toLowerCase() === editingEntry.name.trim().toLowerCase()
+        const currentList = rules.libraries.specializations || [];
+        const duplicate = currentList.find(s =>
+            s.id !== editingEntry.id &&
+            s.name.trim().toLowerCase() === editingEntry.name.trim().toLowerCase()
         );
 
         if (duplicate) {
@@ -110,19 +135,19 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
             return;
         }
 
-        let newLibrary;
-        const exists = library.some(e => e.id === editingEntry.id);
+        let newList;
+        const exists = currentList.some(s => s.id === editingEntry.id);
         if (exists) {
-            newLibrary = library.map(e => e.id === editingEntry.id ? editingEntry : e);
+            newList = currentList.map(s => s.id === editingEntry.id ? editingEntry : s);
         } else {
-            newLibrary = [...library, editingEntry];
+            newList = [...currentList, editingEntry];
         }
 
         onUpdate({
             ...rules,
             libraries: {
                 ...rules.libraries,
-                specializations: newLibrary
+                specializations: newList
             }
         });
 
@@ -131,33 +156,22 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         setEditingEntry(null);
     };
 
-    const executeDelete = () => {
-        if (!entryToDelete) return;
-
-        const newLibrary = library.filter(e => e.id !== entryToDelete.id);
-        onUpdate({
-            ...rules,
-            libraries: {
-                ...rules.libraries,
-                specializations: newLibrary
-            }
-        });
-
-        addLog(`Spécialisation officielle "${entryToDelete.name}" supprimée.`, 'info', 'settings');
-        setEntryToDelete(null);
-    };
-
-    const handlePublish = async () => {
+    const handlePublishClick = () => {
         const token = localStorage.getItem('GITHUB_TOKEN');
         const owner = localStorage.getItem('GITHUB_OWNER');
         const repo = localStorage.getItem('GITHUB_REPO');
 
         if (!token || !owner || !repo) {
-            alert("Veuillez d'abord configurer vos identifiants GitHub via le bouton 'Publier' du menu principal.");
+            addLog("Veuillez d'abord configurer vos identifiants GitHub via le bouton 'Publier' du menu principal.", 'danger', 'settings');
             return;
         }
+        setShowPublishConfirm(true);
+    };
 
-        if (!confirm("Voulez-vous publier la bibliothèque de SPÉCIALISATIONS (specializations.json) sur GitHub ?")) return;
+    const executePublish = async () => {
+        const token = localStorage.getItem('GITHUB_TOKEN') || '';
+        const owner = localStorage.getItem('GITHUB_OWNER') || '';
+        const repo = localStorage.getItem('GITHUB_REPO') || '';
 
         try {
             const content = JSON.stringify({
@@ -166,23 +180,25 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                     date: new Date().toISOString(),
                     type: 'specializations'
                 },
-                data: library
+                data: rules.libraries.specializations || []
             }, null, 2);
 
             const result = await publishFileToGitHub(
                 'public/data/specializations.json',
                 content,
-                `update(skills): Mise à jour bibliothèque spécialisations v${rules.version}`,
+                `update(specs): Mise à jour bibliothèque spécialisations v${rules.version}`,
                 { token, owner, repo, branch: 'main' }
             );
 
             if (result.success) {
                 addLog('Bibliothèque de spécialisations publiée avec succès !', 'success', 'settings');
             } else {
-                alert("Erreur lors de la publication : " + result.message);
+                addLog("Erreur lors de la publication : " + result.message, 'danger', 'settings');
             }
         } catch (e) {
-            alert("Erreur inattendue : " + (e as Error).message);
+            addLog("Erreur inattendue lors de la publication : " + (e as Error).message, 'danger', 'settings');
+        } finally {
+            setShowPublishConfirm(false);
         }
     };
 
@@ -201,7 +217,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
                     <button
-                        onClick={handlePublish}
+                        onClick={handlePublishClick}
                         className="bg-purple-700 hover:bg-purple-800 text-white px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
                         title="Publier specializations.json"
                     >
@@ -242,7 +258,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
 
                                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button onClick={() => handleOpenEdit(entry)} className="text-blue-500 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
-                                                <button onClick={() => setEntryToDelete(entry)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
+                                                <button onClick={() => handleDelete(entry.id, entry.name)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
                                             </div>
                                         </div>
                                         {entry.description && (
@@ -374,25 +390,27 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                 )}
             </ThematicModal>
 
-            {/* Delete Confirm */}
-            {entryToDelete && (
-                <div className="fixed inset-0 z-[150] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden border-2 border-red-100 animate-in zoom-in duration-200">
-                        <div className="p-6 text-center">
-                            <div className="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Trash2 size={24} />
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Supprimer ?</h3>
-                            <p className="text-gray-800 font-bold mb-4">{entryToDelete.name}</p>
-                            <p className="text-gray-500 text-sm">Cette action retirera la spécialisation de la bibliothèque officielle.</p>
-                        </div>
-                        <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t">
-                            <button onClick={() => setEntryToDelete(null)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-white transition-colors">Annuler</button>
-                            <button onClick={executeDelete} className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors">Supprimer</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+
+
+            <ConfirmationModal
+                isOpen={showPublishConfirm}
+                onClose={() => setShowPublishConfirm(false)}
+                onConfirm={executePublish}
+                title="Publier les spécialisations ?"
+                message="Vous allez mettre à jour le fichier specializations.json public."
+                confirmLabel="Publier"
+                type="warning"
+            />
+
+            <ConfirmationModal
+                isOpen={!!showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(null)}
+                onConfirm={confirmDelete}
+                title="Supprimer la spécialisation ?"
+                message="Cette action supprimera définitivement l'entrée de la base admin."
+                confirmLabel="Supprimer"
+                type="danger"
+            />
         </div>
     );
 };

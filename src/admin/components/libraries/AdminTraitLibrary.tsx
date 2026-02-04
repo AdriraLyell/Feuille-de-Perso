@@ -7,6 +7,7 @@ import TraitCard from '../../../components/trait-library/TraitCard';
 import TraitForm from '../../../components/trait-library/TraitForm';
 import { smartIncludes } from '../../../utils/stringUtils';
 import { publishFileToGitHub } from '../../../services/githubService';
+import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 
 interface AdminTraitLibraryProps {
     rules: RulesData;
@@ -93,17 +94,25 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
         setIsModalOpen(true);
     };
 
+    // Modals State
+    const [showPublishConfirm, setShowPublishConfirm] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+
     const handleDelete = (id: string) => {
-        if (confirm('Supprimer définitivement ce trait de la bibliothèque officielle ?')) {
-            const newLibrary = library.filter(l => l.id !== id);
-            onUpdate({
-                ...rules,
-                libraries: {
-                    ...rules.libraries,
-                    traits: newLibrary
-                }
-            });
-        }
+        setShowDeleteConfirm(id);
+    };
+
+    const confirmDelete = () => {
+        if (!showDeleteConfirm) return;
+        const newLibrary = library.filter(l => l.id !== showDeleteConfirm);
+        onUpdate({
+            ...rules,
+            libraries: {
+                ...rules.libraries,
+                traits: newLibrary
+            }
+        });
+        setShowDeleteConfirm(null);
     };
 
     const handleSave = () => {
@@ -129,7 +138,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
         setEditForm(null);
     };
 
-    const handlePublish = async () => {
+    const handlePublishClick = () => {
         const token = localStorage.getItem('GITHUB_TOKEN');
         const owner = localStorage.getItem('GITHUB_OWNER');
         const repo = localStorage.getItem('GITHUB_REPO');
@@ -138,8 +147,13 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
             alert("Veuillez d'abord configurer vos identifiants GitHub via le bouton 'Publier' du menu principal.");
             return;
         }
+        setShowPublishConfirm(true);
+    };
 
-        if (!confirm("Voulez-vous publier la bibliothèque de TRAITS (traits.json) sur GitHub ?")) return;
+    const executePublish = async () => {
+        const token = localStorage.getItem('GITHUB_TOKEN') || '';
+        const owner = localStorage.getItem('GITHUB_OWNER') || '';
+        const repo = localStorage.getItem('GITHUB_REPO') || '';
 
         try {
             const content = JSON.stringify({
@@ -243,7 +257,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
                 </div>
                 <div className="flex gap-2">
                     <button
-                        onClick={handlePublish}
+                        onClick={handlePublishClick}
                         className="bg-purple-700 text-white px-3 py-2 rounded font-bold hover:bg-purple-800 transition-colors flex items-center gap-2 text-sm"
                         title="Publier traits.json"
                     >
@@ -279,6 +293,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
                             {t === 'all' ? 'Tout' : t === 'avantage' ? 'Avantages' : 'Désavantages'}
                         </button>
                     ))}
+
                 </div>
                 <div className="border-l border-slate-300 pl-4 flex gap-2">
                     <button onClick={() => { setSortBy('name'); setSortOrder(o => o === 'asc' ? 'desc' : 'asc'); }} className={`p-2 rounded border ${sortBy === 'name' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-300 text-slate-600'}`}>
@@ -291,21 +306,23 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
             </div>
 
             {/* Tag Filter */}
-            {allAvailableTags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4 items-center pl-1">
-                    <Filter size={14} className="text-slate-400" />
-                    {allAvailableTags.map(tag => (
-                        <button
-                            key={tag}
-                            onClick={() => setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag])}
-                            className={`text-xs px-2 py-0.5 rounded-full border transition-colors ${selectedTags.includes(tag) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-300 hover:border-slate-400'}`}
-                        >
-                            {tag}
-                        </button>
-                    ))}
-                    {selectedTags.length > 0 && <button onClick={() => setSelectedTags([])} className="text-xs text-red-500 hover:underline">Effacer</button>}
-                </div>
-            )}
+            {
+                allAvailableTags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4 items-center pl-1">
+                        <Filter size={14} className="text-slate-400" />
+                        {allAvailableTags.map(tag => (
+                            <button
+                                key={tag}
+                                onClick={() => setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag])}
+                                className={`text-xs px-2 py-0.5 rounded-full border transition-colors ${selectedTags.includes(tag) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-300 hover:border-slate-400'}`}
+                            >
+                                {tag}
+                            </button>
+                        ))}
+                        {selectedTags.length > 0 && <button onClick={() => setSelectedTags([])} className="text-xs text-red-500 hover:underline">Effacer</button>}
+                    </div>
+                )
+            }
 
             {/* List */}
             <div className="flex-grow overflow-y-auto bg-slate-50 border border-slate-200 rounded p-2">
@@ -328,25 +345,47 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
             </div>
 
             {/* Modal - Reusing the Player Component */}
-            {isModalOpen && editForm && (
-                <TraitForm
-                    editForm={editForm}
-                    library={library}
-                    allSkills={allSkills}
-                    allAttributes={allAttributes}
-                    tagInput={tagInput}
-                    error={error}
-                    setEditForm={setEditForm}
-                    setTagInput={setTagInput}
-                    onClose={() => setIsModalOpen(false)}
-                    onSave={handleSave}
-                    addTag={addTag}
-                    removeTag={removeTag}
-                    addEffect={addEffect}
-                    updateEffect={updateEffect}
-                    removeEffect={removeEffect}
-                />
-            )}
+            {
+                isModalOpen && editForm && (
+                    <TraitForm
+                        editForm={editForm}
+                        library={library}
+                        allSkills={allSkills}
+                        allAttributes={allAttributes}
+                        tagInput={tagInput}
+                        error={error}
+                        setEditForm={setEditForm}
+                        setTagInput={setTagInput}
+                        onClose={() => setIsModalOpen(false)}
+                        onSave={handleSave}
+                        addTag={addTag}
+                        removeTag={removeTag}
+                        addEffect={addEffect}
+                        updateEffect={updateEffect}
+                        removeEffect={removeEffect}
+                    />
+                )
+            }
+
+            <ConfirmationModal
+                isOpen={showPublishConfirm}
+                onClose={() => setShowPublishConfirm(false)}
+                onConfirm={executePublish}
+                title="Publier les traits ?"
+                message="Vous allez mettre à jour le fichier traits.json public. Cela affectera tous les joueurs lors de leur prochaine mise à jour."
+                confirmLabel="Publier"
+                type="warning"
+            />
+
+            <ConfirmationModal
+                isOpen={!!showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(null)}
+                onConfirm={confirmDelete}
+                title="Supprimer le trait ?"
+                message="Cette action supprimera définitivement le trait de la base admin."
+                confirmLabel="Supprimer"
+                type="danger"
+            />
         </div>
     );
 };
