@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
 import { RulesData } from '../../types/rules';
 import { Plus, Trash2, GripVertical, AlertCircle } from 'lucide-react';
+import AdminSkillLibrarySidebar from './libraries/AdminSkillLibrarySidebar';
 
 interface AdminSkillsEditorProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
 }
 
+// Drag Types
+type DragItem = { type: 'admin_sheet_skill' | 'admin_lib_skill', category?: string, index?: number, name?: string, data?: any };
+
 const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }) => {
     const definitions = rules.definitions;
     const skillsMap = definitions.skills;
     const labelsMap = definitions.labels || {};
+    const [draggedItem, setDraggedItem] = useState<DragItem | null>(null);
 
     // Safety check for categories structure
     const categories = Object.keys(skillsMap);
@@ -60,12 +65,51 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
         updateSkillList(category, newList);
     };
 
+    // -- DnD Handlers --
+    const handleDragStart = (e: React.DragEvent, type: 'admin_sheet_skill', payload: any) => {
+        setDraggedItem({ type, ...payload });
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("application/json", JSON.stringify({ type, ...payload }));
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    };
+
+    const handleDropOnColumn = (e: React.DragEvent, category: string) => {
+        e.preventDefault();
+        if (!draggedItem) return;
+
+        if (draggedItem.type === 'admin_lib_skill') {
+            // Add from Library
+            const skillName = draggedItem.name || draggedItem.data.name;
+            const currentList = skillsMap[category] || [];
+
+            // Check existence
+            if (currentList.includes(skillName)) return;
+
+            updateSkillList(category, [...currentList, skillName]);
+        }
+
+        // Reordering within same category (Optional, currently simplified)
+
+        setDraggedItem(null);
+    };
+
     const renderColumn = (category: string) => {
         const list = skillsMap[category] || [];
         const label = labelsMap[category] || category;
 
+        const isDropTarget = draggedItem?.type === 'admin_lib_skill';
+
         return (
-            <div key={category} className="bg-white p-4 rounded shadow-sm border border-slate-200 flex flex-col h-[500px]">
+            <div
+                key={category}
+                className={`flex flex-col h-[500px] bg-white p-4 rounded shadow-sm border transition-colors ${isDropTarget ? 'border-blue-300 ring-2 ring-blue-100' : 'border-slate-200'}`}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDropOnColumn(e, category)}
+            >
                 {/* Header with Editable Label */}
                 <div className="mb-4 border-b border-slate-200 pb-2">
                     <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Catégorie (ID: {category})</label>
@@ -93,9 +137,21 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
                 </div>
 
                 {/* List */}
-                <div className="flex-grow overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+                <div className="flex-grow overflow-y-auto pr-2 space-y-2 custom-scrollbar relative">
+                    {/* Visual Hint for Drop */}
+                    {isDropTarget && (
+                        <div className="absolute inset-0 bg-blue-50/50 flex items-center justify-center pointer-events-none border-2 border-dashed border-blue-200 rounded m-1">
+                            <span className="text-blue-600 font-bold bg-white/80 px-2 py-1 rounded">Ajouter ici</span>
+                        </div>
+                    )}
+
                     {list.map((skillName, index) => (
-                        <div key={index} className="flex items-center gap-2 group p-1 hover:bg-slate-50 rounded">
+                        <div
+                            key={index}
+                            draggable={skillName !== ""}
+                            onDragStart={(e) => handleDragStart(e, 'admin_sheet_skill', { category, index, name: skillName })}
+                            className="flex items-center gap-2 group p-1 hover:bg-slate-50 rounded cursor-grab active:cursor-grabbing"
+                        >
                             <span className="text-[10px] text-slate-300 font-mono w-4">{index + 1}</span>
                             {skillName === "" ? (
                                 <div className="flex-grow h-6 flex items-center justify-center bg-slate-100 rounded border border-slate-200 cursor-not-allowed" title="Espaceur (Séparateur)">
@@ -128,24 +184,33 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
     };
 
     return (
-        <div className="space-y-6">
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
-                <div className="flex items-start gap-3">
-                    <AlertCircle className="text-blue-500 mt-0.5" size={20} />
-                    <div>
-                        <h3 className="font-bold text-blue-900 text-sm">Gestion Dynamique</h3>
-                        <p className="text-xs text-blue-700 mt-1">
-                            Ces listes définissent les compétences disponibles pour tout nouveau personnage.
-                            Vous pouvez renommer les catégories (affichées en haut de colonne) et le contenu.
-                            L'ID technique de la catégorie (ex: 'talents') reste fixe pour assurer la compatibilité.
-                        </p>
+        <div className="flex relative">
+            <div className="flex-grow pr-80 p-1"> {/* Spacing for Sidebar */}
+                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                    <div className="flex items-start gap-3">
+                        <AlertCircle className="text-blue-500 mt-0.5" size={20} />
+                        <div>
+                            <h3 className="font-bold text-blue-900 text-sm">Gestion Dynamique</h3>
+                            <p className="text-xs text-blue-700 mt-1">
+                                Glissez-déposez des compétences depuis la réserve (à droite) pour les ajouter.
+                                Glissez une compétence vers la réserve pour l'archiver.
+                            </p>
+                        </div>
                     </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                    {categories.map(cat => renderColumn(cat))}
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {categories.map(cat => renderColumn(cat))}
-            </div>
+            {/* Sidebar */}
+            <AdminSkillLibrarySidebar
+                rules={rules}
+                onUpdate={onUpdate}
+                draggedItem={draggedItem as any}
+                setDraggedItem={setDraggedItem}
+            />
         </div>
     );
 };

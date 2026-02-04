@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.13.1",
+        "date": "2026-02-04",
+        "type": "patch",
+        "changes": [
+            "Admin : Ajout de la 'Réserve de Compétences' dans l'éditeur. Permet d'ajouter/archiver des compétences par glisser-déposer (Drag & Drop) depuis la bibliothèque globale.",
+            "Admin : Intégration de l'assistant d'importation JSON pour peupler rapidement la base de données depuis des fichiers existants.",
+            "Admin : Simplification de la persistance (Suppression de la restauration complexe) au profit d'une protection native contre la fermeture accidentelle.",
+            "Admin : Ajout du champ 'Version' dans la configuration des règles."
+        ]
+    },
+    {
         "version": "2.13.0",
         "date": "2026-02-04",
         "type": "major",
