@@ -1,7 +1,7 @@
 {
   "meta": {
     "version": "2.12.55",
-    "date": "2026-02-04T11:35:18.137Z",
+    "date": "2026-02-04T11:37:22.129Z",
     "type": "traits"
   },
   "data": [
@@ -242,7 +242,7 @@
       "name": "Action Supplémentaire",
       "type": "avantage",
       "cost": "5",
-      "description": "",
+      "description": "Acc sup de combat",
       "tags": [],
       "effects": []
     }
