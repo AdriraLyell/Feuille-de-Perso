@@ -1,6 +1,6 @@
 {
   "name": "rpg-sheet-manager",
-  "version": "2.12.64",
+  "version": "2.13.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,6 +13,8 @@
     "sync-version": "node scripts/sync-version.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.94.1",
+    "dotenv": "^17.2.3",
     "idb-keyval": "^6.2.1",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",

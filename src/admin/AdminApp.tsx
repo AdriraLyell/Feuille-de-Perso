@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { extractRulesFromCharacter } from './utils/templateImporter';
 import { loadRules } from './utils/rulesLoader';
 import { generateRulesJSContent } from './utils/rulesGenerator';
-import { Settings, Save, Download, Upload } from 'lucide-react';
+import { Settings, Save, Download, Upload, ArrowLeft, UploadCloud } from 'lucide-react';
 import { RulesData } from '../types/rules';
 import { APP_VERSION } from '../constants';
 import AdminCreationEditor from './components/AdminCreationEditor';
@@ -22,8 +23,16 @@ import DeployToGithubModal from './components/DeployModal';
 import { BookOpen, Save as SaveIcon, Cloud, AlertTriangle } from 'lucide-react';
 import { usePersistence } from './hooks/usePersistence';
 import RestoreSessionModal from './components/RestoreSessionModal';
+import AdminDashboard from './components/AdminDashboard';
+import { AdminService } from '../services/AdminService';
+import { useNotification } from '../context/NotificationContext'; // Assuming we have this, or use alert for now
 
 const AdminApp: React.FC = () => {
+    // Mode: 'dashboard' | 'editor'
+    const [viewMode, setViewMode] = useState<'dashboard' | 'editor'>('dashboard');
+    const [currentSettingId, setCurrentSettingId] = useState<string | null>(null);
+    const [currentSettingName, setCurrentSettingName] = useState<string>("");
+
     const [rules, setRules] = useState<RulesData | null>(null);
     const [showDeployModal, setShowDeployModal] = useState(false);
     const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'costs' | 'counters' | 'backgrounds' | 'libraries'>('general');
@@ -37,27 +46,62 @@ const AdminApp: React.FC = () => {
     // Wizard State
     const [wizardOpen, setWizardOpen] = useState(false);
     const [candidateRules, setCandidateRules] = useState<RulesData | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Persistence Hook
+    // Persistence Hook (We keep it for local safety, but we might need to scope it by ID later)
     const { hasUnsavedChanges, lastSaved, isRestoring, restoreAvailable, resolveRestore } = usePersistence(
         rules,
         (restoredRules) => {
-            setRules(restoredRules);
-            // @ts-ignore
-            window.EXTERNAL_RULES = restoredRules;
+            // If we restore a session, we implicitly enter editor mode, but we lack the ID...
+            // Complex case. For now, let's allow restore to overwrite ONLY if we are in editor.
+            // Or better: Restore modal should be handled carefully.
+            if (viewMode === 'editor') {
+                setRules(restoredRules);
+                // @ts-ignore
+                window.EXTERNAL_RULES = restoredRules;
+            }
         },
         () => {
             // Callback when persistence flow is complete
         }
     );
 
-    useEffect(() => {
-        // Always load default rules initially so we have a version comparison
-        const loaded = loadRules();
-        setRules(prev => prev || loaded);
-    }, []);
+    // Effect: removed auto-load on mount to favor Dashboard
+
+    const handleSelectSetting = (id: string, loadedRules: RulesData) => {
+        setCurrentSettingId(id);
+        // We assume loadedRules comes from DB with correct Name but RulesData struct doesn't have Name.
+        // We passed name separately via AdminDashboard or we need to fetch it. 
+        // AdminService.loadSetting returns just RulesData. 
+        // We'll update AdminDashboard to pass name too or fetch it.
+        // For now, let's assume the dashboard passed the rules.
+        setRules(loadedRules);
+        setViewMode('editor');
+    };
+
+    const handleBackToDashboard = () => {
+        if (hasUnsavedChanges) {
+            if (!confirm("Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter ?")) return;
+        }
+        setViewMode('dashboard');
+        setCurrentSettingId(null);
+        setRules(null);
+    };
+
+    const handleSaveToCloud = async () => {
+        if (!currentSettingId || !rules) return;
+        setIsSaving(true);
+        const success = await AdminService.saveSetting(currentSettingId, rules);
+        if (success) {
+            alert("Sauvegarde en base de données réussie !");
+        } else {
+            alert("Erreur lors de la sauvegarde.");
+        }
+        setIsSaving(false);
+    };
+
 
     const handleUpdateRules = (newRules: RulesData) => {
         setRules(newRules);
@@ -114,25 +158,35 @@ const AdminApp: React.FC = () => {
         event.target.value = '';
     };
 
+
+    if (viewMode === 'dashboard') {
+        return <AdminDashboard onSelectSetting={handleSelectSetting} />;
+    }
+
     if (!rules) {
         return (
             <div className="flex items-center justify-center h-screen bg-gray-100 text-red-600">
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold">Erreur de chargement</h1>
-                    <p>Le fichier rules.js est introuvable ou corrompu.</p>
+                    <h1 className="text-2xl font-bold">Chargement...</h1>
+                    <p>Initialisation de l'éditeur...</p>
                 </div>
             </div>
         );
     }
+
 
     return (
         <div className="min-h-screen bg-gray-50 text-slate-800 font-sans pb-20">
             {/* Header */}
             <header className="bg-slate-900 text-white p-4 shadow-md sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
+
                     <div className="flex items-center gap-3">
+                        <button onClick={handleBackToDashboard} className="text-slate-400 hover:text-white transition-colors" title="Retour au tableau de bord">
+                            <ArrowLeft size={24} />
+                        </button>
                         <Settings className="text-blue-400" />
-                        <h1 className="text-xl font-bold tracking-wide">Seigneurs des Mystères <span className="text-slate-400 font-normal">| Administration</span></h1>
+                        <h1 className="text-xl font-bold tracking-wide">Éditeur <span className="text-slate-400 font-normal">| {currentSettingName || "Campagne"}</span></h1>
 
                         {/* Discrete Persistence Status */}
                         <div className="ml-4 pl-4 border-l border-slate-700 flex items-center" title={hasUnsavedChanges ? "Modifications locales non publiées" : "Synchronisé"}>
@@ -156,37 +210,25 @@ const AdminApp: React.FC = () => {
                             v{APP_VERSION}
                         </button>
 
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            accept=".json"
-                            className="hidden"
-                        />
                         <button
-                            onClick={handleImportClick}
-                            className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded font-bold transition-colors border border-slate-600"
-                            title="Importer depuis une Fiche Joueur ou un Template"
+                            onClick={handleSaveToCloud}
+                            disabled={isSaving}
+                            className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded font-bold transition-colors shadow-lg shadow-amber-900/20"
+                            title="Sauvegarder en BDD"
                         >
-                            <Upload size={16} /> Import
-                        </button>
-
-                        <button
-                            onClick={handleExport}
-                            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-bold transition-colors"
-                            title="Télécharger rules.js (Manuel)"
-                        >
-                            <Download size={16} /> Export
+                            <UploadCloud size={16} />
+                            {isSaving ? "Sauvegarde..." : "Sauver"}
                         </button>
 
                         <button
                             onClick={() => setShowDeployModal(true)}
                             className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded font-bold transition-colors shadow-lg shadow-purple-900/20"
-                            title="Publier directement sur GitHub"
+                            title="Publier / Exporter le fichier"
                         >
                             <Upload size={16} /> Publier
                         </button>
                     </div>
+
                 </div>
                 {/* Persistence Status Bar Removed - Replaced by Header Icon */}
             </header>

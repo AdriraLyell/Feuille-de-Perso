@@ -47,10 +47,6 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
         }
     };
 
-    useEffect(() => {
-        fetchRules();
-    }, []);
-
     return (
         <RulesContext.Provider value={{ rules, isLoading, error, reloadRules: fetchRules, updateRules: setRules }}>
             {children}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNotification } from '../../context/NotificationContext';
 import { useCharacter } from '../../context/CharacterContext';
@@ -5,6 +6,9 @@ import { NotificationProvider } from '../../context/NotificationContext';
 import { CharacterSheetData } from '../../types';
 import { APP_VERSION } from '../../constants';
 import { migrateData } from '../../utils/migrations';
+import { useRules } from '../../context/RulesContext';
+import { loadRules } from '../../services/RulesLoader';
+import { RulesData } from '../../types/rules';
 
 // Components
 import CharacterSheet from '../CharacterSheet';
@@ -21,6 +25,7 @@ import CreationHUD from '../CreationHUD';
 import UpdateNotifier from '../UpdateNotifier';
 import AppearanceModal from '../AppearanceModal';
 import DiegeticNavigation from './DiegeticNavigation';
+import RulesSourceSelector from '../RulesSourceSelector';
 
 // Icons
 import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, TrendingUp, History, Clock, X, Trash2, Save, Book, LogOut, Menu, Upload } from 'lucide-react';
@@ -28,10 +33,12 @@ import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, Tre
 const MainLayout: React.FC = () => {
     // Consume Context
     const { data, updateData: setData, addLog } = useCharacter();
+    const { rules, updateRules } = useRules();
 
     // UI State
     const [lastSavedState, setLastSavedState] = useState<string>("");
     const [mode, setMode] = useState<'sheet' | 'settings'>('sheet');
+
     const [pendingMode, setPendingMode] = useState<'sheet' | 'settings' | null>(null);
     const [sheetTab, setSheetTab] = useState<'p1' | 'specs' | 'p2' | 'xp' | 'notes'>('p1');
     const [isLandscape, setIsLandscape] = useState(false);
@@ -115,11 +122,37 @@ const MainLayout: React.FC = () => {
         }
     };
 
+
     const handleValidateCreation = () => {
         // Cette fonction est maintenant gérer en interne par CreationHUD via le Context
         // Mais gardée si besoin de logique Layout spécifique (ex: scroll top)
         // Pour l'instant on peut la supprimer ou la laisser vide si non utilisée
     };
+
+    const handleSourceSelect = async (sourceType: 'online' | 'offline', selectedRules?: RulesData) => {
+        if (sourceType === 'online' && selectedRules) {
+            updateRules(selectedRules);
+        } else {
+            // Offline Mode: Load from file (traditional way)
+            const fallback = await loadRules();
+            if (fallback) {
+                updateRules(fallback);
+            } else {
+                alert("Impossible de charger les règles locales.");
+            }
+        }
+    };
+
+    if (!rules) {
+        return (
+            <div className="fixed inset-0 bg-[#1c1c1c] text-white flex items-center justify-center z-50 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')]">
+                <RulesSourceSelector
+                    isOpen={true}
+                    onSelectSource={handleSourceSelect}
+                />
+            </div>
+        );
+    }
 
     return (
         <NotificationProvider value={addLog}>
