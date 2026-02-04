@@ -144,7 +144,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
                                 <div className="flex items-center gap-2 text-xs text-[#bfae85] font-bold uppercase tracking-wider mb-4">
                                     <span className="bg-amber-50 px-2 py-1 rounded">v{setting.version}</span>
                                     <span>•</span>
-                                    <span>{new Date(setting.last_updated).toLocaleDateString()}</span>
+                                    <span>{new Date(setting.last_updated).toLocaleString()}</span>
                                 </div>
 
                                 <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">

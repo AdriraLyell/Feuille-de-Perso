@@ -22,7 +22,6 @@ import AdminSpecializationLibrary from './components/libraries/AdminSpecializati
 import DeployToGithubModal from './components/DeployModal';
 import { BookOpen, Save as SaveIcon, Cloud, AlertTriangle } from 'lucide-react';
 import { usePersistence } from './hooks/usePersistence';
-import RestoreSessionModal from './components/RestoreSessionModal';
 import AdminDashboard from './components/AdminDashboard';
 import { AdminService } from '../services/AdminService';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
@@ -75,34 +74,14 @@ const AdminApp: React.FC = () => {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Persistence Hook (We keep it for local safety, but we might need to scope it by ID later)
-    const { hasUnsavedChanges, lastSaved, isRestoring, restoreAvailable, resolveRestore } = usePersistence(
-        rules,
-        (restoredRules) => {
-            // If we restore a session, we implicitly enter editor mode, but we lack the ID...
-            // Complex case. For now, let's allow restore to overwrite ONLY if we are in editor.
-            // Or better: Restore modal should be handled carefully.
-            if (viewMode === 'editor') {
-                setRules(restoredRules);
-                // @ts-ignore
-                window.EXTERNAL_RULES = restoredRules;
-            }
-        },
-        () => {
-            // Callback when persistence flow is complete
-        }
-    );
-
-    // Effect: removed auto-load on mount to favor Dashboard
+    // Persistence Hook
+    const { hasUnsavedChanges, markAsSaved, resetPersistence } = usePersistence(rules);
 
     const handleSelectSetting = (id: string, loadedRules: RulesData) => {
         setCurrentSettingId(id);
-        // We assume loadedRules comes from DB with correct Name but RulesData struct doesn't have Name.
-        // We passed name separately via AdminDashboard or we need to fetch it. 
-        // AdminService.loadSetting returns just RulesData. 
-        // We'll update AdminDashboard to pass name too or fetch it.
-        // For now, let's assume the dashboard passed the rules.
+        setCurrentSettingName(loadedRules.name || "Campagne"); // We might need to ensure name is passed or fetched.
         setRules(loadedRules);
+        resetPersistence(); // Reset dirty state for new load
         setViewMode('editor');
     };
 
@@ -120,6 +99,7 @@ const AdminApp: React.FC = () => {
         setIsSaving(true);
         const success = await AdminService.saveSetting(currentSettingId, rules);
         if (success) {
+            markAsSaved();
             setSaveFeedback({
                 isOpen: true,
                 success: true,
@@ -434,15 +414,6 @@ const AdminApp: React.FC = () => {
                     }}
                 />
             )}
-
-            {/* Restore Session Modal */}
-            <RestoreSessionModal
-                isOpen={!!restoreAvailable}
-                restorableRules={restoreAvailable}
-                currentVersion={rules?.version || "Inconnue"}
-                onConfirm={() => resolveRestore(true)}
-                onDiscard={() => resolveRestore(false)}
-            />
 
             {/* Save Feedback Modal */}
             {saveFeedback && (

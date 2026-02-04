@@ -84,6 +84,23 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
                     </h4>
 
                     <div className="space-y-6">
+                        {/* Versioning */}
+                        <div>
+                            <label className="block text-xs font-bold text-slate-600 uppercase tracking-widest mb-2">Version des Règles</label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="text"
+                                    value={rules.version}
+                                    onChange={(e) => onUpdate({ ...rules, version: e.target.value })}
+                                    className="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none font-mono font-bold"
+                                    placeholder="1.0.0"
+                                />
+                                <div className="text-xs text-slate-400 italic">
+                                    Changez ce numéro pour forcer la mise à jour chez les joueurs.
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Extended Skills Toggle */}
                         <div className="flex items-center justify-between bg-white p-3 rounded border border-slate-200">
                             <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">Rangs Étendus (6+)</label>
