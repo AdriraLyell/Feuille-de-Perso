@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.12.60",
+        "date": "2026-02-04",
+        "changes": [
+            "Admin : Remplacement des dernières alertes navigateur par des modales lors de la publication des bibliothèques.",
+            "UI : Correction de la version affichée dans la barre de navigation et sur les boutons du journal de modification."
+        ]
+    },
+    {
         "version": "2.12.59",
         "date": "2026-02-04",
         "changes": [

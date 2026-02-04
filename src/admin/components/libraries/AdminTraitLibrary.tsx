@@ -97,6 +97,8 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
     // Modals State
     const [showPublishConfirm, setShowPublishConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+    const [publishResult, setPublishResult] = useState<{ success: boolean; message: string } | null>(null);
+    const [showConfigAlert, setShowConfigAlert] = useState(false);
 
     const handleDelete = (id: string) => {
         setShowDeleteConfirm(id);
@@ -144,7 +146,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
         const repo = localStorage.getItem('GITHUB_REPO');
 
         if (!token || !owner || !repo) {
-            alert("Veuillez d'abord configurer vos identifiants GitHub via le bouton 'Publier' du menu principal.");
+            setShowConfigAlert(true);
             return;
         }
         setShowPublishConfirm(true);
@@ -173,12 +175,12 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
             );
 
             if (result.success) {
-                alert("Bibliothèque de traits publiée avec succès !");
+                setPublishResult({ success: true, message: "Bibliothèque de traits publiée avec succès !" });
             } else {
-                alert("Erreur lors de la publication : " + result.message);
+                setPublishResult({ success: false, message: "Erreur lors de la publication : " + result.message });
             }
         } catch (e) {
-            alert("Erreur inattendue : " + (e as Error).message);
+            setPublishResult({ success: false, message: "Erreur inattendue : " + (e as Error).message });
         }
     };
 
@@ -385,6 +387,28 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
                 message="Cette action supprimera définitivement le trait de la base admin."
                 confirmLabel="Supprimer"
                 type="danger"
+            />
+
+            <ConfirmationModal
+                isOpen={!!publishResult}
+                onClose={() => setPublishResult(null)}
+                onConfirm={() => setPublishResult(null)}
+                title={publishResult?.success ? "Publication Réussie" : "Échec de la Publication"}
+                message={publishResult?.message || ""}
+                confirmLabel="Fermer"
+                type={publishResult?.success ? "success" : "danger"}
+                cancelLabel=""
+            />
+
+            <ConfirmationModal
+                isOpen={showConfigAlert}
+                onClose={() => setShowConfigAlert(false)}
+                onConfirm={() => setShowConfigAlert(false)}
+                title="Configuration Manquante"
+                message="Veuillez d'abord configurer vos identifiants GitHub via le bouton 'Publier' du menu principal."
+                confirmLabel="Compris"
+                type="info"
+                cancelLabel=""
             />
         </div>
     );
