@@ -1,5 +1,5 @@
 window.EXTERNAL_RULES = {
-    "version": "2.12.51",
+    "version": "2.12.53",
     "theme": {
         "creationColor": "#2563eb",
         "xpColor": "#292524",
@@ -13,7 +13,7 @@ window.EXTERNAL_RULES = {
         },
         "creation": {
             "mode": "points",
-            "startingXP": 45000,
+            "startingXP": 450,
             "pointsDistributionMode": "global",
             "pointsBuckets": {
                 "attributes": 60,
@@ -231,5 +231,5 @@ window.EXTERNAL_RULES = {
         "skills": [],
         "specializations": []
     },
-    "lastUpdated": 1770156769092
+    "lastUpdated": 1770191720208
 };
