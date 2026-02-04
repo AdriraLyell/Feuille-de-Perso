@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.12.62",
+        "date": "2026-02-04",
+        "changes": [
+            "Admin : Ajout d'une protection contre la perte de données (Alerte navigateur avant de quitter).",
+            "Admin : Implémentation d'une sauvegarde automatique locale (secours) en cas de crash/rafraîchissement avec restauration de session."
+        ]
+    },
+    {
         "version": "2.12.61",
         "date": "2026-02-04",
         "changes": [

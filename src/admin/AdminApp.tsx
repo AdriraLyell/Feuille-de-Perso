@@ -19,7 +19,8 @@ import AdminTraitLibrary from './components/libraries/AdminTraitLibrary';
 import AdminSkillLibrary from './components/libraries/AdminSkillLibrary';
 import AdminSpecializationLibrary from './components/libraries/AdminSpecializationLibrary';
 import DeployToGithubModal from './components/DeployModal';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Save as SaveIcon } from 'lucide-react';
+import { usePersistence } from './hooks/usePersistence';
 
 const AdminApp: React.FC = () => {
     const [rules, setRules] = useState<RulesData | null>(null);
@@ -38,10 +39,35 @@ const AdminApp: React.FC = () => {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    // Persistence Hook
+    const { hasUnsavedChanges, lastSaved, isRestoring } = usePersistence(
+        rules,
+        (restoredRules) => {
+            setRules(restoredRules);
+            // @ts-ignore
+            window.EXTERNAL_RULES = restoredRules;
+        },
+        () => {
+            // Callback when persistence check is done (whether restored or not)
+            // If NOT restored, we ensure we have the default rules
+            // But wait, usePersistence runs ONCE.
+            // If it restores, it calls onRestore.
+            // If it doesn't, it calls nothing but sets isRestoring to false.
+            // So we need to ensure we load default rules if rules is still null after check.
+        }
+    );
+
     useEffect(() => {
-        // Load rules (External or Fallback)
+        // Only load default/remote rules IF we are not restoring from IDB
+        // We can check if rules is null. 
+        // But since usePersistence is async, we need to wait for it?
+        // Actually, simpler strategy:
+        // We let normal load happen. Then usePersistence (which runs on mount) might OVERWRITE it if user says "Restore".
+        // That's acceptable.
+
         const loaded = loadRules();
-        setRules(loaded);
+        // Only set if we haven't already restored (rare race condition, but safe enough)
+        setRules(prev => prev || loaded);
     }, []);
 
     const handleUpdateRules = (newRules: RulesData) => {
@@ -160,6 +186,13 @@ const AdminApp: React.FC = () => {
                         </button>
                     </div>
                 </div>
+                {/* Persistence Status Bar / Indicator */}
+                <div className={`h-1 transition-all duration-300 ${hasUnsavedChanges ? 'bg-amber-500 w-full' : 'bg-green-500 w-0'}`} />
+                {hasUnsavedChanges && (
+                    <div className="absolute top-20 right-4 z-50 bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded shadow-md border border-amber-200 animate-pulse">
+                        ⚠️ Modifications non publiées
+                    </div>
+                )}
             </header>
 
             {showDeployModal && rules && (
