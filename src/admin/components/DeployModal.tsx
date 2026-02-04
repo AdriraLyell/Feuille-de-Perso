@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { generateRulesJSContent } from '../utils/rulesGenerator';
+import { publishFileToGitHub } from '../../services/githubService';
 import { RulesData } from '../../types/rules';
 import { Save, AlertTriangle, CheckCircle, Loader2, Github, RefreshCw } from 'lucide-react';
 import { APP_VERSION, REMOTE_MANIFEST_URL } from '../../constants';
@@ -71,73 +72,31 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
         setMessage('Préparation du déploiement...');
         saveCredentials();
 
-        try {
-            // 1. Get current SHA of the file (if it exists)
-            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}?ref=${branch}`;
+        // Prepare content
+        const content = generateRulesJSContent(rules);
+        const commitMessage = `update(rules): Mise à jour automatique depuis Admin App v${rules.version}`;
 
-            let sha = '';
-
-            try {
-                const checkRes = await fetch(apiUrl, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
-
-                if (checkRes.ok) {
-                    const data = await checkRes.json();
-                    sha = data.sha;
-                } else if (checkRes.status === 404) {
-                    // File doesn't exist, that's fine, we create it
-                } else {
-                    throw new Error(`Erreur GitHub (${checkRes.status}): ${checkRes.statusText}`);
-                }
-            } catch (err) {
-                // Ignore network errors here, proceed to try writing
-                console.warn("Check file skipped or failed", err);
+        const result = await publishFileToGitHub(
+            filePath,
+            content,
+            commitMessage,
+            {
+                token,
+                owner: repoOwner,
+                repo: repoName,
+                branch: branch
             }
+        );
 
-            // 2. Prepare content
-            const content = generateRulesJSContent(rules);
-            // GitHub requires Base64
-            // Using btoa with UTF-8 fix for special chars (accents)
-            const base64Content = btoa(unescape(encodeURIComponent(content)));
-
-            // 3. Push File
-            const pushRes = await fetch(apiUrl, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: `update(rules): Mise à jour automatique depuis Admin App v${rules.version}`,
-                    content: base64Content,
-                    branch: branch,
-                    sha: sha || undefined // Only include SHA if file existed
-                })
-            });
-
-            if (!pushRes.ok) {
-                const errData = await pushRes.json();
-                throw new Error(errData.message || 'Erreur lors du déploiement');
-            }
-
-            const successData = await pushRes.json();
-            const newCommitSha = successData.commit?.sha;
-
+        if (result.success) {
             setStatus('success');
             setMessage('Fichier rules.js mis à jour avec succès ! Le déploiement GitHub Pages devrait démarrer.');
-
-            if (onDeploySuccess && newCommitSha) {
-                onDeploySuccess(newCommitSha, token);
+            if (onDeploySuccess && result.sha) {
+                onDeploySuccess(result.sha, token);
             }
-
-        } catch (error) {
+        } else {
             setStatus('error');
-            setMessage((error as Error).message);
+            setMessage(result.message || 'Erreur inconnue lors du déploiement.');
         }
     };
 

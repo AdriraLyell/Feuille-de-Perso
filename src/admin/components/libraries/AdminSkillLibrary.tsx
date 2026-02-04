@@ -2,10 +2,11 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibrarySkillEntry } from '../../../types';
-import { Search, Plus, GraduationCap, Save, AlertOctagon, HelpCircle, X, Layers, Edit2, Trash2 } from 'lucide-react';
+import { Search, Plus, GraduationCap, Save, AlertOctagon, HelpCircle, X, Layers, Edit2, Trash2, UploadCloud } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import { CATEGORY_HELP } from '../../../data/constants';
 import { smartIncludes } from '../../../utils/stringUtils';
+import { publishFileToGitHub } from '../../../services/githubService';
 
 interface AdminSkillLibraryProps {
     rules: RulesData;
@@ -76,6 +77,45 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
         setEditingSkill(null);
     };
 
+    const handlePublish = async () => {
+        const token = localStorage.getItem('GITHUB_TOKEN');
+        const owner = localStorage.getItem('GITHUB_OWNER');
+        const repo = localStorage.getItem('GITHUB_REPO');
+
+        if (!token || !owner || !repo) {
+            alert("Veuillez d'abord configurer vos identifiants GitHub via le bouton 'Publier' du menu principal.");
+            return;
+        }
+
+        if (!confirm("Voulez-vous publier la bibliothèque de COMPÉTENCES (skills.json) sur GitHub ?")) return;
+
+        try {
+            const content = JSON.stringify({
+                meta: {
+                    version: rules.version,
+                    date: new Date().toISOString(),
+                    type: 'skills'
+                },
+                data: list
+            }, null, 2);
+
+            const result = await publishFileToGitHub(
+                'public/data/skills.json',
+                content,
+                `update(skills): Mise à jour bibliothèque compétences v${rules.version}`,
+                { token, owner, repo, branch: 'main' }
+            );
+
+            if (result.success) {
+                alert("Bibliothèque de compétences publiée avec succès !");
+            } else {
+                alert("Erreur lors de la publication : " + result.message);
+            }
+        } catch (e) {
+            alert("Erreur inattendue : " + (e as Error).message);
+        }
+    };
+
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-180px)] flex flex-col">
             <div className="flex justify-between items-center mb-6">
@@ -85,12 +125,21 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
                     </h2>
                     <p className="text-slate-500 text-sm">Définissez les compétences standards que les joueurs pourront importer.</p>
                 </div>
-                <button
-                    onClick={handleOpenNew}
-                    className="bg-slate-900 text-white px-4 py-2 rounded font-bold hover:bg-slate-800 transition-colors flex items-center gap-2"
-                >
-                    <Plus size={18} /> Nouvelle Compétence
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={handlePublish}
+                        className="bg-purple-700 text-white px-3 py-2 rounded font-bold hover:bg-purple-800 transition-colors flex items-center gap-2 text-sm"
+                        title="Publier skills.json"
+                    >
+                        <UploadCloud size={16} /> Publier JSON
+                    </button>
+                    <button
+                        onClick={handleOpenNew}
+                        className="bg-slate-900 text-white px-4 py-2 rounded font-bold hover:bg-slate-800 transition-colors flex items-center gap-2"
+                    >
+                        <Plus size={18} /> Nouvelle Compétence
+                    </button>
+                </div>
             </div>
 
             <div className="relative mb-4">

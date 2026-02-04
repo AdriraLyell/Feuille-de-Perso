@@ -7,6 +7,7 @@ interface RulesContextType {
     isLoading: boolean;
     error: string | null;
     reloadRules: () => Promise<void>;
+    updateRules: (newRules: RulesData) => void;
 }
 
 const RulesContext = createContext<RulesContextType | undefined>(undefined);
@@ -51,7 +52,7 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
     }, []);
 
     return (
-        <RulesContext.Provider value={{ rules, isLoading, error, reloadRules: fetchRules }}>
+        <RulesContext.Provider value={{ rules, isLoading, error, reloadRules: fetchRules, updateRules: setRules }}>
             {children}
         </RulesContext.Provider>
     );

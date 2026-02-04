@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Plus, Award, Edit2, Trash2, HelpCircle, Save, X, AlertTriangle, Layers } from 'lucide-react';
+import { Search, Plus, Award, Edit2, Trash2, HelpCircle, Save, X, AlertTriangle, Layers, UploadCloud } from 'lucide-react';
 import { RulesData } from '../../../types/rules';
 import { LibrarySpecializationEntry } from '../../../types';
 import { smartIncludes } from '../../../utils/stringUtils';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import { useNotification } from '../../../context/NotificationContext';
+import { publishFileToGitHub } from '../../../services/githubService';
 
 interface AdminSpecializationLibraryProps {
     rules: RulesData;
@@ -146,6 +147,45 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         setEntryToDelete(null);
     };
 
+    const handlePublish = async () => {
+        const token = localStorage.getItem('GITHUB_TOKEN');
+        const owner = localStorage.getItem('GITHUB_OWNER');
+        const repo = localStorage.getItem('GITHUB_REPO');
+
+        if (!token || !owner || !repo) {
+            alert("Veuillez d'abord configurer vos identifiants GitHub via le bouton 'Publier' du menu principal.");
+            return;
+        }
+
+        if (!confirm("Voulez-vous publier la bibliothèque de SPÉCIALISATIONS (specializations.json) sur GitHub ?")) return;
+
+        try {
+            const content = JSON.stringify({
+                meta: {
+                    version: rules.version,
+                    date: new Date().toISOString(),
+                    type: 'specializations'
+                },
+                data: library
+            }, null, 2);
+
+            const result = await publishFileToGitHub(
+                'public/data/specializations.json',
+                content,
+                `update(skills): Mise à jour bibliothèque spécialisations v${rules.version}`,
+                { token, owner, repo, branch: 'main' }
+            );
+
+            if (result.success) {
+                addLog('Bibliothèque de spécialisations publiée avec succès !', 'success', 'settings');
+            } else {
+                alert("Erreur lors de la publication : " + result.message);
+            }
+        } catch (e) {
+            alert("Erreur inattendue : " + (e as Error).message);
+        }
+    };
+
     return (
         <div className="flex flex-col h-full bg-[#fdfbf7] rounded-sm shadow-sm border border-[#bfae85]/50 overflow-hidden relative min-h-[500px]">
             {/* Toolbar */}
@@ -160,6 +200,13 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                     />
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
+                    <button
+                        onClick={handlePublish}
+                        className="bg-purple-700 hover:bg-purple-800 text-white px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
+                        title="Publier specializations.json"
+                    >
+                        <UploadCloud size={14} /> Publier JSON
+                    </button>
                     <button
                         onClick={handleOpenNew}
                         className="bg-[#5c4d41] hover:bg-[#4a3b32] text-white px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"

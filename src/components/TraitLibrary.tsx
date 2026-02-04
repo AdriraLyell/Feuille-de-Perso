@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { CharacterSheetData, LibraryEntry, TraitEffect } from '../types';
-import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, Download } from 'lucide-react';
+import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, Download, RefreshCw } from 'lucide-react';
 import TraitCard from './trait-library/TraitCard';
 import TraitForm from './trait-library/TraitForm';
 import TraitImportModal from './trait-library/TraitImportModal';
@@ -24,7 +24,7 @@ type SortOrder = 'asc' | 'desc';
 const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, onMultiSelect, isEditable = true, defaultFilter = 'all' }) => {
 
     // 1. Get Official Rules
-    const { rules } = useRules();
+    const { rules, updateRules } = useRules();
 
     // 2. Compute Hybrid Library (Merges Local + Official)
     const hybridList = useMemo(() => {
@@ -175,6 +175,38 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
         setEditForm(null);
     };
 
+    const handleOfficialUpdate = async () => {
+        if (!confirm("Voulez-vous vérifier et télécharger les mises à jour officielles des TRAITS ?")) return;
+
+        try {
+            const res = await fetch('./data/traits.json?t=' + Date.now());
+            if (!res.ok) throw new Error("Fichier introuvable");
+
+            const json = await res.json();
+            const newTraits = json.data as LibraryEntry[];
+
+            if (json.meta && json.meta.type !== 'traits') throw new Error("Format invalide");
+
+            // Update Rules Context
+            const updatedRules = {
+                ...rules!,
+                libraries: {
+                    ...rules!.libraries,
+                    traits: newTraits
+                }
+            };
+            updateRules(updatedRules);
+            // We don't have addLog here, but onUpdate prop is for SHEET update.
+            // TraitsLibrary uses onUpdate for sheet data.
+            // We should use NotificationContext?
+            // NotificationContext hook is likely used in parent or available.
+            // Let's check imports. No useNotification imported.
+            alert(`Bibliothèque officielle mise à jour (${newTraits.length} traits).`);
+        } catch (e) {
+            alert("Échec de la mise à jour officielle : " + (e as Error).message);
+        }
+    };
+
     // --- Form Action Handlers ---
     const handleImportTraits = (importedEntries: LibraryEntry[]) => {
         // When importing from Sheet, we add to LOCAL library
@@ -290,6 +322,13 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                     </h3>
                     {isEditable && (
                         <div className="flex gap-2">
+                            <button
+                                onClick={handleOfficialUpdate}
+                                className="bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
+                                title="Mettre à jour depuis le serveur officiel"
+                            >
+                                <RefreshCw size={14} /> Officiel
+                            </button>
                             <button onClick={() => setIsImportModalOpen(true)} className="bg-white/80 border border-[#bfae85]/50 text-[#5c4d41] hover:bg-stone-50 hover:text-[#1c1917] px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap" title="Importer des traits depuis la fiche de personnage">
                                 <Download size={14} /> Importer
                             </button>

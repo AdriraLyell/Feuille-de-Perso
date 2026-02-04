@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { Search, Plus, Award, CheckCircle2, Edit2, Trash2, Download, HelpCircle, Save, X, AlertTriangle } from 'lucide-react';
+import { Search, Plus, Award, CheckCircle2, Edit2, Trash2, Download, HelpCircle, Save, X, AlertTriangle, RefreshCw } from 'lucide-react';
 import { CharacterSheetData } from '../../types';
 import { useNotification } from '../../context/NotificationContext';
 import { LibrarySpecializationEntry } from '../../types';
@@ -25,7 +25,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
     const [skillSearch, setSkillSearch] = useState('');
 
     // OFFICIAL: Get Rules Context
-    const { rules } = useRules();
+    const { rules, updateRules } = useRules();
 
     // MERGE: Compute Hybrid Specialization Library
     const hybridSpecializations = useMemo(() => {
@@ -135,6 +135,34 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
         setEditingEntry(null);
     };
 
+    const handleOfficialUpdate = async () => {
+        if (!confirm("Voulez-vous vérifier et télécharger les mises à jour officielles des SPÉCIALISATIONS ?")) return;
+
+        try {
+            const res = await fetch('./data/specializations.json?t=' + Date.now());
+            if (!res.ok) throw new Error("Fichier introuvable");
+
+            const json = await res.json();
+            const newSpecs = json.data as LibrarySpecializationEntry[];
+
+            if (json.meta && json.meta.type !== 'specializations') throw new Error("Format invalide");
+
+            // Update Rules Context
+            const updatedRules = {
+                ...rules!,
+                libraries: {
+                    ...rules!.libraries,
+                    specializations: newSpecs
+                }
+            };
+            updateRules(updatedRules);
+            addLog(`Bibliothèque officielle mise à jour (${newSpecs.length} spécialisations).`, 'success', 'settings');
+        } catch (e) {
+            // @ts-ignore
+            addLog("Échec de la mise à jour officielle : " + (e as Error).message, 'danger', 'settings');
+        }
+    };
+
     const executeImportFromSheet = () => {
         // Import into LOCAL
         const currentLib = JSON.parse(JSON.stringify(data.specializationLibrary || []));
@@ -142,7 +170,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
         let addedCount = 0;
 
         // Scanner les spécialisations classiques
-        Object.entries(data.specializations).forEach(([skillId, spes]) => {
+        Object.entries(data.specializations || {}).forEach(([skillId, spes]) => {
             spes.forEach(name => {
                 const norm = name.trim();
                 if (norm && !existingNames.has(norm.toLowerCase())) {
@@ -160,7 +188,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
         });
 
         // Scanner les spécialisations imposées
-        Object.entries(data.imposedSpecializations).forEach(([skillId, spes]) => {
+        Object.entries(data.imposedSpecializations || {}).forEach(([skillId, spes]) => {
             spes.forEach(s => {
                 const norm = s.name.trim();
                 if (norm && !existingNames.has(norm.toLowerCase())) {
@@ -220,6 +248,13 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                     />
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
+                    <button
+                        onClick={handleOfficialUpdate}
+                        className="bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
+                        title="Mettre à jour depuis le serveur officiel"
+                    >
+                        <RefreshCw size={14} /> Officiel
+                    </button>
                     <button
                         onClick={() => setShowImportConfirm(true)}
                         className="bg-white/80 border border-[#bfae85]/50 text-[#5c4d41] hover:bg-stone-50 hover:text-[#1c1917] px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"

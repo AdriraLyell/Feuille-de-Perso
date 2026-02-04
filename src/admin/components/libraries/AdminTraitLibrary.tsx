@@ -2,10 +2,11 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryEntry, TraitEffect } from '../../../types';
-import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ } from 'lucide-react';
+import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, UploadCloud } from 'lucide-react';
 import TraitCard from '../../../components/trait-library/TraitCard';
 import TraitForm from '../../../components/trait-library/TraitForm';
 import { smartIncludes } from '../../../utils/stringUtils';
+import { publishFileToGitHub } from '../../../services/githubService';
 
 interface AdminTraitLibraryProps {
     rules: RulesData;
@@ -128,6 +129,45 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
         setEditForm(null);
     };
 
+    const handlePublish = async () => {
+        const token = localStorage.getItem('GITHUB_TOKEN');
+        const owner = localStorage.getItem('GITHUB_OWNER');
+        const repo = localStorage.getItem('GITHUB_REPO');
+
+        if (!token || !owner || !repo) {
+            alert("Veuillez d'abord configurer vos identifiants GitHub via le bouton 'Publier' du menu principal.");
+            return;
+        }
+
+        if (!confirm("Voulez-vous publier la bibliothèque de TRAITS (traits.json) sur GitHub ?")) return;
+
+        try {
+            const content = JSON.stringify({
+                meta: {
+                    version: rules.version,
+                    date: new Date().toISOString(),
+                    type: 'traits'
+                },
+                data: library
+            }, null, 2);
+
+            const result = await publishFileToGitHub(
+                'public/data/traits.json',
+                content,
+                `update(traits): Mise à jour bibliothèque traits v${rules.version}`,
+                { token, owner, repo, branch: 'main' }
+            );
+
+            if (result.success) {
+                alert("Bibliothèque de traits publiée avec succès !");
+            } else {
+                alert("Erreur lors de la publication : " + result.message);
+            }
+        } catch (e) {
+            alert("Erreur inattendue : " + (e as Error).message);
+        }
+    };
+
     // Filter & Sort Logic
     const processedList = useMemo(() => {
         let list = library.filter(entry => {
@@ -201,12 +241,21 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
                     </h2>
                     <p className="text-slate-500 text-sm">Gérez ici les Avantages et Défauts qui seront proposés aux joueurs.</p>
                 </div>
-                <button
-                    onClick={handleOpenNew}
-                    className="bg-slate-900 text-white px-4 py-2 rounded font-bold hover:bg-slate-800 transition-colors flex items-center gap-2"
-                >
-                    <Plus size={18} /> Nouveau Trait
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={handlePublish}
+                        className="bg-purple-700 text-white px-3 py-2 rounded font-bold hover:bg-purple-800 transition-colors flex items-center gap-2 text-sm"
+                        title="Publier traits.json"
+                    >
+                        <UploadCloud size={16} /> Publier JSON
+                    </button>
+                    <button
+                        onClick={handleOpenNew}
+                        className="bg-slate-900 text-white px-4 py-2 rounded font-bold hover:bg-slate-800 transition-colors flex items-center gap-2"
+                    >
+                        <Plus size={18} /> Nouveau Trait
+                    </button>
+                </div>
             </div>
 
             {/* Toolbar */}

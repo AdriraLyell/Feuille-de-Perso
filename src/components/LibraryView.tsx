@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { CharacterSheetData, LibrarySkillEntry } from '../types';
-import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, CheckCircle2, Download, Award, Layers } from 'lucide-react';
+import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, CheckCircle2, Download, Award, Layers, RefreshCw } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import SpecializationLibraryView from './specialization-library/SpecializationLibraryView';
 import { useCharacter } from '../context/CharacterContext';
@@ -46,7 +46,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
     const [skillToDelete, setSkillToDelete] = useState<LibrarySkillEntry | null>(null);
 
     // OFFICIAL: Get Rules Context
-    const { rules } = useRules();
+    const { rules, updateRules } = useRules();
 
     // MERGE: Compute Hybrid Skill Library
     const hybridSkills = useMemo(() => {
@@ -189,6 +189,33 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         setSkillToDelete(null);
     };
 
+    const handleOfficialUpdate = async () => {
+        if (!confirm("Voulez-vous vérifier et télécharger les mises à jour officielles des COMPÉTENCES ?")) return;
+
+        try {
+            const res = await fetch('./data/skills.json?t=' + Date.now());
+            if (!res.ok) throw new Error("Fichier introuvable");
+
+            const json = await res.json();
+            const newSkills = json.data as LibrarySkillEntry[];
+
+            if (json.meta && json.meta.type !== 'skills') throw new Error("Format invalide");
+
+            // Update Rules Context
+            const updatedRules = {
+                ...rules!,
+                libraries: {
+                    ...rules!.libraries,
+                    skills: newSkills
+                }
+            };
+            updateRules(updatedRules);
+            addLog(`Bibliothèque officielle mise à jour (${newSkills.length} compétences).`, 'success', 'settings');
+        } catch (e) {
+            addLog("Échec de la mise à jour officielle : " + (e as Error).message, 'danger', 'settings');
+        }
+    };
+
     // Logic to import skills currently on the sheet into the library
     const executeImportFromSheet = () => {
         // Import into LOCAL
@@ -302,6 +329,13 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
 
                             {/* Actions - Right */}
                             <div className="flex gap-2 justify-end">
+                                <button
+                                    onClick={handleOfficialUpdate}
+                                    className="bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
+                                    title="Mettre à jour depuis le serveur officiel"
+                                >
+                                    <RefreshCw size={14} /> Officiel
+                                </button>
                                 <button
                                     onClick={() => setShowImportConfirm(true)}
                                     className="bg-white/80 border border-[#bfae85]/50 text-[#5c4d41] hover:bg-stone-50 hover:text-[#1c1917] px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
