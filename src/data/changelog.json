@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.13.9",
+        "date": "2026-02-04",
+        "type": "patch",
+        "changes": [
+            "Hotfix : Utilisation de crypto.randomUUID() pour les IDs de compétences (compatibilité Supabase UUID).",
+            "Hotfix : Retour d'erreurs détaillé dans l'UI admin lors de la sauvegarde BDD."
+        ]
+    },
+    {
         "version": "2.13.8",
         "date": "2026-02-04",
         "type": "patch",
