@@ -1,5 +1,12 @@
 [
     {
+        "version": "2.12.64",
+        "date": "2026-02-04",
+        "changes": [
+            "UI (Admin) : Épuration visuelle de l'indicateur de sauvegarde (Icone seule pour plus de discrétion)."
+        ]
+    },
+    {
         "version": "2.12.63",
         "date": "2026-02-04",
         "changes": [

@@ -135,11 +135,10 @@ const AdminApp: React.FC = () => {
                         <h1 className="text-xl font-bold tracking-wide">Seigneurs des Mystères <span className="text-slate-400 font-normal">| Administration</span></h1>
 
                         {/* Discrete Persistence Status */}
-                        <div className="ml-4 pl-4 border-l border-slate-700 flex items-center" title={hasUnsavedChanges ? "Modifications locales non publiées" : "Synchronisé avec GitHub"}>
+                        <div className="ml-4 pl-4 border-l border-slate-700 flex items-center" title={hasUnsavedChanges ? "Modifications locales non publiées" : "Synchronisé"}>
                             {hasUnsavedChanges ? (
                                 <div className="flex items-center gap-2 text-amber-400 animate-pulse">
                                     <AlertTriangle size={20} />
-                                    <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Non Publié</span>
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2 text-green-400/50">
