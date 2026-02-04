@@ -6,6 +6,7 @@
         "changes": [
             "Architecture : Migration majeure vers une Base de Données (Supabase) pour le stockage des règles.",
             "Admin : Nouveau Tableau de Bord permettant de gérer plusieurs Campagnes (Settings) en parallèle.",
+            "Admin : Gestion avancée des campagnes (Suppression, Visibilité Public/Privé) depuis le dashboard.",
             "Joueur : Nouveau mode 'Hybride'. Au démarrage, choisissez entre 'En Ligne' (Campagnes Publiques à jour) ou 'Hors Ligne' (Fichier Local).",
             "Admin : Sauvegarde des règles directement dans le Cloud.",
             "Technique : Refonte du moteur de chargement pour supporter le lazy-loading et la sélection de source."

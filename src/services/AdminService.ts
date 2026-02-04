@@ -161,5 +161,40 @@ export const AdminService = {
         }
 
         return true;
+    },
+
+    /**
+     * Delete a setting and all its related data
+     */
+    async deleteSetting(id: string): Promise<boolean> {
+        // Delete libraries first (manual cascade just in case DB cascade isn't set)
+        await supabase.from('libraries_traits').delete().eq('setting_id', id);
+        await supabase.from('libraries_skills').delete().eq('setting_id', id);
+        await supabase.from('libraries_specializations').delete().eq('setting_id', id);
+
+        // Delete the setting itself
+        const { error } = await supabase.from('game_settings').delete().eq('id', id);
+
+        if (error) {
+            console.error('Error deleting setting:', error);
+            return false;
+        }
+        return true;
+    },
+
+    /**
+     * Toggle public/private visibility
+     */
+    async togglePublic(id: string, isPublic: boolean): Promise<boolean> {
+        const { error } = await supabase
+            .from('game_settings')
+            .update({ is_public: isPublic })
+            .eq('id', id);
+
+        if (error) {
+            console.error('Error toggling visibility:', error);
+            return false;
+        }
+        return true;
     }
 }

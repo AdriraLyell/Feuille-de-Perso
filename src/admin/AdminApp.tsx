@@ -25,6 +25,7 @@ import { usePersistence } from './hooks/usePersistence';
 import RestoreSessionModal from './components/RestoreSessionModal';
 import AdminDashboard from './components/AdminDashboard';
 import { AdminService } from '../services/AdminService';
+import ConfirmationModal from '../components/ui/ConfirmationModal';
 import { useNotification } from '../context/NotificationContext'; // Assuming we have this, or use alert for now
 
 const AdminApp: React.FC = () => {
@@ -47,6 +48,7 @@ const AdminApp: React.FC = () => {
     const [wizardOpen, setWizardOpen] = useState(false);
     const [candidateRules, setCandidateRules] = useState<RulesData | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [saveFeedback, setSaveFeedback] = useState<{ isOpen: boolean; success: boolean; message: string } | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -95,9 +97,17 @@ const AdminApp: React.FC = () => {
         setIsSaving(true);
         const success = await AdminService.saveSetting(currentSettingId, rules);
         if (success) {
-            alert("Sauvegarde en base de données réussie !");
+            setSaveFeedback({
+                isOpen: true,
+                success: true,
+                message: "Les règles ont été sauvegardées avec succès dans la base de données."
+            });
         } else {
-            alert("Erreur lors de la sauvegarde.");
+            setSaveFeedback({
+                isOpen: true,
+                success: false,
+                message: "Une erreur est survenue lors de la sauvegarde. Vérifiez votre connexion ou les droits d'accès."
+            });
         }
         setIsSaving(false);
     };
@@ -398,6 +408,20 @@ const AdminApp: React.FC = () => {
                 onConfirm={() => resolveRestore(true)}
                 onDiscard={() => resolveRestore(false)}
             />
+
+            {/* Save Feedback Modal */}
+            {saveFeedback && (
+                <ConfirmationModal
+                    isOpen={saveFeedback.isOpen}
+                    onClose={() => setSaveFeedback(null)}
+                    onConfirm={() => setSaveFeedback(null)}
+                    title={saveFeedback.success ? "Sauvegarde Réussie" : "Erreur de Sauvegarde"}
+                    message={saveFeedback.message}
+                    type={saveFeedback.success ? 'success' : 'danger'}
+                    confirmLabel="OK"
+                    cancelLabel="" // Hide cancel button
+                />
+            )}
         </div >
     );
 };

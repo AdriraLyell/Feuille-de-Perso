@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { GameSettingSummary, AdminService } from '../../services/AdminService';
 import { RulesData } from '../../types/rules';
-import { Plus, Loader2, FileCog, Scroll, Trash2 } from 'lucide-react';
+import { Plus, Loader2, FileCog, Scroll, Trash2, Eye, EyeOff } from 'lucide-react';
 import { defaultRules } from '../../data/defaultRules'; // We might need a default template
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
 
 interface AdminDashboardProps {
     onSelectSetting: (id: string, rules: RulesData) => void;
@@ -14,6 +15,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isCreating, setIsCreating] = useState(false);
     const [newName, setNewName] = useState('');
+    const [settingToDelete, setSettingToDelete] = useState<string | null>(null);
 
     useEffect(() => {
         loadSettings();
@@ -54,6 +56,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
             alert("Erreur lors du chargement de la campagne.");
         }
         setIsLoading(false);
+    };
+
+    const handleDelete = async () => {
+        if (!settingToDelete) return;
+        const success = await AdminService.deleteSetting(settingToDelete);
+        if (success) {
+            loadSettings();
+        } else {
+            alert("Erreur lors de la suppression.");
+        }
+    };
+
+    const handleToggleVisibility = async (e: React.MouseEvent, id: string, currentStatus: boolean) => {
+        e.stopPropagation(); // Prevent opening the setting
+        // Optimistic UI update could be done here, but let's just await
+        const success = await AdminService.togglePublic(id, !currentStatus);
+        if (success) {
+            loadSettings();
+        }
     };
 
     return (
@@ -105,9 +126,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
                         >
                             <div className="h-2 bg-amber-700 w-full" />
                             <div className="p-6">
-                                <h3 className="font-serif font-bold text-xl text-[#4a3b32] mb-1 group-hover:text-amber-700 transition-colors">
+                                <h3 className="font-serif font-bold text-xl text-[#4a3b32] mb-1 group-hover:text-amber-700 transition-colors pr-8">
                                     {setting.name}
                                 </h3>
+
+                                {/* Absolute Actions Top Right */}
+                                <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setSettingToDelete(setting.id); }}
+                                        className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                                        title="Supprimer la campagne"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+
                                 <div className="flex items-center gap-2 text-xs text-[#bfae85] font-bold uppercase tracking-wider mb-4">
                                     <span className="bg-amber-50 px-2 py-1 rounded">v{setting.version}</span>
                                     <span>•</span>
@@ -115,9 +148,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
                                 </div>
 
                                 <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
-                                    <span className={`text-xs px-2 py-1 rounded-full font-bold ${setting.is_public ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                                    <button
+                                        onClick={(e) => handleToggleVisibility(e, setting.id, setting.is_public)}
+                                        className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full font-bold transition-all ${setting.is_public
+                                            ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                            }`}
+                                        title={setting.is_public ? "Cliquer pour rendre Privé" : "Cliquer pour rendre Public"}
+                                    >
+                                        {setting.is_public ? <Eye size={12} /> : <EyeOff size={12} />}
                                         {setting.is_public ? 'PUBLIQUE' : 'PRIVÉE'}
-                                    </span>
+                                    </button>
+
                                     <button className="text-amber-700 font-bold text-sm bg-amber-50 px-3 py-1 rounded group-hover:bg-amber-700 group-hover:text-white transition-colors">
                                         Ouvrir
                                     </button>
@@ -127,6 +169,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
                     ))}
                 </div>
             )}
+
+            <ConfirmationModal
+                isOpen={!!settingToDelete}
+                onClose={() => setSettingToDelete(null)}
+                onConfirm={handleDelete}
+                title="Supprimer la campagne ?"
+                message="Attention : Cette action est irréversible. Toutes les règles, compétences et configurations associées à cette campagne seront définitivement perdues."
+                confirmLabel="Supprimer définitivement"
+                type="danger"
+            />
         </div>
     );
 };
