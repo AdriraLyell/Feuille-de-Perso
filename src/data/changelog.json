@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.13.3",
+        "date": "2026-02-04",
+        "type": "patch",
+        "changes": [
+            "UI (Admin) : Adoption complète du thème 'Grimoire' (Sépia/Papier) pour l'éditeur de compétences, identique à la fiche joueur.",
+            "UI (Admin) : Harmonisation des couleurs de police, bordures et arrière-plans."
+        ]
+    },
+    {
         "version": "2.13.2",
         "date": "2026-02-04",
         "type": "patch",
