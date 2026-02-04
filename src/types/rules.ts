@@ -73,6 +73,7 @@ export interface RulesData {
     libraries: {
         traits: LibraryEntry[];
         skills: LibrarySkillEntry[];
+        backgrounds?: LibrarySkillEntry[]; // Optional to maintain backward compatibility with old rules
         specializations: LibrarySpecializationEntry[];
     };
 }

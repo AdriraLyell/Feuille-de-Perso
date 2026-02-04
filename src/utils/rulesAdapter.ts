@@ -154,14 +154,20 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
     if (ruleBackgrounds && Array.isArray(ruleBackgrounds)) {
         // Map to DotEntry[] for skills.arrieres_plans
         // @ts-ignore
-        newState.skills.arrieres_plans = ruleBackgrounds.map(name => ({
-            id: generateId(),
-            name: name,
-            value: 0,
-            creationValue: 0,
-            max: 5, // Default max for backgrounds usually 5 unless specified?
-            variant: ""
-        }));
+        newState.skills.arrieres_plans = ruleBackgrounds.map(name => {
+            // Check library for variable status (Backgrounds use LibrarySkillEntry structure)
+            const libBg = rules.libraries?.backgrounds?.find(b => b.name === name);
+            const isVariable = libBg?.isVariable === true;
+
+            return {
+                id: generateId(),
+                name: name,
+                value: 0,
+                creationValue: 0,
+                max: 5,
+                variant: isVariable ? "" : undefined // Only set variant if specifically variable
+            };
+        });
     }
 
     // 8. Update Counters

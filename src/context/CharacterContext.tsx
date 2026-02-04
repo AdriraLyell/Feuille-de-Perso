@@ -141,7 +141,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
 
     // 3. XP Calculation Effect (Remains here as it depends on data and changes data)
     useEffect(() => {
-        const newExpState = calculateExperienceResults(data);
+        const newExpState = calculateExperienceResults(data, rules);
 
         if (data.experience.spent !== newExpState.spent ||
             data.experience.rest !== newExpState.rest ||
@@ -167,7 +167,8 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         data.creationConfig?.attributeCost,
         data.page2.avantages,
         data.page2.desavantages,
-        data.library
+        data.library,
+        rules
     ]);
 
     // 4. Actions (Stable references via useCallback)

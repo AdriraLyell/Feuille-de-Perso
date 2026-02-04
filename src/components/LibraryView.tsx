@@ -1,17 +1,19 @@
 
 import React, { useState, useMemo } from 'react';
 import { CharacterSheetData, LibrarySkillEntry } from '../types';
-import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, X, Save, CheckCircle2, Download, AlertTriangle, HelpCircle, AlertOctagon, Award, ArrowRight, AlertCircle, Layers } from 'lucide-react';
+import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, CheckCircle2, Download, Award, Layers } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import SpecializationLibraryView from './specialization-library/SpecializationLibraryView';
 import { useCharacter } from '../context/CharacterContext';
 import { useNotification } from '../context/NotificationContext';
 import { smartIncludes } from '../utils/stringUtils';
 import ThematicModal from './ui/ThematicModal';
-import { CATEGORY_HELP } from '../data/constants';
 import { useRules } from '../context/RulesContext';
 import { mergeLibraries, MergedEntry } from '../utils/libraryMerger';
-// ... other imports
+import LibrarySkillForm from './library/LibrarySkillForm';
+import LibraryDeleteModal from './library/LibraryDeleteModal';
+import LibraryImportModal from './library/LibraryImportModal';
+import LibraryRenameModal from './library/LibraryRenameModal';
 
 interface LibraryViewProps {
     data?: CharacterSheetData; // Optional to support standalone use if needed, but we will pass it
@@ -39,9 +41,6 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
 
     // Import Confirmation Modal State
     const [showImportConfirm, setShowImportConfirm] = useState(false);
-
-    // Help Modal State
-    const [showCategoryHelp, setShowCategoryHelp] = useState(false);
 
     // Delete Confirmation Modal State
     const [skillToDelete, setSkillToDelete] = useState<LibrarySkillEntry | null>(null);
@@ -100,17 +99,16 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         setIsSkillModalOpen(true);
     };
 
-    const handleSaveSkill = () => {
-        if (!editingSkill) return;
-        if (!editingSkill.name.trim()) {
+    const handleSaveSkill = (skillToSave: LibrarySkillEntry) => {
+        if (!skillToSave.name.trim()) {
             setSkillError("Le nom de la compétence est requis.");
             return;
         }
 
         const duplicate = hybridSkills.find(m =>
             m.source === 'local' && // Check duplication only against LOCAL items
-            m.entry.id !== editingSkill.id &&
-            m.entry.name.trim().toLowerCase() === editingSkill.name.trim().toLowerCase()
+            m.entry.id !== skillToSave.id &&
+            m.entry.name.trim().toLowerCase() === skillToSave.name.trim().toLowerCase()
         );
 
         if (duplicate) {
@@ -118,18 +116,19 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
             return;
         }
 
-        const existingMerged = skillsList.find(m => m.entry.id === editingSkill.id);
+        const existingMerged = skillsList.find(m => m.entry.id === skillToSave.id);
         const existing = existingMerged ? existingMerged.entry : null;
-        const nameChanged = existing && existing.name.trim().toLowerCase() !== editingSkill.name.trim().toLowerCase();
+        const nameChanged = existing && existing.name.trim().toLowerCase() !== skillToSave.name.trim().toLowerCase();
         const isUsed = existing && usedSkillNames.has(existing.name.trim().toLowerCase());
 
         // If name changed and skill is used, ask for confirmation
         if (nameChanged && isUsed) {
-            setShowRenameConfirm({ oldName: existing.name, newSkill: editingSkill });
+            setShowRenameConfirm({ oldName: existing.name, newSkill: skillToSave });
+            setIsSkillModalOpen(false); // Close editor, open rename confirm
             return;
         }
 
-        finalizeSaveSkill(editingSkill);
+        finalizeSaveSkill(skillToSave);
     };
 
     const finalizeSaveSkill = (skillToSave: LibrarySkillEntry, renameOnSheet: boolean = false) => {
@@ -401,260 +400,43 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                 )}
             </div>
 
-            {/* Category Help Modal */}
+            {/* Sub-Components (Modals) */}
+            {skillToDelete && (
+                <LibraryDeleteModal
+                    skillName={skillToDelete.name}
+                    onClose={() => setSkillToDelete(null)}
+                    onConfirm={executeDeleteSkill}
+                />
+            )}
 
-            {/* Delete Confirmation Modal */}
-            {
-                skillToDelete && (
-                    <div className="fixed inset-0 z-[130] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col animate-in zoom-in duration-200 border-2 border-red-100">
-                            <div className="p-6 text-center">
-                                <div className="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                                    <Trash2 size={28} />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">Supprimer la compétence ?</h3>
-                                <div className="bg-gray-50 p-3 rounded border border-gray-200 mb-4">
-                                    <span className="block font-bold text-gray-800 text-lg">{skillToDelete.name}</span>
-                                </div>
-                                <p className="text-[#5c4d41] text-sm leading-relaxed">
-                                    Cette action est irréversible. La compétence sera retirée de la réserve.
-                                </p>
-                            </div>
-                            <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-200">
-                                <button
-                                    onClick={() => setSkillToDelete(null)}
-                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-white transition-colors"
-                                >
-                                    Annuler
-                                </button>
-                                <button
-                                    onClick={executeDeleteSkill}
-                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 shadow-sm transition-colors flex items-center justify-center gap-2"
-                                >
-                                    <Trash2 size={16} /> Supprimer
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
+            {showImportConfirm && (
+                <LibraryImportModal
+                    onClose={() => setShowImportConfirm(false)}
+                    onConfirm={executeImportFromSheet}
+                />
+            )}
 
-            {/* Import Confirmation Modal */}
-            {
-                showImportConfirm && (
-                    <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in zoom-in duration-200">
-                            <div className="p-6 text-center">
-                                <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
-                                    <Download size={28} />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">Importer depuis la fiche ?</h3>
-                                <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                                    Cette action va scanner votre fiche de personnage et ajouter toutes les compétences trouvées à la réserve.
-                                </p>
-                                <div className="bg-yellow-50 text-yellow-800 text-xs p-3 rounded-lg border border-yellow-200 text-left flex gap-2">
-                                    <AlertTriangle size={16} className="shrink-0 mt-0.5" />
-                                    <span>Les doublons (compétences portant le même nom) seront ignorés pour éviter les répétitions.</span>
-                                </div>
-                            </div>
-                            <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-200">
-                                <button
-                                    onClick={() => setShowImportConfirm(false)}
-                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-white transition-colors"
-                                >
-                                    Annuler
-                                </button>
-                                <button
-                                    onClick={executeImportFromSheet}
-                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-sm transition-colors"
-                                >
-                                    Confirmer
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
+            {isSkillModalOpen && editingSkill && (
+                <LibrarySkillForm
+                    isOpen={isSkillModalOpen}
+                    onClose={() => setIsSkillModalOpen(false)}
+                    title={data.skillLibrary?.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence (Copie)'}
+                    skill={editingSkill}
+                    onSkillChange={setEditingSkill}
+                    onSave={() => handleSaveSkill(editingSkill)} // Passing editingSkill here
+                    error={skillError}
+                />
+            )}
 
-            {/* Skill Edit Modal */}
-            {
-                isSkillModalOpen && editingSkill && (
-                    <ThematicModal
-                        isOpen={isSkillModalOpen}
-                        onClose={() => setIsSkillModalOpen(false)}
-                        title={data.skillLibrary?.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence (Copie)'}
-                        icon={<GraduationCap size={20} />}
-                        size={showCategoryHelp ? 'lg' : 'md'}
-                        footer={
-                            <>
-                                <button onClick={() => setIsSkillModalOpen(false)} className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold">Annuler</button>
-                                <button onClick={handleSaveSkill} className="px-6 py-2 bg-[#5c4d41] text-white rounded-sm font-bold shadow-md hover:bg-[#4a3b32] flex items-center gap-2">
-                                    <Save size={16} /> Enregistrer
-                                </button>
-                            </>
-                        }
-                    >
-                        <div className="flex flex-col lg:flex-row gap-8 py-2">
-                            {/* Editor Form */}
-                            <div className="flex-grow flex flex-col gap-5">
-                                <div>
-                                    <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Nom de la compétence</label>
-                                    <input
-                                        className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm"
-                                        value={editingSkill.name}
-                                        onChange={(e) => setEditingSkill({ ...editingSkill, name: e.target.value })}
-                                        autoFocus
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Description (Narrative)</label>
-                                    <textarea
-                                        className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-3 text-sm text-[#1c1917] bg-white/50 min-h-[120px] focus:border-amber-500 outline-none resize-none shadow-sm italic leading-relaxed"
-                                        value={editingSkill.description || ''}
-                                        onChange={(e) => setEditingSkill({ ...editingSkill, description: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <div className="flex justify-between items-center mb-1">
-                                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase tracking-widest">Catégorie de placement par défaut</label>
-                                        {!showCategoryHelp && (
-                                            <button
-                                                onClick={() => setShowCategoryHelp(true)}
-                                                className="text-[#5c4d41] hover:text-[#8b2e2e] transition-colors flex items-center gap-1 text-[9px] font-bold"
-                                                title="Voir l'aide sur les catégories"
-                                            >
-                                                <HelpCircle size={14} /> Aide
-                                            </button>
-                                        )}
-                                    </div>
-                                    <select
-                                        className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm font-bold"
-                                        value={editingSkill.defaultCategory || ''}
-                                        onChange={(e) => setEditingSkill({ ...editingSkill, defaultCategory: e.target.value })}
-                                    >
-                                        <option value="">-- Placement libre --</option>
-                                        {CATEGORY_HELP.map(cat => (
-                                            <option key={cat.code} value={cat.code}>{cat.label}</option>
-                                        ))}
-                                    </select>
-                                    <p className="text-[10px] text-[#5c4d41] mt-1.5 italic px-1">Définit dans quelle section de la fiche cette compétence sera rangée lors de l'importation.</p>
-                                </div>
-                                <div className="bg-amber-50/50 border border-amber-200/50 rounded-sm p-3 flex items-center gap-3">
-                                    <input
-                                        type="checkbox"
-                                        id="isVariableSkill"
-                                        className="w-4 h-4 accent-amber-600 cursor-pointer"
-                                        checked={editingSkill.isVariable || false}
-                                        onChange={(e) => setEditingSkill({ ...editingSkill, isVariable: e.target.checked })}
-                                    />
-                                    <label htmlFor="isVariableSkill" className="cursor-pointer select-none">
-                                        <span className="block text-xs font-bold text-[#5c4d41] uppercase tracking-wide">Compétence à Spécialité / Variable</span>
-                                        <span className="block text-[10px] text-[#5c4d41]/70 italic mt-0.5">Cochez si le joueur doit préciser quelque chose (ex: "Artisanat : Forge"). Permet d'avoir plusieurs fois cette compétence.</span>
-                                    </label>
-                                </div>
-                                {skillError && (
-                                    <div className="bg-red-50 text-red-800 text-[11px] p-3 rounded-sm border border-red-200 font-bold flex items-center gap-2 animate-shake">
-                                        <AlertOctagon size={16} /> {skillError}
-                                    </div>
-                                )}
-                            </div>
+            {showRenameConfirm && (
+                <LibraryRenameModal
+                    oldName={showRenameConfirm.oldName}
+                    newName={showRenameConfirm.newSkill.name}
+                    onClose={() => setShowRenameConfirm(null)}
+                    onConfirm={() => finalizeSaveSkill(showRenameConfirm.newSkill, true)}
+                />
+            )}
 
-                            {/* Side Help Panel */}
-                            {showCategoryHelp && (
-                                <div className="w-full lg:w-72 shrink-0 animate-in slide-in-from-right-4 duration-300">
-                                    <div className="flex justify-between items-center mb-2 border-b border-[#bfae85]/30 pb-1">
-                                        <span className="text-[10px] font-serif font-black uppercase text-[#8b2e2e] tracking-widest flex items-center gap-1">
-                                            <HelpCircle size={12} /> Aide aux catégories
-                                        </span>
-                                        <button
-                                            onClick={() => setShowCategoryHelp(false)}
-                                            className="text-[#5c4d41] hover:text-[#8b2e2e] p-0.5 rounded"
-                                        >
-                                            <X size={14} />
-                                        </button>
-                                    </div>
-                                    <div className="p-0 overflow-hidden bg-white/30 rounded-sm border border-[#bfae85]/30 relative">
-                                        <table className="w-full text-[10px] text-left border-collapse">
-                                            <thead className="bg-[#fdfbf7] border-b border-[#bfae85]/50 transition-colors">
-                                                <tr>
-                                                    <th className="px-3 py-2 font-black tracking-widest text-[#8b2e2e]">Code</th>
-                                                    <th className="px-3 py-2 font-black tracking-widest text-[#8b2e2e]">Emplacement</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-[#bfae85]/20">
-                                                {CATEGORY_HELP.map((cat, i) => (
-                                                    <tr key={i} className="hover:bg-amber-50/30 transition-colors">
-                                                        <td className="px-3 py-1.5 font-mono text-[#8b2e2e] font-bold">{cat.code}</td>
-                                                        <td className="px-3 py-1.5 text-[#4a3b32]">
-                                                            <div className="font-bold leading-tight">{cat.label}</div>
-                                                            <div className="text-[8px] text-[#5c4d41]/70 italic leading-tight">{cat.loc}</div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <p className="mt-3 text-[9px] text-[#5c4d41]/70 leading-relaxed italic border-l-2 border-[#bfae85]/30 pl-2">
-                                        Conseil : Copiez-collez le code technique exact pour un tri automatique parfait.
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </ThematicModal>
-                )
-            }
-
-            {/* Rename Confirmation Modal */}
-            {
-                showRenameConfirm && (
-                    <ThematicModal
-                        isOpen={!!showRenameConfirm}
-                        onClose={() => setShowRenameConfirm(null)}
-                        title="Renommer la compétence ?"
-                        icon={<AlertTriangle size={24} className="text-[#8b2e2e]" />}
-                        size="md"
-                        footer={
-                            <>
-                                <button
-                                    onClick={() => setShowRenameConfirm(null)}
-                                    className="flex-1 px-4 py-2 border border-[#bfae85]/50 rounded-sm text-[#5c4d41] font-bold hover:bg-stone-200/50 transition-colors"
-                                >
-                                    Non, annuler
-                                </button>
-                                <button
-                                    onClick={() => finalizeSaveSkill(showRenameConfirm.newSkill, true)}
-                                    className="flex-1 px-4 py-2 bg-[#8b2e2e] text-white rounded-sm font-bold shadow-md hover:bg-[#6a2424] transition-colors"
-                                >
-                                    Oui, renommer partout
-                                </button>
-                            </>
-                        }
-                    >
-                        <div className="flex flex-col items-center text-center space-y-5 py-4">
-                            <div className="w-16 h-16 bg-[#8b2e2e]/10 text-[#8b2e2e] rounded-full flex items-center justify-center shadow-inner">
-                                <Edit2 size={32} />
-                            </div>
-                            <div className="space-y-3">
-                                <p className="text-sm text-[#5c4d41] leading-relaxed max-w-sm">
-                                    Cette modification sera répercutée sur **toutes les instances** de cette compétence présentes sur votre fiche.
-                                </p>
-                                <div className="flex items-center justify-center gap-3 text-sm font-serif bg-stone-100/50 px-4 py-2 rounded-sm border border-[#bfae85]/30">
-                                    <span className="line-through text-red-700/60 opacity-60 uppercase tracking-wider">{showRenameConfirm.oldName}</span>
-                                    <ArrowRight size={14} className="text-[#bfae85]" />
-                                    <span className="font-black text-green-800 uppercase tracking-widest">{showRenameConfirm.newSkill.name}</span>
-                                </div>
-                            </div>
-
-                            <div className="bg-amber-50/50 border border-amber-200/50 p-4 rounded-sm flex gap-3 text-left">
-                                <AlertCircle className="text-amber-700 shrink-0" size={18} />
-                                <p className="text-[10px] text-amber-900 leading-tight">
-                                    <strong>Notes :</strong> Vos points acquis, l'expérience dépensée et les spécialisations déjà saisies seront intégralement conservés sous le nouveau nom.
-                                </p>
-                            </div>
-                        </div>
-                    </ThematicModal>
-                )
-            }
         </div >
     );
 };

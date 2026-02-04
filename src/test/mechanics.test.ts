@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { calculateExperienceResults, calculateCardValue } from '../utils/mechanics';
 import { INITIAL_DATA } from '../data/initialState';
-import { CharacterSheetData } from '../types';
+import { CharacterSheetData, RulesData } from '../types';
 
 describe('Mechanics Utils', () => {
     describe('calculateExperienceResults', () => {
@@ -32,6 +32,30 @@ describe('Mechanics Utils', () => {
         });
     });
 
+    it('should use injected rules for counters XP cost', () => {
+        const data: CharacterSheetData = JSON.parse(JSON.stringify(INITIAL_DATA));
+        // Add a counter value
+        data.counters.volonte = { id: 'v1', name: 'Volonté', value: 3, creationValue: 0, max: 10 };
+
+        // Mock rules with a specific cost for 'volonte' (e.g. 10 instead of default 5)
+        // @ts-ignore
+        const mockRules: RulesData = {
+            definitions: {
+                counters: {
+                    volonte: {
+                        id: 'volonte',
+                        name: 'Volonté',
+                        max: 10,
+                        xpCost: 10 // Specific cost for test
+                    }
+                }
+            }
+        } as unknown as RulesData;
+
+        const result = calculateExperienceResults(data, mockRules);
+        // 3 points * 10 cost = 30
+        expect(result.spent).toBe("30");
+    });
     describe('calculateCardValue', () => {
         it('should return null if card feature is disabled', () => {
             const data: CharacterSheetData = JSON.parse(JSON.stringify(INITIAL_DATA));

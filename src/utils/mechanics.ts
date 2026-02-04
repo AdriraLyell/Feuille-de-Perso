@@ -1,8 +1,8 @@
 
-import { CharacterSheetData, ExperienceData, TraitEffect, SkillCategoryKey, DotEntry } from '../types';
+import { CharacterSheetData, ExperienceData, TraitEffect, SkillCategoryKey, DotEntry, RulesData } from '../types';
 
 // --- XP CALCULATION LOGIC ---
-export const calculateExperienceResults = (data: CharacterSheetData): ExperienceData => {
+export const calculateExperienceResults = (data: CharacterSheetData, rules?: RulesData): ExperienceData => {
     // 0. Extract Active Effects from Traits (Avantages/Désavantages)
     const activeEffects: TraitEffect[] = [];
 
@@ -77,10 +77,7 @@ export const calculateExperienceResults = (data: CharacterSheetData): Experience
             }
         });
 
-        // Secondary Skills (Usually half cost, or configurable via specific logic, 
-        // but here we align with the "Specialization" factor logic or keep hardcoded 0.5? 
-        // User said "Like skills but divided by 2", so let's use specFactor or skillFactor * 0.5?
-        // Let's use specFactor as it represents "half cost" things generally in this system.)
+        // Secondary Skills
         const secondSkills = currentData.skills.competences2;
         if (Array.isArray(secondSkills)) {
             secondSkills.forEach(skill => {
@@ -90,18 +87,7 @@ export const calculateExperienceResults = (data: CharacterSheetData): Experience
             });
         }
 
-        // Backgrounds (Usually x2 flat cost in original, but if we move to formula... 
-        // Original code was `diff * 2`. Formula is Triangle * Factor.
-        // Let's assume Backgrounds keep their specific logic OR use a factor.
-        // For now, preserving old logic as user didn't explicitly ask to change backgrounds formula,
-        // just "C'est comme les compétences mais divisé par 2" regarding Specializations (which implies new Formula).
-        // Let's apply formula with factor 1.0 for Backgrounds? No, typically linear.
-        // Let's keep Backgrounds as LINEAR x2 for now (Legacy safe mode). 
-        // Wait, user said "il y a une formule, c'est rang 1 = 1..." which is triangular.
-        // Let's stick to Triangular for everything "Skill-like".
-        // Backgrounds are often linear. Let's keep them linear x2 to avoid breaking them.)
         // Backgrounds
-        // Use configured cost or default to 2 (Linear)
         const bgCost = currentData.creationConfig?.backgroundCost ?? 2;
         const backgroundSkills = currentData.skills.arrieres_plans;
         if (Array.isArray(backgroundSkills)) {
@@ -113,24 +99,7 @@ export const calculateExperienceResults = (data: CharacterSheetData): Experience
         }
 
         // Counters (Volonté, Confiance, etc.)
-        // We need to look up their definition to know the XP cost?
-        // Problem: CharacterSheetData doesn't store the "Definition" (xpCost), only the value.
-        // We rely on rules.definitions.counters which is NOT in data directly.
-        // BUT `data.counters` entries are simple `DotEntry`.
-        // We must inspect `window.EXTERNAL_RULES` or assume we can't calculate it without rules?
-        // OR: We embed the `xpCost` in the `DotEntry` for counters?
-        // Let's assume we can access `window.EXTERNAL_RULES` here as mechanics runs in the browser.
-        // Ideally we should pass rules to this function, but signature change is heavy.
-        // Let's rely on valid "XP Cost" being inferred or passed.
-        // ACTUALLY: `mechanics.ts` is pure. 
-        // Solution: When applying rules, we should store `xpCost` in the Counter DotEntry specifically?
-        // Current `DotEntry` doesn't have `xpCost`.
-        // Let's assume standard names "volonte", "confiance" have hardcoded defaults if rules missing?
-        // No, user wants DYNAMIC. 
-        // Best approach: Use `window.EXTERNAL_RULES` if available for lookup.
-
-        // @ts-ignore
-        const rulesCounters = window.EXTERNAL_RULES?.definitions?.counters;
+        const rulesCounters = rules?.definitions?.counters;
 
         if (rulesCounters && currentData.counters) {
             Object.keys(currentData.counters).forEach(key => {
