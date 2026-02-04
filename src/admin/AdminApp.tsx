@@ -445,6 +445,8 @@ const AdminApp: React.FC = () => {
                     cancelLabel="" // Hide cancel button
                 />
             )}
+
+            <DeploymentMonitor />
         </div >
     );
 };

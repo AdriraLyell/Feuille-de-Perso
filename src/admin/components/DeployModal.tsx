@@ -20,46 +20,11 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
     const [filePath, setFilePath] = useState<string>('public/data/rules.js');
     const [branch, setBranch] = useState<string>('main');
 
-    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [status, setStatus] = useState<'idle' | 'loading' | 'building' | 'success' | 'error'>('idle');
     const [message, setMessage] = useState<string>('');
+    const [statusDetail, setStatusDetail] = useState<string>('');
 
-    // Version Check State
-    const [remoteVersion, setRemoteVersion] = useState<string | null>(null);
-    const [isStale, setIsStale] = useState<boolean>(false);
-
-    // Check for "Stale Admin" on mount
-    React.useEffect(() => {
-        if (isOpen) {
-            checkRemoteVersion();
-        }
-    }, [isOpen]);
-
-    const checkRemoteVersion = async () => {
-        try {
-            const res = await fetch(`${REMOTE_MANIFEST_URL}?t=${Date.now()}`); // Burst cache
-            if (res.ok) {
-                const manifest = await res.json();
-                if (manifest.version && manifest.version !== APP_VERSION) {
-                    setRemoteVersion(manifest.version);
-                    // Simple string compare or semver? Assuming exact match needed for "freshness".
-                    // If remote is different, it's likely newer (or we rolled back).
-                    // Let's assume different = potential issue if remote > local.
-                    // For now, simpler: if different, warn.
-                    setIsStale(manifest.version > APP_VERSION);
-                }
-            }
-        } catch (e) {
-            console.warn("Utils: Version check failed", e);
-        }
-    };
-
-    if (!isOpen) return null;
-
-    const saveCredentials = () => {
-        localStorage.setItem('GITHUB_TOKEN', token);
-        localStorage.setItem('GITHUB_OWNER', repoOwner);
-        localStorage.setItem('GITHUB_REPO', repoName);
-    };
+    // ... (rest of the file until handleDeploy)
 
     const handleDeploy = async () => {
         if (!token || !repoOwner || !repoName) {
@@ -72,31 +37,82 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
         setMessage('Préparation du déploiement...');
         saveCredentials();
 
-        // Prepare content
+        // 1. Publish File
         const content = generateRulesJSContent(rules);
         const commitMessage = `update(rules): Mise à jour automatique depuis Admin App v${rules.version}`;
+
+        const connectConfig = {
+            token,
+            owner: repoOwner,
+            repo: repoName,
+            branch: branch
+        };
 
         const result = await publishFileToGitHub(
             filePath,
             content,
             commitMessage,
-            {
-                token,
-                owner: repoOwner,
-                repo: repoName,
-                branch: branch
-            }
+            connectConfig
         );
 
-        if (result.success) {
+        if (!result.success) {
+            setStatus('error');
+            setMessage(result.message || 'Erreur inconnue lors du déploiement.');
+            return;
+        }
+
+        // 2. Monitor Build
+        setStatus('building');
+        setMessage('Fichier envoyé. Attente du démarrage du déploiement GitHub Pages...');
+
+        // Wait a few seconds for GitHub to trigger the workflow
+        await new Promise(r => setTimeout(r, 5000));
+
+        let run = await import('../../services/githubService').then(m => m.getLatestWorkflowRun(connectConfig));
+
+        // Ensure we got a VERY recent run (created in the last minute)
+        // If the latest run is old, we poll a bit to see if a new one appears
+        let attempts = 0;
+        while (attempts < 5) {
+            const runDate = run ? new Date(run.created_at).getTime() : 0;
+            const now = Date.now();
+            // If run is older than 2 minutes, it's likely the previous one
+            if (!run || (now - runDate > 120000)) {
+                await new Promise(r => setTimeout(r, 3000));
+                run = await import('../../services/githubService').then(m => m.getLatestWorkflowRun(connectConfig));
+                attempts++;
+            } else {
+                break;
+            }
+        }
+
+        if (!run) {
+            setStatus('success'); // Downgrade to simple success if we can't track
+            setMessage('Fichier mis à jour ! (Impossible de suivre le déploiement automatique, mais le fichier est bien sur GitHub).');
+            return;
+        }
+
+        setStatusDetail(`Workflow #${run.id} détecté. En cours d'exécution...`);
+
+        // 3. Poll for completion
+        const finalStatus = await import('../../services/githubService').then(m => m.waitForWorkflowCompletion(
+            run.id,
+            connectConfig,
+            (s) => setStatusDetail(`Status GitHub : ${s}`)
+        ));
+
+        if (finalStatus === 'success') {
             setStatus('success');
-            setMessage('Fichier rules.js mis à jour avec succès ! Le déploiement GitHub Pages devrait démarrer.');
+            setMessage('Déploiement terminé avec succès ! Votre nouvelle version est en ligne.');
             if (onDeploySuccess && result.sha) {
                 onDeploySuccess(result.sha, token);
             }
+        } else if (finalStatus === 'failure') {
+            setStatus('error');
+            setMessage('Le fichier a été mis à jour, mais le déploiement GitHub Pages a échoué. Vérifiez l\'onglet "Actions" sur GitHub.');
         } else {
             setStatus('error');
-            setMessage(result.message || 'Erreur inconnue lors du déploiement.');
+            setMessage('Délai d\'attente dépassé pour le déploiement.');
         }
     };
 
@@ -209,7 +225,7 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
                     >
                         Fermer
                     </button>
-                    {status !== 'success' && (
+                    {status !== 'success' && status !== 'building' && (
                         <button
                             onClick={handleDeploy}
                             disabled={status === 'loading'}
@@ -217,6 +233,16 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
                         >
                             {status === 'loading' ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                             Publier
+                        </button>
+                    )}
+
+                    {status === 'building' && (
+                        <button
+                            disabled
+                            className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded font-bold text-sm transition-colors disabled:opacity-90"
+                        >
+                            <Loader2 size={16} className="animate-spin" />
+                            Déploiement en cours...
                         </button>
                     )}
                 </div>

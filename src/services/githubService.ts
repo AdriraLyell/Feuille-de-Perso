@@ -93,3 +93,75 @@ export async function publishFileToGitHub(
         };
     }
 }
+
+/**
+ * Fetches the latest workflow run for a repository branch.
+ */
+export async function getLatestWorkflowRun(
+    config: GitHubConnectConfig
+): Promise<any | null> {
+    // List runs for the branch, event=push is likely what we want, but just latest is safer
+    const apiUrl = `https://api.github.com/repos/${config.owner}/${config.repo}/actions/runs?branch=${config.branch}&per_page=1`;
+
+    try {
+        const res = await fetch(apiUrl, {
+            headers: {
+                'Authorization': `Bearer ${config.token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            return data.workflow_runs?.[0] || null;
+        }
+        return null;
+    } catch (error) {
+        console.warn('GitHub Service: Get workflow failed', error);
+        return null;
+    }
+}
+
+/**
+ * Polls a workflow run until it completes or times out.
+ */
+export async function waitForWorkflowCompletion(
+    runId: number,
+    config: GitHubConnectConfig,
+    onStatusChange?: (status: string) => void
+): Promise<'success' | 'failure' | 'timeout'> {
+    const MAX_RETRIES = 60; // 60 * 5s = 5 minutes timeout
+    const POLL_INTERVAL = 5000;
+
+    for (let i = 0; i < MAX_RETRIES; i++) {
+        const apiUrl = `https://api.github.com/repos/${config.owner}/${config.repo}/actions/runs/${runId}`;
+
+        try {
+            const res = await fetch(apiUrl, {
+                headers: {
+                    'Authorization': `Bearer ${config.token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (res.ok) {
+                const run = await res.json();
+
+                if (onStatusChange) {
+                    onStatusChange(run.status);
+                }
+
+                if (run.status === 'completed') {
+                    if (run.conclusion === 'success') return 'success';
+                    return 'failure';
+                }
+            }
+        } catch (error) {
+            console.warn('Polling error:', error);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL));
+    }
+
+    return 'timeout';
+}
