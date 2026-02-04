@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { RulesData } from '../../types/rules';
-import { Plus, Trash2, GripVertical, AlertCircle, Minus } from 'lucide-react';
+import { LibrarySkillEntry } from '../../types';
+import { Plus, Trash2, GripVertical, AlertCircle, Minus, FolderSync, CheckCircle2 } from 'lucide-react';
 import AdminSkillLibrarySidebar from './libraries/AdminSkillLibrarySidebar';
 
 interface AdminSkillsEditorProps {
@@ -16,6 +17,67 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
     const skillsMap = definitions.skills;
     const labelsMap = definitions.labels || {};
     const [draggedItem, setDraggedItem] = useState<DragItem | null>(null);
+    const [syncSuccess, setSyncSuccess] = useState<string | null>(null);
+
+    // -- Library Sync Logic --
+    const ensureSkillInLibrary = (skillName: string, category: string, currentRules: RulesData): RulesData | null => {
+        if (!skillName || skillName.trim() === "" || skillName === "Nouvelle Compétence") return null;
+
+        const lib = currentRules.libraries?.skills || [];
+        const exists = lib.some(s => s.name.trim().toLowerCase() === skillName.trim().toLowerCase());
+
+        if (!exists) {
+            const newEntry: LibrarySkillEntry = {
+                id: Math.random().toString(36).substr(2, 9),
+                name: skillName.trim(),
+                description: "",
+                defaultCategory: category,
+                isVariable: false
+            };
+            const newLib = [...lib, newEntry].sort((a, b) => a.name.localeCompare(b.name));
+
+            return {
+                ...currentRules,
+                libraries: {
+                    ...currentRules.libraries,
+                    skills: newLib
+                }
+            };
+        }
+        return null;
+    };
+
+    const handleSkillBlur = (category: string, skillName: string) => {
+        const updatedRules = ensureSkillInLibrary(skillName, category, rules);
+        if (updatedRules) {
+            onUpdate(updatedRules);
+        }
+    };
+
+    const handleSyncAll = () => {
+        let currentRules = { ...rules };
+        let addedCount = 0;
+
+        Object.keys(currentRules.definitions.skills).forEach(category => {
+            const skills = currentRules.definitions.skills[category] || [];
+            skills.forEach(skillName => {
+                const updated = ensureSkillInLibrary(skillName, category, currentRules);
+                if (updated) {
+                    currentRules = updated;
+                    addedCount++;
+                }
+            });
+        });
+
+        if (addedCount > 0) {
+            onUpdate(currentRules);
+            setSyncSuccess(`${addedCount} compétence(s) ajoutée(s) à la bibliothèque.`);
+            setTimeout(() => setSyncSuccess(null), 3000);
+        } else {
+            setSyncSuccess("Bibliothèque déjà à jour.");
+            setTimeout(() => setSyncSuccess(null), 3000);
+        }
+    };
 
     // Safety check for categories structure
     const categories = Object.keys(skillsMap);
@@ -215,6 +277,7 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
                                     <input
                                         value={skillName}
                                         onChange={(e) => updateSkillName(category, index, e.target.value)}
+                                        onBlur={() => handleSkillBlur(category, skillName)}
                                         className="border border-[#bfae85]/30 p-1 rounded-sm w-full focus:border-[#8b2e2e] outline-none bg-white/50 text-xs font-bold text-[#2c241b] transition-all shadow-sm"
                                     />
                                 )}
@@ -237,16 +300,25 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
         <div className="flex relative items-start gap-4">
             <div className="flex-grow space-y-8"> {/* Main Content */}
 
-                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 flex justify-between items-start">
                     <div className="flex items-start gap-3">
                         <AlertCircle className="text-blue-500 mt-0.5" size={20} />
                         <div>
                             <h3 className="font-bold text-blue-900 text-sm">Gestion Dynamique</h3>
                             <p className="text-xs text-blue-700 mt-1">
                                 Glissez-déposez pour réorganiser. Glissez vers la réserve (droite) pour archiver.
+                                <br />Les nouvelles compétences sont automatiquement ajoutées à la bibliothèque.
                             </p>
                         </div>
                     </div>
+                    <button
+                        onClick={handleSyncAll}
+                        className="text-xs bg-white border border-blue-200 text-blue-700 px-3 py-1.5 rounded hover:bg-blue-100 transition-colors font-bold flex items-center gap-2 shadow-sm"
+                        title="Ajouter toutes les compétences actuelles à la bibliothèque"
+                    >
+                        {syncSuccess ? <CheckCircle2 size={14} className="text-green-600" /> : <FolderSync size={14} />}
+                        {syncSuccess || "Synchroniser Bibliothèque"}
+                    </button>
                 </div>
 
                 {/* ROW 1 */}

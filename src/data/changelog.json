@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.13.8",
+        "date": "2026-02-04",
+        "type": "patch",
+        "changes": [
+            "Admin (DB) : Correction du mapping des champs (SnakeCase vs CamelCase) pour la sauvegarde des bibliothèques (Compétences, Traits, Spécialisations) dans Supabase.",
+            "Admin : Assurance que les catégories par défaut et les indicateurs 'Variable' sont correctement persistés en base de données."
+        ]
+    },
+    {
+        "version": "2.13.7",
+        "date": "2026-02-04",
+        "type": "patch",
+        "changes": [
+            "Admin : Synchronisation automatique des noms de compétences vers la Bibliothèque lors de l'édition (sur perte de focus).",
+            "Admin : Ajout d'un bouton 'Synchroniser Bibliothèque' dans l'en-tête pour peupler massivement la réserve avec les compétences existantes."
+        ]
+    },
+    {
         "version": "2.13.6",
         "date": "2026-02-04",
         "type": "patch",

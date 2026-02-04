@@ -46,8 +46,22 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
     const [pendingPreset, setPendingPreset] = useState<any>(null);
     const [showPresetConfirm, setShowPresetConfirm] = useState(false);
 
-    // Dynamic categories based on keys in attributesMap
-    const categories = Object.keys(attributesMap);
+    // Dynamic categories based on keys in attributesMap, sorted by standard order
+    const STANDARD_ORDER = ['physique', 'mental', 'social', 'mystique'];
+    const categories = Object.keys(attributesMap).sort((a, b) => {
+        const indexA = STANDARD_ORDER.indexOf(a);
+        const indexB = STANDARD_ORDER.indexOf(b);
+
+        // If both are standard, sort by standard order
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+
+        // If one is standard, it comes first
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+
+        // Otherwise sort alphabetically (or by insertion order helper if needed, but alpha is stable)
+        return a.localeCompare(b);
+    });
 
     // --- PRESETS ---
     const requestPresetLoad = (preset: typeof ATTRIBUTE_PRESETS[0]) => {

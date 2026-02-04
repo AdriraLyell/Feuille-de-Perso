@@ -119,20 +119,48 @@ export const AdminService = {
             supabase.from('libraries_specializations').select('*').eq('setting_id', id)
         ]);
 
+        // Helper to map DB snake_case to TS camelCase
+        const mapTrait = (t: any): any => ({
+            id: t.id,
+            type: t.type,
+            name: t.name,
+            cost: t.cost,
+            description: t.description,
+            tags: t.tags || [],
+            isVariable: t.is_variable,
+            effects: t.effects || []
+        });
+
+        const mapSkill = (s: any): any => ({
+            id: s.id,
+            name: s.name,
+            description: s.description,
+            defaultCategory: s.default_category,
+            isVariable: s.is_variable
+        });
+
+        const mapSpec = (s: any): any => ({
+            id: s.id,
+            name: s.name,
+            description: s.description,
+            skillIds: s.skill_ids || [],
+            defaultMinLevel: s.default_min_level
+        });
+
         // Construct the full object
         const rules: RulesData = {
             version: setting.version,
             lastUpdated: new Date(setting.last_updated).getTime(),
-            // @ts-ignore - DB Types vs TS Types mapping
+            // @ts-ignore
             configurations: setting.configurations,
             // @ts-ignore
             definitions: setting.definitions,
             // @ts-ignore
-            theme: setting.configurations.theme || { creationColor: "#000", xpColor: "#000" }, // Fallback
+            theme: setting.configurations.theme || { creationColor: "#000", xpColor: "#000" },
             libraries: {
-                traits: traitsRes.data || [],
-                skills: skillsRes.data || [],
-                specializations: specsRes.data || []
+                traits: (traitsRes.data || []).map(mapTrait),
+                skills: (skillsRes.data || []).map(mapSkill),
+                specializations: (specsRes.data || []).map(mapSpec)
             }
         };
 
@@ -165,37 +193,55 @@ export const AdminService = {
         }
 
         // 2. Update Libraries (Naive Strategy: Delete All & Re-Insert)
-        // This is safe because 'setting_id' links them. 
-        // Ideally we would do Diffing, but for a "Save" button, replacing is robust.
 
-        // A. Traits
-        await supabase.from('libraries_traits').delete().eq('setting_id', id);
-        if (rules.libraries.traits.length > 0) {
-            const traitsPayload = rules.libraries.traits.map(t => ({
-                setting_id: id,
-                ...t
-            }));
-            await supabase.from('libraries_traits').insert(traitsPayload);
-        }
+        try {
+            // A. Traits
+            await supabase.from('libraries_traits').delete().eq('setting_id', id);
+            if (rules.libraries.traits.length > 0) {
+                const traitsPayload = rules.libraries.traits.map(t => ({
+                    setting_id: id,
+                    id: t.id,
+                    type: t.type,
+                    name: t.name,
+                    cost: t.cost,
+                    description: t.description,
+                    tags: t.tags,
+                    is_variable: t.isVariable,
+                    effects: t.effects
+                }));
+                await supabase.from('libraries_traits').insert(traitsPayload);
+            }
 
-        // B. Skills
-        await supabase.from('libraries_skills').delete().eq('setting_id', id);
-        if (rules.libraries.skills.length > 0) {
-            const skillsPayload = rules.libraries.skills.map(s => ({
-                setting_id: id,
-                ...s
-            }));
-            await supabase.from('libraries_skills').insert(skillsPayload);
-        }
+            // B. Skills
+            await supabase.from('libraries_skills').delete().eq('setting_id', id);
+            if (rules.libraries.skills.length > 0) {
+                const skillsPayload = rules.libraries.skills.map(s => ({
+                    setting_id: id,
+                    id: s.id,
+                    name: s.name,
+                    description: s.description,
+                    default_category: s.defaultCategory,
+                    is_variable: s.isVariable
+                }));
+                await supabase.from('libraries_skills').insert(skillsPayload);
+            }
 
-        // C. Specializations
-        await supabase.from('libraries_specializations').delete().eq('setting_id', id);
-        if (rules.libraries.specializations.length > 0) {
-            const specsPayload = rules.libraries.specializations.map(s => ({
-                setting_id: id,
-                ...s
-            }));
-            await supabase.from('libraries_specializations').insert(specsPayload);
+            // C. Specializations
+            await supabase.from('libraries_specializations').delete().eq('setting_id', id);
+            if (rules.libraries.specializations.length > 0) {
+                const specsPayload = rules.libraries.specializations.map(s => ({
+                    setting_id: id,
+                    id: s.id,
+                    name: s.name,
+                    description: s.description,
+                    skill_ids: s.skillIds,
+                    default_min_level: s.defaultMinLevel
+                }));
+                await supabase.from('libraries_specializations').insert(specsPayload);
+            }
+        } catch (libError) {
+            console.error("Error saving libraries:", libError);
+            return false;
         }
 
         return true;
