@@ -77,9 +77,9 @@ const AdminApp: React.FC = () => {
     // Persistence Hook
     const { hasUnsavedChanges, markAsSaved, resetPersistence } = usePersistence(rules);
 
-    const handleSelectSetting = (id: string, loadedRules: RulesData) => {
+    const handleSelectSetting = (id: string, name: string, loadedRules: RulesData) => {
         setCurrentSettingId(id);
-        setCurrentSettingName(loadedRules.name || "Campagne"); // We might need to ensure name is passed or fetched.
+        setCurrentSettingName(name);
         setRules(loadedRules);
         resetPersistence(); // Reset dirty state for new load
         setViewMode('editor');
