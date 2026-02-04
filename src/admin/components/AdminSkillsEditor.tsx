@@ -28,7 +28,7 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
 
         if (!exists) {
             const newEntry: LibrarySkillEntry = {
-                id: Math.random().toString(36).substr(2, 9),
+                id: crypto.randomUUID(),
                 name: skillName.trim(),
                 description: "",
                 defaultCategory: category,

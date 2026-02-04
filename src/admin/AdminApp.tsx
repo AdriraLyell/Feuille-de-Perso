@@ -97,8 +97,8 @@ const AdminApp: React.FC = () => {
     const handleSaveToCloud = async () => {
         if (!currentSettingId || !rules) return;
         setIsSaving(true);
-        const success = await AdminService.saveSetting(currentSettingId, rules);
-        if (success) {
+        const result = await AdminService.saveSetting(currentSettingId, rules);
+        if (result.success) {
             markAsSaved();
             setSaveFeedback({
                 isOpen: true,
@@ -109,7 +109,7 @@ const AdminApp: React.FC = () => {
             setSaveFeedback({
                 isOpen: true,
                 success: false,
-                message: "Une erreur est survenue lors de la sauvegarde. Vérifiez votre connexion ou les droits d'accès."
+                message: result.message || "Une erreur inconnue est survenue."
             });
         }
         setIsSaving(false);
@@ -205,14 +205,17 @@ const AdminApp: React.FC = () => {
                         <Settings className="text-blue-400" />
                         <h1 className="text-xl font-bold tracking-wide">Éditeur <span className="text-slate-400 font-normal">| {currentSettingName || "Campagne"}</span></h1>
 
-                        {/* Discrete Persistence Status */}
+                        {/* Hidden Debug Button (Ctrl+Click on Settings) */}
                         <div className="ml-4 pl-4 border-l border-slate-700 flex items-center" title={hasUnsavedChanges ? "Modifications locales non publiées" : "Synchronisé"}>
                             {hasUnsavedChanges ? (
                                 <div className="flex items-center gap-2 text-amber-400 animate-pulse">
                                     <AlertTriangle size={20} />
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-2 text-green-400/50">
+                                <div
+                                    className="flex items-center gap-2 text-green-400/50 cursor-pointer"
+                                    onClick={() => currentSettingId && AdminService.checkSchema(currentSettingId)}
+                                >
                                     <Cloud size={20} />
                                 </div>
                             )}

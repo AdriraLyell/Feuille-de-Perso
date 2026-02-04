@@ -171,7 +171,7 @@ export const AdminService = {
      * Save/Update a setting
      * This is complex because we must save the root AND the libraries
      */
-    async saveSetting(id: string, rules: RulesData, name?: string): Promise<boolean> {
+    async saveSetting(id: string, rules: RulesData, name?: string): Promise<{ success: boolean; message?: string }> {
 
         // 1. Update Root
         const rootUpdate: any = {
@@ -189,14 +189,16 @@ export const AdminService = {
 
         if (rootError) {
             console.error("Failed to update root setting:", rootError);
-            return false;
+            return { success: false, message: `Erreur MAJ Root: ${rootError.message}` };
         }
 
         // 2. Update Libraries (Naive Strategy: Delete All & Re-Insert)
 
         try {
             // A. Traits
-            await supabase.from('libraries_traits').delete().eq('setting_id', id);
+            const { error: delTraitsErr } = await supabase.from('libraries_traits').delete().eq('setting_id', id);
+            if (delTraitsErr) throw new Error("Delete Traits: " + delTraitsErr.message);
+
             if (rules.libraries.traits.length > 0) {
                 const traitsPayload = rules.libraries.traits.map(t => ({
                     setting_id: id,
@@ -209,11 +211,14 @@ export const AdminService = {
                     is_variable: t.isVariable,
                     effects: t.effects
                 }));
-                await supabase.from('libraries_traits').insert(traitsPayload);
+                const { error: insTraitsErr } = await supabase.from('libraries_traits').insert(traitsPayload);
+                if (insTraitsErr) throw new Error("Insert Traits: " + insTraitsErr.message);
             }
 
             // B. Skills
-            await supabase.from('libraries_skills').delete().eq('setting_id', id);
+            const { error: delSkillsErr } = await supabase.from('libraries_skills').delete().eq('setting_id', id);
+            if (delSkillsErr) throw new Error("Delete Skills: " + delSkillsErr.message);
+
             if (rules.libraries.skills.length > 0) {
                 const skillsPayload = rules.libraries.skills.map(s => ({
                     setting_id: id,
@@ -223,11 +228,14 @@ export const AdminService = {
                     default_category: s.defaultCategory,
                     is_variable: s.isVariable
                 }));
-                await supabase.from('libraries_skills').insert(skillsPayload);
+                const { error: insSkillsErr } = await supabase.from('libraries_skills').insert(skillsPayload);
+                if (insSkillsErr) throw new Error("Insert Skills: " + insSkillsErr.message);
             }
 
             // C. Specializations
-            await supabase.from('libraries_specializations').delete().eq('setting_id', id);
+            const { error: delSpecsErr } = await supabase.from('libraries_specializations').delete().eq('setting_id', id);
+            if (delSpecsErr) throw new Error("Delete Specs: " + delSpecsErr.message);
+
             if (rules.libraries.specializations.length > 0) {
                 const specsPayload = rules.libraries.specializations.map(s => ({
                     setting_id: id,
@@ -237,14 +245,15 @@ export const AdminService = {
                     skill_ids: s.skillIds,
                     default_min_level: s.defaultMinLevel
                 }));
-                await supabase.from('libraries_specializations').insert(specsPayload);
+                const { error: insSpecsErr } = await supabase.from('libraries_specializations').insert(specsPayload);
+                if (insSpecsErr) throw new Error("Insert Specs: " + insSpecsErr.message);
             }
         } catch (libError) {
             console.error("Error saving libraries:", libError);
-            return false;
+            return { success: false, message: `Erreur Bibliothèques: ${(libError as Error).message}` };
         }
 
-        return true;
+        return { success: true };
     },
 
     /**
@@ -280,5 +289,29 @@ export const AdminService = {
             return false;
         }
         return true;
+    },
+
+    async checkSchema(id: string): Promise<void> {
+        console.log("--- DEBUG SCHEMA ---");
+
+        // Check Skills Table
+        const { data: skills, error: skillsError } = await supabase
+            .from('libraries_skills')
+            .select('*')
+            .eq('setting_id', id)
+            .limit(1);
+
+        if (skillsError) console.error("Skills Schema Error:", skillsError);
+        else console.log("Skills Sample:", skills?.[0] ? Object.keys(skills[0]) : "Empty Table");
+
+        // Check Traits Table
+        const { data: traits, error: traitsError } = await supabase
+            .from('libraries_traits')
+            .select('*')
+            .eq('setting_id', id)
+            .limit(1);
+
+        if (traitsError) console.error("Traits Schema Error:", traitsError);
+        else console.log("Traits Sample:", traits?.[0] ? Object.keys(traits[0]) : "Empty Table");
     }
 }
