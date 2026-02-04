@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { RulesData } from '../../types/rules';
-import { Plus, Trash2, GripVertical, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, GripVertical, AlertCircle, Minus } from 'lucide-react';
 import AdminSkillLibrarySidebar from './libraries/AdminSkillLibrarySidebar';
 
 interface AdminSkillsEditorProps {
@@ -46,9 +46,9 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
         });
     };
 
-    const addSkill = (category: string) => {
+    const addSkill = (category: string, isSpacer = false) => {
         const currentList = skillsMap[category] || [];
-        updateSkillList(category, [...currentList, "Nouvelle Compétence"]);
+        updateSkillList(category, [...currentList, isSpacer ? "" : "Nouvelle Compétence"]);
     };
 
     const removeSkill = (category: string, index: number) => {
@@ -77,22 +77,66 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
         e.dataTransfer.dropEffect = "move";
     };
 
-    const handleDropOnColumn = (e: React.DragEvent, category: string) => {
+    const handleDropOnColumn = (e: React.DragEvent, targetCategory: string, targetIndex: number) => {
         e.preventDefault();
+        e.stopPropagation();
         if (!draggedItem) return;
 
-        if (draggedItem.type === 'admin_lib_skill') {
-            // Add from Library
-            const skillName = draggedItem.name || draggedItem.data.name;
-            const currentList = skillsMap[category] || [];
+        // 1. Reordering within/between Columns
+        if (draggedItem.type === 'admin_sheet_skill') {
+            const sourceCategory = draggedItem.category!;
+            const sourceIndex = draggedItem.index!;
 
-            // Check existence
-            if (currentList.includes(skillName)) return;
+            // Get Lists
+            const sourceList = [...(skillsMap[sourceCategory] || [])];
+            const targetList = (sourceCategory === targetCategory)
+                ? sourceList
+                : [...(skillsMap[targetCategory] || [])];
 
-            updateSkillList(category, [...currentList, skillName]);
+            // Remove from source
+            const [itemToMove] = sourceList.splice(sourceIndex, 1);
+
+            // Insert into target (handle boundaries)
+            // If dropping on container (targetIndex undefined or similar logic needed if container drop)
+            // But here targetIndex comes from list mapping, so it's precise.
+            // If dragging to end, targetIndex might be length
+            if (targetIndex === -1 || targetIndex >= targetList.length) {
+                targetList.push(itemToMove);
+            } else {
+                targetList.splice(targetIndex, 0, itemToMove);
+            }
+
+            // Update State
+            const newDefinitions = { ...rules.definitions };
+            newDefinitions.skills = { ...newDefinitions.skills };
+
+            newDefinitions.skills[sourceCategory] = sourceList;
+            if (sourceCategory !== targetCategory) {
+                newDefinitions.skills[targetCategory] = targetList;
+            }
+
+            onUpdate({ ...rules, definitions: newDefinitions });
         }
 
-        // Reordering within same category (Optional, currently simplified)
+        // 2. Mobile Library Drop
+        else if (draggedItem.type === 'admin_lib_skill') {
+            const skillName = draggedItem.name || draggedItem.data.name;
+            const currentList = [...(skillsMap[targetCategory] || [])];
+
+            // Avoid duplicates
+            if (currentList.includes(skillName)) {
+                setDraggedItem(null);
+                return;
+            }
+
+            if (targetIndex === -1 || targetIndex >= currentList.length) {
+                currentList.push(skillName);
+            } else {
+                currentList.splice(targetIndex, 0, skillName);
+            }
+
+            updateSkillList(targetCategory, currentList);
+        }
 
         setDraggedItem(null);
     };
@@ -100,92 +144,98 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
     const renderColumn = (category: string) => {
         const list = skillsMap[category] || [];
         const label = labelsMap[category] || category;
-
-        const isDropTarget = draggedItem?.type === 'admin_lib_skill';
+        const isDraggingOver = draggedItem?.type === 'admin_lib_skill';
 
         return (
             <div
                 key={category}
-                className={`flex flex-col h-[500px] bg-white p-4 rounded shadow-sm border transition-colors ${isDropTarget ? 'border-blue-300 ring-2 ring-blue-100' : 'border-slate-200'}`}
+                className={`flex flex-col min-h-[400px] transition-all duration-300 rounded-sm border ${isDraggingOver ? 'border-dashed border-blue-400 bg-blue-50/50' : 'bg-white border-slate-200 shadow-sm'}`}
                 onDragOver={handleDragOver}
-                onDrop={(e) => handleDropOnColumn(e, category)}
+                onDrop={(e) => handleDropOnColumn(e, category, list.length)} // Default drop at end
             >
-                {/* Header with Editable Label */}
-                <div className="mb-4 border-b border-slate-200 pb-2">
-                    <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Catégorie (ID: {category})</label>
-                    <div className="flex items-center gap-2">
+                {/* HEADERS MATCHING PLAYER SETTINGS STYLE */}
+                <div className="font-bold text-[10px] mb-4 text-slate-600 border-b border-slate-200 p-4 pb-2 flex justify-between items-center select-none uppercase tracking-widest bg-slate-50/50">
+                    <div className="flex-grow">
+                        {/* Hidden Input for Rename */}
                         <input
                             value={label}
                             onChange={(e) => updateLabel(category, e.target.value)}
-                            className="font-bold text-sm bg-transparent border-b border-dashed border-slate-300 focus:border-blue-500 outline-none w-full text-slate-800"
+                            className="bg-transparent border-none outline-none w-full text-slate-600 placeholder:text-slate-300 focus:text-blue-600 focus:bg-white rounded hover:bg-white/50 transition-colors cursor-text"
+                            placeholder={category.toUpperCase()}
+                            title="Renommer la catégorie"
                         />
+                    </div>
+
+                    <div className="flex gap-1 ml-2">
                         <button
-                            onClick={() => addSkill(category)}
-                            className="bg-green-600 text-white p-1 rounded hover:bg-green-700 transition-colors shadow-sm"
-                            title="Ajouter une compétence"
+                            onClick={() => addSkill(category, true)}
+                            className="text-[9px] bg-slate-400 text-white px-2 py-1 rounded-sm flex items-center gap-1 hover:bg-slate-500 transition-colors font-bold shadow-sm"
+                            title="Ajouter un espaceur"
                         >
-                            <Plus size={14} />
+                            <Minus size={10} />
                         </button>
                         <button
-                            onClick={() => updateSkillList(category, [...(skillsMap[category] || []), ""])}
-                            className="bg-slate-200 text-slate-600 p-1 rounded hover:bg-slate-300 transition-colors shadow-sm"
-                            title="Ajouter un espaceur (séparateur)"
+                            onClick={() => addSkill(category)}
+                            className="text-[9px] bg-[#166534] text-white px-2 py-1 rounded-sm flex items-center gap-1 hover:bg-[#114b27] transition-colors font-bold shadow-sm"
                         >
-                            <GripVertical size={14} />
+                            <Plus size={10} />
                         </button>
                     </div>
                 </div>
 
-                {/* List */}
-                <div className="flex-grow overflow-y-auto pr-2 space-y-2 custom-scrollbar relative">
-                    {/* Visual Hint for Drop */}
-                    {isDropTarget && (
-                        <div className="absolute inset-0 bg-blue-50/50 flex items-center justify-center pointer-events-none border-2 border-dashed border-blue-200 rounded m-1">
-                            <span className="text-blue-600 font-bold bg-white/80 px-2 py-1 rounded">Ajouter ici</span>
+                <div className="flex-grow overflow-y-auto space-y-2 px-4 pb-4 custom-scrollbar">
+                    {list.length === 0 && (
+                        <div className="h-16 border-2 border-dashed border-slate-200 rounded-sm flex items-center justify-center text-slate-400 text-[10px] pointer-events-none italic">
+                            Zone de dépôt
                         </div>
                     )}
 
-                    {list.map((skillName, index) => (
-                        <div
-                            key={index}
-                            draggable={skillName !== ""}
-                            onDragStart={(e) => handleDragStart(e, 'admin_sheet_skill', { category, index, name: skillName })}
-                            className="flex items-center gap-2 group p-1 hover:bg-slate-50 rounded cursor-grab active:cursor-grabbing"
-                        >
-                            <span className="text-[10px] text-slate-300 font-mono w-4">{index + 1}</span>
-                            {skillName === "" ? (
-                                <div className="flex-grow h-6 flex items-center justify-center bg-slate-100 rounded border border-slate-200 cursor-not-allowed" title="Espaceur (Séparateur)">
-                                    <div className="h-0.5 w-full bg-slate-300 mx-2"></div>
-                                </div>
-                            ) : (
-                                <input
-                                    value={skillName}
-                                    onChange={(e) => updateSkillName(category, index, e.target.value)}
-                                    className="flex-grow text-xs font-medium border border-transparent hover:border-slate-200 focus:border-blue-400 rounded px-1 py-0.5 outline-none bg-transparent focus:bg-white transition-all text-slate-700"
-                                />
-                            )}
-                            <button
-                                onClick={() => removeSkill(category, index)}
-                                className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-600"
-                                title="Supprimer"
+                    {list.map((skillName, index) => {
+                        const isDragging = draggedItem?.type === 'admin_sheet_skill' && draggedItem?.index === index && draggedItem?.category === category;
+
+                        return (
+                            <div
+                                key={index}
+                                draggable={skillName !== ""}
+                                onDragStart={(e) => handleDragStart(e, 'admin_sheet_skill', { category, index, name: skillName })}
+                                onDragOver={handleDragOver}
+                                onDrop={(e) => { e.stopPropagation(); handleDropOnColumn(e, category, index); }}
+                                className={`flex items-center gap-2 group transition-all duration-200 p-1 rounded-sm ${isDragging ? 'opacity-50 bg-slate-100' : 'hover:bg-slate-50'}`}
                             >
-                                <Trash2 size={12} />
-                            </button>
-                        </div>
-                    ))}
-                    {list.length === 0 && (
-                        <div className="text-center italic text-xs text-slate-400 py-4">
-                            Aucune compétence
-                        </div>
-                    )}
+                                <div className="cursor-grab text-slate-300 hover:text-blue-600 active:cursor-grabbing p-1 transition-colors">
+                                    <GripVertical size={16} />
+                                </div>
+                                <span className="text-slate-300 text-[9px] w-4 text-center select-none font-mono">{index + 1}</span>
+
+                                {skillName === "" ? (
+                                    <div className="flex-grow h-7 bg-slate-50 border border-dashed border-slate-200 rounded-sm flex items-center justify-center text-[10px] text-slate-400 italic cursor-default select-none">
+                                        Espaceur
+                                    </div>
+                                ) : (
+                                    <input
+                                        value={skillName}
+                                        onChange={(e) => updateSkillName(category, index, e.target.value)}
+                                        className="border border-slate-200 p-1 rounded-sm w-full focus:border-blue-500 outline-none bg-white/80 text-xs font-bold text-slate-700 transition-all shadow-sm"
+                                    />
+                                )}
+                                <button
+                                    onClick={() => removeSkill(category, index)}
+                                    className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-600 p-1"
+                                    title="Archiver"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         );
     };
 
     return (
-        <div className="flex relative">
-            <div className="flex-grow pr-80 p-1 space-y-8"> {/* Main Content with Spacing */}
+        <div className="flex relative items-start gap-4">
+            <div className="flex-grow space-y-8 pr-80"> {/* Main Content */}
 
                 <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
                     <div className="flex items-start gap-3">
@@ -193,38 +243,31 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
                         <div>
                             <h3 className="font-bold text-blue-900 text-sm">Gestion Dynamique</h3>
                             <p className="text-xs text-blue-700 mt-1">
-                                Glissez-déposez des compétences depuis la réserve (à droite) pour les ajouter.
-                                Glissez une compétence vers la réserve pour l'archiver.
+                                Glissez-déposez pour réorganiser. Glissez vers la réserve (droite) pour archiver.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                {/* ROW 1 : Standard Columns */}
-                <div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {renderColumn("talents")}
-                        {renderColumn("competences")}
-                        {renderColumn("competences_col_2")}
-                        {renderColumn("connaissances")}
-                    </div>
+                {/* ROW 1 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {renderColumn("talents")}
+                    {renderColumn("competences")}
+                    {renderColumn("competences_col_2")}
+                    {renderColumn("connaissances")}
                 </div>
 
-                {/* ROW 2 : Secondary & Backgrounds */}
-                <div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {renderColumn("autres_competences")}
-                        {renderColumn("competences2")}
-                        {renderColumn("autres")}
-                        {renderColumn("arrieres_plans")}
-                    </div>
+                {/* ROW 2 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {renderColumn("autres_competences")}
+                    {renderColumn("competences2")}
+                    {renderColumn("autres")}
+                    {renderColumn("arrieres_plans")}
                 </div>
 
-                {/* ROW 3 : Counters */}
-                <div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {renderColumn("counters")}
-                    </div>
+                {/* ROW 3 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {renderColumn("counters")}
                 </div>
 
             </div>
