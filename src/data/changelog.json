@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.13.4",
+        "date": "2026-02-04",
+        "type": "patch",
+        "changes": [
+            "UI (Admin) : Correction finale du padding et de la structure des widgets de compétences pour un alignement pixel-perfect avec la vue Joueur."
+        ]
+    },
+    {
         "version": "2.13.3",
         "date": "2026-02-04",
         "type": "patch",
