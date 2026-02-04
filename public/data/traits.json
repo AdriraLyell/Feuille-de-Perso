@@ -1,0 +1,250 @@
+{
+  "meta": {
+    "version": "2.12.55",
+    "date": "2026-02-04T11:37:22.129Z",
+    "type": "traits"
+  },
+  "data": [
+    {
+      "id": "l80rw72gm",
+      "name": "Cadeau MJ",
+      "type": "desavantage",
+      "cost": "5",
+      "description": "Bonus offert par le MJ",
+      "tags": [
+        "mj",
+        "cadeau"
+      ],
+      "effects": []
+    },
+    {
+      "id": "27hybts0z",
+      "name": "Etranger",
+      "type": "desavantage",
+      "cost": "2",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "31knlq1xw",
+      "name": "Curieux",
+      "type": "desavantage",
+      "cost": "2",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "cvb4iaq8u",
+      "name": "Mal des Transports",
+      "type": "desavantage",
+      "cost": "3",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "35byyexj9",
+      "name": "Enfant",
+      "type": "desavantage",
+      "cost": "3",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "406i9uq49",
+      "name": "Seul au Monde",
+      "type": "desavantage",
+      "cost": "2",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "b4su9ob6a",
+      "name": "Règles",
+      "type": "desavantage",
+      "cost": "2",
+      "description": "Arts Martiaux",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "qhsbib53c",
+      "name": "Allergie",
+      "type": "desavantage",
+      "cost": "2",
+      "description": "Matériau qui est le point faible de la créature scellée",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "gice3jgxx",
+      "name": "Addiction",
+      "type": "desavantage",
+      "cost": "2",
+      "description": "Thé - Céremonie",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "bg6qovqvk",
+      "name": "Ennemi",
+      "type": "desavantage",
+      "cost": "3",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "py8mr8e76",
+      "name": "Recherché",
+      "type": "desavantage",
+      "cost": "1",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "h5ii3z1lg",
+      "name": "Possédé",
+      "type": "desavantage",
+      "cost": "5",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "0i1j6c4kw",
+      "name": "Mauvaises Nuits",
+      "type": "desavantage",
+      "cost": "3",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "eew87u5in",
+      "name": "Amnésie",
+      "type": "desavantage",
+      "cost": "2",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "3lrtkvj9x",
+      "name": "Marche dans les Ombres",
+      "type": "avantage",
+      "cost": "2",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "z41ohltyl",
+      "name": "Maitre",
+      "type": "avantage",
+      "cost": "3",
+      "description": "",
+      "tags": [],
+      "effects": [
+        {
+          "id": "h6wxnagx8",
+          "type": "free_skill_rank",
+          "value": 5,
+          "target": "Bagarre"
+        }
+      ]
+    },
+    {
+      "id": "o83xervd2",
+      "name": "Reflexes Rapides",
+      "type": "avantage",
+      "cost": "1",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "oobdgthdl",
+      "name": "Hyperlaxite",
+      "type": "avantage",
+      "cost": "1",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "ny4i8hfzm",
+      "name": "Héros d'Exception",
+      "type": "avantage",
+      "cost": "3",
+      "description": "",
+      "tags": [],
+      "effects": [
+        {
+          "id": "dod5zpi6j",
+          "type": "xp_bonus",
+          "value": 20
+        }
+      ]
+    },
+    {
+      "id": "le2wsayjc",
+      "name": "XCT Pack",
+      "type": "avantage",
+      "cost": "5",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "5qcasdidj",
+      "name": "Petit Dormeur",
+      "type": "avantage",
+      "cost": "1",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "awghegaqm",
+      "name": "Apprentissage Rapide",
+      "type": "avantage",
+      "cost": "2",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "vmxd17jtc",
+      "name": "XCT Art Martiaux",
+      "type": "avantage",
+      "cost": "5",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "5syhnofnw",
+      "name": "Ambidextre",
+      "type": "avantage",
+      "cost": "1",
+      "description": "",
+      "tags": [],
+      "effects": []
+    },
+    {
+      "id": "iyh98j31l",
+      "name": "Action Supplémentaire",
+      "type": "avantage",
+      "cost": "5",
+      "description": "Acc sup de combat",
+      "tags": [],
+      "effects": []
+    }
+  ]
+}
