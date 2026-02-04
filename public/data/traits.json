@@ -1,7 +1,7 @@
 {
   "meta": {
-    "version": "2.12.55",
-    "date": "2026-02-04T12:41:36.244Z",
+    "version": "2.12.57",
+    "date": "2026-02-04T12:53:35.281Z",
     "type": "traits"
   },
   "data": [
@@ -76,18 +76,20 @@
       "name": "Allergie",
       "type": "desavantage",
       "cost": "2",
-      "description": "Matériau qui est le point faible de la créature scellée",
+      "description": "",
       "tags": [],
-      "effects": []
+      "effects": [],
+      "isVariable": true
     },
     {
       "id": "gice3jgxx",
       "name": "Addiction",
       "type": "desavantage",
       "cost": "2",
-      "description": "Thé - Céremonie",
+      "description": "",
       "tags": [],
-      "effects": []
+      "effects": [],
+      "isVariable": true
     },
     {
       "id": "bg6qovqvk",
