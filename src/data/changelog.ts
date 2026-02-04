@@ -3,6 +3,13 @@ import { ChangelogEntry } from '../types';
 
 export const CHANGELOG = [
     {
+        version: '2.12.54',
+        date: '2026-02-04',
+        changes: [
+            'Système : Optimisation majeure de la détection des mises à jour. L\'application utilise désormais l\'API GitHub (mode rapide) pour contourner le délai de 5 minutes du CDN, avec repli automatique sur le CDN en cas de limite atteinte.',
+        ]
+    },
+    {
         version: '2.12.53',
         date: '2026-02-03',
         changes: [

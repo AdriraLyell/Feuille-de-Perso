@@ -1,5 +1,5 @@
 import { RulesData } from '../types/rules';
-import { RAW_RULES_URL } from '../constants';
+import { RAW_RULES_URL, REPO_OWNER, REPO_NAME } from '../constants';
 
 // @ts-ignore
 declare global {
@@ -81,16 +81,60 @@ export const loadRules = async (): Promise<RulesData | null> => {
 export const checkForUpdate = async (currentRules: RulesData | null): Promise<boolean> => {
     if (!currentRules) return false;
 
+    if (!currentRules) return false;
+
+    // Helper to parse rules from JS text
+    const parseRulesFromText = (text: string): RulesData | null => {
+        const jsonMatch = text.match(/window\.EXTERNAL_RULES\s*=\s*(\{[\s\S]*\});?/);
+        if (jsonMatch && jsonMatch[1]) {
+            return JSON.parse(jsonMatch[1]) as RulesData;
+        }
+        return null;
+    };
+
     try {
+        // STRATEGY 1: GitHub API (Instant, No CDN Cache, but Rate Limited 60/h)
+        // We use "Accept: application/vnd.github.v3.raw" to get content directly without Base64 decoding
+        const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/public/data/rules.js?ref=main`;
+
+        console.log('[RulesLoader] Checking update via API...');
+        const apiResponse = await fetch(apiUrl, {
+            headers: { 'Accept': 'application/vnd.github.v3.raw' },
+            cache: 'no-store'
+        });
+
+        if (apiResponse.ok) {
+            const text = await apiResponse.text();
+            const remoteRules = parseRulesFromText(text);
+
+            if (remoteRules) {
+                // Compare Timestamps
+                if (remoteRules.lastUpdated && currentRules.lastUpdated) {
+                    if (remoteRules.lastUpdated > currentRules.lastUpdated) {
+                        console.log('[RulesLoader] Update found via API!');
+                        return true;
+                    }
+                    return false; // API says we are up to date
+                }
+                // Fallback Version
+                if (remoteRules.version !== currentRules.version) {
+                    return remoteRules.version > currentRules.version;
+                }
+                return false;
+            }
+        } else if (apiResponse.status === 403 || apiResponse.status === 429) {
+            console.warn('[RulesLoader] API Rate Limit hit. Falling back to Raw CDN.');
+        }
+
+        // STRATEGY 2: Fallback to Raw CDN (5min Cache Latency)
         const rawUrlCacheBusted = `${RAW_RULES_URL}?v=${Date.now()}`;
-        const response = await fetch(rawUrlCacheBusted, { cache: 'no-store' }); // Head request might be enough if we trusted headers, but we need body for timestamp
+        const response = await fetch(rawUrlCacheBusted, { cache: 'no-store' });
 
         if (response.ok) {
             const text = await response.text();
-            const jsonMatch = text.match(/window\.EXTERNAL_RULES\s*=\s*(\{[\s\S]*\});?/);
-            if (jsonMatch && jsonMatch[1]) {
-                const remoteRules = JSON.parse(jsonMatch[1]) as RulesData;
+            const remoteRules = parseRulesFromText(text);
 
+            if (remoteRules) {
                 // Compare Timestamps (Precise)
                 if (remoteRules.lastUpdated && currentRules.lastUpdated) {
                     return remoteRules.lastUpdated > currentRules.lastUpdated;
@@ -98,7 +142,7 @@ export const checkForUpdate = async (currentRules: RulesData | null): Promise<bo
 
                 // Fallback to Version (Legacy)
                 if (remoteRules.version !== currentRules.version) {
-                    return remoteRules.version > currentRules.version; // String Comparison is weak but okay for now
+                    return remoteRules.version > currentRules.version;
                 }
             }
         }
