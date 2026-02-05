@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.15.0",
+        "date": "2026-02-05",
+        "type": "minor",
+        "changes": [
+            "ARCH : Migration vers des IDs d'attributs génériques (pave_attributs_1, etc.) pour une indépendance totale vis-à-vis des thèmes.",
+            "SYSTEM : Implémentation d'un moteur de migration runtime pour convertir automatiquement les anciens personnages sans perte de données.",
+            "ADMIN : Les éditeurs d'attributs (Admin & Joueur) génèrent désormais ces nouveaux IDs génériques par défaut."
+        ]
+    },
+    {
         "version": "2.14.3",
         "date": "2026-02-05",
         "type": "patch",

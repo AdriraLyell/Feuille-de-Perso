@@ -38,20 +38,20 @@ export const defaultRules: RulesData = {
     },
     definitions: {
         attributes: {
-            "physique": ["Force", "Constitution", "Dextérité", "Agilité"],
-            "social": ["Charisme", "Empathie", "Apparence", "Communication"],
-            "mental": ["Intellect", "Volonté", "Intuition", "Perception"]
+            "pave_attributs_1": ["Force", "Constitution", "Dextérité", "Agilité"],
+            "pave_attributs_2": ["Intellect", "Volonté", "Intuition", "Perception"],
+            "pave_attributs_3": ["Charisme", "Empathie", "Apparence", "Communication"]
         },
         secondaryAttributes: {
-            "physique": ["Corpulence", "Beauté"],
-            "social": ["Présence", "Charme"],
-            "mental": ["Conscience", "Attraction"],
-            "mystique": ["Aura", "Fascination"]
+            "pave_attributs_1": ["Corpulence", "Beauté"],
+            "pave_attributs_2": ["Conscience", "Attraction"],
+            "pave_attributs_3": ["Présence", "Charme"],
+            "pave_attributs_4": ["Aura", "Fascination"]
         },
         skills: {
-            "physique": [],
-            "social": [],
-            "mental": [],
+            "pave_attributs_1": [],
+            "pave_attributs_2": [],
+            "pave_attributs_3": [],
             "counters": ["Volonté", "Confiance"]
         },
         counters: {
@@ -60,9 +60,9 @@ export const defaultRules: RulesData = {
         },
         backgrounds: ["Ressources", "Alliés", "Contacts", "Mentor"],
         labels: {
-            "physique": "Physique",
-            "social": "Social",
-            "mental": "Mental"
+            "pave_attributs_1": "Physique",
+            "pave_attributs_2": "Mental",
+            "pave_attributs_3": "Social"
         }
     },
     theme: {

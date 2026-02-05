@@ -11,10 +11,10 @@ interface AttributesEditorProps {
 }
 
 const DEFAULT_ATTRIBUTES: Record<string, string[]> = {
-    'physique': ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'],
-    'mental': ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'],
-    'social': ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'],
-    'mystique': ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité']
+    'pave_attributs_1': ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'],
+    'pave_attributs_2': ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'],
+    'pave_attributs_3': ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'],
+    'pave_attributs_4': ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité']
 };
 
 const ATTRIBUTE_PRESETS = [
@@ -22,19 +22,19 @@ const ATTRIBUTE_PRESETS = [
         name: "Standard (Classique)",
         desc: "3 Pavés de 4 Attributs",
         structure: [
-            { id: 'physique', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'] },
-            { id: 'mental', label: 'Mental', attrs: ['Intellect', 'Volonté', 'Intuition', 'Perception'] },
-            { id: 'social', label: 'Social', attrs: ['Charisme', 'Empathie', 'Apparence', 'Communication'] }
+            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'] },
+            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Intellect', 'Volonté', 'Intuition', 'Perception'] },
+            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Empathie', 'Apparence', 'Communication'] }
         ]
     },
     {
         name: "Complet (Mystique)",
         desc: "4 Pavés de 5 Attributs",
         structure: [
-            { id: 'physique', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'] },
-            { id: 'mental', label: 'Mental', attrs: ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'] },
-            { id: 'social', label: 'Social', attrs: ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'] },
-            { id: 'mystique', label: 'Mystique', attrs: ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité'] }
+            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'] },
+            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'] },
+            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'] },
+            { id: 'pave_attributs_4', label: 'Mystique', attrs: ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité'] }
         ]
     }
 ];
@@ -88,10 +88,10 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
 
     const handleCategoryCountChange = (newCount: number) => {
         const defaultDefs = [
-            { id: 'physique', label: 'Physique' },
-            { id: 'mental', label: 'Mental' },
-            { id: 'social', label: 'Social' },
-            { id: 'mystique', label: 'Mystique' }
+            { id: 'pave_attributs_1', label: 'Physique' },
+            { id: 'pave_attributs_2', label: 'Mental' },
+            { id: 'pave_attributs_3', label: 'Social' },
+            { id: 'pave_attributs_4', label: 'Mystique' }
         ];
 
         const currentDefs = [...data.attributeSettings];
@@ -104,7 +104,7 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
             for (let i = currentDefs.length; i < newCount; i++) {
                 let defToAdd = defaultDefs[i];
                 if (!defToAdd) {
-                    defToAdd = { id: `cat_${i + 1}`, label: `Pavé ${i + 1}` };
+                    defToAdd = { id: `pave_attributs_${i + 1}`, label: `Pavé ${i + 1}` };
                 }
 
                 if (currentDefs.some(d => d.id === defToAdd.id)) {

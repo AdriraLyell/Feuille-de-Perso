@@ -161,24 +161,24 @@ export const INITIAL_DATA: CharacterSheetData = {
   experience: { gain: '0', spent: '0', rest: '0' },
   // Default Attributes Configuration
   attributeSettings: [
-    { id: 'physique', label: 'Physique' },
-    { id: 'mental', label: 'Mental' },
-    { id: 'social', label: 'Social' }
+    { id: 'pave_attributs_1', label: 'Physique' },
+    { id: 'pave_attributs_2', label: 'Mental' },
+    { id: 'pave_attributs_3', label: 'Social' }
   ],
   attributes: {
-    physique: [
+    pave_attributs_1: [
       createAttributeEntry('Force'),
       createAttributeEntry('Constitution'),
       createAttributeEntry('Dextérité'),
       createAttributeEntry('Agilité'),
     ],
-    mental: [
+    pave_attributs_2: [
       createAttributeEntry('Intellect'),
       createAttributeEntry('Volonté'),
       createAttributeEntry('Intuition'),
       createAttributeEntry('Perception'),
     ],
-    social: [
+    pave_attributs_3: [
       createAttributeEntry('Charisme'),
       createAttributeEntry('Empathie'),
       createAttributeEntry('Apparence'),
@@ -187,19 +187,19 @@ export const INITIAL_DATA: CharacterSheetData = {
   },
   secondaryAttributesActive: false,
   secondaryAttributes: {
-    physique: [
+    pave_attributs_1: [
       createAttributeEntry('Corpulence'),
       createAttributeEntry('Apparence'),
     ],
-    mental: [
+    pave_attributs_2: [
       createAttributeEntry('Conscience'),
       createAttributeEntry('Attraction'),
     ],
-    social: [
+    pave_attributs_3: [
       createAttributeEntry('Présence'),
       createAttributeEntry('Charme'),
     ],
-    mystique: [
+    pave_attributs_4: [
       createAttributeEntry('Aura'),
       createAttributeEntry('Fascination'),
     ]

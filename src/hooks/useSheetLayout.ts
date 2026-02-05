@@ -5,9 +5,9 @@ import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../types';
 export const useSheetLayout = (data: CharacterSheetData) => {
 
     const attributeCategories = useMemo(() => data.attributeSettings || [
-        { id: 'physique', label: 'Physique' },
-        { id: 'mental', label: 'Mental' },
-        { id: 'social', label: 'Social' }
+        { id: 'pave_attributs_1', label: 'Physique' },
+        { id: 'pave_attributs_2', label: 'Mental' },
+        { id: 'pave_attributs_3', label: 'Social' }
     ], [data.attributeSettings]);
 
     const getAttributesGridClass = useCallback(() => {

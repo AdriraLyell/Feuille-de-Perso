@@ -27,19 +27,19 @@ const ATTRIBUTE_PRESETS = [
         name: "Standard (Classique)",
         desc: "3 Pavés de 4 Attributs",
         structure: [
-            { id: 'physique', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'] },
-            { id: 'mental', label: 'Mental', attrs: ['Intellect', 'Volonté', 'Intuition', 'Perception'] },
-            { id: 'social', label: 'Social', attrs: ['Charisme', 'Empathie', 'Apparence', 'Communication'] }
+            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'] },
+            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Intellect', 'Volonté', 'Intuition', 'Perception'] },
+            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Empathie', 'Apparence', 'Communication'] }
         ]
     },
     {
         name: "Complet (Mystique)",
         desc: "4 Pavés de 5 Attributs",
         structure: [
-            { id: 'physique', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'] },
-            { id: 'mental', label: 'Mental', attrs: ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'] },
-            { id: 'social', label: 'Social', attrs: ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'] },
-            { id: 'mystique', label: 'Mystique', attrs: ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité'] }
+            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'] },
+            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'] },
+            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'] },
+            { id: 'pave_attributs_4', label: 'Mystique', attrs: ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité'] }
         ]
     }
 ];
@@ -54,7 +54,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
     const [showPresetConfirm, setShowPresetConfirm] = useState(false);
 
     // Dynamic categories based on keys in attributesMap, sorted by standard order
-    const STANDARD_ORDER = ['physique', 'mental', 'social', 'mystique'];
+    const STANDARD_ORDER = ['pave_attributs_1', 'pave_attributs_2', 'pave_attributs_3', 'pave_attributs_4', 'pave_attributs_5'];
     const categories = Object.keys(attributesMap).sort((a, b) => {
         const indexA = STANDARD_ORDER.indexOf(a);
         const indexB = STANDARD_ORDER.indexOf(b);
@@ -106,12 +106,11 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
     // --- MANAGE CATEGORIES ---
     const addCategory = () => {
         const count = categories.length;
-        const potentialIds = ['physique', 'mental', 'social', 'mystique', 'spirituel', 'martial'];
-        let nextId = potentialIds[count] || `cat_${count + 1}`;
+        let nextId = `pave_attributs_${count + 1}`;
 
         // Ensure uniqueness
         if (categories.includes(nextId)) {
-            nextId = `cat_${count + 1}_${Math.random().toString(36).substr(2, 3)}`;
+            nextId = `pave_attributs_${count + 1}_${Math.random().toString(36).substr(2, 3)}`;
         }
 
         // ALL categories must have the same number of attributes.

@@ -493,10 +493,65 @@ export const migrateData = (parsed: any): CharacterSheetData => {
         });
     }
 
-    if (parsed.counters) {
-        if (typeof parsed.counters.volonte.creationValue === 'undefined') parsed.counters.volonte.creationValue = 3;
-        if (typeof parsed.counters.confiance.creationValue === 'undefined') parsed.counters.confiance.creationValue = 3;
-        parsed.counters.custom = ensureCreationValue(parsed.counters.custom);
+    // --- MIGRATION 18: GENERIC ATTRIBUTE IDS ---
+    // Rename 'physique', 'mental', 'social', 'mystique' to generic 'pave_attributs_x'
+    const idMap: Record<string, string> = {
+        'physique': 'pave_attributs_1',
+        'mental': 'pave_attributs_2',
+        'social': 'pave_attributs_3',
+        'mystique': 'pave_attributs_4',
+        'spirituel': 'pave_attributs_5',
+        'martial': 'pave_attributs_6'
+    };
+
+    const migrateId = (oldId: string): string => {
+        if (idMap[oldId]) return idMap[oldId];
+        if (oldId.startsWith('cat_')) {
+            const num = parseInt(oldId.split('_')[1]);
+            if (!isNaN(num)) return `pave_attributs_${num}`;
+        }
+        return oldId;
+    };
+
+    // 1. Migrate Attributes
+    if (parsed.attributes) {
+        const newAttributes: any = {};
+        Object.keys(parsed.attributes).forEach(oldId => {
+            newAttributes[migrateId(oldId)] = parsed.attributes[oldId];
+        });
+        parsed.attributes = newAttributes;
+    }
+
+    // 2. Migrate Secondary Attributes
+    if (parsed.secondaryAttributes) {
+        const newSec: any = {};
+        Object.keys(parsed.secondaryAttributes).forEach(oldId => {
+            newSec[migrateId(oldId)] = parsed.secondaryAttributes[oldId];
+        });
+        parsed.secondaryAttributes = newSec;
+    }
+
+    // 3. Migrate Attribute Settings
+    if (parsed.attributeSettings) {
+        parsed.attributeSettings = parsed.attributeSettings.map((s: any) => ({
+            ...s,
+            id: migrateId(s.id)
+        }));
+    }
+
+    // 4. Migrate Skills categories
+    if (parsed.skills) {
+        const newSkills: any = {};
+        Object.keys(parsed.skills).forEach(oldId => {
+            const newId = migrateId(oldId);
+            // Some keys are fixed (arrieres_plans, etc.) and shouldn't be migrated if they don't match d'idMap
+            if (idMap[oldId] || oldId.startsWith('cat_')) {
+                newSkills[newId] = parsed.skills[oldId];
+            } else {
+                newSkills[oldId] = parsed.skills[oldId];
+            }
+        });
+        parsed.skills = newSkills;
     }
 
     return parsed as CharacterSheetData;

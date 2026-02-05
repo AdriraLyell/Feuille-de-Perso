@@ -97,7 +97,7 @@ const CreationHUD: React.FC = () => {
         });
 
         // Attributes
-        const attrCats: AttributeCategoryKey[] = ['physique', 'mental', 'social'];
+        const attrCats = data.attributeSettings.map(s => s.id);
 
         attrCats.forEach(cat => {
             data.attributes[cat].forEach(attr => {
