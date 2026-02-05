@@ -131,10 +131,12 @@ export interface AttributePreset {
   id: string;
   name: string;
   description: string;
+  hasSecondary: boolean;
   structure: {
     id: string;
     label: string;
     attrs: string[];
+    secondaryAttrs?: string[];
   }[];
   isOfficial: boolean;
 }

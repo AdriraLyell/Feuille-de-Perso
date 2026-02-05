@@ -92,6 +92,13 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
 
     // --- PRESETS ---
     const requestPresetLoad = (preset: any) => {
+        // Normalize preset structure for hardcoded presets
+        if (preset.structure && !preset.structure[0].secondaryAttrs && preset.structure[0].attrs) {
+            preset.structure = preset.structure.map((cat: any) => ({
+                ...cat,
+                secondaryAttrs: [] // Hardcoded presets don't have secondary attrs
+            }));
+        }
         setPendingPreset(preset);
         setShowPresetConfirm(true);
     };
@@ -103,10 +110,12 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
         const structure = categories.map(cat => ({
             id: cat,
             label: labelsMap[cat] || cat,
-            attrs: [...attributesMap[cat]]
+            attrs: [...attributesMap[cat]],
+            secondaryAttrs: rules.configurations.global.secondaryAttributes ? [...(secondaryMap[cat] || [])] : []
         }));
 
-        const success = await AdminService.saveAttributePreset(newPresetName, newPresetDesc, structure);
+        const isSecondaryActive = !!rules.configurations.global.secondaryAttributes;
+        const success = await AdminService.saveAttributePreset(newPresetName, newPresetDesc, structure, isSecondaryActive);
         if (success) {
             setIsSaveModalOpen(false);
             setNewPresetName("");
@@ -127,16 +136,28 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
 
         const newAttributes: Record<string, string[]> = {};
         const newLabels: Record<string, string> = { ...labelsMap };
-        // Preserve existing secondary attributes
+        // Preserve existing or load from preset
         const newSecondary: Record<string, string[]> = { ...secondaryMap };
+
+        const hasSecondaryInPreset = pendingPreset.has_secondary || pendingPreset.hasSecondary || false;
 
         pendingPreset.structure.forEach((cat: any) => {
             newAttributes[cat.id] = [...cat.attrs];
             newLabels[cat.id] = cat.label;
+            if (cat.secondaryAttrs) {
+                newSecondary[cat.id] = [...cat.secondaryAttrs];
+            }
         });
 
         onUpdate({
             ...rules,
+            configurations: {
+                ...rules.configurations,
+                global: {
+                    ...rules.configurations.global,
+                    secondaryAttributes: hasSecondaryInPreset
+                }
+            },
             definitions: {
                 ...rules.definitions,
                 attributes: newAttributes,
@@ -429,24 +450,8 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 </h4>
 
                 <div className="flex flex-col md:flex-row gap-8">
-                    {/* Global Options */}
-                    <div className="w-full md:w-1/3 space-y-4">
-                        <div className="flex items-center justify-between bg-slate-50 p-3 rounded border border-slate-200">
-                            <div>
-                                <h5 className="text-xs font-bold text-slate-700">Attributs Secondaires</h5>
-                                <p className="text-[10px] text-slate-500 italic">Active 2 attributs supplémentaires par pavé.</p>
-                            </div>
-                            <button
-                                onClick={toggleSecondaryGlobal}
-                                className={`w-10 h-5 rounded-full p-0.5 transition-colors duration-200 ${rules.configurations.global.secondaryAttributes ? 'bg-blue-600' : 'bg-slate-300'}`}
-                            >
-                                <div className={`bg-white w-4 h-4 rounded-full shadow transform transition-transform duration-200 ${rules.configurations.global.secondaryAttributes ? 'translate-x-5' : ''}`} />
-                            </button>
-                        </div>
-                    </div>
-
                     {/* Presets Grid */}
-                    <div className="w-full md:w-2/3">
+                    <div className="w-full">
                         <div className="flex items-center justify-between mb-3">
                             <h5 className="text-xs font-bold text-slate-700 uppercase tracking-tighter flex items-center gap-1">
                                 <LayoutGrid size={14} /> Bibliothèque de Préréglages
@@ -530,15 +535,27 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                     <h3 className="font-bold text-slate-700 uppercase tracking-widest text-sm flex items-center gap-2">
                         <LayoutGrid size={18} className="text-blue-600" /> Structure ({categories.length} / 5 Pavés)
                     </h3>
-                    <button
-                        onClick={addCategory}
-                        disabled={categories.length >= 5}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide transition-colors ${categories.length >= 5
-                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                            : 'bg-slate-800 hover:bg-slate-700 text-white'}`}
-                    >
-                        <Plus size={14} /> Ajouter un Pavé
-                    </button>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded border border-slate-200">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Secondaires</span>
+                            <button
+                                onClick={toggleSecondaryGlobal}
+                                className={`w-8 h-4 rounded-full p-0.5 transition-colors duration-200 ${rules.configurations.global.secondaryAttributes ? 'bg-blue-600' : 'bg-slate-300'}`}
+                            >
+                                <div className={`bg-white w-3 h-3 rounded-full shadow transform transition-transform duration-200 ${rules.configurations.global.secondaryAttributes ? 'translate-x-4' : ''}`} />
+                            </button>
+                        </div>
+
+                        <button
+                            onClick={addCategory}
+                            disabled={categories.length >= 5}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide transition-colors ${categories.length >= 5
+                                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                : 'bg-slate-800 hover:bg-slate-700 text-white'}`}
+                        >
+                            <Plus size={14} /> Ajouter un Pavé
+                        </button>
+                    </div>
                 </div>
 
                 <div className={`grid grid-cols-1 md:grid-cols-${Math.min(categories.length, 5)} gap-6`}>

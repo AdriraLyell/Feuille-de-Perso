@@ -670,10 +670,10 @@ export const AdminService = {
         return data;
     },
 
-    async saveAttributePreset(name: string, description: string, structure: any): Promise<boolean> {
+    async saveAttributePreset(name: string, description: string, structure: any, hasSecondary: boolean): Promise<boolean> {
         const { error } = await supabase
             .from('attribute_presets')
-            .insert([{ name, description, structure, is_official: false }]);
+            .insert([{ name, description, structure, has_secondary: hasSecondary, is_official: false }]);
 
         if (error) {
             console.error('Error saving attribute preset:', error);
