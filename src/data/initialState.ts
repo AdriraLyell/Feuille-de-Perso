@@ -93,6 +93,9 @@ export const INITIAL_SKILLS = {
     createDotEntry('Alliés'), createDotEntry('Contacts'), createDotEntry('Mentor'),
     createDotEntry('Ressources'), createDotEntry('Célébrité'), createDotEntry('Statut'),
     createDotEntry('Influence'), createDotEntry('Talisman'), createDotEntry('Arcane'),
+  ],
+  counters: [
+    createDotEntry('Volonté'), createDotEntry('Confiance')
   ]
 };
 

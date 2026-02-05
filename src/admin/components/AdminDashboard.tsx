@@ -45,7 +45,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
             autres_competences: "Libres",
             competences2: "Physique",
             autres: "Autres",
-            arrieres_plans: "Arrière-Plans" // Should probably not be here but safe to have
+            arrieres_plans: "Arrière-Plans", // Should probably not be here but safe to have
+            counters: "Compteurs"
         };
 
         Object.keys(INITIAL_SKILLS).forEach(key => {

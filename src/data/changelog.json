@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.16.6",
+        "date": "2026-02-05",
+        "type": "patch",
+        "changes": [
+            "Correction du placement par défaut des compteurs (Volonté/Confiance) lors de la création d'une nouvelle campagne"
+        ]
+    },
+    {
         "version": "2.16.5",
         "date": "2026-02-05",
         "type": "patch",
