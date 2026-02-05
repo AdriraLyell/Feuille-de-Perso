@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.16.2",
+        "date": "2026-02-05",
+        "type": "patch",
+        "changes": [
+            "Correction du remplissage automatique des noms d'attributs secondaires par défaut (basé sur le libellé du pavé)",
+            "Mise à jour des préréglages codés en dur pour inclure les attributs secondaires par défaut",
+            "Sécurisation du script de migration SQL (Unique Constraint)"
+        ]
+    },
+    {
         "version": "2.16.1",
         "date": "2026-02-05",
         "type": "patch",

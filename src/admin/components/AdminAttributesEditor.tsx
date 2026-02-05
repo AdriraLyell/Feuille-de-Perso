@@ -28,23 +28,36 @@ const ATTRIBUTE_PRESETS = [
     {
         name: "v2 (Classique)",
         desc: "3 Pavés de 4 Attributs",
+        hasSecondary: false,
         structure: [
-            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'] },
-            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Intellect', 'Volonté', 'Intuition', 'Perception'] },
-            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Empathie', 'Apparence', 'Communication'] }
+            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'], secondaryAttrs: ['Corpulence', 'Beauté'] },
+            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Intellect', 'Volonté', 'Intuition', 'Perception'], secondaryAttrs: ['Conscience', 'Attraction'] },
+            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Empathie', 'Apparence', 'Communication'], secondaryAttrs: ['Présence', 'Charme'] }
         ]
     },
     {
         name: "v4 (Complet)",
         desc: "4 Pavés de 5 Attributs",
+        hasSecondary: true,
         structure: [
-            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'] },
-            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'] },
-            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'] },
-            { id: 'pave_attributs_4', label: 'Mystique', attrs: ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité'] }
+            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'], secondaryAttrs: ['Corpulence', 'Beauté'] },
+            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'], secondaryAttrs: ['Conscience', 'Attraction'] },
+            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'], secondaryAttrs: ['Présence', 'Charme'] },
+            { id: 'pave_attributs_4', label: 'Mystique', attrs: ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité'], secondaryAttrs: ['Aura', 'Fascination'] }
         ]
     }
 ];
+
+const getDefaultSecondaryAttrs = (label: string, id: string): string[] => {
+    const l = label.toLowerCase();
+    const i = id.toLowerCase();
+    for (const key of Object.keys(DEFAULT_SECONDARY_ATTRIBUTES)) {
+        if (l.includes(key) || i.includes(key)) {
+            return [...DEFAULT_SECONDARY_ATTRIBUTES[key]];
+        }
+    }
+    return ["Secondaire 1", "Secondaire 2"];
+};
 
 const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, onUpdate }) => {
     const definitions = rules.definitions;
@@ -204,7 +217,8 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
         const isSecondaryActive = !!rules.configurations.global.secondaryAttributes;
         const newSecondaryMap = { ...secondaryMap };
         if (isSecondaryActive) {
-            newSecondaryMap[nextId] = DEFAULT_SECONDARY_ATTRIBUTES[nextId] || ["Secondaire 1", "Secondaire 2"];
+            const label = nextId.charAt(0).toUpperCase() + nextId.slice(1);
+            newSecondaryMap[nextId] = getDefaultSecondaryAttrs(label, nextId);
         }
 
         onUpdate({
@@ -253,8 +267,12 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
         const newSecondary = { ...secondaryMap };
         if (newActive) {
             Object.keys(attributesMap).forEach(cat => {
-                const defaultSec = DEFAULT_SECONDARY_ATTRIBUTES[cat] || ["Secondaire 1", "Secondaire 2"];
-                if (!newSecondary[cat] || newSecondary[cat].length !== 2) {
+                const label = labelsMap[cat] || cat;
+                const defaultSec = getDefaultSecondaryAttrs(label, cat);
+
+                // If it doesn't exist or is empty, fill it
+                if (!newSecondary[cat] || newSecondary[cat].length !== 2 ||
+                    (newSecondary[cat][0] === "" && newSecondary[cat][1] === "")) {
                     const existing = newSecondary[cat] || [];
                     newSecondary[cat] = [
                         existing[0] || defaultSec[0],
