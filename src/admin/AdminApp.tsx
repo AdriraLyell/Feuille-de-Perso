@@ -221,20 +221,7 @@ const AdminApp: React.FC = () => {
                             )}
                         </div>
 
-                        {/* TMP: Migration Button */}
-                        <div
-                            className="ml-2 p-1 text-xs bg-indigo-900 text-indigo-200 rounded cursor-pointer hover:bg-indigo-700"
-                            onClick={async () => {
-                                if (confirm("Lancer la migration des compétences globales ?")) {
-                                    /* Dynamic Import to avoid bundling if not used */
-                                    const { migrateGlobalSkills } = await import('./utils/migrationTool');
-                                    const res = await migrateGlobalSkills();
-                                    alert(res.message);
-                                }
-                            }}
-                        >
-                            MIGRATE GLOBAL
-                        </div>
+
                     </div>
                     <div className="flex items-center gap-4 text-sm">
                         <button

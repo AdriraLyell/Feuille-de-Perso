@@ -80,6 +80,8 @@ export interface LibrarySkillEntry {
   description?: string;
   defaultCategory?: string; // Hint for auto-placement (optional)
   isVariable?: boolean; // Si vrai, permet les doublons avec des variants différents (ex: "Artisanat : Forge")
+  isGlobal?: boolean; // True if from global library
+  isActive?: boolean; // True if selected for this campaign
 }
 
 // Nouveau : Entrée pour le catalogue des spécialisations

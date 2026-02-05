@@ -113,11 +113,25 @@ export const AdminService = {
         }
 
         // 2. Fetch Libraries (Parallel)
-        const [traitsRes, skillsRes, specsRes] = await Promise.all([
+        // For Skills, we need Global (setting_id IS NULL) AND Local (setting_id = id)
+        // AND the selection status from rel_setting_skills
+
+        const [traitsRes, skillsRes, specsRes, relSkillsRes] = await Promise.all([
+            // Traits: Legacy behavior (Local only for now, or naive) -> Keeping Local as per strict plan for now? 
+            // Wait, plan only mentioned Skills.
             supabase.from('libraries_traits').select('*').eq('setting_id', id),
-            supabase.from('libraries_skills').select('*').eq('setting_id', id),
-            supabase.from('libraries_specializations').select('*').eq('setting_id', id)
+
+            // Skills: Fetch ALL (Global + Local)
+            supabase.from('libraries_skills').select('*').or(`setting_id.eq.${id},setting_id.is.null`),
+
+            // Specs
+            supabase.from('libraries_specializations').select('*').eq('setting_id', id),
+
+            // Relations (Active Global Skills)
+            supabase.from('rel_setting_skills').select('skill_id').eq('setting_id', id)
         ]);
+
+        const activeSkillIds = new Set((relSkillsRes.data || []).map((r: any) => r.skill_id));
 
         // Helper to map DB snake_case to TS camelCase
         const mapTrait = (t: any): any => ({
@@ -131,12 +145,14 @@ export const AdminService = {
             effects: t.effects || []
         });
 
-        const mapSkill = (s: any): any => ({
+        const mapSkill = (s: any, activeIds: Set<string>): any => ({
             id: s.id,
             name: s.name,
             description: s.description,
             defaultCategory: s.default_category,
-            isVariable: s.is_variable
+            isVariable: s.is_variable,
+            isGlobal: s.setting_id === null,
+            isActive: activeIds.has(s.id) || s.setting_id === id // Locals are always active
         });
 
         const mapSpec = (s: any): any => ({
@@ -159,7 +175,7 @@ export const AdminService = {
             theme: setting.configurations.theme || { creationColor: "#000", xpColor: "#000" },
             libraries: {
                 traits: (traitsRes.data || []).map(mapTrait),
-                skills: (skillsRes.data || []).map(mapSkill),
+                skills: (skillsRes.data || []).map(s => mapSkill(s, activeSkillIds)),
                 specializations: (specsRes.data || []).map(mapSpec)
             }
         };
@@ -215,12 +231,19 @@ export const AdminService = {
                 if (insTraitsErr) throw new Error("Insert Traits: " + insTraitsErr.message);
             }
 
-            // B. Skills
-            const { error: delSkillsErr } = await supabase.from('libraries_skills').delete().eq('setting_id', id);
-            if (delSkillsErr) throw new Error("Delete Skills: " + delSkillsErr.message);
+            // B. Skills Management (Enhanced for Global/Local)
+            // 1. Identify Locals vs Globals in the incoming list
+            const localSkillsToSave = rules.libraries.skills.filter(s => !s.isGlobal);
+            const activeGlobalSkillIds = rules.libraries.skills
+                .filter(s => s.isGlobal && s.isActive !== false) // Default to true if undefined
+                .map(s => s.id);
 
-            if (rules.libraries.skills.length > 0) {
-                const skillsPayload = rules.libraries.skills.map(s => ({
+            // 2. Sync Local Skills (Naive Replace for setting_id = id items)
+            const { error: delSkillsErr } = await supabase.from('libraries_skills').delete().eq('setting_id', id);
+            if (delSkillsErr) throw new Error("Delete Locals: " + delSkillsErr.message);
+
+            if (localSkillsToSave.length > 0) {
+                const skillsPayload = localSkillsToSave.map(s => ({
                     setting_id: id,
                     id: s.id,
                     name: s.name,
@@ -229,7 +252,22 @@ export const AdminService = {
                     is_variable: s.isVariable
                 }));
                 const { error: insSkillsErr } = await supabase.from('libraries_skills').insert(skillsPayload);
-                if (insSkillsErr) throw new Error("Insert Skills: " + insSkillsErr.message);
+                if (insSkillsErr) throw new Error("Insert Locals: " + insSkillsErr.message);
+            }
+
+            // 3. Sync Selection (rel_setting_skills)
+            // Wipe existing selections for this setting
+            const { error: delRelErr } = await supabase.from('rel_setting_skills').delete().eq('setting_id', id);
+            if (delRelErr) throw new Error("Delete Selection: " + delRelErr.message);
+
+            if (activeGlobalSkillIds.length > 0) {
+                const relPayload = activeGlobalSkillIds.map(skillId => ({
+                    setting_id: id,
+                    skill_id: skillId,
+                    is_active: true
+                }));
+                const { error: insRelErr } = await supabase.from('rel_setting_skills').insert(relPayload);
+                if (insRelErr) throw new Error("Insert Selection: " + insRelErr.message);
             }
 
             // C. Specializations

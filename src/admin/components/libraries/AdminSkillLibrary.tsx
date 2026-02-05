@@ -176,16 +176,34 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                         {filteredList.map(skill => (
-                            <div key={skill.id} className="bg-white border border-slate-200 rounded p-3 hover:shadow-md transition-shadow group flex flex-col justify-between">
+                            <div key={skill.id} className={`bg-white border rounded p-3 transition-shadow group flex flex-col justify-between ${skill.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
                                 <div>
                                     <div className="flex justify-between items-start mb-1">
                                         <div className="flex items-center gap-1.5 overflow-hidden">
+                                            {/* Selection Toggle */}
+                                            <input
+                                                type="checkbox"
+                                                checked={skill.isActive !== false}
+                                                onChange={() => {
+                                                    const newList = list.map(s => s.id === skill.id ? { ...s, isActive: !s.isActive } : s);
+                                                    onUpdate({ ...rules, libraries: { ...rules.libraries, skills: newList } });
+                                                }}
+                                                className="w-4 h-4 text-blue-600 rounded cursor-pointer"
+                                                title={skill.isActive !== false ? "Désactiver (Retirer de la campagne)" : "Activer (Ajouter à la campagne)"}
+                                            />
                                             {skill.isVariable && <span title="Compétence à variantes"><Layers size={14} className="text-blue-500 shrink-0" /></span>}
-                                            <span className="font-bold text-slate-800 truncate" title={skill.name}>{skill.name}</span>
+                                            <span className={`font-bold truncate ${skill.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={skill.name}>{skill.name}</span>
                                         </div>
                                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
-                                            <button onClick={() => handleOpenEdit(skill)} className="text-blue-600 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
-                                            <button onClick={() => handleDelete(skill.id)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
+                                            {/* Edit: Only for Local */}
+                                            {!skill.isGlobal && (
+                                                <button onClick={() => handleOpenEdit(skill)} className="text-blue-600 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
+                                            )}
+                                            {/* Delete: Only for Local. Global is handled via checkbox */}
+                                            {!skill.isGlobal && (
+                                                <button onClick={() => handleDelete(skill.id)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
+                                            )}
+                                            {skill.isGlobal && <span title="Compétence Globale (Lecture Seule)" className="text-xs text-amber-500 font-bold border border-amber-200 bg-amber-50 px-1 rounded">GLOBAL</span>}
                                         </div>
                                     </div>
                                     {skill.description && <p className="text-xs text-slate-500 italic line-clamp-2 mb-2">{skill.description}</p>}
