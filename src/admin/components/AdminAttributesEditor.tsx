@@ -516,37 +516,40 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                         </span>
                                     </div>
                                     <div className="mt-2 flex items-center justify-between">
-                                        <div className="flex items-center gap-1.5 pt-1">
-                                            {(preset.has_secondary || (preset as any).hasSecondary) && (
-                                                <Zap size={10} className="text-amber-500 fill-amber-500 animate-pulse" />
-                                            )}
+                                        <div className="flex items-center gap-1 pt-1 overflow-x-auto no-scrollbar">
                                             <div className="flex gap-1" title={`${preset.structure.length} Pavés`}>
-                                                {preset.structure.map((pave: any, i: number) => (
-                                                    <div
-                                                        key={i}
-                                                        className={`flex flex-col gap-0.5 p-0.5 rounded-sm border ${(preset.has_secondary || (preset as any).hasSecondary)
-                                                                ? 'bg-amber-50 border-amber-200'
-                                                                : 'bg-slate-50 border-slate-200'
-                                                            }`}
-                                                        title={`${pave.attrs.length} attributs`}
-                                                    >
-                                                        {pave.attrs.map((_: any, dotIdx: number) => (
-                                                            <div
-                                                                key={dotIdx}
-                                                                className={`w-1 h-1 rounded-full ${(preset.has_secondary || (preset as any).hasSecondary)
-                                                                        ? 'bg-amber-400'
-                                                                        : 'bg-slate-300'
-                                                                    }`}
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                ))}
+                                                {preset.structure.map((pave: any, i: number) => {
+                                                    const isSecondary = ((preset as any).has_secondary || (preset as any).hasSecondary);
+                                                    return (
+                                                        <div
+                                                            key={i}
+                                                            className={`flex flex-col gap-0.5 p-0.5 rounded-sm border ${isSecondary ? 'bg-amber-50/50 border-amber-100' : 'bg-slate-50 border-slate-200'
+                                                                }`}
+                                                        >
+                                                            {/* Primaries */}
+                                                            <div className="flex flex-col gap-0.5">
+                                                                {pave.attrs.map((_: any, dotIdx: number) => (
+                                                                    <div key={dotIdx} className="w-1 h-1 rounded-full bg-blue-400/70" />
+                                                                ))}
+                                                            </div>
+
+                                                            {/* Separator & Secondaries */}
+                                                            {isSecondary && (pave.secondaryAttrs?.length > 0 || !preset.id) && (
+                                                                <>
+                                                                    <div className="h-px bg-slate-200 w-full my-0.5" />
+                                                                    <div className="flex flex-col gap-0.5">
+                                                                        {(pave.secondaryAttrs || ["", ""]).map((_: any, dotIdx: number) => (
+                                                                            <div key={dotIdx} className="w-1 h-1 rounded-full bg-amber-400" />
+                                                                        ))}
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-1 text-[9px] font-bold text-slate-400">
-                                            <span>{preset.structure[0]?.attrs.length || 0} Attrs</span>
-                                            <Play size={10} className="text-slate-300 group-hover/card:text-amber-500 ml-1" />
-                                        </div>
+                                        <Play size={10} className="text-slate-300 group-hover/card:text-amber-500 shrink-0" />
                                     </div>
                                 </div>
                             ))}
@@ -558,16 +561,29 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                     onClick={() => requestPresetLoad(preset)}
                                     className="bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded p-3 text-left transition-all group flex items-start gap-3"
                                 >
-                                    <div className="bg-white p-2 rounded-full border border-slate-200 group-hover:border-amber-400 group-hover:text-amber-700 text-slate-300 relative">
+                                    <div className="bg-white p-2 rounded-full border border-slate-200 group-hover:border-amber-400 group-hover:text-amber-700 text-slate-300 shrink-0">
                                         <Play size={14} className="ml-0.5" />
-                                        {(preset as any).hasSecondary && <Zap size={8} className="absolute -top-1 -right-1 text-amber-500 fill-amber-500" />}
                                     </div>
                                     <div className="flex-grow">
-                                        <div className="flex items-center justify-between">
-                                            <span className="block font-bold text-slate-700 text-xs group-hover:text-amber-900">{preset.name}</span>
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase">{(preset.structure[0] as any).attrs.length} Attrs</span>
+                                        <div className="flex items-start justify-between">
+                                            <div>
+                                                <span className="block font-bold text-slate-700 text-xs group-hover:text-amber-900">{preset.name}</span>
+                                                <span className="block text-[10px] text-slate-500 italic leading-tight">{preset.desc}</span>
+                                            </div>
+
+                                            {/* Micro-structure for hardcoded */}
+                                            <div className="flex gap-0.5 ml-2">
+                                                {preset.structure.map((pave: any, i: number) => (
+                                                    <div key={i} className="flex flex-col gap-0.5 p-0.5 bg-white/50 border border-slate-100 rounded-sm">
+                                                        <div className="flex flex-col gap-0.5">
+                                                            {pave.attrs.slice(0, 3).map((_: any, j: number) => (
+                                                                <div key={j} className="w-0.5 h-0.5 rounded-full bg-slate-300" />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <span className="block text-[10px] text-slate-500 italic">{preset.desc}</span>
                                     </div>
                                 </button>
                             ))}

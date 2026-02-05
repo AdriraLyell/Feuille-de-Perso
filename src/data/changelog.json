@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.16.4",
+        "date": "2026-02-05",
+        "type": "patch",
+        "changes": [
+            "Affinement de la visualisation Dot-System : design ultra-compact avec séparation claire entre attributs primaires (bleu) et secondaires (ambre)",
+            "Suppression des labels textuels superflus dans la bibliothèque de préréglages pour une interface plus épurée"
+        ]
+    },
+    {
         "version": "2.16.3",
         "date": "2026-02-05",
         "type": "patch",
