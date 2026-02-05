@@ -64,6 +64,7 @@ export const generateDefaultRules = (): RulesData => {
         theme: data.theme,
         configurations: {
             creation: data.creationConfig,
+
             xpCosts: {
                 attributeFactor: 6,
                 skillFactor: 1,
@@ -101,7 +102,9 @@ export const generateDefaultRules = (): RulesData => {
         libraries: {
             traits: data.library || [],
             skills: data.skillLibrary || [],
-            specializations: data.specializationLibrary || []
+            specializations: data.specializationLibrary || [],
+            backgrounds: [],
+            counters: []
         }
     };
 };

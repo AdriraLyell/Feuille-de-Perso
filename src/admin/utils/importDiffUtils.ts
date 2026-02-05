@@ -14,6 +14,8 @@ export interface DiffReport {
             traits: { new: number, conflict: number, identical: number };
             skills: { new: number, conflict: number, identical: number };
             specializations: { new: number, conflict: number, identical: number };
+            backgrounds: { new: number, conflict: number, identical: number };
+            counters: { new: number, conflict: number, identical: number };
         };
     };
 }
@@ -44,7 +46,9 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
             libraries: {
                 traits: { new: 0, conflict: 0, identical: 0 },
                 skills: { new: 0, conflict: 0, identical: 0 },
-                specializations: { new: 0, conflict: 0, identical: 0 }
+                specializations: { new: 0, conflict: 0, identical: 0 },
+                backgrounds: { new: 0, conflict: 0, identical: 0 },
+                counters: { new: 0, conflict: 0, identical: 0 }
             }
         }
     };
@@ -149,7 +153,7 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
     // Library Merge Logic
     if (options.sections.libraries) {
         // Ensure library buckets exist
-        if (!result.libraries) result.libraries = { traits: [], skills: [], specializations: [] };
+        if (!result.libraries) result.libraries = { traits: [], skills: [], specializations: [], backgrounds: [], counters: [] };
 
         const mergeLibList = <T extends { id: string }>(curr: T[], cand: T[]) => {
             const map = new Map(curr.map(i => [i.id, i]));

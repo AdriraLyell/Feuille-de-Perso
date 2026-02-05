@@ -66,6 +66,8 @@ export const defaultRules: RulesData = {
     libraries: {
         traits: [],
         skills: [],
-        specializations: []
+        specializations: [],
+        backgrounds: [],
+        counters: []
     }
 };

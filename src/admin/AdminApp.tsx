@@ -19,6 +19,8 @@ import ImportWizardModal from './components/import-wizard/ImportWizardModal';
 import AdminTraitLibrary from './components/libraries/AdminTraitLibrary';
 import AdminSkillLibrary from './components/libraries/AdminSkillLibrary';
 import AdminSpecializationLibrary from './components/libraries/AdminSpecializationLibrary';
+import AdminBackgroundLibrary from './components/libraries/AdminBackgroundLibrary';
+import AdminCounterLibrary from './components/libraries/AdminCounterLibrary';
 import DeployToGithubModal from './components/DeployModal';
 import { BookOpen, Save as SaveIcon, Cloud, AlertTriangle } from 'lucide-react';
 import { usePersistence } from './hooks/usePersistence';
@@ -58,8 +60,8 @@ const AdminApp: React.FC = () => {
 
     const [rules, setRules] = useState<RulesData | null>(null);
     const [showDeployModal, setShowDeployModal] = useState(false);
-    const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'costs' | 'counters' | 'backgrounds' | 'libraries'>('general');
-    const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations'>('traits');
+    const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'costs' | 'libraries'>('general');
+    const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters'>('traits');
 
     // Import Modal State
     const [showImportResult, setShowImportResult] = useState(false);
@@ -315,18 +317,7 @@ const AdminApp: React.FC = () => {
                     >
                         Coûts & Limites
                     </button>
-                    <button
-                        onClick={() => setActiveTab('counters')}
-                        className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === 'counters' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
-                    >
-                        Compteurs
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('backgrounds')}
-                        className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === 'backgrounds' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
-                    >
-                        Arrière-Plans
-                    </button>
+
                     <button
                         onClick={() => setActiveTab('libraries')}
                         className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === 'libraries' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
@@ -362,32 +353,39 @@ const AdminApp: React.FC = () => {
                     <AdminCostsEditor rules={rules} onUpdate={handleUpdateRules} />
                 )}
 
-                {activeTab === 'counters' && (
-                    <AdminCountersEditor rules={rules} onUpdate={handleUpdateRules} />
-                )}
 
-                {activeTab === 'backgrounds' && (
-                    <AdminBackgroundsEditor rules={rules} onUpdate={handleUpdateRules} />
-                )}
 
                 {activeTab === 'libraries' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4">
-                        <div className="flex gap-4 mb-4 bg-white p-2 rounded-lg shadow-sm border border-slate-200 w-fit mx-auto">
+
+                        <div className="flex gap-4 mb-4 bg-white p-2 rounded-lg shadow-sm border border-slate-200 w-fit mx-auto overflow-x-auto">
                             <button
                                 onClick={() => setActiveLibraryTab('traits')}
-                                className={`px-4 py-2 rounded font-bold text-sm transition-colors ${activeLibraryTab === 'traits' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                                className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === 'traits' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
                             >
                                 Traits (Avantages/Défauts)
                             </button>
                             <button
                                 onClick={() => setActiveLibraryTab('skills')}
-                                className={`px-4 py-2 rounded font-bold text-sm transition-colors ${activeLibraryTab === 'skills' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                                className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === 'skills' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
                             >
-                                Réserve de Compétences
+                                Compétences
+                            </button>
+                            <button
+                                onClick={() => setActiveLibraryTab('backgrounds')}
+                                className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === 'backgrounds' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                            >
+                                Arrières-Plans
+                            </button>
+                            <button
+                                onClick={() => setActiveLibraryTab('counters')}
+                                className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === 'counters' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                            >
+                                Compteurs
                             </button>
                             <button
                                 onClick={() => setActiveLibraryTab('specializations')}
-                                className={`px-4 py-2 rounded font-bold text-sm transition-colors ${activeLibraryTab === 'specializations' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                                className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === 'specializations' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
                             >
                                 Spécialisations
                             </button>
@@ -399,12 +397,19 @@ const AdminApp: React.FC = () => {
                         {activeLibraryTab === 'skills' && (
                             <AdminSkillLibrary rules={rules} onUpdate={handleUpdateRules} />
                         )}
+                        {activeLibraryTab === 'backgrounds' && (
+                            <AdminBackgroundLibrary rules={rules} onUpdate={handleUpdateRules} />
+                        )}
+                        {activeLibraryTab === 'counters' && (
+                            <AdminCounterLibrary rules={rules} onUpdate={handleUpdateRules} />
+                        )}
                         {activeLibraryTab === 'specializations' && (
                             <AdminSpecializationLibrary rules={rules} onUpdate={handleUpdateRules} />
                         )}
                     </div>
-                )}
-            </main>
+                )
+                }
+            </main >
 
             <ImportResultModal
                 isOpen={showImportResult}
@@ -417,42 +422,47 @@ const AdminApp: React.FC = () => {
                 onClose={() => setShowChangelog(false)}
             />
 
-            {wizardOpen && candidateRules && rules && (
-                <ImportWizardModal
-                    isOpen={wizardOpen}
-                    onClose={() => { setWizardOpen(false); setCandidateRules(null); }}
-                    currentRules={rules}
-                    candidateRules={candidateRules}
-                    onConfirm={(merged) => {
-                        handleUpdateRules(merged);
-                        setWizardOpen(false);
-                        setCandidateRules(null);
-                        // Optionally show success message?
-                        setImportReport({
-                            success: ["Fusion effectuée avec succès"],
-                            warnings: []
-                        });
-                        setShowImportResult(true);
-                    }}
-                />
-            )}
+            {
+                wizardOpen && candidateRules && rules && (
+                    <ImportWizardModal
+                        isOpen={wizardOpen}
+                        onClose={() => { setWizardOpen(false); setCandidateRules(null); }}
+                        currentRules={rules}
+                        candidateRules={candidateRules}
+                        onConfirm={(merged) => {
+                            handleUpdateRules(merged);
+                            setWizardOpen(false);
+                            setCandidateRules(null);
+                            // Optionally show success message?
+                            setImportReport({
+                                success: ["Fusion effectuée avec succès"],
+                                warnings: []
+                            });
+                            setShowImportResult(true);
+                        }}
+                    />
+                )
+            }
 
             {/* Save Feedback Modal */}
-            {saveFeedback && (
-                <ConfirmationModal
-                    isOpen={saveFeedback.isOpen}
-                    onClose={() => setSaveFeedback(null)}
-                    onConfirm={() => setSaveFeedback(null)}
-                    title={saveFeedback.success ? "Sauvegarde Réussie" : "Erreur de Sauvegarde"}
-                    message={saveFeedback.message}
-                    type={saveFeedback.success ? 'success' : 'danger'}
-                    confirmLabel="OK"
-                    cancelLabel="" // Hide cancel button
-                />
-            )}
+            {
+                saveFeedback && (
+                    <ConfirmationModal
+                        isOpen={saveFeedback.isOpen}
+                        onClose={() => setSaveFeedback(null)}
+                        onConfirm={() => setSaveFeedback(null)}
+                        title={saveFeedback.success ? "Sauvegarde Réussie" : "Erreur de Sauvegarde"}
+                        message={saveFeedback.message}
+                        type={saveFeedback.success ? 'success' : 'danger'}
+                        confirmLabel="OK"
+                        cancelLabel="" // Hide cancel button
+                    />
+                )
+            }
 
             <DeploymentMonitor />
         </div >
     );
 };
 export default AdminApp;
+

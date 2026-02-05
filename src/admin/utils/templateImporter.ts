@@ -48,7 +48,13 @@ export const extractRulesFromCharacter = (
 
     // Ensure libraries structure exists
     if (!newRules.libraries) {
-        newRules.libraries = { traits: [], skills: [], specializations: [] };
+        newRules.libraries = {
+            traits: [],
+            skills: [],
+            specializations: [],
+            backgrounds: [],
+            counters: []
+        };
     }
 
     // 1. Import Creation Config
