@@ -2,7 +2,7 @@
 import { RulesData } from '../../types/rules';
 import { AttributePreset } from '../../types/system';
 import { Plus, Trash2, Shield, Zap, LayoutGrid, Play, Info, Save, Loader2 } from 'lucide-react';
-import { AdminService } from '../../services/AdminService';
+import { CampaignService } from '../../services/CampaignService';
 import { AttributeService } from '../../services/AttributeService';
 import ThematicModal from '../../components/ui/ThematicModal';
 import { DEFAULT_ATTRIBUTES, ATTRIBUTE_PRESETS, getDefaultSecondaryAttrs } from '../../data/defaults/attributes';

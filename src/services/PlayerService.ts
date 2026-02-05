@@ -1,7 +1,7 @@
 
 import { supabase } from './supabase';
 import { RulesData } from '../types/rules';
-import { AdminService, GameSettingSummary } from './AdminService';
+import { CampaignService, GameSettingSummary } from './CampaignService';
 
 export const PlayerService = {
 
@@ -29,6 +29,6 @@ export const PlayerService = {
      * (RLS says public users can only Select if is_public=true)
      */
     async loadSetting(id: string): Promise<RulesData | null> {
-        return AdminService.loadSetting(id);
+        return CampaignService.loadSetting(id);
     }
 };

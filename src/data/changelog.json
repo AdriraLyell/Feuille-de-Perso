@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.17.6",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Hotfix : Correction des imports brisés suite au renommage de AdminService en CampaignService.",
+            "Hotfix : Restauration des imports manquants (RulesData, React) dans AdminCreationEditor.",
+            "Fix : Correction d'une erreur de type TypeScript sur le Drag & Drop des compétences."
+        ]
+    },
+    {
         "version": "2.17.5",
         "date": "2026-02-06",
         "type": "patch",

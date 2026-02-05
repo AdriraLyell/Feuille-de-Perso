@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { GameSettingSummary } from '../services/AdminService';
+import { GameSettingSummary } from '../services/CampaignService';
 import { PlayerService } from '../services/PlayerService';
 import { Cloud, Wifi, WifiOff, FileJson, Loader2, ArrowRight } from 'lucide-react';
 import { RulesData } from '../types/rules';

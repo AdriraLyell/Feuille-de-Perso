@@ -1,3 +1,5 @@
+import React from 'react';
+import { RulesData } from '../../types/rules';
 import CreationGeneralSettings from './creation/CreationGeneralSettings';
 import RankSlotsConfig from './creation/RankSlotsConfig';
 import CreationPointsPreview from './creation/CreationPointsPreview';
@@ -47,7 +49,7 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
             configurations: {
                 ...rules.configurations,
                 cards: {
-                    ...(rules.configurations.cards || {}),
+                    ...rules.configurations.cards,
                     [field]: value
                 }
             }

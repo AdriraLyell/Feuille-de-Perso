@@ -232,7 +232,7 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
                                 onRemoveSkill={removeSkill}
                                 onSkillBlur={handleSkillBlur}
                                 onDragStart={(e, idx, name) => handleDragStart(e, cat, idx, name)}
-                                onDrop={handleDropOnColumn}
+                                onDrop={(e, idx) => handleDropOnColumn(e, cat, idx)}
                                 draggedItemInfo={draggedItem}
                             />
                         ))}
