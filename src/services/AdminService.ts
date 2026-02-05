@@ -116,8 +116,14 @@ export const AdminService = {
                     await supabase.from('libraries_specializations').insert(specsPayload);
                 }
 
-                // D. Backgrounds (Unified)
-                if (initialRules.libraries.backgrounds && initialRules.libraries.backgrounds.length > 0) {
+                // D. Backgrounds (Unified & Smart Link from Layout)
+                // We combine explicitly passed library items AND items found in the Layout (definitions.skills.arrieres_plans)
+                const layoutBgNames = initialRules.definitions?.skills?.['arrieres_plans'] || [];
+                const libBgNames = initialRules.libraries?.backgrounds?.map(b => b.name) || [];
+                // Unique set of names to look for
+                const targetBgNames = new Set([...layoutBgNames, ...libBgNames].map(n => n.trim().toLowerCase()).filter(n => n !== ""));
+
+                if (targetBgNames.size > 0) {
                     const { data: globalBgs } = await supabase
                         .from('libraries_backgrounds')
                         .select('id, name')
@@ -126,29 +132,58 @@ export const AdminService = {
                     const globalBgMap = new Map((globalBgs || []).map(b => [b.name.trim().toLowerCase(), b.id]));
                     const bgPayload: any[] = [];
                     const bgLinksPayload: any[] = [];
+                    const processedNames = new Set<string>();
 
-                    initialRules.libraries.backgrounds.forEach(b => {
-                        const normalizedName = b.name.trim().toLowerCase();
-                        if (globalBgMap.has(normalizedName)) {
+                    // 1. Process Explicit Library Items (Preserve full object data)
+                    if (initialRules.libraries?.backgrounds) {
+                        initialRules.libraries.backgrounds.forEach(b => {
+                            const normalized = b.name.trim().toLowerCase();
+                            if (processedNames.has(normalized)) return;
+                            processedNames.add(normalized);
+
+                            if (globalBgMap.has(normalized)) {
+                                bgLinksPayload.push({
+                                    setting_id: settingId,
+                                    background_id: globalBgMap.get(normalized),
+                                    is_active: true
+                                });
+                            } else {
+                                bgPayload.push({
+                                    setting_id: settingId,
+                                    ...b
+                                });
+                            }
+                        });
+                    }
+
+                    // 2. Process Layout Items (Implicit Link)
+                    layoutBgNames.forEach(name => {
+                        const normalized = name.trim().toLowerCase();
+                        if (normalized === "" || processedNames.has(normalized)) return;
+                        processedNames.add(normalized);
+
+                        if (globalBgMap.has(normalized)) {
                             bgLinksPayload.push({
                                 setting_id: settingId,
-                                background_id: globalBgMap.get(normalizedName),
+                                background_id: globalBgMap.get(normalized),
                                 is_active: true
                             });
-                        } else {
-                            bgPayload.push({
-                                setting_id: settingId,
-                                ...b
-                            });
                         }
+                        // Note: If it's in Layout but NOT in Global/Library, we can't create it as we lack data (description etc).
+                        // It serves as a placeholder.
                     });
 
                     if (bgPayload.length > 0) await supabase.from('libraries_backgrounds').insert(bgPayload);
                     if (bgLinksPayload.length > 0) await supabase.from('rel_setting_backgrounds').insert(bgLinksPayload);
                 }
 
-                // E. Counters (Unified)
-                if (initialRules.libraries.counters && initialRules.libraries.counters.length > 0) {
+                // E. Counters (Unified & Smart Link from Definitions)
+                const layoutCounters = Object.values(initialRules.definitions?.counters || {});
+                const layoutCounterNames = layoutCounters.map((c: any) => c.name);
+                const libCounterNames = initialRules.libraries?.counters?.map(c => c.name) || [];
+                const targetCounterNames = new Set([...layoutCounterNames, ...libCounterNames].map(n => n.trim().toLowerCase()));
+
+                if (targetCounterNames.size > 0) {
                     const { data: globalCounters } = await supabase
                         .from('libraries_counters')
                         .select('id, name')
@@ -157,23 +192,45 @@ export const AdminService = {
                     const globalCounterMap = new Map((globalCounters || []).map(c => [c.name.trim().toLowerCase(), c.id]));
                     const counterPayload: any[] = [];
                     const counterLinksPayload: any[] = [];
+                    const processedNames = new Set<string>();
 
-                    initialRules.libraries.counters.forEach(c => {
-                        const normalizedName = c.name.trim().toLowerCase();
-                        if (globalCounterMap.has(normalizedName)) {
+                    // 1. Explicit Library Items
+                    if (initialRules.libraries?.counters) {
+                        initialRules.libraries.counters.forEach(c => {
+                            const normalized = c.name.trim().toLowerCase();
+                            if (processedNames.has(normalized)) return;
+                            processedNames.add(normalized);
+
+                            if (globalCounterMap.has(normalized)) {
+                                counterLinksPayload.push({
+                                    setting_id: settingId,
+                                    counter_id: globalCounterMap.get(normalized),
+                                    is_active: true
+                                });
+                            } else {
+                                counterPayload.push({
+                                    setting_id: settingId,
+                                    id: c.id,
+                                    name: c.name,
+                                    max_value: c.maxValue,
+                                    default_value: c.defaultValue,
+                                    xp_cost: c.xpCost
+                                });
+                            }
+                        });
+                    }
+
+                    // 2. Layout Items
+                    layoutCounters.forEach((c: any) => {
+                        const normalized = c.name.trim().toLowerCase();
+                        if (processedNames.has(normalized)) return;
+                        processedNames.add(normalized);
+
+                        if (globalCounterMap.has(normalized)) {
                             counterLinksPayload.push({
                                 setting_id: settingId,
-                                counter_id: globalCounterMap.get(normalizedName),
+                                counter_id: globalCounterMap.get(normalized),
                                 is_active: true
-                            });
-                        } else {
-                            counterPayload.push({
-                                setting_id: settingId,
-                                id: c.id,
-                                name: c.name,
-                                max_value: c.maxValue,
-                                default_value: c.defaultValue,
-                                xp_cost: c.xpCost
                             });
                         }
                     });
