@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.16.5",
+        "date": "2026-02-05",
+        "type": "patch",
+        "changes": [
+            "Finalisation de l'intégration du Dot-System dans le header des cartes de préréglages",
+            "Harmonisation des préréglages codés en dur avec le nouveau design de visualisation",
+            "Nettoyage structurel et optimisation de l'affichage des points d'attributs"
+        ]
+    },
+    {
         "version": "2.16.4",
         "date": "2026-02-05",
         "type": "patch",

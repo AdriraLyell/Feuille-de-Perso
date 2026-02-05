@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { RulesData } from '../../types/rules';
 import { AttributePreset } from '../../types/system';
 import { Plus, Trash2, Shield, Zap, LayoutGrid, Play, Info, Save, Loader2 } from 'lucide-react';
@@ -11,15 +11,15 @@ interface AdminAttributesEditorProps {
 }
 
 const DEFAULT_ATTRIBUTES: Record<string, string[]> = {
-    'physique': ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'],
-    'mental': ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'],
-    'social': ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'],
-    'mystique': ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité']
+    'physique': ['Force', 'Constitution', 'AgilitÃ©', 'DextÃ©ritÃ©', 'Perception'],
+    'mental': ['VolontÃ©', 'StabilitÃ©', 'Astuce/SubtilitÃ©', 'Intellect', 'Intuition'],
+    'social': ['Charisme', 'Calme', 'MimÃ©tisme', 'Communication', 'Empathie'],
+    'mystique': ['Puissance', 'RÃ©sistance', 'Souplesse', 'PrÃ©cision', 'SensibilitÃ©']
 };
 
 const DEFAULT_SECONDARY_ATTRIBUTES: Record<string, string[]> = {
-    'physique': ['Corpulence', 'Beauté'],
-    'social': ['Présence', 'Charme'],
+    'physique': ['Corpulence', 'BeautÃ©'],
+    'social': ['PrÃ©sence', 'Charme'],
     'mental': ['Conscience', 'Attraction'],
     'mystique': ['Aura', 'Fascination']
 };
@@ -27,23 +27,23 @@ const DEFAULT_SECONDARY_ATTRIBUTES: Record<string, string[]> = {
 const ATTRIBUTE_PRESETS = [
     {
         name: "v2 (Classique)",
-        desc: "3 Pavés de 4 Attributs",
+        desc: "3 PavÃ©s de 4 Attributs",
         hasSecondary: false,
         structure: [
-            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'], secondaryAttrs: ['Corpulence', 'Beauté'] },
-            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Intellect', 'Volonté', 'Intuition', 'Perception'], secondaryAttrs: ['Conscience', 'Attraction'] },
-            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Empathie', 'Apparence', 'Communication'], secondaryAttrs: ['Présence', 'Charme'] }
+            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'DextÃ©ritÃ©', 'AgilitÃ©'], secondaryAttrs: ['Corpulence', 'BeautÃ©'] },
+            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Intellect', 'VolontÃ©', 'Intuition', 'Perception'], secondaryAttrs: ['Conscience', 'Attraction'] },
+            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Empathie', 'Apparence', 'Communication'], secondaryAttrs: ['PrÃ©sence', 'Charme'] }
         ]
     },
     {
         name: "v4 (Complet)",
-        desc: "4 Pavés de 5 Attributs",
+        desc: "4 PavÃ©s de 5 Attributs",
         hasSecondary: true,
         structure: [
-            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'], secondaryAttrs: ['Corpulence', 'Beauté'] },
-            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'], secondaryAttrs: ['Conscience', 'Attraction'] },
-            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'], secondaryAttrs: ['Présence', 'Charme'] },
-            { id: 'pave_attributs_4', label: 'Mystique', attrs: ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité'], secondaryAttrs: ['Aura', 'Fascination'] }
+            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'AgilitÃ©', 'DextÃ©ritÃ©', 'Perception'], secondaryAttrs: ['Corpulence', 'BeautÃ©'] },
+            { id: 'pave_attributs_2', label: 'Mental', attrs: ['VolontÃ©', 'StabilitÃ©', 'Astuce/SubtilitÃ©', 'Intellect', 'Intuition'], secondaryAttrs: ['Conscience', 'Attraction'] },
+            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Calme', 'MimÃ©tisme', 'Communication', 'Empathie'], secondaryAttrs: ['PrÃ©sence', 'Charme'] },
+            { id: 'pave_attributs_4', label: 'Mystique', attrs: ['Puissance', 'RÃ©sistance', 'Souplesse', 'PrÃ©cision', 'SensibilitÃ©'], secondaryAttrs: ['Aura', 'Fascination'] }
         ]
     }
 ];
@@ -139,7 +139,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
 
     const handleDeletePreset = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
-        if (!confirm("Supprimer ce préréglage ?")) return;
+        if (!confirm("Supprimer ce prÃ©rÃ©glage ?")) return;
         const success = await AdminService.deleteAttributePreset(id);
         if (success) loadDBPresets();
     };
@@ -388,7 +388,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 <button
                     onClick={() => removeCategory(category)}
                     className="absolute top-2 right-2 text-slate-300 hover:text-red-500 opacity-0 group-hover/col:opacity-100 transition-opacity"
-                    title="Supprimer ce pavé"
+                    title="Supprimer ce pavÃ©"
                 >
                     <Trash2 size={16} />
                 </button>
@@ -408,7 +408,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                     <button
                         onClick={addAttribute}
                         className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded hover:bg-blue-200 transition-colors font-bold"
-                        title="Ajouter un attribut à TOUS les pavés"
+                        title="Ajouter un attribut Ã  TOUS les pavÃ©s"
                     >
                         +
                     </button>
@@ -425,7 +425,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                             <button
                                 onClick={() => removeAttribute(index)}
                                 className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-0.5"
-                                title="Supprimer cet index de TOUS les pavés"
+                                title="Supprimer cet index de TOUS les pavÃ©s"
                             >
                                 <Trash2 size={12} />
                             </button>
@@ -464,7 +464,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
             {/* PRESETS SECTION & OPTIONS */}
             <div className="bg-white p-6 rounded shadow-sm border border-slate-200">
                 <h4 className="font-bold text-slate-800 text-sm uppercase tracking-widest mb-4 flex items-center gap-2 border-b pb-2">
-                    <Zap size={16} className="text-amber-500" /> Options & Préréglages
+                    <Zap size={16} className="text-amber-500" /> Options & PrÃ©rÃ©glages
                 </h4>
 
                 <div className="flex flex-col md:flex-row gap-8">
@@ -472,7 +472,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                     <div className="w-full">
                         <div className="flex items-center justify-between mb-3">
                             <h5 className="text-xs font-bold text-slate-700 uppercase tracking-tighter flex items-center gap-1">
-                                <LayoutGrid size={14} /> Bibliothèque de Préréglages
+                                <LayoutGrid size={14} /> BibliothÃ¨que de PrÃ©rÃ©glages
                             </h5>
                             <button
                                 onClick={() => setIsSaveModalOpen(true)}
@@ -487,7 +487,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                             {isLoadingPresets ? (
                                 <div className="col-span-full py-10 flex flex-col items-center justify-center text-slate-400 gap-2">
                                     <Loader2 className="animate-spin" size={24} />
-                                    <span className="text-xs font-medium">Chargement des préréglages...</span>
+                                    <span className="text-xs font-medium">Chargement des prÃ©rÃ©glages...</span>
                                 </div>
                             ) : dbPresets.map((preset, idx) => (
                                 <div
@@ -496,51 +496,31 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                     className="relative bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[80px]"
                                 >
                                     <div>
-                                        <div className="flex justify-between items-start mb-1">
-                                            <span className="block font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate pr-4">
+                                        <div className="flex justify-between items-center mb-1 gap-2">
+                                            <span className="font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate flex-grow">
                                                 {preset.name}
                                             </span>
-                                            {preset.isOfficial ? (
-                                                <span title="Officiel"><Shield size={12} className="text-blue-400 shrink-0" /></span>
-                                            ) : (
-                                                <button
-                                                    onClick={(e) => handleDeletePreset(e, preset.id)}
-                                                    className="opacity-0 group-hover/card:opacity-100 text-slate-300 hover:text-red-500 transition-opacity"
-                                                >
-                                                    <Trash2 size={12} />
-                                                </button>
-                                            )}
-                                        </div>
-                                        <span className="block text-[10px] text-slate-500 italic line-clamp-2 leading-tight">
-                                            {preset.description}
-                                        </span>
-                                    </div>
-                                    <div className="mt-2 flex items-center justify-between">
-                                        <div className="flex items-center gap-1 pt-1 overflow-x-auto no-scrollbar">
-                                            <div className="flex gap-1" title={`${preset.structure.length} Pavés`}>
+
+                                            {/* Micro-structure relocated to header */}
+                                            <div className="flex gap-0.5 items-center">
                                                 {preset.structure.map((pave: any, i: number) => {
                                                     const isSecondary = ((preset as any).has_secondary || (preset as any).hasSecondary);
                                                     return (
                                                         <div
                                                             key={i}
-                                                            className={`flex flex-col gap-0.5 p-0.5 rounded-sm border ${isSecondary ? 'bg-amber-50/50 border-amber-100' : 'bg-slate-50 border-slate-200'
+                                                            className={`flex flex-col gap-0.5 p-0.5 rounded-[1px] border ${isSecondary ? 'bg-amber-50/50 border-amber-100' : 'bg-slate-50 border-slate-200'
                                                                 }`}
                                                         >
-                                                            {/* Primaries */}
                                                             <div className="flex flex-col gap-0.5">
-                                                                {pave.attrs.map((_: any, dotIdx: number) => (
-                                                                    <div key={dotIdx} className="w-1 h-1 rounded-full bg-blue-400/70" />
+                                                                {pave.attrs.slice(0, 4).map((_: any, j: number) => (
+                                                                    <div key={j} className="w-0.5 h-0.5 rounded-full bg-blue-400/70" />
                                                                 ))}
                                                             </div>
-
-                                                            {/* Separator & Secondaries */}
-                                                            {isSecondary && (pave.secondaryAttrs?.length > 0 || !preset.id) && (
+                                                            {isSecondary && (
                                                                 <>
-                                                                    <div className="h-px bg-slate-200 w-full my-0.5" />
+                                                                    <div className="h-[0.5px] bg-slate-200 w-full my-0.5" />
                                                                     <div className="flex flex-col gap-0.5">
-                                                                        {(pave.secondaryAttrs || ["", ""]).map((_: any, dotIdx: number) => (
-                                                                            <div key={dotIdx} className="w-1 h-1 rounded-full bg-amber-400" />
-                                                                        ))}
+                                                                        <div className="w-0.5 h-0.5 rounded-full bg-amber-400" />
                                                                     </div>
                                                                 </>
                                                             )}
@@ -548,7 +528,28 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                                     );
                                                 })}
                                             </div>
+
+                                            <div className="shrink-0 flex items-center">
+                                                {preset.isOfficial ? (
+                                                    <span title="Officiel"><Shield size={12} className="text-blue-400" /></span>
+                                                ) : (
+                                                    <button
+                                                        onClick={(e) => handleDeletePreset(e, preset.id)}
+                                                        className="opacity-0 group-hover/card:opacity-100 text-slate-300 hover:text-red-500 transition-opacity"
+                                                    >
+                                                        <Trash2 size={12} />
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
+                                        <span className="block text-[10px] text-slate-500 italic line-clamp-2 leading-tight">
+                                            {preset.description}
+                                        </span>
+                                    </div>
+                                    <div className="mt-1 flex items-center justify-between">
+                                        <span className="block text-[10px] text-slate-400 italic font-medium">
+                                            {preset.structure.length} PavÃ©s
+                                        </span>
                                         <Play size={10} className="text-slate-300 group-hover/card:text-amber-500 shrink-0" />
                                     </div>
                                 </div>
@@ -559,31 +560,43 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                 <button
                                     key={`hc-${idx}`}
                                     onClick={() => requestPresetLoad(preset)}
-                                    className="bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded p-3 text-left transition-all group flex items-start gap-3"
+                                    className="bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded p-3 text-left transition-all group/card flex flex-col justify-between min-h-[80px]"
                                 >
-                                    <div className="bg-white p-2 rounded-full border border-slate-200 group-hover:border-amber-400 group-hover:text-amber-700 text-slate-300 shrink-0">
-                                        <Play size={14} className="ml-0.5" />
-                                    </div>
-                                    <div className="flex-grow">
-                                        <div className="flex items-start justify-between">
-                                            <div>
-                                                <span className="block font-bold text-slate-700 text-xs group-hover:text-amber-900">{preset.name}</span>
-                                                <span className="block text-[10px] text-slate-500 italic leading-tight">{preset.desc}</span>
-                                            </div>
+                                    <div className="flex justify-between items-center mb-1 gap-2">
+                                        <div className="min-w-0 flex-grow">
+                                            <span className="block font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate">{preset.name}</span>
+                                            <span className="text-[10px] text-slate-400 italic font-medium leading-tight truncate">{preset.structure.length} PavÃ©s</span>
+                                        </div>
 
-                                            {/* Micro-structure for hardcoded */}
-                                            <div className="flex gap-0.5 ml-2">
-                                                {preset.structure.map((pave: any, i: number) => (
-                                                    <div key={i} className="flex flex-col gap-0.5 p-0.5 bg-white/50 border border-slate-100 rounded-sm">
+                                        {/* Micro-structure for hardcoded relocated */}
+                                        <div className="flex gap-0.5 items-center shrink-0">
+                                            {preset.structure.map((pave: any, i: number) => {
+                                                const isSec = (preset as any).hasSecondary;
+                                                return (
+                                                    <div key={i} className={`flex flex-col gap-0.5 p-0.5 rounded-[1px] border ${isSec ? 'bg-amber-50/50 border-amber-100' : 'bg-white border-slate-100'}`}>
                                                         <div className="flex flex-col gap-0.5">
-                                                            {pave.attrs.slice(0, 3).map((_: any, j: number) => (
-                                                                <div key={j} className="w-0.5 h-0.5 rounded-full bg-slate-300" />
+                                                            {(pave.attrs || []).slice(0, 3).map((_: any, j: number) => (
+                                                                <div key={j} className="w-0.5 h-0.5 rounded-full bg-blue-400/70" />
                                                             ))}
                                                         </div>
+                                                        {isSec && (
+                                                            <>
+                                                                <div className="h-[0.5px] bg-slate-200 w-full my-0.5" />
+                                                                <div className="flex flex-col gap-0.5">
+                                                                    <div className="w-0.5 h-0.5 rounded-full bg-amber-400" />
+                                                                </div>
+                                                            </>
+                                                        )}
                                                     </div>
-                                                ))}
-                                            </div>
+                                                );
+                                            })}
                                         </div>
+                                    </div>
+                                    <div className="mt-1 flex items-center justify-between">
+                                        <span className="block text-[10px] text-slate-400 italic font-medium">
+                                            {preset.structure.length} PavÃ©s
+                                        </span>
+                                        <Play size={10} className="text-slate-300 group-hover/card:text-amber-500 shrink-0" />
                                     </div>
                                 </button>
                             ))}
@@ -596,7 +609,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
             <div>
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-slate-700 uppercase tracking-widest text-sm flex items-center gap-2">
-                        <LayoutGrid size={18} className="text-blue-600" /> Structure ({categories.length} / 5 Pavés)
+                        <LayoutGrid size={18} className="text-blue-600" /> Structure ({categories.length} / 5 PavÃ©s)
                     </h3>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded border border-slate-200">
@@ -616,7 +629,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                 ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                 : 'bg-slate-800 hover:bg-slate-700 text-white'}`}
                         >
-                            <Plus size={14} /> Ajouter un Pavé
+                            <Plus size={14} /> Ajouter un PavÃ©
                         </button>
                     </div>
                 </div>
@@ -631,7 +644,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 <ThematicModal
                     isOpen={showPresetConfirm}
                     onClose={() => { setShowPresetConfirm(false); setPendingPreset(null); }}
-                    title="Charger le préréglage ?"
+                    title="Charger le prÃ©rÃ©glage ?"
                     icon={<Zap size={24} className="text-amber-600" />}
                     size="md"
                     footer={
@@ -645,7 +658,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 >
                     <div className="flex flex-col items-center text-center space-y-4 py-4">
                         <p className="text-sm text-slate-600">
-                            Cette action remplacera <span className="font-bold text-red-600">toute</span> votre configuration d'attributs actuelle par le modèle :
+                            Cette action remplacera <span className="font-bold text-red-600">toute</span> votre configuration d'attributs actuelle par le modÃ¨le :
                         </p>
                         <div className="bg-amber-50 p-2 rounded border border-amber-200 font-bold text-amber-900">
                             {pendingPreset.name}
@@ -660,7 +673,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 <ThematicModal
                     isOpen={isSaveModalOpen}
                     onClose={() => setIsSaveModalOpen(false)}
-                    title="Sauvegarder en tant que préréglage"
+                    title="Sauvegarder en tant que prÃ©rÃ©glage"
                     icon={<Save size={24} className="text-green-600" />}
                     size="md"
                     footer={
@@ -678,16 +691,16 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 >
                     <div className="space-y-4 py-4">
                         <p className="text-sm text-slate-600">
-                            Enregistrez cette structure pour la réutiliser dans d'autres campagnes.
+                            Enregistrez cette structure pour la rÃ©utiliser dans d'autres campagnes.
                         </p>
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nom du préréglage</label>
+                                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nom du prÃ©rÃ©glage</label>
                                 <input
                                     autoFocus
                                     value={newPresetName}
                                     onChange={(e) => setNewPresetName(e.target.value)}
-                                    placeholder="Ex: Système 3-Pavés-6-Attributs"
+                                    placeholder="Ex: SystÃ¨me 3-PavÃ©s-6-Attributs"
                                     className="w-full bg-slate-50 border border-slate-200 rounded p-2 text-sm focus:border-green-500 outline-none"
                                 />
                             </div>
@@ -696,13 +709,13 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                 <textarea
                                     value={newPresetDesc}
                                     onChange={(e) => setNewPresetDesc(e.target.value)}
-                                    placeholder="Décrivez l'usage de ce préréglage..."
+                                    placeholder="DÃ©crivez l'usage de ce prÃ©rÃ©glage..."
                                     className="w-full bg-slate-50 border border-slate-200 rounded p-2 text-xs focus:border-green-500 outline-none h-20 resize-none"
                                 />
                             </div>
                         </div>
                         <div className="bg-slate-50 p-3 rounded border border-slate-200">
-                            <h6 className="text-[10px] font-bold text-slate-500 uppercase mb-2">Résumé de la structure :</h6>
+                            <h6 className="text-[10px] font-bold text-slate-500 uppercase mb-2">RÃ©sumÃ© de la structure :</h6>
                             <div className="flex flex-wrap gap-2">
                                 {categories.map(cat => (
                                     <div key={cat} className="bg-white px-2 py-1 rounded border border-slate-200 text-[10px] font-bold text-slate-700">
@@ -719,4 +732,3 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
 };
 
 export default AdminAttributesEditor;
-
