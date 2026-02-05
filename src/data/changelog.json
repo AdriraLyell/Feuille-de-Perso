@@ -1,5 +1,36 @@
 [
     {
+        "version": "2.17.5",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Refactorisation finale des services Admin (AdminService)",
+            "Renommage de AdminService en CampaignService (gestion CRUD des campagnes)",
+            "Création de RuleCalculationsService pour centraliser les formules de calcul (XP, Coûts, Cartes)",
+            "Unification de la logique de calcul entre MJ et Joueur via mechanics.ts"
+        ]
+    },
+    {
+        "version": "2.17.4",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Refactorisation de l'éditeur de création (AdminCreationEditor)",
+            "Extraction des sous-composants : CreationGeneralSettings, RankSlotsConfig, CreationPointsPreview et CardSystemConfig",
+            "Simplification du fichier principal et isolation des zones de configuration"
+        ]
+    },
+    {
+        "version": "2.17.3",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Modularisation de l'éditeur de compétences (AdminSkillsEditor)",
+            "Extraction du composant SkillCategoryCard pour une meilleure gestion des colonnes",
+            "Simplification de la logique de Drag & Drop inter-colonnes"
+        ]
+    },
+    {
         "version": "2.17.2",
         "date": "2026-02-06",
         "type": "patch",
@@ -168,33 +199,6 @@
         "changes": [
             "Hotfix : Utilisation de crypto.randomUUID() pour les IDs de compétences (compatibilité Supabase UUID).",
             "Hotfix : Retour d'erreurs détaillé dans l'UI admin lors de la sauvegarde BDD."
-        ]
-    },
-    {
-        "version": "2.13.8",
-        "date": "2026-02-04",
-        "type": "patch",
-        "changes": [
-            "Admin (DB) : Correction du mapping des champs (SnakeCase vs CamelCase) pour la sauvegarde des bibliothèques (Compétences, Traits, Spécialisations) dans Supabase.",
-            "Admin : Assurance que les catégories par défaut et les indicateurs 'Variable' sont correctement persistés en base de données."
-        ]
-    },
-    {
-        "version": "2.13.7",
-        "date": "2026-02-04",
-        "type": "patch",
-        "changes": [
-            "Admin : Synchronisation automatique des noms de compétences vers la Bibliothèque lors de l'édition (sur perte de focus).",
-            "Admin : Ajout d'un bouton 'Synchroniser Bibliothèque' dans l'en-tête pour peupler massivement la réserve avec les compétences existantes."
-        ]
-    },
-    {
-        "version": "2.13.6",
-        "date": "2026-02-04",
-        "type": "patch",
-        "changes": [
-            "Fix (Admin) : Correction de la persistance des bibliothèques lors de la création/import de campagne. Les données sont désormais correctement injectées dans les tables BDD.",
-            "UI (Admin) : Ajustement du sticky de la barre latérale pour éviter le chevauchement avec l'en-tête."
         ]
     }
 ]

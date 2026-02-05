@@ -1,6 +1,7 @@
-import React from 'react';
-import { RulesData, RulesCreationConfig, RulesCardConfig } from '../../types/rules';
-import { Sliders, List, PieChart, CreditCard, Info } from 'lucide-react';
+import CreationGeneralSettings from './creation/CreationGeneralSettings';
+import RankSlotsConfig from './creation/RankSlotsConfig';
+import CreationPointsPreview from './creation/CreationPointsPreview';
+import CardSystemConfig from './creation/CardSystemConfig';
 
 interface AdminCreationEditorProps {
     rules: RulesData;
@@ -9,6 +10,7 @@ interface AdminCreationEditorProps {
 
 const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpdate }) => {
     const config = rules.configurations.creation;
+    const cardConfig = rules.configurations.cards;
 
     const updateCreationConfig = (field: string, value: any) => {
         onUpdate({
@@ -45,7 +47,7 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
             configurations: {
                 ...rules.configurations,
                 cards: {
-                    ...rules.configurations.cards,
+                    ...(rules.configurations.cards || {}),
                     [field]: value
                 }
             }
@@ -68,312 +70,40 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
         });
     };
 
-    // Access Card Config separately as it is outside creation block in RulesData
-    const cardConfig = rules.configurations.cards;
-
     return (
         <div className="space-y-6">
-
             {/* Configuration Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <CreationGeneralSettings
+                    version={rules.version}
+                    config={config}
+                    onUpdateVersion={(v) => onUpdate({ ...rules, version: v })}
+                    onUpdateConfig={updateCreationConfig}
+                    onUpdatePointsBuckets={updatePointsBuckets}
+                />
 
-                {/* General Settings */}
-                <div className="bg-slate-50 p-6 rounded shadow-sm border border-slate-200">
-                    <h4 className="font-bold text-slate-700 border-b border-slate-200 pb-2 mb-4 flex items-center gap-2 uppercase tracking-widest text-sm">
-                        <Sliders size={18} className="text-blue-600" /> Paramètres de Création
-                    </h4>
-
-                    <div className="space-y-6">
-                        {/* Versioning */}
-                        <div>
-                            <label className="block text-xs font-bold text-slate-600 uppercase tracking-widest mb-2">Version des Règles</label>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="text"
-                                    value={rules.version}
-                                    onChange={(e) => onUpdate({ ...rules, version: e.target.value })}
-                                    className="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none font-mono font-bold"
-                                    placeholder="1.0.0"
-                                />
-                                <div className="text-xs text-slate-400 italic">
-                                    Changez ce numéro pour forcer la mise à jour chez les joueurs.
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Extended Skills Toggle */}
-                        <div className="flex items-center justify-between bg-white p-3 rounded border border-slate-200">
-                            <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">Rangs Étendus (6+)</label>
-                            <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-bold text-slate-400 tracking-widest">{config.extendedSkills ? 'ACTIF' : 'INACTIF'}</span>
-                                <button
-                                    onClick={() => updateCreationConfig('extendedSkills', !config.extendedSkills)}
-                                    className={`w-10 h-5 rounded-full p-0.5 transition-colors ${config.extendedSkills ? 'bg-blue-600' : 'bg-slate-300'}`}
-                                >
-                                    <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${config.extendedSkills ? 'translate-x-5' : ''}`} />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-xs font-bold text-slate-600 uppercase tracking-widest mb-2">Méthode de Création</label>
-                            <div className="flex bg-slate-200 p-1 rounded">
-                                <button
-                                    onClick={() => updateCreationConfig('mode', 'rangs')}
-                                    className={`flex-1 py-2 text-xs font-bold uppercase tracking-widest rounded transition-all ${config.mode === 'rangs' ? 'bg-white text-blue-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                >
-                                    Par Rangs
-                                </button>
-                                <button
-                                    onClick={() => updateCreationConfig('mode', 'points')}
-                                    className={`flex-1 py-2 text-xs font-bold uppercase tracking-widest rounded transition-all ${config.mode === 'points' ? 'bg-white text-blue-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                >
-                                    Par Points (XP)
-                                </button>
-                            </div>
-                        </div>
-
-                        {config.mode === 'points' && (
-                            <div className="space-y-4 pt-2">
-                                {/* Sub-mode selector */}
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase">Répartition</label>
-                                    <div className="flex bg-slate-200 p-1 rounded">
-                                        <button
-                                            onClick={() => updateCreationConfig('pointsDistributionMode', 'global')}
-                                            className={`flex-1 py-1 text-xs font-bold uppercase rounded transition-all ${(!config.pointsDistributionMode || config.pointsDistributionMode === 'global') ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                        >
-                                            Pot Commun
-                                        </button>
-                                        <button
-                                            onClick={() => updateCreationConfig('pointsDistributionMode', 'buckets')}
-                                            className={`flex-1 py-1 text-xs font-bold uppercase rounded transition-all ${config.pointsDistributionMode === 'buckets' ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                        >
-                                            Budgets Séparés
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {(!config.pointsDistributionMode || config.pointsDistributionMode === 'global') ? (
-                                    <div className="animate-in fade-in slide-in-from-top-2">
-                                        <label className="block text-sm font-bold text-slate-700 mb-1">XP de Départ (Global)</label>
-                                        <input
-                                            type="number"
-                                            value={config.startingXP || 0}
-                                            onChange={(e) => updateCreationConfig('startingXP', parseInt(e.target.value) || 0)}
-                                            className="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none font-mono font-bold text-lg"
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">XP Attributs</label>
-                                            <input
-                                                type="number"
-                                                value={config.pointsBuckets?.attributes || 0}
-                                                onChange={(e) => updatePointsBuckets('attributes', parseInt(e.target.value) || 0)}
-                                                className="w-full border border-slate-300 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">XP Compétences</label>
-                                            <input
-                                                type="number"
-                                                value={config.pointsBuckets?.skills || 0}
-                                                onChange={(e) => updatePointsBuckets('skills', parseInt(e.target.value) || 0)}
-                                                className="w-full border border-slate-300 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">XP Arrière-plans</label>
-                                            <input
-                                                type="number"
-                                                value={config.pointsBuckets?.backgrounds || 0}
-                                                onChange={(e) => updatePointsBuckets('backgrounds', parseInt(e.target.value) || 0)}
-                                                className="w-full border border-slate-300 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {config.mode === 'rangs' && (
-                            <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
-                                <div>
-                                    <label className="block text-sm font-bold text-slate-700 mb-1">Pts Attributs</label>
-                                    <input
-                                        type="number"
-                                        value={config.attributePoints || 0}
-                                        onChange={(e) => updateCreationConfig('attributePoints', parseInt(e.target.value) || 0)}
-                                        className="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-slate-700 mb-1">Pts Arr. Plans</label>
-                                    <input
-                                        type="number"
-                                        value={config.backgroundPoints || 0}
-                                        onChange={(e) => updateCreationConfig('backgroundPoints', parseInt(e.target.value) || 0)}
-                                        className="w-full border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="grid grid-cols-2 gap-4 bg-white p-3 rounded border border-slate-200">
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-widest">Attr. Min</label>
-                                <input
-                                    type="number"
-                                    value={config.attributeMin ?? -1}
-                                    onChange={(e) => updateCreationConfig('attributeMin', parseInt(e.target.value))}
-                                    className="w-full border border-slate-300 rounded px-2 py-1 text-sm focus:border-blue-600 outline-none"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-widest">Attr. Max</label>
-                                <input
-                                    type="number"
-                                    value={config.attributeMax ?? 3}
-                                    onChange={(e) => updateCreationConfig('attributeMax', parseInt(e.target.value))}
-                                    className="w-full border border-slate-300 rounded px-2 py-1 text-sm focus:border-blue-600 outline-none"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-3 rounded border border-slate-200 mt-2">
-                            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-widest">Coût Arrière-Plans (XP)</label>
-                            <input
-                                type="number"
-                                value={config.backgroundCost ?? 2}
-                                onChange={(e) => updateCreationConfig('backgroundCost', parseInt(e.target.value))}
-                                className="w-full border border-slate-300 rounded px-2 py-1 text-sm focus:border-blue-600 outline-none"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right Column: Rank Slots or Colors */}
                 <div className="flex flex-col gap-6">
-
-                    {/* Rank Slots Configuration (Only if mode is 'rangs') */}
                     {config.mode === 'rangs' && (
-                        <div className="bg-white p-6 rounded shadow-sm border border-slate-200">
-                            <h4 className="font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
-                                <List size={18} className="text-blue-500" /> Répartition des Rangs
-                            </h4>
-                            <div className="space-y-3">
-                                {[5, 4, 3, 2, 1].map(rank => (
-                                    <div key={rank} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded">
-                                        <span className="font-bold text-slate-600">Rang {rank}</span>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                type="number"
-                                                // @ts-ignore
-                                                value={config.rankSlots[rank] || 0}
-                                                onChange={(e) => updateRankSlot(rank, parseInt(e.target.value) || 0)}
-                                                className="w-20 border border-slate-300 rounded px-2 py-1 text-center font-mono focus:border-blue-500 outline-none"
-                                            />
-                                            <span className="text-sm text-slate-400">rangs</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <RankSlotsConfig
+                            rankSlots={config.rankSlots}
+                            onUpdateRankSlot={updateRankSlot}
+                        />
                     )}
 
-                    {/* Distribution Preview for Points Mode (Buckets) */}
                     {config.mode === 'points' && config.pointsDistributionMode === 'buckets' && (
-                        <div className="bg-white p-6 rounded shadow-sm border border-slate-200">
-                            <h4 className="font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
-                                <PieChart size={18} className="text-blue-500" /> Répartition Totale
-                            </h4>
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-slate-600">Attributs</span>
-                                    <span className="font-bold">{config.pointsBuckets?.attributes || 0} XP</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-slate-600">Compétences</span>
-                                    <span className="font-bold">{config.pointsBuckets?.skills || 0} XP</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-slate-600">Arrière-plans</span>
-                                    <span className="font-bold">{config.pointsBuckets?.backgrounds || 0} XP</span>
-                                </div>
-                                <div className="pt-2 border-t border-slate-200 flex justify-between items-center">
-                                    <span className="font-bold text-slate-800">Total</span>
-                                    <span className="font-bold text-blue-600 text-lg">
-                                        {(config.pointsBuckets?.attributes || 0) + (config.pointsBuckets?.skills || 0) + (config.pointsBuckets?.backgrounds || 0)} XP
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                        <CreationPointsPreview
+                            pointsBuckets={config.pointsBuckets || { attributes: 0, skills: 0, backgrounds: 0 }}
+                        />
                     )}
-
                 </div>
-
             </div>
 
-            {/* Separator */}
             <hr className="border-slate-200 mx-10" />
 
-            {/* Card System Configuration */}
-            <div className="bg-slate-50 p-6 rounded shadow-sm border border-slate-200">
-                <div className="flex items-center justify-between border-b border-slate-200 pb-2 mb-4">
-                    <h4 className="font-bold text-slate-700 flex items-center gap-2 uppercase tracking-widest text-sm">
-                        <CreditCard size={18} className="text-blue-600" /> Système de Carte
-                    </h4>
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black text-slate-400 tracking-widest">{cardConfig?.active ? 'ACTIF' : 'INACTIF'}</span>
-                        <button
-                            onClick={() => updateCardConfig('active', !cardConfig?.active)}
-                            className={`w-10 h-5 rounded-full p-0.5 transition-colors ${cardConfig?.active ? 'bg-green-600' : 'bg-slate-300'}`}
-                        >
-                            <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform ${cardConfig?.active ? 'translate-x-5' : ''}`} />
-                        </button>
-                    </div>
-                </div>
-
-                <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 transition-opacity ${cardConfig?.active ? 'opacity-100' : 'opacity-40 pointer-events-none grayscale'}`}>
-                    <div>
-                        <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-tighter">Compétences retenues</label>
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="number"
-                                value={cardConfig?.bestSkillsCount ?? 6}
-                                onChange={(e) => updateCardConfig('bestSkillsCount', parseInt(e.target.value))}
-                                className="w-full border border-slate-300 rounded px-3 py-1.5 focus:border-blue-600 outline-none bg-white font-bold"
-                            />
-                            <div title="Nombre de meilleures compétences utilisées pour la moyenne">
-                                <Info size={16} className="text-slate-400" />
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">Incrément par Palier</label>
-                        <input
-                            type="number"
-                            step="0.1"
-                            value={cardConfig?.increment ?? 0.5}
-                            onChange={(e) => updateCardConfig('increment', parseFloat(e.target.value))}
-                            className="w-full border border-slate-300 rounded px-3 py-2 focus:border-blue-600 outline-none"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1 uppercase">Seuil de Base (Valet)</label>
-                        <input
-                            type="number"
-                            step="0.1"
-                            value={cardConfig?.baseStart ?? 2}
-                            onChange={(e) => updateCardConfig('baseStart', parseFloat(e.target.value))}
-                            className="w-full border border-slate-300 rounded px-3 py-2 focus:border-blue-600 outline-none"
-                        />
-                    </div>
-                </div>
-            </div>
-
+            <CardSystemConfig
+                config={cardConfig}
+                onUpdateCardConfig={updateCardConfig}
+            />
         </div>
     );
 };

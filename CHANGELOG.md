@@ -1,5 +1,22 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.1.0] - 01/02/2026 10:20 [MINOR]
+
+- Architecture : Refactorisation structurelle majeure pour améliorer la maintenabilité.
+- Code : Extraction de la logique métier (calculs de bonus, mode création) dans des Custom Hooks dédiés (useCharacterBonuses, useCreationMode).
+- Organisation : Réorganisation des composants UI (migration de DotRating vers le dossier dédié).
+- Performance : Séparation de la logique de calcul de la couche de présentation (JSX) pour une meilleure clarté.
+
+## [2.0.5] - 31/01/2026 23:15 [PATCH]
+
+- UI : Remplacement du sélecteur d'orientation textuel par des icônes géométriques explicites.
+- Visual : Utilisation de RectangleHorizontal (Paysage) et RectangleVertical (Portrait) pour indiquer le mode actuel.
+
+## [2.0.4] - 31/01/2026 21:58 [PATCH]
+
+- UI : Simplification du bouton de gestion des données (Sauvegarde/Chargement).
+- Visual : Suppression du label textuel pour ne conserver que les icônes, allégeant la barre de navigation.
+
 ## [2.0.3] - 31/01/2026 21:55 [PATCH]
 
 - UI : Mise à jour de l'icône du bouton de sauvegarde.

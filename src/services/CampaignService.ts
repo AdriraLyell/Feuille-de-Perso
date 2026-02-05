@@ -6,7 +6,7 @@ import { INITIAL_DATA } from '../data/initialState';
 import { LibraryService } from './LibraryService';
 
 
-export const AdminService = {
+export const CampaignService = {
 
     /**
      * List all available settings (campagnes)

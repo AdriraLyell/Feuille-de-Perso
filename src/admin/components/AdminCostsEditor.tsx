@@ -1,6 +1,7 @@
 import React from 'react';
 import { RulesData } from '../../types/rules';
 import { Coins, AlertTriangle, Calculator, TrendingUp } from 'lucide-react';
+import { RuleCalculationsService } from '../../services/RuleCalculationsService';
 
 interface AdminCostsEditorProps {
     rules: RulesData;
@@ -10,6 +11,10 @@ interface AdminCostsEditorProps {
 const AdminCostsEditor: React.FC<AdminCostsEditorProps> = ({ rules, onUpdate }) => {
     const costs = rules.configurations.xpCosts;
     const creationConfig = rules.configurations.creation;
+
+    // Calculs de preview
+    const exampleRank = 3;
+    const exampleTriangular = RuleCalculationsService.triangular(exampleRank);
 
     const updateFactor = (field: string, value: number) => {
         onUpdate({
@@ -57,9 +62,9 @@ const AdminCostsEditor: React.FC<AdminCostsEditorProps> = ({ rules, onUpdate }) 
                             <p className="font-bold mb-1">Règle Triangulaire :</p>
                             <p>Le coût est calculé selon le rang atteint :</p>
                             <ul className="list-disc ml-4 mt-1 space-y-0.5">
-                                <li>Rang 1 = 1 XP</li>
-                                <li>Rang 2 = 1+2 = 3 XP</li>
-                                <li>Rang 3 = 1+2+3 = 6 XP</li>
+                                <li>Rang 1 = {RuleCalculationsService.triangular(1)} XP</li>
+                                <li>Rang 2 = 1+2 = {RuleCalculationsService.triangular(2)} XP</li>
+                                <li>Rang {exampleRank} = 1+2+3 = {exampleTriangular} XP</li>
                             </ul>
                             <p className="mt-2 text-blue-700">Le coût final est : <strong>Coût Base x Facteur</strong></p>
                         </div>
@@ -124,7 +129,7 @@ const AdminCostsEditor: React.FC<AdminCostsEditorProps> = ({ rules, onUpdate }) 
 
                     {/* Creation Costs */}
                     <div className="bg-slate-50 p-6 rounded border border-slate-200">
-                        <h4 className="font-bold text-slate-700 text-sm uppercase tracking-widest mb-4">Création (Achat Fixe)</h4>
+                        <h4 className="font-bold text-slate-700 text-sm uppercase tracking-widest">Création (Achat Fixe)</h4>
                         <div className="space-y-4">
                             <div className="bg-amber-50 p-3 rounded border border-amber-200 text-xs text-amber-800 mb-4 flex gap-2">
                                 <AlertTriangle size={16} />

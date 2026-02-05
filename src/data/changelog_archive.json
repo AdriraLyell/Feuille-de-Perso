@@ -1,5 +1,32 @@
 [
     {
+        "version": "2.13.8",
+        "date": "2026-02-04",
+        "type": "patch",
+        "changes": [
+            "Admin (DB) : Correction du mapping des champs (SnakeCase vs CamelCase) pour la sauvegarde des bibliothèques (Compétences, Traits, Spécialisations) dans Supabase.",
+            "Admin : Assurance que les catégories par défaut et les indicateurs 'Variable' sont correctement persistés en base de données."
+        ]
+    },
+    {
+        "version": "2.13.7",
+        "date": "2026-02-04",
+        "type": "patch",
+        "changes": [
+            "Admin : Synchronisation automatique des noms de compétences vers la Bibliothèque lors de l'édition (sur perte de focus).",
+            "Admin : Ajout d'un bouton 'Synchroniser Bibliothèque' dans l'en-tête pour peupler massivement la réserve avec les compétences existantes."
+        ]
+    },
+    {
+        "version": "2.13.6",
+        "date": "2026-02-04",
+        "type": "patch",
+        "changes": [
+            "Fix (Admin) : Correction de la persistance des bibliothèques lors de la création/import de campagne. Les données sont désormais correctement injectées dans les tables BDD.",
+            "UI (Admin) : Ajustement du sticky de la barre latérale pour éviter le chevauchement avec l'en-tête."
+        ]
+    },
+    {
         "version": "2.13.5",
         "date": "2026-02-04",
         "type": "patch",
@@ -842,35 +869,6 @@
             "Architecture : Séparation du CharacterContext en État (données) et Actions (fonctions) pour une meilleure fluidité.",
             "Stabilité : Stabilisation des fonctions de modification (useCallback + Functional Updates) pour éviter les calculs inutiles.",
             "Optimisation : Mémoïsation des composants de section (Attributs, Compétences, Combat, Compteurs) via React.memo."
-        ]
-    },
-    {
-        "version": "2.1.0",
-        "date": "01/02/2026 10:20",
-        "type": "minor",
-        "changes": [
-            "Architecture : Refactorisation structurelle majeure pour améliorer la maintenabilité.",
-            "Code : Extraction de la logique métier (calculs de bonus, mode création) dans des Custom Hooks dédiés (useCharacterBonuses, useCreationMode).",
-            "Organisation : Réorganisation des composants UI (migration de DotRating vers le dossier dédié).",
-            "Performance : Séparation de la logique de calcul de la couche de présentation (JSX) pour une meilleure clarté."
-        ]
-    },
-    {
-        "version": "2.0.5",
-        "date": "31/01/2026 23:15",
-        "type": "patch",
-        "changes": [
-            "UI : Remplacement du sélecteur d'orientation textuel par des icônes géométriques explicites.",
-            "Visual : Utilisation de RectangleHorizontal (Paysage) et RectangleVertical (Portrait) pour indiquer le mode actuel."
-        ]
-    },
-    {
-        "version": "2.0.4",
-        "date": "31/01/2026 21:58",
-        "type": "patch",
-        "changes": [
-            "UI : Simplification du bouton de gestion des données (Sauvegarde/Chargement).",
-            "Visual : Suppression du label textuel pour ne conserver que les icônes, allégeant la barre de navigation."
         ]
     }
 ]

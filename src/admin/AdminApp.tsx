@@ -25,7 +25,7 @@ import DeployToGithubModal from './components/DeployModal';
 import { BookOpen, Save as SaveIcon, Cloud, AlertTriangle } from 'lucide-react';
 import { usePersistence } from './hooks/usePersistence';
 import AdminDashboard from './components/AdminDashboard';
-import { AdminService } from '../services/AdminService';
+import { CampaignService } from '../services/CampaignService';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
 import { useNotification } from '../context/NotificationContext'; // Assuming we have this, or use alert for now
 import { supabase } from '../services/supabase';
@@ -99,7 +99,7 @@ const AdminApp: React.FC = () => {
     const handleSaveToCloud = async () => {
         if (!currentSettingId || !rules) return;
         setIsSaving(true);
-        const result = await AdminService.saveSetting(currentSettingId, rules);
+        const result = await CampaignService.saveSetting(currentSettingId, rules);
         if (result.success) {
             markAsSaved();
             setSaveFeedback({
@@ -216,7 +216,7 @@ const AdminApp: React.FC = () => {
                             ) : (
                                 <div
                                     className="flex items-center gap-2 text-green-400/50 cursor-pointer"
-                                    onClick={() => currentSettingId && AdminService.checkSchema(currentSettingId)}
+                                    onClick={() => currentSettingId && CampaignService.checkSchema(currentSettingId)}
                                 >
                                     <Cloud size={20} />
                                 </div>

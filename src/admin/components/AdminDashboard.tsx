@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { GameSettingSummary, AdminService } from '../../services/AdminService';
+import { GameSettingSummary, CampaignService } from '../../services/CampaignService';
 import { RulesData } from '../../types/rules';
 import { Plus, Loader2, FileCog, Scroll, Trash2, Eye, EyeOff } from 'lucide-react';
 import { defaultRules } from '../../data/defaultRules'; // We might need a default template
@@ -25,7 +25,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
 
     const loadSettings = async () => {
         setIsLoading(true);
-        const data = await AdminService.listSettings();
+        const data = await CampaignService.listSettings();
         if (data) setSettings(data);
         setIsLoading(false);
     };
@@ -69,7 +69,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
             }
         };
 
-        const newId = await AdminService.createSetting(newName, template);
+        const newId = await CampaignService.createSetting(newName, template);
         if (newId) {
             setNewName('');
             loadSettings(); // Refresh list
@@ -79,7 +79,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
 
     const handleSelect = async (id: string) => {
         setIsLoading(true);
-        const rules = await AdminService.loadSetting(id);
+        const rules = await CampaignService.loadSetting(id);
         const settingName = settings.find(s => s.id === id)?.name || "Campagne";
 
         if (rules) {
@@ -92,7 +92,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
 
     const handleDelete = async () => {
         if (!settingToDelete) return;
-        const success = await AdminService.deleteSetting(settingToDelete);
+        const success = await CampaignService.deleteSetting(settingToDelete);
         if (success) {
             loadSettings();
         } else {
@@ -103,7 +103,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
     const handleToggleVisibility = async (e: React.MouseEvent, id: string, currentStatus: boolean) => {
         e.stopPropagation(); // Prevent opening the setting
         // Optimistic UI update could be done here, but let's just await
-        const success = await AdminService.togglePublic(id, !currentStatus);
+        const success = await CampaignService.togglePublic(id, !currentStatus);
         if (success) {
             loadSettings();
         }
