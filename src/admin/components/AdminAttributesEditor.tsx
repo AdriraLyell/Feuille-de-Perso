@@ -107,8 +107,25 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
             nextId = `cat_${count + 1}_${Math.random().toString(36).substr(2, 3)}`;
         }
 
+        // ALL categories must have the same number of attributes.
+        // We take the count from the first existing category.
+        const firstCatId = categories[0];
+        const attributeCount = firstCatId ? (attributesMap[firstCatId]?.length || 0) : 4;
+
         // Default attributes for this ID if known
-        const defaults = DEFAULT_ATTRIBUTES[nextId] || ['Attribut 1', 'Attribut 2', 'Attribut 3', 'Attribut 4'];
+        let defaults = DEFAULT_ATTRIBUTES[nextId] || [];
+        // Adjust defaults to match current global count
+        if (defaults.length < attributeCount) {
+            const extra = Array(attributeCount - defaults.length).fill(0).map((_, i) => `Attribut ${defaults.length + i + 1}`);
+            defaults = [...defaults, ...extra];
+        } else if (defaults.length > attributeCount) {
+            defaults = defaults.slice(0, attributeCount);
+        }
+
+        // If no default known at all
+        if (defaults.length === 0) {
+            defaults = Array(attributeCount).fill(0).map((_, i) => `Attribut ${i + 1}`);
+        }
 
         // Default Secondary if active
         const isSecondaryActive = !!rules.configurations.global.secondaryAttributes;
@@ -219,33 +236,34 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
         });
     };
 
-    const addAttribute = (category: string) => {
-        const currentList = attributesMap[category] || [];
-        const newList = [...currentList, "Nouvel Attribut"];
+    const addAttribute = () => {
+        const newAttributesMap = { ...attributesMap };
+        Object.keys(newAttributesMap).forEach(cat => {
+            newAttributesMap[cat] = [...newAttributesMap[cat], `Attr ${newAttributesMap[cat].length + 1}`];
+        });
+
         onUpdate({
             ...rules,
             definitions: {
                 ...rules.definitions,
-                attributes: {
-                    ...rules.definitions.attributes,
-                    [category]: newList
-                }
+                attributes: newAttributesMap
             }
         });
     };
 
-    const removeAttribute = (category: string, index: number) => {
-        const currentList = attributesMap[category] || [];
-        const newList = [...currentList];
-        newList.splice(index, 1);
+    const removeAttribute = (index: number) => {
+        const newAttributesMap = { ...attributesMap };
+        Object.keys(newAttributesMap).forEach(cat => {
+            const newList = [...newAttributesMap[cat]];
+            newList.splice(index, 1);
+            newAttributesMap[cat] = newList;
+        });
+
         onUpdate({
             ...rules,
             definitions: {
                 ...rules.definitions,
-                attributes: {
-                    ...rules.definitions.attributes,
-                    [category]: newList
-                }
+                attributes: newAttributesMap
             }
         });
     };
@@ -296,9 +314,9 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 <div className="flex items-center justify-between mb-2">
                     <h4 className="text-xs font-bold text-slate-600 uppercase flex items-center gap-1"><Shield size={12} /> Primaires</h4>
                     <button
-                        onClick={() => addAttribute(category)}
+                        onClick={addAttribute}
                         className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded hover:bg-blue-200 transition-colors font-bold"
-                        title="Ajouter un attribut"
+                        title="Ajouter un attribut à TOUS les pavés"
                     >
                         +
                     </button>
@@ -313,9 +331,9 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                 className="flex-grow text-sm font-medium border border-transparent hover:border-slate-200 focus:border-blue-400 rounded px-1 py-0.5 outline-none bg-transparent focus:bg-white transition-all"
                             />
                             <button
-                                onClick={() => removeAttribute(category, index)}
+                                onClick={() => removeAttribute(index)}
                                 className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-0.5"
-                                title="Supprimer"
+                                title="Supprimer cet index de TOUS les pavés"
                             >
                                 <Trash2 size={12} />
                             </button>

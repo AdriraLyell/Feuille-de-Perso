@@ -5,7 +5,7 @@
         "type": "patch",
         "changes": [
             "FIX: Les attributs par défaut suivent désormais la structure Standard (3 pavés de 4 attributs).",
-            "IMPROVE: L'éditeur d'attributs permet d'ajouter/supprimer des attributs individuellement.",
+            "IMPROVE: L'éditeur d'attributs impose désormais une symétrie globale (le nombre d'attributs est identique pour tous les pavés).",
             "IMPROVE: Support débloqué pour un 5ème pavé d'attributs."
         ]
     },
