@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.16.3",
+        "date": "2026-02-05",
+        "type": "patch",
+        "changes": [
+            "Nouvelle visualisation des préréglages : ajout d'une micro-structure (grille de points) affichant le nombre d'attributs par pavé",
+            "Indicateur visuel pour les attributs secondaires (couleur ambre + icône éclair ⚡)",
+            "Amélioration de la lisibilité de la bibliothèque de préréglages"
+        ]
+    },
+    {
         "version": "2.16.2",
         "date": "2026-02-05",
         "type": "patch",

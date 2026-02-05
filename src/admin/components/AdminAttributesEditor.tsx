@@ -516,12 +516,37 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                         </span>
                                     </div>
                                     <div className="mt-2 flex items-center justify-between">
-                                        <div className="flex gap-0.5">
-                                            {preset.structure.map((_, i) => (
-                                                <div key={i} className="w-1.5 h-3 bg-slate-200 group-hover/card:bg-amber-200 rounded-sm" />
-                                            ))}
+                                        <div className="flex items-center gap-1.5 pt-1">
+                                            {(preset.has_secondary || (preset as any).hasSecondary) && (
+                                                <Zap size={10} className="text-amber-500 fill-amber-500 animate-pulse" />
+                                            )}
+                                            <div className="flex gap-1" title={`${preset.structure.length} Pavés`}>
+                                                {preset.structure.map((pave: any, i: number) => (
+                                                    <div
+                                                        key={i}
+                                                        className={`flex flex-col gap-0.5 p-0.5 rounded-sm border ${(preset.has_secondary || (preset as any).hasSecondary)
+                                                                ? 'bg-amber-50 border-amber-200'
+                                                                : 'bg-slate-50 border-slate-200'
+                                                            }`}
+                                                        title={`${pave.attrs.length} attributs`}
+                                                    >
+                                                        {pave.attrs.map((_: any, dotIdx: number) => (
+                                                            <div
+                                                                key={dotIdx}
+                                                                className={`w-1 h-1 rounded-full ${(preset.has_secondary || (preset as any).hasSecondary)
+                                                                        ? 'bg-amber-400'
+                                                                        : 'bg-slate-300'
+                                                                    }`}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <Play size={10} className="text-slate-300 group-hover/card:text-amber-500" />
+                                        <div className="flex items-center gap-1 text-[9px] font-bold text-slate-400">
+                                            <span>{preset.structure[0]?.attrs.length || 0} Attrs</span>
+                                            <Play size={10} className="text-slate-300 group-hover/card:text-amber-500 ml-1" />
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -533,11 +558,15 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                     onClick={() => requestPresetLoad(preset)}
                                     className="bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded p-3 text-left transition-all group flex items-start gap-3"
                                 >
-                                    <div className="bg-white p-2 rounded-full border border-slate-200 group-hover:border-amber-400 group-hover:text-amber-700 text-slate-300">
+                                    <div className="bg-white p-2 rounded-full border border-slate-200 group-hover:border-amber-400 group-hover:text-amber-700 text-slate-300 relative">
                                         <Play size={14} className="ml-0.5" />
+                                        {(preset as any).hasSecondary && <Zap size={8} className="absolute -top-1 -right-1 text-amber-500 fill-amber-500" />}
                                     </div>
-                                    <div>
-                                        <span className="block font-bold text-slate-700 text-xs group-hover:text-amber-900">{preset.name}</span>
+                                    <div className="flex-grow">
+                                        <div className="flex items-center justify-between">
+                                            <span className="block font-bold text-slate-700 text-xs group-hover:text-amber-900">{preset.name}</span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase">{(preset.structure[0] as any).attrs.length} Attrs</span>
+                                        </div>
                                         <span className="block text-[10px] text-slate-500 italic">{preset.desc}</span>
                                     </div>
                                 </button>
