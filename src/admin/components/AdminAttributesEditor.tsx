@@ -11,15 +11,15 @@ interface AdminAttributesEditorProps {
 }
 
 const DEFAULT_ATTRIBUTES: Record<string, string[]> = {
-    'physique': ['Force', 'Constitution', 'AgilitÃ©', 'DextÃ©ritÃ©', 'Perception'],
-    'mental': ['VolontÃ©', 'StabilitÃ©', 'Astuce/SubtilitÃ©', 'Intellect', 'Intuition'],
-    'social': ['Charisme', 'Calme', 'MimÃ©tisme', 'Communication', 'Empathie'],
-    'mystique': ['Puissance', 'RÃ©sistance', 'Souplesse', 'PrÃ©cision', 'SensibilitÃ©']
+    'physique': ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'],
+    'mental': ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'],
+    'social': ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'],
+    'mystique': ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité']
 };
 
 const DEFAULT_SECONDARY_ATTRIBUTES: Record<string, string[]> = {
-    'physique': ['Corpulence', 'BeautÃ©'],
-    'social': ['PrÃ©sence', 'Charme'],
+    'physique': ['Corpulence', 'Beauté'],
+    'social': ['Présence', 'Charme'],
     'mental': ['Conscience', 'Attraction'],
     'mystique': ['Aura', 'Fascination']
 };
@@ -27,23 +27,23 @@ const DEFAULT_SECONDARY_ATTRIBUTES: Record<string, string[]> = {
 const ATTRIBUTE_PRESETS = [
     {
         name: "v2 (Classique)",
-        desc: "3 PavÃ©s de 4 Attributs",
+        desc: "3 Pavés de 4 Attributs",
         hasSecondary: false,
         structure: [
-            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'DextÃ©ritÃ©', 'AgilitÃ©'], secondaryAttrs: ['Corpulence', 'BeautÃ©'] },
-            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Intellect', 'VolontÃ©', 'Intuition', 'Perception'], secondaryAttrs: ['Conscience', 'Attraction'] },
-            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Empathie', 'Apparence', 'Communication'], secondaryAttrs: ['PrÃ©sence', 'Charme'] }
+            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'], secondaryAttrs: ['Corpulence', 'Beauté'] },
+            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Intellect', 'Volonté', 'Intuition', 'Perception'], secondaryAttrs: ['Conscience', 'Attraction'] },
+            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Empathie', 'Apparence', 'Communication'], secondaryAttrs: ['Présence', 'Charme'] }
         ]
     },
     {
         name: "v4 (Complet)",
-        desc: "4 PavÃ©s de 5 Attributs",
+        desc: "4 Pavés de 5 Attributs",
         hasSecondary: true,
         structure: [
-            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'AgilitÃ©', 'DextÃ©ritÃ©', 'Perception'], secondaryAttrs: ['Corpulence', 'BeautÃ©'] },
-            { id: 'pave_attributs_2', label: 'Mental', attrs: ['VolontÃ©', 'StabilitÃ©', 'Astuce/SubtilitÃ©', 'Intellect', 'Intuition'], secondaryAttrs: ['Conscience', 'Attraction'] },
-            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Calme', 'MimÃ©tisme', 'Communication', 'Empathie'], secondaryAttrs: ['PrÃ©sence', 'Charme'] },
-            { id: 'pave_attributs_4', label: 'Mystique', attrs: ['Puissance', 'RÃ©sistance', 'Souplesse', 'PrÃ©cision', 'SensibilitÃ©'], secondaryAttrs: ['Aura', 'Fascination'] }
+            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'], secondaryAttrs: ['Corpulence', 'Beauté'] },
+            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'], secondaryAttrs: ['Conscience', 'Attraction'] },
+            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'], secondaryAttrs: ['Présence', 'Charme'] },
+            { id: 'pave_attributs_4', label: 'Mystique', attrs: ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité'], secondaryAttrs: ['Aura', 'Fascination'] }
         ]
     }
 ];
@@ -139,7 +139,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
 
     const handleDeletePreset = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
-        if (!confirm("Supprimer ce prÃ©rÃ©glage ?")) return;
+        if (!confirm("Supprimer ce préréglage ?")) return;
         const success = await AdminService.deleteAttributePreset(id);
         if (success) loadDBPresets();
     };
@@ -388,7 +388,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 <button
                     onClick={() => removeCategory(category)}
                     className="absolute top-2 right-2 text-slate-300 hover:text-red-500 opacity-0 group-hover/col:opacity-100 transition-opacity"
-                    title="Supprimer ce pavÃ©"
+                    title="Supprimer ce pavé"
                 >
                     <Trash2 size={16} />
                 </button>
@@ -408,7 +408,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                     <button
                         onClick={addAttribute}
                         className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded hover:bg-blue-200 transition-colors font-bold"
-                        title="Ajouter un attribut Ã  TOUS les pavÃ©s"
+                        title="Ajouter un attribut à TOUS les pavés"
                     >
                         +
                     </button>
@@ -425,7 +425,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                             <button
                                 onClick={() => removeAttribute(index)}
                                 className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-0.5"
-                                title="Supprimer cet index de TOUS les pavÃ©s"
+                                title="Supprimer cet index de TOUS les pavés"
                             >
                                 <Trash2 size={12} />
                             </button>
@@ -464,7 +464,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
             {/* PRESETS SECTION & OPTIONS */}
             <div className="bg-white p-6 rounded shadow-sm border border-slate-200">
                 <h4 className="font-bold text-slate-800 text-sm uppercase tracking-widest mb-4 flex items-center gap-2 border-b pb-2">
-                    <Zap size={16} className="text-amber-500" /> Options & PrÃ©rÃ©glages
+                    <Zap size={16} className="text-amber-500" /> Options & Préréglages
                 </h4>
 
                 <div className="flex flex-col md:flex-row gap-8">
@@ -472,7 +472,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                     <div className="w-full">
                         <div className="flex items-center justify-between mb-3">
                             <h5 className="text-xs font-bold text-slate-700 uppercase tracking-tighter flex items-center gap-1">
-                                <LayoutGrid size={14} /> BibliothÃ¨que de PrÃ©rÃ©glages
+                                <LayoutGrid size={14} /> Bibliothèque de Préréglages
                             </h5>
                             <button
                                 onClick={() => setIsSaveModalOpen(true)}
@@ -487,7 +487,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                             {isLoadingPresets ? (
                                 <div className="col-span-full py-10 flex flex-col items-center justify-center text-slate-400 gap-2">
                                     <Loader2 className="animate-spin" size={24} />
-                                    <span className="text-xs font-medium">Chargement des prÃ©rÃ©glages...</span>
+                                    <span className="text-xs font-medium">Chargement des préréglages...</span>
                                 </div>
                             ) : dbPresets.map((preset, idx) => (
                                 <div
@@ -548,7 +548,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                     </div>
                                     <div className="mt-1 flex items-center justify-between">
                                         <span className="block text-[10px] text-slate-400 italic font-medium">
-                                            {preset.structure.length} PavÃ©s
+                                            {preset.structure.length} Pavés
                                         </span>
                                         <Play size={10} className="text-slate-300 group-hover/card:text-amber-500 shrink-0" />
                                     </div>
@@ -565,7 +565,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                     <div className="flex justify-between items-center mb-1 gap-2">
                                         <div className="min-w-0 flex-grow">
                                             <span className="block font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate">{preset.name}</span>
-                                            <span className="text-[10px] text-slate-400 italic font-medium leading-tight truncate">{preset.structure.length} PavÃ©s</span>
+                                            <span className="text-[10px] text-slate-400 italic font-medium leading-tight truncate">{preset.structure.length} Pavés</span>
                                         </div>
 
                                         {/* Micro-structure for hardcoded relocated */}
@@ -594,7 +594,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                     </div>
                                     <div className="mt-1 flex items-center justify-between">
                                         <span className="block text-[10px] text-slate-400 italic font-medium">
-                                            {preset.structure.length} PavÃ©s
+                                            {preset.structure.length} Pavés
                                         </span>
                                         <Play size={10} className="text-slate-300 group-hover/card:text-amber-500 shrink-0" />
                                     </div>
@@ -609,7 +609,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
             <div>
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-slate-700 uppercase tracking-widest text-sm flex items-center gap-2">
-                        <LayoutGrid size={18} className="text-blue-600" /> Structure ({categories.length} / 5 PavÃ©s)
+                        <LayoutGrid size={18} className="text-blue-600" /> Structure ({categories.length} / 5 Pavés)
                     </h3>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded border border-slate-200">
@@ -629,7 +629,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                 ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                 : 'bg-slate-800 hover:bg-slate-700 text-white'}`}
                         >
-                            <Plus size={14} /> Ajouter un PavÃ©
+                            <Plus size={14} /> Ajouter un Pavé
                         </button>
                     </div>
                 </div>
@@ -644,7 +644,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 <ThematicModal
                     isOpen={showPresetConfirm}
                     onClose={() => { setShowPresetConfirm(false); setPendingPreset(null); }}
-                    title="Charger le prÃ©rÃ©glage ?"
+                    title="Charger le préréglage ?"
                     icon={<Zap size={24} className="text-amber-600" />}
                     size="md"
                     footer={
@@ -658,7 +658,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 >
                     <div className="flex flex-col items-center text-center space-y-4 py-4">
                         <p className="text-sm text-slate-600">
-                            Cette action remplacera <span className="font-bold text-red-600">toute</span> votre configuration d'attributs actuelle par le modÃ¨le :
+                            Cette action remplacera <span className="font-bold text-red-600">toute</span> votre configuration d'attributs actuelle par le modèle :
                         </p>
                         <div className="bg-amber-50 p-2 rounded border border-amber-200 font-bold text-amber-900">
                             {pendingPreset.name}
@@ -673,7 +673,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 <ThematicModal
                     isOpen={isSaveModalOpen}
                     onClose={() => setIsSaveModalOpen(false)}
-                    title="Sauvegarder en tant que prÃ©rÃ©glage"
+                    title="Sauvegarder en tant que préréglage"
                     icon={<Save size={24} className="text-green-600" />}
                     size="md"
                     footer={
@@ -691,16 +691,16 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 >
                     <div className="space-y-4 py-4">
                         <p className="text-sm text-slate-600">
-                            Enregistrez cette structure pour la rÃ©utiliser dans d'autres campagnes.
+                            Enregistrez cette structure pour la réutiliser dans d'autres campagnes.
                         </p>
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nom du prÃ©rÃ©glage</label>
+                                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nom du préréglage</label>
                                 <input
                                     autoFocus
                                     value={newPresetName}
                                     onChange={(e) => setNewPresetName(e.target.value)}
-                                    placeholder="Ex: SystÃ¨me 3-PavÃ©s-6-Attributs"
+                                    placeholder="Ex: Système 3-Pavés-6-Attributs"
                                     className="w-full bg-slate-50 border border-slate-200 rounded p-2 text-sm focus:border-green-500 outline-none"
                                 />
                             </div>
@@ -709,13 +709,13 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                 <textarea
                                     value={newPresetDesc}
                                     onChange={(e) => setNewPresetDesc(e.target.value)}
-                                    placeholder="DÃ©crivez l'usage de ce prÃ©rÃ©glage..."
+                                    placeholder="Décrivez l'usage de ce préréglage..."
                                     className="w-full bg-slate-50 border border-slate-200 rounded p-2 text-xs focus:border-green-500 outline-none h-20 resize-none"
                                 />
                             </div>
                         </div>
                         <div className="bg-slate-50 p-3 rounded border border-slate-200">
-                            <h6 className="text-[10px] font-bold text-slate-500 uppercase mb-2">RÃ©sumÃ© de la structure :</h6>
+                            <h6 className="text-[10px] font-bold text-slate-500 uppercase mb-2">Résumé de la structure :</h6>
                             <div className="flex flex-wrap gap-2">
                                 {categories.map(cat => (
                                     <div key={cat} className="bg-white px-2 py-1 rounded border border-slate-200 text-[10px] font-bold text-slate-700">
