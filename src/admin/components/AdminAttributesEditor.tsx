@@ -6,6 +6,8 @@ import { AdminService } from '../../services/AdminService';
 import { AttributeService } from '../../services/AttributeService';
 import ThematicModal from '../../components/ui/ThematicModal';
 import { DEFAULT_ATTRIBUTES, ATTRIBUTE_PRESETS, getDefaultSecondaryAttrs } from '../../data/defaults/attributes';
+import AttributeCategoryCard from './attributes/AttributeCategoryCard';
+import AttributePresetManager from './attributes/AttributePresetManager';
 
 interface AdminAttributesEditorProps {
     rules: RulesData;
@@ -15,30 +17,9 @@ interface AdminAttributesEditorProps {
 
 const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, onUpdate }) => {
     const definitions = rules.definitions;
-    const attributesMap = definitions.attributes;
+    const attributesMap = definitions.attributes || {};
     const secondaryMap = definitions.secondaryAttributes || {};
     const labelsMap = definitions.labels || {};
-
-    const [pendingPreset, setPendingPreset] = useState<any>(null);
-    const [showPresetConfirm, setShowPresetConfirm] = useState(false);
-
-    // DB Presets State
-    const [dbPresets, setDbPresets] = useState<AttributePreset[]>([]);
-    const [isLoadingPresets, setIsLoadingPresets] = useState(true);
-    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
-    const [newPresetName, setNewPresetName] = useState("");
-    const [newPresetDesc, setNewPresetDesc] = useState("");
-
-    useEffect(() => {
-        loadDBPresets();
-    }, []);
-
-    const loadDBPresets = async () => {
-        setIsLoadingPresets(true);
-        const data = await AttributeService.listAttributePresets();
-        if (data) setDbPresets(data);
-        setIsLoadingPresets(false);
-    };
 
     // Dynamic categories based on keys in attributesMap, sorted by standard order
     const STANDARD_ORDER = ['pave_attributs_1', 'pave_attributs_2', 'pave_attributs_3', 'pave_attributs_4', 'pave_attributs_5'];
@@ -57,6 +38,25 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
         return a.localeCompare(b);
     });
 
+    // States for Modals
+    const [showPresetConfirm, setShowPresetConfirm] = useState(false);
+    const [pendingPreset, setPendingPreset] = useState<any>(null);
+
+    // DB Presets
+    const [dbPresets, setDbPresets] = useState<AttributePreset[]>([]);
+    const [isLoadingPresets, setIsLoadingPresets] = useState(true);
+
+    useEffect(() => {
+        loadDBPresets();
+    }, []);
+
+    const loadDBPresets = async () => {
+        setIsLoadingPresets(true);
+        const data = await AttributeService.listAttributePresets();
+        if (data) setDbPresets(data);
+        setIsLoadingPresets(false);
+    };
+
     // --- PRESETS ---
     const requestPresetLoad = (preset: any) => {
         // Normalize preset structure for hardcoded presets
@@ -70,9 +70,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
         setShowPresetConfirm(true);
     };
 
-    const handleSaveCurrentAsPreset = async () => {
-        if (!newPresetName.trim()) return;
-
+    const handleSaveCurrentAsPreset = async (name: string, desc: string) => {
         // Structure current attributes for the preset
         const structure = categories.map(cat => ({
             id: cat,
@@ -82,17 +80,13 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
         }));
 
         const isSecondaryActive = !!rules.configurations.global.secondaryAttributes;
-        const success = await AttributeService.saveAttributePreset(newPresetName, newPresetDesc, structure, isSecondaryActive);
+        const success = await AttributeService.saveAttributePreset(name, desc, structure, isSecondaryActive);
         if (success) {
-            setIsSaveModalOpen(false);
-            setNewPresetName("");
-            setNewPresetDesc("");
             loadDBPresets(); // Refresh
         }
     };
 
-    const handleDeletePreset = async (e: React.MouseEvent, id: string) => {
-        e.stopPropagation();
+    const handleDeletePreset = async (id: string) => {
         if (!confirm("Supprimer ce préréglage ?")) return;
         const success = await AttributeService.deleteAttributePreset(id);
         if (success) loadDBPresets();
@@ -193,6 +187,9 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
     };
 
     const removeCategory = (categoryId: string) => {
+        if (categories.length <= 1) return;
+        if (!confirm(`Supprimer le pavé "${labelsMap[categoryId] || categoryId}" ?`)) return;
+
         const newAttributes = { ...attributesMap };
         delete newAttributes[categoryId];
 
@@ -253,18 +250,15 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
     };
 
     const updateSecondaryItemName = (category: string, index: number, newName: string) => {
-        const currentList = secondaryMap[category] || ["Secondaire 1", "Secondaire 2"];
-        const newList = [...currentList];
-        newList[index] = newName;
+        const newSecondary = { ...secondaryMap };
+        if (!newSecondary[category]) newSecondary[category] = ["", ""];
+        newSecondary[category][index] = newName;
 
         onUpdate({
             ...rules,
             definitions: {
                 ...rules.definitions,
-                secondaryAttributes: {
-                    ...secondaryMap,
-                    [category]: newList
-                }
+                secondaryAttributes: newSecondary
             }
         });
     };
@@ -275,7 +269,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
             definitions: {
                 ...rules.definitions,
                 labels: {
-                    ...rules.definitions.labels,
+                    ...labelsMap,
                     [category]: newLabel
                 }
             }
@@ -284,8 +278,11 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
 
     const addAttribute = () => {
         const newAttributesMap = { ...attributesMap };
+        const count = attributesMap[categories[0]]?.length || 0;
+        const newName = `Attribut ${count + 1}`;
+
         Object.keys(newAttributesMap).forEach(cat => {
-            newAttributesMap[cat] = [...newAttributesMap[cat], `Attr ${newAttributesMap[cat].length + 1}`];
+            newAttributesMap[cat] = [...newAttributesMap[cat], newName];
         });
 
         onUpdate({
@@ -299,6 +296,9 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
 
     const removeAttribute = (index: number) => {
         const newAttributesMap = { ...attributesMap };
+        const count = attributesMap[categories[0]]?.length || 0;
+        if (count <= 1) return;
+
         Object.keys(newAttributesMap).forEach(cat => {
             const newList = [...newAttributesMap[cat]];
             newList.splice(index, 1);
@@ -315,249 +315,46 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
     };
 
     const updateItemName = (category: string, index: number, newName: string) => {
-        const currentList = attributesMap[category] || [];
-        const newList = [...currentList];
-        newList[index] = newName;
+        const newAttributesMap = { ...attributesMap };
+        newAttributesMap[category][index] = newName;
 
         onUpdate({
             ...rules,
             definitions: {
                 ...rules.definitions,
-                attributes: {
-                    ...rules.definitions.attributes,
-                    [category]: newList
-                }
+                attributes: newAttributesMap
             }
         });
     };
 
-    const renderColumn = (category: string) => {
-        const primaryList = attributesMap[category] || [];
-        const isSecondaryActive = !!rules.configurations.global.secondaryAttributes;
-        const secondaryList = secondaryMap[category] || ["Secondaire 1", "Secondaire 2"];
-        const label = labelsMap[category] || category.charAt(0).toUpperCase() + category.slice(1);
-
-        return (
-            <div key={category} className="bg-white p-4 rounded shadow-sm border border-slate-200 flex flex-col h-full relative group/col">
-                <button
-                    onClick={() => removeCategory(category)}
-                    className="absolute top-2 right-2 text-slate-300 hover:text-red-500 opacity-0 group-hover/col:opacity-100 transition-opacity"
-                    title="Supprimer ce pavé"
-                >
-                    <Trash2 size={16} />
-                </button>
-
-                {/* Header with Editable Label */}
-                <div className="mb-4 border-b border-slate-200 pb-2 pr-6">
-                    <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">ID: {category}</label>
-                    <input
-                        value={label}
-                        onChange={(e) => updateLabel(category, e.target.value)}
-                        className="font-bold text-lg bg-transparent border-b border-dashed border-slate-300 focus:border-blue-500 outline-none w-full text-slate-800"
-                    />
-                </div>
-
-                <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-xs font-bold text-slate-600 uppercase flex items-center gap-1"><Shield size={12} /> Primaires</h4>
-                    <button
-                        onClick={addAttribute}
-                        className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded hover:bg-blue-200 transition-colors font-bold"
-                        title="Ajouter un attribut à TOUS les pavés"
-                    >
-                        +
-                    </button>
-                </div>
-                <div className="space-y-1 mb-6 flex-grow">
-                    {primaryList.map((name, index) => (
-                        <div key={`prim-${index}`} className="flex items-center gap-2 group">
-                            <span className="text-[10px] text-slate-300 w-4 select-none">{index + 1}</span>
-                            <input
-                                value={name}
-                                onChange={(e) => updateItemName(category, index, e.target.value)}
-                                className="flex-grow text-sm font-medium border border-transparent hover:border-slate-200 focus:border-blue-400 rounded px-1 py-0.5 outline-none bg-transparent focus:bg-white transition-all"
-                            />
-                            <button
-                                onClick={() => removeAttribute(index)}
-                                className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-0.5"
-                                title="Supprimer cet index de TOUS les pavés"
-                            >
-                                <Trash2 size={12} />
-                            </button>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Secondary Attributes (Global Toggle) */}
-                {isSecondaryActive && (
-                    <div className={`pt-4 border-t border-slate-100 bg-slate-50 -mx-4 px-4 pb-2 rounded-b sticky bottom-0 animate-in slide-in-from-bottom-2`}>
-                        <div className="flex items-center justify-between mb-2 pt-2">
-                            <h4 className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1"><Zap size={12} /> Secondaires</h4>
-                        </div>
-                        <div className="space-y-1">
-                            {[0, 1].map((index) => (
-                                <div key={`sec-${index}`} className="flex items-center gap-2 group">
-                                    <span className="text-[10px] text-slate-300 w-4 select-none">+{index + 1}</span>
-                                    <input
-                                        value={secondaryList[index] || ""}
-                                        onChange={(e) => updateSecondaryItemName(category, index, e.target.value)}
-                                        className="flex-grow text-xs text-slate-600 border border-transparent hover:border-slate-300 focus:border-blue-400 rounded px-1 py-0.5 outline-none bg-transparent focus:bg-white transition-all"
-                                        placeholder={`Secondaire ${index + 1}`}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
-        );
-    };
-
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
-
-            {/* PRESETS SECTION & OPTIONS */}
-            <div className="bg-white p-6 rounded shadow-sm border border-slate-200">
-                <h4 className="font-bold text-slate-800 text-sm uppercase tracking-widest mb-4 flex items-center gap-2 border-b pb-2">
-                    <Zap size={16} className="text-amber-500" /> Options & Préréglages
-                </h4>
-
-                <div className="flex flex-col md:flex-row gap-8">
-                    {/* Presets Grid */}
-                    <div className="w-full">
-                        <div className="flex items-center justify-between mb-3">
-                            <h5 className="text-xs font-bold text-slate-700 uppercase tracking-tighter flex items-center gap-1">
-                                <LayoutGrid size={14} /> Bibliothèque de Préréglages
-                            </h5>
-                            <button
-                                onClick={() => setIsSaveModalOpen(true)}
-                                className="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200 transition-colors font-bold flex items-center gap-1"
-                                title="Sauvegarder la config actuelle"
-                            >
-                                <Save size={12} /> Sauver Actuel
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                            {isLoadingPresets ? (
-                                <div className="col-span-full py-10 flex flex-col items-center justify-center text-slate-400 gap-2">
-                                    <Loader2 className="animate-spin" size={24} />
-                                    <span className="text-xs font-medium">Chargement des préréglages...</span>
-                                </div>
-                            ) : dbPresets.map((preset, idx) => (
-                                <div
-                                    key={preset.id || idx}
-                                    onClick={() => requestPresetLoad(preset)}
-                                    className="relative bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[80px]"
-                                >
-                                    <div>
-                                        <div className="flex justify-between items-center mb-1 gap-2">
-                                            <span className="font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate flex-grow">
-                                                {preset.name}
-                                            </span>
-
-                                            {/* Micro-structure relocated to header */}
-                                            <div className="flex gap-0.5 items-center">
-                                                {preset.structure.map((pave: any, i: number) => {
-                                                    const isSecondary = ((preset as any).has_secondary || (preset as any).hasSecondary);
-                                                    return (
-                                                        <div
-                                                            key={i}
-                                                            className={`flex flex-col gap-0.5 p-0.5 rounded-[1px] border ${isSecondary ? 'bg-amber-50/50 border-amber-100' : 'bg-slate-50 border-slate-200'
-                                                                }`}
-                                                        >
-                                                            <div className="flex flex-col gap-0.5">
-                                                                {pave.attrs.slice(0, 4).map((_: any, j: number) => (
-                                                                    <div key={j} className="w-0.5 h-0.5 rounded-full bg-blue-400/70" />
-                                                                ))}
-                                                            </div>
-                                                            {isSecondary && (
-                                                                <>
-                                                                    <div className="h-[0.5px] bg-slate-200 w-full my-0.5" />
-                                                                    <div className="flex flex-col gap-0.5">
-                                                                        <div className="w-0.5 h-0.5 rounded-full bg-amber-400" />
-                                                                    </div>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-
-                                            <div className="shrink-0 flex items-center">
-                                                {preset.isOfficial ? (
-                                                    <span title="Officiel"><Shield size={12} className="text-blue-400" /></span>
-                                                ) : (
-                                                    <button
-                                                        onClick={(e) => handleDeletePreset(e, preset.id)}
-                                                        className="opacity-0 group-hover/card:opacity-100 text-slate-300 hover:text-red-500 transition-opacity"
-                                                    >
-                                                        <Trash2 size={12} />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <span className="block text-[10px] text-slate-500 italic line-clamp-2 leading-tight">
-                                            {preset.description}
-                                        </span>
-                                    </div>
-                                    <div className="mt-1 flex items-center justify-between">
-                                        <span className="block text-[10px] text-slate-400 italic font-medium">
-                                            {preset.structure.length} Pavés
-                                        </span>
-                                        <Play size={10} className="text-slate-300 group-hover/card:text-amber-500 shrink-0" />
-                                    </div>
-                                </div>
-                            ))}
-
-                            {/* Fallback to hardcoded if DB empty and not loading */}
-                            {!isLoadingPresets && dbPresets.length === 0 && ATTRIBUTE_PRESETS.map((preset, idx) => (
-                                <button
-                                    key={`hc-${idx}`}
-                                    onClick={() => requestPresetLoad(preset)}
-                                    className="bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded p-3 text-left transition-all group/card flex flex-col justify-between min-h-[80px]"
-                                >
-                                    <div className="flex justify-between items-center mb-1 gap-2">
-                                        <div className="min-w-0 flex-grow">
-                                            <span className="block font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate">{preset.name}</span>
-                                            <span className="text-[10px] text-slate-400 italic font-medium leading-tight truncate">{preset.structure.length} Pavés</span>
-                                        </div>
-
-                                        {/* Micro-structure for hardcoded relocated */}
-                                        <div className="flex gap-0.5 items-center shrink-0">
-                                            {preset.structure.map((pave: any, i: number) => {
-                                                const isSec = preset.hasSecondary;
-                                                return (
-                                                    <div key={i} className={`flex flex-col gap-0.5 p-0.5 rounded-[1px] border ${isSec ? 'bg-amber-50/50 border-amber-100' : 'bg-white border-slate-100'}`}>
-                                                        <div className="flex flex-col gap-0.5">
-                                                            {(pave.attrs || []).slice(0, 3).map((_: any, j: number) => (
-                                                                <div key={j} className="w-0.5 h-0.5 rounded-full bg-blue-400/70" />
-                                                            ))}
-                                                        </div>
-                                                        {isSec && (
-                                                            <>
-                                                                <div className="h-[0.5px] bg-slate-200 w-full my-0.5" />
-                                                                <div className="flex flex-col gap-0.5">
-                                                                    <div className="w-0.5 h-0.5 rounded-full bg-amber-400" />
-                                                                </div>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                    <div className="mt-1 flex items-center justify-between">
-                                        <span className="block text-[10px] text-slate-400 italic font-medium">
-                                            {preset.structure.length} Pavés
-                                        </span>
-                                        <Play size={10} className="text-slate-300 group-hover/card:text-amber-500 shrink-0" />
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
+        <div className="space-y-8 animate-in fade-in duration-500">
+            {/* Header / Info */}
+            <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-xl">
+                <div className="flex gap-3">
+                    <Info className="text-blue-500 shrink-0" size={20} />
+                    <div className="space-y-1">
+                        <h4 className="text-sm font-bold text-blue-900">Information sur la Structure</h4>
+                        <p className="text-xs text-blue-800/80 leading-relaxed">
+                            Tous les pavés d'attributs doivent avoir le <span className="font-bold underline">même nombre</span> de caractéristiques.
+                            Les modifications de nombre d'attributs (ajout/suppression) s'appliquent automatiquement à l'ensemble des pavés.
+                        </p>
                     </div>
                 </div>
             </div>
+
+            {/* PRESETS SECTION */}
+            <AttributePresetManager
+                dbPresets={dbPresets}
+                isLoading={isLoadingPresets}
+                onLoadRequested={requestPresetLoad}
+                onSaveRequested={handleSaveCurrentAsPreset}
+                onDeleteRequested={handleDeletePreset}
+                currentStructureSummary={categories.map(cat => ({
+                    label: labelsMap[cat] || cat,
+                    count: attributesMap[cat].length
+                }))}
+            />
 
             {/* COLUMNS SECTION */}
             <div>
@@ -589,7 +386,22 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 </div>
 
                 <div className={`grid grid-cols-1 md:grid-cols-${Math.min(categories.length, 5)} gap-6`}>
-                    {categories.map(cat => renderColumn(cat))}
+                    {categories.map(cat => (
+                        <AttributeCategoryCard
+                            key={cat}
+                            id={cat}
+                            label={labelsMap[cat] || cat}
+                            primaryAttrs={attributesMap[cat]}
+                            secondaryAttrs={secondaryMap[cat]}
+                            isSecondaryActive={!!rules.configurations.global.secondaryAttributes}
+                            onUpdateLabel={updateLabel}
+                            onUpdatePrimary={updateItemName}
+                            onUpdateSecondary={updateSecondaryItemName}
+                            onAddAttribute={addAttribute}
+                            onRemoveAttribute={removeAttribute}
+                            onRemoveCategory={removeCategory}
+                        />
+                    ))}
                 </div>
             </div>
 
@@ -618,66 +430,6 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                             {pendingPreset.name}
                         </div>
                         <p className="text-xs text-slate-400 italic">Les noms et scores actuels seront perdus.</p>
-                    </div>
-                </ThematicModal>
-            )}
-
-            {/* SAVE PRESET MODAL */}
-            {isSaveModalOpen && (
-                <ThematicModal
-                    isOpen={isSaveModalOpen}
-                    onClose={() => setIsSaveModalOpen(false)}
-                    title="Sauvegarder en tant que préréglage"
-                    icon={<Save size={24} className="text-green-600" />}
-                    size="md"
-                    footer={
-                        <>
-                            <button onClick={() => setIsSaveModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded font-bold">Annuler</button>
-                            <button
-                                onClick={handleSaveCurrentAsPreset}
-                                disabled={!newPresetName.trim()}
-                                className="px-6 py-2 bg-green-600 text-white rounded font-bold shadow hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Sauvegarder
-                            </button>
-                        </>
-                    }
-                >
-                    <div className="space-y-4 py-4">
-                        <p className="text-sm text-slate-600">
-                            Enregistrez cette structure pour la réutiliser dans d'autres campagnes.
-                        </p>
-                        <div className="space-y-3">
-                            <div>
-                                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nom du préréglage</label>
-                                <input
-                                    autoFocus
-                                    value={newPresetName}
-                                    onChange={(e) => setNewPresetName(e.target.value)}
-                                    placeholder="Ex: Système 3-Pavés-6-Attributs"
-                                    className="w-full bg-slate-50 border border-slate-200 rounded p-2 text-sm focus:border-green-500 outline-none"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Description (Optionnel)</label>
-                                <textarea
-                                    value={newPresetDesc}
-                                    onChange={(e) => setNewPresetDesc(e.target.value)}
-                                    placeholder="Décrivez l'usage de ce préréglage..."
-                                    className="w-full bg-slate-50 border border-slate-200 rounded p-2 text-xs focus:border-green-500 outline-none h-20 resize-none"
-                                />
-                            </div>
-                        </div>
-                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
-                            <h6 className="text-[10px] font-bold text-slate-500 uppercase mb-2">Résumé de la structure :</h6>
-                            <div className="flex flex-wrap gap-2">
-                                {categories.map(cat => (
-                                    <div key={cat} className="bg-white px-2 py-1 rounded border border-slate-200 text-[10px] font-bold text-slate-700">
-                                        {labelsMap[cat] || cat} ({attributesMap[cat].length})
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                     </div>
                 </ThematicModal>
             )}
