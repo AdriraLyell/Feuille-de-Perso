@@ -35,4 +35,10 @@ if (fs.existsSync(paths.constants)) {
     console.log('✅ src/constants.ts mis à jour.');
 }
 
+// 3. Rotation automatique du changelog
+console.log('🔄 Rotation du journal des modifications...');
+import('./manage-changelog.js').catch(err => {
+    console.error('⚠️ Erreur lors de la rotation du journal :', err);
+});
+
 console.log('🎉 Tous les fichiers sont synchronisés !');
