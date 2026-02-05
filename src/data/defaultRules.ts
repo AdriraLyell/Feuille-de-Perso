@@ -46,7 +46,8 @@ export const defaultRules: RulesData = {
         skills: {
             "physique": [],
             "social": [],
-            "mental": []
+            "mental": [],
+            "counters": ["Volonté", "Confiance"]
         },
         counters: {
             "volonte": { id: "volonte", name: "Volonté", max: 10, xpCost: 0 },
