@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { CharacterSheetData } from '../../types';
 import { Zap, Play, CheckSquare, Info, LayoutGrid } from 'lucide-react';
 import ThematicModal from '../ui/ThematicModal';
+import { DEFAULT_ATTRIBUTES, ATTRIBUTE_PRESETS } from '../../data/defaults/attributes';
 
 interface AttributesEditorProps {
     data: CharacterSheetData;
@@ -10,34 +11,6 @@ interface AttributesEditorProps {
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings') => void;
 }
 
-const DEFAULT_ATTRIBUTES: Record<string, string[]> = {
-    'pave_attributs_1': ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'],
-    'pave_attributs_2': ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'],
-    'pave_attributs_3': ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'],
-    'pave_attributs_4': ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité']
-};
-
-const ATTRIBUTE_PRESETS = [
-    {
-        name: "v2 (Classique)",
-        desc: "3 Pavés de 4 Attributs",
-        structure: [
-            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'] },
-            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Intellect', 'Volonté', 'Intuition', 'Perception'] },
-            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Empathie', 'Apparence', 'Communication'] }
-        ]
-    },
-    {
-        name: "v4 (Complet)",
-        desc: "4 Pavés de 5 Attributs",
-        structure: [
-            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'] },
-            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'] },
-            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'] },
-            { id: 'pave_attributs_4', label: 'Mystique', attrs: ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité'] }
-        ]
-    }
-];
 
 const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onAddLog }) => {
     const [pendingPreset, setPendingPreset] = useState<any>(null);
@@ -268,7 +241,7 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
                             </div>
                             <div>
                                 <span className="block font-bold text-[#5c4d41] text-xs group-hover:text-amber-900">{preset.name}</span>
-                                <span className="block text-[10px] text-[#5c4d41]/60 italic">{preset.desc}</span>
+                                <span className="block text-[10px] text-[#5c4d41]/60 italic">{preset.description}</span>
                             </div>
                         </button>
                     ))}
@@ -431,7 +404,7 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
                     <div className="flex flex-col items-center text-center space-y-4 py-4">
                         <div className="bg-amber-50/50 p-4 rounded-sm border border-[#bfae85]/30 w-full">
                             <span className="block font-black text-[#8b2e2e] uppercase tracking-widest text-sm mb-1">{pendingPreset.name}</span>
-                            <span className="text-[10px] text-[#5c4d41]/70 italic">{pendingPreset.desc}</span>
+                            <span className="text-[10px] text-[#5c4d41]/70 italic">{pendingPreset.description}</span>
                         </div>
                         <p className="text-xs text-[#5c4d41] leading-relaxed">
                             Cette action remplacera <span className="font-bold underline">toute</span> votre configuration d'attributs actuelle.

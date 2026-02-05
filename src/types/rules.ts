@@ -78,3 +78,19 @@ export interface RulesData {
         specializations: LibrarySpecializationEntry[];
     };
 }
+export interface GameSettingSummary {
+    id: string;
+    name: string;
+    version: string;
+    last_updated: string;
+    is_public: boolean;
+}
+
+export interface GameSetting {
+    id: string;
+    name: string;
+    version: string;
+    lastUpdated: number;
+    isPublic: boolean;
+    rules: RulesData;
+}

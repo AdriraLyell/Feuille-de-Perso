@@ -3,61 +3,15 @@ import { RulesData } from '../../types/rules';
 import { AttributePreset } from '../../types/system';
 import { Plus, Trash2, Shield, Zap, LayoutGrid, Play, Info, Save, Loader2 } from 'lucide-react';
 import { AdminService } from '../../services/AdminService';
+import { AttributeService } from '../../services/AttributeService';
 import ThematicModal from '../../components/ui/ThematicModal';
+import { DEFAULT_ATTRIBUTES, ATTRIBUTE_PRESETS, getDefaultSecondaryAttrs } from '../../data/defaults/attributes';
 
 interface AdminAttributesEditorProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
 }
 
-const DEFAULT_ATTRIBUTES: Record<string, string[]> = {
-    'physique': ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'],
-    'mental': ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'],
-    'social': ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'],
-    'mystique': ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité']
-};
-
-const DEFAULT_SECONDARY_ATTRIBUTES: Record<string, string[]> = {
-    'physique': ['Corpulence', 'Beauté'],
-    'social': ['Présence', 'Charme'],
-    'mental': ['Conscience', 'Attraction'],
-    'mystique': ['Aura', 'Fascination']
-};
-
-const ATTRIBUTE_PRESETS = [
-    {
-        name: "v2 (Classique)",
-        desc: "3 Pavés de 4 Attributs",
-        hasSecondary: false,
-        structure: [
-            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'], secondaryAttrs: ['Corpulence', 'Beauté'] },
-            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Intellect', 'Volonté', 'Intuition', 'Perception'], secondaryAttrs: ['Conscience', 'Attraction'] },
-            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Empathie', 'Apparence', 'Communication'], secondaryAttrs: ['Présence', 'Charme'] }
-        ]
-    },
-    {
-        name: "v4 (Complet)",
-        desc: "4 Pavés de 5 Attributs",
-        hasSecondary: true,
-        structure: [
-            { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'], secondaryAttrs: ['Corpulence', 'Beauté'] },
-            { id: 'pave_attributs_2', label: 'Mental', attrs: ['Volonté', 'Stabilité', 'Astuce/Subtilité', 'Intellect', 'Intuition'], secondaryAttrs: ['Conscience', 'Attraction'] },
-            { id: 'pave_attributs_3', label: 'Social', attrs: ['Charisme', 'Calme', 'Mimétisme', 'Communication', 'Empathie'], secondaryAttrs: ['Présence', 'Charme'] },
-            { id: 'pave_attributs_4', label: 'Mystique', attrs: ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité'], secondaryAttrs: ['Aura', 'Fascination'] }
-        ]
-    }
-];
-
-const getDefaultSecondaryAttrs = (label: string, id: string): string[] => {
-    const l = label.toLowerCase();
-    const i = id.toLowerCase();
-    for (const key of Object.keys(DEFAULT_SECONDARY_ATTRIBUTES)) {
-        if (l.includes(key) || i.includes(key)) {
-            return [...DEFAULT_SECONDARY_ATTRIBUTES[key]];
-        }
-    }
-    return ["Secondaire 1", "Secondaire 2"];
-};
 
 const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, onUpdate }) => {
     const definitions = rules.definitions;
@@ -81,7 +35,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
 
     const loadDBPresets = async () => {
         setIsLoadingPresets(true);
-        const data = await AdminService.listAttributePresets();
+        const data = await AttributeService.listAttributePresets();
         if (data) setDbPresets(data);
         setIsLoadingPresets(false);
     };
@@ -128,7 +82,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
         }));
 
         const isSecondaryActive = !!rules.configurations.global.secondaryAttributes;
-        const success = await AdminService.saveAttributePreset(newPresetName, newPresetDesc, structure, isSecondaryActive);
+        const success = await AttributeService.saveAttributePreset(newPresetName, newPresetDesc, structure, isSecondaryActive);
         if (success) {
             setIsSaveModalOpen(false);
             setNewPresetName("");
@@ -140,7 +94,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
     const handleDeletePreset = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
         if (!confirm("Supprimer ce préréglage ?")) return;
-        const success = await AdminService.deleteAttributePreset(id);
+        const success = await AttributeService.deleteAttributePreset(id);
         if (success) loadDBPresets();
     };
 
@@ -571,7 +525,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                         {/* Micro-structure for hardcoded relocated */}
                                         <div className="flex gap-0.5 items-center shrink-0">
                                             {preset.structure.map((pave: any, i: number) => {
-                                                const isSec = (preset as any).hasSecondary;
+                                                const isSec = preset.hasSecondary;
                                                 return (
                                                     <div key={i} className={`flex flex-col gap-0.5 p-0.5 rounded-[1px] border ${isSec ? 'bg-amber-50/50 border-amber-100' : 'bg-white border-slate-100'}`}>
                                                         <div className="flex flex-col gap-0.5">

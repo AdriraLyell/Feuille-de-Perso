@@ -1,14 +1,10 @@
 
 import { supabase } from './supabase';
-import { RulesData } from '../types/rules';
+import { GameSetting, RulesData, GameSettingSummary } from '../types/rules';
+export type { GameSetting, RulesData, GameSettingSummary };
+import { INITIAL_DATA } from '../data/initialState';
+import { LibraryService } from './LibraryService';
 
-export interface GameSettingSummary {
-    id: string;
-    name: string;
-    version: string;
-    last_updated: string;
-    is_public: boolean;
-}
 
 export const AdminService = {
 
@@ -57,191 +53,7 @@ export const AdminService = {
 
         // Persist Libraries if present
         if (initialRules.libraries) {
-            try {
-                // A. Traits
-                if (initialRules.libraries.traits && initialRules.libraries.traits.length > 0) {
-                    const traitsPayload = initialRules.libraries.traits.map(t => ({
-                        setting_id: settingId,
-                        ...t
-                    }));
-                    await supabase.from('libraries_traits').insert(traitsPayload);
-                }
-
-                // B. Skills (Enhanced: Link Global vs Create Local)
-                if (initialRules.libraries.skills && initialRules.libraries.skills.length > 0) {
-                    // 1. Fetch all Global Skills to check against
-                    const { data: globalSkills } = await supabase
-                        .from('libraries_skills')
-                        .select('id, name')
-                        .is('setting_id', null);
-
-                    const globalSkillMap = new Map((globalSkills || []).map(s => [s.name.trim().toLowerCase(), s.id]));
-
-                    const skillsPayload: any[] = [];
-                    const linksPayload: any[] = [];
-
-                    initialRules.libraries.skills.forEach(s => {
-                        const normalizedName = s.name.trim().toLowerCase();
-                        if (globalSkillMap.has(normalizedName)) {
-                            // It's a global skill -> Link it
-                            linksPayload.push({
-                                setting_id: settingId,
-                                skill_id: globalSkillMap.get(normalizedName),
-                                is_active: true
-                            });
-                        } else {
-                            // It's not global -> Create Local
-                            skillsPayload.push({
-                                setting_id: settingId,
-                                ...s
-                            });
-                        }
-                    });
-
-                    if (skillsPayload.length > 0) {
-                        await supabase.from('libraries_skills').insert(skillsPayload);
-                    }
-
-                    if (linksPayload.length > 0) {
-                        await supabase.from('rel_setting_skills').insert(linksPayload);
-                    }
-                }
-
-                // C. Specializations
-                if (initialRules.libraries.specializations && initialRules.libraries.specializations.length > 0) {
-                    const specsPayload = initialRules.libraries.specializations.map(s => ({
-                        setting_id: settingId,
-                        ...s
-                    }));
-                    await supabase.from('libraries_specializations').insert(specsPayload);
-                }
-
-                // D. Backgrounds (Unified & Smart Link from Layout)
-                // We combine explicitly passed library items AND items found in the Layout (definitions.skills.arrieres_plans)
-                const layoutBgNames = initialRules.definitions?.skills?.['arrieres_plans'] || [];
-                const libBgNames = initialRules.libraries?.backgrounds?.map(b => b.name) || [];
-                // Unique set of names to look for
-                const targetBgNames = new Set([...layoutBgNames, ...libBgNames].map(n => n.trim().toLowerCase()).filter(n => n !== ""));
-
-                if (targetBgNames.size > 0) {
-                    const { data: globalBgs } = await supabase
-                        .from('libraries_backgrounds')
-                        .select('id, name')
-                        .is('setting_id', null);
-
-                    const globalBgMap = new Map((globalBgs || []).map(b => [b.name.trim().toLowerCase(), b.id]));
-                    const bgPayload: any[] = [];
-                    const bgLinksPayload: any[] = [];
-                    const processedNames = new Set<string>();
-
-                    // 1. Process Explicit Library Items (Preserve full object data)
-                    if (initialRules.libraries?.backgrounds) {
-                        initialRules.libraries.backgrounds.forEach(b => {
-                            const normalized = b.name.trim().toLowerCase();
-                            if (processedNames.has(normalized)) return;
-                            processedNames.add(normalized);
-
-                            if (globalBgMap.has(normalized)) {
-                                bgLinksPayload.push({
-                                    setting_id: settingId,
-                                    background_id: globalBgMap.get(normalized),
-                                    is_active: true
-                                });
-                            } else {
-                                bgPayload.push({
-                                    setting_id: settingId,
-                                    ...b
-                                });
-                            }
-                        });
-                    }
-
-                    // 2. Process Layout Items (Implicit Link)
-                    layoutBgNames.forEach(name => {
-                        const normalized = name.trim().toLowerCase();
-                        if (normalized === "" || processedNames.has(normalized)) return;
-                        processedNames.add(normalized);
-
-                        if (globalBgMap.has(normalized)) {
-                            bgLinksPayload.push({
-                                setting_id: settingId,
-                                background_id: globalBgMap.get(normalized),
-                                is_active: true
-                            });
-                        }
-                        // Note: If it's in Layout but NOT in Global/Library, we can't create it as we lack data (description etc).
-                        // It serves as a placeholder.
-                    });
-
-                    if (bgPayload.length > 0) await supabase.from('libraries_backgrounds').insert(bgPayload);
-                    if (bgLinksPayload.length > 0) await supabase.from('rel_setting_backgrounds').insert(bgLinksPayload);
-                }
-
-                // E. Counters (Unified & Smart Link from Definitions)
-                const layoutCounters = Object.values(initialRules.definitions?.counters || {});
-                const layoutCounterNames = layoutCounters.map((c: any) => c.name);
-                const libCounterNames = initialRules.libraries?.counters?.map(c => c.name) || [];
-                const targetCounterNames = new Set([...layoutCounterNames, ...libCounterNames].map(n => n.trim().toLowerCase()));
-
-                if (targetCounterNames.size > 0) {
-                    const { data: globalCounters } = await supabase
-                        .from('libraries_counters')
-                        .select('id, name')
-                        .is('setting_id', null);
-
-                    const globalCounterMap = new Map((globalCounters || []).map(c => [c.name.trim().toLowerCase(), c.id]));
-                    const counterPayload: any[] = [];
-                    const counterLinksPayload: any[] = [];
-                    const processedNames = new Set<string>();
-
-                    // 1. Explicit Library Items
-                    if (initialRules.libraries?.counters) {
-                        initialRules.libraries.counters.forEach(c => {
-                            const normalized = c.name.trim().toLowerCase();
-                            if (processedNames.has(normalized)) return;
-                            processedNames.add(normalized);
-
-                            if (globalCounterMap.has(normalized)) {
-                                counterLinksPayload.push({
-                                    setting_id: settingId,
-                                    counter_id: globalCounterMap.get(normalized),
-                                    is_active: true
-                                });
-                            } else {
-                                counterPayload.push({
-                                    setting_id: settingId,
-                                    id: c.id,
-                                    name: c.name,
-                                    max_value: c.maxValue,
-                                    default_value: c.defaultValue,
-                                    xp_cost: c.xpCost
-                                });
-                            }
-                        });
-                    }
-
-                    // 2. Layout Items
-                    layoutCounters.forEach((c: any) => {
-                        const normalized = c.name.trim().toLowerCase();
-                        if (processedNames.has(normalized)) return;
-                        processedNames.add(normalized);
-
-                        if (globalCounterMap.has(normalized)) {
-                            counterLinksPayload.push({
-                                setting_id: settingId,
-                                counter_id: globalCounterMap.get(normalized),
-                                is_active: true
-                            });
-                        }
-                    });
-
-                    if (counterPayload.length > 0) await supabase.from('libraries_counters').insert(counterPayload);
-                    if (counterLinksPayload.length > 0) await supabase.from('rel_setting_counters').insert(counterLinksPayload);
-                }
-            } catch (libError) {
-                console.error("Error persisting initial libraries:", libError);
-                // We don't fail the whole creation, but we warn
-            }
+            await LibraryService.persistInitialLibraries(settingId, initialRules);
         }
 
         return settingId;
@@ -255,162 +67,30 @@ export const AdminService = {
      */
     async loadSetting(id: string): Promise<RulesData | null> {
         // 1. Fetch Main Config
-        const { data: setting, error: settingError } = await supabase
+        const { data: settingData, error: settingError } = await supabase
             .from('game_settings')
             .select('*')
             .eq('id', id)
             .single();
 
-        if (settingError || !setting) {
+        if (settingError || !settingData) {
             console.error('Error loading setting:', settingError);
             return null;
         }
 
-        // 2. Fetch Libraries (Parallel)
-        // For Skills, we need Global (setting_id IS NULL) AND Local (setting_id = id)
-        // AND the selection status from rel_setting_skills
+        // 2. Load Libraries
+        const libraries = await LibraryService.loadLibraries(id);
 
-        const [traitsRes, skillsRes, specsRes, relSkillsRes, bgsRes, relBgsRes, countersRes, relCountersRes] = await Promise.all([
-            // Traits: Legacy behavior (Local only for now, or naive) -> Keeping Local as per strict plan for now? 
-            // Wait, plan only mentioned Skills.
-            supabase.from('libraries_traits').select('*').eq('setting_id', id),
-
-            // Skills: Fetch ALL (Global + Local)
-            supabase.from('libraries_skills').select('*').or(`setting_id.eq.${id},setting_id.is.null`),
-
-            // Specs
-            supabase.from('libraries_specializations').select('*').eq('setting_id', id),
-
-            // Relations (Active Global Skills)
-            supabase.from('rel_setting_skills').select('skill_id').eq('setting_id', id),
-
-            // Backgrounds: Global + Local
-            supabase.from('libraries_backgrounds').select('*').or(`setting_id.eq.${id},setting_id.is.null`),
-            // Background Selection
-            supabase.from('rel_setting_backgrounds').select('background_id').eq('setting_id', id),
-
-            // Counters: Global + Local
-            supabase.from('libraries_counters').select('*').or(`setting_id.eq.${id},setting_id.is.null`),
-            // Counter Selection
-            supabase.from('rel_setting_counters').select('counter_id').eq('setting_id', id)
-        ]);
-
-        const activeSkillIds = new Set((relSkillsRes.data || []).map((r: any) => r.skill_id));
-        const activeBgIds = new Set((relBgsRes.data || []).map((r: any) => r.background_id));
-        const activeCounterIds = new Set((relCountersRes.data || []).map((r: any) => r.counter_id));
-
-        // Helper to map DB snake_case to TS camelCase
-        const mapTrait = (t: any): any => ({
-            id: t.id,
-            type: t.type,
-            name: t.name,
-            cost: t.cost,
-            description: t.description,
-            tags: t.tags || [],
-            isVariable: t.is_variable,
-            effects: t.effects || []
-        });
-
-        const mapSkill = (s: any, activeIds: Set<string>): any => ({
-            id: s.id,
-            name: s.name,
-            description: s.description,
-            defaultCategory: s.default_category,
-            isVariable: s.is_variable,
-            isGlobal: s.setting_id === null,
-            isActive: activeIds.has(s.id) || s.setting_id === id // Locals are always active
-        });
-
-        const mapSpec = (s: any): any => ({
-            id: s.id,
-            name: s.name,
-            description: s.description,
-            skillIds: s.skill_ids || [],
-            defaultMinLevel: s.default_min_level
-        });
-
-        const mapBg = (b: any, activeIds: Set<string>): any => ({
-            id: b.id,
-            name: b.name,
-            description: b.description,
-            isVariable: b.is_variable,
-            isGlobal: b.setting_id === null,
-            isActive: activeIds.has(b.id) || b.setting_id === id
-        });
-
-        const mapCounter = (c: any, activeIds: Set<string>): any => ({
-            id: c.id,
-            name: c.name,
-            maxValue: c.max_value,
-            defaultValue: c.default_value,
-            xpCost: c.xp_cost,
-            isGlobal: c.setting_id === null,
-            isActive: activeIds.has(c.id) || c.setting_id === id
-        });
-
-
-        // Construct the full object
         const rules: RulesData = {
-            version: setting.version,
-            lastUpdated: new Date(setting.last_updated).getTime(),
+            version: settingData.version,
+            lastUpdated: new Date(settingData.last_updated).getTime(),
             // @ts-ignore
-            configurations: setting.configurations,
+            configurations: settingData.configurations,
             // @ts-ignore
-            definitions: setting.definitions,
+            definitions: settingData.definitions,
             // @ts-ignore
-            theme: setting.configurations.theme || { creationColor: "#000", xpColor: "#000" },
-            libraries: {
-                traits: (traitsRes.data || []).map(mapTrait),
-                skills: (() => {
-                    // Dedup logic: Local overrides Global by Name
-                    const mappedGlobals = (skillsRes.data || [])
-                        .filter(s => s.setting_id === null)
-                        .map(s => mapSkill(s, activeSkillIds));
-
-                    const mappedLocals = (skillsRes.data || [])
-                        .filter(s => s.setting_id === id)
-                        .map(s => mapSkill(s, activeSkillIds));
-
-                    const skillMap = new Map<string, any>();
-
-                    // 1. Add Globals
-                    mappedGlobals.forEach(s => skillMap.set(s.name.trim().toLowerCase(), s));
-
-                    // 2. Override with Locals
-                    mappedLocals.forEach(s => skillMap.set(s.name.trim().toLowerCase(), s));
-
-                    return Array.from(skillMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-                })(),
-                specializations: (specsRes.data || []).map(mapSpec),
-                backgrounds: (() => {
-                    const mappedGlobals = (bgsRes.data || [])
-                        .filter(b => b.setting_id === null)
-                        .map(b => mapBg(b, activeBgIds));
-                    const mappedLocals = (bgsRes.data || [])
-                        .filter(b => b.setting_id === id)
-                        .map(b => mapBg(b, activeBgIds));
-
-                    const bgMap = new Map<string, any>();
-                    mappedGlobals.forEach(b => bgMap.set(b.name.trim().toLowerCase(), b));
-                    mappedLocals.forEach(b => bgMap.set(b.name.trim().toLowerCase(), b));
-
-                    return Array.from(bgMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-                })(),
-                counters: (() => {
-                    const mappedGlobals = (countersRes.data || [])
-                        .filter(c => c.setting_id === null)
-                        .map(c => mapCounter(c, activeCounterIds));
-                    const mappedLocals = (countersRes.data || [])
-                        .filter(c => c.setting_id === id)
-                        .map(c => mapCounter(c, activeCounterIds));
-
-                    const cMap = new Map<string, any>();
-                    mappedGlobals.forEach(c => cMap.set(c.name.trim().toLowerCase(), c));
-                    mappedLocals.forEach(c => cMap.set(c.name.trim().toLowerCase(), c));
-
-                    return Array.from(cMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-                })()
-            }
+            theme: settingData.configurations.theme || { creationColor: "#000", xpColor: "#000" },
+            libraries: libraries
         };
 
         return rules;
@@ -441,149 +121,9 @@ export const AdminService = {
             return { success: false, message: `Erreur MAJ Root: ${rootError.message}` };
         }
 
-        // 2. Update Libraries (Naive Strategy: Delete All & Re-Insert)
-
+        // 2. Synchronize Libraries
         try {
-            // A. Traits
-            const { error: delTraitsErr } = await supabase.from('libraries_traits').delete().eq('setting_id', id);
-            if (delTraitsErr) throw new Error("Delete Traits: " + delTraitsErr.message);
-
-            if (rules.libraries.traits.length > 0) {
-                const traitsPayload = rules.libraries.traits.map(t => ({
-                    setting_id: id,
-                    id: t.id,
-                    type: t.type,
-                    name: t.name,
-                    cost: t.cost,
-                    description: t.description,
-                    tags: t.tags,
-                    is_variable: t.isVariable,
-                    effects: t.effects
-                }));
-                const { error: insTraitsErr } = await supabase.from('libraries_traits').insert(traitsPayload);
-                if (insTraitsErr) throw new Error("Insert Traits: " + insTraitsErr.message);
-            }
-
-            // B. Skills Management (Enhanced for Global/Local)
-            // 1. Identify Locals vs Globals in the incoming list
-            const localSkillsToSave = rules.libraries.skills.filter(s => !s.isGlobal);
-            const activeGlobalSkillIds = rules.libraries.skills
-                .filter(s => s.isGlobal && s.isActive !== false) // Default to true if undefined
-                .map(s => s.id);
-
-            // 2. Sync Local Skills (Naive Replace for setting_id = id items)
-            const { error: delSkillsErr } = await supabase.from('libraries_skills').delete().eq('setting_id', id);
-            if (delSkillsErr) throw new Error("Delete Locals: " + delSkillsErr.message);
-
-            if (localSkillsToSave.length > 0) {
-                const skillsPayload = localSkillsToSave.map(s => ({
-                    setting_id: id,
-                    id: s.id,
-                    name: s.name,
-                    description: s.description,
-                    default_category: s.defaultCategory,
-                    is_variable: s.isVariable
-                }));
-                const { error: insSkillsErr } = await supabase.from('libraries_skills').insert(skillsPayload);
-                if (insSkillsErr) throw new Error("Insert Locals: " + insSkillsErr.message);
-            }
-
-            // 3. Sync Selection (rel_setting_skills)
-            // Wipe existing selections for this setting
-            const { error: delRelErr } = await supabase.from('rel_setting_skills').delete().eq('setting_id', id);
-            if (delRelErr) throw new Error("Delete Selection: " + delRelErr.message);
-
-            if (activeGlobalSkillIds.length > 0) {
-                const relPayload = activeGlobalSkillIds.map(skillId => ({
-                    setting_id: id,
-                    skill_id: skillId,
-                    is_active: true
-                }));
-                const { error: insRelErr } = await supabase.from('rel_setting_skills').insert(relPayload);
-                if (insRelErr) throw new Error("Insert Selection: " + insRelErr.message);
-            }
-
-            // C. Specializations
-            const { error: delSpecsErr } = await supabase.from('libraries_specializations').delete().eq('setting_id', id);
-            if (delSpecsErr) throw new Error("Delete Specs: " + delSpecsErr.message);
-
-            if (rules.libraries.specializations.length > 0) {
-                const specsPayload = rules.libraries.specializations.map(s => ({
-                    setting_id: id,
-                    id: s.id,
-                    name: s.name,
-                    description: s.description,
-                    skill_ids: s.skillIds,
-                    default_min_level: s.defaultMinLevel
-                }));
-                const { error: insSpecsErr } = await supabase.from('libraries_specializations').insert(specsPayload);
-                if (insSpecsErr) throw new Error("Insert Specs: " + insSpecsErr.message);
-            }
-
-            // D. Backgrounds (Unified Save)
-            const localBgsToSave = rules.libraries.backgrounds.filter(b => !b.isGlobal);
-            const activeGlobalBgIds = rules.libraries.backgrounds
-                .filter(b => b.isGlobal && b.isActive !== false)
-                .map(b => b.id);
-
-            const { error: delBgErr } = await supabase.from('libraries_backgrounds').delete().eq('setting_id', id);
-            if (delBgErr) throw new Error("Delete Local Bgs: " + delBgErr.message);
-
-            if (localBgsToSave.length > 0) {
-                const bgPayload = localBgsToSave.map(b => ({
-                    setting_id: id,
-                    id: b.id,
-                    name: b.name,
-                    description: b.description,
-                    is_variable: b.isVariable
-                }));
-                await supabase.from('libraries_backgrounds').insert(bgPayload);
-            }
-
-            const { error: delRelBgErr } = await supabase.from('rel_setting_backgrounds').delete().eq('setting_id', id);
-            if (delRelBgErr) throw new Error("Delete Selection Bgs: " + delRelBgErr.message);
-
-            if (activeGlobalBgIds.length > 0) {
-                const relPayload = activeGlobalBgIds.map(bid => ({
-                    setting_id: id,
-                    background_id: bid,
-                    is_active: true
-                }));
-                await supabase.from('rel_setting_backgrounds').insert(relPayload);
-            }
-
-            // E. Counters (Unified Save)
-            const localCountersToSave = rules.libraries.counters.filter(c => !c.isGlobal);
-            const activeGlobalCounterIds = rules.libraries.counters
-                .filter(c => c.isGlobal && c.isActive !== false)
-                .map(c => c.id);
-
-            const { error: delCtrErr } = await supabase.from('libraries_counters').delete().eq('setting_id', id);
-            if (delCtrErr) throw new Error("Delete Local Counters: " + delCtrErr.message);
-
-            if (localCountersToSave.length > 0) {
-                const ctrPayload = localCountersToSave.map(c => ({
-                    setting_id: id,
-                    id: c.id,
-                    name: c.name,
-                    max_value: c.maxValue,
-                    default_value: c.defaultValue,
-                    xp_cost: c.xpCost
-                }));
-                await supabase.from('libraries_counters').insert(ctrPayload);
-            }
-
-            const { error: delRelCtrErr } = await supabase.from('rel_setting_counters').delete().eq('setting_id', id);
-            if (delRelCtrErr) throw new Error("Delete Selection Counters: " + delRelCtrErr.message);
-
-            if (activeGlobalCounterIds.length > 0) {
-                const relPayload = activeGlobalCounterIds.map(cid => ({
-                    setting_id: id,
-                    counter_id: cid,
-                    is_active: true
-                }));
-                await supabase.from('rel_setting_counters').insert(relPayload);
-            }
+            await LibraryService.syncLibraries(id, rules);
         } catch (libError) {
             console.error("Error saving libraries:", libError);
             return { success: false, message: `Erreur Bibliothèques: ${(libError as Error).message}` };
@@ -653,46 +193,4 @@ export const AdminService = {
         else console.log("Traits Sample:", traits?.[0] ? Object.keys(traits[0]) : "Empty Table");
     },
 
-    /**
-     * Attribute Presets Management
-     */
-    async listAttributePresets(): Promise<any[] | null> {
-        const { data, error } = await supabase
-            .from('attribute_presets')
-            .select('*')
-            .order('is_official', { ascending: false })
-            .order('name', { ascending: true });
-
-        if (error) {
-            console.error('Error listing attribute presets:', error);
-            return null;
-        }
-        return data;
-    },
-
-    async saveAttributePreset(name: string, description: string, structure: any, hasSecondary: boolean): Promise<boolean> {
-        const { error } = await supabase
-            .from('attribute_presets')
-            .insert([{ name, description, structure, has_secondary: hasSecondary, is_official: false }]);
-
-        if (error) {
-            console.error('Error saving attribute preset:', error);
-            return false;
-        }
-        return true;
-    },
-
-    async deleteAttributePreset(id: string): Promise<boolean> {
-        const { error } = await supabase
-            .from('attribute_presets')
-            .delete()
-            .eq('id', id)
-            .eq('is_official', false); // Protection
-
-        if (error) {
-            console.error('Error deleting attribute preset:', error);
-            return false;
-        }
-        return true;
-    }
 }

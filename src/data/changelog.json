@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.17.0",
+        "date": "2026-02-06",
+        "type": "minor",
+        "changes": [
+            "Refactoring majeur de AdminService : extraction des responsabilités vers AttributeService et LibraryService",
+            "Centralisation des constantes d'attributs (defaults/attributes.ts) pour une meilleure cohérence MJ/Joueur et support Offline",
+            "Optimisation du moteur de synchronisation des bibliothèques (Traits, Compétences, Arrières-plans, Compteurs)",
+            "Amélioration de la robustesse du typage global (RulesData, GameSetting)"
+        ]
+    },
+    {
         "version": "2.16.6",
         "date": "2026-02-05",
         "type": "patch",
