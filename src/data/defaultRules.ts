@@ -42,7 +42,12 @@ export const defaultRules: RulesData = {
             "social": ["Charisme", "Empathie", "Apparence", "Communication"],
             "mental": ["Intellect", "Volonté", "Intuition", "Perception"]
         },
-        secondaryAttributes: {},
+        secondaryAttributes: {
+            "physique": ["Corpulence", "Beauté"],
+            "social": ["Présence", "Charme"],
+            "mental": ["Conscience", "Attraction"],
+            "mystique": ["Aura", "Fascination"]
+        },
         skills: {
             "physique": [],
             "social": [],

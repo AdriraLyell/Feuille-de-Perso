@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.14.3",
+        "date": "2026-02-05",
+        "type": "patch",
+        "changes": [
+            "FIX: Ajout des noms par défaut pour les attributs secondaires (Corpulence, Beauté, Conscience, etc.).",
+            "IMPROVE: L'éditeur utilise désormais ces noms par défaut lors de l'activation des attributs secondaires."
+        ]
+    },
+    {
         "version": "2.14.2",
         "date": "2026-02-05",
         "type": "patch",

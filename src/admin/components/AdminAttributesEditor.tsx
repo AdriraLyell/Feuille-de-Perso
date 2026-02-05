@@ -15,6 +15,13 @@ const DEFAULT_ATTRIBUTES: Record<string, string[]> = {
     'mystique': ['Puissance', 'Résistance', 'Souplesse', 'Précision', 'Sensibilité']
 };
 
+const DEFAULT_SECONDARY_ATTRIBUTES: Record<string, string[]> = {
+    'physique': ['Corpulence', 'Beauté'],
+    'social': ['Présence', 'Charme'],
+    'mental': ['Conscience', 'Attraction'],
+    'mystique': ['Aura', 'Fascination']
+};
+
 const ATTRIBUTE_PRESETS = [
     {
         name: "Standard (Classique)",
@@ -131,7 +138,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
         const isSecondaryActive = !!rules.configurations.global.secondaryAttributes;
         const newSecondaryMap = { ...secondaryMap };
         if (isSecondaryActive) {
-            newSecondaryMap[nextId] = ["Secondaire 1", "Secondaire 2"];
+            newSecondaryMap[nextId] = DEFAULT_SECONDARY_ATTRIBUTES[nextId] || ["Secondaire 1", "Secondaire 2"];
         }
 
         onUpdate({
@@ -180,11 +187,12 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
         const newSecondary = { ...secondaryMap };
         if (newActive) {
             Object.keys(attributesMap).forEach(cat => {
+                const defaultSec = DEFAULT_SECONDARY_ATTRIBUTES[cat] || ["Secondaire 1", "Secondaire 2"];
                 if (!newSecondary[cat] || newSecondary[cat].length !== 2) {
                     const existing = newSecondary[cat] || [];
                     newSecondary[cat] = [
-                        existing[0] || "Secondaire 1",
-                        existing[1] || "Secondaire 2"
+                        existing[0] || defaultSec[0],
+                        existing[1] || defaultSec[1]
                     ];
                 }
             });
