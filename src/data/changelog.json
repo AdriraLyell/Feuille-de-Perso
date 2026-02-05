@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.14.1",
+        "date": "2026-02-05",
+        "type": "patch",
+        "changes": [
+            "FIX: Nettoyage des compteurs par défaut (Suppression 'Points de Vie').",
+            "FIX: Le compteur 'Confiance' est désormais actif par défaut.",
+            "IMPROVE: Liaison automatique des éléments pré-existants (Layout) avec la Bibliothèque Globale."
+        ]
+    },
+    {
         "version": "2.14.0",
         "date": "2026-02-05",
         "type": "minor",

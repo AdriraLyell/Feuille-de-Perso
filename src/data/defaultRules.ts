@@ -49,8 +49,8 @@ export const defaultRules: RulesData = {
             "mental": []
         },
         counters: {
-            "pv": { id: "pv", name: "Points de Vie", max: 10, xpCost: 0 },
-            "volonte": { id: "volonte", name: "Volonté", max: 10, xpCost: 0 }
+            "volonte": { id: "volonte", name: "Volonté", max: 10, xpCost: 0 },
+            "confiance": { id: "confiance", name: "Confiance", max: 10, xpCost: 0 }
         },
         backgrounds: ["Ressources", "Alliés", "Contacts", "Mentor"],
         labels: {
