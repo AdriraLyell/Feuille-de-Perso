@@ -93,6 +93,20 @@ export interface LibrarySpecializationEntry {
   description?: string;
 }
 
+export interface LibraryBackgroundEntry extends LibrarySkillEntry {
+  // Same structure as Skill for now (id, name, desc, isVariable...)
+}
+
+export interface LibraryCounterEntry {
+  id: string;
+  name: string;
+  maxValue: number; // Default 10
+  defaultValue: number; // Default 0
+  xpCost: number; // 0 = free
+  isGlobal?: boolean;
+  isActive?: boolean;
+}
+
 export interface LogEntry {
   id: string;
   timestamp: string;

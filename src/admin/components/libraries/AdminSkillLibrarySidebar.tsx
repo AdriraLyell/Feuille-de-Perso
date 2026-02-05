@@ -11,6 +11,7 @@ interface AdminSkillLibrarySidebarProps {
 }
 
 const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rules, onUpdate, draggedItem, setDraggedItem }) => {
+    const [activeTab, setActiveTab] = React.useState<'skills' | 'backgrounds' | 'counters'>('skills');
 
     const handleDragStart = (e: React.DragEvent, type: 'admin_lib_skill', dataPayload: any) => {
         setDraggedItem({ type, ...dataPayload });
@@ -24,11 +25,15 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
     };
 
     const handleDropOnLibrary = (e: React.DragEvent) => {
+        // ... (Keep existing logic for archiving skills, it only applies to Skills tab effectively)
         e.preventDefault();
         if (!draggedItem) return;
 
-        // Only accept items from sheet (archiving)
-        if (draggedItem.type === 'admin_sheet_skill') {
+        // Only accept sheet skills for now (Archiving)
+        // We only archive to the SKILLS library. 
+        // Archiving Backgrounds from sheet is not yet supported/requested (Sheet doesn't have drag source for backgrounds yet).
+
+        if (draggedItem.type === 'admin_sheet_skill' && activeTab === 'skills') {
             const category = draggedItem.category!;
             const index = draggedItem.index!;
             const skillName = draggedItem.name!;
@@ -47,7 +52,6 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
             };
 
             // 2. Add to Library (if not exists)
-            // Check duplicate name first to be safe
             const existingInLib = (rules.libraries.skills || []).find(l => l.name === skillName);
             let newLib = [...(rules.libraries.skills || [])];
 
@@ -76,18 +80,51 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
         setDraggedItem(null);
     };
 
-    // Filter out skills that are already present on the sheet
-    const currentSkillNames = new Set<string>();
-    Object.keys(rules.definitions.skills).forEach(cat => {
-        rules.definitions.skills[cat].forEach(s => {
-            if (s) currentSkillNames.add(s.trim().toLowerCase());
-        });
-    });
+    // --- Filter Logic ---
+    const getVisibleItems = () => {
+        if (activeTab === 'skills') {
+            const currentSkillNames = new Set<string>();
+            Object.keys(rules.definitions.skills).forEach(cat => {
+                rules.definitions.skills[cat].forEach(s => {
+                    if (s) currentSkillNames.add(s.trim().toLowerCase());
+                });
+            });
+            return (rules.libraries.skills || []).filter(libItem =>
+                (libItem.isVariable || !currentSkillNames.has(libItem.name.trim().toLowerCase())) &&
+                libItem.isActive !== false
+            );
+        }
+        if (activeTab === 'backgrounds') {
+            // Check if already placed? 
+            // Backgrounds are placed in definitions.skills too (mixed).
+            // So we check against the SAME set of names.
+            const currentNames = new Set<string>();
+            Object.keys(rules.definitions.skills).forEach(cat => {
+                rules.definitions.skills[cat].forEach(s => {
+                    if (s) currentNames.add(s.trim().toLowerCase());
+                });
+            });
+            return (rules.libraries.backgrounds || []).filter(b =>
+                !currentNames.has(b.name.trim().toLowerCase()) && b.isActive !== false
+            );
+        }
+        if (activeTab === 'counters') {
+            const currentNames = new Set<string>();
+            Object.keys(rules.definitions.skills).forEach(cat => {
+                rules.definitions.skills[cat].forEach(s => {
+                    if (s) currentNames.add(s.trim().toLowerCase());
+                });
+            });
+            // We also check defining counters directly in definitions.counters?
+            // Actually user wants to place them in SKILL SLOTS for layout.
+            return (rules.libraries.counters || []).filter(c =>
+                !currentNames.has(c.name.trim().toLowerCase()) && c.isActive !== false
+            );
+        }
+        return [];
+    };
 
-    const visibleLibrary = (rules.libraries.skills || []).filter(libItem =>
-        (libItem.isVariable || !currentSkillNames.has(libItem.name.trim().toLowerCase())) &&
-        libItem.isActive !== false // Only show Active skills in the campaign reserve
-    );
+    const visibleLibrary = getVisibleItems();
 
     return (
         <div
@@ -95,49 +132,71 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
             onDragOver={handleDragOver}
             onDrop={handleDropOnLibrary}
         >
-            <div className="p-4 bg-slate-200 border-b border-gray-300 font-bold text-slate-700 flex items-center gap-2 shadow-sm">
-                <BookOpen size={18} />
-                Réserve de Compétences
+            <div className="bg-slate-200 border-b border-gray-300 shadow-sm">
+                <div className="p-3 font-bold text-slate-700 flex items-center gap-2">
+                    <BookOpen size={18} />
+                    Réserve
+                </div>
+                {/* TABS */}
+                <div className="flex text-xs font-bold text-slate-600">
+                    <button
+                        onClick={() => setActiveTab('skills')}
+                        className={`flex-1 py-2 text-center border-b-2 transition-colors ${activeTab === 'skills' ? 'border-blue-600 text-blue-700 bg-white' : 'border-transparent hover:bg-slate-300/50'}`}
+                    >
+                        Compétences
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('backgrounds')}
+                        className={`flex-1 py-2 text-center border-b-2 transition-colors ${activeTab === 'backgrounds' ? 'border-purple-600 text-purple-700 bg-white' : 'border-transparent hover:bg-slate-300/50'}`}
+                    >
+                        Arr. Plans
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('counters')}
+                        className={`flex-1 py-2 text-center border-b-2 transition-colors ${activeTab === 'counters' ? 'border-red-600 text-red-700 bg-white' : 'border-transparent hover:bg-slate-300/50'}`}
+                    >
+                        Compteurs
+                    </button>
+                </div>
             </div>
 
-            {draggedItem?.type === 'admin_sheet_skill' && (
+            {draggedItem?.type === 'admin_sheet_skill' && activeTab === 'skills' && (
                 <div className="absolute inset-0 bg-orange-100/90 z-50 flex flex-col items-center justify-center border-4 border-dashed border-orange-400 m-2 rounded-xl pointer-events-none">
                     <Archive size={48} className="text-orange-600 mb-2" />
                     <span className="font-bold text-orange-800 text-lg">Archiver ici</span>
-                    <span className="text-sm text-orange-700">Retirer de la fiche et garder en réserve</span>
                 </div>
             )}
 
             <div className="p-3 text-xs text-slate-500 border-b border-slate-200 bg-slate-50">
-                Glissez des compétences ici vers une catégorie pour les ajouter aux règles.
+                {activeTab === 'skills' && "Glissez vers une catégorie."}
+                {activeTab === 'backgrounds' && "Glissez un Historique vers la fiche."}
+                {activeTab === 'counters' && "Glissez un Compteur vers la fiche."}
             </div>
 
             <div className="flex-grow overflow-y-auto p-3 space-y-2 custom-scrollbar">
                 {visibleLibrary.length === 0 ? (
                     <div className="text-center text-slate-400 italic mt-10 px-4">
-                        {(rules.libraries.skills || []).length > 0
-                            ? "Toutes les compétences de la réserve sont déjà utilisées."
-                            : "La réserve est vide."}
+                        La réserve est vide.
                     </div>
                 ) : (
-                    visibleLibrary.map(item => {
-                        const isPresent = currentSkillNames.has(item.name.trim().toLowerCase());
+                    visibleLibrary.map((item: any) => {
+                        // We stick to 'admin_lib_skill' type so the Editor accepts it.
+                        // Checks for duplicates
+                        // Re-calculate presence for display logic
+                        const isPresent = false; // Filter logic currently hides present items so this is always false (except variables)
 
                         return (
                             <div
                                 key={item.id}
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, 'admin_lib_skill', { name: item.name, data: item })}
-                                className={`p-2 rounded border shadow-sm cursor-grab active:cursor-grabbing transition-all flex justify-between items-center group ${isPresent
-                                    ? 'bg-green-50/30 border-green-200/60 hover:border-green-400'
-                                    : 'bg-white border-gray-300 hover:border-purple-400 hover:shadow-md'
-                                    }`}
+                                className={`p-2 rounded border shadow-sm cursor-grab active:cursor-grabbing transition-all flex justify-between items-center group bg-white border-gray-300 hover:border-purple-400 hover:shadow-md`}
                             >
                                 <div className="flex items-center gap-2 overflow-hidden">
                                     <GripVertical size={14} className="text-gray-300 shrink-0" />
                                     <div className="flex flex-col min-w-0">
                                         <div className="flex items-center gap-1.5">
-                                            <span className={`font-bold text-sm truncate ${isPresent ? 'text-green-800' : 'text-slate-700'}`}>
+                                            <span className={`font-bold text-sm truncate text-slate-700`}>
                                                 {item.name}
                                             </span>
                                         </div>
@@ -145,13 +204,7 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                                             {item.isVariable && (
                                                 <div className="flex items-center gap-0.5 text-[10px] text-blue-600 bg-blue-50 px-1 rounded-sm border border-blue-100">
                                                     <Layers size={10} />
-                                                    <span className="font-semibold" title="Compétence à variations">Variable</span>
-                                                </div>
-                                            )}
-                                            {isPresent && (
-                                                <div className="flex items-center gap-0.5 text-[10px] text-green-700 bg-green-50 px-1 rounded-sm border border-green-100">
-                                                    <CheckCircle2 size={10} />
-                                                    <span className="font-semibold">Présent</span>
+                                                    <span className="font-semibold" title="Variable">Var</span>
                                                 </div>
                                             )}
                                         </div>

@@ -4,7 +4,7 @@ export interface RulesThemeConfig {
     dotSymbol?: string;
 }
 
-import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry } from './system';
+import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry } from './system';
 
 export interface RulesCreationConfig {
     mode: 'points' | 'rangs';
@@ -73,7 +73,8 @@ export interface RulesData {
     libraries: {
         traits: LibraryEntry[];
         skills: LibrarySkillEntry[];
-        backgrounds?: LibrarySkillEntry[]; // Optional to maintain backward compatibility with old rules
+        backgrounds: LibraryBackgroundEntry[]; // Unified Backgrounds
+        counters: LibraryCounterEntry[]; // Unified Counters
         specializations: LibrarySpecializationEntry[];
     };
 }

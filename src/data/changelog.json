@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.14.0",
+        "date": "2026-02-05",
+        "type": "minor",
+        "changes": [
+            "Feature (Bibliothèques Unifiées) : Extension de la bibliothèque globale pour inclure les Arrières-Plans et les Compteurs.",
+            "Admin UI : Mise à jour de la barre latérale 'Réserve' avec des onglets pour gérer Compétences, Arrières-Plans et Compteurs.",
+            "Backend : Persistance en base de données (Supabase) des nouvelles bibliothèques et gestion des liens Global/Local.",
+            "Admin UI : Support du Glisser-Déposer pour toutes les entités de bibliothèque vers l'éditeur de mise en page."
+        ]
+    },
+    {
         "version": "2.13.10",
         "date": "2026-02-05",
         "type": "patch",
