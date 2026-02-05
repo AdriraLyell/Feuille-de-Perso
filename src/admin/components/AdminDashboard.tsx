@@ -4,7 +4,7 @@ import { GameSettingSummary, AdminService } from '../../services/AdminService';
 import { RulesData } from '../../types/rules';
 import { Plus, Loader2, FileCog, Scroll, Trash2, Eye, EyeOff } from 'lucide-react';
 import { defaultRules } from '../../data/defaultRules'; // We might need a default template
-import { INITIAL_DATA } from '../../data/initialState';
+import { INITIAL_DATA, INITIAL_SKILLS } from '../../data/initialState';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 
 interface AdminDashboardProps {
@@ -33,12 +33,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
     const handleCreate = async () => {
         if (!newName.trim()) return;
         setIsCreating(true);
+
+        // Prep Layout keys based on INITIAL_SKILLS keys
+        // We map the structure: { talents: [Obj, Obj...], ... } -> { talents: ["Apparence", "Sport"...], ... }
+        const layoutDefinitions: Record<string, string[]> = {};
+        const labels: Record<string, string> = {
+            talents: "Talents",
+            competences: "Compétences",
+            competences_col_2: "Mentales / Autres",
+            connaissances: "Connaissances",
+            autres_competences: "Libres",
+            competences2: "Physique",
+            autres: "Autres",
+            arrieres_plans: "Arrière-Plans" // Should probably not be here but safe to have
+        };
+
+        Object.keys(INITIAL_SKILLS).forEach(key => {
+            // @ts-ignore
+            layoutDefinitions[key] = INITIAL_SKILLS[key].map((s: any) => s.name || ""); // "" preserves spacers
+        });
+
         // Use a base template for new rules
-        // Note: We should probably keep a "Template" JSON or use the current app default
         const template: Partial<RulesData> = {
             version: '1.0.0',
-            configurations: { ...defaultRules.configurations }, // Assuming defaultRules exists or we construct minimal
-            definitions: { ...defaultRules.definitions },
+            configurations: { ...defaultRules.configurations },
+            definitions: {
+                ...defaultRules.definitions,
+                skills: layoutDefinitions, // <-- This is the Pre-Fill Layout
+                labels: { ...defaultRules.definitions.labels, ...labels } // <-- This ensures headers are nice
+            },
             libraries: {
                 ...defaultRules.libraries,
                 skills: INITIAL_DATA.skillLibrary // Inject standard skills for "Smart Linking"
