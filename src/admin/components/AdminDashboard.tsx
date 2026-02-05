@@ -4,6 +4,7 @@ import { GameSettingSummary, AdminService } from '../../services/AdminService';
 import { RulesData } from '../../types/rules';
 import { Plus, Loader2, FileCog, Scroll, Trash2, Eye, EyeOff } from 'lucide-react';
 import { defaultRules } from '../../data/defaultRules'; // We might need a default template
+import { INITIAL_DATA } from '../../data/initialState';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 
 interface AdminDashboardProps {
@@ -37,7 +38,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
         const template: Partial<RulesData> = {
             version: '1.0.0',
             configurations: { ...defaultRules.configurations }, // Assuming defaultRules exists or we construct minimal
-            definitions: { ...defaultRules.definitions }
+            definitions: { ...defaultRules.definitions },
+            libraries: {
+                ...defaultRules.libraries,
+                skills: INITIAL_DATA.skillLibrary // Inject standard skills for "Smart Linking"
+            }
         };
 
         const newId = await AdminService.createSetting(newName, template);

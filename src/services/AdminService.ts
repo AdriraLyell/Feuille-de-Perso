@@ -206,7 +206,26 @@ export const AdminService = {
             theme: setting.configurations.theme || { creationColor: "#000", xpColor: "#000" },
             libraries: {
                 traits: (traitsRes.data || []).map(mapTrait),
-                skills: (skillsRes.data || []).map(s => mapSkill(s, activeSkillIds)),
+                skills: (() => {
+                    // Dedup logic: Local overrides Global by Name
+                    const mappedGlobals = (skillsRes.data || [])
+                        .filter(s => s.setting_id === null)
+                        .map(s => mapSkill(s, activeSkillIds));
+
+                    const mappedLocals = (skillsRes.data || [])
+                        .filter(s => s.setting_id === id)
+                        .map(s => mapSkill(s, activeSkillIds));
+
+                    const skillMap = new Map<string, any>();
+
+                    // 1. Add Globals
+                    mappedGlobals.forEach(s => skillMap.set(s.name.trim().toLowerCase(), s));
+
+                    // 2. Override with Locals
+                    mappedLocals.forEach(s => skillMap.set(s.name.trim().toLowerCase(), s));
+
+                    return Array.from(skillMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+                })(),
                 specializations: (specsRes.data || []).map(mapSpec)
             }
         };
