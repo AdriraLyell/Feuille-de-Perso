@@ -30,7 +30,7 @@ if (fs.existsSync(paths.version)) {
 // 2. Mise à jour de src/constants.ts
 if (fs.existsSync(paths.constants)) {
     let content = fs.readFileSync(paths.constants, 'utf8');
-    content = content.replace(/export const APP_VERSION = "[^"]+";/, `export const APP_VERSION = "${currentVersion}";`);
+    content = content.replace(/export const APP_VERSION = ['"][^'"]+['"];/, `export const APP_VERSION = '${currentVersion}';`);
     fs.writeFileSync(paths.constants, content);
     console.log('✅ src/constants.ts mis à jour.');
 }

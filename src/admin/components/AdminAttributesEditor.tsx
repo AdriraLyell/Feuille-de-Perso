@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RulesData } from '../../types/rules';
-import { Plus, Trash2, Shield, Zap, LayoutGrid, Play, Info } from 'lucide-react';
+import { AttributePreset } from '../../types/system';
+import { Plus, Trash2, Shield, Zap, LayoutGrid, Play, Info, Save, Loader2 } from 'lucide-react';
+import { AdminService } from '../../services/AdminService';
 import ThematicModal from '../../components/ui/ThematicModal';
 
 interface AdminAttributesEditorProps {
@@ -24,7 +26,7 @@ const DEFAULT_SECONDARY_ATTRIBUTES: Record<string, string[]> = {
 
 const ATTRIBUTE_PRESETS = [
     {
-        name: "Standard (Classique)",
+        name: "v2 (Classique)",
         desc: "3 Pavés de 4 Attributs",
         structure: [
             { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'] },
@@ -33,7 +35,7 @@ const ATTRIBUTE_PRESETS = [
         ]
     },
     {
-        name: "Complet (Mystique)",
+        name: "v4 (Complet)",
         desc: "4 Pavés de 5 Attributs",
         structure: [
             { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'] },
@@ -53,6 +55,24 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
     const [pendingPreset, setPendingPreset] = useState<any>(null);
     const [showPresetConfirm, setShowPresetConfirm] = useState(false);
 
+    // DB Presets State
+    const [dbPresets, setDbPresets] = useState<AttributePreset[]>([]);
+    const [isLoadingPresets, setIsLoadingPresets] = useState(true);
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [newPresetName, setNewPresetName] = useState("");
+    const [newPresetDesc, setNewPresetDesc] = useState("");
+
+    useEffect(() => {
+        loadDBPresets();
+    }, []);
+
+    const loadDBPresets = async () => {
+        setIsLoadingPresets(true);
+        const data = await AdminService.listAttributePresets();
+        if (data) setDbPresets(data);
+        setIsLoadingPresets(false);
+    };
+
     // Dynamic categories based on keys in attributesMap, sorted by standard order
     const STANDARD_ORDER = ['pave_attributs_1', 'pave_attributs_2', 'pave_attributs_3', 'pave_attributs_4', 'pave_attributs_5'];
     const categories = Object.keys(attributesMap).sort((a, b) => {
@@ -66,14 +86,40 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
         if (indexA !== -1) return -1;
         if (indexB !== -1) return 1;
 
-        // Otherwise sort alphabetically (or by insertion order helper if needed, but alpha is stable)
+        // Otherwise sort alphabetically
         return a.localeCompare(b);
     });
 
     // --- PRESETS ---
-    const requestPresetLoad = (preset: typeof ATTRIBUTE_PRESETS[0]) => {
+    const requestPresetLoad = (preset: any) => {
         setPendingPreset(preset);
         setShowPresetConfirm(true);
+    };
+
+    const handleSaveCurrentAsPreset = async () => {
+        if (!newPresetName.trim()) return;
+
+        // Structure current attributes for the preset
+        const structure = categories.map(cat => ({
+            id: cat,
+            label: labelsMap[cat] || cat,
+            attrs: [...attributesMap[cat]]
+        }));
+
+        const success = await AdminService.saveAttributePreset(newPresetName, newPresetDesc, structure);
+        if (success) {
+            setIsSaveModalOpen(false);
+            setNewPresetName("");
+            setNewPresetDesc("");
+            loadDBPresets(); // Refresh
+        }
+    };
+
+    const handleDeletePreset = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        if (!confirm("Supprimer ce préréglage ?")) return;
+        const success = await AdminService.deleteAttributePreset(id);
+        if (success) loadDBPresets();
     };
 
     const executePresetLoad = () => {
@@ -399,12 +445,68 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                         </div>
                     </div>
 
-                    {/* Presets */}
+                    {/* Presets Grid */}
                     <div className="w-full md:w-2/3">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {ATTRIBUTE_PRESETS.map((preset, idx) => (
+                        <div className="flex items-center justify-between mb-3">
+                            <h5 className="text-xs font-bold text-slate-700 uppercase tracking-tighter flex items-center gap-1">
+                                <LayoutGrid size={14} /> Bibliothèque de Préréglages
+                            </h5>
+                            <button
+                                onClick={() => setIsSaveModalOpen(true)}
+                                className="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200 transition-colors font-bold flex items-center gap-1"
+                                title="Sauvegarder la config actuelle"
+                            >
+                                <Save size={12} /> Sauver Actuel
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                            {isLoadingPresets ? (
+                                <div className="col-span-full py-10 flex flex-col items-center justify-center text-slate-400 gap-2">
+                                    <Loader2 className="animate-spin" size={24} />
+                                    <span className="text-xs font-medium">Chargement des préréglages...</span>
+                                </div>
+                            ) : dbPresets.map((preset, idx) => (
+                                <div
+                                    key={preset.id || idx}
+                                    onClick={() => requestPresetLoad(preset)}
+                                    className="relative bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[80px]"
+                                >
+                                    <div>
+                                        <div className="flex justify-between items-start mb-1">
+                                            <span className="block font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate pr-4">
+                                                {preset.name}
+                                            </span>
+                                            {preset.isOfficial ? (
+                                                <span title="Officiel"><Shield size={12} className="text-blue-400 shrink-0" /></span>
+                                            ) : (
+                                                <button
+                                                    onClick={(e) => handleDeletePreset(e, preset.id)}
+                                                    className="opacity-0 group-hover/card:opacity-100 text-slate-300 hover:text-red-500 transition-opacity"
+                                                >
+                                                    <Trash2 size={12} />
+                                                </button>
+                                            )}
+                                        </div>
+                                        <span className="block text-[10px] text-slate-500 italic line-clamp-2 leading-tight">
+                                            {preset.description}
+                                        </span>
+                                    </div>
+                                    <div className="mt-2 flex items-center justify-between">
+                                        <div className="flex gap-0.5">
+                                            {preset.structure.map((_, i) => (
+                                                <div key={i} className="w-1.5 h-3 bg-slate-200 group-hover/card:bg-amber-200 rounded-sm" />
+                                            ))}
+                                        </div>
+                                        <Play size={10} className="text-slate-300 group-hover/card:text-amber-500" />
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Fallback to hardcoded if DB empty and not loading */}
+                            {!isLoadingPresets && dbPresets.length === 0 && ATTRIBUTE_PRESETS.map((preset, idx) => (
                                 <button
-                                    key={idx}
+                                    key={`hc-${idx}`}
                                     onClick={() => requestPresetLoad(preset)}
                                     className="bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded p-3 text-left transition-all group flex items-start gap-3"
                                 >
@@ -469,6 +571,66 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                             {pendingPreset.name}
                         </div>
                         <p className="text-xs text-slate-400 italic">Les noms et scores actuels seront perdus.</p>
+                    </div>
+                </ThematicModal>
+            )}
+
+            {/* SAVE PRESET MODAL */}
+            {isSaveModalOpen && (
+                <ThematicModal
+                    isOpen={isSaveModalOpen}
+                    onClose={() => setIsSaveModalOpen(false)}
+                    title="Sauvegarder en tant que préréglage"
+                    icon={<Save size={24} className="text-green-600" />}
+                    size="md"
+                    footer={
+                        <>
+                            <button onClick={() => setIsSaveModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded font-bold">Annuler</button>
+                            <button
+                                onClick={handleSaveCurrentAsPreset}
+                                disabled={!newPresetName.trim()}
+                                className="px-6 py-2 bg-green-600 text-white rounded font-bold shadow hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Sauvegarder
+                            </button>
+                        </>
+                    }
+                >
+                    <div className="space-y-4 py-4">
+                        <p className="text-sm text-slate-600">
+                            Enregistrez cette structure pour la réutiliser dans d'autres campagnes.
+                        </p>
+                        <div className="space-y-3">
+                            <div>
+                                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nom du préréglage</label>
+                                <input
+                                    autoFocus
+                                    value={newPresetName}
+                                    onChange={(e) => setNewPresetName(e.target.value)}
+                                    placeholder="Ex: Système 3-Pavés-6-Attributs"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded p-2 text-sm focus:border-green-500 outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Description (Optionnel)</label>
+                                <textarea
+                                    value={newPresetDesc}
+                                    onChange={(e) => setNewPresetDesc(e.target.value)}
+                                    placeholder="Décrivez l'usage de ce préréglage..."
+                                    className="w-full bg-slate-50 border border-slate-200 rounded p-2 text-xs focus:border-green-500 outline-none h-20 resize-none"
+                                />
+                            </div>
+                        </div>
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                            <h6 className="text-[10px] font-bold text-slate-500 uppercase mb-2">Résumé de la structure :</h6>
+                            <div className="flex flex-wrap gap-2">
+                                {categories.map(cat => (
+                                    <div key={cat} className="bg-white px-2 py-1 rounded border border-slate-200 text-[10px] font-bold text-slate-700">
+                                        {labelsMap[cat] || cat} ({attributesMap[cat].length})
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </ThematicModal>
             )}

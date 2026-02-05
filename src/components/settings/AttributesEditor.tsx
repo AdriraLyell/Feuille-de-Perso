@@ -19,7 +19,7 @@ const DEFAULT_ATTRIBUTES: Record<string, string[]> = {
 
 const ATTRIBUTE_PRESETS = [
     {
-        name: "Standard (Classique)",
+        name: "v2 (Classique)",
         desc: "3 Pavés de 4 Attributs",
         structure: [
             { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Dextérité', 'Agilité'] },
@@ -28,7 +28,7 @@ const ATTRIBUTE_PRESETS = [
         ]
     },
     {
-        name: "Complet (Mystique)",
+        name: "v4 (Complet)",
         desc: "4 Pavés de 5 Attributs",
         structure: [
             { id: 'pave_attributs_1', label: 'Physique', attrs: ['Force', 'Constitution', 'Agilité', 'Dextérité', 'Perception'] },

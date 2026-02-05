@@ -127,3 +127,14 @@ export interface BonusInfo {
   value: number;
   sources: string[];
 }
+export interface AttributePreset {
+  id: string;
+  name: string;
+  description: string;
+  structure: {
+    id: string;
+    label: string;
+    attrs: string[];
+  }[];
+  isOfficial: boolean;
+}

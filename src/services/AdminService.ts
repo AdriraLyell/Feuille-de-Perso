@@ -651,5 +651,48 @@ export const AdminService = {
 
         if (traitsError) console.error("Traits Schema Error:", traitsError);
         else console.log("Traits Sample:", traits?.[0] ? Object.keys(traits[0]) : "Empty Table");
+    },
+
+    /**
+     * Attribute Presets Management
+     */
+    async listAttributePresets(): Promise<any[] | null> {
+        const { data, error } = await supabase
+            .from('attribute_presets')
+            .select('*')
+            .order('is_official', { ascending: false })
+            .order('name', { ascending: true });
+
+        if (error) {
+            console.error('Error listing attribute presets:', error);
+            return null;
+        }
+        return data;
+    },
+
+    async saveAttributePreset(name: string, description: string, structure: any): Promise<boolean> {
+        const { error } = await supabase
+            .from('attribute_presets')
+            .insert([{ name, description, structure, is_official: false }]);
+
+        if (error) {
+            console.error('Error saving attribute preset:', error);
+            return false;
+        }
+        return true;
+    },
+
+    async deleteAttributePreset(id: string): Promise<boolean> {
+        const { error } = await supabase
+            .from('attribute_presets')
+            .delete()
+            .eq('id', id)
+            .eq('is_official', false); // Protection
+
+        if (error) {
+            console.error('Error deleting attribute preset:', error);
+            return false;
+        }
+        return true;
     }
 }
