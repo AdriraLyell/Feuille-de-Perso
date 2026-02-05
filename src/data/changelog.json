@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.14.2",
+        "date": "2026-02-05",
+        "type": "patch",
+        "changes": [
+            "FIX: Les attributs par défaut suivent désormais la structure Standard (3 pavés de 4 attributs).",
+            "IMPROVE: L'éditeur d'attributs permet d'ajouter/supprimer des attributs individuellement.",
+            "IMPROVE: Support débloqué pour un 5ème pavé d'attributs."
+        ]
+    },
+    {
         "version": "2.14.1",
         "date": "2026-02-05",
         "type": "patch",

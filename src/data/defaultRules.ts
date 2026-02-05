@@ -38,9 +38,9 @@ export const defaultRules: RulesData = {
     },
     definitions: {
         attributes: {
-            "physique": ["Force", "Dextérité", "Vigueur"],
-            "social": ["Charisme", "Manipulation", "Apparence"],
-            "mental": ["Intelligence", "Astuce", "Perception"]
+            "physique": ["Force", "Constitution", "Dextérité", "Agilité"],
+            "social": ["Charisme", "Empathie", "Apparence", "Communication"],
+            "mental": ["Intellect", "Volonté", "Intuition", "Perception"]
         },
         secondaryAttributes: {},
         skills: {

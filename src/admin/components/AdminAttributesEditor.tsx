@@ -219,7 +219,36 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
         });
     };
 
-    // Removed individual addItem/removeItem functions for attributes as we now use Global Symmetry
+    const addAttribute = (category: string) => {
+        const currentList = attributesMap[category] || [];
+        const newList = [...currentList, "Nouvel Attribut"];
+        onUpdate({
+            ...rules,
+            definitions: {
+                ...rules.definitions,
+                attributes: {
+                    ...rules.definitions.attributes,
+                    [category]: newList
+                }
+            }
+        });
+    };
+
+    const removeAttribute = (category: string, index: number) => {
+        const currentList = attributesMap[category] || [];
+        const newList = [...currentList];
+        newList.splice(index, 1);
+        onUpdate({
+            ...rules,
+            definitions: {
+                ...rules.definitions,
+                attributes: {
+                    ...rules.definitions.attributes,
+                    [category]: newList
+                }
+            }
+        });
+    };
 
     const updateItemName = (category: string, index: number, newName: string) => {
         const currentList = attributesMap[category] || [];
@@ -264,25 +293,34 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                     />
                 </div>
 
-                {/* Primary Attributes */}
-                <div className="mb-6 flex-grow">
-                    <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-xs font-bold text-slate-600 uppercase flex items-center gap-1"><Shield size={12} /> Primaires</h4>
-                        {/* No Individual Add Button */}
-                    </div>
-                    <div className="space-y-1">
-                        {primaryList.map((name, index) => (
-                            <div key={`prim-${index}`} className="flex items-center gap-2 group">
-                                <span className="text-[10px] text-slate-300 w-4 select-none">{index + 1}</span>
-                                <input
-                                    value={name}
-                                    onChange={(e) => updateItemName(category, index, e.target.value)}
-                                    className="flex-grow text-sm font-medium border border-transparent hover:border-slate-200 focus:border-blue-400 rounded px-1 py-0.5 outline-none bg-transparent focus:bg-white transition-all"
-                                />
-                                {/* No Individual Remove Button - Use Global Count */}
-                            </div>
-                        ))}
-                    </div>
+                <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-bold text-slate-600 uppercase flex items-center gap-1"><Shield size={12} /> Primaires</h4>
+                    <button
+                        onClick={() => addAttribute(category)}
+                        className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded hover:bg-blue-200 transition-colors font-bold"
+                        title="Ajouter un attribut"
+                    >
+                        +
+                    </button>
+                </div>
+                <div className="space-y-1 mb-6 flex-grow">
+                    {primaryList.map((name, index) => (
+                        <div key={`prim-${index}`} className="flex items-center gap-2 group">
+                            <span className="text-[10px] text-slate-300 w-4 select-none">{index + 1}</span>
+                            <input
+                                value={name}
+                                onChange={(e) => updateItemName(category, index, e.target.value)}
+                                className="flex-grow text-sm font-medium border border-transparent hover:border-slate-200 focus:border-blue-400 rounded px-1 py-0.5 outline-none bg-transparent focus:bg-white transition-all"
+                            />
+                            <button
+                                onClick={() => removeAttribute(category, index)}
+                                className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-0.5"
+                                title="Supprimer"
+                            >
+                                <Trash2 size={12} />
+                            </button>
+                        </div>
+                    ))}
                 </div>
 
                 {/* Secondary Attributes (Global Toggle) */}
@@ -363,12 +401,12 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
             <div>
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-slate-700 uppercase tracking-widest text-sm flex items-center gap-2">
-                        <LayoutGrid size={18} className="text-blue-600" /> Structure ({categories.length} / 4 Pavés)
+                        <LayoutGrid size={18} className="text-blue-600" /> Structure ({categories.length} / 5 Pavés)
                     </h3>
                     <button
                         onClick={addCategory}
-                        disabled={categories.length >= 4}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide transition-colors ${categories.length >= 4
+                        disabled={categories.length >= 5}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide transition-colors ${categories.length >= 5
                             ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                             : 'bg-slate-800 hover:bg-slate-700 text-white'}`}
                     >
@@ -376,7 +414,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                     </button>
                 </div>
 
-                <div className={`grid grid-cols-1 md:grid-cols-${Math.min(categories.length, 4)} gap-6`}>
+                <div className={`grid grid-cols-1 md:grid-cols-${Math.min(categories.length, 5)} gap-6`}>
                     {categories.map(cat => renderColumn(cat))}
                 </div>
             </div>
