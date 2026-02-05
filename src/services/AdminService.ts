@@ -67,13 +67,44 @@ export const AdminService = {
                     await supabase.from('libraries_traits').insert(traitsPayload);
                 }
 
-                // B. Skills
+                // B. Skills (Enhanced: Link Global vs Create Local)
                 if (initialRules.libraries.skills && initialRules.libraries.skills.length > 0) {
-                    const skillsPayload = initialRules.libraries.skills.map(s => ({
-                        setting_id: settingId,
-                        ...s
-                    }));
-                    await supabase.from('libraries_skills').insert(skillsPayload);
+                    // 1. Fetch all Global Skills to check against
+                    const { data: globalSkills } = await supabase
+                        .from('libraries_skills')
+                        .select('id, name')
+                        .is('setting_id', null);
+
+                    const globalSkillMap = new Map((globalSkills || []).map(s => [s.name.trim().toLowerCase(), s.id]));
+
+                    const skillsPayload: any[] = [];
+                    const linksPayload: any[] = [];
+
+                    initialRules.libraries.skills.forEach(s => {
+                        const normalizedName = s.name.trim().toLowerCase();
+                        if (globalSkillMap.has(normalizedName)) {
+                            // It's a global skill -> Link it
+                            linksPayload.push({
+                                setting_id: settingId,
+                                skill_id: globalSkillMap.get(normalizedName),
+                                is_active: true
+                            });
+                        } else {
+                            // It's not global -> Create Local
+                            skillsPayload.push({
+                                setting_id: settingId,
+                                ...s
+                            });
+                        }
+                    });
+
+                    if (skillsPayload.length > 0) {
+                        await supabase.from('libraries_skills').insert(skillsPayload);
+                    }
+
+                    if (linksPayload.length > 0) {
+                        await supabase.from('rel_setting_skills').insert(linksPayload);
+                    }
                 }
 
                 // C. Specializations

@@ -85,7 +85,8 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
     });
 
     const visibleLibrary = (rules.libraries.skills || []).filter(libItem =>
-        libItem.isVariable || !currentSkillNames.has(libItem.name.trim().toLowerCase())
+        (libItem.isVariable || !currentSkillNames.has(libItem.name.trim().toLowerCase())) &&
+        libItem.isActive !== false // Only show Active skills in the campaign reserve
     );
 
     return (
