@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.17.7",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Refactorisation majeure de l'éditeur d'attributs Admin (AdminAttributesEditor).",
+            "Extraction de la logique métier dans un hook personnalisé useAttributeEditor.ts.",
+            "Réduction de 70% de la taille du composant UI AdminAttributesEditor.",
+            "Amélioration de la maintenance et de la lisibilité de la gestion des attributs."
+        ]
+    },
+    {
         "version": "2.17.6",
         "date": "2026-02-06",
         "type": "patch",
