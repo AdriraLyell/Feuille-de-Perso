@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.17.9",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Hotfix : Correction de l'import manquant de l'icône Shield.",
+            "Hotfix : Suppression de la prop résiduelle onAddAttribute dans l'éditeur d'attributs."
+        ]
+    },
+    {
         "version": "2.17.8",
         "date": "2026-02-06",
         "type": "patch",

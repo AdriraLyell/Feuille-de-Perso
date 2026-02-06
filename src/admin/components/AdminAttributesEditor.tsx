@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { RulesData } from '../../types/rules';
-import { Zap, LayoutGrid, Info } from 'lucide-react';
+import { Zap, LayoutGrid, Info, Shield } from 'lucide-react';
 import ThematicModal from '../../components/ui/ThematicModal';
 import AttributeCategoryCard from './attributes/AttributeCategoryCard';
 import AttributePresetManager from './attributes/AttributePresetManager';
@@ -98,7 +98,6 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                             onUpdateLabel={actions.updateLabel}
                             onUpdatePrimary={actions.updateItemName}
                             onUpdateSecondary={actions.updateSecondaryItemName}
-                            onAddAttribute={actions.addAttribute}
                             onRemoveAttribute={actions.removeAttribute}
                             onRemoveCategory={actions.removeCategory}
                         />
