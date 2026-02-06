@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.17.11",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "UI : Alignement vertical parfait des titres de préréglages.",
+            "UI : Unification visuelle des cartes (bordures arrondies, ombres, fonds blancs).",
+            "UX : Ajout de hauteurs minimales garanties pour éviter les décalages de grille."
+        ]
+    },
+    {
         "version": "2.17.10",
         "date": "2026-02-06",
         "type": "patch",

@@ -62,42 +62,45 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                         <div
                             key={preset.id}
                             onClick={() => onLoadRequested(preset)}
-                            className="relative bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[80px]"
+                            className="relative bg-white border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded-lg p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[95px] shadow-sm hover:shadow-md"
                         >
                             <div>
-                                <div className="flex justify-between items-center mb-1 gap-2">
+                                <div className="flex justify-between items-center mb-1 gap-2 min-h-[20px]">
                                     <span className="font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate flex-grow">
                                         {preset.name}
                                     </span>
-                                    <div className="flex gap-0.5 items-center">
-                                        {preset.structure.map((pave: any, i: number) => {
-                                            const isSecondary = (preset.has_secondary || preset.hasSecondary);
-                                            return (
-                                                <div
-                                                    key={i}
-                                                    className={`flex flex-col gap-0.5 p-0.5 rounded-[1px] border ${isSecondary ? 'bg-amber-50/50 border-amber-100' : 'bg-slate-50 border-slate-200'}`}
-                                                >
-                                                    <div className="flex flex-col gap-0.5">
-                                                        {pave.attrs.slice(0, 4).map((_: any, j: number) => (
-                                                            <div key={j} className="w-0.5 h-0.5 rounded-full bg-blue-400/70" />
-                                                        ))}
+                                    <div className="flex items-center gap-1.5 shrink-0">
+                                        <div className="flex gap-0.5 items-center">
+                                            {preset.structure.map((pave: any, i: number) => {
+                                                const isSecondary = (preset.has_secondary || preset.hasSecondary);
+                                                return (
+                                                    <div
+                                                        key={i}
+                                                        className={`flex flex-col gap-0.5 p-0.5 rounded-[1px] border ${isSecondary ? 'bg-amber-50/50 border-amber-100' : 'bg-slate-50 border-slate-200'}`}
+                                                    >
+                                                        <div className="flex flex-col gap-0.5">
+                                                            {pave.attrs.slice(0, 4).map((_: any, j: number) => (
+                                                                <div key={j} className="w-0.5 h-0.5 rounded-full bg-blue-400/70" />
+                                                            ))}
+                                                        </div>
+                                                        {isSecondary && (
+                                                            <>
+                                                                <div className="h-[0.5px] bg-slate-200 w-full my-0.5" />
+                                                                <div className="flex flex-col gap-0.5">
+                                                                    <div className="w-0.5 h-0.5 rounded-full bg-amber-400" />
+                                                                </div>
+                                                            </>
+                                                        )}
                                                     </div>
-                                                    {isSecondary && (
-                                                        <>
-                                                            <div className="h-[0.5px] bg-slate-200 w-full my-0.5" />
-                                                            <div className="flex flex-col gap-0.5">
-                                                                <div className="w-0.5 h-0.5 rounded-full bg-amber-400" />
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                    <div className="shrink-0 flex items-center">
-                                        {preset.isOfficial ? (
-                                            <span title="Officiel"><Shield size={12} className="text-blue-400" /></span>
-                                        ) : (
+                                                );
+                                            })}
+                                        </div>
+                                        {preset.isOfficial && (
+                                            <span title="Officiel" className="shrink-0">
+                                                <Shield size={12} className="text-blue-500 fill-blue-50" />
+                                            </span>
+                                        )}
+                                        {!preset.isOfficial && (
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); onDeleteRequested(preset.id); }}
                                                 className="opacity-0 group-hover/card:opacity-100 text-slate-300 hover:text-red-500 transition-opacity"
@@ -107,11 +110,11 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                         )}
                                     </div>
                                 </div>
-                                <span className="block text-[10px] text-slate-500 italic line-clamp-2 leading-tight">
+                                <span className="block text-[10px] text-slate-500 italic line-clamp-2 leading-tight min-h-[24px]">
                                     {preset.description}
                                 </span>
                             </div>
-                            <div className="mt-1 flex items-center justify-between">
+                            <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2">
                                 <span className="block text-[10px] text-slate-400 italic font-medium">
                                     {preset.structure.length} Pavés
                                 </span>
@@ -122,48 +125,57 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
 
                     {/* Fallback to hardcoded if DB empty and not loading */}
                     {!isLoading && dbPresets.length === 0 && ATTRIBUTE_PRESETS.map((preset, idx) => (
-                        <button
+                        <div
                             key={`hc-${idx}`}
                             onClick={() => onLoadRequested(preset)}
-                            className="bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded p-3 text-left transition-all group/card flex flex-col justify-between min-h-[80px]"
+                            className="relative bg-white border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded-lg p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[95px] shadow-sm hover:shadow-md"
                         >
-                            <div className="flex justify-between items-center mb-1 gap-2">
-                                <div className="min-w-0 flex-grow">
-                                    <span className="block font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate">{preset.name}</span>
-                                    <span className="block text-[10px] text-slate-500 italic line-clamp-2 leading-tight">
-                                        {preset.description}
+                            <div>
+                                <div className="flex justify-between items-center mb-1 gap-2 min-h-[20px]">
+                                    <span className="font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate flex-grow">
+                                        {preset.name}
                                     </span>
-                                </div>
-                                <div className="flex gap-0.5 items-center shrink-0">
-                                    {preset.structure.map((pave: any, i: number) => {
-                                        const isSec = preset.hasSecondary;
-                                        return (
-                                            <div key={i} className={`flex flex-col gap-0.5 p-0.5 rounded-[1px] border ${isSec ? 'bg-amber-50/50 border-amber-100' : 'bg-white border-slate-100'}`}>
-                                                <div className="flex flex-col gap-0.5">
-                                                    {(pave.attrs || []).slice(0, 3).map((_: any, j: number) => (
-                                                        <div key={j} className="w-0.5 h-0.5 rounded-full bg-blue-400/70" />
-                                                    ))}
-                                                </div>
-                                                {isSec && (
-                                                    <>
-                                                        <div className="h-[0.5px] bg-slate-200 w-full my-0.5" />
+                                    <div className="flex items-center gap-1.5 shrink-0">
+                                        <div className="flex gap-0.5 items-center">
+                                            {preset.structure.map((pave: any, i: number) => {
+                                                const isSec = preset.hasSecondary;
+                                                return (
+                                                    <div key={i} className={`flex flex-col gap-0.5 p-0.5 rounded-[1px] border ${isSec ? 'bg-amber-50/50 border-amber-100' : 'bg-white border-slate-100'}`}>
                                                         <div className="flex flex-col gap-0.5">
-                                                            <div className="w-0.5 h-0.5 rounded-full bg-amber-400" />
+                                                            {(pave.attrs || []).slice(0, 3).map((_: any, j: number) => (
+                                                                <div key={j} className="w-0.5 h-0.5 rounded-full bg-blue-400/70" />
+                                                            ))}
                                                         </div>
-                                                    </>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                                        {isSec && (
+                                                            <>
+                                                                <div className="h-[0.5px] bg-slate-200 w-full my-0.5" />
+                                                                <div className="flex flex-col gap-0.5">
+                                                                    <div className="w-0.5 h-0.5 rounded-full bg-amber-400" />
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                        {preset.isOfficial && (
+                                            <span title="Officiel" className="shrink-0">
+                                                <Shield size={12} className="text-blue-500 fill-blue-50" />
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
+                                <span className="block text-[10px] text-slate-500 italic line-clamp-2 leading-tight min-h-[24px]">
+                                    {preset.description}
+                                </span>
                             </div>
-                            <div className="mt-1 flex items-center justify-between">
+                            <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2">
                                 <span className="block text-[10px] text-slate-400 italic font-medium">
                                     {preset.structure.length} Pavés
                                 </span>
                                 <Play size={10} className="text-slate-300 group-hover/card:text-amber-500 shrink-0" />
                             </div>
-                        </button>
+                        </div>
                     ))}
                 </div>
             </div>
