@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.17.10",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "UI : Suppression des doublons de texte 'X Pavés' dans les widgets de préréglages.",
+            "UI : Unification du rendu entre les préréglages officiels et personnalisés."
+        ]
+    },
+    {
         "version": "2.17.9",
         "date": "2026-02-06",
         "type": "patch",

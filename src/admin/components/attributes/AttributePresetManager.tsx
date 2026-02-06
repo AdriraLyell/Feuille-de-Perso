@@ -130,7 +130,9 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                             <div className="flex justify-between items-center mb-1 gap-2">
                                 <div className="min-w-0 flex-grow">
                                     <span className="block font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate">{preset.name}</span>
-                                    <span className="text-[10px] text-slate-400 italic font-medium leading-tight truncate">{preset.structure.length} Pavés</span>
+                                    <span className="block text-[10px] text-slate-500 italic line-clamp-2 leading-tight">
+                                        {preset.description}
+                                    </span>
                                 </div>
                                 <div className="flex gap-0.5 items-center shrink-0">
                                     {preset.structure.map((pave: any, i: number) => {
