@@ -62,15 +62,15 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                         <div
                             key={preset.id}
                             onClick={() => onLoadRequested(preset)}
-                            className="relative bg-white border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded-lg p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[95px] shadow-sm hover:shadow-md"
+                            className="relative bg-white border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded-lg p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[105px] shadow-sm hover:shadow-md"
                         >
                             <div>
-                                <div className="flex justify-between items-center mb-1 gap-2 min-h-[20px]">
-                                    <span className="font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate flex-grow">
+                                <div className="flex justify-between items-start mb-1 gap-2 min-h-[32px]">
+                                    <span className="font-bold text-slate-700 text-[11px] group-hover/card:text-amber-900 truncate flex-grow pt-0.5">
                                         {preset.name}
                                     </span>
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                        <div className="flex gap-0.5 items-center">
+                                    <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
+                                        <div className="flex gap-0.5 items-center h-full">
                                             {preset.structure.map((pave: any, i: number) => {
                                                 const isSecondary = (preset.has_secondary || preset.hasSecondary);
                                                 return (
@@ -128,15 +128,15 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                         <div
                             key={`hc-${idx}`}
                             onClick={() => onLoadRequested(preset)}
-                            className="relative bg-white border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded-lg p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[95px] shadow-sm hover:shadow-md"
+                            className="relative bg-white border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded-lg p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[105px] shadow-sm hover:shadow-md"
                         >
                             <div>
-                                <div className="flex justify-between items-center mb-1 gap-2 min-h-[20px]">
-                                    <span className="font-bold text-slate-700 text-xs group-hover/card:text-amber-900 truncate flex-grow">
+                                <div className="flex justify-between items-start mb-1 gap-2 min-h-[32px]">
+                                    <span className="font-bold text-slate-700 text-[11px] group-hover/card:text-amber-900 truncate flex-grow pt-0.5">
                                         {preset.name}
                                     </span>
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                        <div className="flex gap-0.5 items-center">
+                                    <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
+                                        <div className="flex gap-0.5 items-center h-full">
                                             {preset.structure.map((pave: any, i: number) => {
                                                 const isSec = preset.hasSecondary;
                                                 return (

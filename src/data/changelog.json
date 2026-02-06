@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.17.12",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "UI : Fix définitif de l'alignement vertical inter-widgets dans les préréglages d'attributs.",
+            "UI : Alignement par le haut (items-start) pour garantir une ligne de lecture constante."
+        ]
+    },
+    {
         "version": "2.17.11",
         "date": "2026-02-06",
         "type": "patch",
