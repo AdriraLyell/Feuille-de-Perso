@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.17.8",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "UI : Dé placement du bouton 'Ajouter un Attribut' dans le header de la section Attributs pour plus de clarté.",
+            "Nettoyage : Suppression des boutons d'ajout redondants sur chaque pavé d'attributs."
+        ]
+    },
+    {
         "version": "2.17.7",
         "date": "2026-02-06",
         "type": "patch",

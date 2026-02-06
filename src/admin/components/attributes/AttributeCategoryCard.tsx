@@ -10,7 +10,6 @@ interface AttributeCategoryCardProps {
     onUpdateLabel: (id: string, val: string) => void;
     onUpdatePrimary: (id: string, idx: number, val: string) => void;
     onUpdateSecondary: (id: string, idx: number, val: string) => void;
-    onAddAttribute: () => void;
     onRemoveAttribute: (idx: number) => void;
     onRemoveCategory: (id: string) => void;
 }
@@ -24,7 +23,6 @@ const AttributeCategoryCard: React.FC<AttributeCategoryCardProps> = ({
     onUpdateLabel,
     onUpdatePrimary,
     onUpdateSecondary,
-    onAddAttribute,
     onRemoveAttribute,
     onRemoveCategory
 }) => {
@@ -52,13 +50,6 @@ const AttributeCategoryCard: React.FC<AttributeCategoryCardProps> = ({
                 <h4 className="text-xs font-bold text-slate-600 uppercase flex items-center gap-1">
                     <Shield size={12} /> Primaires
                 </h4>
-                <button
-                    onClick={onAddAttribute}
-                    className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded hover:bg-blue-200 transition-colors font-bold"
-                    title="Ajouter un attribut à TOUS les pavés"
-                >
-                    +
-                </button>
             </div>
             <div className="space-y-1 mb-6 flex-grow">
                 {primaryAttrs.map((name, index) => (

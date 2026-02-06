@@ -68,11 +68,18 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                         </div>
 
                         <button
+                            onClick={actions.addAttribute}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide transition-colors bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                        >
+                            <Shield size={14} /> Ajouter un Attribut
+                        </button>
+
+                        <button
                             onClick={actions.addCategory}
                             disabled={categories.length >= 5}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide transition-colors ${categories.length >= 5
                                 ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                : 'bg-slate-800 hover:bg-slate-700 text-white'}`}
+                                : 'bg-slate-800 hover:bg-slate-700 text-white shadow-sm'}`}
                         >
                             <LayoutGrid size={14} /> Ajouter un Pavé
                         </button>
