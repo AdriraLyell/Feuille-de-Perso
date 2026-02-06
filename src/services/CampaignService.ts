@@ -4,6 +4,7 @@ import { GameSetting, RulesData, GameSettingSummary } from '../types/rules';
 export type { GameSetting, RulesData, GameSettingSummary };
 import { INITIAL_DATA } from '../data/initialState';
 import { LibraryService } from './LibraryService';
+import { migrateRulesToV2 } from '../utils/migrations';
 
 
 export const CampaignService = {
@@ -81,7 +82,7 @@ export const CampaignService = {
         // 2. Load Libraries
         const libraries = await LibraryService.loadLibraries(id);
 
-        const rules: RulesData = {
+        const rules: RulesData = migrateRulesToV2({
             version: settingData.version,
             lastUpdated: new Date(settingData.last_updated).getTime(),
             // @ts-ignore
@@ -89,9 +90,9 @@ export const CampaignService = {
             // @ts-ignore
             definitions: settingData.definitions,
             // @ts-ignore
-            theme: settingData.configurations.theme || { creationColor: "#000", xpColor: "#000" },
+            theme: settingData.configurations?.theme || { creationColor: "#000", xpColor: "#000" },
             libraries: libraries
-        };
+        });
 
         return rules;
     },

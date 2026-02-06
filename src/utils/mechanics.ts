@@ -8,6 +8,6 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 };
 
 // --- CARD CALCULATION LOGIC ---
-export const calculateCardValue = (data: CharacterSheetData): string | null => {
-    return RuleCalculationsService.calculateCardValue(data);
+export const calculateCardValue = (data: CharacterSheetData, rules?: RulesData): string | null => {
+    return RuleCalculationsService.calculateCardValue(data, rules || null);
 };

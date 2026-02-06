@@ -1,8 +1,8 @@
-
 import { useCallback, useMemo } from 'react';
-import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../types';
+import { CharacterSheetData, DotEntry } from '../types';
+import { RulesData } from '../types/rules';
 
-export const useSheetLayout = (data: CharacterSheetData) => {
+export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null) => {
 
     const attributeCategories = useMemo(() => data.attributeSettings || [
         { id: 'pave_attributs_1', label: 'Physique' },
@@ -20,59 +20,45 @@ export const useSheetLayout = (data: CharacterSheetData) => {
     }, [attributeCategories]);
 
     const getDynamicColumns = useCallback(() => {
-        // Helper to safely get items, defaulting to empty array if category missing
-        const getItems = (cat: SkillCategoryKey) => data.skills[cat] || [];
+        const skillCats = rules?.definitions?.skillCategories || [];
+        if (skillCats.length === 0) return []; // Fallback empty
 
-        // Setup the 5 fixed-position columns with their anchor lists
-        // We assume item height + header overhead (~2 items)
-        const columns = [
-            {
-                id: 0,
-                blocks: [{ title: 'Talents', items: getItems('talents'), cat: 'talents' }],
-                height: getItems('talents').length + 2
-            },
-            {
-                id: 1,
-                blocks: [{ title: 'Compétences', items: getItems('competences'), cat: 'competences' }],
-                height: getItems('competences').length + 2
-            },
-            {
-                id: 2,
-                blocks: [{ title: 'Compétences', items: getItems('competences_col_2'), cat: 'competences_col_2' }],
-                height: getItems('competences_col_2').length + 2
-            },
-            {
-                id: 3,
-                blocks: [{ title: 'Connaissances', items: getItems('connaissances'), cat: 'connaissances' }],
-                height: getItems('connaissances').length + 2
-            },
-            {
-                id: 4,
-                blocks: [] as { title: string, items: DotEntry[], cat: string }[],
-                height: 0
-            }
-        ];
+        // 1. Separate by behavior
+        const skills = skillCats.filter(c => c.behavior === 'Compétence' || c.behavior === 'Secondaire');
+        const backgrounds = skillCats.filter(c => c.behavior === 'Arrière-plan');
+        const counters = skillCats.filter(c => c.behavior === 'Compteur');
 
-        // The floating widgets that need to be placed
-        const floatingWidgets = [
-            { title: 'Autres Compétences', items: getItems('autres_competences'), cat: 'autres_competences' },
-            { title: 'Compétences Secondaires', items: getItems('competences2'), cat: 'competences2' },
-            { title: 'Autres', items: getItems('autres'), cat: 'autres' },
-        ];
+        // 2. Base columns (First 4 are usually the main ones)
+        // We use an adaptive approach: Divide 'skills' into 4-5 columns balancing height
+        const columnCount = 5;
+        const columns = Array.from({ length: columnCount }, (_, id) => ({
+            id,
+            blocks: [] as { title: string, items: DotEntry[], cat: string, description?: string, icon?: string }[],
+            height: 0
+        }));
 
-        // Distribute them to the shortest column
-        floatingWidgets.forEach(widget => {
-            if (widget.items.length === 0) return; // Skip empty widgets if desired, or keep them to show headers
-
-            // Find column with min height
+        // Distribute skills & secondaries
+        skills.forEach(cat => {
+            const items = data.skills[cat.id] || [];
+            // Find shortest column
             const targetCol = columns.reduce((prev, curr) => (prev.height < curr.height) ? prev : curr);
 
-            targetCol.blocks.push(widget);
-            targetCol.height += widget.items.length + 2;
+            targetCol.blocks.push({
+                title: cat.label,
+                items,
+                cat: cat.id,
+                description: cat.description,
+                icon: cat.icon
+            });
+            targetCol.height += items.length + 2;
         });
 
-        return columns;
-    }, [data.skills]);
+        return {
+            columns,
+            backgrounds: backgrounds.map(cat => ({ title: cat.label, items: data.skills[cat.id] || [], cat: cat.id })),
+            counters: counters.map(cat => ({ title: cat.label, id: cat.id }))
+        };
+    }, [data.skills, rules?.definitions?.skillCategories]);
 
     return {
         attributeCategories,

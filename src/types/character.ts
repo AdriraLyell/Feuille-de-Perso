@@ -54,16 +54,7 @@ export interface CharacterSheetData {
   // Metadata for attribute categories (order, labels)
   attributeSettings: AttributeCategoryDef[];
 
-  skills: {
-    talents: DotEntry[];
-    competences: DotEntry[]; // Center column top 1
-    competences_col_2: DotEntry[]; // Center column top 2 (New)
-    connaissances: DotEntry[]; // Right column top
-    competences2: DotEntry[]; // Center column bottom (Competences Secondaires)
-    autres_competences: DotEntry[]; // Left column bottom (Autres Competences)
-    autres: DotEntry[]; // Right column bottom (Autres)
-    arrieres_plans: DotEntry[]; // Right column bottom (Arrieres Plans)
-  };
+  skills: Record<string, DotEntry[]>;
   combat: {
     weapons: CombatEntry[];
     armor: {

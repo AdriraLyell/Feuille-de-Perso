@@ -65,5 +65,22 @@ export const AttributeService = {
             return false;
         }
         return true;
+    },
+
+    /**
+     * Update an attribute preset metadata
+     */
+    async updateAttributePreset(id: string, updates: { name?: string; description?: string }): Promise<boolean> {
+        // Map camelCase to snake_case if needed (none here as name/description are same)
+        const { error } = await supabase
+            .from('attribute_presets')
+            .update(updates)
+            .eq('id', id);
+
+        if (error) {
+            console.error('Error updating attribute preset:', error);
+            return false;
+        }
+        return true;
     }
 };

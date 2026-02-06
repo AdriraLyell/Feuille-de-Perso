@@ -14,8 +14,8 @@ type DragItem = { type: 'admin_sheet_skill' | 'admin_lib_skill', category?: stri
 
 const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }) => {
     const definitions = rules.definitions;
-    const skillsMap = definitions.skills;
-    const labelsMap = definitions.labels || {};
+    const skillsMap = definitions.skills || {};
+    const skillCategories = definitions.skillCategories || [];
     const [draggedItem, setDraggedItem] = useState<DragItem | null>(null);
     const [syncSuccess, setSyncSuccess] = useState<string | null>(null);
 
@@ -58,10 +58,10 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
         let currentRules = { ...rules };
         let addedCount = 0;
 
-        Object.keys(currentRules.definitions.skills).forEach(category => {
-            const skills = currentRules.definitions.skills[category] || [];
+        skillCategories.forEach(cat => {
+            const skills = skillsMap[cat.id] || [];
             skills.forEach(skillName => {
-                const updated = ensureSkillInLibrary(skillName, category, currentRules);
+                const updated = ensureSkillInLibrary(skillName, cat.id, currentRules);
                 if (updated) {
                     currentRules = updated;
                     addedCount++;
@@ -97,13 +97,43 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
             ...rules,
             definitions: {
                 ...rules.definitions,
-                labels: {
-                    ...rules.definitions.labels,
-                    [category]: newLabel
-                }
+                skillCategories: skillCategories.map(cat =>
+                    cat.id === category ? { ...cat, label: newLabel } : cat
+                )
             }
         });
     };
+
+    const updateBehavior = (category: string, behavior: any) => {
+        // Déterminer les coûts par défaut selon le behavior
+        let factor = 1;
+        let type: 'linear' | 'triangular' = 'triangular';
+
+        if (behavior === 'Secondaire') {
+            factor = 0.5;
+            type = 'triangular';
+        } else if (behavior === 'Arrière-plan' || behavior === 'Compteur') {
+            factor = 1;
+            type = 'linear';
+        }
+
+        onUpdate({
+            ...rules,
+            definitions: {
+                ...rules.definitions,
+                skillCategories: skillCategories.map(cat =>
+                    cat.id === category
+                        ? {
+                            ...cat,
+                            behavior,
+                            costConfig: { factor, type } // Mise à jour automatique des coûts
+                        }
+                        : cat
+                )
+            }
+        });
+    };
+
 
     const addSkill = (category: string, isSpacer = false) => {
         const currentList = skillsMap[category] || [];
@@ -212,32 +242,28 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
                     </button>
                 </div>
 
-                {/* Grid Rows */}
-                {[
-                    ["talents", "competences", "competences_col_2", "connaissances"],
-                    ["autres_competences", "competences2", "autres", "arrieres_plans"],
-                    ["counters"]
-                ].map((row, rIdx) => (
-                    <div key={rIdx} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {row.map(cat => (
-                            <SkillCategoryCard
-                                key={cat}
-                                id={cat}
-                                label={labelsMap[cat] || cat}
-                                skills={skillsMap[cat] || []}
-                                isDraggingSidebarItem={draggedItem?.type === 'admin_lib_skill'}
-                                onUpdateLabel={updateLabel}
-                                onUpdateSkill={updateSkillName}
-                                onAddSkill={addSkill}
-                                onRemoveSkill={removeSkill}
-                                onSkillBlur={handleSkillBlur}
-                                onDragStart={(e, idx, name) => handleDragStart(e, cat, idx, name)}
-                                onDrop={(e, idx) => handleDropOnColumn(e, cat, idx)}
-                                draggedItemInfo={draggedItem}
-                            />
-                        ))}
-                    </div>
-                ))}
+                {/* Dynamic Columns Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {skillCategories.map(cat => (
+                        <SkillCategoryCard
+                            key={cat.id}
+                            id={cat.id}
+                            label={cat.label}
+                            categoryConfig={cat}
+                            skills={skillsMap[cat.id] || []}
+                            isDraggingSidebarItem={draggedItem?.type === 'admin_lib_skill'}
+                            onUpdateLabel={updateLabel}
+                            onUpdateBehavior={updateBehavior}
+                            onUpdateSkill={updateSkillName}
+                            onAddSkill={addSkill}
+                            onRemoveSkill={removeSkill}
+                            onSkillBlur={handleSkillBlur}
+                            onDragStart={(e, idx, name) => handleDragStart(e, cat.id, idx, name)}
+                            onDrop={(e, idx) => handleDropOnColumn(e, cat.id, idx)}
+                            draggedItemInfo={draggedItem}
+                        />
+                    ))}
+                </div>
             </div>
 
             <AdminSkillLibrarySidebar

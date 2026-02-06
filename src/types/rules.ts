@@ -41,6 +41,21 @@ export interface RulesCardConfig {
     maxLabel: string;
 }
 
+export type SkillBehavior = 'Compétence' | 'Secondaire' | 'Arrière-plan' | 'Compteur';
+
+export interface SkillCategoryConfig {
+    id: string;               // Ex: Col_Comp_1
+    behavior: SkillBehavior;
+    label: string;            // Titre affiché
+    description?: string;     // Info-bulle optionnelle
+    icon?: string;            // Nom de l'icône Lucide ou Emoji
+    allowSpecializations: boolean;
+    costConfig: {
+        factor: number;
+        type: 'triangular' | 'linear';
+    };
+}
+
 export interface RulesCounterDefinition {
     id: string;
     name: string;
@@ -64,10 +79,11 @@ export interface RulesData {
     definitions: {
         attributes: Record<string, string[]>;
         secondaryAttributes: Record<string, string[]>;
-        skills: Record<string, string[]>; // Categories -> List of skill names
+        skills: Record<string, string[]>; // Keep for data mapping compatibility (Legacy)
+        skillCategories: SkillCategoryConfig[]; // NEW: Tableau ordonné des colonnes
         counters: Record<string, RulesCounterDefinition>; // Dynamic Counters
         backgrounds: string[]; // List of available backgrounds
-        labels: Record<string, string>;   // Category ID -> Display Label
+        labels: Record<string, string>;   // Category ID -> Display Label (Legacy)
     };
     theme: RulesThemeConfig;
     libraries: {

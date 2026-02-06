@@ -1,6 +1,6 @@
 import React from 'react';
 import { RulesData } from '../../types/rules';
-import { Coins, AlertTriangle, Calculator, TrendingUp } from 'lucide-react';
+import { Coins, AlertTriangle, Calculator, TrendingUp, Sigma, Zap, BarChart3, Info } from 'lucide-react';
 import { RuleCalculationsService } from '../../services/RuleCalculationsService';
 
 interface AdminCostsEditorProps {
@@ -42,174 +42,132 @@ const AdminCostsEditor: React.FC<AdminCostsEditorProps> = ({ rules, onUpdate }) 
         });
     };
 
+    const updateCategoryCost = (id: string, factor: number, type: 'linear' | 'triangular') => {
+        onUpdate({
+            ...rules,
+            definitions: {
+                ...rules.definitions,
+                skillCategories: rules.definitions.skillCategories.map(cat =>
+                    cat.id === id ? { ...cat, costConfig: { factor, type } } : cat
+                )
+            }
+        });
+    };
+
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-2">
 
+            {/* MAIN SECTION: SKILL CATEGORY ECONOMY */}
             <div className="bg-white p-8 rounded shadow-sm border border-slate-200">
                 <h3 className="font-bold text-slate-800 text-lg mb-6 flex items-center gap-2 border-b pb-2 px-2">
-                    <Coins size={20} className="text-amber-500" /> Gestion des Coûts (XP)
+                    <Coins size={20} className="text-amber-500" /> Économie des Compétences
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-slate-100 italic text-slate-400 text-[10px] uppercase tracking-widest">
+                                <th className="pb-3 px-2 font-bold">Catégorie</th>
+                                <th className="pb-3 px-2 font-bold">Behavior</th>
+                                <th className="pb-3 px-4 font-bold text-center">Formule</th>
+                                <th className="pb-3 px-2 font-bold text-right w-32">Facteur</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            {rules.definitions.skillCategories.map(cat => (
+                                <tr key={cat.id} className="hover:bg-slate-50/50 transition-colors group">
+                                    <td className="py-4 px-2">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
+                                                <Zap size={14} />
+                                            </div>
+                                            <div>
+                                                <div className="text-sm font-bold text-slate-700">{cat.label}</div>
+                                                <div className="text-[10px] text-slate-400 font-mono tracking-tighter uppercase">{cat.id}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-2">
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${cat.behavior === 'Compétence' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                            cat.behavior === 'Arrière-plan' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                                                cat.behavior === 'Secondaire' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                    'bg-slate-50 text-slate-600 border-slate-100'
+                                            }`}>
+                                            {cat.behavior}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-4">
+                                        <div className="flex items-center justify-center gap-1">
+                                            <div className="inline-flex bg-slate-100 p-1 rounded-sm gap-1">
+                                                <button
+                                                    onClick={() => updateCategoryCost(cat.id, cat.costConfig.factor, 'triangular')}
+                                                    className={`px-3 py-1 rounded-sm text-[10px] font-bold transition-all flex items-center gap-1 ${cat.costConfig.type === 'triangular'
+                                                        ? 'bg-white text-blue-600 shadow-sm ring-1 ring-slate-200'
+                                                        : 'text-slate-400 hover:text-slate-600'
+                                                        }`}
+                                                    title="Somme triangulaire (1+2+3...)"
+                                                >
+                                                    <BarChart3 size={12} /> Triangulaire
+                                                </button>
+                                                <button
+                                                    onClick={() => updateCategoryCost(cat.id, cat.costConfig.factor, 'linear')}
+                                                    className={`px-3 py-1 rounded-sm text-[10px] font-bold transition-all flex items-center gap-1 ${cat.costConfig.type === 'linear'
+                                                        ? 'bg-white text-emerald-600 shadow-sm ring-1 ring-slate-200'
+                                                        : 'text-slate-400 hover:text-slate-600'
+                                                        }`}
+                                                    title="Progression par palier fixe"
+                                                >
+                                                    <TrendingUp size={12} /> Linéaire
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-2 text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <span className="text-xs text-slate-300 font-bold">x</span>
+                                            <input
+                                                type="number"
+                                                step="0.1"
+                                                value={cat.costConfig.factor}
+                                                onChange={(e) => updateCategoryCost(cat.id, parseFloat(e.target.value) || 0, cat.costConfig.type)}
+                                                className="w-16 p-2 border border-slate-200 rounded text-center font-bold text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                                            />
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
 
-                    {/* Progression Scale Logic */}
-                    <div className="bg-slate-50 p-6 rounded border border-slate-200">
-                        <h4 className="font-bold text-slate-700 text-sm uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <Calculator size={16} /> Formule de Progression
-                        </h4>
-
-                        <div className="bg-blue-50 border border-blue-100 p-3 rounded mb-6 text-xs text-blue-900 leading-relaxed">
-                            <p className="font-bold mb-1">Règle Triangulaire :</p>
-                            <p>Le coût est calculé selon le rang atteint :</p>
-                            <ul className="list-disc ml-4 mt-1 space-y-0.5">
-                                <li>Rang 1 = {RuleCalculationsService.triangular(1)} XP</li>
-                                <li>Rang 2 = 1+2 = {RuleCalculationsService.triangular(2)} XP</li>
-                                <li>Rang {exampleRank} = 1+2+3 = {exampleTriangular} XP</li>
-                            </ul>
-                            <p className="mt-2 text-blue-700">Le coût final est : <strong>Coût Base x Facteur</strong></p>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-slate-600">Facteur Compétence</label>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs text-slate-400 font-bold">x</span>
-                                    <input
-                                        type="number"
-                                        step="0.1"
-                                        value={costs.skillFactor}
-                                        onChange={(e) => updateFactor('skillFactor', parseFloat(e.target.value) || 0)}
-                                        className="w-20 p-2 border border-slate-300 rounded text-center font-bold"
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-slate-600">Facteur Spécialisation</label>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs text-slate-400 font-bold">x</span>
-                                    <input
-                                        type="number"
-                                        step="0.1"
-                                        value={costs.specializationFactor}
-                                        onChange={(e) => updateFactor('specializationFactor', parseFloat(e.target.value) || 0)}
-                                        className="w-20 p-2 border border-slate-300 rounded text-center font-bold"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Linear Costs */}
-                    <div className="bg-slate-50 p-6 rounded border border-slate-200">
-                        <h4 className="font-bold text-slate-700 text-sm uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <TrendingUp size={16} /> Progression Linéaire
-                        </h4>
-                        <div className="bg-emerald-50 border border-emerald-100 p-3 rounded mb-6 text-xs text-emerald-900 leading-relaxed">
-                            <p className="font-bold mb-1">Coût Fixe par Point :</p>
-                            <p>Le coût est proportionnel à l'augmentation.</p>
-                            <p className="mt-2 text-emerald-700">Coût = <strong>Différence x Coût Unitaire</strong></p>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-slate-600">Coût d'Attribut (par point)</label>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="number"
-                                        step="1"
-                                        value={costs.attributeFactor ?? 6}
-                                        onChange={(e) => updateFactor('attributeFactor', parseFloat(e.target.value) || 0)}
-                                        className="w-20 p-2 border border-slate-300 rounded text-center font-bold"
-                                    />
-                                    <span className="text-xs text-slate-400 font-bold">XP</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Creation Costs */}
-                    <div className="bg-slate-50 p-6 rounded border border-slate-200">
-                        <h4 className="font-bold text-slate-700 text-sm uppercase tracking-widest">Création (Achat Fixe)</h4>
-                        <div className="space-y-4">
-                            <div className="bg-amber-50 p-3 rounded border border-amber-200 text-xs text-amber-800 mb-4 flex gap-2">
-                                <AlertTriangle size={16} />
-                                Ces coûts concernent uniquement la création de personnage ("Mode Points").
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-slate-600">Coût d'Attribut (1 point)</label>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="number"
-                                        value={creationConfig.attributeCost ?? 6}
-                                        onChange={(e) => updateCreationCost('attributeCost', parseInt(e.target.value) || 0)}
-                                        className="w-20 p-2 border border-slate-300 rounded text-center font-bold"
-                                    />
-                                    <span className="text-xs text-slate-400 font-bold w-6">XP</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                <div className="mt-6 bg-slate-50 p-4 rounded border border-dashed border-slate-200 text-xs text-slate-500 italic flex gap-3 items-center">
+                    <Info size={16} className="text-slate-400 shrink-0" />
+                    Le coût total d'une compétence est calculé ainsi : [Valeur selon Formule] × [Facteur].
+                    Par exemple, Rang 3 en Triangulaire (1+2+3=6) avec un facteur de x3 coûte 18 XP.
                 </div>
             </div>
 
-            {/* LIMITS SECTION */}
+            {/* ATTRIBUTES SECTION */}
             <div className="bg-white p-8 rounded shadow-sm border border-slate-200">
                 <h3 className="font-bold text-slate-800 text-lg mb-6 flex items-center gap-2 border-b pb-2 px-2">
-                    <AlertTriangle size={20} className="text-red-500" /> Limites & Bornes
+                    <Calculator size={20} className="text-blue-500" /> Gestion des Attributs
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-4">
-                        <h4 className="font-bold text-slate-700 text-sm uppercase tracking-widest">Globales</h4>
-                        <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium text-slate-600">Score Maximum Absolu</label>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="number"
-                                    value={rules.configurations.global.maxAttributeScore}
-                                    onChange={(e) => onUpdate({
-                                        ...rules,
-                                        configurations: {
-                                            ...rules.configurations,
-                                            global: {
-                                                ...rules.configurations.global,
-                                                maxAttributeScore: parseInt(e.target.value) || 5
-                                            }
-                                        }
-                                    })}
-                                    className="w-20 p-2 border border-slate-300 rounded text-center font-bold"
-                                />
-                                <span className="text-xs text-slate-400 font-bold w-6">pts</span>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div className="space-y-4">
-                        <h4 className="font-bold text-slate-700 text-sm uppercase tracking-widest">À la Création</h4>
-                        <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium text-slate-600">Minimum par Attribut</label>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="number"
-                                    value={creationConfig.attributeMin ?? 1}
-                                    onChange={(e) => updateCreationCost('attributeMin', parseInt(e.target.value) || 0)}
-                                    className="w-20 p-2 border border-slate-300 rounded text-center font-bold"
-                                />
-                                <span className="text-xs text-slate-400 font-bold w-6">pts</span>
-                            </div>
+                <div className="bg-slate-50 p-6 rounded border border-slate-200 max-w-md">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <label className="text-sm font-bold text-slate-700">Coût d'Attribut (XP)</label>
+                            <p className="text-[10px] text-slate-400 italic">Prix d'un point lors de la progression (Linéaire).</p>
                         </div>
-                        <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium text-slate-600">Maximum par Attribut</label>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="number"
-                                    value={creationConfig.attributeMax ?? 5}
-                                    onChange={(e) => updateCreationCost('attributeMax', parseInt(e.target.value) || 5)}
-                                    className="w-20 p-2 border border-slate-300 rounded text-center font-bold"
-                                />
-                                <span className="text-xs text-slate-400 font-bold w-6">pts</span>
-                            </div>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="number"
+                                step="1"
+                                value={costs.attributeFactor ?? 6}
+                                onChange={(e) => updateFactor('attributeFactor', parseFloat(e.target.value) || 0)}
+                                className="w-16 p-2 border border-slate-200 rounded text-center font-bold text-sm bg-white outline-none focus:ring-2 focus:ring-blue-100"
+                            />
+                            <span className="text-xs text-slate-300 font-bold uppercase">XP</span>
                         </div>
                     </div>
                 </div>

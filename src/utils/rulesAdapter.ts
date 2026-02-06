@@ -89,29 +89,27 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
     }
 
     // 6. Update Skills Definition
-    // We need to update both the default 'skills' lists on the sheet AND the 'skillLibrary'
+    // We update both the sheet 'skills' lists AND the 'skillLibrary'
     const ruleSkills = rules.definitions.skills;
-    if (ruleSkills) {
+    const ruleCategories = rules.definitions.skillCategories;
+
+    if (ruleCategories && ruleCategories.length > 0) {
         const newSkills: Record<string, DotEntry[]> = {};
         const newSkillLibrary: LibrarySkillEntry[] = [];
 
-        Object.keys(ruleSkills).forEach(category => {
-            const names = ruleSkills[category];
+        ruleCategories.forEach(cat => {
+            const names = ruleSkills ? ruleSkills[cat.id] : [];
+            if (!names) {
+                newSkills[cat.id] = [];
+                return;
+            }
 
             // Build the sheet skill list
-            newSkills[category] = names.map(name => {
+            newSkills[cat.id] = names.map(name => {
                 if (!name || name.trim() === "") {
-                    return {
-                        id: generateId(),
-                        name: "", // Spacer
-                        value: 0,
-                        creationValue: 0,
-                        max: 0,
-                        variant: ""
-                    };
+                    return { id: generateId(), name: "", value: 0, creationValue: 0, max: 0, variant: "" };
                 }
 
-                // Check library for variable status
                 const libSkill = rules.libraries?.skills?.find(s => s.name === name);
                 const isVariable = libSkill?.isVariable === true;
 
@@ -121,41 +119,65 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
                     value: 0,
                     creationValue: 0,
                     max: rules.configurations.global.maxSkillScore,
-                    variant: isVariable ? "" : undefined // Only set variant if specifically variable
+                    variant: isVariable ? "" : undefined
                 };
             });
 
             // Build the library entries
             names.forEach(name => {
-                if (!name || name.trim() === "") return; // Skip spacers for library
-
+                if (!name || name.trim() === "") return;
                 newSkillLibrary.push({
                     id: generateId(),
                     name: name,
-                    defaultCategory: category,
+                    defaultCategory: cat.id,
                     description: "",
-                    isVariable: false // We assume false by default for rules-defined skills unless specified otherwise
+                    isVariable: false
                 });
             });
         });
 
-        // Initialize empty arrays for standard categories if not in rules, to avoid crashes
-        const standardCats = ['talents', 'competences', 'competences_col_2', 'connaissances', 'competences2', 'autres_competences', 'autres', 'arrieres_plans'];
-        standardCats.forEach(cat => {
-            if (!newSkills[cat]) newSkills[cat] = [];
-        });
+        newState.skills = newSkills;
+        newState.skillLibrary = newSkillLibrary;
+    } else if (ruleSkills) {
+        // Fallback Legacy (Old definitions.skills Record)
+        const newSkills: Record<string, DotEntry[]> = {};
+        const newSkillLibrary: LibrarySkillEntry[] = [];
 
-        newState.skills = newSkills as any; // Cast to bypass strict key checks
-        newState.skillLibrary = newSkillLibrary; // This replaces the hardcoded library
+        Object.keys(ruleSkills).forEach(category => {
+            const names = ruleSkills[category];
+            newSkills[category] = names.map(name => {
+                if (!name || name.trim() === "") return { id: generateId(), name: "", value: 0, creationValue: 0, max: 0, variant: "" };
+                const libSkill = rules.libraries?.skills?.find(s => s.name === name);
+                return {
+                    id: generateId(),
+                    name: name,
+                    value: 0,
+                    creationValue: 0,
+                    max: rules.configurations.global.maxSkillScore,
+                    variant: libSkill?.isVariable ? "" : undefined
+                };
+            });
+
+            names.forEach(name => {
+                if (!name || name.trim() === "") return;
+                newSkillLibrary.push({ id: generateId(), name: name, defaultCategory: category, description: "", isVariable: false });
+            });
+        });
+        newState.skills = newSkills;
+        newState.skillLibrary = newSkillLibrary;
     }
 
-    // 7. Update Backgrounds (if defined in rules)
+    // Ensure all 9 columns exist even if not defined in rules
+    const requiredCats = ['Col_Comp_1', 'Col_Comp_2', 'Col_Comp_3', 'Col_Comp_4', 'Col_Comp_5', 'Col_Comp_6', 'Col_Comp_7', 'Col_Comp_8', 'Col_Comp_9'];
+    requiredCats.forEach(cat => {
+        if (!newState.skills[cat]) newState.skills[cat] = [];
+    });
+
+    // 7. Update Backgrounds (if defined in rules as string array)
     const ruleBackgrounds = rules.definitions.backgrounds;
     if (ruleBackgrounds && Array.isArray(ruleBackgrounds)) {
-        // Map to DotEntry[] for skills.arrieres_plans
-        // @ts-ignore
-        newState.skills.arrieres_plans = ruleBackgrounds.map(name => {
-            // Check library for variable status (Backgrounds use LibrarySkillEntry structure)
+        // Map to DotEntry[] for legacy arrieres_plans and Col_Comp_8
+        const bgEntries = ruleBackgrounds.map(name => {
             const libBg = rules.libraries?.backgrounds?.find(b => b.name === name);
             const isVariable = libBg?.isVariable === true;
 
@@ -165,9 +187,11 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
                 value: 0,
                 creationValue: 0,
                 max: 5,
-                variant: isVariable ? "" : undefined // Only set variant if specifically variable
+                variant: isVariable ? "" : undefined
             };
         });
+
+        newState.skills.Col_Comp_8 = bgEntries;
     }
 
     // 8. Update Counters

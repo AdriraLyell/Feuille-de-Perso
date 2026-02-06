@@ -75,43 +75,56 @@ export const RuleCalculationsService = {
             return effect ? effect.value : 0;
         };
 
-        // Compétences Standard
-        const standardCategories: SkillCategoryKey[] = [
-            'talents', 'competences', 'competences_col_2', 'connaissances',
-            'autres_competences', 'autres'
-        ];
+        // Calcul des Compétences basé sur skillCategories (Dynamique)
+        const categories = rules?.definitions?.skillCategories;
 
-        standardCategories.forEach(key => {
-            const skillList = data.skills[key];
-            if (Array.isArray(skillList)) {
+        if (categories && categories.length > 0) {
+            categories.forEach(cat => {
+                const skillList = data.skills[cat.id];
+                if (!Array.isArray(skillList)) return;
+
+                const factor = cat.costConfig?.factor ?? skillFactor;
+                const isTriangular = cat.costConfig?.type === 'triangular';
+
                 skillList.forEach(skill => {
                     const freeLimit = getFreeRankLimit(skill.name);
                     const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
-                    totalSpent += this.getXPCost(skill.value, effectiveCreationValue, skillFactor, true);
+                    totalSpent += this.getXPCost(skill.value, effectiveCreationValue, factor, isTriangular);
+                });
+            });
+        } else {
+            // Fallback Legacy (Anciens persos ou règles sans skillCategories)
+            const standardCategories = ['talents', 'competences', 'competences_col_2', 'connaissances', 'autres_competences', 'autres', 'Col_Comp_1', 'Col_Comp_2', 'Col_Comp_3', 'Col_Comp_4', 'Col_Comp_5', 'Col_Comp_7'];
+            standardCategories.forEach(key => {
+                const list = data.skills[key];
+                if (Array.isArray(list)) {
+                    list.forEach(skill => {
+                        const freeLimit = getFreeRankLimit(skill.name);
+                        const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
+                        totalSpent += this.getXPCost(skill.value, effectiveCreationValue, skillFactor, true);
+                    });
+                }
+            });
+
+            const secondSkills = data.skills.competences2 || data.skills.Col_Comp_6;
+            if (Array.isArray(secondSkills)) {
+                secondSkills.forEach(skill => {
+                    const freeLimit = getFreeRankLimit(skill.name);
+                    const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
+                    totalSpent += this.getXPCost(skill.value, effectiveCreationValue, specFactor, true);
                 });
             }
-        });
 
-        // Compétences Secondaires
-        const secondSkills = data.skills.competences2;
-        if (Array.isArray(secondSkills)) {
-            secondSkills.forEach(skill => {
-                const freeLimit = getFreeRankLimit(skill.name);
-                const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
-                totalSpent += this.getXPCost(skill.value, effectiveCreationValue, specFactor, true);
-            });
+            const bgCostValue = data.creationConfig?.backgroundCost ?? 2;
+            const backgroundSkills = data.skills.arrieres_plans || data.skills.Col_Comp_8;
+            if (Array.isArray(backgroundSkills)) {
+                backgroundSkills.forEach(skill => {
+                    totalSpent += this.getXPCost(skill.value, skill.creationValue || 0, bgCostValue, false);
+                });
+            }
         }
 
-        // Arrière-Plans (Coût Linéaire)
-        const bgCost = data.creationConfig?.backgroundCost ?? 2;
-        const backgroundSkills = data.skills.arrieres_plans;
-        if (Array.isArray(backgroundSkills)) {
-            backgroundSkills.forEach(skill => {
-                totalSpent += this.getXPCost(skill.value, skill.creationValue || 0, bgCost, false);
-            });
-        }
-
-        // Compteurs (Volonté, Confiance, etc.)
+        // Compteurs (toujours géré par rules.definitions.counters pour l'instant)
         const rulesCounters = rules?.definitions?.counters;
         if (rulesCounters && data.counters) {
             Object.keys(data.counters).forEach(key => {
@@ -130,11 +143,11 @@ export const RuleCalculationsService = {
             }
         }
 
-        // Spécialisations
+        // Spécialisations (Coût 0 par défaut)
         const specs = data.specializations || {};
         Object.values(specs).forEach(list => {
-            // Une spécialisation coûte Triangle(1) * specFactor = 1 * factor
-            totalSpent += list.length * (1 * specFactor);
+            // Les spécialisations ne coûtent plus d'XP
+            totalSpent += 0;
         });
 
         // Attributs (Coût Linéaire)
@@ -169,25 +182,32 @@ export const RuleCalculationsService = {
     /**
      * Calcule la valeur de la carte de tarot basée sur les meilleures compétences
      */
-    calculateCardValue(data: CharacterSheetData): string | null {
+    calculateCardValue(data: CharacterSheetData, rules: RulesData | null): string | null {
         const cardConfig = data.creationConfig?.cardConfig;
         if (!cardConfig || !cardConfig.active) return null;
 
-        const allSkills: number[] = [];
-        Object.keys(data.skills).forEach(key => {
-            if (key === 'arrieres_plans') return;
-            // @ts-ignore
-            const list = data.skills[key] || [];
+        const cardSkills: number[] = [];
+        const rulesCategories = data.skills;
+
+        Object.keys(rulesCategories).forEach(key => {
+            // On ignore les arrière-plans et compteurs pour le tarot (Logique métier)
+            const catConfig = data.creationConfig?.rankSlots ? rules?.definitions?.skillCategories?.find(c => c.id === key) : null;
+            if (catConfig && (catConfig.behavior === 'Arrière-plan' || catConfig.behavior === 'Compteur')) return;
+
+            // Fallback pour anciens IDs
+            if (key === 'arrieres_plans' || key === 'counters' || key === 'Col_Comp_8' || key === 'Col_Comp_9') return;
+
+            const list = rulesCategories[key] || [];
             list.forEach((skill: DotEntry) => {
                 if (skill.name && skill.value > 0) {
-                    allSkills.push(skill.value);
+                    cardSkills.push(skill.value);
                 }
             });
         });
 
-        allSkills.sort((a, b) => b - a);
-        const n = cardConfig.bestSkillsCount;
-        const topSkills = allSkills.slice(0, n);
+        cardSkills.sort((a, b) => b - a);
+        const n = cardConfig.bestSkillsCount || 3;
+        const topSkills = cardSkills.slice(0, n);
         while (topSkills.length < n) topSkills.push(0);
 
         const average = topSkills.reduce((a, b) => a + b, 0) / n;

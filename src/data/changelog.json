@@ -1,5 +1,127 @@
 [
     {
+        "version": "2.17.24",
+        "date": "2026-02-06",
+        "type": "cleanup",
+        "changes": [
+            "Suppression de la section redondante 'Limites & Bornes' dans l'onglet Coûts.",
+            "Consolidation des paramètres de limites d'attributs exclusivement dans l'onglet Création.",
+            "Retrait du réglage 'Score Maximal Absolu' (non fonctionnel)."
+        ]
+    },
+    {
+        "version": "2.17.23",
+        "date": "2026-02-06",
+        "type": "cleanup",
+        "changes": [
+            "Simplification de la gestion des attributs : suppression du coût initial redondant.",
+            "Standardisation du coût de progression des attributs à 6 XP par défaut.",
+            "Nettoyage des facteurs de coûts globaux (Spécialisations à 0, Skills à 1)."
+        ]
+    },
+    {
+        "version": "2.17.22",
+        "date": "2026-02-06",
+        "type": "cleanup",
+        "changes": [
+            "Suppression du coût en XP des spécialisations : elles sont désormais gratuites par défaut.",
+            "Nettoyage de l'interface Admin : retrait du multiplicateur de spécialisation.",
+            "Simplification de la section de gestion des attributs."
+        ]
+    },
+    {
+        "version": "2.17.21",
+        "date": "2026-02-06",
+        "type": "cleanup",
+        "changes": [
+            "Nettoyage de l'onglet Coûts & Limites : Suppression des widgets redondants 'Formule de Progression' et 'Progression Linéaire'.",
+            "Consolidation des réglages d'Attributs et Spécialisations dans une section unifiée.",
+            "Amélioration de la lisibilité de l'interface Admin par la suppression du facteur global de compétence devenu obsolète.",
+            "Optimisation du layout pour mettre l'accent sur l'Économie des Compétences."
+        ]
+    },
+    {
+        "version": "2.17.20",
+        "date": "2026-02-06",
+        "type": "feature",
+        "changes": [
+            "Automatisation des coûts par Behavior : Changer le type d'une catégorie (ex: Secondaire) met à jour automatiquement sa formule et son facteur.",
+            "Affinement des économies par défaut : Compétences (x1 Triangulaire), Secondaires (x0.5 Triangulaire), Arrière-plans (x1 Linéaire), Compteurs (x1 Linéaire).",
+            "Harmonisation de la migration des règles héritées vers les nouveaux standards économiques.",
+            "Mise à jour des règles par défaut pour les nouvelles fiches personnages."
+        ]
+    },
+    {
+        "version": "2.17.19",
+        "date": "2026-02-06",
+        "type": "feature",
+        "changes": [
+            "Centralisation de la gestion des coûts de compétences dans l'onglet 'Coûts & Limites'.",
+            "Nouvelle interface 'Économie des Compétences' permettant de régler Facteurs et Formules (Linéaire/Triangulaire) par catégorie.",
+            "Nettoyage de l'éditeur de layout (Compétences) pour une interface plus aérée.",
+            "Amélioration de la cohérence visuelle des indicateurs de behavior."
+        ]
+    },
+    {
+        "version": "2.17.18",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Correction de la synchronisation des bibliothèques (Arrière-plans et Compteurs) lors de la création d'un nouveau setting.",
+            "Alignement du LibraryService sur les identifiants de colonnes génériques (Col_Comp_8/9) pour la détection des éléments actifs."
+        ]
+    },
+    {
+        "version": "2.17.17",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Migration automatique des anciens 'Settings' (campagnes) vers le système de compétences v2.",
+            "Correction de l'onglet Compétences vide pour les anciens paramètres via injection dynamique de 'skillCategories'.",
+            "Mise à jour de la bibliothèque de compétences pour supporter les identifiants de colonnes génériques."
+        ]
+    },
+    {
+        "version": "2.17.16",
+        "date": "2026-02-06",
+        "type": "feature",
+        "changes": [
+            "Refonte majeure de l'ID des colonnes de compétences (Generic IDs Col_Comp_1..9).",
+            "Support des configurations dynamiques : Libellés, Behaviors (Compétence, Secondaire, etc.) et Coûts configurables par catégorie.",
+            "Ajout des info-bulles (description) et icônes optionnelles pour les catégories de compétences.",
+            "Migration automatique des anciennes données de personnages vers le nouveau format.",
+            "Rendu dynamique des colonnes côté Admin et Joueur respectant l'ordre défini par le MJ.",
+            "Adaptation du moteur de calcul d'XP pour supporter les facteurs de coût par catégorie."
+        ]
+    },
+    {
+        "version": "2.17.15",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "UI : Restauration de la taille des icônes d'action à 12.",
+            "UI : Correction du chevauchement entre la structure (rectangles) et les icônes d'édition."
+        ]
+    },
+    {
+        "version": "2.17.14",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "UI : Alignement invariant des icônes d'action sur les préréglages (indépendant de la hauteur de la structure)."
+        ]
+    },
+    {
+        "version": "2.17.13",
+        "date": "2026-02-06",
+        "type": "feature",
+        "changes": [
+            "Admin : Possibilité d'éditer le nom et la description des préréglages d'attributs.",
+            "Sécurité : Le nom des préréglages officiels est verrouillé en édition (seule la description est modifiable).",
+            "UI : Ajout d'icônes d'édition (Crayon) sur les widgets de préréglages."
+        ]
+    },
+    {
         "version": "2.17.12",
         "date": "2026-02-06",
         "type": "patch",

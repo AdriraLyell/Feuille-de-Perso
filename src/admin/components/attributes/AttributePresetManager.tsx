@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Shield, Zap, Play, Info, Save, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Shield, Zap, Play, Info, Save, Loader2, Pencil } from 'lucide-react';
 import { ATTRIBUTE_PRESETS } from '../../../data/defaults/attributes';
+import { AttributePreset } from '../../../types/system';
 import ThematicModal from '../../../components/ui/ThematicModal';
 
 interface AttributePresetManagerProps {
-    dbPresets: any[];
+    dbPresets: AttributePreset[];
     isLoading: boolean;
     onLoadRequested: (preset: any) => void;
     onSaveRequested: (name: string, desc: string) => void;
+    onUpdateRequested: (id: string, name: string, desc: string) => void;
     onDeleteRequested: (id: string) => void;
     currentStructureSummary: { label: string; count: number }[];
 }
@@ -17,19 +19,45 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
     isLoading,
     onLoadRequested,
     onSaveRequested,
+    onUpdateRequested,
     onDeleteRequested,
     currentStructureSummary
 }) => {
-    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
-    const [newPresetName, setNewPresetName] = useState("");
-    const [newPresetDesc, setNewPresetDesc] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState<'save' | 'edit'>('save');
+    const [editingPresetId, setEditingPresetId] = useState<string | null>(null);
+    const [isOfficial, setIsOfficial] = useState(false);
 
-    const handleSave = () => {
-        if (!newPresetName.trim()) return;
-        onSaveRequested(newPresetName, newPresetDesc);
-        setNewPresetName("");
-        setNewPresetDesc("");
-        setIsSaveModalOpen(false);
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+
+    const openSaveModal = () => {
+        setModalMode('save');
+        setName("");
+        setDescription("");
+        setIsOfficial(false);
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (preset: AttributePreset) => {
+        setModalMode('edit');
+        setEditingPresetId(preset.id);
+        setName(preset.name);
+        setDescription(preset.description);
+        setIsOfficial(preset.isOfficial || false);
+        setIsModalOpen(true);
+    };
+
+    const handleSubmit = () => {
+        if (!name.trim()) return;
+
+        if (modalMode === 'save') {
+            onSaveRequested(name, description);
+        } else if (editingPresetId) {
+            onUpdateRequested(editingPresetId, name, description);
+        }
+
+        setIsModalOpen(false);
     };
 
     return (
@@ -42,7 +70,7 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                     <p className="text-[10px] text-slate-400 font-medium">Configurez rapidement une structure standard ou personnalisée.</p>
                 </div>
                 <button
-                    onClick={() => setIsSaveModalOpen(true)}
+                    onClick={openSaveModal}
                     className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider bg-green-50 text-green-700 px-3 py-1.5 rounded border border-green-100 hover:bg-green-100 transition-colors"
                 >
                     <Save size={14} /> Sauvegarder Actu.
@@ -64,15 +92,39 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                             onClick={() => onLoadRequested(preset)}
                             className="relative bg-white border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded-lg p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[105px] shadow-sm hover:shadow-md"
                         >
+                            {/* Actions positioned absolutely to be invariant */}
+                            <div className="absolute top-2.5 right-2 flex items-center gap-1 z-10">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); openEditModal(preset); }}
+                                    className="opacity-0 group-hover/card:opacity-100 text-slate-300 hover:text-blue-500 transition-opacity p-0.5"
+                                    title="Modifier les informations"
+                                >
+                                    <Pencil size={12} />
+                                </button>
+                                {preset.isOfficial ? (
+                                    <span title="Officiel" className="p-0.5">
+                                        <Shield size={12} className="text-blue-500 fill-blue-50" />
+                                    </span>
+                                ) : (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onDeleteRequested(preset.id); }}
+                                        className="opacity-0 group-hover/card:opacity-100 text-slate-300 hover:text-red-500 transition-opacity p-0.5"
+                                        title="Supprimer"
+                                    >
+                                        <Trash2 size={12} />
+                                    </button>
+                                )}
+                            </div>
+
                             <div>
-                                <div className="flex justify-between items-start mb-1 gap-2 min-h-[32px]">
-                                    <span className="font-bold text-slate-700 text-[11px] group-hover/card:text-amber-900 truncate flex-grow pt-0.5">
+                                <div className="flex justify-between items-start mb-1 gap-2 min-h-[28px]">
+                                    <span className="font-bold text-slate-700 text-[11px] group-hover/card:text-amber-900 truncate flex-grow pt-0.5 pr-14">
                                         {preset.name}
                                     </span>
-                                    <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
-                                        <div className="flex gap-0.5 items-center h-full">
+                                    <div className="shrink-0 pt-0.5 pr-12">
+                                        <div className="flex gap-0.5 items-center">
                                             {preset.structure.map((pave: any, i: number) => {
-                                                const isSecondary = (preset.has_secondary || preset.hasSecondary);
+                                                const isSecondary = (preset.hasSecondary);
                                                 return (
                                                     <div
                                                         key={i}
@@ -95,19 +147,6 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                                 );
                                             })}
                                         </div>
-                                        {preset.isOfficial && (
-                                            <span title="Officiel" className="shrink-0">
-                                                <Shield size={12} className="text-blue-500 fill-blue-50" />
-                                            </span>
-                                        )}
-                                        {!preset.isOfficial && (
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); onDeleteRequested(preset.id); }}
-                                                className="opacity-0 group-hover/card:opacity-100 text-slate-300 hover:text-red-500 transition-opacity"
-                                            >
-                                                <Trash2 size={12} />
-                                            </button>
-                                        )}
                                     </div>
                                 </div>
                                 <span className="block text-[10px] text-slate-500 italic line-clamp-2 leading-tight min-h-[24px]">
@@ -130,13 +169,29 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                             onClick={() => onLoadRequested(preset)}
                             className="relative bg-white border border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded-lg p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[105px] shadow-sm hover:shadow-md"
                         >
+                            {/* Actions positioned absolutely to be invariant */}
+                            <div className="absolute top-2.5 right-2 flex items-center gap-1 z-10">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); openEditModal(preset as any); }}
+                                    className="opacity-0 group-hover/card:opacity-100 text-slate-300 hover:text-blue-500 transition-opacity p-0.5"
+                                    title="Modifier"
+                                >
+                                    <Pencil size={12} />
+                                </button>
+                                {preset.isOfficial && (
+                                    <span title="Officiel" className="p-0.5">
+                                        <Shield size={12} className="text-blue-500 fill-blue-50" />
+                                    </span>
+                                )}
+                            </div>
+
                             <div>
-                                <div className="flex justify-between items-start mb-1 gap-2 min-h-[32px]">
-                                    <span className="font-bold text-slate-700 text-[11px] group-hover/card:text-amber-900 truncate flex-grow pt-0.5">
+                                <div className="flex justify-between items-start mb-1 gap-2 min-h-[28px]">
+                                    <span className="font-bold text-slate-700 text-[11px] group-hover/card:text-amber-900 truncate flex-grow pt-0.5 pr-14">
                                         {preset.name}
                                     </span>
-                                    <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
-                                        <div className="flex gap-0.5 items-center h-full">
+                                    <div className="shrink-0 pt-0.5 pr-12">
+                                        <div className="flex gap-0.5 items-center">
                                             {preset.structure.map((pave: any, i: number) => {
                                                 const isSec = preset.hasSecondary;
                                                 return (
@@ -158,11 +213,6 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                                 );
                                             })}
                                         </div>
-                                        {preset.isOfficial && (
-                                            <span title="Officiel" className="shrink-0">
-                                                <Shield size={12} className="text-blue-500 fill-blue-50" />
-                                            </span>
-                                        )}
                                     </div>
                                 </div>
                                 <span className="block text-[10px] text-slate-500 italic line-clamp-2 leading-tight min-h-[24px]">
@@ -180,62 +230,76 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                 </div>
             </div>
 
-            {/* SAVE PRESET MODAL */}
-            {isSaveModalOpen && (
+            {/* SAVE/EDIT PRESET MODAL */}
+            {isModalOpen && (
                 <ThematicModal
-                    isOpen={isSaveModalOpen}
-                    onClose={() => setIsSaveModalOpen(false)}
-                    title="Sauvegarder en tant que préréglage"
-                    icon={<Save size={24} className="text-green-600" />}
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    title={modalMode === 'save' ? "Sauvegarder en tant que préréglage" : "Modifier le préréglage"}
+                    icon={modalMode === 'save' ? <Save size={24} className="text-green-600" /> : <Pencil size={24} className="text-blue-600" />}
                     size="md"
                     footer={
                         <>
-                            <button onClick={() => setIsSaveModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded font-bold">Annuler</button>
+                            <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded font-bold">Annuler</button>
                             <button
-                                onClick={handleSave}
-                                disabled={!newPresetName.trim()}
-                                className="px-6 py-2 bg-green-600 text-white rounded font-bold shadow hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={handleSubmit}
+                                disabled={!name.trim()}
+                                className={`px-6 py-2 rounded font-bold shadow text-white disabled:opacity-50 disabled:cursor-not-allowed ${modalMode === 'save' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
                             >
-                                Sauvegarder
+                                {modalMode === 'save' ? 'Sauvegarder' : 'Mettre à jour'}
                             </button>
                         </>
                     }
                 >
                     <div className="space-y-4 py-4">
                         <p className="text-sm text-slate-600">
-                            Enregistrez cette structure pour la réutiliser dans d'autres campagnes.
+                            {modalMode === 'save'
+                                ? "Enregistrez cette structure pour la réutiliser dans d'autres campagnes."
+                                : "Modifiez les informations de ce préréglage."}
                         </p>
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nom du préréglage</label>
+                                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
+                                    Nom du préréglage {isOfficial && "(Officiel - Non modifiable)"}
+                                </label>
                                 <input
-                                    autoFocus
-                                    value={newPresetName}
-                                    onChange={(e) => setNewPresetName(e.target.value)}
+                                    autoFocus={!isOfficial}
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
                                     placeholder="Ex: Système 3-Pavés-6-Attributs"
-                                    className="w-full bg-slate-50 border border-slate-200 rounded p-2 text-sm focus:border-green-500 outline-none"
+                                    disabled={isOfficial}
+                                    className={`w-full border rounded p-2 text-sm outline-none transition-colors ${isOfficial ? 'bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed' : 'bg-slate-50 border-slate-200 focus:border-blue-500'}`}
                                 />
+                                {isOfficial && (
+                                    <p className="text-[10px] text-amber-600 mt-1 flex items-center gap-1">
+                                        <Info size={10} /> Seule la description peut être modifiée pour les préréglages officiels.
+                                    </p>
+                                )}
                             </div>
                             <div>
-                                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Description (Optionnel)</label>
+                                <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Description</label>
                                 <textarea
-                                    value={newPresetDesc}
-                                    onChange={(e) => setNewPresetDesc(e.target.value)}
+                                    autoFocus={isOfficial}
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
                                     placeholder="Décrivez l'usage de ce préréglage..."
-                                    className="w-full bg-slate-50 border border-slate-200 rounded p-2 text-xs focus:border-green-500 outline-none h-20 resize-none"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded p-2 text-xs focus:border-blue-500 outline-none h-20 resize-none"
                                 />
                             </div>
                         </div>
-                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
-                            <h6 className="text-[10px] font-bold text-slate-500 uppercase mb-2">Résumé de la structure :</h6>
-                            <div className="flex flex-wrap gap-2">
-                                {currentStructureSummary.map((cat, idx) => (
-                                    <div key={idx} className="bg-white px-2 py-1 rounded border border-slate-200 text-[10px] font-bold text-slate-700">
-                                        {cat.label} ({cat.count})
-                                    </div>
-                                ))}
+
+                        {modalMode === 'save' && (
+                            <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                                <h6 className="text-[10px] font-bold text-slate-500 uppercase mb-2">Résumé de la structure :</h6>
+                                <div className="flex flex-wrap gap-2">
+                                    {currentStructureSummary.map((cat, idx) => (
+                                        <div key={idx} className="bg-white px-2 py-1 rounded border border-slate-200 text-[10px] font-bold text-slate-700">
+                                            {cat.label} ({cat.count})
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </ThematicModal>
             )}

@@ -1,5 +1,5 @@
 
-import { CharacterSheetData, LibrarySkillEntry } from '../types';
+import { CharacterSheetData, LibrarySkillEntry, DotEntry } from '../types';
 import { createDotEntry, createAttributeEntry, createCombatEntry, generateId } from '../utils/factories';
 
 export const DEFAULT_THEME = {
@@ -13,8 +13,8 @@ export const DEFAULT_THEME = {
 // CE FICHIER CONTIENT DES DONNÉES DE REPLI (FALLBACK).
 // Dans l'application normale, ces données sont écrasées par le chargement dynamique des règles (rules.js).
 // Ne pas supprimer ce fichier sous peine de briser le typage ou le mode hors-ligne initial.
-export const INITIAL_SKILLS = {
-  talents: [
+export const INITIAL_SKILLS: Record<string, DotEntry[]> = {
+  Col_Comp_1: [
     createDotEntry('Vigilance'), createDotEntry('Repérage'), createDotEntry('T.O.C'),
     createDotEntry(''), // Spacer
     createDotEntry('Athlétisme'), createDotEntry('Esquive'),
@@ -26,7 +26,7 @@ export const INITIAL_SKILLS = {
     createDotEntry(''), // Spacer
     createDotEntry('Style'), createDotEntry('Jeu'),
   ],
-  competences: [
+  Col_Comp_2: [
     createDotEntry('Armurerie'), createDotEntry('Bricolage'),
     createDotEntry(''), // Spacer
     createDotEntry('Electricité'), createDotEntry('Hydraulique'), createDotEntry('Mécanique'),
@@ -40,12 +40,10 @@ export const INITIAL_SKILLS = {
     createDotEntry(''), // Spacer
     createDotEntry('Animaux'), createDotEntry('Pistage'), createDotEntry('Survie'),
     createDotEntry(''), // Spacer
-    createDotEntry('Animaux'), createDotEntry('Pistage'), createDotEntry('Survie'),
-    createDotEntry(''), // Spacer
     createDotEntry('Jouer', 0, ''),
     createDotEntry(''), // Spacer
   ],
-  competences_col_2: [
+  Col_Comp_3: [
     createDotEntry('Chirurgie'), createDotEntry('Discrétion'), createDotEntry('Equitation'),
     createDotEntry('Evaluation'), createDotEntry('Falsification'), createDotEntry('Natation'),
     createDotEntry('Prestidigitation'), createDotEntry('Serrures'),
@@ -58,11 +56,9 @@ export const INITIAL_SKILLS = {
     createDotEntry(''), // Spacer
     createDotEntry('Mêlée'), createDotEntry('Bagarre'), createDotEntry('Lancé'), createDotEntry('Tir'),
     createDotEntry(''), // Spacer
-    createDotEntry('Mêlée'), createDotEntry('Bagarre'), createDotEntry('Lancé'), createDotEntry('Tir'),
-    createDotEntry(''), // Spacer
     createDotEntry('Art Martial', 0, ''),
   ],
-  connaissances: [
+  Col_Comp_4: [
     createDotEntry('Biologie'), createDotEntry('Droit'),
     createDotEntry(''), // Spacer
     createDotEntry('Finance'), createDotEntry('Géographie'), createDotEntry('Histoire'), createDotEntry('Légendes'),
@@ -76,25 +72,24 @@ export const INITIAL_SKILLS = {
     createDotEntry(''), // Spacer
     createDotEntry('Linguistique'), createDotEntry('Médecine'),
   ],
-  autres_competences: [
-    createDotEntry('Pilotage'), createDotEntry('Conduite'), createDotEntry('Photo'),
+  Col_Comp_5: [
     createDotEntry('Pilotage'), createDotEntry('Conduite'), createDotEntry('Photo'),
     createDotEntry('Communication'), createDotEntry('Artisanat', 0, ''),
     createDotEntry('Féerie'), createDotEntry('Bestiaire'), createDotEntry('Horlogerie'),
     createDotEntry('Automate'),
   ],
-  competences2: [
+  Col_Comp_6: [
     createDotEntry('Acrobatie'), createDotEntry('Escalade'), createDotEntry('Saut'),
     createDotEntry('Course')
   ],
-  autres: [
+  Col_Comp_7: [
   ],
-  arrieres_plans: [
+  Col_Comp_8: [
     createDotEntry('Alliés'), createDotEntry('Contacts'), createDotEntry('Mentor'),
     createDotEntry('Ressources'), createDotEntry('Célébrité'), createDotEntry('Statut'),
     createDotEntry('Influence'), createDotEntry('Talisman'), createDotEntry('Arcane'),
   ],
-  counters: [
+  Col_Comp_9: [
     createDotEntry('Volonté'), createDotEntry('Confiance')
   ]
 };
@@ -108,7 +103,7 @@ const generateDefaultSkillLibrary = (): LibrarySkillEntry[] => {
   const defaultVariableSkills = ['artisanat', 'jouer', 'art martial'];
 
   Object.keys(INITIAL_SKILLS).forEach(key => {
-    if (key === 'arrieres_plans') return; // Skip backgrounds in default library
+    if (key === 'Col_Comp_8') return; // Skip backgrounds in default library
     // @ts-ignore
     INITIAL_SKILLS[key].forEach((skill: any) => {
       if (skill.name && skill.name.trim() !== '') {

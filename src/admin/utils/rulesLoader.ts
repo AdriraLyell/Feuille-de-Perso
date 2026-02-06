@@ -68,7 +68,7 @@ export const generateDefaultRules = (): RulesData => {
             xpCosts: {
                 attributeFactor: 6,
                 skillFactor: 1,
-                specializationFactor: 0.5
+                specializationFactor: 0
             },
             cards: {
                 ...data.creationConfig.cardConfig,
@@ -86,6 +86,17 @@ export const generateDefaultRules = (): RulesData => {
             attributes: attrDefs,
             secondaryAttributes: secAttrDefs,
             skills: skillDefs,
+            skillCategories: [
+                { id: 'Col_Comp_1', label: 'Talents', behavior: 'Compétence', allowSpecializations: true, costConfig: { factor: 1, type: 'triangular' } },
+                { id: 'Col_Comp_2', label: 'Compétences', behavior: 'Compétence', allowSpecializations: true, costConfig: { factor: 1, type: 'triangular' } },
+                { id: 'Col_Comp_3', label: 'Compétences (Suite)', behavior: 'Compétence', allowSpecializations: true, costConfig: { factor: 1, type: 'triangular' } },
+                { id: 'Col_Comp_4', label: 'Connaissances', behavior: 'Compétence', allowSpecializations: true, costConfig: { factor: 1, type: 'triangular' } },
+                { id: 'Col_Comp_5', label: 'Autres Compétences', behavior: 'Compétence', allowSpecializations: true, costConfig: { factor: 1, type: 'triangular' } },
+                { id: 'Col_Comp_6', label: 'Compétences Secondaires', behavior: 'Secondaire', allowSpecializations: false, costConfig: { factor: 0.5, type: 'triangular' } },
+                { id: 'Col_Comp_7', label: 'Autres', behavior: 'Secondaire', allowSpecializations: false, costConfig: { factor: 0.5, type: 'triangular' } },
+                { id: 'Col_Comp_8', label: 'Arrières Plans', behavior: 'Arrière-plan', allowSpecializations: false, costConfig: { factor: 1, type: 'linear' } },
+                { id: 'Col_Comp_9', label: 'Compteurs', behavior: 'Compteur', allowSpecializations: false, costConfig: { factor: 1, type: 'linear' } }
+            ],
             backgrounds: backgroundDefs,
             counters: counterDefs,
             labels: {

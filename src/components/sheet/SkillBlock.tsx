@@ -1,8 +1,10 @@
-
 import React, { useState } from 'react';
 import { DotEntry } from '../../types';
 import DotRating from '../ui/DotRating';
 import { SectionHeader } from './Shared';
+import { Info } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
 const DotRow: React.FC<{
     entry: DotEntry;
@@ -117,31 +119,63 @@ export const SkillBlock = React.memo<{
     theme?: { creationColor: string, xpColor: string, dotSymbol?: string };
     onDefineVariant?: (category: string, id: string, name: string) => void;
     allowExtendedSkills?: boolean;
-}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false }) => (
-    <div className="flex flex-col h-full">
-        <SectionHeader title={title} />
-        <div className="flex-grow py-1">
-            {(items || []).map(item => {
-                // Combine specs for this specific item
-                const uSpecs = userSpecs[item.id] || [];
-                const iSpecs = imposedSpecs[item.id] || [];
-                // Imposed specs first, then user specs
-                const combinedSpecs = [...iSpecs, ...uSpecs];
+    description?: string;
+    icon?: string;
+}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, icon }) => {
+    const [showDesc, setShowDesc] = useState(false);
 
-                return (
-                    <DotRow
-                        key={item.id}
-                        entry={item}
-                        category={cat}
-                        onUpdate={onUpdate}
-                        specializations={uSpecs}
-                        imposedSpecs={iSpecs}
-                        theme={theme}
-                        onDefineVariant={onDefineVariant}
-                        allowExtendedSkills={allowExtendedSkills}
-                    />
-                );
-            })}
+    // Resolve Icon if it's a valid Lucide name
+    const IconComponent = icon ? (LucideIcons[icon as keyof typeof LucideIcons] as LucideIcon) : null;
+
+    return (
+        <div className="flex flex-col h-full">
+            <div className="relative group/header">
+                <SectionHeader
+                    title={
+                        <div className="flex items-center gap-1.5 justify-center">
+                            {IconComponent && <IconComponent size={12} className="text-[#bfae85]/70" />}
+                            {title}
+                            {description && (
+                                <button
+                                    onMouseEnter={() => setShowDesc(true)}
+                                    onMouseLeave={() => setShowDesc(false)}
+                                    className="ml-1 text-[#bfae85]/40 hover:text-[#8b2e2e] transition-colors"
+                                >
+                                    <Info size={10} />
+                                </button>
+                            )}
+                        </div>
+                    }
+                />
+
+                {showDesc && description && (
+                    <div className="absolute z-[101] left-1/2 -translate-x-1/2 bottom-full mb-1 w-48 bg-stone-800 text-white text-[9px] p-2 rounded shadow-xl animate-in fade-in slide-in-from-bottom-1 duration-200 pointer-events-none text-center">
+                        {description}
+                        <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-stone-800"></div>
+                    </div>
+                )}
+            </div>
+
+            <div className="flex-grow py-1">
+                {(items || []).map(item => {
+                    const iSpecs = imposedSpecs[item.id] || [];
+                    const uSpecs = userSpecs[item.id] || [];
+
+                    return (
+                        <DotRow
+                            key={item.id}
+                            entry={item}
+                            category={cat}
+                            onUpdate={onUpdate}
+                            specializations={uSpecs}
+                            imposedSpecs={iSpecs}
+                            theme={theme}
+                            onDefineVariant={onDefineVariant}
+                            allowExtendedSkills={allowExtendedSkills}
+                        />
+                    );
+                })}
+            </div>
         </div>
-    </div>
-));
+    );
+});

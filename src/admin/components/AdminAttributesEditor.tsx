@@ -43,6 +43,7 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                 isLoading={states.isLoadingPresets}
                 onLoadRequested={actions.requestPresetLoad}
                 onSaveRequested={actions.handleSaveCurrentAsPreset}
+                onUpdateRequested={actions.handleUpdatePreset}
                 onDeleteRequested={actions.handleDeletePreset}
                 currentStructureSummary={categories.map(cat => ({
                     label: labelsMap[cat] || cat,

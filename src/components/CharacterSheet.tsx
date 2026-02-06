@@ -18,6 +18,7 @@ import { useCharacterData, useCharacterActions } from '../context/CharacterConte
 import { useCharacterBonuses } from '../hooks/useCharacterBonuses';
 import { useCreationMode } from '../hooks/useCreationMode';
 import { useSheetLayout } from '../hooks/useSheetLayout';
+import { useRules } from '../context/RulesContext';
 
 import ThematicModal from './ui/ThematicModal';
 import { Layers, Save } from 'lucide-react';
@@ -53,11 +54,13 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         setShowCreationWarning
     } = useCreationMode(data, onChange, onAddLog);
 
+    const { rules } = useRules();
+
     const {
         attributeCategories,
         getAttributesGridClass,
         getDynamicColumns
-    } = useSheetLayout(data);
+    } = useSheetLayout(data, rules);
 
     // --- Handlers ---
     const updateHeader = useCallback((field: keyof typeof data.header, value: string) => {
@@ -263,9 +266,11 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         });
     }, [onChange, onAddLog]);
 
-    const cardValue = calculateCardValue(data);
+    const cardValue = calculateCardValue(data, rules);
     const creationActive = data.creationConfig?.active;
     const allowExtendedSkills = data.creationConfig?.extendedSkills || false;
+
+    const { columns, backgrounds, counters } = getDynamicColumns() as any;
 
     return (
         <div className={`sheet-container ${isLandscape ? 'landscape' : ''}`}>
@@ -298,9 +303,9 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
             {isLandscape ? (
                 /* --- Landscape Layout (6 Columns Dynamic) --- */
                 <div className="flex-grow grid grid-cols-6 border-b-2 border-stone-800">
-                    {getDynamicColumns().map((col, idx) => (
+                    {columns.map((col: any, idx: number) => (
                         <div key={idx} className="border-r border-stone-400 flex flex-col">
-                            {col.blocks.map((block, bIdx) => (
+                            {col.blocks.map((block: any, bIdx: number) => (
                                 <div key={bIdx} className={bIdx < col.blocks.length - 1 ? 'flex-grow border-b border-stone-300' : 'flex-grow'}>
                                     <SkillBlock
                                         title={block.title}
@@ -318,21 +323,23 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                         </div>
                     ))}
 
-                    {/* Col 6: Arrières Plans & Combat & Counters */}
+                    {/* Col 6: Dynamic Backgrounds & Combat & Counters */}
                     <div className="flex flex-col h-full">
-                        <div className="flex-none border-b border-stone-400">
-                            <SkillBlock
-                                title="Arrières Plans"
-                                items={data.skills.arrieres_plans || []}
-                                cat="arrieres_plans"
-                                onUpdate={updateDot}
-                                userSpecs={data.specializations}
-                                imposedSpecs={data.imposedSpecializations}
-                                theme={data.theme}
-                                onDefineVariant={handleDefineVariant}
-                                allowExtendedSkills={allowExtendedSkills}
-                            />
-                        </div>
+                        {backgrounds.map((bg: any, bIdx: number) => (
+                            <div key={bg.cat} className="flex-none border-b border-stone-400">
+                                <SkillBlock
+                                    title={bg.title}
+                                    items={bg.items || []}
+                                    cat={bg.cat}
+                                    onUpdate={updateDot}
+                                    userSpecs={data.specializations}
+                                    imposedSpecs={data.imposedSpecializations}
+                                    theme={data.theme}
+                                    onDefineVariant={handleDefineVariant}
+                                    allowExtendedSkills={allowExtendedSkills}
+                                />
+                            </div>
+                        ))}
                         <div className="flex-none border-b border-stone-400 overflow-hidden">
                             <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
                         </div>
@@ -345,32 +352,64 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 /* --- Portrait Layout (Standard) --- */
                 <>
                     <div className="grid grid-cols-4 border-b-2 border-stone-800 h-auto">
-                        <div className="border-r border-stone-400">
-                            <SkillBlock title="Talents" items={data.skills.talents || []} cat="talents" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
-                        </div>
-                        <div className="border-r border-stone-400">
-                            <SkillBlock title="Compétences" items={data.skills.competences || []} cat="competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
-                        </div>
-                        <div className="border-r border-stone-400">
-                            <SkillBlock title="Compétences" items={data.skills.competences_col_2 || []} cat="competences_col_2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
-                        </div>
-                        <div>
-                            <SkillBlock title="Connaissances" items={data.skills.connaissances || []} cat="connaissances" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
-                        </div>
+                        {columns.slice(0, 4).map((col: any, idx: number) => (
+                            <div key={idx} className={idx < 3 ? "border-r border-stone-400" : ""}>
+                                {col.blocks.map((block: any, bIdx: number) => (
+                                    <SkillBlock
+                                        key={block.cat}
+                                        title={block.title}
+                                        items={block.items}
+                                        cat={block.cat}
+                                        onUpdate={updateDot}
+                                        userSpecs={data.specializations}
+                                        imposedSpecs={data.imposedSpecializations}
+                                        theme={data.theme}
+                                        onDefineVariant={handleDefineVariant}
+                                        allowExtendedSkills={allowExtendedSkills}
+                                    />
+                                ))}
+                            </div>
+                        ))}
                     </div>
 
                     <div className="grid grid-cols-4 border-b-2 border-stone-800 flex-grow min-h-[200px]">
+                        {/* Fifth Column + Overflows if any */}
                         <div className="border-r border-stone-400">
-                            <SkillBlock title="Autres Compétences" items={data.skills.autres_competences || []} cat="autres_competences" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
+                            {columns[4]?.blocks.map((block: any) => (
+                                <SkillBlock
+                                    key={block.cat}
+                                    title={block.title}
+                                    items={block.items}
+                                    cat={block.cat}
+                                    onUpdate={updateDot}
+                                    userSpecs={data.specializations}
+                                    imposedSpecs={data.imposedSpecializations}
+                                    theme={data.theme}
+                                    onDefineVariant={handleDefineVariant}
+                                    allowExtendedSkills={allowExtendedSkills}
+                                />
+                            ))}
                         </div>
-                        <div className="border-r border-stone-400">
-                            <SkillBlock title="Compétences Secondaires" items={data.skills.competences2 || []} cat="competences2" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
+                        {/* Other Columns / Spares if we decide to add more columns to layout hook */}
+                        <div className="col-span-2 border-r border-stone-400 flex flex-col">
+                            {/* Potential overflow space or fixed widgets */}
                         </div>
-                        <div className="border-r border-stone-400">
-                            <SkillBlock title="Autres" items={data.skills.autres || []} cat="autres" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
-                        </div>
+
                         <div>
-                            <SkillBlock title="Arrières Plans" items={data.skills.arrieres_plans || []} cat="arrieres_plans" onUpdate={updateDot} userSpecs={data.specializations} imposedSpecs={data.imposedSpecializations} theme={data.theme} onDefineVariant={handleDefineVariant} allowExtendedSkills={allowExtendedSkills} />
+                            {backgrounds.map((bg: any) => (
+                                <SkillBlock
+                                    key={bg.cat}
+                                    title={bg.title}
+                                    items={bg.items || []}
+                                    cat={bg.cat}
+                                    onUpdate={updateDot}
+                                    userSpecs={data.specializations}
+                                    imposedSpecs={data.imposedSpecializations}
+                                    theme={data.theme}
+                                    onDefineVariant={handleDefineVariant}
+                                    allowExtendedSkills={allowExtendedSkills}
+                                />
+                            ))}
                         </div>
                     </div>
 

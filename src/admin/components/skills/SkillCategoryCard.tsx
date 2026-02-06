@@ -1,12 +1,15 @@
 import React from 'react';
-import { Plus, Trash2, GripVertical, Minus } from 'lucide-react';
+import { Plus, Minus, GripVertical, Trash2 } from 'lucide-react';
+import { SkillCategoryConfig, SkillBehavior } from '../../../types/rules';
 
 interface SkillCategoryCardProps {
     id: string;
     label: string;
+    categoryConfig: SkillCategoryConfig;
     skills: string[];
     isDraggingSidebarItem: boolean;
     onUpdateLabel: (id: string, val: string) => void;
+    onUpdateBehavior: (id: string, behavior: SkillBehavior) => void;
     onUpdateSkill: (id: string, idx: number, val: string) => void;
     onAddSkill: (id: string, isSpacer: boolean) => void;
     onRemoveSkill: (id: string, idx: number) => void;
@@ -19,9 +22,11 @@ interface SkillCategoryCardProps {
 const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
     id,
     label,
+    categoryConfig,
     skills,
     isDraggingSidebarItem,
     onUpdateLabel,
+    onUpdateBehavior,
     onUpdateSkill,
     onAddSkill,
     onRemoveSkill,
@@ -41,35 +46,48 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
             onDragOver={handleDragOver}
             onDrop={(e) => onDrop(e, skills.length)}
         >
-            {/* Header */}
-            <h3 className="font-bold text-[10px] mb-4 text-[#5c4d41] border-b border-[#bfae85]/30 pb-2 flex justify-between items-center select-none uppercase tracking-widest">
-                <div className="flex-grow">
+            {/* Header Area */}
+            <div className="border-b border-[#bfae85]/30 pb-3 mb-4 space-y-3">
+                <div className="flex justify-between items-center gap-2">
                     <input
                         value={label}
                         onChange={(e) => onUpdateLabel(id, e.target.value)}
-                        className="bg-transparent border-none outline-none w-full text-[#5c4d41] placeholder:text-[#bfae85] focus:text-[#8b2e2e] rounded hover:bg-[#bfae85]/10 transition-colors cursor-text"
-                        placeholder={id.toUpperCase()}
-                        title="Renommer la catégorie"
+                        className="bg-white/40 border border-[#bfae85]/20 px-2 py-1 outline-none flex-grow text-[#5c4d41] font-bold text-sm rounded shadow-inner"
+                        placeholder="Label de la catégorie"
                     />
+                    <div className="flex gap-1 shrink-0">
+                        <button
+                            onClick={() => onAddSkill(id, true)}
+                            className="bg-stone-500 text-white p-1 rounded hover:bg-stone-600 transition-colors shadow-sm"
+                            title="Ajouter un espaceur"
+                        >
+                            <Minus size={14} />
+                        </button>
+                        <button
+                            onClick={() => onAddSkill(id, false)}
+                            className="bg-[#166534] text-white p-1 rounded hover:bg-[#114b27] transition-colors shadow-sm"
+                            title="Ajouter une compétence"
+                        >
+                            <Plus size={14} />
+                        </button>
+                    </div>
                 </div>
 
-                <div className="flex gap-1 ml-2">
-                    <button
-                        onClick={() => onAddSkill(id, true)}
-                        className="text-[9px] bg-stone-500 text-white px-2 py-1 rounded-sm flex items-center gap-1 hover:bg-stone-600 transition-colors font-bold shadow-sm"
-                        title="Ajouter un espaceur"
+                <div className="flex items-center gap-2 text-[10px]">
+                    <select
+                        value={categoryConfig.behavior}
+                        onChange={(e) => onUpdateBehavior(id, e.target.value as SkillBehavior)}
+                        className="bg-white/60 border border-[#bfae85]/30 rounded px-1 py-0.5 text-[#5c4d41] font-medium outline-none"
                     >
-                        <Minus size={10} />
-                    </button>
-                    <button
-                        onClick={() => onAddSkill(id, false)}
-                        className="text-[9px] bg-[#166534] text-white px-2 py-1 rounded-sm flex items-center gap-1 hover:bg-[#114b27] transition-colors font-bold shadow-sm"
-                        title="Ajouter"
-                    >
-                        <Plus size={10} />
-                    </button>
+                        <option value="Compétence">Compétence</option>
+                        <option value="Secondaire">Secondaire</option>
+                        <option value="Arrière-plan">Arrière-plan</option>
+                        <option value="Compteur">Compteur</option>
+                    </select>
+
+                    <span className="text-[9px] text-[#bfae85] uppercase tracking-tighter shrink-0">{id}</span>
                 </div>
-            </h3>
+            </div>
 
             {/* List */}
             <div className="flex-grow overflow-y-auto space-y-2 pr-1 custom-scrollbar max-h-[500px] min-h-[50px]">

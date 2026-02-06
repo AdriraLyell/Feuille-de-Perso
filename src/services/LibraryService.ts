@@ -73,7 +73,7 @@ export const LibraryService = {
         }
 
         // D. Backgrounds
-        const layoutBgNames = initialRules.definitions?.skills?.['arrieres_plans'] || [];
+        const layoutBgNames = initialRules.definitions?.skills?.['Col_Comp_8'] || [];
         const libBgNames = initialRules.libraries?.backgrounds?.map(b => b.name) || [];
         const targetBgNames = new Set([...layoutBgNames, ...libBgNames].map(n => n.trim().toLowerCase()).filter(n => n !== ""));
 
@@ -96,14 +96,26 @@ export const LibraryService = {
                     }
                 });
             }
+
+            // Also check layout names to activate global bgs not explicitly in rules.libraries (for new settings)
+            layoutBgNames.forEach(name => {
+                const normalized = name.trim().toLowerCase();
+                if (processedNames.has(normalized)) return;
+                if (globalBgMap.has(normalized)) {
+                    processedNames.add(normalized);
+                    bgLinksPayload.push({ setting_id: settingId, background_id: globalBgMap.get(normalized), is_active: true });
+                }
+            });
+
             if (bgPayload.length > 0) await supabase.from('libraries_backgrounds').insert(bgPayload);
             if (bgLinksPayload.length > 0) await supabase.from('rel_setting_backgrounds').insert(bgLinksPayload);
         }
 
         // E. Counters
-        const layoutCounterNames = Object.values(initialRules.definitions?.counters || {}).map((c: any) => c.name);
+        const layoutCounterNamesFromSkills = initialRules.definitions?.skills?.['Col_Comp_9'] || [];
+        const layoutCounterNamesFromDefs = Object.values(initialRules.definitions?.counters || {}).map((c: any) => c.name);
         const libCounterNames = initialRules.libraries?.counters?.map(c => c.name) || [];
-        const targetCounterNames = new Set([...layoutCounterNames, ...libCounterNames].map(n => n.trim().toLowerCase()));
+        const targetCounterNames = new Set([...layoutCounterNamesFromSkills, ...layoutCounterNamesFromDefs, ...libCounterNames].map(n => n.trim().toLowerCase()));
 
         if (targetCounterNames.size > 0) {
             const { data: globalCounters } = await supabase.from('libraries_counters').select('id, name').is('setting_id', null);
@@ -124,6 +136,17 @@ export const LibraryService = {
                     }
                 });
             }
+
+            // Also check layout names (Skills Col_Comp_9 or definitions.counters) to activate global counters
+            targetCounterNames.forEach(name => {
+                const normalized = name.trim().toLowerCase();
+                if (processedNames.has(normalized)) return;
+                if (globalCounterMap.has(normalized)) {
+                    processedNames.add(normalized);
+                    counterLinksPayload.push({ setting_id: settingId, counter_id: globalCounterMap.get(normalized), is_active: true });
+                }
+            });
+
             if (counterPayload.length > 0) await supabase.from('libraries_counters').insert(counterPayload);
             if (counterLinksPayload.length > 0) await supabase.from('rel_setting_counters').insert(counterLinksPayload);
         }
@@ -159,11 +182,23 @@ export const LibraryService = {
             effects: t.effects || []
         });
 
+        const legacySkillMap: Record<string, string> = {
+            'talents': 'Col_Comp_1',
+            'competences': 'Col_Comp_2',
+            'competences_col_2': 'Col_Comp_3',
+            'connaissances': 'Col_Comp_4',
+            'autres_competences': 'Col_Comp_5',
+            'competences2': 'Col_Comp_6',
+            'autres': 'Col_Comp_7',
+            'arrieres_plans': 'Col_Comp_8',
+            'counters': 'Col_Comp_9'
+        };
+
         const mapSkill = (s: any, activeIds: Set<string>, sid: string) => ({
             id: s.id,
             name: s.name,
             description: s.description,
-            defaultCategory: s.default_category,
+            defaultCategory: legacySkillMap[s.default_category] || s.default_category,
             isVariable: s.is_variable,
             isGlobal: s.setting_id === null,
             isActive: activeIds.has(s.id) || s.setting_id === sid

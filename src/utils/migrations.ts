@@ -1,5 +1,6 @@
 
 import { CharacterSheetData, SkillCategoryKey, LibrarySkillEntry } from '../types';
+import { RulesData, SkillCategoryConfig, SkillBehavior } from '../types/rules';
 import { INITIAL_DATA } from '../data/initialState';
 
 // --- MIGRATION LOGIC ---
@@ -442,15 +443,36 @@ export const migrateData = (parsed: any): CharacterSheetData => {
         parsed.skills = {};
     }
 
-    const requiredSkillCats: SkillCategoryKey[] = [
-        'talents', 'competences', 'competences_col_2', 'connaissances',
-        'competences2', 'autres_competences', 'autres', 'arrieres_plans'
+    const requiredSkillCats: string[] = [
+        'Col_Comp_1', 'Col_Comp_2', 'Col_Comp_3', 'Col_Comp_4',
+        'Col_Comp_5', 'Col_Comp_6', 'Col_Comp_7', 'Col_Comp_8', 'Col_Comp_9'
     ];
 
     requiredSkillCats.forEach(cat => {
         if (!parsed.skills[cat]) {
-            // @ts-ignore
             parsed.skills[cat] = INITIAL_DATA.skills[cat] || [];
+        }
+    });
+
+    // --- MIGRATION: LEGACY SKILLS TO GENERIC IDS ---
+    const legacySkillMap: Record<string, string> = {
+        'talents': 'Col_Comp_1',
+        'competences': 'Col_Comp_2',
+        'competences_col_2': 'Col_Comp_3',
+        'connaissances': 'Col_Comp_4',
+        'autres_competences': 'Col_Comp_5',
+        'competences2': 'Col_Comp_6',
+        'autres': 'Col_Comp_7',
+        'arrieres_plans': 'Col_Comp_8',
+        'counters': 'Col_Comp_9'
+    };
+
+    Object.keys(legacySkillMap).forEach(oldKey => {
+        if (parsed.skills[oldKey]) {
+            const newKey = legacySkillMap[oldKey];
+            // Merging if both exist (unlikely but safe)
+            parsed.skills[newKey] = [...(parsed.skills[newKey] || []), ...parsed.skills[oldKey]];
+            delete parsed.skills[oldKey];
         }
     });
 
@@ -539,20 +561,107 @@ export const migrateData = (parsed: any): CharacterSheetData => {
         }));
     }
 
-    // 4. Migrate Skills categories
+    // 4. Migrate Skills categories (Unify with legacy mapping)
     if (parsed.skills) {
         const newSkills: any = {};
         Object.keys(parsed.skills).forEach(oldId => {
-            const newId = migrateId(oldId);
-            // Some keys are fixed (arrieres_plans, etc.) and shouldn't be migrated if they don't match d'idMap
-            if (idMap[oldId] || oldId.startsWith('cat_')) {
-                newSkills[newId] = parsed.skills[oldId];
-            } else {
-                newSkills[oldId] = parsed.skills[oldId];
-            }
+            const newId = legacySkillMap[oldId] || migrateId(oldId);
+            newSkills[newId] = parsed.skills[oldId];
         });
         parsed.skills = newSkills;
     }
 
     return parsed as CharacterSheetData;
+};
+
+// --- RULES MIGRATION (v2) ---
+export const migrateRulesToV2 = (rules: any): RulesData => {
+    if (!rules) return rules;
+
+    const legacySkillMap: Record<string, string> = {
+        'talents': 'Col_Comp_1',
+        'competences': 'Col_Comp_2',
+        'competences_col_2': 'Col_Comp_3',
+        'connaissances': 'Col_Comp_4',
+        'autres_competences': 'Col_Comp_5',
+        'competences2': 'Col_Comp_6',
+        'autres': 'Col_Comp_7',
+        'arrieres_plans': 'Col_Comp_8',
+        'counters': 'Col_Comp_9'
+    };
+
+    const behaviorMap: Record<string, SkillBehavior> = {
+        'Col_Comp_1': 'Compétence',
+        'Col_Comp_2': 'Compétence',
+        'Col_Comp_3': 'Compétence',
+        'Col_Comp_4': 'Compétence',
+        'Col_Comp_5': 'Secondaire',
+        'Col_Comp_6': 'Secondaire',
+        'Col_Comp_7': 'Secondaire',
+        'Col_Comp_8': 'Arrière-plan',
+        'Col_Comp_9': 'Compteur'
+    };
+
+    // 1. Ensure Definitions exist
+    if (!rules.definitions) rules.definitions = {};
+
+    // 2. Migrate skillCategories if missing
+    if (!rules.definitions.skillCategories || rules.definitions.skillCategories.length === 0) {
+        const labels = rules.definitions.labels || {};
+        const categories: SkillCategoryConfig[] = [];
+
+        // Build from legacy map
+        Object.entries(legacySkillMap).forEach(([oldKey, newId]) => {
+            const label = labels[oldKey] || labels[newId] || oldKey.charAt(0).toUpperCase() + oldKey.slice(1);
+            const behavior = behaviorMap[newId] || 'Compétence';
+
+            const factor = behavior === 'Secondaire' ? 0.5 : 1;
+            const type = (behavior === 'Arrière-plan' || behavior === 'Compteur') ? 'linear' : 'triangular';
+
+            categories.push({
+                id: newId,
+                label: label,
+                behavior: behavior,
+                description: "",
+                allowSpecializations: behavior === 'Compétence',
+                costConfig: { factor, type }
+            });
+        });
+
+        // Sort by ID to maintain order
+        categories.sort((a, b) => a.id.localeCompare(b.id));
+        rules.definitions.skillCategories = categories;
+    }
+
+    // 3. Migrate definitions.skills Record keys
+    if (rules.definitions.skills) {
+        const newSkills: Record<string, string[]> = {};
+        Object.keys(rules.definitions.skills).forEach(oldKey => {
+            const newKey = legacySkillMap[oldKey] || oldKey;
+            newSkills[newKey] = rules.definitions.skills[oldKey];
+        });
+        rules.definitions.skills = newSkills;
+    }
+
+    // 4. Migrate definitions.labels Record keys
+    if (rules.definitions.labels) {
+        const newLabels: Record<string, string> = {};
+        Object.keys(rules.definitions.labels).forEach(oldKey => {
+            const newKey = legacySkillMap[oldKey] || oldKey;
+            newLabels[newKey] = rules.definitions.labels[oldKey];
+        });
+        rules.definitions.labels = newLabels;
+    }
+
+    // 5. Ensure configurations structure
+    if (!rules.configurations) rules.configurations = INITIAL_DATA.creationConfig; // Fallback
+    if (!rules.configurations.xpCosts) {
+        rules.configurations.xpCosts = {
+            attributeFactor: 6,
+            skillFactor: 1,
+            specializationFactor: 0
+        };
+    }
+
+    return rules as RulesData;
 };

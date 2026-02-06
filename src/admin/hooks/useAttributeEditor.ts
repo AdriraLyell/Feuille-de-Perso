@@ -72,6 +72,12 @@ export const useAttributeEditor = (rules: RulesData, onUpdate: (newRules: RulesD
         if (success) loadDBPresets();
     };
 
+    const handleUpdatePreset = async (id: string, name: string, description: string) => {
+        const success = await AttributeService.updateAttributePreset(id, { name, description });
+        if (success) loadDBPresets();
+        return success;
+    };
+
     const executePresetLoad = () => {
         if (!pendingPreset) return;
 
@@ -310,7 +316,8 @@ export const useAttributeEditor = (rules: RulesData, onUpdate: (newRules: RulesD
             requestPresetLoad,
             executePresetLoad,
             handleSaveCurrentAsPreset,
-            handleDeletePreset
+            handleDeletePreset,
+            handleUpdatePreset
         }
     };
 };

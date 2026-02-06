@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { CharacterSheetData, DotEntry, SkillCategoryKey, LibrarySkillEntry } from '../../types';
 import { Minus, Plus, GripVertical, Trash2, Save, GraduationCap } from 'lucide-react';
 import ThematicModal from '../ui/ThematicModal';
+import { useRules } from '../../context/RulesContext';
 
 interface SkillsEditorProps {
     data: CharacterSheetData;
@@ -13,6 +14,9 @@ interface SkillsEditorProps {
 }
 
 const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, draggedItem, setDraggedItem }) => {
+    const { rules } = useRules();
+    const skillCategories = rules?.definitions?.skillCategories || [];
+
     const [focusedValue, setFocusedValue] = useState<string | null>(null);
     const [newlyAddedId, setNewlyAddedId] = useState<string | null>(null);
 
@@ -25,19 +29,9 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
     } | null>(null);
     const [variantInput, setVariantInput] = useState("");
 
-    const getCategoryLabel = (cat: string) => {
-        switch (cat) {
-            case 'talents': return 'Talents (Col 1)';
-            case 'competences': return 'Compétences (Col 2)';
-            case 'competences_col_2': return 'Compétences (Col 3)';
-            case 'connaissances': return 'Connaissances (Col 4)';
-            case 'autres_competences': return 'Autres Compétences';
-            case 'competences2': return 'Compétences Secondaires';
-            case 'autres': return 'Autres';
-            case 'arrieres_plans': return 'Arrières Plans';
-            case 'counters': return 'Compteurs';
-            default: return cat;
-        }
+    const getCategoryLabel = (catId: string) => {
+        const found = skillCategories.find(c => c.id === catId);
+        return found ? found.label : catId;
     };
 
     // --- CRUD LOGIC ---
@@ -464,23 +458,18 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-8">
             <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {renderCategoryEditor("Talents (Col 1)", "talents")}
-                    {renderCategoryEditor("Compétences (Col 2)", "competences")}
-                    {renderCategoryEditor("Compétences (Col 3)", "competences_col_2")}
-                    {renderCategoryEditor("Connaissances (Col 4)", "connaissances")}
+                    {skillCategories.map(cat => (
+                        <div key={cat.id} className="min-h-[200px]">
+                            {renderCategoryEditor(cat.label, cat.id, "h-full", cat.behavior === 'Arrière-plan' ? 'Nouvel Arrière Plan' : 'Nouvelle Compétence')}
+                        </div>
+                    ))}
                 </div>
             </div>
+
+            {/* Custom Counters section if needed (usually those are not in skillCategories if they are completely custom, but here we manage them too) */}
             <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {renderCategoryEditor("Autres Compétences", "autres_competences")}
-                    {renderCategoryEditor("Compétences Secondaires", "competences2")}
-                    {renderCategoryEditor("Autres", "autres")}
-                    {renderCategoryEditor("Arrières Plans", "arrieres_plans", "h-full", "Nouvel Arrière Plan")}
-                </div>
-            </div>
-            <div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {renderCategoryEditor("Compteurs", "counters", "h-full", "Nouveau Compteur")}
+                    {renderCategoryEditor("Compteurs Personnalisés", "counters", "h-full", "Nouveau Compteur")}
                 </div>
             </div>
 
