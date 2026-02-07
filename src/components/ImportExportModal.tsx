@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
 import { CharacterSheetData } from '../types';
-import { Download, Upload, Save } from 'lucide-react';
+import { Download, Upload, Save, Cloud } from 'lucide-react';
 import { useCharacter } from '../context/CharacterContext';
 import ThematicModal from './ui/ThematicModal';
 import { APP_VERSION } from '../constants';
 import ExportPanel from './import-export/ExportPanel';
 import ImportPanel from './import-export/ImportPanel';
+import CloudPanel from './import-export/CloudPanel';
 
 interface ImportExportModalProps {
     isOpen: boolean;
@@ -18,7 +19,7 @@ interface ImportExportModalProps {
 
 const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, onExportSuccess, onImportSuccess, variant }) => {
     const { data } = useCharacter();
-    const [activeTab, setActiveTab] = useState<'export' | 'import'>('export');
+    const [activeTab, setActiveTab] = useState<'export' | 'import' | 'cloud'>('export');
 
     if (!isOpen) return null;
 
@@ -58,6 +59,15 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                             Chargement
                         </div>
                     </button>
+                    <button
+                        onClick={() => setActiveTab('cloud')}
+                        className={`px-4 py-2 font-serif font-bold text-lg transition-colors rounded-t-lg ${activeTab === 'cloud' ? 'bg-[#8b2e2e] text-[#fdfbf7]' : 'hover:bg-[#bfae85]/20 text-[#5c4d41]'}`}
+                    >
+                        <div className="flex items-center gap-2">
+                            <Cloud size={20} />
+                            Cloud
+                        </div>
+                    </button>
                 </div>
 
                 {/* Content */}
@@ -76,6 +86,14 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, 
                         onImportSuccess={onImportSuccess}
                         onClose={onClose}
                         onRequestExport={() => setActiveTab('export')}
+                    />
+                )}
+
+                {activeTab === 'cloud' && (
+                    <CloudPanel
+                        data={data}
+                        onLoadSuccess={onImportSuccess}
+                        onClose={onClose}
                     />
                 )}
 

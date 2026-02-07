@@ -5,6 +5,7 @@ import { PlayerService } from '../services/PlayerService';
 import { CharacterSyncService } from '../services/CharacterSyncService';
 import { CharacterSheetData } from '../types/character';
 import { GameSettingSummary } from '../services/CampaignService';
+import { useRules } from '../context/RulesContext';
 
 interface SyncModalProps {
     isOpen: boolean;
@@ -21,6 +22,7 @@ const SyncModal: React.FC<SyncModalProps> = ({
     characterData,
     onSyncComplete
 }) => {
+    const { isOnlineMode, rules } = useRules();
     const [campaigns, setCampaigns] = useState<GameSettingSummary[]>([]);
     const [selectedCampaign, setSelectedCampaign] = useState<string>('');
     const [playerName, setPlayerName] = useState<string>('');
@@ -32,17 +34,22 @@ const SyncModal: React.FC<SyncModalProps> = ({
     // Pre-fill from existing syncInfo or header
     useEffect(() => {
         if (isOpen) {
-            // Pre-fill from existing sync info
-            if (characterData.syncInfo) {
+            // Priority 1: Current Rules (if online)
+            if (isOnlineMode && (rules as any)?.settingId) {
+                setSelectedCampaign((rules as any).settingId);
+            }
+            // Priority 2: Existing sync info (if not online or as fallback)
+            else if (characterData.syncInfo) {
                 setSelectedCampaign(characterData.syncInfo.settingId);
             }
+
             // Pre-fill names from header
             setPlayerName(characterData.header?.player || '');
             setCharacterName(characterData.header?.name || '');
             setStatus('idle');
             setErrorMessage('');
         }
-    }, [isOpen, characterData]);
+    }, [isOpen, characterData, isOnlineMode, rules]);
 
     // Load public campaigns
     useEffect(() => {
@@ -161,9 +168,17 @@ const SyncModal: React.FC<SyncModalProps> = ({
 
                 {/* Campaign Selector */}
                 <div>
-                    <label className="block text-sm font-bold text-[#4a3b32] mb-1.5">
-                        Campagne
-                    </label>
+                    <div className="flex justify-between items-center mb-1.5">
+                        <label className="block text-sm font-bold text-[#4a3b32]">
+                            Campagne
+                        </label>
+                        {isOnlineMode && (
+                            <span className="text-[10px] bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded border border-amber-200 uppercase flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+                                Verrouillé sur session active
+                            </span>
+                        )}
+                    </div>
                     {isLoadingCampaigns ? (
                         <div className="text-gray-500 text-sm">Chargement des campagnes...</div>
                     ) : campaigns.length === 0 ? (
@@ -175,7 +190,8 @@ const SyncModal: React.FC<SyncModalProps> = ({
                         <select
                             value={selectedCampaign}
                             onChange={(e) => setSelectedCampaign(e.target.value)}
-                            className="w-full px-3 py-2 border border-[#bfae85] rounded-md bg-white text-[#2c241b] focus:outline-none focus:ring-2 focus:ring-[#8b2e2e]"
+                            disabled={isOnlineMode}
+                            className={`w-full px-3 py-2 border border-[#bfae85] rounded-md bg-white text-[#2c241b] focus:outline-none focus:ring-2 focus:ring-[#8b2e2e] ${isOnlineMode ? 'opacity-70 bg-stone-50 cursor-not-allowed' : ''}`}
                         >
                             {campaigns.map(campaign => (
                                 <option key={campaign.id} value={campaign.id}>
@@ -183,6 +199,11 @@ const SyncModal: React.FC<SyncModalProps> = ({
                                 </option>
                             ))}
                         </select>
+                    )}
+                    {isOnlineMode && (
+                        <p className="mt-1.5 text-[11px] text-stone-500 italic">
+                            Les règles appliquées dépendent de cette campagne. Vous ne pouvez pas synchroniser sur une autre source sans recharger l'application.
+                        </p>
                     )}
                 </div>
 

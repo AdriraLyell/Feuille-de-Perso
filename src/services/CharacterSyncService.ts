@@ -7,6 +7,7 @@
 
 import { supabase } from './supabase';
 import { CharacterSheetData } from '../types/character';
+import { ImageCompressionService } from './ImageCompressionService';
 
 // Types for sync operations
 export interface SyncedCharacter {
@@ -21,6 +22,7 @@ export interface SyncedCharacter {
 
 export interface SyncedCharacterSummary {
     id: string;
+    setting_id: string;
     character_name: string;
     player_name: string;
     last_synced: string;
@@ -46,13 +48,16 @@ export const CharacterSyncService = {
     ): Promise<SyncResult> {
         try {
             // Remove syncInfo from the data being stored to avoid circular reference
-            const { syncInfo, ...dataToStore } = data;
+            const { syncInfo, ...cleanData } = data;
+
+            // Step 1: Compress images in data
+            const dataToStore = await this.processImages(cleanData, 'compress');
 
             const { data: result, error } = await supabase
                 .from('characters')
                 .upsert(
                     {
-                        setting_id: settingId,
+                        setting_id: (settingId === 'orphan' || !settingId) ? null : settingId,
                         player_name: playerName.trim(),
                         character_name: characterName.trim(),
                         data: dataToStore,
@@ -79,12 +84,47 @@ export const CharacterSyncService = {
     },
 
     /**
+     * Get all characters synced by a specific player (for cloud loading).
+     */
+    async getCharactersByPlayerName(playerName: string): Promise<SyncedCharacterSummary[]> {
+        const { data, error } = await supabase
+            .from('characters')
+            .select('id, character_name, player_name, last_synced, setting_id')
+            .eq('player_name', playerName.trim())
+            .order('last_synced', { ascending: false });
+
+        if (error) {
+            console.error('[CharacterSyncService] Fetch by player error:', error);
+            return [];
+        }
+
+        return data || [];
+    },
+
+    /**
+     * Get ALL characters across all campaigns (for Admin Master List).
+     */
+    async getAllCharacters(): Promise<SyncedCharacterSummary[]> {
+        const { data, error } = await supabase
+            .from('characters')
+            .select('id, character_name, player_name, last_synced, setting_id')
+            .order('last_synced', { ascending: false });
+
+        if (error) {
+            console.error('[CharacterSyncService] Fetch all error:', error);
+            return [];
+        }
+
+        return data || [];
+    },
+
+    /**
      * Get all characters synced to a specific campaign (for Admin view).
      */
     async getCharactersBySettingId(settingId: string): Promise<SyncedCharacterSummary[]> {
         const { data, error } = await supabase
             .from('characters')
-            .select('id, character_name, player_name, last_synced')
+            .select('id, setting_id, character_name, player_name, last_synced')
             .eq('setting_id', settingId)
             .order('last_synced', { ascending: false });
 
@@ -97,7 +137,7 @@ export const CharacterSyncService = {
     },
 
     /**
-     * Get a single character by ID (for Admin detail view).
+     * Get a single character by ID (for Admin or Player detail view).
      */
     async getCharacterById(id: string): Promise<SyncedCharacter | null> {
         const { data, error } = await supabase
@@ -110,6 +150,9 @@ export const CharacterSyncService = {
             console.error('[CharacterSyncService] Fetch by ID error:', error);
             return null;
         }
+
+        // Decompress images
+        data.data = await this.processImages(data.data, 'decompress');
 
         return data;
     },
@@ -144,5 +187,35 @@ export const CharacterSyncService = {
         } catch {
             return false;
         }
+    },
+
+    /**
+     * Recursively process an object to compress/decompress image strings.
+     */
+    async processImages(obj: any, action: 'compress' | 'decompress'): Promise<any> {
+        if (!obj || typeof obj !== 'object') return obj;
+
+        if (Array.isArray(obj)) {
+            return Promise.all(obj.map(item => this.processImages(item, action)));
+        }
+
+        const processed: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (typeof value === 'string') {
+                if (action === 'compress' && value.startsWith('data:image/')) {
+                    const result = await ImageCompressionService.compressFull(value);
+                    processed[key] = result.compressed;
+                } else if (action === 'decompress' && value.startsWith('GZIP:')) {
+                    processed[key] = ImageCompressionService.decompressFull(value);
+                } else {
+                    processed[key] = value;
+                }
+            } else if (typeof value === 'object') {
+                processed[key] = await this.processImages(value, action);
+            } else {
+                processed[key] = value;
+            }
+        }
+        return processed;
     }
 };

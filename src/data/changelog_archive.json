@@ -1,5 +1,41 @@
 [
     {
+        "version": "2.17.36",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix: La description des compteurs est maintenant correctement persistée en BDD (mode Online).",
+            "Sync: LibraryService inclut désormais 'description' dans les insert/load de counters."
+        ]
+    },
+    {
+        "version": "2.17.35",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix: Le thème (couleurs des points) est maintenant correctement réinitialisé lors de la création d'un nouveau personnage.",
+            "Cleanup: Suppression de la gestion du thème dans les règles Admin (non utilisée)."
+        ]
+    },
+    {
+        "version": "2.17.34",
+        "date": "2026-02-06",
+        "type": "bugfix",
+        "changes": [
+            "Fix critique: Les compteurs utilisent maintenant 'Départ' au lieu de 'Max' pour la valeur initiale.",
+            "Sync: La description des compteurs est maintenant synchronisée depuis Admin vers Joueur."
+        ]
+    },
+    {
+        "version": "2.17.33",
+        "date": "2026-02-06",
+        "type": "bugfix",
+        "changes": [
+            "Fix critique: Correction de la duplication des compétences lors de l'import d'anciens personnages.",
+            "Migration: Les clés legacy sont maintenant migrées AVANT l'injection des valeurs par défaut."
+        ]
+    },
+    {
         "version": "2.17.32",
         "date": "2026-02-06",
         "type": "refactor",
@@ -871,35 +907,6 @@
         "date": "2026-02-02",
         "changes": [
             "Diagnostic : Ajout de traces détaillées dans le processus de migration de la bibliothèque."
-        ]
-    },
-    {
-        "version": "2.12.24",
-        "date": "2026-02-02",
-        "changes": [
-            "Correction d'initialisation : Forçage de la mise à jour des indicateurs \"Variable\" pour les bibliothèques existantes (Artisanat, Jouer, Art Martial)."
-        ]
-    },
-    {
-        "version": "2.12.23",
-        "date": "2026-02-02",
-        "changes": [
-            "Ajout de traces pour diagnostic approfondi de l'initialisation."
-        ]
-    },
-    {
-        "version": "2.12.22",
-        "date": "2026-02-02",
-        "changes": [
-            "Correction définitive de l'initialisation : Le premier lancement charge désormais strictement les données par défaut, garantissant l'intégrité de la bibliothèque et des valeurs."
-        ]
-    },
-    {
-        "version": "2.12.21",
-        "date": "2026-02-02",
-        "changes": [
-            "Correction critique : La bibliothèque de compétences se charge désormais correctement lors de la première ouverture (ou mise à jour depuis une ancienne version).",
-            "Correction interne : La propriété \"Variable\" est maintenant correctement validée et conservée."
         ]
     }
 ]

@@ -4,7 +4,7 @@
 -- 1. Create the characters table
 CREATE TABLE IF NOT EXISTS characters (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    setting_id UUID REFERENCES game_settings(id) ON DELETE CASCADE,
+    setting_id UUID REFERENCES game_settings(id) ON DELETE SET NULL,
     character_name TEXT NOT NULL,
     player_name TEXT NOT NULL,
     data JSONB NOT NULL,
@@ -12,8 +12,19 @@ CREATE TABLE IF NOT EXISTS characters (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     
     -- Prevent duplicate characters for same campaign/player/name combo
+    -- Note: setting_id can be NULL for "orphaned" characters
     UNIQUE(setting_id, character_name, player_name)
 );
+
+-- 1b. ENSURE constraint is ON DELETE SET NULL (in case table already existed)
+ALTER TABLE characters 
+DROP CONSTRAINT IF EXISTS characters_setting_id_fkey;
+
+ALTER TABLE characters 
+ADD CONSTRAINT characters_setting_id_fkey 
+FOREIGN KEY (setting_id) 
+REFERENCES game_settings(id) 
+ON DELETE SET NULL;
 
 -- 2. Create index for fast lookups by campaign
 CREATE INDEX IF NOT EXISTS idx_characters_setting ON characters(setting_id);

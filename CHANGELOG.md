@@ -1,5 +1,22 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.12.24] - 2026-02-02
+
+- Correction d'initialisation : Forçage de la mise à jour des indicateurs "Variable" pour les bibliothèques existantes (Artisanat, Jouer, Art Martial).
+
+## [2.12.23] - 2026-02-02
+
+- Ajout de traces pour diagnostic approfondi de l'initialisation.
+
+## [2.12.22] - 2026-02-02
+
+- Correction définitive de l'initialisation : Le premier lancement charge désormais strictement les données par défaut, garantissant l'intégrité de la bibliothèque et des valeurs.
+
+## [2.12.21] - 2026-02-02
+
+- Correction critique : La bibliothèque de compétences se charge désormais correctement lors de la première ouverture (ou mise à jour depuis une ancienne version).
+- Correction interne : La propriété "Variable" est maintenant correctement validée et conservée.
+
 ## [2.12.20] - 2026-02-02
 
 - Ajustement : Déplacement de l'icône "Variable" à côté de l'indicateur de présence sur les cartes de compétence.

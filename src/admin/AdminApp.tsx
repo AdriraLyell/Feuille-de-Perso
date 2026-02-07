@@ -33,13 +33,14 @@ import { supabase } from '../services/supabase';
 import { Session } from '@supabase/supabase-js';
 import LoginScreen from './components/LoginScreen';
 import { LogOut } from 'lucide-react';
+import GlobalPlayersView from './components/GlobalPlayersView';
 
 const AdminApp: React.FC = () => {
     // Auth State
     const [session, setSession] = useState<Session | null>(null);
 
-    // Mode: 'dashboard' | 'editor'
-    const [viewMode, setViewMode] = useState<'dashboard' | 'editor'>('dashboard');
+    // Mode: 'dashboard' | 'editor' | 'players'
+    const [viewMode, setViewMode] = useState<'dashboard' | 'editor' | 'players'>('dashboard');
     const [currentSettingId, setCurrentSettingId] = useState<string | null>(null);
     const [currentSettingName, setCurrentSettingName] = useState<string>("");
 
@@ -180,7 +181,24 @@ const AdminApp: React.FC = () => {
     }
 
     if (viewMode === 'dashboard') {
-        return <AdminDashboard onSelectSetting={handleSelectSetting} />;
+        return <AdminDashboard onSelectSetting={handleSelectSetting} onViewPlayers={() => setViewMode('players')} />;
+    }
+
+    if (viewMode === 'players') {
+        return (
+            <div className="min-h-screen bg-gray-50 p-8">
+                <div className="max-w-7xl mx-auto">
+                    <button
+                        onClick={() => setViewMode('dashboard')}
+                        className="mb-6 flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold transition-colors"
+                    >
+                        <ArrowLeft size={20} />
+                        Retour au Tableau de Bord
+                    </button>
+                    <GlobalPlayersView />
+                </div>
+            </div>
+        );
     }
 
     if (!rules) {

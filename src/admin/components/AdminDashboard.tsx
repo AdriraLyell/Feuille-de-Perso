@@ -2,16 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import { GameSettingSummary, CampaignService } from '../../services/CampaignService';
 import { RulesData } from '../../types/rules';
-import { Plus, Loader2, FileCog, Scroll, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Plus, Loader2, FileCog, Scroll, Trash2, Eye, EyeOff, Users } from 'lucide-react';
 import { defaultRules } from '../../data/defaultRules'; // We might need a default template
 import { INITIAL_DATA, INITIAL_SKILLS } from '../../data/initialState';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 
 interface AdminDashboardProps {
     onSelectSetting: (id: string, name: string, rules: RulesData) => void;
+    onViewPlayers: () => void;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onViewPlayers }) => {
     // ... (state lines 14-19 are unchanged, but we need to include them in context or skip safely)
     const [settings, setSettings] = useState<GameSettingSummary[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -111,10 +112,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting }) => {
 
     return (
         <div className="flex flex-col h-full bg-[#fdfbf7] p-8 max-w-5xl mx-auto w-full">
-            <h1 className="text-3xl font-serif font-bold text-[#4a3b32] mb-2 flex items-center gap-3">
-                <FileCog size={32} className="text-amber-700" />
-                Tableau de Bord MJ
-            </h1>
+            <div className="flex justify-between items-center mb-2">
+                <h1 className="text-3xl font-serif font-bold text-[#4a3b32] flex items-center gap-3">
+                    <FileCog size={32} className="text-amber-700" />
+                    Tableau de Bord MJ
+                </h1>
+
+                <button
+                    onClick={onViewPlayers}
+                    className="flex items-center gap-2 bg-[#8b2e2e] hover:bg-[#a33939] text-white px-4 py-2 rounded-md font-bold transition-all shadow-md"
+                >
+                    <Users size={18} />
+                    Tous les Joueurs
+                </button>
+            </div>
             <p className="text-[#5c4d41] mb-8 italic">Gérez vos campagnes et configurations de règles.</p>
 
             {/* Actions Bar */}

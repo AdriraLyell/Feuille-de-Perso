@@ -219,11 +219,12 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
 
     const importData = useCallback((newData: CharacterSheetData) => {
         try {
-            const validated = validateCharacterData(newData);
+            const migrated = migrateData(newData);
+            const validated = validateCharacterData(migrated);
             setData(validated);
             addLog("Données importées avec succès", 'success', 'settings');
         } catch (e) {
-            console.error("Import validation failed", e);
+            console.error("Import validation/migration failed", e);
             addLog("Échec de l'import : les données sont malformées ou incompatibles", 'danger', 'settings');
         }
     }, [addLog]);

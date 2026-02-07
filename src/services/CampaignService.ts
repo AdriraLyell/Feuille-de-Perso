@@ -94,8 +94,9 @@ export const CampaignService = {
             libraries: libraries
         });
 
-        // Inject settingId so RulesContext can detect online mode
+        // Inject setting metadata so RulesContext can detect online mode and display name
         (rules as any).settingId = id;
+        (rules as any).settingName = settingData.name;
 
         // Sync definitions.counters with libraries.counters (add new counters, update descriptions)
         if (libraries.counters && libraries.counters.length > 0) {

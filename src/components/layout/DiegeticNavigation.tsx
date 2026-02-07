@@ -1,6 +1,7 @@
 import React from 'react';
 import { Book, Settings, FileText, Layout, Save, Upload, Feather, LogOut, Printer, Monitor, Smartphone, History, HelpCircle, ScrollText, ArrowRightLeft, BookOpen, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
+import { useRules } from '../../context/RulesContext';
 import { CharacterSheetData } from '../../types';
 import RulesStatus from '../ui/RulesStatus';
 
@@ -27,6 +28,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     onShowLogs, showLogs, onShowUserGuide, onShowChangelog, onOpenAppearance, onOpenSync, syncStatus, appVersion
 }) => {
     const { data } = useCharacter();
+    const { rules } = useRules();
 
     return (
         <nav className="bg-gray-800 text-white px-4 shadow-md no-print sticky top-0 z-50 h-14 flex items-center border-b border-gray-700 relative">
@@ -47,15 +49,27 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                     <div className="w-px h-6 bg-gray-600 hidden md:block"></div>
 
-                    {/* Sheet Button */}
-                    <button
-                        onClick={() => onModeChange('sheet')}
-                        className={`px-4 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-2 ${currentMode === 'sheet'
-                            ? 'bg-blue-600 text-white shadow-sm'
-                            : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
-                    >
-                        <FileText size={16} /> Fiche de Personnage
-                    </button>
+                    {/* Sheet Button & Setting Badge */}
+                    <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                        <button
+                            onClick={() => onModeChange('sheet')}
+                            className={`px-4 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-2 ${currentMode === 'sheet'
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
+                        >
+                            <FileText size={16} /> Fiche de Personnage
+                        </button>
+
+                        {(rules as any)?.settingName && (
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-700/50 border border-slate-600 rounded-full text-[10px] md:text-xs font-medium text-slate-300 animate-in fade-in slide-in-from-left-2 duration-300">
+                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                <span className="uppercase tracking-wider opacity-70 mr-1 hidden sm:inline">Campagne:</span>
+                                <span className="font-bold text-white truncate max-w-[120px] md:max-w-[200px]">
+                                    {(rules as any).settingName}
+                                </span>
+                            </div>
+                        )}
+                    </div>
 
                 </div>
 
