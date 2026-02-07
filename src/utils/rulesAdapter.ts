@@ -12,10 +12,7 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
     // Deep copy to avoid mutating baseState
     const newState: CharacterSheetData = JSON.parse(JSON.stringify(baseState));
 
-    // 1. Apply Theme
-    newState.theme = { ...newState.theme, ...rules.theme };
-
-    // 1b. Apply XP Costs
+    // 1. Apply XP Costs
     newState.xpCosts = {
         attributeFactor: rules.configurations.xpCosts.attributeFactor,
         skillFactor: rules.configurations.xpCosts.skillFactor,
@@ -201,13 +198,16 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
 
         Object.keys(ruleCounters).forEach(key => {
             const def = ruleCounters[key];
+            // Use defaultValue for starting value, fallback to 3 if not set
+            const startValue = (def as any).defaultValue !== undefined ? (def as any).defaultValue : 3;
             newCounters[key] = {
                 id: def.id || key,
                 name: def.name,
-                value: def.max, // Value represents the Max cap in DotRating
-                creationValue: def.max,
-                max: def.max, // Hard cap for UI
-                current: 0 // "Utilisé" start at 0
+                description: (def as any).description || '',
+                value: startValue,           // Use defaultValue, not max!
+                creationValue: startValue,   // Use defaultValue, not max!
+                max: def.max,                // Hard cap for UI
+                current: 0                   // "Utilisé" start at 0
             };
         });
 

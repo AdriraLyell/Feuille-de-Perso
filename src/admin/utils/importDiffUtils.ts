@@ -60,9 +60,7 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
     if (isDifferent(current.configurations.xpCosts, candidate.configurations.xpCosts)) {
         report.details.general.push("Coûts XP modifiés");
     }
-    if (isDifferent(current.theme, candidate.theme)) {
-        report.details.general.push("Thème visuel modifié");
-    }
+
 
     // 2. Attributes
     const attrKeys = new Set([...Object.keys(current.definitions.attributes), ...Object.keys(candidate.definitions.attributes)]);
@@ -125,7 +123,7 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
     if (options.sections.general) {
         result.configurations.creation = candidate.configurations.creation;
         result.configurations.xpCosts = candidate.configurations.xpCosts;
-        result.theme = candidate.theme;
+
         // Also card config if present? Assuming included in general
         result.configurations.cards = candidate.configurations.cards;
     }

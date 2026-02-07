@@ -38,6 +38,8 @@ const AdminCountersEditor: React.FC<AdminCountersEditorProps> = ({ rules, onUpda
                     [id]: {
                         id,
                         name: "Nouveau Compteur",
+                        description: "",
+                        defaultValue: 3,
                         max: 10,
                         xpCost: 5
                     }
@@ -92,7 +94,16 @@ const AdminCountersEditor: React.FC<AdminCountersEditorProps> = ({ rules, onUpda
                                     className="w-full border border-slate-300 rounded px-2 py-1 font-bold"
                                 />
                             </div>
-                            <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <label className="block text-[10px] font-bold text-slate-500 uppercase">Description</label>
+                                <textarea
+                                    value={counter.description || ''}
+                                    onChange={(e) => handleUpdateCounter(counter.id, 'description', e.target.value)}
+                                    className="w-full border border-slate-300 rounded px-2 py-1 text-xs min-h-[50px] resize-none"
+                                    placeholder="Description pour tooltip..."
+                                />
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
                                 <div>
                                     <label className="block text-[10px] font-bold text-slate-500 uppercase">Max</label>
                                     <input
@@ -100,6 +111,15 @@ const AdminCountersEditor: React.FC<AdminCountersEditorProps> = ({ rules, onUpda
                                         value={counter.max}
                                         onChange={(e) => handleUpdateCounter(counter.id, 'max', parseInt(e.target.value))}
                                         className="w-full border border-slate-300 rounded px-2 py-1 text-center"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-slate-500 uppercase">Départ</label>
+                                    <input
+                                        type="number"
+                                        value={counter.defaultValue || counter.value || 0}
+                                        onChange={(e) => handleUpdateCounter(counter.id, 'defaultValue', parseInt(e.target.value))}
+                                        className="w-full border border-slate-300 rounded px-2 py-1 text-center font-bold text-blue-600"
                                     />
                                 </div>
                                 <div>

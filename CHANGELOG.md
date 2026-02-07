@@ -1,5 +1,221 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.12.11] - 2026-02-01
+
+- Harmonisation des boutons d'action (Importer/Créer) sur l'ensemble des bibliothèques.
+- Standardisation de la taille des textes et des icônes d'action.
+
+## [2.12.10] - 2026-02-01
+
+- Harmonisation visuelle des onglets de bibliothèque (Style Premium RPG).
+- Unification du thème (Sépia/Papier) pour Traits et Spécialisations.
+- Ajout de badges 'Utilisé' sur les cartes de Traits.
+
+## [2.12.9] - 2026-02-01 [PATCH]
+
+- UI : Synchronisation du numéro de version affiché dans l'interface (2.9.11 -> 2.12.9).
+
+## [2.12.0] - 2026-02-01 [MINOR]
+
+- Feature : L'éditeur de traits (page Détails & Equipement) permet maintenant de saisir une description et un tag/catégorie.
+- Feature : Lors de la sélection d'un trait depuis la bibliothèque, la description et le tag sont automatiquement remplis.
+
+## [2.11.5] - 2026-02-01 [PATCH]
+
+- UI : Agrandissement de la zone de la bibliothèque dans les réglages pour maximiser l'espace utilisable.
+
+## [2.11.4] - 2026-02-01 [PATCH]
+
+- Bug Fix : Correction d'une erreur (ReferenceError) lors de l'ouverture des réglages due à des imports manquants.
+
+## [2.11.3] - 2026-02-01 [PATCH]
+
+- UI : Le bouton 'Bibliothèque' a été déplacé du menu principal vers l'onglet dédié dans les Réglages.
+
+## [2.11.2] - 2026-02-01 [PATCH]
+
+- Correction : Le rapport de migration (et la recommandation de sauvegarde) s'affiche désormais correctement après un import.
+
+## [2.11.1] - 2026-02-01 [PATCH]
+
+- Code : Refactoring majeur du module Import/Export (Découpage en sous-composants).
+- Maintenance : Amélioration de la structure du code pour faciliter les évolutions futures.
+
+## [2.9.11] - 2026-02-01 [PATCH]
+
+- UI : Mise à jour du libellé de la légende de la réserve ('Présent dans la Fiche').
+
+## [2.9.10] - 2026-02-01 [PATCH]
+
+- UI : Centrage de la légende 'Sur la fiche' dans la barre d'outils de la réserve.
+
+## [2.9.9] - 2026-02-01 [PATCH]
+
+- Optimisation UX : Réduction de la taille des vignettes de compétences dans la réserve.
+- Optimisation UX : L'indicateur 'Sur la fiche' est désormais une icône placée avant le nom de la compétence.
+- Optimisation UX : Ajout d'une légende globale dans la barre d'outils de la réserve.
+
+## [2.9.8] - 2026-02-01 [PATCH]
+
+- Bug Fix : Restauration des imports critiques dans les Réglages (Correction du crash ReferenceError).
+
+## [2.9.7] - 2026-02-01 [MINOR]
+
+- Audit d'accessibilité et correction des contrastes dans les Réglages
+- Harmonisation thématique complète du menu Réglages (Style Grimoire)
+- Migration des modales de confirmation des réglages vers ThematicModal
+- Amélioration de la lisibilité des textes secondaires (tons Sépia/Encre)
+
+## [2.9.6] - 01/02/2026 17:40 [PATCH]
+
+- UX : L'aide des catégories s'affiche désormais comme un panneau latéral coulissant dans l'éditeur (au lieu d'une modale superposée).
+- UX : Permet de consulter les codes de placement tout en saisissant les informations de la compétence.
+
+## [2.9.5] - 01/02/2026 17:35 [PATCH]
+
+- UX : Déplacement du bouton d'aide des catégories dans l'éditeur de compétence.
+- UI : Passage de l'aide des catégories en mode 'ThematicModal' avec style Grimoire.
+- Accessibilité : Audit et correction globale des contrastes (textes gris trop clairs).
+- Accessibilité : Amélioration de la visibilité des placeholders sur le parchemin.
+
+## [2.9.4] - 01/02/2026 17:22 [PATCH]
+
+- Bug Fix : Correction d'une ReferenceError lors du chargement de la modale d'édition de compétence (Import manquant).
+
+## [2.9.3] - 01/02/2026 17:20 [MINOR]
+
+- UI : Refonte visuelle complète des formulaires bibliothèque vers un style 'Grimoire' (Papier & Encre).
+- Accessibilité : Correction majeure des contrastes sur les descriptions et sélecteurs.
+- Design : Suppression des couleurs vives (rose fushia) au profit d'une palette plus naturelle (Bordeaux, Forêt, Ambre).
+- UX : Passage de tous les éditeurs de la bibliothèque sur le système de modales thématiques.
+
+## [2.9.2] - 01/02/2026 17:10 [PATCH]
+
+- Réserve : Masquage de l'icône de suppression pour les compétences présentes sur la fiche (Sécurité).
+- Réserve : Maintien de l'icône d'édition pour permettre le renommage synchronisé.
+
+## [2.9.1] - 01/02/2026 16:45 [PATCH]
+
+- Fix : Correction d'un crash (ReferenceError) lors de l'enregistrement d'une compétence renommée dû à une icône manquante.
+
+## [2.9.0] - 01/02/2026 16:45 [MAJOR]
+
+- Réserve : Déblocage de l'édition et de la suppression des compétences déjà présentes sur la fiche.
+- Réserve : Possibilité de définir/modifier la catégorie de placement par défaut pour chaque compétence.
+- Réserve : Système de renommage synchronisé avec la fiche de personnage (avec confirmation de sécurité).
+- UX : Amélioration de la visibilité des indicateurs 'Sur la fiche' dans la réserve.
+
+## [2.8.2] - 01/02/2026 15:55 [PATCH]
+
+- Import : Remplacement de l'alerte navigateur par une modale thématique élégante après une migration.
+- Import : Ajout d'un bouton de sauvegarde directe dans la modale de succès de migration.
+
+## [2.8.1] - 01/02/2026 15:50 [PATCH]
+
+- Import : Ajout d'une recommandation de sauvegarde immédiate après une migration de fichier.
+- Migration : Finalisation du système de moissonnage des spécialisations.
+
+## [2.8.0] - 01/02/2026 15:45 [MINOR]
+
+- Migration : Système de moissonnage automatique des spécialisations lors de l'importation de vieilles fiches.
+- Migration : Initialisation automatique de la bibliothèque de spécialisations si absente.
+- Migration : Sécurisation de l'intégrité des données (thèmes, effets des traits, configuration de création) pour les imports d'anciennes versions (v2.4+).
+- Migration : Correction d'un bug où la bibliothèque de compétences n'était pas toujours correctement réactivée lors d'un import.
+
+## [2.7.9] - 01/02/2026 15:35 [PATCH]
+
+- Bugfix : Correction d'un crash au démarrage suite à un import manquant (icône Plus).
+
+## [2.7.8] - 01/02/2026 15:30 [PATCH]
+
+- UI/UX : Refonte visuelle des zones de spécialisations (Design 'Pills' épuré).
+- UI/UX : Suppression des placeholders texte encombrants au profit d'un design pointillé minimalist pour les champs vides.
+- UI/UX : Distinction visuelle accrue entre spécialisations imposées (bleues) et spécialisations joueur (ambrées).
+
+## [2.7.7] - 01/02/2026 15:20 [PATCH]
+
+- Versioning : Automatisation de la synchronisation entre package.json, version.json et constants.ts.
+- Versioning : Correction de la version dans le fichier version.json.
+
+## [2.7.6] - 01/02/2026 15:15 [PATCH]
+
+- UX : Dans la modale d'édition, les compétences cochées restent désormais visibles même si elles ne correspondent pas au terme de recherche actuel.
+- UX : Une compétence décochée qui ne correspond pas au filtre disparaît immédiatement de la vue.
+
+## [2.7.5] - 01/02/2026 15:05 [PATCH]
+
+- Recherche : Implémentation de la recherche intelligente (insensible aux accents et à la casse).
+- Filtres : Uniformisation du comportement de recherche dans toutes les bibliothèques et l'Omnibar.
+- Technique : Centralisation de la normalisation de texte via un nouvel utilitaire stringUtils.
+
+## [2.7.4] - 01/02/2026 14:55 [PATCH]
+
+- Bibliothèque : Ajout d'un champ de recherche pour filtrer les compétences lors de l'édition d'une spécialisation.
+- Bibliothèque : Tri alphabétique automatique de la liste des compétences parentes.
+- UX : Amélioration visuelle de la sélection des compétences (surbrillance et indicateur de nombre).
+
+## [2.7.3] - 01/02/2026 14:45 [PATCH]
+
+- Sécurité : Alerte de confirmation avant de quitter les réglages si des modifications ne sont pas enregistrées.
+- Fiabilisation : Correction du bug de pollution des bibliothèques (synchronisation déportée sur le 'onBlur').
+- Automatisation : Synchronisation bidirectionnelle automatique entre la configuration MJ et les catalogues globaux.
+- UI : Renommage des 'Spécialisations Imposées' en 'Spécialisations Automatiques' pour plus de clarté.
+
+## [2.7.0] - 01/02/2026 14:00 [MINOR]
+
+- Bibliothèque : Création du Catalogue de Spécialisations centralisé.
+- Ergonomie : Nouvel Omnibar de recherche intelligente pour les spécialisations.
+- Drag-and-Drop : Support du glisser-déposer depuis le catalogue vers la fiche ou les réglages MJ.
+- Import/Export : Support complet du catalogue de spécialisations avec fusion intelligente et résolution de conflits.
+
+## [2.6.0] - 01/02/2026 13:00 [MINOR]
+
+- Architecture : Refonte technique majeure des composants cœurs pour une meilleure modularité.
+- TraitLibrary : Fragmentation du composant monolithique en sous-composants spécialisés (TraitCard, TraitForm, TraitEffectEditor).
+- CharacterSheet : Découpage chirurgical du fichier principal (Header, ExperienceSummary, CreationModeModal).
+- Performance : Optimisation du cycle de rendu React grâce à des composants plus petits et isolés.
+- Maintenance : Extraction de la logique complexe de mise en page dans un hook dédié (useSheetLayout).
+- Code Quality : Réduction significative de la complexité cyclomatique des fichiers principaux.
+
+## [2.5.1] - 01/02/2026 12:35 [PATCH]
+
+- Spécialisations : Application d'une règle globale de visibilité (minimum 1 point dans la compétence requis).
+- Fiche : Les spécialisations imposées sont désormais masquées tant que la compétence racine est à 0.
+
+## [2.5.0] - 01/02/2026 12:35 [MINOR]
+
+- Spécialisations : Introduction des seuils de niveau pour les spécialisations imposées.
+- MJ : Possibilité de définir un niveau minimum requis dans une compétence pour activer une spécialisation offerte.
+- UI : Nouvel éditeur de seuils intégré dans les paramètres de spécialisation.
+- Fiche : Masquage automatique des spécialisations (et de l'étoile indicative) tant que le niveau requis n'est pas atteint.
+- Architecture : Migration structurelle des données de spécialisation pour supporter les métadonnées de seuil.
+
+## [2.4.0] - 01/02/2026 12:08 [MINOR]
+
+- UI : Expansion majeure du catalogue de symboles de notation (32 symboles disponibles).
+- UI : Ajout de symboles thématiques RPG (Couronne, Fantôme, Hache, Épée, etc.).
+- UI : Optimisation du rendu visuel des symboles avec gestion native du remplissage (stroke/fill).
+- Architecture : Résolution de l'erreur de configuration TypeScript (types Node.js).
+- Version : Passage à la version 2.4.0 pour marquer l'introduction de la personnalisation visuelle avancée.
+
+## [2.3.0] - 01/02/2026 11:53 [MINOR]
+
+- Robustesse : Ajout d'une couche de validation de données (Zod) pour sécuriser le chargement et l'import.
+- Qualité : Mise en place de l'environnement de tests unitaires avec Vitest.
+- Tests : Validation automatisée de la logique de calcul d'XP, des migrations de données et des hooks de bonus.
+- UI : Personnalisation des symboles de notation (Cercle, Carré, Étoile, etc.) via l'onglet Apparence.
+- Correction : Optimisation visuelle des symboles (mode vide/plein) pour une meilleure lisibilité.
+- UI : Ajout d'une alerte visuelle de décalage de version lors de l'importation de fichiers.
+- Maintenance : Refonte chirurgicale du module d'Import/Export (découpage en composants et extraction de la logique métier).
+- Sécurité : Protection contre les sauvegardes corrompues avec fallback automatique vers l'état initial sain.
+
+## [2.2.0] - 01/02/2026 10:45 [MINOR]
+
+- Performance : Optimisation majeure des re-rendus React.
+- Architecture : Séparation du CharacterContext en État (données) et Actions (fonctions) pour une meilleure fluidité.
+- Stabilité : Stabilisation des fonctions de modification (useCallback + Functional Updates) pour éviter les calculs inutiles.
+- Optimisation : Mémoïsation des composants de section (Attributs, Compétences, Combat, Compteurs) via React.memo.
+
 ## [2.1.0] - 01/02/2026 10:20 [MINOR]
 
 - Architecture : Refactorisation structurelle majeure pour améliorer la maintenabilité.

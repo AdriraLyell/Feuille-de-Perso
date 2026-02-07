@@ -81,10 +81,6 @@ export const defaultRules: RulesData = {
             "pave_attributs_3": "Social"
         }
     },
-    theme: {
-        creationColor: "#1d4ed8",
-        xpColor: "#b45309"
-    },
     libraries: {
         traits: [],
         skills: [],

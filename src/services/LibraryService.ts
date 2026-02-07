@@ -132,7 +132,7 @@ export const LibraryService = {
                     if (globalCounterMap.has(normalized)) {
                         counterLinksPayload.push({ setting_id: settingId, counter_id: globalCounterMap.get(normalized), is_active: true });
                     } else {
-                        counterPayload.push({ setting_id: settingId, id: c.id, name: c.name, max_value: (c as any).maxValue, default_value: (c as any).defaultValue, xp_cost: (c as any).xpCost });
+                        counterPayload.push({ setting_id: settingId, id: c.id, name: c.name, description: c.description, max_value: (c as any).maxValue, default_value: (c as any).defaultValue, xp_cost: (c as any).xpCost });
                     }
                 });
             }
@@ -224,6 +224,7 @@ export const LibraryService = {
         const mapCounter = (c: any, activeIds: Set<string>, sid: string) => ({
             id: c.id,
             name: c.name,
+            description: c.description,
             maxValue: c.max_value,
             defaultValue: c.default_value,
             xpCost: c.xp_cost,
@@ -284,6 +285,7 @@ export const LibraryService = {
 
         // B. Skills
         const localSkillsToSave = rules.libraries.skills.filter(s => !s.isGlobal);
+        const globalSkillsToUpdate = rules.libraries.skills.filter(s => s.isGlobal);
         const activeGlobalSkillIds = rules.libraries.skills.filter(s => s.isGlobal && s.isActive !== false).map(s => s.id);
 
         await supabase.from('libraries_skills').delete().eq('setting_id', settingId);
@@ -297,6 +299,19 @@ export const LibraryService = {
                 is_variable: s.isVariable
             }));
             await supabase.from('libraries_skills').insert(skillsPayload);
+        }
+
+        // UPDATE Global Skills (propagates to all campaigns using them)
+        for (const gs of globalSkillsToUpdate) {
+            await supabase.from('libraries_skills')
+                .update({
+                    name: gs.name,
+                    description: gs.description,
+                    default_category: gs.defaultCategory,
+                    is_variable: gs.isVariable
+                })
+                .eq('id', gs.id)
+                .is('setting_id', null);
         }
 
         await supabase.from('rel_setting_skills').delete().eq('setting_id', settingId);
@@ -321,12 +336,25 @@ export const LibraryService = {
 
         // D. Backgrounds
         const localBgsToSave = rules.libraries.backgrounds.filter(b => !b.isGlobal);
+        const globalBgsToUpdate = rules.libraries.backgrounds.filter(b => b.isGlobal);
         const activeGlobalBgIds = rules.libraries.backgrounds.filter(b => b.isGlobal && b.isActive !== false).map(b => b.id);
 
         await supabase.from('libraries_backgrounds').delete().eq('setting_id', settingId);
         if (localBgsToSave.length > 0) {
             const bgPayload = localBgsToSave.map(b => ({ setting_id: settingId, id: b.id, name: b.name, description: b.description, is_variable: b.isVariable }));
             await supabase.from('libraries_backgrounds').insert(bgPayload);
+        }
+
+        // UPDATE Global Backgrounds (propagates to all campaigns using them)
+        for (const gb of globalBgsToUpdate) {
+            await supabase.from('libraries_backgrounds')
+                .update({
+                    name: gb.name,
+                    description: gb.description,
+                    is_variable: gb.isVariable
+                })
+                .eq('id', gb.id)
+                .is('setting_id', null);
         }
 
         await supabase.from('rel_setting_backgrounds').delete().eq('setting_id', settingId);
@@ -337,12 +365,35 @@ export const LibraryService = {
 
         // E. Counters
         const localCountersToSave = rules.libraries.counters.filter(c => !c.isGlobal);
+        const globalCountersToUpdate = rules.libraries.counters.filter(c => c.isGlobal);
         const activeGlobalCounterIds = rules.libraries.counters.filter(c => c.isGlobal && c.isActive !== false).map(c => c.id);
 
         await supabase.from('libraries_counters').delete().eq('setting_id', settingId);
         if (localCountersToSave.length > 0) {
-            const ctrPayload = localCountersToSave.map(c => ({ setting_id: settingId, id: c.id, name: c.name, max_value: (c as any).maxValue, default_value: (c as any).defaultValue, xp_cost: (c as any).xpCost }));
+            const ctrPayload = localCountersToSave.map(c => ({
+                setting_id: settingId,
+                id: c.id,
+                name: c.name,
+                description: c.description || '',
+                max_value: (c as any).maxValue ?? 10,
+                default_value: (c as any).defaultValue ?? 0,
+                xp_cost: (c as any).xpCost ?? 0
+            }));
             await supabase.from('libraries_counters').insert(ctrPayload);
+        }
+
+        // UPDATE Global Counters (propagates to all campaigns using them)
+        for (const gc of globalCountersToUpdate) {
+            await supabase.from('libraries_counters')
+                .update({
+                    name: gc.name,
+                    description: gc.description,
+                    max_value: (gc as any).maxValue,
+                    default_value: (gc as any).defaultValue,
+                    xp_cost: (gc as any).xpCost
+                })
+                .eq('id', gc.id)
+                .is('setting_id', null);
         }
 
         await supabase.from('rel_setting_counters').delete().eq('setting_id', settingId);

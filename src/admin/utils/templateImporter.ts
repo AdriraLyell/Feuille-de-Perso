@@ -82,14 +82,6 @@ export const extractRulesFromCharacter = (
         warnings.push("Coûts XP manquants dans le fichier (ignoré).");
     }
 
-    // 3. Import Theme
-    if (sheet.theme) {
-        newRules.theme = {
-            ...newRules.theme,
-            ...sheet.theme
-        };
-        success.push("Thème Visuel (Couleurs)");
-    }
 
     // 4. Import Attributes Definitions
     if (sheet.attributes) {

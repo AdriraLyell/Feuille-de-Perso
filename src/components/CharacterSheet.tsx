@@ -245,10 +245,16 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 onAddLog(`Modification ${String(counterName)} (${field === 'value' ? 'Maxi' : 'Utilisé'}) : ${value}`, 'info', 'sheet', `counter_${String(id)}_${String(field)}`);
                 return { ...prev, counters: { ...prev.counters, custom: newCustom } };
             } else {
+                // Find the key by searching for the counter with matching id
+                const counterKey = Object.keys(prev.counters).find(k => {
+                    const c = prev.counters[k];
+                    return !Array.isArray(c) && c?.id === id;
+                }) || id; // Fallback to using id as key for legacy compatibility
+
                 // @ts-ignore
-                const current = prev.counters[String(id)];
+                const current = prev.counters[counterKey];
                 // Guard against Array (should not happen for non-custom ID but types say DotEntry | DotEntry[])
-                if (Array.isArray(current)) return prev;
+                if (Array.isArray(current) || !current) return prev;
 
                 const newItem = { ...current };
 
@@ -261,7 +267,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 }
 
                 onAddLog(`Modification ${String(newItem.name)} (${field === 'value' ? 'Maxi' : 'Utilisé'}) : ${value}`, 'info', 'sheet', `counter_${String(id)}_${String(field)}`);
-                return { ...prev, counters: { ...prev.counters, [String(id)]: newItem } };
+                return { ...prev, counters: { ...prev.counters, [counterKey]: newItem } };
             }
         });
     }, [onChange, onAddLog]);
@@ -349,12 +355,12 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                     </div>
                 </div>
             ) : (
-                /* --- Portrait Layout (Standard) --- */
+                /* --- Portrait Layout (Standard Deterministic) --- */
                 <>
                     <div className="grid grid-cols-4 border-b-2 border-stone-800 h-auto">
-                        {columns.slice(0, 4).map((col: any, idx: number) => (
+                        {columns.map((col: any, idx: number) => (
                             <div key={idx} className={idx < 3 ? "border-r border-stone-400" : ""}>
-                                {col.blocks.map((block: any, bIdx: number) => (
+                                {col.topBlocks.map((block: any) => (
                                     <SkillBlock
                                         key={block.cat}
                                         title={block.title}
@@ -373,44 +379,41 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                     </div>
 
                     <div className="grid grid-cols-4 border-b-2 border-stone-800 flex-grow min-h-[200px]">
-                        {/* Fifth Column + Overflows if any */}
-                        <div className="border-r border-stone-400">
-                            {columns[4]?.blocks.map((block: any) => (
-                                <SkillBlock
-                                    key={block.cat}
-                                    title={block.title}
-                                    items={block.items}
-                                    cat={block.cat}
-                                    onUpdate={updateDot}
-                                    userSpecs={data.specializations}
-                                    imposedSpecs={data.imposedSpecializations}
-                                    theme={data.theme}
-                                    onDefineVariant={handleDefineVariant}
-                                    allowExtendedSkills={allowExtendedSkills}
-                                />
-                            ))}
-                        </div>
-                        {/* Other Columns / Spares if we decide to add more columns to layout hook */}
-                        <div className="col-span-2 border-r border-stone-400 flex flex-col">
-                            {/* Potential overflow space or fixed widgets */}
-                        </div>
-
-                        <div>
-                            {backgrounds.map((bg: any) => (
-                                <SkillBlock
-                                    key={bg.cat}
-                                    title={bg.title}
-                                    items={bg.items || []}
-                                    cat={bg.cat}
-                                    onUpdate={updateDot}
-                                    userSpecs={data.specializations}
-                                    imposedSpecs={data.imposedSpecializations}
-                                    theme={data.theme}
-                                    onDefineVariant={handleDefineVariant}
-                                    allowExtendedSkills={allowExtendedSkills}
-                                />
-                            ))}
-                        </div>
+                        {columns.map((col: any, idx: number) => (
+                            <div key={idx} className={idx < 3 ? "border-r border-stone-400" : ""}>
+                                {col.bottomBlocks.map((block: any) => (
+                                    <SkillBlock
+                                        key={block.cat}
+                                        title={block.title}
+                                        items={block.items}
+                                        cat={block.cat}
+                                        onUpdate={updateDot}
+                                        userSpecs={data.specializations}
+                                        imposedSpecs={data.imposedSpecializations}
+                                        theme={data.theme}
+                                        onDefineVariant={handleDefineVariant}
+                                        allowExtendedSkills={allowExtendedSkills}
+                                    />
+                                ))}
+                                {idx === 3 && (
+                                    /* backgrounds render in the last column of second row */
+                                    backgrounds.map((bg: any) => (
+                                        <SkillBlock
+                                            key={bg.cat}
+                                            title={bg.title}
+                                            items={bg.items || []}
+                                            cat={bg.cat}
+                                            onUpdate={updateDot}
+                                            userSpecs={data.specializations}
+                                            imposedSpecs={data.imposedSpecializations}
+                                            theme={data.theme}
+                                            onDefineVariant={handleDefineVariant}
+                                            allowExtendedSkills={allowExtendedSkills}
+                                        />
+                                    ))
+                                )}
+                            </div>
+                        ))}
                     </div>
 
                     <div className="grid grid-cols-2">

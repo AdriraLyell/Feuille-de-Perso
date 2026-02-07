@@ -14,7 +14,10 @@ export const CountersSection = React.memo<CountersSectionProps>(({ data, updateC
     const renderCounterItem = (counter: DotEntry, isCustom: boolean) => (
         <div key={counter.id} className="col-span-1 border border-stone-300 bg-white rounded-sm shadow-sm flex items-center p-1 overflow-hidden h-9">
             {/* Title on the left */}
-            <div className="w-16 shrink-0 font-bold text-[9px] uppercase tracking-tighter text-stone-800 border-r border-stone-200 mr-1 pr-1 h-full flex items-center break-words leading-none justify-center text-center">
+            <div
+                className="w-16 shrink-0 font-bold text-[9px] uppercase tracking-tighter text-stone-800 border-r border-stone-200 mr-1 pr-1 h-full flex items-center break-words leading-none justify-center text-center cursor-help"
+                title={counter.description || counter.name}
+            >
                 {counter.name}
             </div>
 

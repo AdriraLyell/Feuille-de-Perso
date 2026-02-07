@@ -195,10 +195,9 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
                                             <span className={`font-bold truncate ${skill.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={skill.name}>{skill.name}</span>
                                         </div>
                                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
-                                            {/* Edit: Only for Local */}
-                                            {!skill.isGlobal && (
-                                                <button onClick={() => handleOpenEdit(skill)} className="text-blue-600 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
-                                            )}
+                                            {/* Edit */}
+                                            <button onClick={() => handleOpenEdit(skill)} className="text-blue-600 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
+
                                             {/* Delete: Only for Local. Global is handled via checkbox */}
                                             {!skill.isGlobal && (
                                                 <button onClick={() => handleDelete(skill.id)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>

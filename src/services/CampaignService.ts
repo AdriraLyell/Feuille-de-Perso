@@ -94,6 +94,42 @@ export const CampaignService = {
             libraries: libraries
         });
 
+        // Sync definitions.counters with libraries.counters (add new counters, update descriptions)
+        if (libraries.counters && libraries.counters.length > 0) {
+            const activeCounters = libraries.counters.filter(c => c.isActive !== false);
+
+            if (!rules.definitions.counters) {
+                rules.definitions.counters = {};
+            }
+
+            activeCounters.forEach(libCounter => {
+                // Generate a safe key from the counter name (normalize accents é→e, è→e, etc.)
+                const key = libCounter.name
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]/g, '_')
+                    .replace(/_+/g, '_') // Collapse multiple underscores
+                    .replace(/^_|_$/g, ''); // Trim leading/trailing underscores
+
+                if (!rules.definitions.counters[key]) {
+                    // Add new counter to definitions
+                    rules.definitions.counters[key] = {
+                        id: libCounter.id,
+                        name: libCounter.name,
+                        description: libCounter.description || '',
+                        max: (libCounter as any).maxValue || 10,
+                        value: (libCounter as any).defaultValue || 0,
+                        defaultValue: (libCounter as any).defaultValue || 0,
+                        xpCost: (libCounter as any).xpCost || 0
+                    };
+                } else {
+                    // Update existing counter description from library
+                    rules.definitions.counters[key].description = libCounter.description || rules.definitions.counters[key].description;
+                }
+            });
+        }
+
         return rules;
     },
 

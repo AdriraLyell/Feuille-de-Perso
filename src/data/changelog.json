@@ -1,5 +1,185 @@
 [
     {
+        "version": "2.17.43",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix: Le système de cartes activé dans Admin est maintenant correctement chargé dans l'App Joueur.",
+            "Sync: rulesReconciler fusionne désormais configurations.cards vers creationConfig.cardConfig."
+        ]
+    },
+    {
+        "version": "2.17.42",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix critique: Cliquer sur un nouveau compteur ne crée plus de doublon fantôme.",
+            "Fix: updateCounter recherche maintenant correctement par id du compteur."
+        ]
+    },
+    {
+        "version": "2.17.41",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix: Les nouveaux compteurs créés dans Admin sont maintenant correctement sauvegardés en BDD (format UUID).",
+            "Fix: Correction de la duplication des compteurs avec accents (ex: Volonté).",
+            "Sync: Les valeurs par défaut sont maintenant correctement appliquées lors de la création de compteurs."
+        ]
+    },
+    {
+        "version": "2.17.40",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin→Joueur: Les nouveaux compteurs créés dans la bibliothèque Admin apparaissent maintenant automatiquement dans la fiche joueur.",
+            "Sync: CampaignService synchronise definitions.counters avec libraries.counters au chargement."
+        ]
+    },
+    {
+        "version": "2.17.39",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Les Compétences et Arrière-plans Globaux sont maintenant éditables et propagent leurs modifications à toutes les campagnes.",
+            "Sync: LibraryService met à jour les Globaux (Skills, Backgrounds, Counters) lors de la sauvegarde."
+        ]
+    },
+    {
+        "version": "2.17.38",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix critique: Les descriptions de compteurs provenant de l'Admin (mode Online) sont maintenant correctement synchronisées vers la fiche joueur.",
+            "Pont: rulesReconciler utilise désormais libraries.counters comme source secondaire pour les descriptions."
+        ]
+    },
+    {
+        "version": "2.17.37",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Les compteurs Globaux sont maintenant éditables et propagent leurs modifications à toutes les campagnes.",
+            "Sync: LibraryService met à jour les Globaux (setting_id = NULL) lors de la sauvegarde."
+        ]
+    },
+    {
+        "version": "2.17.36",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix: La description des compteurs est maintenant correctement persistée en BDD (mode Online).",
+            "Sync: LibraryService inclut désormais 'description' dans les insert/load de counters."
+        ]
+    },
+    {
+        "version": "2.17.35",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix: Le thème (couleurs des points) est maintenant correctement réinitialisé lors de la création d'un nouveau personnage.",
+            "Cleanup: Suppression de la gestion du thème dans les règles Admin (non utilisée)."
+        ]
+    },
+    {
+        "version": "2.17.34",
+        "date": "2026-02-06",
+        "type": "bugfix",
+        "changes": [
+            "Fix critique: Les compteurs utilisent maintenant 'Départ' au lieu de 'Max' pour la valeur initiale.",
+            "Sync: La description des compteurs est maintenant synchronisée depuis Admin vers Joueur."
+        ]
+    },
+    {
+        "version": "2.17.33",
+        "date": "2026-02-06",
+        "type": "bugfix",
+        "changes": [
+            "Fix critique: Correction de la duplication des compétences lors de l'import d'anciens personnages.",
+            "Migration: Les clés legacy sont maintenant migrées AVANT l'injection des valeurs par défaut."
+        ]
+    },
+    {
+        "version": "2.17.32",
+        "date": "2026-02-06",
+        "type": "refactor",
+        "changes": [
+            "Refactoring majeur: Découpage de migrations.ts (687→15 lignes) en 9 modules spécialisés.",
+            "Architecture: Nouveau dossier utils/migrations/ avec modules par domaine.",
+            "Maintenabilité: Chaque migration isolée, testable indépendamment."
+        ]
+    },
+    {
+        "version": "2.17.31",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Tests: Suite de tests exhaustive pour migrations.ts (51 tests).",
+            "Tests: Création de fixtures legacy pour valider toutes les migrations de données.",
+            "Build: Intégration du script sync-version dans le processus de build."
+        ]
+    },
+    {
+        "version": "2.17.30",
+        "date": "2026-02-06",
+        "type": "feature",
+        "changes": [
+            "Admin: Autorisation de l'édition des éléments 'Globaux' dans les bibliothèques.",
+            "Admin: Ajout de 'Description' et 'Départ' dans la gestion des compteurs.",
+            "Core: Correction du bug d'initialisation des compteurs à 10/10.",
+            "Core: Synchronisation forcée des descriptions d'Admin vers les fiches Joueurs."
+        ]
+    },
+    {
+        "version": "2.17.29",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Rollback: Suppression de l'édition locale sur la fiche joueur.",
+            "Layout: Mappage déterministe des colonnes de compétences (1234/5678)."
+        ]
+    },
+    {
+        "version": "2.17.28",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Alignement dynamique des colonnes de compétences sur les catégories d'attributs.",
+            "Correction d'un problème de superposition des blocs de compétences.",
+            "Optimisation de l'algorithme de distribution pour préserver l'espace de l'XP et des Arrière-plans."
+        ]
+    },
+    {
+        "version": "2.17.27",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Correction d'un crash structurel dans le moteur de layout (erreur .slice).",
+            "Amélioration de la résilience du layout pendant le chargement des règles."
+        ]
+    },
+    {
+        "version": "2.17.26",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Refonte du schéma de validation Zod pour supporter les IDs de compétences dynamiques.",
+            "Correction d'un bug critique de migration écrasant les attributs par 'undefined'.",
+            "Stabilisation de la vue Spécialisations (rendu dynamique via les règles).",
+            "Résolution des crashs TypeError au chargement en mode hors-ligne."
+        ]
+    },
+    {
+        "version": "2.17.25",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Sécurisation des scripts de migration et de réconciliation pour le mode hors-ligne.",
+            "Correction du décalage d'affichage de la version dans l'interface.",
+            "Ajout de protections contre les données malformées lors du chargement initial."
+        ]
+    },
+    {
         "version": "2.17.24",
         "date": "2026-02-06",
         "type": "cleanup",
@@ -7,387 +187,6 @@
             "Suppression de la section redondante 'Limites & Bornes' dans l'onglet Coûts.",
             "Consolidation des paramètres de limites d'attributs exclusivement dans l'onglet Création.",
             "Retrait du réglage 'Score Maximal Absolu' (non fonctionnel)."
-        ]
-    },
-    {
-        "version": "2.17.23",
-        "date": "2026-02-06",
-        "type": "cleanup",
-        "changes": [
-            "Simplification de la gestion des attributs : suppression du coût initial redondant.",
-            "Standardisation du coût de progression des attributs à 6 XP par défaut.",
-            "Nettoyage des facteurs de coûts globaux (Spécialisations à 0, Skills à 1)."
-        ]
-    },
-    {
-        "version": "2.17.22",
-        "date": "2026-02-06",
-        "type": "cleanup",
-        "changes": [
-            "Suppression du coût en XP des spécialisations : elles sont désormais gratuites par défaut.",
-            "Nettoyage de l'interface Admin : retrait du multiplicateur de spécialisation.",
-            "Simplification de la section de gestion des attributs."
-        ]
-    },
-    {
-        "version": "2.17.21",
-        "date": "2026-02-06",
-        "type": "cleanup",
-        "changes": [
-            "Nettoyage de l'onglet Coûts & Limites : Suppression des widgets redondants 'Formule de Progression' et 'Progression Linéaire'.",
-            "Consolidation des réglages d'Attributs et Spécialisations dans une section unifiée.",
-            "Amélioration de la lisibilité de l'interface Admin par la suppression du facteur global de compétence devenu obsolète.",
-            "Optimisation du layout pour mettre l'accent sur l'Économie des Compétences."
-        ]
-    },
-    {
-        "version": "2.17.20",
-        "date": "2026-02-06",
-        "type": "feature",
-        "changes": [
-            "Automatisation des coûts par Behavior : Changer le type d'une catégorie (ex: Secondaire) met à jour automatiquement sa formule et son facteur.",
-            "Affinement des économies par défaut : Compétences (x1 Triangulaire), Secondaires (x0.5 Triangulaire), Arrière-plans (x1 Linéaire), Compteurs (x1 Linéaire).",
-            "Harmonisation de la migration des règles héritées vers les nouveaux standards économiques.",
-            "Mise à jour des règles par défaut pour les nouvelles fiches personnages."
-        ]
-    },
-    {
-        "version": "2.17.19",
-        "date": "2026-02-06",
-        "type": "feature",
-        "changes": [
-            "Centralisation de la gestion des coûts de compétences dans l'onglet 'Coûts & Limites'.",
-            "Nouvelle interface 'Économie des Compétences' permettant de régler Facteurs et Formules (Linéaire/Triangulaire) par catégorie.",
-            "Nettoyage de l'éditeur de layout (Compétences) pour une interface plus aérée.",
-            "Amélioration de la cohérence visuelle des indicateurs de behavior."
-        ]
-    },
-    {
-        "version": "2.17.18",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Correction de la synchronisation des bibliothèques (Arrière-plans et Compteurs) lors de la création d'un nouveau setting.",
-            "Alignement du LibraryService sur les identifiants de colonnes génériques (Col_Comp_8/9) pour la détection des éléments actifs."
-        ]
-    },
-    {
-        "version": "2.17.17",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Migration automatique des anciens 'Settings' (campagnes) vers le système de compétences v2.",
-            "Correction de l'onglet Compétences vide pour les anciens paramètres via injection dynamique de 'skillCategories'.",
-            "Mise à jour de la bibliothèque de compétences pour supporter les identifiants de colonnes génériques."
-        ]
-    },
-    {
-        "version": "2.17.16",
-        "date": "2026-02-06",
-        "type": "feature",
-        "changes": [
-            "Refonte majeure de l'ID des colonnes de compétences (Generic IDs Col_Comp_1..9).",
-            "Support des configurations dynamiques : Libellés, Behaviors (Compétence, Secondaire, etc.) et Coûts configurables par catégorie.",
-            "Ajout des info-bulles (description) et icônes optionnelles pour les catégories de compétences.",
-            "Migration automatique des anciennes données de personnages vers le nouveau format.",
-            "Rendu dynamique des colonnes côté Admin et Joueur respectant l'ordre défini par le MJ.",
-            "Adaptation du moteur de calcul d'XP pour supporter les facteurs de coût par catégorie."
-        ]
-    },
-    {
-        "version": "2.17.15",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "UI : Restauration de la taille des icônes d'action à 12.",
-            "UI : Correction du chevauchement entre la structure (rectangles) et les icônes d'édition."
-        ]
-    },
-    {
-        "version": "2.17.14",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "UI : Alignement invariant des icônes d'action sur les préréglages (indépendant de la hauteur de la structure)."
-        ]
-    },
-    {
-        "version": "2.17.13",
-        "date": "2026-02-06",
-        "type": "feature",
-        "changes": [
-            "Admin : Possibilité d'éditer le nom et la description des préréglages d'attributs.",
-            "Sécurité : Le nom des préréglages officiels est verrouillé en édition (seule la description est modifiable).",
-            "UI : Ajout d'icônes d'édition (Crayon) sur les widgets de préréglages."
-        ]
-    },
-    {
-        "version": "2.17.12",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "UI : Fix définitif de l'alignement vertical inter-widgets dans les préréglages d'attributs.",
-            "UI : Alignement par le haut (items-start) pour garantir une ligne de lecture constante."
-        ]
-    },
-    {
-        "version": "2.17.11",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "UI : Alignement vertical parfait des titres de préréglages.",
-            "UI : Unification visuelle des cartes (bordures arrondies, ombres, fonds blancs).",
-            "UX : Ajout de hauteurs minimales garanties pour éviter les décalages de grille."
-        ]
-    },
-    {
-        "version": "2.17.10",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "UI : Suppression des doublons de texte 'X Pavés' dans les widgets de préréglages.",
-            "UI : Unification du rendu entre les préréglages officiels et personnalisés."
-        ]
-    },
-    {
-        "version": "2.17.9",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Hotfix : Correction de l'import manquant de l'icône Shield.",
-            "Hotfix : Suppression de la prop résiduelle onAddAttribute dans l'éditeur d'attributs."
-        ]
-    },
-    {
-        "version": "2.17.8",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "UI : Dé placement du bouton 'Ajouter un Attribut' dans le header de la section Attributs pour plus de clarté.",
-            "Nettoyage : Suppression des boutons d'ajout redondants sur chaque pavé d'attributs."
-        ]
-    },
-    {
-        "version": "2.17.7",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Refactorisation majeure de l'éditeur d'attributs Admin (AdminAttributesEditor).",
-            "Extraction de la logique métier dans un hook personnalisé useAttributeEditor.ts.",
-            "Réduction de 70% de la taille du composant UI AdminAttributesEditor.",
-            "Amélioration de la maintenance et de la lisibilité de la gestion des attributs."
-        ]
-    },
-    {
-        "version": "2.17.6",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Hotfix : Correction des imports brisés suite au renommage de AdminService en CampaignService.",
-            "Hotfix : Restauration des imports manquants (RulesData, React) dans AdminCreationEditor.",
-            "Fix : Correction d'une erreur de type TypeScript sur le Drag & Drop des compétences."
-        ]
-    },
-    {
-        "version": "2.17.5",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Refactorisation finale des services Admin (AdminService)",
-            "Renommage de AdminService en CampaignService (gestion CRUD des campagnes)",
-            "Création de RuleCalculationsService pour centraliser les formules de calcul (XP, Coûts, Cartes)",
-            "Unification de la logique de calcul entre MJ et Joueur via mechanics.ts"
-        ]
-    },
-    {
-        "version": "2.17.4",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Refactorisation de l'éditeur de création (AdminCreationEditor)",
-            "Extraction des sous-composants : CreationGeneralSettings, RankSlotsConfig, CreationPointsPreview et CardSystemConfig",
-            "Simplification du fichier principal et isolation des zones de configuration"
-        ]
-    },
-    {
-        "version": "2.17.3",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Modularisation de l'éditeur de compétences (AdminSkillsEditor)",
-            "Extraction du composant SkillCategoryCard pour une meilleure gestion des colonnes",
-            "Simplification de la logique de Drag & Drop inter-colonnes"
-        ]
-    },
-    {
-        "version": "2.17.2",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Optimisation du journal des modifications (split JSON et automatisation de l'archivage)",
-            "Chargement asynchrone (lazy-loading) de l'historique ancien pour améliorer les performances au démarrage",
-            "Mise en place d'une rotation automatique : Top 20 (Main) / Top 100 (Archive) / Legacy (Markdown)"
-        ]
-    },
-    {
-        "version": "2.17.1",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Modularisation massive de l'éditeur d'attributs (AdminAttributesEditor)",
-            "Création du sous-composant AttributeCategoryCard (gestion d'un pavé)",
-            "Création du sous-composant AttributePresetManager (gestion des préréglages et sauvegarde)",
-            "Optimisation du code et réduction de la complexité du fichier principal"
-        ]
-    },
-    {
-        "version": "2.17.0",
-        "date": "2026-02-06",
-        "type": "minor",
-        "changes": [
-            "Refactoring majeur de AdminService : extraction des responsabilités vers AttributeService et LibraryService",
-            "Centralisation des constantes d'attributs (defaults/attributes.ts) pour une meilleure cohérence MJ/Joueur et support Offline",
-            "Optimisation du moteur de synchronisation des bibliothèques (Traits, Compétences, Arrières-plans, Compteurs)",
-            "Amélioration de la robustesse du typage global (RulesData, GameSetting)"
-        ]
-    },
-    {
-        "version": "2.16.6",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "Correction du placement par défaut des compteurs (Volonté/Confiance) lors de la création d'une nouvelle campagne"
-        ]
-    },
-    {
-        "version": "2.16.5",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "Finalisation de l'intégration du Dot-System dans le header des cartes de préréglages",
-            "Harmonisation des préréglages codés en dur avec le nouveau design de visualisation",
-            "Nettoyage structurel et optimisation de l'affichage des points d'attributs"
-        ]
-    },
-    {
-        "version": "2.16.4",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "Affinement de la visualisation Dot-System : design ultra-compact avec séparation claire entre attributs primaires (bleu) et secondaires (ambre)",
-            "Suppression des labels textuels superflus dans la bibliothèque de préréglages pour une interface plus épurée"
-        ]
-    },
-    {
-        "version": "2.16.3",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "Nouvelle visualisation des préréglages : ajout d'une micro-structure (grille de points) affichant le nombre d'attributs par pavé",
-            "Indicateur visuel pour les attributs secondaires (couleur ambre + icône éclair ⚡)",
-            "Amélioration de la lisibilité de la bibliothèque de préréglages"
-        ]
-    },
-    {
-        "version": "2.16.2",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "Correction du remplissage automatique des noms d'attributs secondaires par défaut (basé sur le libellé du pavé)",
-            "Mise à jour des préréglages codés en dur pour inclure les attributs secondaires par défaut",
-            "Sécurisation du script de migration SQL (Unique Constraint)"
-        ]
-    },
-    {
-        "version": "2.16.1",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "Inclusion des attributs secondaires dans les préréglages (sauvegarde et chargement)",
-            "Amélioration de l'UI : Déplacement du commutateur 'Secondaires' à côté du bouton d'ajout de pavé",
-            "Correction et synchronisation des types de préréglages avec la base de données"
-        ]
-    },
-    {
-        "version": "2.16.0",
-        "date": "2026-02-05",
-        "type": "minor",
-        "changes": [
-            "Refontes des préréglages d'attributs (Renommage Standard -> v2 et Complet -> v4)",
-            "Gestion dynamique des préréglages via la base de données (Table attribute_presets)",
-            "Amélioration de l'interface Admin : Grille de cartes ergonomique pour la sélection",
-            "Nouvelle fonctionnalité : Sauvegarder la structure actuelle en tant que préréglage réutilisable",
-            "Possibilité de supprimer ses propres préréglages personnalisés"
-        ]
-    },
-    {
-        "version": "2.15.0",
-        "date": "2026-02-05",
-        "type": "minor",
-        "changes": [
-            "ARCH : Migration vers des IDs d'attributs génériques (pave_attributs_1, etc.) pour une indépendance totale vis-à-vis des thèmes.",
-            "SYSTEM : Implémentation d'un moteur de migration runtime pour convertir automatiquement les anciens personnages sans perte de données.",
-            "ADMIN : Les éditeurs d'attributs (Admin & Joueur) génèrent désormais ces nouveaux IDs génériques par défaut."
-        ]
-    },
-    {
-        "version": "2.14.3",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "FIX: Ajout des noms par défaut pour les attributs secondaires (Corpulence, Beauté, Conscience, etc.).",
-            "IMPROVE: L'éditeur utilise désormais ces noms par défaut lors de l'activation des attributs secondaires."
-        ]
-    },
-    {
-        "version": "2.14.2",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "FIX: Les attributs par défaut suivent désormais la structure Standard (3 pavés de 4 attributs).",
-            "IMPROVE: L'éditeur d'attributs impose désormais une symétrie globale (le nombre d'attributs est identique pour tous les pavés).",
-            "IMPROVE: Support débloqué pour un 5ème pavé d'attributs."
-        ]
-    },
-    {
-        "version": "2.14.1",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "FIX: Nettoyage des compteurs par défaut (Suppression 'Points de Vie').",
-            "FIX: Le compteur 'Confiance' est désormais actif par défaut.",
-            "IMPROVE: Liaison automatique des éléments pré-existants (Layout) avec la Bibliothèque Globale."
-        ]
-    },
-    {
-        "version": "2.14.0",
-        "date": "2026-02-05",
-        "type": "minor",
-        "changes": [
-            "Feature (Bibliothèques Unifiées) : Extension de la bibliothèque globale pour inclure les Arrières-Plans et les Compteurs.",
-            "Admin UI : Mise à jour de la barre latérale 'Réserve' avec des onglets pour gérer Compétences, Arrières-Plans et Compteurs.",
-            "Backend : Persistance en base de données (Supabase) des nouvelles bibliothèques et gestion des liens Global/Local.",
-            "Admin UI : Support du Glisser-Déposer pour toutes les entités de bibliothèque vers l'éditeur de mise en page."
-        ]
-    },
-    {
-        "version": "2.13.10",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "Refonte Bibliothèque Globale : Gestion unifiée des compétences.",
-            "Correction Creation : Les nouvelles campagnes démarrent avec les compétences globales liées.",
-            "Correction Doublons : Nettoyage de la base de données et masquage intelligent des doublons.",
-            "Admin : La barre latérale 'Réserve' filtre désormais les compétences inactives."
-        ]
-    },
-    {
-        "version": "2.13.9",
-        "date": "2026-02-04",
-        "type": "patch",
-        "changes": [
-            "Hotfix : Utilisation de crypto.randomUUID() pour les IDs de compétences (compatibilité Supabase UUID).",
-            "Hotfix : Retour d'erreurs détaillé dans l'UI admin lors de la sauvegarde BDD."
         ]
     }
 ]

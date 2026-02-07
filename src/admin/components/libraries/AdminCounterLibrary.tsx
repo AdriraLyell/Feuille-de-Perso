@@ -23,7 +23,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
 
     const filteredList = useMemo(() => {
         return list
-            .filter(c => smartIncludes(c.name, searchTerm))
+            .filter(c => smartIncludes(c.name, searchTerm) || (c.description && smartIncludes(c.description, searchTerm)))
             .sort((a, b) => a.name.localeCompare(b.name));
     }, [list, searchTerm]);
 
@@ -32,11 +32,13 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
     const handleOpenNew = () => {
         setError(null);
         setEditingItem({
-            id: Math.random().toString(36).substr(2, 9),
+            id: crypto.randomUUID(),
             name: '',
+            description: '',
             maxValue: 10,
             defaultValue: 0,
-            xpCost: 0
+            xpCost: 0,
+            isGlobal: false
         });
         setIsModalOpen(true);
     };
@@ -146,12 +148,8 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                             <span className={`font-bold truncate ${item.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={item.name}>{item.name}</span>
                                         </div>
                                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
-                                            {!item.isGlobal && (
-                                                <button onClick={() => handleOpenEdit(item)} className="text-blue-600 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
-                                            )}
-                                            {!item.isGlobal && (
-                                                <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
-                                            )}
+                                            <button onClick={() => handleOpenEdit(item)} className="text-blue-600 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
+                                            <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
                                             {item.isGlobal && <span title="Global" className="text-xs text-amber-500 font-bold border border-amber-200 bg-amber-50 px-1 rounded">GLOBAL</span>}
                                         </div>
                                     </div>
@@ -160,6 +158,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                         <span title="Défaut">Départ: {item.defaultValue}</span>
                                         <span title="Coût XP">Coût: {item.xpCost}</span>
                                     </div>
+                                    {item.description && <p className="text-[10px] text-slate-500 italic line-clamp-1 mt-1">{item.description}</p>}
                                 </div>
                             </div>
                         ))}
@@ -191,6 +190,16 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                 value={editingItem.name}
                                 onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
                                 autoFocus
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Description (Notes)</label>
+                            <textarea
+                                className="w-full border border-slate-300 rounded px-3 py-2 text-sm min-h-[60px] focus:border-red-500 outline-none resize-none"
+                                value={editingItem.description || ''}
+                                onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
+                                placeholder="Expliquez à quoi sert ce compteur..."
                             />
                         </div>
 

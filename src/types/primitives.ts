@@ -7,6 +7,7 @@ export interface DotEntry {
   current?: number; // Valeur temporaire (Utilisé / Carrés)
   max: number;
   variant?: string; // Précision pour les compétences variables (ex: "Artisanat : Forge")
+  description?: string; // New: Description info-bubble
 }
 
 export interface AttributeEntry {

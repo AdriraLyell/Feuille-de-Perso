@@ -59,18 +59,18 @@ const DotRow: React.FC<{
         >
             <span
                 className={`text-xs truncate font-medium transition-colors ${isUndefinedVariable
-                    ? 'text-stone-500 cursor-pointer hover:text-amber-700 hover:underline'
+                    ? 'text-amber-600 font-bold cursor-pointer hover:underline'
                     : hasSpecs
-                        ? 'text-blue-900 font-semibold cursor-help'
+                        ? 'text-blue-900 font-semibold cursor-help underline underline-offset-2 decoration-blue-300'
                         : 'text-stone-700 cursor-default'}`}
                 // Dynamic width adjustment to avoid overlap with extra bubbles
-                style={{ width: effectiveMax > 5 ? '40%' : '60%' }}
+                style={{ width: effectiveMax > 5 ? '45%' : '65%' }}
                 onClick={handleClick}
-                title={entry.variant ? `${entry.name} : ${entry.variant}` : entry.name}
+                title={entry.description || (entry.variant ? `${entry.name} : ${entry.variant}` : entry.name)}
             >
                 {entry.name}
                 {entry.variant !== undefined && (
-                    <span className={`${isUndefinedVariable ? 'font-bold' : 'text-stone-500 font-normal'}`}>
+                    <span className={`${isUndefinedVariable ? 'italic opacity-60' : 'text-stone-500 font-normal'}`}>
                         {' : '}{entry.variant || '...'}
                     </span>
                 )}
@@ -99,7 +99,7 @@ const DotRow: React.FC<{
                 value={entry.value}
                 creationValue={entry.creationValue}
                 onChange={(val) => onUpdate('skills', category, entry.id, val)}
-                className="scale-90 origin-right"
+                className="scale-90 origin-right ml-auto"
                 creationColor={theme?.creationColor}
                 xpColor={theme?.xpColor}
                 symbol={theme?.dotSymbol}
@@ -128,7 +128,7 @@ export const SkillBlock = React.memo<{
     const IconComponent = icon ? (LucideIcons[icon as keyof typeof LucideIcons] as LucideIcon) : null;
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col">
             <div className="relative group/header">
                 <SectionHeader
                     title={

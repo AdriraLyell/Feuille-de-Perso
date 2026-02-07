@@ -5,6 +5,7 @@ import SpecializationOmnibar from './specialization-library/SpecializationOmniba
 import SpecializationLibraryDrawer from './specialization-library/SpecializationLibraryDrawer';
 import { Award, Book, Plus } from 'lucide-react';
 import { useState } from 'react';
+import { useRules } from '../context/RulesContext';
 
 interface Props {
     isLandscape?: boolean;
@@ -18,6 +19,7 @@ const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
 
 const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false }) => {
     const { data, updateData: onChange, addLog: onAddLog } = useCharacter();
+    const { rules } = useRules();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     const getSkillName = (skillId: string): string => {
@@ -164,9 +166,12 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
     };
 
     const renderCategory = (title: string, categoryKey: SkillCategoryKey) => {
+        const categoryData = data.skills[categoryKey];
+        if (!categoryData || !Array.isArray(categoryData)) return null;
+
         // Show skill if it has dots OR imposed specializations
-        const skills = data.skills[categoryKey].filter(s => {
-            if (s.name.trim() === '') return false; // Skip spacers
+        const skills = categoryData.filter(s => {
+            if (!s || !s.name || s.name.trim() === '') return false; // Skip spacers
             // GLOBAL FIX: If skill value is 0, we don't show it (no specs visible at 0)
             return s.value > 0;
         });
@@ -226,13 +231,26 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                 )}
 
                 <div className="space-y-0.5 overflow-auto">
-                    {renderCategory("Talents", "talents")}
-                    {renderCategory("Compétences", "competences")}
-                    {renderCategory("Compétences (Suite)", "competences_col_2")}
-                    {renderCategory("Connaissances", "connaissances")}
-                    {renderCategory("Autres Compétences", "autres_competences")}
-                    {/* Excluded Compétences Secondaires */}
-                    {renderCategory("Autres", "autres")}
+                    {/* Dynamic Rendering from Rules */}
+                    {rules?.definitions?.skillCategories
+                        ?.filter(cat => cat.behavior === 'Compétence' || cat.behavior === 'Secondaire')
+                        ?.map(cat => (
+                            <div key={cat.id}>
+                                {renderCategory(cat.label, cat.id as any)}
+                            </div>
+                        ))}
+
+                    {/* Fallback Rendering if no rules / legacy keys */}
+                    {(!rules || !rules.definitions?.skillCategories) && (
+                        <>
+                            {renderCategory("Talents", "talents" as any)}
+                            {renderCategory("Compétences", "competences" as any)}
+                            {renderCategory("Compétences (Suite)", "competences_col_2" as any)}
+                            {renderCategory("Connaissances", "connaissances" as any)}
+                            {renderCategory("Autres Compétences", "autres_competences" as any)}
+                            {renderCategory("Autres", "autres" as any)}
+                        </>
+                    )}
                 </div>
             </div>
 

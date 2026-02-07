@@ -100,6 +100,7 @@ export interface LibraryBackgroundEntry extends LibrarySkillEntry {
 export interface LibraryCounterEntry {
   id: string;
   name: string;
+  description?: string; // New: Description for tooltip
   maxValue: number; // Default 10
   defaultValue: number; // Default 0
   xpCost: number; // 0 = free

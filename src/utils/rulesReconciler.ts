@@ -10,22 +10,29 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
     // Deep copy to work safely
     const newState: CharacterSheetData = JSON.parse(JSON.stringify(currentState));
 
-    // 1. Update Configuration (Costs, Theme, etc.)
+    // 1. Update Configuration (Costs, etc.)
     // These are safe to simply overwrite as they are "System Rules"
-    if (rules.theme) newState.theme = { ...newState.theme, ...rules.theme };
+    if (rules.configurations && rules.configurations.xpCosts) {
+        newState.xpCosts = {
+            attributeFactor: rules.configurations.xpCosts.attributeFactor || 6,
+            skillFactor: rules.configurations.xpCosts.skillFactor || 1,
+            specializationFactor: rules.configurations.xpCosts.specializationFactor || 0
+        };
+    }
 
-    newState.xpCosts = {
-        attributeFactor: rules.configurations.xpCosts.attributeFactor,
-        skillFactor: rules.configurations.xpCosts.skillFactor,
-        specializationFactor: rules.configurations.xpCosts.specializationFactor
-    };
-
-    newState.creationConfig = {
-        ...newState.creationConfig,
-        ...rules.configurations.creation,
-        // Force cast for rankSlots as generic Record<string> is not assignable to strict keys {1:number...}
-        rankSlots: rules.configurations.creation.rankSlots as any
-    };
+    if (rules.configurations && rules.configurations.creation) {
+        newState.creationConfig = {
+            ...newState.creationConfig,
+            ...rules.configurations.creation,
+            // Merge cardConfig from rules.configurations.cards (same as rulesAdapter)
+            cardConfig: rules.configurations.cards ? {
+                ...newState.creationConfig.cardConfig,
+                ...rules.configurations.cards
+            } : newState.creationConfig.cardConfig,
+            // Force cast for rankSlots as generic Record<string> is not assignable to strict keys {1:number...}
+            rankSlots: rules.configurations.creation.rankSlots as any
+        };
+    }
 
     // 2. Reconcile Attributes
     // We match by Name since IDs might differ if re-generated
@@ -133,31 +140,32 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
                 }
 
                 // Find existing
-                // We typically match by Name.
-                // Note: If user renamed a skill, it might be lost or duplicated?
-                // But skills are usually static.
-                const existing = existingEntries.find(e => e.name === name);
+                const existing = existingEntries.find(e => e && e.name === name);
+
+                // Lookup description from library
+                const libSkill = rules.libraries?.skills?.find(s => s && s.name === name);
+                const isVariable = libSkill?.isVariable === true;
+                const description = libSkill?.description || "";
 
                 if (existing) {
                     return {
                         ...existing,
                         // Update Max in case rule changed the cap
-                        max: rules.configurations.global.maxSkillScore,
+                        max: rules.configurations?.global?.maxSkillScore || 10,
                         // Update Name (case correction)
-                        name: name
-                        // Preserve existing variant state
+                        name: name,
+                        // Refresh description from library
+                        description: description || existing.description
                     };
                 } else {
                     // New Skill
-                    const libSkill = rules.libraries?.skills?.find(s => s.name === name);
-                    const isVariable = libSkill?.isVariable === true;
-
                     return {
                         id: generateId(),
                         name: name,
+                        description: description,
                         value: 0,
                         creationValue: 0,
-                        max: rules.configurations.global.maxSkillScore,
+                        max: rules.configurations?.global?.maxSkillScore || 10,
                         variant: isVariable ? "" : undefined
                     };
                 }
@@ -182,12 +190,21 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
         // @ts-ignore
         newState.skills.arrieres_plans = ruleBackgrounds.map(name => {
             const existing = existingBackgrounds.find((e: DotEntry) => e.name === name);
+            const libBg = rules.libraries?.backgrounds?.find(b => b.name === name);
+            const description = libBg?.description || "";
+
             if (existing) {
-                return { ...existing, max: 5, name: name };
+                return {
+                    ...existing,
+                    max: 5,
+                    name: name,
+                    description: description || existing.description
+                };
             }
             return {
                 id: generateId(),
                 name: name,
+                description: description,
                 value: 0, creationValue: 0, max: 5, variant: ""
             };
         });
@@ -202,22 +219,32 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
             const def = rules.definitions.counters[key];
             const existing = currentState.counters[key];
 
+            // Lookup description from library (Online mode uses libraries.counters)
+            const libCounter = rules.libraries?.counters?.find(c =>
+                c.name?.toLowerCase() === def.name?.toLowerCase() || c.id === key
+            );
+            const description = (def as any).description || libCounter?.description || '';
+
             if (existing) {
                 newCounters[key] = {
                     ...existing,
+                    // Preserve existing value, or use default from rules
                     name: def.name,
                     max: def.max,
-                    // If cap changed to be lower than current value, clamp it?
-                    // Let's trust logic to handle clamping elsewhere or keep over-cap.
-                    creationValue: def.max
+                    description: description || (existing as any).description || '',
+                    value: (existing as any).value !== undefined ? (existing as any).value : ((def as any).defaultValue !== undefined ? (def as any).defaultValue : ((def as any).value || 3)),
+                    creationValue: (existing as any).creationValue !== undefined ? (existing as any).creationValue : ((def as any).defaultValue !== undefined ? (def as any).defaultValue : ((def as any).value || 3))
                 };
             } else {
+                // New Counter Case
+                const startValue = (def as any).defaultValue !== undefined ? (def as any).defaultValue : ((def as any).value || 3);
                 newCounters[key] = {
                     id: def.id || key,
                     name: def.name,
-                    value: def.max,
-                    creationValue: def.max,
-                    max: def.max,
+                    description: description,
+                    value: startValue,
+                    creationValue: startValue,
+                    max: def.max || 10,
                     current: 0
                 };
             }

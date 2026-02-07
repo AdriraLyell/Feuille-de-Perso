@@ -231,16 +231,7 @@ export const CharacterSheetDataSchema = z.object({
     secondaryAttributes: z.record(z.string(), z.array(AttributeEntrySchema)),
     secondaryAttributesActive: z.boolean(),
     attributeSettings: z.array(AttributeCategoryDefSchema),
-    skills: z.object({
-        talents: z.array(DotEntrySchema),
-        competences: z.array(DotEntrySchema),
-        competences_col_2: z.array(DotEntrySchema),
-        connaissances: z.array(DotEntrySchema),
-        competences2: z.array(DotEntrySchema),
-        autres_competences: z.array(DotEntrySchema),
-        autres: z.array(DotEntrySchema),
-        arrieres_plans: z.array(DotEntrySchema)
-    }),
+    skills: z.record(z.string(), z.array(DotEntrySchema)),
     combat: z.object({
         weapons: z.array(CombatEntrySchema),
         armor: z.array(z.object({

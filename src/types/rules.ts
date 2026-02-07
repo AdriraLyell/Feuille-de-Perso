@@ -1,9 +1,3 @@
-export interface RulesThemeConfig {
-    creationColor: string;
-    xpColor: string;
-    dotSymbol?: string;
-}
-
 import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry } from './system';
 
 export interface RulesCreationConfig {
@@ -61,6 +55,9 @@ export interface RulesCounterDefinition {
     name: string;
     max: number;
     xpCost: number; // Cost per point. <= 0 means cannot be bought with XP
+    value?: number; // Starting value (Legacy compatibility)
+    defaultValue?: number; // Starting value (New system)
+    description?: string; // New: Description for tooltip
 }
 
 export interface RulesData {
@@ -85,7 +82,6 @@ export interface RulesData {
         backgrounds: string[]; // List of available backgrounds
         labels: Record<string, string>;   // Category ID -> Display Label (Legacy)
     };
-    theme: RulesThemeConfig;
     libraries: {
         traits: LibraryEntry[];
         skills: LibrarySkillEntry[];
