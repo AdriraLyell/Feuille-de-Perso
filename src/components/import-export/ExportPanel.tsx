@@ -6,6 +6,7 @@ import { APP_VERSION } from '../../constants';
 import { createTemplateFromData } from '../../utils/importExportUtils';
 import { getImage, blobToBase64 } from '../../imageDB';
 import { useNotification } from '../../context/NotificationContext';
+import { ImageCompressionService } from '../../services/ImageCompressionService';
 
 interface ExportPanelProps {
     data: CharacterSheetData;
@@ -116,10 +117,18 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                 exportData = { specializationLibrary: data.specializationLibrary, appVersion: APP_VERSION };
                 filename = `${timestamp}_Biblio_Specialisations`;
                 break;
-            case 'library_all':
-                exportData = { library: data.library, skillLibrary: data.skillLibrary, specializationLibrary: data.specializationLibrary, appVersion: APP_VERSION };
                 filename = `${timestamp}_Biblio_Complete`;
                 break;
+        }
+
+        // --- COMPRESS IMAGES IN EXPORT DATA ---
+        addLog("Compression des images en cours...", 'info', 'sheet', 'img-compress');
+        try {
+            exportData = await ImageCompressionService.processImages(exportData, 'compress');
+            addLog("Images compressées avec succès.", 'success', 'sheet', 'img-compress');
+        } catch (e) {
+            console.error("[Export] Compression failed", e);
+            addLog("Avertissement : La compression des images a échoué, export brut utilisé.", 'danger', 'sheet', 'img-compress');
         }
 
         const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });

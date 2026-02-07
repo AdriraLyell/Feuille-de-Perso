@@ -192,5 +192,39 @@ export const ImageCompressionService = {
         // Only need to decompress gzip layer
         // Image compression is lossy and permanent
         return this.decompressBase64(compressed);
+    },
+
+    /**
+     * Recursively process an object to compress/decompress image strings.
+     * Moves this logic from CharacterSyncService to be reusable.
+     */
+    async processImages(obj: any, action: 'compress' | 'decompress'): Promise<any> {
+        if (!obj || typeof obj !== 'object') return obj;
+
+        if (Array.isArray(obj)) {
+            return Promise.all(obj.map(item => this.processImages(item, action)));
+        }
+
+        const processed: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (typeof value === 'string') {
+                if (action === 'compress' && value.startsWith('data:image/')) {
+                    const result = await this.compressFull(value);
+                    processed[key] = result.compressed;
+                } else if (action === 'compress' && value.startsWith('GZIP:')) {
+                    // ALREADY COMPRESSED - SKIP to avoid generation loss
+                    processed[key] = value;
+                } else if (action === 'decompress' && value.startsWith('GZIP:')) {
+                    processed[key] = this.decompressFull(value);
+                } else {
+                    processed[key] = value;
+                }
+            } else if (typeof value === 'object') {
+                processed[key] = await this.processImages(value, action);
+            } else {
+                processed[key] = value;
+            }
+        }
+        return processed;
     }
 };

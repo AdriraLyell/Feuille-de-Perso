@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { ImageConfig } from '../../types';
 import { X, Move, Scaling, WrapText, BoxSelect, Maximize2, Minimize2, StretchHorizontal } from 'lucide-react';
 import { getImage } from '../../imageDB';
+import { ImageCompressionService } from '../../services/ImageCompressionService';
 
 interface NoteImageZoneProps {
     uniqueId: string; // Placement ID
@@ -14,12 +15,12 @@ interface NoteImageZoneProps {
 
 const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config, onUpdateConfig, onDelete }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-    
+
     // Default Config Initialization
-    const defaultConfig: ImageConfig = { 
-        width: 300, 
-        height: 200, 
-        marginTop: 0, 
+    const defaultConfig: ImageConfig = {
+        width: 300,
+        height: 200,
+        marginTop: 0,
         align: 'right',
         x: 0,
         y: 0,
@@ -50,20 +51,41 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
 
     useEffect(() => {
         let active = true;
+        let cleanupUrl = "";
+
         const load = async () => {
             try {
                 const blob = await getImage(imageId);
                 if (blob && active) {
-                    const url = URL.createObjectURL(blob);
-                    setImageUrl(url);
-                    return () => URL.revokeObjectURL(url);
+                    // Check if blob is a GZIP string
+                    const text = await new Response(blob).text();
+                    let finalUrl = "";
+
+                    if (text.startsWith('GZIP:')) {
+                        const decompressed = ImageCompressionService.decompressFull(text);
+                        finalUrl = decompressed;
+                    } else {
+                        finalUrl = URL.createObjectURL(blob);
+                    }
+
+                    if (active) {
+                        setImageUrl(finalUrl);
+                        cleanupUrl = finalUrl;
+                    }
                 }
             } catch (e) {
                 console.error("Erreur chargement image note", e);
             }
         };
+
         load();
-        return () => { active = false; };
+
+        return () => {
+            active = false;
+            if (cleanupUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(cleanupUrl);
+            }
+        };
     }, [imageId]);
 
     // --- RESIZE HANDLERS ---
@@ -71,10 +93,10 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
         e.preventDefault();
         e.stopPropagation();
         setIsResizing(true);
-        startPosRef.current = { 
-            x: e.clientX, 
-            y: e.clientY, 
-            w: tempConfig.width, 
+        startPosRef.current = {
+            x: e.clientX,
+            y: e.clientY,
+            w: tempConfig.width,
             h: tempConfig.height,
             configX: 0, configY: 0, mt: 0
         };
@@ -85,9 +107,9 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
         e.preventDefault();
         e.stopPropagation();
         setIsMoving(true);
-        startPosRef.current = { 
-            x: e.clientX, 
-            y: e.clientY, 
+        startPosRef.current = {
+            x: e.clientX,
+            y: e.clientY,
             w: 0, h: 0,
             configX: tempConfig.x || 0,
             configY: tempConfig.y || 0,
@@ -107,8 +129,8 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
                 const newWidth = Math.max(50, w + dx);
                 const newHeight = Math.max(50, h + dy);
                 setTempConfig(prev => ({ ...prev, width: newWidth, height: newHeight }));
-            } 
-            
+            }
+
             if (isMoving) {
                 if (tempConfig.mode === 'absolute') {
                     // Absolute Mode: Free X/Y movement
@@ -148,11 +170,11 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
     const toggleMode = (e: React.MouseEvent) => {
         e.stopPropagation();
         const newMode = tempConfig.mode === 'absolute' ? 'flow' : 'absolute';
-        
+
         // When switching to absolute, sync X/Y from current visual state if possible
         // Ideally we would calculate position, but for now we rely on existing X/Y or marginTop
         let updates: Partial<ImageConfig> = { mode: newMode };
-        
+
         if (newMode === 'absolute') {
             // Initialize X/Y if they are 0 (first switch)
             if (!tempConfig.x && !tempConfig.y) {
@@ -177,7 +199,7 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
         const modes: ImageConfig['fit'][] = ['cover', 'contain', 'fill'];
         const currentIdx = modes.indexOf(tempConfig.fit || 'cover');
         const nextMode = modes[(currentIdx + 1) % modes.length];
-        
+
         const newConfig = { ...tempConfig, fit: nextMode };
         setTempConfig(newConfig);
         onUpdateConfig(newConfig);
@@ -187,7 +209,7 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
 
     // Computed Styles based on Mode
     const isAbsolute = tempConfig.mode === 'absolute';
-    
+
     const containerStyle: React.CSSProperties = isAbsolute ? {
         position: 'absolute',
         top: tempConfig.y || 0,
@@ -199,10 +221,10 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
         float: tempConfig.align,
         width: tempConfig.width,
         // Important: In flow mode, we add the margin to the total height but allow text to flow in it via shape-outside
-        height: tempConfig.height + tempConfig.marginTop, 
+        height: tempConfig.height + tempConfig.marginTop,
         paddingTop: tempConfig.marginTop, // Push the visual image down
         shapeOutside: `inset(${tempConfig.marginTop}px 0 0 0)`, // Tell text it can occupy the top area
-        
+
         [tempConfig.align === 'left' ? 'marginRight' : 'marginLeft']: '20px',
         marginBottom: '10px',
         zIndex: 10,
@@ -213,18 +235,18 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
     const currentFit = tempConfig.fit || 'cover';
 
     return (
-        <div 
+        <div
             ref={containerRef}
             className="group/image select-none"
             style={containerStyle}
         >
             <div className={`w-full h-full relative border-4 border-white shadow-md bg-white transition-shadow ${isInteracting ? 'shadow-xl ring-2 ring-indigo-400 opacity-90' : ''}`}>
-                <img 
-                    src={imageUrl} 
-                    alt="Note Attachment" 
+                <img
+                    src={imageUrl}
+                    alt="Note Attachment"
                     className={`w-full h-full pointer-events-none transition-all duration-300 object-${currentFit}`}
                 />
-                
+
                 {/* Overlay Controls */}
                 <div className={`absolute inset-0 bg-black/10 transition-opacity flex flex-col justify-between p-2
                     ${isInteracting ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover/image:opacity-100 pointer-events-none group-hover/image:pointer-events-auto'}
@@ -234,11 +256,10 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
                             {/* Mode Toggle Button */}
                             <button
                                 onClick={toggleMode}
-                                className={`p-1.5 rounded shadow text-xs font-bold flex items-center gap-1 transition-colors ${
-                                    isAbsolute 
-                                    ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                                className={`p-1.5 rounded shadow text-xs font-bold flex items-center gap-1 transition-colors ${isAbsolute
+                                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
                                     : 'bg-white text-indigo-700 hover:bg-indigo-50'
-                                }`}
+                                    }`}
                                 title={isAbsolute ? "Mode Libre (Flottant)" : "Mode Habillage (Texte autour)"}
                             >
                                 {isAbsolute ? <BoxSelect size={14} /> : <WrapText size={14} />}
@@ -256,7 +277,7 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
                             </button>
                         </div>
 
-                        <button 
+                        <button
                             onClick={(e) => { e.stopPropagation(); onDelete(); }}
                             className="bg-red-600 text-white p-1 rounded shadow hover:bg-red-700"
                             title="Supprimer"
@@ -264,9 +285,9 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
                             <X size={14} />
                         </button>
                     </div>
-                    
+
                     {/* Move Handle (Center) */}
-                    <div 
+                    <div
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-move bg-white/80 p-2 rounded-full hover:bg-white text-stone-700"
                         onMouseDown={handleMoveStart}
                         title="Déplacer"
@@ -275,7 +296,7 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
                     </div>
 
                     {/* Resize Handle (Bottom Right) */}
-                    <div 
+                    <div
                         className="absolute bottom-0 right-0 cursor-nwse-resize p-1 text-white bg-indigo-600/80 rounded-tl-lg hover:bg-indigo-600"
                         onMouseDown={handleResizeStart}
                     >

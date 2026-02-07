@@ -1,5 +1,43 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.12.33] - 2026-02-02
+
+- Correctif : Restauration de la taille de la zone "Notes" en bas de la page "Détails & Équipement".
+
+## [2.12.32] - 2026-02-02
+
+- Correctif Critique : Le défilement de la page n'est plus bloqué après avoir validé ou fermé une fenêtre modale.
+
+## [2.12.31] - 2026-02-02
+
+- Correctif : Suppression des logs de débogage dans la console.
+- Ergonomie : La fiche s'agrandit désormais automatiquement en hauteur si vous ajoutez beaucoup de compétences, débloquant le défilement.
+
+## [2.12.30] - 2026-02-02
+
+- Ergonomie : Les compétences à variations (Artisanat : ...) sont maintenant cliquables directement sur la fiche.
+- Fonctionnalité : Remplir une variante ajoute automatiquement une nouvelle ligne vide en dessous pour des ajouts rapides.
+
+## [2.12.29] - 2026-02-02
+
+- Nettoyage : Suppression des traces de débogage de la migration, le correctif étant confirmé.
+
+## [2.12.28] - 2026-02-02
+
+- Correction Critique : Mise à jour du schéma de validation pour autoriser le champ "variante" (empêche sa suppression automatique).
+
+## [2.12.27] - 2026-02-02
+
+- Correction d'urgence : Réparation automatique des conflits de nommage dans les données sauvegardées (skilllibrary vs skillLibrary).
+
+## [2.12.26] - 2026-02-02
+
+- Correction : Application rétroactive du statut "Variable" aux compétences déjà présentes sur la fiche (restauration des champs de saisie).
+
+## [2.12.25] - 2026-02-02
+
+- Diagnostic : Ajout de traces détaillées dans le processus de migration de la bibliothèque.
+
 ## [2.12.24] - 2026-02-02
 
 - Correction d'initialisation : Forçage de la mise à jour des indicateurs "Variable" pour les bibliothèques existantes (Artisanat, Jouer, Art Martial).

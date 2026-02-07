@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Upload, Trash2, Image as ImageIcon } from 'lucide-react';
 import { saveImage, getImage, deleteImage, base64ToBlob } from '../../imageDB';
 import ConfirmationModal from '../ui/ConfirmationModal';
+import { ImageCompressionService } from '../../services/ImageCompressionService';
 
 interface CharacterImageWidgetProps {
     imageId: string | undefined;
@@ -19,14 +20,29 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
 
     useEffect(() => {
         let active = true;
+        let cleanupUrl = "";
+
         const load = async () => {
             if (imageId) {
                 try {
                     const blob = await getImage(imageId);
                     if (blob && active) {
-                        const url = URL.createObjectURL(blob);
-                        setImageUrl(url);
-                        return () => URL.revokeObjectURL(url);
+                        // Check if blob is a GZIP string
+                        // Using new Response(blob).text() for better compatibility/types
+                        const text = await new Response(blob).text();
+                        let finalUrl = "";
+
+                        if (text.startsWith('GZIP:')) {
+                            const decompressed = ImageCompressionService.decompressFull(text);
+                            finalUrl = decompressed; // It's already a data URL
+                        } else {
+                            finalUrl = URL.createObjectURL(blob);
+                        }
+
+                        if (active) {
+                            setImageUrl(finalUrl);
+                            cleanupUrl = finalUrl;
+                        }
                     }
                 } catch (e) {
                     console.error("Failed to load image from DB", e);
@@ -34,7 +50,12 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
             } else if (legacyImage && legacyImage.length > 100) {
                 if (active) setLoading(true);
                 try {
-                    const blob = await base64ToBlob(legacyImage);
+                    // If legacy image is gzipped, decompress for migration
+                    const toMigrate = legacyImage.startsWith('GZIP:')
+                        ? ImageCompressionService.decompressFull(legacyImage)
+                        : legacyImage;
+
+                    const blob = await base64ToBlob(toMigrate);
                     const newId = await saveImage(blob);
                     if (active) {
                         onImageUpdate(newId);
@@ -47,11 +68,18 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
                     if (active) setLoading(false);
                 }
             } else {
-                setImageUrl(null);
+                if (active) setImageUrl(null);
             }
         };
+
         load();
-        return () => { active = false; };
+
+        return () => {
+            active = false;
+            if (cleanupUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(cleanupUrl);
+            }
+        };
     }, [imageId, legacyImage, onImageUpdate]);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

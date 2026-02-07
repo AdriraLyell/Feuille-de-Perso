@@ -31,6 +31,10 @@ export const blobToBase64 = (blob: Blob): Promise<string> => {
 };
 
 export const base64ToBlob = async (base64: string): Promise<Blob> => {
+    // Handle GZIP marker - save as text blob
+    if (base64.startsWith('GZIP:')) {
+        return new Blob([base64], { type: 'text/plain' });
+    }
     const response = await fetch(base64);
     return await response.blob();
 };

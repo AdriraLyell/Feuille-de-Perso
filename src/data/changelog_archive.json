@@ -1,5 +1,89 @@
 [
     {
+        "version": "2.17.45",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "UX: Le premier champ de saisie des attributs affiche maintenant '0' par défaut.",
+            "Core: Initialisation automatique de val1 à '0' lors de la création d'attributs."
+        ]
+    },
+    {
+        "version": "2.17.44",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Nouveau: Mode Expert pour les réglages avancés en mode Online.",
+            "Online Mode: Les onglets Attributs, Compétences, Spécialisations et Paramètres sont masqués par défaut.",
+            "UX: Bouton 'Réglages Avancés' avec double confirmation pour activer le Mode Expert.",
+            "UX: Bandeau d'avertissement persistant quand le Mode Expert est actif."
+        ]
+    },
+    {
+        "version": "2.17.43",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix: Le système de cartes activé dans Admin est maintenant correctement chargé dans l'App Joueur.",
+            "Sync: rulesReconciler fusionne désormais configurations.cards vers creationConfig.cardConfig."
+        ]
+    },
+    {
+        "version": "2.17.42",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix critique: Cliquer sur un nouveau compteur ne crée plus de doublon fantôme.",
+            "Fix: updateCounter recherche maintenant correctement par id du compteur."
+        ]
+    },
+    {
+        "version": "2.17.41",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix: Les nouveaux compteurs créés dans Admin sont maintenant correctement sauvegardés en BDD (format UUID).",
+            "Fix: Correction de la duplication des compteurs avec accents (ex: Volonté).",
+            "Sync: Les valeurs par défaut sont maintenant correctement appliquées lors de la création de compteurs."
+        ]
+    },
+    {
+        "version": "2.17.40",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin→Joueur: Les nouveaux compteurs créés dans la bibliothèque Admin apparaissent maintenant automatiquement dans la fiche joueur.",
+            "Sync: CampaignService synchronise definitions.counters avec libraries.counters au chargement."
+        ]
+    },
+    {
+        "version": "2.17.39",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Les Compétences et Arrière-plans Globaux sont maintenant éditables et propagent leurs modifications à toutes les campagnes.",
+            "Sync: LibraryService met à jour les Globaux (Skills, Backgrounds, Counters) lors de la sauvegarde."
+        ]
+    },
+    {
+        "version": "2.17.38",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix critique: Les descriptions de compteurs provenant de l'Admin (mode Online) sont maintenant correctement synchronisées vers la fiche joueur.",
+            "Pont: rulesReconciler utilise désormais libraries.counters comme source secondaire pour les descriptions."
+        ]
+    },
+    {
+        "version": "2.17.37",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Les compteurs Globaux sont maintenant éditables et propagent leurs modifications à toutes les campagnes.",
+            "Sync: LibraryService met à jour les Globaux (setting_id = NULL) lors de la sauvegarde."
+        ]
+    },
+    {
         "version": "2.17.36",
         "date": "2026-02-07",
         "type": "bugfix",
@@ -842,71 +926,6 @@
         "date": "2026-02-02",
         "changes": [
             "Correctif : La zone de saisie \"Notes\" occupe bien toute la hauteur disponible du cadre."
-        ]
-    },
-    {
-        "version": "2.12.33",
-        "date": "2026-02-02",
-        "changes": [
-            "Correctif : Restauration de la taille de la zone \"Notes\" en bas de la page \"Détails & Équipement\"."
-        ]
-    },
-    {
-        "version": "2.12.32",
-        "date": "2026-02-02",
-        "changes": [
-            "Correctif Critique : Le défilement de la page n'est plus bloqué après avoir validé ou fermé une fenêtre modale."
-        ]
-    },
-    {
-        "version": "2.12.31",
-        "date": "2026-02-02",
-        "changes": [
-            "Correctif : Suppression des logs de débogage dans la console.",
-            "Ergonomie : La fiche s'agrandit désormais automatiquement en hauteur si vous ajoutez beaucoup de compétences, débloquant le défilement."
-        ]
-    },
-    {
-        "version": "2.12.30",
-        "date": "2026-02-02",
-        "changes": [
-            "Ergonomie : Les compétences à variations (Artisanat : ...) sont maintenant cliquables directement sur la fiche.",
-            "Fonctionnalité : Remplir une variante ajoute automatiquement une nouvelle ligne vide en dessous pour des ajouts rapides."
-        ]
-    },
-    {
-        "version": "2.12.29",
-        "date": "2026-02-02",
-        "changes": [
-            "Nettoyage : Suppression des traces de débogage de la migration, le correctif étant confirmé."
-        ]
-    },
-    {
-        "version": "2.12.28",
-        "date": "2026-02-02",
-        "changes": [
-            "Correction Critique : Mise à jour du schéma de validation pour autoriser le champ \"variante\" (empêche sa suppression automatique)."
-        ]
-    },
-    {
-        "version": "2.12.27",
-        "date": "2026-02-02",
-        "changes": [
-            "Correction d'urgence : Réparation automatique des conflits de nommage dans les données sauvegardées (skilllibrary vs skillLibrary)."
-        ]
-    },
-    {
-        "version": "2.12.26",
-        "date": "2026-02-02",
-        "changes": [
-            "Correction : Application rétroactive du statut \"Variable\" aux compétences déjà présentes sur la fiche (restauration des champs de saisie)."
-        ]
-    },
-    {
-        "version": "2.12.25",
-        "date": "2026-02-02",
-        "changes": [
-            "Diagnostic : Ajout de traces détaillées dans le processus de migration de la bibliothèque."
         ]
     }
 ]

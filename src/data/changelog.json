@@ -1,5 +1,103 @@
 [
     {
+        "version": "2.20.12",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Optimisation: Évitement de la re-compression des images déjà optimisées (prévention de la perte de qualité).",
+            "Core: Décompression à la volée uniquement lors de l'affichage (données stockées compressées partout).",
+            "Fix: Correction des imports et de la gestion de la mémoire à l'affichage des images."
+        ]
+    },
+    {
+        "version": "2.20.11",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Export/Import: Intégration de la compression d'images (JPEG + GZIP) dans les fichiers .json.",
+            "Optimisation: Réduction de 70-85% de la taille des fichiers d'exportation.",
+            "Core: Centralisation de la logique de traitement d'images pour réutilisation.",
+            "Rétrocompatibilité: Les anciens fichiers JSON non compressés restent parfaitement importables."
+        ]
+    },
+    {
+        "version": "2.20.10",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Admin: Calcul du total réel des attributs (somme des 3 champs de score).",
+            "Admin: Restauration du groupement par catégories (Séries) pour les compétences.",
+            "Admin: Optimisation de la structure et du filtrage des fiches personnages."
+        ]
+    },
+    {
+        "version": "2.20.9",
+        "date": "2026-02-07",
+        "type": "fix",
+        "changes": [
+            "Admin: Correction de l'affichage des scores d'attributs (passage de value à val1)."
+        ]
+    },
+    {
+        "version": "2.20.8",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Admin: Restauration des catégories d'Attributs (Physique, Social, Mental) dans la vue personnage.",
+            "Admin: Correction de l'affichage des Arrière-plans (filtrage amélioré).",
+            "Admin: Les sections Avantages/Désavantages sont désormais masquées si elles sont vides.",
+            "Admin: Nettoyage de la structure de code de la vue personnage."
+        ]
+    },
+    {
+        "version": "2.20.7",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Amélioration de la vue lecture seule des personnages (compacte et détaillée).",
+            "Admin: Affichage des Arrière-plans et des Traits."
+        ]
+    },
+    {
+        "version": "2.20.6",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Layout: Restauration du mode portrait original (4 colonnes de compétences).",
+            "Layout: Maintien de l'optimisation paysage (5 colonnes) avec détection dynamique.",
+            "Core: Le moteur de rendu adapte désormais la distribution des catégories selon l'orientation."
+        ]
+    },
+    {
+        "version": "2.20.5",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Layout: Optimisation du mode paysage avec 5 colonnes de compétences.",
+            "UX: Suppression de l'espace vide à droite de la feuille en mode paysage.",
+            "Core: Redistribution intelligente des catégories sur la grille 6-cols."
+        ]
+    },
+    {
+        "version": "2.20.4",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Hotfix: Correction d'un crash lors du passage en mode paysage (isLandscape).",
+            "Fix: Correction de l'application de la largeur A4 dans les réglages (portrait).",
+            "Core: Restauration des propriétés de colonnes attendues par le moteur de rendu."
+        ]
+    },
+    {
+        "version": "2.20.3",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "UX/UI: Les bibliothèques utilisent désormais le format A4 (1100px) en mode standard.",
+            "UX: Centrage dynamique du contenu pour une meilleure lisibilité sur grands écrans."
+        ]
+    },
+    {
         "version": "2.20.2",
         "date": "2026-02-07",
         "type": "feature",
@@ -114,90 +212,6 @@
         "changes": [
             "Fix critique: Les arrière-plans ne deviennent plus tous 'variable' lors du refresh de l'app.",
             "Core: rulesReconciler vérifie maintenant le flag isVariable depuis la bibliothèque."
-        ]
-    },
-    {
-        "version": "2.17.45",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "UX: Le premier champ de saisie des attributs affiche maintenant '0' par défaut.",
-            "Core: Initialisation automatique de val1 à '0' lors de la création d'attributs."
-        ]
-    },
-    {
-        "version": "2.17.44",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Nouveau: Mode Expert pour les réglages avancés en mode Online.",
-            "Online Mode: Les onglets Attributs, Compétences, Spécialisations et Paramètres sont masqués par défaut.",
-            "UX: Bouton 'Réglages Avancés' avec double confirmation pour activer le Mode Expert.",
-            "UX: Bandeau d'avertissement persistant quand le Mode Expert est actif."
-        ]
-    },
-    {
-        "version": "2.17.43",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix: Le système de cartes activé dans Admin est maintenant correctement chargé dans l'App Joueur.",
-            "Sync: rulesReconciler fusionne désormais configurations.cards vers creationConfig.cardConfig."
-        ]
-    },
-    {
-        "version": "2.17.42",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix critique: Cliquer sur un nouveau compteur ne crée plus de doublon fantôme.",
-            "Fix: updateCounter recherche maintenant correctement par id du compteur."
-        ]
-    },
-    {
-        "version": "2.17.41",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix: Les nouveaux compteurs créés dans Admin sont maintenant correctement sauvegardés en BDD (format UUID).",
-            "Fix: Correction de la duplication des compteurs avec accents (ex: Volonté).",
-            "Sync: Les valeurs par défaut sont maintenant correctement appliquées lors de la création de compteurs."
-        ]
-    },
-    {
-        "version": "2.17.40",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin→Joueur: Les nouveaux compteurs créés dans la bibliothèque Admin apparaissent maintenant automatiquement dans la fiche joueur.",
-            "Sync: CampaignService synchronise definitions.counters avec libraries.counters au chargement."
-        ]
-    },
-    {
-        "version": "2.17.39",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin: Les Compétences et Arrière-plans Globaux sont maintenant éditables et propagent leurs modifications à toutes les campagnes.",
-            "Sync: LibraryService met à jour les Globaux (Skills, Backgrounds, Counters) lors de la sauvegarde."
-        ]
-    },
-    {
-        "version": "2.17.38",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix critique: Les descriptions de compteurs provenant de l'Admin (mode Online) sont maintenant correctement synchronisées vers la fiche joueur.",
-            "Pont: rulesReconciler utilise désormais libraries.counters comme source secondaire pour les descriptions."
-        ]
-    },
-    {
-        "version": "2.17.37",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin: Les compteurs Globaux sont maintenant éditables et propagent leurs modifications à toutes les campagnes.",
-            "Sync: LibraryService met à jour les Globaux (setting_id = NULL) lors de la sauvegarde."
         ]
     }
 ]

@@ -124,7 +124,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
   };
 
   return (
-    <div className="px-6 pb-20 max-w-[1600px] mx-auto relative flex">
+    <div className={`w-full px-6 pb-20 mx-auto relative flex transition-all duration-300 ${!showAdvancedTabs ? 'max-w-[1100px]' : 'max-w-[1600px]'}`}>
       {/* --- LEFT COLUMN: Main Content --- */}
       <div className={`flex-grow transition-all duration-300 ${(activeTab === 'skills' || activeTab === 'specializations') ? 'mr-80' : ''}`}>
 

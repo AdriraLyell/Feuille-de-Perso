@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { X, User, Star, Book, Shield, Backpack } from 'lucide-react';
+import { X, User, Star, Book, Shield, Backpack, Award, Zap } from 'lucide-react';
 import { SyncedCharacter } from '../../services/CharacterSyncService';
 import { CharacterSheetData } from '../../types/character';
 
@@ -46,7 +46,7 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
 
                     {/* Header Info */}
                     <section className="bg-slate-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-slate-700 mb-3 flex items-center gap-2 border-b pb-1">
                             <User size={18} /> Identité
                         </h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -71,60 +71,159 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
 
                     {/* Attributes */}
                     <section className="bg-amber-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-bold text-amber-800 mb-3 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-amber-800 mb-3 flex items-center gap-2 border-b border-amber-200 pb-1">
                             <Star size={18} /> Attributs
                         </h3>
-                        <div className="grid grid-cols-3 gap-4">
-                            {Object.entries(data.attributes || {}).map(([category, attrs]) => (
-                                <div key={category} className="bg-white p-3 rounded shadow-sm">
-                                    <h4 className="font-bold text-amber-700 text-sm uppercase mb-2">{category}</h4>
-                                    {(attrs as any[]).map((attr, idx) => (
-                                        <div key={idx} className="flex justify-between text-sm">
-                                            <span>{attr.name}</span>
-                                            <span className="font-bold">{attr.value}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* Skills Summary */}
-                    <section className="bg-blue-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-                            <Book size={18} /> Compétences (Résumé)
-                        </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                            {Object.entries(data.skills || {}).map(([category, skills]) => {
-                                const activeSkills = (skills as any[]).filter(s => s.value > 0);
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {(data.attributeSettings || []).map((setting) => {
+                                const attrs = data.attributes?.[setting.id] || [];
                                 return (
-                                    <div key={category} className="bg-white p-2 rounded shadow-sm">
-                                        <h4 className="font-bold text-blue-700 text-xs uppercase">{category}</h4>
-                                        <span className="text-lg font-bold text-blue-600">{activeSkills.length}</span>
-                                        <span className="text-blue-400 text-xs ml-1">actives</span>
+                                    <div key={setting.id} className="space-y-2">
+                                        <h4 className="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-2 bg-amber-100/50 px-2 py-0.5 rounded w-fit">
+                                            {setting.label}
+                                        </h4>
+                                        <div className="grid grid-cols-1 gap-2">
+                                            {(attrs as any[]).map((attr, idx) => {
+                                                const total = (parseInt(attr.val1) || 0) + (parseInt(attr.val2) || 0) + (parseInt(attr.val3) || 0);
+                                                return (
+                                                    <div key={idx} className="bg-white px-3 py-1.5 rounded shadow-sm flex justify-between items-center text-sm border border-amber-100">
+                                                        <span className="text-slate-600 font-medium">{attr.name}</span>
+                                                        <span className="font-bold text-amber-700">{total}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 );
                             })}
                         </div>
                     </section>
 
+                    {/* Skills - Original Categories Layout */}
+                    <section className="bg-blue-50 p-4 rounded-lg">
+                        <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2 border-b border-blue-200 pb-1">
+                            <Book size={18} /> Compétences
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {Object.entries(data.skills || {})
+                                .filter(([category, skills]) => {
+                                    const active = (skills as any[]).filter(s => s.name && s.value > 0);
+                                    return active.length > 0 &&
+                                        !category.toLowerCase().includes('background') &&
+                                        !category.toLowerCase().includes('arrière-plan') &&
+                                        category !== 'Col_Comp_8';
+                                })
+                                .sort(([a], [b]) => a.localeCompare(b))
+                                .map(([category, skills]) => (
+                                    <div key={category} className="space-y-2">
+                                        <h4 className="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1 bg-blue-100/50 px-2 py-0.5 rounded w-fit">
+                                            {category.replace('Col_Comp_', 'Série ')}
+                                        </h4>
+                                        <div className="space-y-1">
+                                            {(skills as any[]).filter(s => s.name && s.value > 0).map((skill, idx) => (
+                                                <div key={idx} className="bg-white px-2 py-1 rounded shadow-sm flex justify-between items-center text-xs border border-blue-100">
+                                                    <span className="text-slate-700 truncate mr-2" title={skill.name}>{skill.name}</span>
+                                                    <span className="font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">{skill.value}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </section>
+
+                    {/* Backgrounds */}
+                    {Object.entries(data.skills || {})
+                        .filter(([category]) => category.toLowerCase().includes('background') || category.toLowerCase().includes('arrière-plan') || category === 'Col_Comp_8')
+                        .flatMap(([_, skills]) => (skills as any[]).filter(s => s.name && s.value > 0)).length > 0 && (
+                            <section className="bg-orange-50 p-4 rounded-lg">
+                                <h3 className="text-lg font-bold text-orange-800 mb-3 flex items-center gap-2 border-b border-orange-200 pb-1">
+                                    <Award size={18} /> Arrière-plans
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                                    {Object.entries(data.skills || {})
+                                        .filter(([category]) => category.toLowerCase().includes('background') || category.toLowerCase().includes('arrière-plan') || category === 'Col_Comp_8')
+                                        .flatMap(([_, skills]) => (skills as any[]).filter(s => s.name && s.value > 0))
+                                        .sort((a, b) => a.name.localeCompare(b.name))
+                                        .map((bg, idx) => (
+                                            <div key={idx} className="bg-white px-3 py-2 rounded shadow-sm flex justify-between items-center text-sm border border-orange-100">
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-slate-800">{bg.name}</span>
+                                                    {bg.variant && <span className="text-[10px] text-slate-500 italic">{bg.variant}</span>}
+                                                </div>
+                                                <span className="font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded">{bg.value}</span>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </section>
+                        )}
+
+                    {/* Traits (Advantages / Disadvantages) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {(data.page2?.avantages || []).filter(t => t.name && t.name.trim() !== '').length > 0 && (
+                            <section className="bg-emerald-50 p-4 rounded-lg">
+                                <h3 className="text-lg font-bold text-emerald-800 mb-3 flex items-center gap-2 border-b border-emerald-200 pb-1">
+                                    <Zap size={18} /> Avantages
+                                </h3>
+                                <div className="space-y-2">
+                                    {data.page2.avantages
+                                        .filter(t => t.name && t.name.trim() !== '')
+                                        .map((trait, idx) => (
+                                            <div key={idx} className="bg-white p-2 rounded shadow-sm border border-emerald-100 flex justify-between items-start gap-2">
+                                                <div>
+                                                    <div className="font-bold text-sm text-emerald-900">{trait.name}</div>
+                                                    {trait.variant && <div className="text-[10px] text-slate-500 italic">{trait.variant}</div>}
+                                                </div>
+                                                <span className="font-mono font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded text-xs">+{trait.value}</span>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </section>
+                        )}
+
+                        {(data.page2?.desavantages || []).filter(t => t.name && t.name.trim() !== '').length > 0 && (
+                            <section className="bg-red-50 p-4 rounded-lg">
+                                <h3 className="text-lg font-bold text-red-800 mb-3 flex items-center gap-2 border-b border-red-200 pb-1">
+                                    <Zap size={18} className="rotate-180" /> Désavantages
+                                </h3>
+                                <div className="space-y-2">
+                                    {data.page2.desavantages
+                                        .filter(t => t.name && t.name.trim() !== '')
+                                        .map((trait, idx) => (
+                                            <div key={idx} className="bg-white p-2 rounded shadow-sm border border-red-100 flex justify-between items-start gap-2">
+                                                <div>
+                                                    <div className="font-bold text-sm text-red-900">{trait.name}</div>
+                                                    {trait.variant && <div className="text-[10px] text-slate-500 italic">{trait.variant}</div>}
+                                                </div>
+                                                <span className="font-mono font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded text-xs">-{trait.value}</span>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </section>
+                        )}
+                    </div>
+
                     {/* Experience */}
                     <section className="bg-purple-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-bold text-purple-800 mb-3 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-purple-800 mb-3 flex items-center gap-2 border-b border-purple-200 pb-1">
                             <Shield size={18} /> Expérience
                         </h3>
                         <div className="grid grid-cols-3 gap-4 text-center">
-                            <div className="bg-white p-3 rounded shadow-sm">
-                                <span className="text-purple-400 block text-xs uppercase">Total Gagné</span>
-                                <span className="text-2xl font-bold text-purple-700">{data.experience?.gain || 0}</span>
+                            <div className="bg-white p-2 rounded shadow-sm border border-purple-100">
+                                <span className="text-purple-400 block text-[10px] uppercase font-bold">Gagné</span>
+                                <span className="text-xl font-bold text-purple-700">{data.experience?.gain || 0}</span>
                             </div>
-                            <div className="bg-white p-3 rounded shadow-sm">
-                                <span className="text-purple-400 block text-xs uppercase">Dépensé</span>
-                                <span className="text-2xl font-bold text-purple-700">{data.experience?.spent || 0}</span>
+                            <div className="bg-white p-2 rounded shadow-sm border border-purple-100">
+                                <span className="text-purple-400 block text-[10px] uppercase font-bold">Dépensé</span>
+                                <span className="text-xl font-bold text-purple-700">{data.experience?.spent || 0}</span>
                             </div>
-                            <div className="bg-white p-3 rounded shadow-sm">
-                                <span className="text-purple-400 block text-xs uppercase">Restant</span>
-                                <span className="text-2xl font-bold text-green-600">{data.experience?.rest || 0}</span>
+                            <div className="bg-white p-2 rounded shadow-sm border border-purple-100">
+                                <span className="text-purple-400 block text-[10px] uppercase font-bold">Restant</span>
+                                <span className="text-xl font-bold text-green-600">{data.experience?.rest || 0}</span>
                             </div>
                         </div>
                     </section>
@@ -132,10 +231,10 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
                     {/* Equipment Preview */}
                     {data.page2?.equipement && (
                         <section className="bg-stone-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-bold text-stone-700 mb-3 flex items-center gap-2">
+                            <h3 className="text-lg font-bold text-stone-700 mb-3 flex items-center gap-2 border-b border-stone-200 pb-1">
                                 <Backpack size={18} /> Équipement
                             </h3>
-                            <div className="bg-white p-3 rounded shadow-sm text-sm whitespace-pre-wrap max-h-32 overflow-y-auto">
+                            <div className="bg-white p-3 rounded shadow-sm text-sm whitespace-pre-wrap max-h-32 overflow-y-auto border border-stone-200">
                                 {data.page2.equipement || '-'}
                             </div>
                         </section>

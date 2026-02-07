@@ -19,7 +19,7 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
         return 'grid-cols-3'; // fallback
     }, [attributeCategories]);
 
-    const getDynamicColumns = useCallback(() => {
+    const getDynamicColumns = useCallback((isLandscape: boolean = false) => {
         const skillCats = rules?.definitions?.skillCategories || [];
         if (skillCats.length === 0) return { columns: [], backgrounds: [], counters: [] }; // Fallback empty structure
 
@@ -28,28 +28,48 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
         const backgrounds = skillCats.filter(c => c.behavior === 'Arrière-plan');
         const counters = skillCats.filter(c => c.behavior === 'Compteur');
 
-        // 2. Base columns (Fixed 4 columns for skills layout)
-        const columnCount = 4;
+        // 2. Base columns: 4 for portrait, 5 for landscape
+        const columnCount = isLandscape ? 5 : 4;
         const columns = Array.from({ length: columnCount }, (_, id) => ({
             id,
             topBlocks: [] as any[],
-            bottomBlocks: [] as any[]
+            bottomBlocks: [] as any[],
+            get blocks() { return [...this.topBlocks, ...this.bottomBlocks]; }
         }));
 
-        // Deterministic Mapping (Column, Row) - Strict Order: 1 2 3 4 / 5 6 7 8
-        // Row 1 (Top): Col_Comp_1, 2, 3, 4
-        // Row 2 (Bottom): Col_Comp_5, 6, 7, 8
-        const mapping: Record<string, { col: number, row: 'top' | 'bottom' }> = {
-            'Col_Comp_1': { col: 0, row: 'top' },
-            'Col_Comp_2': { col: 1, row: 'top' },
-            'Col_Comp_3': { col: 2, row: 'top' },
-            'Col_Comp_4': { col: 3, row: 'top' },
-            'Col_Comp_5': { col: 0, row: 'bottom' },
-            'Col_Comp_6': { col: 1, row: 'bottom' },
-            'Col_Comp_7': { col: 2, row: 'bottom' },
-            'Col_Comp_8': { col: 3, row: 'bottom' },
-            'Col_Comp_9': { col: 0, row: 'bottom' }, // Overflow remains Col 1 bottom
-        };
+        // 3. Dynamic Mapping based on column count
+        const mapping: Record<string, { col: number, row: 'top' | 'bottom' }> = {};
+
+        if (isLandscape) {
+            // Mapping for 5 columns (1-5 Top / 6-10 Bottom)
+            const landscapeMap: Record<string, { col: number, row: 'top' | 'bottom' }> = {
+                'Col_Comp_1': { col: 0, row: 'top' },
+                'Col_Comp_2': { col: 1, row: 'top' },
+                'Col_Comp_3': { col: 2, row: 'top' },
+                'Col_Comp_4': { col: 3, row: 'top' },
+                'Col_Comp_5': { col: 4, row: 'top' },
+                'Col_Comp_6': { col: 0, row: 'bottom' },
+                'Col_Comp_7': { col: 1, row: 'bottom' },
+                'Col_Comp_8': { col: 2, row: 'bottom' },
+                'Col_Comp_9': { col: 3, row: 'bottom' },
+                'Col_Comp_10': { col: 4, row: 'bottom' },
+            };
+            Object.assign(mapping, landscapeMap);
+        } else {
+            // Mapping for 4 columns (1-4 Top / 5-8 Bottom)
+            const portraitMap: Record<string, { col: number, row: 'top' | 'bottom' }> = {
+                'Col_Comp_1': { col: 0, row: 'top' },
+                'Col_Comp_2': { col: 1, row: 'top' },
+                'Col_Comp_3': { col: 2, row: 'top' },
+                'Col_Comp_4': { col: 3, row: 'top' },
+                'Col_Comp_5': { col: 0, row: 'bottom' },
+                'Col_Comp_6': { col: 1, row: 'bottom' },
+                'Col_Comp_7': { col: 2, row: 'bottom' },
+                'Col_Comp_8': { col: 3, row: 'bottom' },
+                'Col_Comp_9': { col: 0, row: 'bottom' }, // Overflow
+            };
+            Object.assign(mapping, portraitMap);
+        }
 
         skills.forEach(cat => {
             const items = data.skills[cat.id] || [];

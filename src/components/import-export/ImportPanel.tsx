@@ -11,6 +11,7 @@ import ImportOptionsSection from './ImportOptionsSection';
 import ConflictResolver from './ConflictResolver';
 import ThematicButton from '../ui/ThematicButton';
 import ThematicModal from '../ui/ThematicModal';
+import { ImageCompressionService } from '../../services/ImageCompressionService';
 
 interface ImportPanelProps {
     data: CharacterSheetData; // Current data for merging/conflict detection
@@ -76,6 +77,8 @@ const ImportPanel: React.FC<ImportPanelProps> = ({ data, variant, onImportSucces
                     return;
                 }
 
+                // --- PRESERVE COMPRESSION IN IMPORT DATA ---
+                // We no longer decompress here to avoid generation loss during next export.
                 setPendingFile(json);
                 setAnalysis({ hasHeader, hasStructure, hasLibrary, hasSkillLibrary, hasSpecLibrary, isFilled, fileVersion, versionMismatch });
 

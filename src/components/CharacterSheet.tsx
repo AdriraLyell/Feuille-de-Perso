@@ -276,7 +276,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
     const creationActive = data.creationConfig?.active;
     const allowExtendedSkills = data.creationConfig?.extendedSkills || false;
 
-    const { columns, backgrounds, counters } = getDynamicColumns() as any;
+    const { columns, backgrounds, counters } = getDynamicColumns(isLandscape) as any;
 
     return (
         <div className={`sheet-container ${isLandscape ? 'landscape' : ''}`}>

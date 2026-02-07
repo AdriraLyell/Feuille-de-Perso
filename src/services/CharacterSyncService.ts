@@ -151,8 +151,9 @@ export const CharacterSyncService = {
             return null;
         }
 
-        // Decompress images
-        data.data = await this.processImages(data.data, 'decompress');
+        // We no longer decompress automatically here to preserve the compressed state 
+        // throughout the app, preventing re-compression quality loss.
+        // UI components will decompress on-the-fly for display.
 
         return data;
     },
@@ -191,31 +192,9 @@ export const CharacterSyncService = {
 
     /**
      * Recursively process an object to compress/decompress image strings.
+     * @deprecated Use ImageCompressionService.processImages instead
      */
     async processImages(obj: any, action: 'compress' | 'decompress'): Promise<any> {
-        if (!obj || typeof obj !== 'object') return obj;
-
-        if (Array.isArray(obj)) {
-            return Promise.all(obj.map(item => this.processImages(item, action)));
-        }
-
-        const processed: any = {};
-        for (const [key, value] of Object.entries(obj)) {
-            if (typeof value === 'string') {
-                if (action === 'compress' && value.startsWith('data:image/')) {
-                    const result = await ImageCompressionService.compressFull(value);
-                    processed[key] = result.compressed;
-                } else if (action === 'decompress' && value.startsWith('GZIP:')) {
-                    processed[key] = ImageCompressionService.decompressFull(value);
-                } else {
-                    processed[key] = value;
-                }
-            } else if (typeof value === 'object') {
-                processed[key] = await this.processImages(value, action);
-            } else {
-                processed[key] = value;
-            }
-        }
-        return processed;
+        return ImageCompressionService.processImages(obj, action);
     }
 };
