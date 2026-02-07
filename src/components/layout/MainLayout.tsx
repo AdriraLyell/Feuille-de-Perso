@@ -26,6 +26,7 @@ import UpdateNotifier from '../UpdateNotifier';
 import AppearanceModal from '../AppearanceModal';
 import DiegeticNavigation from './DiegeticNavigation';
 import RulesSourceSelector from '../RulesSourceSelector';
+import SyncModal from '../SyncModal';
 
 // Icons
 import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, TrendingUp, History, Clock, X, Trash2, Save, Book, LogOut, Menu, Upload } from 'lucide-react';
@@ -53,6 +54,7 @@ const MainLayout: React.FC = () => {
     const [historyTab, setHistoryTab] = useState<'sheet' | 'settings'>('sheet');
 
     const [showAppearance, setShowAppearance] = useState(false);
+    const [showSync, setShowSync] = useState(false);
 
     // Initialize Reference State for Unsaved Indicator
     useEffect(() => {
@@ -175,6 +177,8 @@ const MainLayout: React.FC = () => {
                     onShowUserGuide={() => setShowUserGuide(true)}
                     onShowChangelog={() => setShowChangelog(true)}
                     onOpenAppearance={() => setShowAppearance(true)}
+                    onOpenSync={() => setShowSync(true)}
+                    syncStatus={data.syncInfo ? 'synced' : 'none'}
                     appVersion={APP_VERSION}
                 />
 
@@ -277,6 +281,15 @@ const MainLayout: React.FC = () => {
                         onClose={() => setShowAppearance(false)}
                         data={data}
                         onUpdate={(newData) => setData(newData)}
+                    />
+                    <SyncModal
+                        isOpen={showSync}
+                        onClose={() => setShowSync(false)}
+                        characterData={data}
+                        onSyncComplete={(syncInfo) => {
+                            setData(prev => ({ ...prev, syncInfo }));
+                            addLog(`Fiche synchronisée avec ${syncInfo?.settingName}`, 'success', 'sheet');
+                        }}
                     />
                 </div>
             </div>

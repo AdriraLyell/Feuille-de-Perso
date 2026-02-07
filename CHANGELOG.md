@@ -1,5 +1,34 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.12.20] - 2026-02-02
+
+- Ajustement : Déplacement de l'icône "Variable" à côté de l'indicateur de présence sur les cartes de compétence.
+
+## [2.12.19] - 2026-02-02
+
+- Polissage visuel de la bibliothèque de compétences (icônes "Variable" et "Présent").
+- Ajout d'une légende explicative dans la vue principale de la bibliothèque.
+
+## [2.12.18] - 2026-02-02
+
+- Correction : Les compétences variables ajoutées sans précision affichent bien " : ..." au lieu de rien.
+- Assurance que la propriété "variante" est bien conservée même vide.
+
+## [2.12.17] - 2026-02-02
+
+- Ajout d'un indicateur visuel (" : ...") pour les compétences variables sans spécialité définie sur la fiche.
+- Amélioration de la lisibilité des compétences vides.
+
+## [2.12.16] - 2026-02-02
+
+- Configuration par défaut : Artisanat, Jouer et Art Martial sont désormais initialisés comme variables.
+- Ceci permet de spécifier directement la spécialité lors de la création d'un nouveau personnage.
+
+## [2.12.15] - 2026-02-02
+
+- Les compétences "variables" resten désomais dans la réserve après ajout, pour permettre des ajouts multiples (ex: plusieurs Artisanats).
+- Correction mineure de l'affichage de la réserve.
+
 ## [2.12.14] - 2026-02-02
 
 - Remplacement de la modale native par une modale thématique lors de l'ajout de compétences variables.

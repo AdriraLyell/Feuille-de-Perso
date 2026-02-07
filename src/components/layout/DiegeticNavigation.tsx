@@ -1,5 +1,5 @@
 import React from 'react';
-import { Book, Settings, FileText, Layout, Save, Upload, Feather, LogOut, Printer, Monitor, Smartphone, History, HelpCircle, ScrollText, ArrowRightLeft, BookOpen, Download, RectangleVertical, RectangleHorizontal, Palette } from 'lucide-react';
+import { Book, Settings, FileText, Layout, Save, Upload, Feather, LogOut, Printer, Monitor, Smartphone, History, HelpCircle, ScrollText, ArrowRightLeft, BookOpen, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { CharacterSheetData } from '../../types';
 import RulesStatus from '../ui/RulesStatus';
@@ -16,13 +16,15 @@ interface DiegeticNavigationProps {
     onShowUserGuide: () => void;
     onShowChangelog: () => void;
     onOpenAppearance: () => void;
+    onOpenSync: () => void;
+    syncStatus?: 'none' | 'synced' | 'pending';
     appVersion: string;
 }
 
 const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     currentMode, onModeChange, onOpenImportExport,
     onPrintRequest, onToggleLandscape, isLandscape,
-    onShowLogs, showLogs, onShowUserGuide, onShowChangelog, onOpenAppearance, appVersion
+    onShowLogs, showLogs, onShowUserGuide, onShowChangelog, onOpenAppearance, onOpenSync, syncStatus, appVersion
 }) => {
     const { data } = useCharacter();
 
@@ -97,6 +99,19 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                             <Save size={18} />
                             <Download size={18} />
                         </div>
+                    </button>
+
+                    {/* Sync Button */}
+                    <button
+                        onClick={onOpenSync}
+                        className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all text-sm font-bold border ${syncStatus === 'synced'
+                            ? 'bg-green-700/20 hover:bg-green-700/40 text-green-500 border-green-700/50'
+                            : 'bg-purple-700/20 hover:bg-purple-700/40 text-purple-400 border-purple-700/50'
+                            }`}
+                        title="Synchroniser avec le MJ"
+                    >
+                        <UploadCloud size={18} />
+                        <span className="hidden lg:inline">Sync</span>
                     </button>
 
                     <div className="w-px h-6 bg-gray-600 mx-1"></div>

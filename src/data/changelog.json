@@ -1,5 +1,18 @@
 [
     {
+        "version": "2.18.0",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Nouveau: Synchronisation des fiches joueurs avec le MJ !",
+            "Joueur: Bouton 'Sync' dans la navigation pour envoyer sa fiche à une campagne.",
+            "Joueur: Modal de synchronisation avec sélection de campagne et pré-remplissage des noms.",
+            "Admin: Nouvel onglet 'Joueurs' affichant la liste des fiches synchronisées.",
+            "Admin: Vue lecture seule des fiches de personnages soumises.",
+            "Infra: Nouveau service CharacterSyncService pour la gestion BDD des personnages."
+        ]
+    },
+    {
         "version": "2.17.51",
         "date": "2026-02-07",
         "type": "refactor",
@@ -175,65 +188,6 @@
         "changes": [
             "Fix critique: Correction de la duplication des compétences lors de l'import d'anciens personnages.",
             "Migration: Les clés legacy sont maintenant migrées AVANT l'injection des valeurs par défaut."
-        ]
-    },
-    {
-        "version": "2.17.32",
-        "date": "2026-02-06",
-        "type": "refactor",
-        "changes": [
-            "Refactoring majeur: Découpage de migrations.ts (687→15 lignes) en 9 modules spécialisés.",
-            "Architecture: Nouveau dossier utils/migrations/ avec modules par domaine.",
-            "Maintenabilité: Chaque migration isolée, testable indépendamment."
-        ]
-    },
-    {
-        "version": "2.17.31",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Tests: Suite de tests exhaustive pour migrations.ts (51 tests).",
-            "Tests: Création de fixtures legacy pour valider toutes les migrations de données.",
-            "Build: Intégration du script sync-version dans le processus de build."
-        ]
-    },
-    {
-        "version": "2.17.30",
-        "date": "2026-02-06",
-        "type": "feature",
-        "changes": [
-            "Admin: Autorisation de l'édition des éléments 'Globaux' dans les bibliothèques.",
-            "Admin: Ajout de 'Description' et 'Départ' dans la gestion des compteurs.",
-            "Core: Correction du bug d'initialisation des compteurs à 10/10.",
-            "Core: Synchronisation forcée des descriptions d'Admin vers les fiches Joueurs."
-        ]
-    },
-    {
-        "version": "2.17.29",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Rollback: Suppression de l'édition locale sur la fiche joueur.",
-            "Layout: Mappage déterministe des colonnes de compétences (1234/5678)."
-        ]
-    },
-    {
-        "version": "2.17.28",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Alignement dynamique des colonnes de compétences sur les catégories d'attributs.",
-            "Correction d'un problème de superposition des blocs de compétences.",
-            "Optimisation de l'algorithme de distribution pour préserver l'espace de l'XP et des Arrière-plans."
-        ]
-    },
-    {
-        "version": "2.17.27",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Correction d'un crash structurel dans le moteur de layout (erreur .slice).",
-            "Amélioration de la résilience du layout pendant le chargement des règles."
         ]
     }
 ]

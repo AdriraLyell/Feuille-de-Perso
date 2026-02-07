@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { extractRulesFromCharacter } from './utils/templateImporter';
 import { loadRules } from './utils/rulesLoader';
 import { generateRulesJSContent } from './utils/rulesGenerator';
-import { Settings, Save, Download, Upload, ArrowLeft, UploadCloud } from 'lucide-react';
+import { Settings, Save, Download, Upload, ArrowLeft, UploadCloud, Users } from 'lucide-react';
 import { RulesData } from '../types/rules';
 import { APP_VERSION } from '../constants';
 import AdminCreationEditor from './components/AdminCreationEditor';
@@ -25,6 +25,7 @@ import DeployToGithubModal from './components/DeployModal';
 import { BookOpen, Save as SaveIcon, Cloud, AlertTriangle } from 'lucide-react';
 import { usePersistence } from './hooks/usePersistence';
 import AdminDashboard from './components/AdminDashboard';
+import CampaignCharactersView from './components/CampaignCharactersView';
 import { CampaignService } from '../services/CampaignService';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
 import { useNotification } from '../context/NotificationContext'; // Assuming we have this, or use alert for now
@@ -60,7 +61,7 @@ const AdminApp: React.FC = () => {
 
     const [rules, setRules] = useState<RulesData | null>(null);
     const [showDeployModal, setShowDeployModal] = useState(false);
-    const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'costs' | 'libraries'>('general');
+    const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'costs' | 'libraries' | 'players'>('general');
     const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters'>('traits');
 
     // Import Modal State
@@ -326,6 +327,14 @@ const AdminApp: React.FC = () => {
                             <BookOpen size={16} /> Bibliothèques
                         </div>
                     </button>
+                    <button
+                        onClick={() => setActiveTab('players')}
+                        className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === 'players' ? 'border-purple-600 text-purple-600 bg-purple-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+                    >
+                        <div className="flex items-center justify-center gap-2">
+                            <Users size={16} /> Joueurs
+                        </div>
+                    </button>
                 </div>
             </nav>
 
@@ -407,8 +416,11 @@ const AdminApp: React.FC = () => {
                             <AdminSpecializationLibrary rules={rules} onUpdate={handleUpdateRules} />
                         )}
                     </div>
-                )
-                }
+                )}
+
+                {activeTab === 'players' && currentSettingId && (
+                    <CampaignCharactersView settingId={currentSettingId} />
+                )}
             </main >
 
             <ImportResultModal

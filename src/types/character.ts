@@ -98,6 +98,13 @@ export interface CharacterSheetData {
       player: number;
     };
   };
+  // Sync information for online mode
+  syncInfo?: {
+    syncId: string;      // UUID from database
+    settingId: string;   // Campaign ID
+    settingName: string; // Campaign name (cached for display)
+    lastSynced: number;  // Timestamp of last sync
+  };
 }
 
 export type SkillCategoryKey = keyof CharacterSheetData['skills'];

@@ -1,5 +1,64 @@
 [
     {
+        "version": "2.17.32",
+        "date": "2026-02-06",
+        "type": "refactor",
+        "changes": [
+            "Refactoring majeur: Découpage de migrations.ts (687→15 lignes) en 9 modules spécialisés.",
+            "Architecture: Nouveau dossier utils/migrations/ avec modules par domaine.",
+            "Maintenabilité: Chaque migration isolée, testable indépendamment."
+        ]
+    },
+    {
+        "version": "2.17.31",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Tests: Suite de tests exhaustive pour migrations.ts (51 tests).",
+            "Tests: Création de fixtures legacy pour valider toutes les migrations de données.",
+            "Build: Intégration du script sync-version dans le processus de build."
+        ]
+    },
+    {
+        "version": "2.17.30",
+        "date": "2026-02-06",
+        "type": "feature",
+        "changes": [
+            "Admin: Autorisation de l'édition des éléments 'Globaux' dans les bibliothèques.",
+            "Admin: Ajout de 'Description' et 'Départ' dans la gestion des compteurs.",
+            "Core: Correction du bug d'initialisation des compteurs à 10/10.",
+            "Core: Synchronisation forcée des descriptions d'Admin vers les fiches Joueurs."
+        ]
+    },
+    {
+        "version": "2.17.29",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Rollback: Suppression de l'édition locale sur la fiche joueur.",
+            "Layout: Mappage déterministe des colonnes de compétences (1234/5678)."
+        ]
+    },
+    {
+        "version": "2.17.28",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Alignement dynamique des colonnes de compétences sur les catégories d'attributs.",
+            "Correction d'un problème de superposition des blocs de compétences.",
+            "Optimisation de l'algorithme de distribution pour préserver l'espace de l'XP et des Arrière-plans."
+        ]
+    },
+    {
+        "version": "2.17.27",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Correction d'un crash structurel dans le moteur de layout (erreur .slice).",
+            "Amélioration de la résilience du layout pendant le chargement des règles."
+        ]
+    },
+    {
         "version": "2.17.26",
         "date": "2026-02-06",
         "type": "patch",
@@ -841,53 +900,6 @@
         "changes": [
             "Correction critique : La bibliothèque de compétences se charge désormais correctement lors de la première ouverture (ou mise à jour depuis une ancienne version).",
             "Correction interne : La propriété \"Variable\" est maintenant correctement validée et conservée."
-        ]
-    },
-    {
-        "version": "2.12.20",
-        "date": "2026-02-02",
-        "changes": [
-            "Ajustement : Déplacement de l'icône \"Variable\" à côté de l'indicateur de présence sur les cartes de compétence."
-        ]
-    },
-    {
-        "version": "2.12.19",
-        "date": "2026-02-02",
-        "changes": [
-            "Polissage visuel de la bibliothèque de compétences (icônes \"Variable\" et \"Présent\").",
-            "Ajout d'une légende explicative dans la vue principale de la bibliothèque."
-        ]
-    },
-    {
-        "version": "2.12.18",
-        "date": "2026-02-02",
-        "changes": [
-            "Correction : Les compétences variables ajoutées sans précision affichent bien \" : ...\" au lieu de rien.",
-            "Assurance que la propriété \"variante\" est bien conservée même vide."
-        ]
-    },
-    {
-        "version": "2.12.17",
-        "date": "2026-02-02",
-        "changes": [
-            "Ajout d'un indicateur visuel (\" : ...\") pour les compétences variables sans spécialité définie sur la fiche.",
-            "Amélioration de la lisibilité des compétences vides."
-        ]
-    },
-    {
-        "version": "2.12.16",
-        "date": "2026-02-02",
-        "changes": [
-            "Configuration par défaut : Artisanat, Jouer et Art Martial sont désormais initialisés comme variables.",
-            "Ceci permet de spécifier directement la spécialité lors de la création d'un nouveau personnage."
-        ]
-    },
-    {
-        "version": "2.12.15",
-        "date": "2026-02-02",
-        "changes": [
-            "Les compétences \"variables\" resten désomais dans la réserve après ajout, pour permettre des ajouts multiples (ex: plusieurs Artisanats).",
-            "Correction mineure de l'affichage de la réserve."
         ]
     }
 ]
