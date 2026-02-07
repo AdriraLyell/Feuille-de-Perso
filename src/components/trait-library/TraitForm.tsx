@@ -161,6 +161,19 @@ const TraitForm: React.FC<TraitFormProps> = ({
                     </label>
                 </div>
 
+                {editForm.isVariable && (
+                    <div className="animate-in fade-in slide-in-from-top-2 duration-200 -mt-4 px-1">
+                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Variantes suggérées (Réserve)</label>
+                        <input
+                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-xs text-[#1c1917] bg-[#fdfbf7] focus:border-amber-500 outline-none shadow-sm font-bold placeholder:italic placeholder:font-normal"
+                            value={(editForm.variants || []).join(', ')}
+                            onChange={(e) => setEditForm({ ...editForm, variants: e.target.value.split(',').map(v => v.trim()).filter(v => v !== '') })}
+                            placeholder="Ex: Chats, Pollen, Poussière..."
+                        />
+                        <p className="text-[9px] text-[#5c4d41]/70 mt-1 italic px-1">Séparez par des virgules. Ces options seront proposées lors de l'édition du trait sur la fiche perso.</p>
+                    </div>
+                )}
+
                 {/* Effects Section */}
                 <div className="border border-[#bfae85]/20 rounded-sm bg-white/30">
                     <TraitEffectEditor

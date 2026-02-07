@@ -1,5 +1,139 @@
 [
     {
+        "version": "2.20.11",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Export/Import: Intégration de la compression d'images (JPEG + GZIP) dans les fichiers .json.",
+            "Optimisation: Réduction de 70-85% de la taille des fichiers d'exportation.",
+            "Core: Centralisation de la logique de traitement d'images pour réutilisation.",
+            "Rétrocompatibilité: Les anciens fichiers JSON non compressés restent parfaitement importables."
+        ]
+    },
+    {
+        "version": "2.20.10",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Admin: Calcul du total réel des attributs (somme des 3 champs de score).",
+            "Admin: Restauration du groupement par catégories (Séries) pour les compétences.",
+            "Admin: Optimisation de la structure et du filtrage des fiches personnages."
+        ]
+    },
+    {
+        "version": "2.20.9",
+        "date": "2026-02-07",
+        "type": "fix",
+        "changes": [
+            "Admin: Correction de l'affichage des scores d'attributs (passage de value à val1)."
+        ]
+    },
+    {
+        "version": "2.20.8",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Admin: Restauration des catégories d'Attributs (Physique, Social, Mental) dans la vue personnage.",
+            "Admin: Correction de l'affichage des Arrière-plans (filtrage amélioré).",
+            "Admin: Les sections Avantages/Désavantages sont désormais masquées si elles sont vides.",
+            "Admin: Nettoyage de la structure de code de la vue personnage."
+        ]
+    },
+    {
+        "version": "2.20.7",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Amélioration de la vue lecture seule des personnages (compacte et détaillée).",
+            "Admin: Affichage des Arrière-plans et des Traits."
+        ]
+    },
+    {
+        "version": "2.20.6",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Layout: Restauration du mode portrait original (4 colonnes de compétences).",
+            "Layout: Maintien de l'optimisation paysage (5 colonnes) avec détection dynamique.",
+            "Core: Le moteur de rendu adapte désormais la distribution des catégories selon l'orientation."
+        ]
+    },
+    {
+        "version": "2.20.5",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Layout: Optimisation du mode paysage avec 5 colonnes de compétences.",
+            "UX: Suppression de l'espace vide à droite de la feuille en mode paysage.",
+            "Core: Redistribution intelligente des catégories sur la grille 6-cols."
+        ]
+    },
+    {
+        "version": "2.20.4",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Hotfix: Correction d'un crash lors du passage en mode paysage (isLandscape).",
+            "Fix: Correction de l'application de la largeur A4 dans les réglages (portrait).",
+            "Core: Restauration des propriétés de colonnes attendues par le moteur de rendu."
+        ]
+    },
+    {
+        "version": "2.20.3",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "UX/UI: Les bibliothèques utilisent désormais le format A4 (1100px) en mode standard.",
+            "UX: Centrage dynamique du contenu pour une meilleure lisibilité sur grands écrans."
+        ]
+    },
+    {
+        "version": "2.20.2",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Joueur: Affichage du nom de la campagne active dans la barre de navigation.",
+            "Sync: Verrouillage intelligent du sélecteur de campagne en mode 'En Ligne'.",
+            "UX: Badge dynamique indiquant le contexte de jeu actuel."
+        ]
+    },
+    {
+        "version": "2.20.1",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix critique: Les attributs ne sont plus réinitialisés à 0 lors de l'import d'un personnage.",
+            "Fix: Migration automatique des données lors de l'import (permet de charger d'anciennes fiches).",
+            "Fix: Correction de la conversion des valeurs 0 numériques en chaînes '0' pour les attributs."
+        ]
+    },
+    {
+        "version": "2.20.0",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Nouveau: Archivage et Master List Admin !",
+            "Admin: Nouveau bouton 'Tous les Joueurs' pour voir les fiches de toutes les campagnes.",
+            "Admin: Conservation des fiches même après suppression d'une campagne (Fiches orphelines).",
+            "Infra: Intégration de la compression d'images (JPEG 85% + gzip base64) lors de la synchronisation.",
+            "Optimisation: Gain de place significatif en base de données pour les images de personnages.",
+            "Joueur: Support des fiches 'Indépendantes' récupérées depuis le cloud."
+        ]
+    },
+    {
+        "version": "2.19.0",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Nouveau: Chargement des personnages depuis le cloud !",
+            "Joueur: Nouvel onglet 'Cloud' dans Import/Export pour récupérer ses fiches synchronisées.",
+            "Joueur: Recherche par nom de joueur avec liste des personnages disponibles.",
+            "Joueur: Confirmation avant écrasement de la fiche locale.",
+            "Infra: Service ImageCompressionService créé (compression JPEG + gzip, intégration à venir).",
+            "Infra: Nouvelle méthode getCharactersByPlayerName() dans CharacterSyncService."
+        ]
+    },
+    {
         "version": "2.18.0",
         "date": "2026-02-07",
         "type": "feature",
@@ -829,118 +963,6 @@
         "date": "2026-02-04",
         "changes": [
             "Système : Optimisation majeure de la détection des mises à jour. L'application utilise désormais l'API GitHub (mode rapide) pour contourner le délai de 5 minutes du CDN, avec repli automatique sur le CDN en cas de limite atteinte."
-        ]
-    },
-    {
-        "version": "2.12.53",
-        "date": "2026-02-03",
-        "changes": [
-            "Admin : Ajout du \"Moniteur de Déploiement\". Une fois la publication lancée, une barre de progression en bas d'écran vous informe en temps réel de l'avancement du build sur GitHub Actions (En attente -> Construction -> Terminé)."
-        ]
-    },
-    {
-        "version": "2.12.52",
-        "date": "2026-02-03",
-        "changes": [
-            "Admin : Ajout d'une protection contre la \"Double Mise à Jour\". L'application vérifie désormais si une version plus récente est disponible en ligne avant de vous laisser publier, affichant une alerte si nécessaire.",
-            "Système : Correction de l'injection de version dans les règles générées."
-        ]
-    },
-    {
-        "version": "2.12.51",
-        "date": "2026-02-03",
-        "changes": [
-            "Système : Amélioration de la détection des mises à jour de règles. Les requêtes ignorent désormais agressivement le cache navigateur (no-store).",
-            "UI : Ajout d'un indicateur de version des règles dans l'en-tête de la fiche.",
-            "UI : Ajout d'un bouton \"Rafraîchir les Règles\" à côté de la version pour forcer le rechargement manuel en cas de doute."
-        ]
-    },
-    {
-        "version": "2.12.50",
-        "date": "2026-02-03",
-        "changes": [
-            "Système : Activation du mode \"Mise à jour Instantanée\". Les règles sont désormais lues directement depuis le dépôt (Raw), contournant le délai de déploiement GitHub Pages.",
-            "Bugfix : Correction d'un problème où des \"Attributs Secondaires Fantômes\" restaient affichés après la suppression d'un pavé d'attributs. La réconciliation nettoie désormais correctement les données orphelines.",
-            "Admin : Ajout d'un lien de vérification directe du fichier après publication."
-        ]
-    },
-    {
-        "version": "2.12.49",
-        "date": "2026-02-03",
-        "changes": [
-            "Système : Implémentation du \"Smart Fetching\" pour contourner le cache navigateur et garantir le chargement des dernières règles.",
-            "Système : Ajout de la \"Réconciliation Automatique\". Les mises à jour de règles (nouvelles compétences, coûts) s'appliquent désormais automatiquement au lancement de la fiche, sans besoin de Reset, tout en préservant les données du joueur.",
-            "Admin : Correction de l'interface de publication (réinitialisation correcte de la fenêtre après upload)."
-        ]
-    },
-    {
-        "version": "2.12.48",
-        "date": "2026-02-03",
-        "changes": [
-            "Admin : Nouvelle fonctionnalité \"Publier\" permettant de mettre à jour le système en ligne directement depuis l'interface (GitHub Pages).",
-            "Admin : Le fichier rules.js est désormais généré à la volée pour l'export et le déploiement.",
-            "Admin : Support de l'authentification GitHub par Token personnel pour le déploiement sécurisé."
-        ]
-    },
-    {
-        "version": "2.12.47",
-        "date": "2026-02-02",
-        "changes": [
-            "Admin : Ajout de l'éditeur de bibliothèque de Spécialisations officielles.",
-            "Joueur : Intégration de la bibliothèque de spécialisations officielles (Vue hybride).",
-            "Système : Support amélioré de la liaison des spécialisations officielles avec les compétences (Lien par Nom et ID)."
-        ]
-    },
-    {
-        "version": "2.12.46",
-        "date": "2026-02-02",
-        "changes": [
-            "Admin : Création de l'éditeur de bibliothèques OFFICIELLES (Traits & Compétences).",
-            "Joueur : Intégration des bibliothèques officielles dans l'application (vue hybride Locale + Officielle).",
-            "Joueur : Les éléments officiels apparaissent avec un badge \"OFF\" et sont protégés en écriture (clonage automatique à la modification)."
-        ]
-    },
-    {
-        "version": "2.12.45",
-        "date": "2026-02-02",
-        "changes": [
-            "Admin : Nouvel onglet \"Attributs\" pour éditer les définitions d'attributs (Primaires et Secondaires).",
-            "Admin : Correction de l'édition des \"espaceurs\" (compétences vides) avec un placeholder."
-        ]
-    },
-    {
-        "version": "2.12.44",
-        "date": "2026-02-02",
-        "changes": [
-            "Admin : Suppression du paramètre \"Départ\" (inutile) pour les compteurs (défaut à 0).",
-            "Amélioration de typage."
-        ]
-    },
-    {
-        "version": "2.12.43",
-        "date": "2026-02-02",
-        "changes": [
-            "Ajout de la gestion dynamique des Compteurs (Volonté, Confiance...) dans l'Admin.",
-            "Ajout de la gestion dynamique des Arrière-Plans dans l'Admin.",
-            "Mise à jour du calcul d'XP pour supporter les coûts variables des compteurs et arrière-plans.",
-            "Correction: Spacers préservés lors de l'import/export."
-        ]
-    },
-    {
-        "version": "2.12.42",
-        "date": "2026-02-02",
-        "changes": [
-            "Support des spacers (champs vides) dans les listes de compétences.",
-            "Nettoyage de fichiers obsolètes (rules.json)."
-        ]
-    },
-    {
-        "version": "2.12.41",
-        "date": "2026-02-02",
-        "changes": [
-            "Admin : Ajout d'une fenêtre de résultat détaillée après l'import d'un template (Succès vs Avertissements).",
-            "Admin : Amélioration de la logique d'import pour supporter les formats \"Sauvegarde Complète\" et \"Fiche Unitaire\".",
-            "Système : Lissage de l'expérience utilisateur pour la synchronisation Joueur -> Admin."
         ]
     }
 ]

@@ -90,8 +90,7 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                 });
             });
             return (rules.libraries.skills || []).filter(libItem =>
-                (libItem.isVariable || !currentSkillNames.has(libItem.name.trim().toLowerCase())) &&
-                libItem.isActive !== false
+                (libItem.isVariable || !currentSkillNames.has(libItem.name.trim().toLowerCase()))
             );
         }
         if (activeTab === 'backgrounds') {
@@ -105,7 +104,7 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                 });
             });
             return (rules.libraries.backgrounds || []).filter(b =>
-                !currentNames.has(b.name.trim().toLowerCase()) && b.isActive !== false
+                !currentNames.has(b.name.trim().toLowerCase())
             );
         }
         if (activeTab === 'counters') {
@@ -118,7 +117,7 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
             // We also check defining counters directly in definitions.counters?
             // Actually user wants to place them in SKILL SLOTS for layout.
             return (rules.libraries.counters || []).filter(c =>
-                !currentNames.has(c.name.trim().toLowerCase()) && c.isActive !== false
+                !currentNames.has(c.name.trim().toLowerCase())
             );
         }
         return [];
@@ -206,6 +205,9 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                                                     <Layers size={10} />
                                                     <span className="font-semibold" title="Variable">Var</span>
                                                 </div>
+                                            )}
+                                            {item.isActive === false && (
+                                                <div className="text-[9px] text-red-500 font-bold px-1 rounded-sm border border-red-100 bg-red-50">Inactif</div>
                                             )}
                                         </div>
                                     </div>

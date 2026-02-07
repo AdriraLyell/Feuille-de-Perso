@@ -516,6 +516,22 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                                 autoFocus
                                 onKeyDown={(e) => e.key === 'Enter' && confirmVariableSkill()}
                             />
+
+                            {/* Suggested Variants */}
+                            {pendingSkillDrop.libItem.variants && pendingSkillDrop.libItem.variants.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-[#bfae85]/20">
+                                    <span className="w-full text-[9px] font-bold text-[#bfae85] uppercase tracking-wider mb-1">Variantes suggérées :</span>
+                                    {pendingSkillDrop.libItem.variants.map(v => (
+                                        <button
+                                            key={v}
+                                            onClick={() => setVariantInput(v)}
+                                            className={`px-2 py-1 text-xs rounded-full border transition-all ${variantInput === v ? 'bg-[#8b2e2e] text-white border-[#8b2e2e]' : 'bg-white text-[#5c4d41] border-[#bfae85]/30 hover:border-[#8b2e2e] hover:shadow-sm'}`}
+                                        >
+                                            {v}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </ThematicModal>

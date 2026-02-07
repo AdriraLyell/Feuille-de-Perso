@@ -1,21 +1,57 @@
-/**
- * CharacterReadOnlyView
- * 
- * Displays a synced character sheet in read-only mode for Admin viewing.
- */
-
-import React from 'react';
-import { X, User, Star, Book, Shield, Backpack, Award, Zap } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, User, Star, Book, Shield, Backpack, Award, Zap, Download } from 'lucide-react';
 import { SyncedCharacter } from '../../services/CharacterSyncService';
 import { CharacterSheetData } from '../../types/character';
+import { CampaignService } from '../../services/CampaignService';
+import { defaultRules } from '../../data/defaultRules';
+import LibraryImportWizard from './LibraryImportWizard';
 
 interface CharacterReadOnlyViewProps {
     character: SyncedCharacter;
     onClose: () => void;
+    onRefreshRules?: () => void;
 }
 
-const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character, onClose }) => {
+const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character, onClose, onRefreshRules }) => {
     const data = character.data as CharacterSheetData;
+    const [categoryLabels, setCategoryLabels] = useState<Record<string, string>>({});
+    const [isImportWizardOpen, setIsImportWizardOpen] = useState(false);
+
+    useEffect(() => {
+        const loadLabels = async () => {
+            if (!character.setting_id) {
+                // Orphaned character: use default labels
+                const defaults: Record<string, string> = {};
+                defaultRules.definitions.skillCategories.forEach(cat => {
+                    defaults[cat.id] = cat.label;
+                });
+                setCategoryLabels(defaults);
+                return;
+            }
+
+            const rules = await CampaignService.loadSetting(character.setting_id);
+            if (rules && rules.definitions.skillCategories) {
+                const labels: Record<string, string> = {};
+                rules.definitions.skillCategories.forEach(cat => {
+                    labels[cat.id] = cat.label;
+                });
+                setCategoryLabels(labels);
+            } else {
+                // Fallback to defaults if load fails
+                const defaults: Record<string, string> = {};
+                defaultRules.definitions.skillCategories.forEach(cat => {
+                    defaults[cat.id] = cat.label;
+                });
+                setCategoryLabels(defaults);
+            }
+        };
+
+        loadLabels();
+    }, [character.setting_id]);
+
+    const getCategoryLabel = (id: string) => {
+        return categoryLabels[id] || id.replace('Col_Comp_', 'Série ');
+    };
 
     return (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
@@ -33,12 +69,22 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
                             Sync : {new Date(character.last_synced).toLocaleString('fr-FR')}
                         </p>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-2 hover:bg-slate-700 rounded-full transition-colors"
-                    >
-                        <X size={24} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setIsImportWizardOpen(true)}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                            title={character.setting_id ? "Importer dans la bibliothèque de la campagne" : "Importer dans la bibliothèque d'une campagne au choix"}
+                        >
+                            <Download size={14} />
+                            Importer en Bibliothèque
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="p-2 hover:bg-slate-700 rounded-full transition-colors"
+                        >
+                            <X size={24} />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -111,21 +157,43 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
                                     return active.length > 0 &&
                                         !category.toLowerCase().includes('background') &&
                                         !category.toLowerCase().includes('arrière-plan') &&
-                                        category !== 'Col_Comp_8';
+                                        category !== 'Col_Comp_8' &&
+                                        category !== 'Col_Comp_9';
                                 })
                                 .sort(([a], [b]) => a.localeCompare(b))
                                 .map(([category, skills]) => (
                                     <div key={category} className="space-y-2">
                                         <h4 className="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1 bg-blue-100/50 px-2 py-0.5 rounded w-fit">
-                                            {category.replace('Col_Comp_', 'Série ')}
+                                            {getCategoryLabel(category)}
                                         </h4>
                                         <div className="space-y-1">
-                                            {(skills as any[]).filter(s => s.name && s.value > 0).map((skill, idx) => (
-                                                <div key={idx} className="bg-white px-2 py-1 rounded shadow-sm flex justify-between items-center text-xs border border-blue-100">
-                                                    <span className="text-slate-700 truncate mr-2" title={skill.name}>{skill.name}</span>
-                                                    <span className="font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">{skill.value}</span>
-                                                </div>
-                                            ))}
+                                            {(skills as any[]).filter(s => s.name && s.value > 0).map((skill, idx) => {
+                                                const personalSpecs = data.specializations?.[skill.id] || [];
+                                                const imposedSpecs = data.imposedSpecializations?.[skill.id] || [];
+
+                                                return (
+                                                    <div key={idx} className="bg-white px-2 py-1.5 rounded shadow-sm flex flex-col gap-1 border border-blue-100">
+                                                        <div className="flex justify-between items-center text-xs">
+                                                            <span className="text-slate-700 truncate mr-2 font-medium" title={skill.name}>{skill.name}</span>
+                                                            <span className="font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">{skill.value}</span>
+                                                        </div>
+                                                        {(personalSpecs.length > 0 || imposedSpecs.length > 0) && (
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {imposedSpecs.map((spec, sIdx) => (
+                                                                    <span key={`imp-${sIdx}`} className="text-[8px] leading-tight px-1 py-0.5 bg-indigo-50 text-indigo-700 rounded border border-indigo-100 font-bold uppercase tracking-tighter">
+                                                                        {spec.name}
+                                                                    </span>
+                                                                ))}
+                                                                {personalSpecs.map((spec, sIdx) => (
+                                                                    <span key={`pers-${sIdx}`} className="text-[8px] leading-tight px-1 py-0.5 bg-slate-50 text-slate-500 rounded border border-slate-100 italic">
+                                                                        {spec}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 ))
@@ -146,15 +214,36 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
                                         .filter(([category]) => category.toLowerCase().includes('background') || category.toLowerCase().includes('arrière-plan') || category === 'Col_Comp_8')
                                         .flatMap(([_, skills]) => (skills as any[]).filter(s => s.name && s.value > 0))
                                         .sort((a, b) => a.name.localeCompare(b.name))
-                                        .map((bg, idx) => (
-                                            <div key={idx} className="bg-white px-3 py-2 rounded shadow-sm flex justify-between items-center text-sm border border-orange-100">
-                                                <div className="flex flex-col">
-                                                    <span className="font-bold text-slate-800">{bg.name}</span>
-                                                    {bg.variant && <span className="text-[10px] text-slate-500 italic">{bg.variant}</span>}
+                                        .map((bg, idx) => {
+                                            const personalSpecs = data.specializations?.[bg.id] || [];
+                                            const imposedSpecs = data.imposedSpecializations?.[bg.id] || [];
+
+                                            return (
+                                                <div key={idx} className="bg-white px-3 py-2 rounded shadow-sm flex flex-col gap-1 border border-orange-100">
+                                                    <div className="flex justify-between items-center text-sm">
+                                                        <div className="flex flex-col">
+                                                            <span className="font-bold text-slate-800">{bg.name}</span>
+                                                            {bg.variant && <span className="text-[10px] text-slate-500 italic">{bg.variant}</span>}
+                                                        </div>
+                                                        <span className="font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded">{bg.value}</span>
+                                                    </div>
+                                                    {(personalSpecs.length > 0 || imposedSpecs.length > 0) && (
+                                                        <div className="flex flex-wrap gap-1 mt-1">
+                                                            {imposedSpecs.map((spec, sIdx) => (
+                                                                <span key={`imp-${sIdx}`} className="text-[8px] leading-tight px-1 py-0.5 bg-indigo-50 text-indigo-700 rounded border border-indigo-100 font-bold uppercase tracking-tighter">
+                                                                    {spec.name}
+                                                                </span>
+                                                            ))}
+                                                            {personalSpecs.map((spec, sIdx) => (
+                                                                <span key={`pers-${sIdx}`} className="text-[8px] leading-tight px-1 py-0.5 bg-slate-50 text-slate-500 rounded border border-slate-100 italic">
+                                                                    {spec}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <span className="font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded">{bg.value}</span>
-                                            </div>
-                                        ))
+                                            );
+                                        })
                                     }
                                 </div>
                             </section>
@@ -251,6 +340,17 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
                     </button>
                 </div>
             </div>
+
+            {/* Import Wizard */}
+            {isImportWizardOpen && (
+                <LibraryImportWizard
+                    character={character}
+                    onClose={() => setIsImportWizardOpen(false)}
+                    onSuccess={() => {
+                        if (onRefreshRules) onRefreshRules();
+                    }}
+                />
+            )}
         </div>
     );
 };

@@ -1,5 +1,78 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.12.53] - 2026-02-03
+
+- Admin : Ajout du "Moniteur de Déploiement". Une fois la publication lancée, une barre de progression en bas d'écran vous informe en temps réel de l'avancement du build sur GitHub Actions (En attente -> Construction -> Terminé).
+
+## [2.12.52] - 2026-02-03
+
+- Admin : Ajout d'une protection contre la "Double Mise à Jour". L'application vérifie désormais si une version plus récente est disponible en ligne avant de vous laisser publier, affichant une alerte si nécessaire.
+- Système : Correction de l'injection de version dans les règles générées.
+
+## [2.12.51] - 2026-02-03
+
+- Système : Amélioration de la détection des mises à jour de règles. Les requêtes ignorent désormais agressivement le cache navigateur (no-store).
+- UI : Ajout d'un indicateur de version des règles dans l'en-tête de la fiche.
+- UI : Ajout d'un bouton "Rafraîchir les Règles" à côté de la version pour forcer le rechargement manuel en cas de doute.
+
+## [2.12.50] - 2026-02-03
+
+- Système : Activation du mode "Mise à jour Instantanée". Les règles sont désormais lues directement depuis le dépôt (Raw), contournant le délai de déploiement GitHub Pages.
+- Bugfix : Correction d'un problème où des "Attributs Secondaires Fantômes" restaient affichés après la suppression d'un pavé d'attributs. La réconciliation nettoie désormais correctement les données orphelines.
+- Admin : Ajout d'un lien de vérification directe du fichier après publication.
+
+## [2.12.49] - 2026-02-03
+
+- Système : Implémentation du "Smart Fetching" pour contourner le cache navigateur et garantir le chargement des dernières règles.
+- Système : Ajout de la "Réconciliation Automatique". Les mises à jour de règles (nouvelles compétences, coûts) s'appliquent désormais automatiquement au lancement de la fiche, sans besoin de Reset, tout en préservant les données du joueur.
+- Admin : Correction de l'interface de publication (réinitialisation correcte de la fenêtre après upload).
+
+## [2.12.48] - 2026-02-03
+
+- Admin : Nouvelle fonctionnalité "Publier" permettant de mettre à jour le système en ligne directement depuis l'interface (GitHub Pages).
+- Admin : Le fichier rules.js est désormais généré à la volée pour l'export et le déploiement.
+- Admin : Support de l'authentification GitHub par Token personnel pour le déploiement sécurisé.
+
+## [2.12.47] - 2026-02-02
+
+- Admin : Ajout de l'éditeur de bibliothèque de Spécialisations officielles.
+- Joueur : Intégration de la bibliothèque de spécialisations officielles (Vue hybride).
+- Système : Support amélioré de la liaison des spécialisations officielles avec les compétences (Lien par Nom et ID).
+
+## [2.12.46] - 2026-02-02
+
+- Admin : Création de l'éditeur de bibliothèques OFFICIELLES (Traits & Compétences).
+- Joueur : Intégration des bibliothèques officielles dans l'application (vue hybride Locale + Officielle).
+- Joueur : Les éléments officiels apparaissent avec un badge "OFF" et sont protégés en écriture (clonage automatique à la modification).
+
+## [2.12.45] - 2026-02-02
+
+- Admin : Nouvel onglet "Attributs" pour éditer les définitions d'attributs (Primaires et Secondaires).
+- Admin : Correction de l'édition des "espaceurs" (compétences vides) avec un placeholder.
+
+## [2.12.44] - 2026-02-02
+
+- Admin : Suppression du paramètre "Départ" (inutile) pour les compteurs (défaut à 0).
+- Amélioration de typage.
+
+## [2.12.43] - 2026-02-02
+
+- Ajout de la gestion dynamique des Compteurs (Volonté, Confiance...) dans l'Admin.
+- Ajout de la gestion dynamique des Arrière-Plans dans l'Admin.
+- Mise à jour du calcul d'XP pour supporter les coûts variables des compteurs et arrière-plans.
+- Correction: Spacers préservés lors de l'import/export.
+
+## [2.12.42] - 2026-02-02
+
+- Support des spacers (champs vides) dans les listes de compétences.
+- Nettoyage de fichiers obsolètes (rules.json).
+
+## [2.12.41] - 2026-02-02
+
+- Admin : Ajout d'une fenêtre de résultat détaillée après l'import d'un template (Succès vs Avertissements).
+- Admin : Amélioration de la logique d'import pour supporter les formats "Sauvegarde Complète" et "Fiche Unitaire".
+- Système : Lissage de l'expérience utilisateur pour la synchronisation Joueur -> Admin.
+
 ## [2.12.40] - 2026-02-02
 
 - Admin : Refonte majeure du calcul des coûts d'XP. Le système utilise une formule triangulaire pour les Compétences (Facteur 1.0) et Spécialisations (Facteur 0.5).

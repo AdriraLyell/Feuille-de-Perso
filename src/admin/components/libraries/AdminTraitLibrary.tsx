@@ -332,16 +332,37 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
 
                 <div className="space-y-1">
                     {processedList.map(entry => (
-                        <TraitCard
-                            key={entry.id}
-                            entry={entry}
-                            isEditable={true}
-                            isSelected={false}
-                            onSelect={() => { }} // No selection needed in Admin
-                            onEdit={handleOpenEdit}
-                            onDelete={handleDelete}
-                            showMultiSelect={false}
-                        />
+                        <div key={entry.id} className="relative group">
+                            <div className="absolute left-3 top-4 z-10">
+                                <input
+                                    type="checkbox"
+                                    checked={entry.isActive !== false}
+                                    onChange={() => {
+                                        const newList = library.map(l => l.id === entry.id ? { ...l, isActive: !l.isActive } : l);
+                                        onUpdate({ ...rules, libraries: { ...rules.libraries, traits: newList } });
+                                    }}
+                                    className="w-4 h-4 text-blue-600 rounded cursor-pointer"
+                                    title={entry.isActive !== false ? "Désactiver" : "Activer"}
+                                />
+                            </div>
+                            <div className="pl-6">
+                                <TraitCard
+                                    entry={entry}
+                                    isEditable={true}
+                                    isSelected={entry.isActive === false} // Reuse for "ghosted" look if inactive
+                                    onSelect={() => { }}
+                                    onEdit={handleOpenEdit}
+                                    onDelete={handleDelete}
+                                    showMultiSelect={false}
+                                    source={entry.isGlobal ? 'official' : 'local'}
+                                />
+                                {entry.isGlobal && (
+                                    <div className="absolute top-3 right-12 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span className="text-[10px] text-amber-500 font-bold border border-amber-200 bg-amber-50 px-1 rounded">GLOBAL</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>

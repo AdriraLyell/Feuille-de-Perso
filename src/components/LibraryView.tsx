@@ -14,6 +14,7 @@ import LibrarySkillForm from './library/LibrarySkillForm';
 import LibraryDeleteModal from './library/LibraryDeleteModal';
 import LibraryImportModal from './library/LibraryImportModal';
 import LibraryRenameModal from './library/LibraryRenameModal';
+import { disambiguateCategories } from '../utils/categoryUtils';
 import ConfirmationModal from './ui/ConfirmationModal';
 
 interface LibraryViewProps {
@@ -57,6 +58,25 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         // We use the same merger logic, works for {id, ...} objects
         return mergeLibraries(local, official);
     }, [data.skillLibrary, rules]);
+
+    // Dynamic Categories Source of Truth
+    const availableCategories = useMemo(() => {
+        let rawCategories: { code: string, label: string, loc: string }[] = [];
+
+        if (rules?.definitions.skillCategories && rules.definitions.skillCategories.length > 0) {
+            rawCategories = rules.definitions.skillCategories.map(cat => ({
+                code: cat.id,
+                label: cat.label,
+                loc: cat.description || ""
+            }));
+        }
+
+        return disambiguateCategories(rawCategories);
+    }, [rules]);
+
+    const getCategoryLabel = (code: string) => {
+        return availableCategories.find(c => c.code === code)?.label || code;
+    };
 
     const skillsList = hybridSkills; // Now we work with MergedEntry<LibrarySkillEntry>[]
 
@@ -421,7 +441,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                                                 </div>
                                                 {skill.defaultCategory && (
                                                     <span className="text-[8px] text-amber-800/50 font-mono bg-amber-100/20 px-1 py-0.5 rounded-sm self-start mt-1 border border-amber-200/10">
-                                                        {skill.defaultCategory}
+                                                        {getCategoryLabel(skill.defaultCategory)}
                                                     </span>
                                                 )}
 
@@ -466,6 +486,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                     onSkillChange={setEditingSkill}
                     onSave={() => handleSaveSkill(editingSkill)} // Passing editingSkill here
                     error={skillError}
+                    categories={availableCategories.length > 0 ? availableCategories : undefined}
                 />
             )}
 

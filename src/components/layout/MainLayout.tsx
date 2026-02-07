@@ -9,6 +9,7 @@ import { migrateData } from '../../utils/migrations';
 import { useRules } from '../../context/RulesContext';
 import { loadRules } from '../../services/RulesLoader';
 import { RulesData } from '../../types/rules';
+import { PlayerService } from '../../services/PlayerService';
 import { INITIAL_DATA } from '../../data/initialState';
 
 // Components
@@ -167,6 +168,40 @@ const MainLayout: React.FC = () => {
         }
     };
 
+    const handleImportSuccess = async (newData: CharacterSheetData) => {
+        const migrated = migrateData(newData);
+        setData(migrated);
+
+        // -- Rules Synchronization --
+        // If the imported character has sync info, we should try to load the corresponding rules
+        // to switch the app to "Online Mode" for that campaign.
+        if (migrated.syncInfo?.settingId) {
+            const currentSettingId = (rules as any)?.settingId;
+
+            if (migrated.syncInfo.settingId !== currentSettingId) {
+                console.log(`[MainLayout] New character campaign detected: ${migrated.syncInfo.settingId}. Attempting to sync rules...`);
+                try {
+                    const newRules = await PlayerService.loadSetting(migrated.syncInfo.settingId);
+                    if (newRules) {
+                        updateRules({
+                            ...newRules,
+                            // @ts-ignore
+                            settingId: migrated.syncInfo.settingId,
+                            settingName: migrated.syncInfo.settingName
+                        });
+                        addLog(`Règles de la campagne "${migrated.syncInfo.settingName}" chargées automatiquement.`, 'success', 'settings');
+                    }
+                } catch (e) {
+                    console.error("[MainLayout] Failed to auto-sync rules on import:", e);
+                }
+            }
+        }
+
+        setMode('sheet');
+        setIsSettingsDirty(false);
+        setLastSavedState(JSON.stringify(newData));
+    };
+
     const handleConfirmReset = () => {
         if (!pendingRules) return;
 
@@ -311,7 +346,7 @@ const MainLayout: React.FC = () => {
                     <ImportExportModal
                         isOpen={showImportExport}
                         onClose={() => setShowImportExport(false)}
-                        onImportSuccess={(newData) => { const migrated = migrateData(newData); setData(migrated); setMode('sheet'); setIsSettingsDirty(false); setLastSavedState(JSON.stringify(newData)); }}
+                        onImportSuccess={handleImportSuccess}
                         onExportSuccess={() => { setLastSavedState(JSON.stringify(data)); }}
                         variant={mode === 'settings' ? 'gm' : 'player'}
                     />

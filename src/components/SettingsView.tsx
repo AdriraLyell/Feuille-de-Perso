@@ -103,6 +103,14 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
     }
   }, [localData, data, onDirtyChange]);
 
+  // Force Tab to Library if entering Online Mode without Expert Mode
+  useEffect(() => {
+    const advancedTabs = ['attributes', 'skills', 'specializations', 'creation'];
+    if (isOnlineMode && !expertMode && advancedTabs.includes(activeTab)) {
+      setActiveTab('library');
+    }
+  }, [isOnlineMode, expertMode, activeTab]);
+
   const performReset = () => {
     // FIX: Use applyRulesToState instead of raw INITIAL_DATA
     const base = JSON.parse(JSON.stringify(INITIAL_DATA));

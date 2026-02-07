@@ -266,7 +266,7 @@ export const CampaignService = {
             // Generate mapping for local IDs to new local IDs
             // (Globals remain shared)
             const idMap = new Map<string, string>();
-            const generateNewId = () => Math.random().toString(36).substring(2, 11);
+            const generateNewId = () => crypto.randomUUID();
 
             // 3. Process Libraries - Generate new IDs for local items
             // Traits

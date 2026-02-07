@@ -12,6 +12,7 @@ interface LibrarySkillFormProps {
     onSkillChange: (skill: LibrarySkillEntry) => void;
     onSave: () => void;
     error: string | null;
+    categories?: { code: string, label: string, loc?: string }[];
 }
 
 const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
@@ -21,7 +22,8 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
     skill,
     onSkillChange,
     onSave,
-    error
+    error,
+    categories = CATEGORY_HELP
 }) => {
     const [showCategoryHelp, setShowCategoryHelp] = useState(false);
 
@@ -80,7 +82,7 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
                             onChange={(e) => onSkillChange({ ...skill, defaultCategory: e.target.value })}
                         >
                             <option value="">-- Placement libre --</option>
-                            {CATEGORY_HELP.map(cat => (
+                            {categories.map(cat => (
                                 <option key={cat.code} value={cat.code}>{cat.label}</option>
                             ))}
                         </select>
@@ -99,6 +101,19 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
                             <span className="block text-[10px] text-[#5c4d41]/70 italic mt-0.5">Cochez si le joueur doit préciser quelque chose (ex: "Artisanat : Forge"). Permet d'avoir plusieurs fois cette compétence.</span>
                         </label>
                     </div>
+
+                    {skill.isVariable && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-200 -mt-2 px-1">
+                            <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Variantes suggérées (Réserve)</label>
+                            <input
+                                className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-xs text-[#1c1917] bg-[#fdfbf7] focus:border-amber-500 outline-none shadow-sm font-bold placeholder:italic placeholder:font-normal"
+                                value={(skill.variants || []).join(', ')}
+                                onChange={(e) => onSkillChange({ ...skill, variants: e.target.value.split(',').map(v => v.trim()).filter(v => v !== '') })}
+                                placeholder="Forge, Histoire, Épées..."
+                            />
+                            <p className="text-[9px] text-[#5c4d41]/70 mt-1 italic px-1">Séparez par des virgules. Ces options seront proposées lors du drag-and-drop.</p>
+                        </div>
+                    )}
                     {error && (
                         <div className="bg-red-50 text-red-800 text-[11px] p-3 rounded-sm border border-red-200 font-bold flex items-center gap-2 animate-shake">
                             <AlertOctagon size={16} /> {error}
@@ -129,7 +144,7 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-[#bfae85]/20">
-                                    {CATEGORY_HELP.map((cat, i) => (
+                                    {categories.map((cat, i) => (
                                         <tr key={i} className="hover:bg-amber-50/30 transition-colors">
                                             <td className="px-3 py-1.5 font-mono text-[#8b2e2e] font-bold">{cat.code}</td>
                                             <td className="px-3 py-1.5 text-[#4a3b32]">

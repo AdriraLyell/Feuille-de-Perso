@@ -1,5 +1,5 @@
 
-export const generateId = () => Math.random().toString(36).substr(2, 9);
+export const generateId = () => crypto.randomUUID();
 
 export const createDotEntry = (name: string, value = 0, variant?: string): any => ({
   id: generateId(),

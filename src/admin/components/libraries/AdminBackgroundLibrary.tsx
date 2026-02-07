@@ -192,7 +192,7 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                             <input
                                 type="checkbox"
                                 id="isBgVariable"
-                                className="w-4 h-4 text-purple-600 rounded"
+                                className="w-4 h-4 text-purple-600 rounded cursor-pointer"
                                 checked={editingItem.isVariable || false}
                                 onChange={(e) => setEditingItem({ ...editingItem, isVariable: e.target.checked })}
                             />
@@ -201,6 +201,18 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                                 <span className="block text-xs text-purple-700">Ex: "Influence : Politique"</span>
                             </label>
                         </div>
+                        {editingItem.isVariable && (
+                            <div className="animate-in fade-in slide-in-from-top-2 duration-200 -mt-3">
+                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Variantes suggérées (Réserve)</label>
+                                <input
+                                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-purple-500 outline-none font-bold placeholder:italic placeholder:font-normal"
+                                    value={(editingItem.variants || []).join(', ')}
+                                    onChange={(e) => setEditingItem({ ...editingItem, variants: e.target.value.split(',').map(v => v.trim()).filter(v => v !== '') })}
+                                    placeholder="Noblesse, Milice, Académie..."
+                                />
+                                <p className="text-[10px] text-slate-500 mt-1 italic">Séparez les options par des virgules.</p>
+                            </div>
+                        )}
                         {error && (
                             <div className="bg-red-50 text-red-800 text-xs p-3 rounded border border-red-200 font-bold flex items-center gap-2">
                                 <AlertOctagon size={16} /> {error}

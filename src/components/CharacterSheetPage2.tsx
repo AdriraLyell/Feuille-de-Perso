@@ -23,9 +23,10 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
     const [focusNewReputation, setFocusNewReputation] = useState<number | null>(null);
     const [editorName, setEditorName] = useState('');
     const [editorValue, setEditorValue] = useState('');
-    const [editorDescription, setEditorDescription] = useState('');
     const [editorTag, setEditorTag] = useState('');
     const [editorVariant, setEditorVariant] = useState('');
+    const [editorVariants, setEditorVariants] = useState<string[]>([]);
+    const [editorDescription, setEditorDescription] = useState('');
 
     useEffect(() => {
         if (editingSlot) {
@@ -198,7 +199,24 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                             <div className="p-5 bg-gray-50 border-b border-gray-200 shrink-0">
                                 <div className="flex gap-4 items-end mb-4">
                                     <div className="w-1/3"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom du Trait</label><input className="w-full border border-gray-300 rounded px-3 py-2 font-bold text-gray-900 focus:border-blue-500 outline-none" value={editorName} onChange={(e) => setEditorName(e.target.value)} autoFocus /></div>
-                                    <div className="flex-grow"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Complément (Variant)</label><input className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorVariant} onChange={(e) => setEditorVariant(e.target.value)} placeholder="Ex: Chats, Pollen..." /></div>
+                                    <div className="flex-grow">
+                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Complément (Variant)</label>
+                                        <input className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorVariant} onChange={(e) => setEditorVariant(e.target.value)} placeholder="Ex: Chats, Pollen..." />
+                                        {/* Suggested Variants */}
+                                        {editorVariants.length > 0 && (
+                                            <div className="flex flex-wrap gap-1.5 mt-2">
+                                                {editorVariants.map(v => (
+                                                    <button
+                                                        key={v}
+                                                        onClick={() => setEditorVariant(v)}
+                                                        className={`px-2 py-0.5 text-[10px] font-bold rounded-full border transition-all ${editorVariant === v ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:border-blue-400'}`}
+                                                    >
+                                                        {v}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="w-24"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tag</label><input className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorTag} onChange={(e) => setEditorTag(e.target.value)} placeholder="Ex: Mental..." /></div>
                                     <div className="w-20"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Valeur</label><input className="w-full border border-gray-300 rounded px-3 py-2 font-mono text-center focus:border-blue-500 outline-none" value={editorValue} onChange={(e) => setEditorValue(e.target.value)} /></div>
                                 </div>
@@ -206,14 +224,14 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description / Effets</label>
                                     <textarea className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-700 h-24 focus:border-blue-500 outline-none resize-none" value={editorDescription} onChange={(e) => setEditorDescription(e.target.value)} placeholder="Description détaillée du trait..." />
                                 </div>
-                                <div className="flex justify-end"><button onClick={() => { setEditorName(''); setEditorValue(''); setEditorDescription(''); setEditorTag(''); setEditorVariant(''); }} className="text-gray-500 text-xs hover:text-red-600 px-3 py-1.5 flex items-center gap-1 hover:bg-red-50 rounded"><Trash2 size={14} /> Vider</button></div>
+                                <div className="flex justify-end"><button onClick={() => { setEditorName(''); setEditorValue(''); setEditorDescription(''); setEditorTag(''); setEditorVariant(''); setEditorVariants([]); }} className="text-gray-500 text-xs hover:text-red-600 px-3 py-1.5 flex items-center gap-1 hover:bg-red-50 rounded"><Trash2 size={14} /> Vider</button></div>
                             </div>
                             <div className="flex-grow flex flex-col min-h-0 border-t border-gray-200">
                                 <div className="bg-blue-50 px-4 py-2 border-b border-blue-100 flex items-center justify-between text-blue-800 text-sm font-bold shrink-0">
                                     <div className="flex items-center gap-2"><BookOpen size={16} />Bibliothèque</div>
                                     <button onClick={() => { const target = editingSlot.type; setEditingSlot(null); setMultiSelectTarget(target); }} className="text-xs bg-white border border-blue-200 hover:bg-blue-100 px-2 py-1 rounded text-blue-700 flex items-center gap-1 shadow-sm"><CheckSquare size={12} /> Sélection multiple</button>
                                 </div>
-                                <div className="flex-grow overflow-hidden relative"><TraitLibrary data={data} onUpdate={onChange} onSelect={(e) => { setEditorName(e.name); setEditorValue(e.cost); setEditorDescription(e.description); setEditorTag(e.tags?.[0] || ''); setEditorVariant(''); /* Reset variant on new select */ }} isEditable={false} defaultFilter={editingSlot.type === 'avantages' ? 'avantage' : 'desavantage'} /></div>
+                                <div className="flex-grow overflow-hidden relative"><TraitLibrary data={data} onUpdate={onChange} onSelect={(e) => { setEditorName(e.name); setEditorValue(e.cost); setEditorDescription(e.description); setEditorTag(e.tags?.[0] || ''); setEditorVariant(''); setEditorVariants(e.variants || []); }} isEditable={false} defaultFilter={editingSlot.type === 'avantages' ? 'avantage' : 'desavantage'} /></div>
                             </div>
                         </div>
                         <div className="p-4 bg-gray-100 border-t border-gray-200 flex justify-between items-center shrink-0">

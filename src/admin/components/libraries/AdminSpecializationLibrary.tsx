@@ -252,9 +252,23 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                                 >
                                     <div>
                                         <div className="flex justify-between items-start mb-1">
-                                            <span className="font-serif font-black uppercase text-xs tracking-wide text-[#4a3b32]">
-                                                {entry.name}
-                                            </span>
+                                            <div className="flex items-center gap-1.5 overflow-hidden">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={entry.isActive !== false}
+                                                    onChange={() => {
+                                                        const currentList = rules.libraries.specializations || [];
+                                                        const newList = currentList.map(s => s.id === entry.id ? { ...s, isActive: !s.isActive } : s);
+                                                        onUpdate({ ...rules, libraries: { ...rules.libraries, specializations: newList } });
+                                                    }}
+                                                    className="w-4 h-4 text-amber-600 rounded cursor-pointer"
+                                                    title={entry.isActive !== false ? "Désactiver" : "Activer"}
+                                                />
+                                                <span className={`font-serif font-black uppercase text-xs tracking-wide ${entry.isActive === false ? 'text-slate-500 line-through' : 'text-[#4a3b32]'}`}>
+                                                    {entry.name}
+                                                </span>
+                                                {entry.isGlobal && <span title="Global" className="text-[8px] text-amber-500 font-bold border border-amber-200 bg-amber-50 px-1 rounded shrink-0">GLOB</span>}
+                                            </div>
 
                                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button onClick={() => handleOpenEdit(entry)} className="text-blue-500 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>

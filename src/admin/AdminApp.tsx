@@ -119,6 +119,16 @@ const AdminApp: React.FC = () => {
         setIsSaving(false);
     };
 
+    const refreshRules = async () => {
+        if (!currentSettingId) return;
+        const loadedRules = await CampaignService.loadSetting(currentSettingId);
+        if (loadedRules) {
+            setRules(loadedRules);
+            // Optionally reset persistence if we want to discard local changes? 
+            // In case of Import, we definitely want the new state.
+            resetPersistence();
+        }
+    };
 
     const handleUpdateRules = (newRules: RulesData) => {
         setRules(newRules);
@@ -437,7 +447,7 @@ const AdminApp: React.FC = () => {
                 )}
 
                 {activeTab === 'players' && currentSettingId && (
-                    <CampaignCharactersView settingId={currentSettingId} />
+                    <CampaignCharactersView settingId={currentSettingId} onRefreshRules={refreshRules} />
                 )}
             </main >
 

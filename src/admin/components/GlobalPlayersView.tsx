@@ -11,6 +11,7 @@ import { CharacterSyncService, SyncedCharacterSummary, SyncedCharacter } from '.
 import CharacterReadOnlyView from './CharacterReadOnlyView';
 import { PlayerService } from '../../services/PlayerService';
 import { GameSettingSummary } from '../../services/CampaignService';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
 
 const GlobalPlayersView: React.FC = () => {
     const [characters, setCharacters] = useState<SyncedCharacterSummary[]>([]);
@@ -19,6 +20,7 @@ const GlobalPlayersView: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCharacter, setSelectedCharacter] = useState<SyncedCharacter | null>(null);
     const [filterOrphans, setFilterOrphans] = useState(false);
+    const [characterToDelete, setCharacterToDelete] = useState<string | null>(null);
 
     useEffect(() => {
         loadData();
@@ -48,13 +50,17 @@ const GlobalPlayersView: React.FC = () => {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (window.confirm('Êtes-vous sûr de vouloir supprimer cette fiche synchronisée ?')) {
-            const success = await CharacterSyncService.deleteCharacter(id);
-            if (success) {
-                setCharacters(prev => prev.filter(c => c.id !== id));
-            }
+    const handleDelete = (id: string) => {
+        setCharacterToDelete(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!characterToDelete) return;
+        const success = await CharacterSyncService.deleteCharacter(characterToDelete);
+        if (success) {
+            setCharacters(prev => prev.filter(c => c.id !== characterToDelete));
         }
+        setCharacterToDelete(null);
     };
 
     const filteredCharacters = characters.filter(char => {
@@ -93,8 +99,8 @@ const GlobalPlayersView: React.FC = () => {
                     <button
                         onClick={() => setFilterOrphans(!filterOrphans)}
                         className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${filterOrphans
-                                ? 'bg-amber-100 text-amber-700 border border-amber-200'
-                                : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
+                            ? 'bg-amber-100 text-amber-700 border border-amber-200'
+                            : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
                             }`}
                         title="Afficher uniquement les personnages dont la campagne a été supprimée"
                     >
@@ -198,6 +204,16 @@ const GlobalPlayersView: React.FC = () => {
                     onClose={() => setSelectedCharacter(null)}
                 />
             )}
+
+            <ConfirmationModal
+                isOpen={!!characterToDelete}
+                onClose={() => setCharacterToDelete(null)}
+                onConfirm={confirmDelete}
+                title="Supprimer la synchronisation ?"
+                message="Attention : Cette action supprimera définitivement la fiche du cloud. Le joueur pourra toujours synchroniser sa fiche à nouveau s'il le souhaite."
+                confirmLabel="Supprimer"
+                type="danger"
+            />
         </div>
     );
 };

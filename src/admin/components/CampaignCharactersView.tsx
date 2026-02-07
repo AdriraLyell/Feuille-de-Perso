@@ -11,9 +11,10 @@ import CharacterReadOnlyView from './CharacterReadOnlyView';
 
 interface CampaignCharactersViewProps {
     settingId: string;
+    onRefreshRules?: () => void;
 }
 
-const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ settingId }) => {
+const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ settingId, onRefreshRules }) => {
     const [characters, setCharacters] = useState<SyncedCharacterSummary[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedCharacter, setSelectedCharacter] = useState<SyncedCharacter | null>(null);
@@ -138,6 +139,7 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
                 <CharacterReadOnlyView
                     character={selectedCharacter}
                     onClose={() => setSelectedCharacter(null)}
+                    onRefreshRules={onRefreshRules}
                 />
             )}
         </div>

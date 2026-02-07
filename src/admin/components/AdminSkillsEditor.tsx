@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { RulesData } from '../../types/rules';
 import { LibrarySkillEntry } from '../../types';
 import { AlertCircle, FolderSync, CheckCircle2 } from 'lucide-react';
+import { disambiguateCategories } from '../../utils/categoryUtils';
 import AdminSkillLibrarySidebar from './libraries/AdminSkillLibrarySidebar';
 import SkillCategoryCard from './skills/SkillCategoryCard';
 
@@ -244,12 +245,12 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
 
                 {/* Dynamic Columns Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {skillCategories.map(cat => (
+                    {disambiguateCategories(skillCategories).map(cat => (
                         <SkillCategoryCard
                             key={cat.id}
                             id={cat.id}
                             label={cat.label}
-                            categoryConfig={cat}
+                            categoryConfig={skillCategories.find(c => c.id === cat.id)!}
                             skills={skillsMap[cat.id] || []}
                             isDraggingSidebarItem={draggedItem?.type === 'admin_lib_skill'}
                             onUpdateLabel={updateLabel}

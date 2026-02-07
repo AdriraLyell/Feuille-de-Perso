@@ -7,6 +7,7 @@ import ThematicModal from '../../../components/ui/ThematicModal';
 import { CATEGORY_HELP } from '../../../data/constants';
 import { smartIncludes } from '../../../utils/stringUtils';
 import { publishFileToGitHub } from '../../../services/githubService';
+import { disambiguateCategories } from '../../../utils/categoryUtils';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 
 interface AdminSkillLibraryProps {
@@ -28,6 +29,27 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
             .filter(s => smartIncludes(s.name, searchTerm) || (s.description && smartIncludes(s.description, searchTerm)))
             .sort((a, b) => a.name.localeCompare(b.name));
     }, [list, searchTerm]);
+
+    // Dynamic Categories Source of Truth
+    const availableCategories = useMemo(() => {
+        // Start with fallbacks
+        let rawCategories = [...CATEGORY_HELP];
+
+        // Overlay rules if they exist
+        if (rules.definitions.skillCategories && rules.definitions.skillCategories.length > 0) {
+            rawCategories = rules.definitions.skillCategories.map(cat => ({
+                code: cat.id,
+                label: cat.label,
+                loc: cat.description || ""
+            }));
+        }
+
+        return disambiguateCategories(rawCategories);
+    }, [rules.definitions.skillCategories]);
+
+    const getCategoryLabel = (code: string) => {
+        return availableCategories.find(c => c.code === code)?.label || code;
+    };
 
     const [showPublishConfirm, setShowPublishConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
@@ -209,7 +231,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
                                 </div>
                                 {skill.defaultCategory && (
                                     <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200 self-start">
-                                        {CATEGORY_HELP.find(c => c.code === skill.defaultCategory)?.label || skill.defaultCategory}
+                                        {getCategoryLabel(skill.defaultCategory)}
                                     </span>
                                 )}
                             </div>
@@ -267,7 +289,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
                                     onChange={(e) => setEditingSkill({ ...editingSkill, defaultCategory: e.target.value })}
                                 >
                                     <option value="">-- Aucune --</option>
-                                    {CATEGORY_HELP.map(cat => (
+                                    {availableCategories.map(cat => (
                                         <option key={cat.code} value={cat.code}>{cat.label}</option>
                                     ))}
                                 </select>
@@ -300,7 +322,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
                                     <button onClick={() => setShowCategoryHelp(false)}><X size={14} /></button>
                                 </div>
                                 <div className="space-y-2 text-xs">
-                                    {CATEGORY_HELP.map(cat => (
+                                    {availableCategories.map(cat => (
                                         <div key={cat.code} className="grid grid-cols-[1fr_2fr] gap-2">
                                             <code className="bg-slate-200 px-1 rounded font-mono text-slate-700">{cat.code}</code>
                                             <span className="text-slate-500">{cat.label}</span>

@@ -70,7 +70,10 @@ export interface LibraryEntry {
   description: string;
   tags?: string[];
   isVariable?: boolean; // Si vrai, demande une précision (variant) à l'ajout
+  variants?: string[]; // Liste des variantes suggérées (ex: "Chats", "Pollen" pour Allergie)
   effects?: TraitEffect[]; // New Effects System
+  isGlobal?: boolean;
+  isActive?: boolean;
 }
 
 // Nouveau : Entrée pour la réserve de compétences
@@ -80,6 +83,7 @@ export interface LibrarySkillEntry {
   description?: string;
   defaultCategory?: string; // Hint for auto-placement (optional)
   isVariable?: boolean; // Si vrai, permet les doublons avec des variants différents (ex: "Artisanat : Forge")
+  variants?: string[]; // Liste des variantes suggérées (ex: "Forge", "Histoire", "Épées")
   isGlobal?: boolean; // True if from global library
   isActive?: boolean; // True if selected for this campaign
 }
@@ -91,6 +95,8 @@ export interface LibrarySpecializationEntry {
   skillIds: string[];      // IDs des compétences parentes (ex: "competences_armes_feu")
   defaultMinLevel: number; // Seuil minimum par défaut (0-5)
   description?: string;
+  isGlobal?: boolean;
+  isActive?: boolean;
 }
 
 export interface LibraryBackgroundEntry extends LibrarySkillEntry {
