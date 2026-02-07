@@ -1,5 +1,66 @@
 [
     {
+        "version": "2.21.1",
+        "date": "2026-02-07",
+        "type": "improvement",
+        "changes": [
+            "Admin: Remplacement de la fenêtre de saisie navigateur par une modale thématique pour la duplication de campagne.",
+            "UX: Amélioration de l'esthétique et de la cohérence visuelle lors de la création d'une copie."
+        ]
+    },
+    {
+        "version": "2.21.0",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Ajout de la possibilité de dupliquer une campagne existante.",
+            "Admin: La duplication crée une nouvelle campagne avec les mêmes règles et bibliothèques, mais sans copier les personnages.",
+            "Admin: Les identifiants des bibliothèques locales sont régénérés lors de la duplication pour garantir l'indépendance des données."
+        ]
+    },
+    {
+        "version": "2.20.16",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Data: Correction du bug de remise à zéro des attributs lors de la reprise de session.",
+            "Migration: Normalisation systématique des identifiants de catégories d'attributs dans les règles (ex: 'Physique' -> 'pave_attributs_1').",
+            "Sécurité: La réconciliation des attributs est désormais additive, empêchant la suppression accidentelle de valeurs si les règles sont incomplètes ou mal formées."
+        ]
+    },
+    {
+        "version": "2.20.15",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Sécurité: Changement de stratégie de réconciliation (Additve). Les compétences existantes du personnage ne sont plus jamais supprimées lors du chargement d'une nouvelle campagne, même si la campagne est incomplète.",
+            "Migration: Correction d'un bug où les règles chargées depuis GitHub restaient en format legacy, causant des conflits d'affichage.",
+            "Stabilité: Ajout de logs de débogage avancés dans le CharacterContext pour tracer les flux de données.",
+            "Fix: Résolution du blocage (boucle infinie) lors de la résolution des conflits de session au démarrage."
+        ]
+    },
+    {
+        "version": "2.20.14",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix: Correction de la perte des compétences lors du chargement des campagnes en ligne (reconstruction du layout depuis la bibliothèque).",
+            "Fix: Correction d'une boucle infinie (UI bloquée) lors d'un conflit de campagne au démarrage.",
+            "Stabilité: Ajout de garde-fous globaux et gestion d'erreurs sur le chargement des données Supabase."
+        ]
+    },
+    {
+        "version": "2.20.13",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Sécurité: Ajout d'une modale de conflit lors du changement de campagne pour éviter les pertes de données.",
+            "UX: Nouveau bouton 'Reprendre ma session' pour charger instantanément la campagne associée au personnage local.",
+            "Sauvegarde: Option de sauvegarde de secours (JSON) intégrée directement dans la modale de conflit.",
+            "Core: Extraction de la logique d'exportation vers un utilitaire partagé."
+        ]
+    },
+    {
         "version": "2.20.12",
         "date": "2026-02-07",
         "type": "refactor",
@@ -141,77 +202,6 @@
             "Joueur: Confirmation avant écrasement de la fiche locale.",
             "Infra: Service ImageCompressionService créé (compression JPEG + gzip, intégration à venir).",
             "Infra: Nouvelle méthode getCharactersByPlayerName() dans CharacterSyncService."
-        ]
-    },
-    {
-        "version": "2.18.0",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Nouveau: Synchronisation des fiches joueurs avec le MJ !",
-            "Joueur: Bouton 'Sync' dans la navigation pour envoyer sa fiche à une campagne.",
-            "Joueur: Modal de synchronisation avec sélection de campagne et pré-remplissage des noms.",
-            "Admin: Nouvel onglet 'Joueurs' affichant la liste des fiches synchronisées.",
-            "Admin: Vue lecture seule des fiches de personnages soumises.",
-            "Infra: Nouveau service CharacterSyncService pour la gestion BDD des personnages."
-        ]
-    },
-    {
-        "version": "2.17.51",
-        "date": "2026-02-07",
-        "type": "refactor",
-        "changes": [
-            "Admin: Réorganisation des Paramètres de Création.",
-            "UX: Déplacement des bornes d'attributs en tête de section pour une meilleure clarté.",
-            "UX: Libellés renommés en 'Attribut Minimal' et 'Attribut Maximal'."
-        ]
-    },
-    {
-        "version": "2.17.50",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Config: Mise à jour des valeurs par défaut pour la répartition des rangs (10, 8, 6, 2, 0)."
-        ]
-    },
-    {
-        "version": "2.17.49",
-        "date": "2026-02-07",
-        "type": "refactor",
-        "changes": [
-            "Admin: Déplacement du 'Coût d'Attribut (XP)' de l'onglet Coûts vers l'onglet Général & Création.",
-            "UX: Centralisation des coûts fondamentaux dans la section Configuration Générale."
-        ]
-    },
-    {
-        "version": "2.17.48",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin: Refonte visuelle de l'onglet 'Général & Création'.",
-            "UX: Déplacement de la 'Version des Règles' dans un en-tête global.",
-            "UX: Extraction de 'Rangs Étendus' et 'Coût Arrière-Plans' dans une section 'Configuration Générale' premium."
-        ]
-    },
-    {
-        "version": "2.17.47",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin: Inversion de l'ordre d'affichage de la 'Répartition des Rangs' (désormais de 1 à 5).",
-            "Config: Mise à jour des valeurs par défaut pour les nouveaux settings :",
-            "- Mode Rangs: Attr=12, Plans=7, Attr Min=-1, Coût Arrière-plan=2",
-            "- Mode Pot Commun: XP=450",
-            "- Mode Budgets Séparés: Attr=120, Comp=240, Plans=20"
-        ]
-    },
-    {
-        "version": "2.17.46",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix critique: Les arrière-plans ne deviennent plus tous 'variable' lors du refresh de l'app.",
-            "Core: rulesReconciler vérifie maintenant le flag isVariable depuis la bibliothèque."
         ]
     }
 ]

@@ -67,74 +67,115 @@ export const CampaignService = {
      * BUT wait, our schema normalized them. So we must fetch them.
      */
     async loadSetting(id: string): Promise<RulesData | null> {
-        // 1. Fetch Main Config
-        const { data: settingData, error: settingError } = await supabase
-            .from('game_settings')
-            .select('*')
-            .eq('id', id)
-            .single();
+        try {
+            // 1. Fetch Main Config
+            const { data: settingData, error: settingError } = await supabase
+                .from('game_settings')
+                .select('*')
+                .eq('id', id)
+                .single();
 
-        if (settingError || !settingData) {
-            console.error('Error loading setting:', settingError);
-            return null;
-        }
-
-        // 2. Load Libraries
-        const libraries = await LibraryService.loadLibraries(id);
-
-        const rules: RulesData = migrateRulesToV2({
-            version: settingData.version,
-            lastUpdated: new Date(settingData.last_updated).getTime(),
-            // @ts-ignore
-            configurations: settingData.configurations,
-            // @ts-ignore
-            definitions: settingData.definitions,
-            // @ts-ignore
-            theme: settingData.configurations?.theme || { creationColor: "#000", xpColor: "#000" },
-            libraries: libraries
-        });
-
-        // Inject setting metadata so RulesContext can detect online mode and display name
-        (rules as any).settingId = id;
-        (rules as any).settingName = settingData.name;
-
-        // Sync definitions.counters with libraries.counters (add new counters, update descriptions)
-        if (libraries.counters && libraries.counters.length > 0) {
-            const activeCounters = libraries.counters.filter(c => c.isActive !== false);
-
-            if (!rules.definitions.counters) {
-                rules.definitions.counters = {};
+            if (settingError || !settingData) {
+                console.error('Error loading setting:', settingError);
+                return null;
             }
 
-            activeCounters.forEach(libCounter => {
-                // Generate a safe key from the counter name (normalize accents é→e, è→e, etc.)
-                const key = libCounter.name
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-                    .toLowerCase()
-                    .replace(/[^a-z0-9]/g, '_')
-                    .replace(/_+/g, '_') // Collapse multiple underscores
-                    .replace(/^_|_$/g, ''); // Trim leading/trailing underscores
+            // 2. Load Libraries
+            const libraries = await LibraryService.loadLibraries(id);
 
-                if (!rules.definitions.counters[key]) {
-                    // Add new counter to definitions
-                    rules.definitions.counters[key] = {
-                        id: libCounter.id,
-                        name: libCounter.name,
-                        description: libCounter.description || '',
-                        max: (libCounter as any).maxValue || 10,
-                        value: (libCounter as any).defaultValue || 0,
-                        defaultValue: (libCounter as any).defaultValue || 0,
-                        xpCost: (libCounter as any).xpCost || 0
-                    };
-                } else {
-                    // Update existing counter description from library
-                    rules.definitions.counters[key].description = libCounter.description || rules.definitions.counters[key].description;
+            const rules: RulesData = migrateRulesToV2({
+                version: settingData.version,
+                lastUpdated: new Date(settingData.last_updated).getTime(),
+                // @ts-ignore
+                configurations: settingData.configurations,
+                // @ts-ignore
+                definitions: settingData.definitions,
+                // @ts-ignore
+                theme: settingData.configurations?.theme || { creationColor: "#000", xpColor: "#000" },
+                libraries: libraries
+            });
+
+            // Inject setting metadata
+            (rules as any).settingId = id;
+            (rules as any).settingName = settingData.name;
+
+            // 3. REBUILD definitions.skills layout from libraries if needed
+            // Only rebuild if the current layout is empty or significantly different
+            const currentLayoutKeys = Object.keys(rules.definitions.skills || {});
+            const hasExistingLayout = currentLayoutKeys.length > 0 && currentLayoutKeys.some(k => (rules.definitions.skills as any)[k]?.length > 0);
+
+            if (!hasExistingLayout && libraries.skills.length > 0) {
+                console.log("[CampaignService] Rebuilding skill layout from library (empty layout detected)");
+                if (!rules.definitions.skills) rules.definitions.skills = {};
+
+                libraries.skills.forEach(s => {
+                    if (s.isActive !== false) {
+                        const cat = s.defaultCategory || 'Col_Comp_2';
+                        if (!rules.definitions.skills[cat]) rules.definitions.skills[cat] = [];
+                        if (!rules.definitions.skills[cat].includes(s.name)) {
+                            rules.definitions.skills[cat].push(s.name);
+                        }
+                    }
+                });
+            }
+
+            // Ensure categories from libraries exist in skillCategories if migrateRules didn't find them
+            // Backgrounds
+            const bgCat = 'Col_Comp_8';
+            if (!rules.definitions.skills[bgCat]) rules.definitions.skills[bgCat] = [];
+            libraries.backgrounds.forEach(b => {
+                if (b.isActive !== false && !rules.definitions.skills[bgCat].includes(b.name)) {
+                    rules.definitions.skills[bgCat].push(b.name);
                 }
             });
-        }
 
-        return rules;
+            // Counters
+            const counterCat = 'Col_Comp_9';
+            if (!rules.definitions.skills[counterCat]) rules.definitions.skills[counterCat] = [];
+            libraries.counters.forEach(c => {
+                if (c.isActive !== false && !rules.definitions.skills[counterCat].includes(c.name)) {
+                    rules.definitions.skills[counterCat].push(c.name);
+                }
+            });
+
+            // Sync definitions.counters map (for specific counter definitions like max/xpCost)
+            if (libraries.counters && libraries.counters.length > 0) {
+                const activeCounters = libraries.counters.filter(c => c.isActive !== false);
+
+                if (!rules.definitions.counters) {
+                    rules.definitions.counters = {};
+                }
+
+                activeCounters.forEach(libCounter => {
+                    const key = libCounter.name
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]/g, '_')
+                        .replace(/_+/g, '_')
+                        .replace(/^_|_$/g, '');
+
+                    if (!rules.definitions.counters[key]) {
+                        rules.definitions.counters[key] = {
+                            id: libCounter.id,
+                            name: libCounter.name,
+                            description: libCounter.description || '',
+                            max: (libCounter as any).maxValue || 10,
+                            value: (libCounter as any).defaultValue || 0,
+                            defaultValue: (libCounter as any).defaultValue || 0,
+                            xpCost: (libCounter as any).xpCost || 0
+                        };
+                    } else {
+                        rules.definitions.counters[key].description = libCounter.description || rules.definitions.counters[key].description;
+                    }
+                });
+            }
+
+            return rules;
+        } catch (e) {
+            console.error("[CampaignService] Critical error loading setting:", e);
+            return null;
+        }
     },
 
     /**
@@ -208,6 +249,83 @@ export const CampaignService = {
             return false;
         }
         return true;
+    },
+
+    /**
+     * Duplicate a setting (copy rules and libraries, but no characters)
+     */
+    async duplicateSetting(sourceId: string, newName: string): Promise<string | null> {
+        try {
+            // 1. Load source setting
+            const sourceRules = await this.loadSetting(sourceId);
+            if (!sourceRules) throw new Error("Source setting not found");
+
+            // 2. Clone rules object (Deep Copy)
+            const clonedRules: RulesData = JSON.parse(JSON.stringify(sourceRules));
+
+            // Generate mapping for local IDs to new local IDs
+            // (Globals remain shared)
+            const idMap = new Map<string, string>();
+            const generateNewId = () => Math.random().toString(36).substring(2, 11);
+
+            // 3. Process Libraries - Generate new IDs for local items
+            // Traits
+            clonedRules.libraries.traits = clonedRules.libraries.traits.map(t => {
+                const newId = generateNewId();
+                idMap.set(t.id, newId);
+                return { ...t, id: newId };
+            });
+
+            // Skills
+            clonedRules.libraries.skills = clonedRules.libraries.skills.map(s => {
+                if (s.isGlobal) return s;
+                const newId = generateNewId();
+                idMap.set(s.id, newId);
+                return { ...s, id: newId };
+            });
+
+            // Specializations
+            clonedRules.libraries.specializations = clonedRules.libraries.specializations.map(s => {
+                const newId = generateNewId();
+                idMap.set(s.id, newId);
+                // Update internal skill links
+                const newSkillIds = (s.skillIds || []).map(sid => idMap.get(sid) || sid);
+                return { ...s, id: newId, skillIds: newSkillIds };
+            });
+
+            // Backgrounds
+            clonedRules.libraries.backgrounds = clonedRules.libraries.backgrounds.map(b => {
+                if (b.isGlobal) return b;
+                const newId = generateNewId();
+                idMap.set(b.id, newId);
+                return { ...b, id: newId };
+            });
+
+            // Counters
+            clonedRules.libraries.counters = clonedRules.libraries.counters.map(c => {
+                if (c.isGlobal) return c;
+                const newId = generateNewId();
+                idMap.set(c.id, newId);
+                return { ...c, id: newId };
+            });
+
+            // 4. Update definitions.counters (if they reference library IDs)
+            if (clonedRules.definitions.counters) {
+                Object.keys(clonedRules.definitions.counters).forEach(key => {
+                    const def = clonedRules.definitions.counters[key];
+                    if (def.id && idMap.has(def.id)) {
+                        def.id = idMap.get(def.id)!;
+                    }
+                });
+            }
+
+            // 5. Create new setting
+            return await this.createSetting(newName, clonedRules);
+
+        } catch (e) {
+            console.error("[CampaignService] Duplication failed:", e);
+            return null;
+        }
     },
 
     async checkSchema(id: string): Promise<void> {

@@ -6,7 +6,7 @@ import { INITIAL_DATA } from '../../data/initialState';
 import { migrateTerminology } from './migrateTerminology';
 import { migrateTraits } from './migrateTraits';
 import { migrateCounters } from './migrateCounters';
-import { migrateAttributes } from './migrateAttributes';
+import { migrateAttributes, migrateAttributeId } from './migrateAttributes';
 import { migrateNotebook } from './migrateNotebook';
 import { migrateSkills, LEGACY_SKILL_MAP } from './migrateSkills';
 import { migrateSpecializations } from './migrateSpecializations';
@@ -105,11 +105,33 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
         rules.definitions.skills = newSkills;
     }
 
-    // 4. Migrate definitions.labels Record keys
+    // 4. Migrate definitions.attributes Record keys
+    if (rules.definitions.attributes) {
+        const newAttrs: Record<string, string[]> = {};
+        Object.keys(rules.definitions.attributes).forEach(oldKey => {
+            const newKey = migrateAttributeId(oldKey);
+            newAttrs[newKey] = rules.definitions.attributes[oldKey];
+        });
+        rules.definitions.attributes = newAttrs;
+    }
+
+    // 5. Migrate definitions.secondaryAttributes Record keys
+    if (rules.definitions.secondaryAttributes) {
+        const newSecAttrs: Record<string, string[]> = {};
+        Object.keys(rules.definitions.secondaryAttributes).forEach(oldKey => {
+            const newKey = migrateAttributeId(oldKey);
+            newSecAttrs[newKey] = rules.definitions.secondaryAttributes[oldKey];
+        });
+        rules.definitions.secondaryAttributes = newSecAttrs;
+    }
+
+    // 6. Migrate definitions.labels Record keys
     if (rules.definitions.labels) {
         const newLabels: Record<string, string> = {};
         Object.keys(rules.definitions.labels).forEach(oldKey => {
-            const newKey = LEGACY_SKILL_MAP[oldKey] || oldKey;
+            // Apply both skill map and attribute map (hierarchical check)
+            let newKey = LEGACY_SKILL_MAP[oldKey] || oldKey;
+            newKey = migrateAttributeId(newKey);
             newLabels[newKey] = rules.definitions.labels[oldKey];
         });
         rules.definitions.labels = newLabels;

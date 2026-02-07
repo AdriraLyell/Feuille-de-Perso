@@ -1,5 +1,76 @@
 [
     {
+        "version": "2.18.0",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Nouveau: Synchronisation des fiches joueurs avec le MJ !",
+            "Joueur: Bouton 'Sync' dans la navigation pour envoyer sa fiche à une campagne.",
+            "Joueur: Modal de synchronisation avec sélection de campagne et pré-remplissage des noms.",
+            "Admin: Nouvel onglet 'Joueurs' affichant la liste des fiches synchronisées.",
+            "Admin: Vue lecture seule des fiches de personnages soumises.",
+            "Infra: Nouveau service CharacterSyncService pour la gestion BDD des personnages."
+        ]
+    },
+    {
+        "version": "2.17.51",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Admin: Réorganisation des Paramètres de Création.",
+            "UX: Déplacement des bornes d'attributs en tête de section pour une meilleure clarté.",
+            "UX: Libellés renommés en 'Attribut Minimal' et 'Attribut Maximal'."
+        ]
+    },
+    {
+        "version": "2.17.50",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Config: Mise à jour des valeurs par défaut pour la répartition des rangs (10, 8, 6, 2, 0)."
+        ]
+    },
+    {
+        "version": "2.17.49",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Admin: Déplacement du 'Coût d'Attribut (XP)' de l'onglet Coûts vers l'onglet Général & Création.",
+            "UX: Centralisation des coûts fondamentaux dans la section Configuration Générale."
+        ]
+    },
+    {
+        "version": "2.17.48",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Refonte visuelle de l'onglet 'Général & Création'.",
+            "UX: Déplacement de la 'Version des Règles' dans un en-tête global.",
+            "UX: Extraction de 'Rangs Étendus' et 'Coût Arrière-Plans' dans une section 'Configuration Générale' premium."
+        ]
+    },
+    {
+        "version": "2.17.47",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Inversion de l'ordre d'affichage de la 'Répartition des Rangs' (désormais de 1 à 5).",
+            "Config: Mise à jour des valeurs par défaut pour les nouveaux settings :",
+            "- Mode Rangs: Attr=12, Plans=7, Attr Min=-1, Coût Arrière-plan=2",
+            "- Mode Pot Commun: XP=450",
+            "- Mode Budgets Séparés: Attr=120, Comp=240, Plans=20"
+        ]
+    },
+    {
+        "version": "2.17.46",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix critique: Les arrière-plans ne deviennent plus tous 'variable' lors du refresh de l'app.",
+            "Core: rulesReconciler vérifie maintenant le flag isVariable depuis la bibliothèque."
+        ]
+    },
+    {
         "version": "2.17.45",
         "date": "2026-02-07",
         "type": "feature",
@@ -870,62 +941,6 @@
             "Admin : Ajout d'une fenêtre de résultat détaillée après l'import d'un template (Succès vs Avertissements).",
             "Admin : Amélioration de la logique d'import pour supporter les formats \"Sauvegarde Complète\" et \"Fiche Unitaire\".",
             "Système : Lissage de l'expérience utilisateur pour la synchronisation Joueur -> Admin."
-        ]
-    },
-    {
-        "version": "2.12.40",
-        "date": "2026-02-02",
-        "changes": [
-            "Admin : Refonte majeure du calcul des coûts d'XP. Le système utilise une formule triangulaire pour les Compétences (Facteur 1.0) et Spécialisations (Facteur 0.5).",
-            "Admin : Les Attributs conservent une progression linéaire avec un coût configurable (Défaut : 6 XP / point).",
-            "Admin : Ajout de l'éditeur \"Coûts & Limites\" permettant de définir ces facteurs.",
-            "Système : Mise à jour du moteur de règles pour supporter les facteurs de coûts dynamiques."
-        ]
-    },
-    {
-        "version": "2.12.39",
-        "date": "2026-02-02",
-        "changes": [
-            "Nouvelle Fonctionnalité : Support des \"Rangs Étendus\" pour les compétences. Vous pouvez désormais monter jusqu'à 10 (coût en XP linéaire).",
-            "Configuration : Ajout d'une option pour activer/désactiver les rangs étendus dans les paramètres de création.",
-            "Interface : Affichage dynamique des rangs > 5 (les bulles supplémentaires s'affichent au besoin)."
-        ]
-    },
-    {
-        "version": "2.12.38",
-        "date": "2026-02-02",
-        "changes": [
-            "Interface : L'éditeur d'Apparence (Couleurs & Thèmes) est maintenant accessible directement depuis la barre de navigation principale (icône palette), à gauche des Réglages.",
-            "Interface : Retrait de l'onglet Apparence de la fenêtre de configuration pour simplifier."
-        ]
-    },
-    {
-        "version": "2.12.37",
-        "date": "2026-02-02",
-        "changes": [
-            "Migration : La synchronisation des compétences variables respecte désormais vos choix personnalisés (si vous avez désactivé une variable, elle le restera).",
-            "Interface : Renommage des onglets \"Exportation/Importation\" en \"Sauvegarde/Chargement\" pour plus de clarté."
-        ]
-    },
-    {
-        "version": "2.12.36",
-        "date": "2026-02-02",
-        "changes": [
-            "Migration : Synchronisation automatique des compétences \"variables\" (Bibliothèque Système -> Bibliothèque Personnage -> Fiche)."
-        ]
-    },
-    {
-        "version": "2.12.35",
-        "date": "2026-02-02",
-        "changes": [
-            "Correctif : Amélioration de la zone de saisie \"Notes\" pour garantir qu'on puisse écrire jusqu'en bas."
-        ]
-    },
-    {
-        "version": "2.12.34",
-        "date": "2026-02-02",
-        "changes": [
-            "Correctif : La zone de saisie \"Notes\" occupe bien toute la hauteur disponible du cadre."
         ]
     }
 ]

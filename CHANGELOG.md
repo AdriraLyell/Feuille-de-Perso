@@ -1,5 +1,40 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.12.40] - 2026-02-02
+
+- Admin : Refonte majeure du calcul des coûts d'XP. Le système utilise une formule triangulaire pour les Compétences (Facteur 1.0) et Spécialisations (Facteur 0.5).
+- Admin : Les Attributs conservent une progression linéaire avec un coût configurable (Défaut : 6 XP / point).
+- Admin : Ajout de l'éditeur "Coûts & Limites" permettant de définir ces facteurs.
+- Système : Mise à jour du moteur de règles pour supporter les facteurs de coûts dynamiques.
+
+## [2.12.39] - 2026-02-02
+
+- Nouvelle Fonctionnalité : Support des "Rangs Étendus" pour les compétences. Vous pouvez désormais monter jusqu'à 10 (coût en XP linéaire).
+- Configuration : Ajout d'une option pour activer/désactiver les rangs étendus dans les paramètres de création.
+- Interface : Affichage dynamique des rangs > 5 (les bulles supplémentaires s'affichent au besoin).
+
+## [2.12.38] - 2026-02-02
+
+- Interface : L'éditeur d'Apparence (Couleurs & Thèmes) est maintenant accessible directement depuis la barre de navigation principale (icône palette), à gauche des Réglages.
+- Interface : Retrait de l'onglet Apparence de la fenêtre de configuration pour simplifier.
+
+## [2.12.37] - 2026-02-02
+
+- Migration : La synchronisation des compétences variables respecte désormais vos choix personnalisés (si vous avez désactivé une variable, elle le restera).
+- Interface : Renommage des onglets "Exportation/Importation" en "Sauvegarde/Chargement" pour plus de clarté.
+
+## [2.12.36] - 2026-02-02
+
+- Migration : Synchronisation automatique des compétences "variables" (Bibliothèque Système -> Bibliothèque Personnage -> Fiche).
+
+## [2.12.35] - 2026-02-02
+
+- Correctif : Amélioration de la zone de saisie "Notes" pour garantir qu'on puisse écrire jusqu'en bas.
+
+## [2.12.34] - 2026-02-02
+
+- Correctif : La zone de saisie "Notes" occupe bien toute la hauteur disponible du cadre.
+
 ## [2.12.33] - 2026-02-02
 
 - Correctif : Restauration de la taille de la zone "Notes" en bas de la page "Détails & Équipement".

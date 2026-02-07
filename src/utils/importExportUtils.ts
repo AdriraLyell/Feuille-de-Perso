@@ -1,4 +1,82 @@
 import { CharacterSheetData, LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry } from '../types';
+import { APP_VERSION } from '../constants';
+import { getImage, blobToBase64 } from '../imageDB';
+import { ImageCompressionService } from '../services/ImageCompressionService';
+
+/**
+ * Utility to export a character as JSON.
+ * Extracted from ExportPanel for reuse in safety modals.
+ */
+export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (msg: string, type: 'info' | 'success' | 'danger', scope?: any) => void) => {
+    const dataToProcess = JSON.parse(JSON.stringify(data));
+
+    // 1. Resolve Images from DB
+    if (dataToProcess.page2?.characterImageId) {
+        try {
+            const blob = await getImage(dataToProcess.page2.characterImageId);
+            if (blob) {
+                const base64 = await blobToBase64(blob);
+                dataToProcess.page2.characterImage = base64;
+            }
+        } catch (e) {
+            console.error("Failed to export character image from DB", e);
+        }
+        delete dataToProcess.page2.characterImageId;
+    }
+
+    // Resolve Campaign Notes Images
+    if (dataToProcess.campaignNotes) {
+        for (const note of dataToProcess.campaignNotes) {
+            if (note.images && Array.isArray(note.images)) {
+                for (const img of note.images) {
+                    if (img.imageId) {
+                        try {
+                            const blob = await getImage(img.imageId);
+                            if (blob) {
+                                (img as any).base64Data = await blobToBase64(blob);
+                            }
+                        } catch (e) {
+                            console.error(`Failed to export note image ${img.id}`, e);
+                        }
+                        delete img.imageId;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!dataToProcess.appVersion) {
+        dataToProcess.appVersion = APP_VERSION;
+    }
+
+    // 2. Compression
+    if (addLog) addLog("Compression des images en cours...", 'info', 'sheet');
+    let finalData = dataToProcess;
+    try {
+        finalData = await ImageCompressionService.processImages(dataToProcess, 'compress');
+        if (addLog) addLog("Images compressées avec succès.", 'success', 'sheet');
+    } catch (e) {
+        console.error("[Export] Compression failed", e);
+        if (addLog) addLog("Avertissement : La compression des images a échoué, export brut utilisé.", 'danger', 'sheet');
+    }
+
+    // 3. Trigger Download
+    const now = new Date();
+    const timestamp = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}_${String(now.getHours()).padStart(2, '0')}h${String(now.getMinutes()).padStart(2, '0')}`;
+    const filename = `${timestamp}_Personnage_${data.header.name || 'SansNom'}.json`;
+
+    const blob = new Blob([JSON.stringify(finalData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    if (addLog) addLog(`Sauvegarde de secours réussie : ${filename}`, 'success', 'both');
+};
 
 /**
  * Interface pour la détection de conflits entre données locales et importées.

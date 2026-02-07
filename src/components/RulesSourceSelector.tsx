@@ -2,12 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import { GameSettingSummary } from '../services/CampaignService';
 import { PlayerService } from '../services/PlayerService';
-import { Cloud, Wifi, WifiOff, FileJson, Loader2, ArrowRight } from 'lucide-react';
+import { Cloud, Wifi, WifiOff, FileJson, Loader2, ArrowRight, RotateCcw } from 'lucide-react';
 import { RulesData } from '../types/rules';
 
 interface RulesSourceSelectorProps {
     isOpen: boolean;
-    onSelectSource: (sourceType: 'online' | 'offline', rules?: RulesData, settingId?: string) => void;
+    onSelectSource: (sourceType: 'online' | 'offline', rules?: RulesData, settingId?: string, settingName?: string) => void;
     onClose?: () => void; // Optional if non-blocking
 }
 
@@ -16,24 +16,73 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
     const [isLoading, setIsLoading] = useState(false);
     const [mode, setMode] = useState<'initial' | 'online_list'>('initial');
 
+    // Check for existing session in localStorage
+    const saved = localStorage.getItem('rpg-sheet-data');
+    let resumeInfo: { name: string; campaign: string; settingId: string } | null = null;
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            if (parsed.header?.name || (parsed.syncInfo?.settingId)) {
+                resumeInfo = {
+                    name: parsed.header?.name || 'Sans Nom',
+                    campaign: parsed.syncInfo?.settingName || 'Inconnue',
+                    settingId: parsed.syncInfo?.settingId || 'orphan'
+                };
+            }
+        } catch (e) { }
+    }
+
     // Try to load public settings when opening online mode
     const handleOnlineClick = async () => {
         setIsLoading(true);
-        const settings = await PlayerService.listPublicSettings();
-        setPublicSettings(settings);
-        setMode('online_list');
-        setIsLoading(false);
+        try {
+            const settings = await PlayerService.listPublicSettings();
+            setPublicSettings(settings);
+            setMode('online_list');
+        } catch (e) {
+            console.error("[OnlineClick] Failed to list settings:", e);
+            alert("Erreur de connexion : Impossible de récupérer la liste des campagnes.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleResumeClick = async () => {
+        if (!resumeInfo || resumeInfo.settingId === 'orphan') {
+            onSelectSource('offline');
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const rules = await PlayerService.loadSetting(resumeInfo.settingId);
+            if (rules) {
+                onSelectSource('online', rules, resumeInfo.settingId, resumeInfo.campaign);
+            } else {
+                onSelectSource('offline');
+            }
+        } catch (e) {
+            console.error("[Resume] Failed to load rules:", e);
+            onSelectSource('offline');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleSettingClick = async (setting: GameSettingSummary) => {
         setIsLoading(true);
-        const rules = await PlayerService.loadSetting(setting.id);
-        if (rules) {
-            onSelectSource('online', rules, setting.id);
-        } else {
-            alert("Erreur de chargement du setting.");
+        try {
+            const rules = await PlayerService.loadSetting(setting.id);
+            if (rules) {
+                onSelectSource('online', rules, setting.id, setting.name);
+            } else {
+                alert("Erreur : Impossible de charger les règles de cette campagne.");
+            }
+        } catch (e) {
+            console.error("[SettingClick] Error loading rules:", e);
+            alert("Une erreur critique est survenue lors du chargement.");
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     };
 
     const handleOfflineClick = () => {
@@ -57,6 +106,26 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
                 <div className="p-6">
                     {mode === 'initial' && (
                         <div className="grid grid-cols-1 gap-4">
+                            {resumeInfo && (
+                                <button
+                                    onClick={handleResumeClick}
+                                    className="group flex items-center justify-between p-4 rounded-lg border-2 border-indigo-200 bg-indigo-50/50 hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left shadow-sm"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="bg-indigo-100 p-3 rounded-full text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                            <RotateCcw size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-indigo-900">Reprendre ma session</h3>
+                                            <p className="text-indigo-600 text-xs font-medium">
+                                                {resumeInfo.name} • {resumeInfo.campaign}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <ArrowRight className="text-indigo-300 group-hover:text-indigo-500" />
+                                </button>
+                            )}
+
                             <button
                                 onClick={handleOnlineClick}
                                 className="group flex items-center justify-between p-4 rounded-lg border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition-all text-left"

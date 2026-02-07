@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { RulesData } from '../types/rules';
 import { loadRules } from '../services/RulesLoader';
+import { migrateRulesToV2 } from '../utils/migrations';
 
 interface RulesContextType {
     rules: RulesData | null;
@@ -36,11 +37,13 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
         setError(null);
         try {
             const data = await loadRules();
-            setRules(data);
-            // Determine if we're in online mode (rules came from BDD/Setting)
-            // If rules have a settingId or source indicator, we're online
-            const online = !!(data as any)?.settingId || (data as any)?.source === 'database';
-            setIsOnlineMode(online);
+            if (data) {
+                const migrated = migrateRulesToV2(data);
+                setRules(migrated);
+
+                const online = !!(migrated as any)?.settingId || (migrated as any)?.source === 'database';
+                setIsOnlineMode(online);
+            }
             // @ts-ignore
             window.rulesStatus = { loaded: true, error: null, version: data?.version, online };
         } catch (err) {
@@ -56,10 +59,12 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
 
     // Wrapper for updateRules that auto-detects online mode
     const handleUpdateRules = (newRules: RulesData) => {
-        setRules(newRules);
+        const migrated = migrateRulesToV2(newRules);
+        setRules(migrated);
         // Auto-detect online mode from rules data
-        const online = !!(newRules as any)?.settingId || (newRules as any)?.source === 'database';
+        const online = !!(migrated as any)?.settingId || (migrated as any)?.source === 'database';
         setIsOnlineMode(online);
+        setIsLoading(false); // Ensure loading is stopped
         console.log('[RulesContext] Rules updated, online mode:', online);
     };
 

@@ -133,8 +133,24 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
             // To be safer and avoid unnecessary renders, we could check a version flag in data?
             // But reconciler is fast.
 
-            console.log("[CharacterContext] Reconciling data with loaded rules...");
-            return reconcileRulesWithState(currentData, rules);
+            try {
+                const skillsBefore = Object.values(currentData.skills).flat().filter(s => s.name).length;
+                console.log(`[CharacterContext] Reconciling with rules v${rules.version}. Skills before: ${skillsBefore}`);
+
+                const newData = reconcileRulesWithState(currentData, rules);
+
+                const skillsAfter = Object.values(newData.skills).flat().filter(s => s.name).length;
+                console.log(`[CharacterContext] Reconciliation complete. Skills after: ${skillsAfter}`);
+
+                if (skillsAfter < skillsBefore && skillsBefore > 0) {
+                    console.warn(`[CharacterContext] Skills count dropped from ${skillsBefore} to ${skillsAfter}! Check rules for missing definitions.`);
+                }
+
+                return newData;
+            } catch (e) {
+                console.error("[CharacterContext] Critical error during reconciliation:", e);
+                return currentData; // Prevent crash, keep old data
+            }
         });
 
     }, [rules]);

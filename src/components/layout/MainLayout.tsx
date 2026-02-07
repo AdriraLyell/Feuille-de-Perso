@@ -9,6 +9,7 @@ import { migrateData } from '../../utils/migrations';
 import { useRules } from '../../context/RulesContext';
 import { loadRules } from '../../services/RulesLoader';
 import { RulesData } from '../../types/rules';
+import { INITIAL_DATA } from '../../data/initialState';
 
 // Components
 import CharacterSheet from '../CharacterSheet';
@@ -27,6 +28,8 @@ import AppearanceModal from '../AppearanceModal';
 import DiegeticNavigation from './DiegeticNavigation';
 import RulesSourceSelector from '../RulesSourceSelector';
 import SyncModal from '../SyncModal';
+import CampaignConflictModal from '../ui/CampaignConflictModal';
+import { exportCharacterAsJSON } from '../../utils/importExportUtils';
 
 // Icons
 import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, TrendingUp, History, Clock, X, Trash2, Save, Book, LogOut, Menu, Upload } from 'lucide-react';
@@ -55,6 +58,10 @@ const MainLayout: React.FC = () => {
 
     const [showAppearance, setShowAppearance] = useState(false);
     const [showSync, setShowSync] = useState(false);
+
+    // Conflict handling
+    const [showConflict, setShowConflict] = useState(false);
+    const [pendingRules, setPendingRules] = useState<{ rules: RulesData, id: string, name: string } | null>(null);
 
     // Initialize Reference State for Unsaved Indicator
     useEffect(() => {
@@ -131,9 +138,24 @@ const MainLayout: React.FC = () => {
         // Pour l'instant on peut la supprimer ou la laisser vide si non utilisée
     };
 
-    const handleSourceSelect = async (sourceType: 'online' | 'offline', selectedRules?: RulesData) => {
-        if (sourceType === 'online' && selectedRules) {
-            updateRules(selectedRules);
+    const handleSourceSelect = async (sourceType: 'online' | 'offline', selectedRules?: RulesData, settingId?: string, settingName?: string) => {
+        if (sourceType === 'online' && selectedRules && settingId) {
+            // Check for conflict
+            const hasCharacter = data.header?.name?.trim() !== '';
+            const isDifferentCampaign = data.syncInfo?.settingId !== settingId;
+
+            if (hasCharacter && isDifferentCampaign) {
+                setPendingRules({ rules: selectedRules, id: settingId, name: settingName || 'Nouvelle Campagne' });
+                setShowConflict(true);
+            } else {
+                // No conflict, just update
+                updateRules({
+                    ...selectedRules,
+                    // @ts-ignore - inject metadata if missing
+                    settingId,
+                    settingName: settingName || (selectedRules as any).settingName
+                });
+            }
         } else {
             // Offline Mode: Load from file (traditional way)
             const fallback = await loadRules();
@@ -145,12 +167,47 @@ const MainLayout: React.FC = () => {
         }
     };
 
+    const handleConfirmReset = () => {
+        if (!pendingRules) return;
+
+        // 1. Wipe data to INITIAL_DATA
+        setData(JSON.parse(JSON.stringify(INITIAL_DATA)));
+
+        // 2. Apply rules
+        updateRules({
+            ...pendingRules.rules,
+            // @ts-ignore
+            settingId: pendingRules.id,
+            settingName: pendingRules.name
+        });
+
+        setShowConflict(false);
+        setPendingRules(null);
+        addLog(`Nouvelle campagne chargée : ${pendingRules.name}. Fiche réinitialisée.`, 'info', 'settings');
+    };
+
+    const handleConfirmBackup = async () => {
+        await exportCharacterAsJSON(data, addLog);
+    };
+
     if (!rules) {
         return (
             <div className="fixed inset-0 bg-[#1c1c1c] text-white flex items-center justify-center z-50 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')]">
                 <RulesSourceSelector
                     isOpen={true}
                     onSelectSource={handleSourceSelect}
+                />
+
+                {/* Render conflict modal here too because rules are still null during conflict resolution */}
+                <CampaignConflictModal
+                    isOpen={showConflict}
+                    onClose={() => setShowConflict(false)}
+                    characterName={data.header?.name}
+                    currentCampaignName={data.syncInfo?.settingName || 'Indépendante'}
+                    newCampaignName={pendingRules?.name || ''}
+                    onConfirmReset={handleConfirmReset}
+                    onStay={() => setShowConflict(false)}
+                    onBackup={handleConfirmBackup}
                 />
             </div>
         );
@@ -290,6 +347,17 @@ const MainLayout: React.FC = () => {
                             setData(prev => ({ ...prev, syncInfo }));
                             addLog(`Fiche synchronisée avec ${syncInfo?.settingName}`, 'success', 'sheet');
                         }}
+                    />
+
+                    <CampaignConflictModal
+                        isOpen={showConflict}
+                        onClose={() => setShowConflict(false)}
+                        characterName={data.header?.name}
+                        currentCampaignName={data.syncInfo?.settingName || 'Indépendante'}
+                        newCampaignName={pendingRules?.name || ''}
+                        onConfirmReset={handleConfirmReset}
+                        onStay={() => setShowConflict(false)}
+                        onBackup={handleConfirmBackup}
                     />
                 </div>
             </div>

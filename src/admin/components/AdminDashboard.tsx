@@ -2,10 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { GameSettingSummary, CampaignService } from '../../services/CampaignService';
 import { RulesData } from '../../types/rules';
-import { Plus, Loader2, FileCog, Scroll, Trash2, Eye, EyeOff, Users } from 'lucide-react';
+import { Plus, Loader2, FileCog, Scroll, Trash2, Eye, EyeOff, Users, Copy } from 'lucide-react';
 import { defaultRules } from '../../data/defaultRules'; // We might need a default template
 import { INITIAL_DATA, INITIAL_SKILLS } from '../../data/initialState';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import DuplicateSettingModal from './DuplicateSettingModal';
 
 interface AdminDashboardProps {
     onSelectSetting: (id: string, name: string, rules: RulesData) => void;
@@ -19,6 +20,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onView
     const [isCreating, setIsCreating] = useState(false);
     const [newName, setNewName] = useState('');
     const [settingToDelete, setSettingToDelete] = useState<string | null>(null);
+    const [settingToDuplicate, setSettingToDuplicate] = useState<{ id: string, name: string } | null>(null);
 
     useEffect(() => {
         loadSettings();
@@ -110,6 +112,26 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onView
         }
     };
 
+    const handleDuplicate = async (e: React.MouseEvent, id: string, oldName: string) => {
+        e.stopPropagation();
+        setSettingToDuplicate({ id, name: oldName });
+    };
+
+    const confirmDuplicate = async (newName: string) => {
+        if (!settingToDuplicate) return;
+        const { id } = settingToDuplicate;
+
+        setIsLoading(true);
+        const newId = await CampaignService.duplicateSetting(id, newName);
+        if (newId) {
+            loadSettings();
+        } else {
+            alert("Erreur lors de la duplication.");
+        }
+        setIsLoading(false);
+        setSettingToDuplicate(null);
+    };
+
     return (
         <div className="flex flex-col h-full bg-[#fdfbf7] p-8 max-w-5xl mx-auto w-full">
             <div className="flex justify-between items-center mb-2">
@@ -176,6 +198,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onView
                                 {/* Absolute Actions Top Right */}
                                 <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button
+                                        onClick={(e) => handleDuplicate(e, setting.id, setting.name)}
+                                        className="p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                                        title="Dupliquer la campagne"
+                                    >
+                                        <Copy size={18} />
+                                    </button>
+                                    <button
                                         onClick={(e) => { e.stopPropagation(); setSettingToDelete(setting.id); }}
                                         className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
                                         title="Supprimer la campagne"
@@ -221,6 +250,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onView
                 message="Attention : Cette action est irréversible. Toutes les règles, compétences et configurations associées à cette campagne seront définitivement perdues."
                 confirmLabel="Supprimer définitivement"
                 type="danger"
+            />
+
+            <DuplicateSettingModal
+                isOpen={!!settingToDuplicate}
+                onClose={() => setSettingToDuplicate(null)}
+                oldName={settingToDuplicate?.name || ''}
+                onConfirm={confirmDuplicate}
             />
         </div>
     );

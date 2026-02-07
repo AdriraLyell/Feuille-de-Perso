@@ -44,20 +44,20 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
             const definedNames = ruleAttributes[category];
             const existingEntries = currentState.attributes[category] || [];
 
-            // Map new definition
-            newAttributes[category] = definedNames.map(name => {
+            const processedNames = new Set<string>();
+
+            // A. Update/Add from Rules
+            const syncedAttributes = definedNames.map(name => {
+                processedNames.add(name);
                 // Find existing value
                 const existing = existingEntries.find(e => e.name === name);
 
                 if (existing) {
-                    // Start from existing to keep values, but update name/structure if needed
                     return {
                         ...existing,
-                        // Ensure name is synced (fix typos in rules propagates)
-                        name: name
+                        name: name // sync name
                     };
                 } else {
-                    // New attribute in rules
                     return {
                         id: generateId(),
                         name: name,
@@ -66,9 +66,20 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
                     };
                 }
             });
+
+            // B. Preserve existing attributes NOT in rules
+            const remainingAttributes = existingEntries.filter(e => e && e.name && !processedNames.has(e.name));
+
+            newAttributes[category] = [...syncedAttributes, ...remainingAttributes];
         });
 
-        // Preserve other categories not in rules? No, rules define the sheet structure.
+        // C. Preserve categories from current state NOT in rules
+        Object.keys(currentState.attributes).forEach(cat => {
+            if (!newAttributes[cat]) {
+                newAttributes[cat] = currentState.attributes[cat];
+            }
+        });
+
         newState.attributes = newAttributes;
     }
 
@@ -83,23 +94,22 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
     }
 
     // 2c. Reconcile Secondary Attributes
-    // Check if rules define secondary attributes logic
-    // Even if empty, we should clean up stale entries if the category no longer exists
     const ruleSecondary = rules.definitions.secondaryAttributes || {};
-    // If not defined in rules, maybe we should clear it if global config says so?
-    // But let's assume if it's there, we reconcile it.
-
-    // We iterate based on PRIMARY categories (since secondary are attached to them)
-    // OR based on defined secondary attributes keys? 
-    // Usually they match primary keys.
     const newSecondary: any = {};
 
-    // Only process categories that exist in primary attributes (source of truth for blocks)
-    Object.keys(ruleAttributes || {}).forEach(category => {
-        const definedNames = ruleSecondary[category] || []; // Might be empty
-        const existingEntries = currentState.secondaryAttributes?.[category] || [];
+    // Use current state categories as base if rules are empty, or merge
+    const allCategories = new Set([
+        ...Object.keys(ruleAttributes || {}),
+        ...Object.keys(currentState.secondaryAttributes || {})
+    ]);
 
-        newSecondary[category] = definedNames.map(name => {
+    allCategories.forEach(category => {
+        const definedNames = ruleSecondary[category] || [];
+        const existingEntries = currentState.secondaryAttributes?.[category] || [];
+        const processedNames = new Set<string>();
+
+        const syncedSecondary = definedNames.map(name => {
+            processedNames.add(name);
             const existing = existingEntries.find(e => e.name === name);
             if (existing) {
                 return { ...existing, name: name };
@@ -112,6 +122,10 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
                 };
             }
         });
+
+        const remainingSecondary = existingEntries.filter(e => e && e.name && !processedNames.has(e.name));
+
+        newSecondary[category] = [...syncedSecondary, ...remainingSecondary];
     });
     newState.secondaryAttributes = newSecondary;
 
@@ -126,23 +140,19 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
         const newSkills: any = {};
 
         Object.keys(ruleSkills).forEach(category => {
-            const definedNames = ruleSkills[category];
+            const definedNames = ruleSkills[category] || [];
             const existingEntries = currentState.skills[category as keyof typeof currentState.skills] as DotEntry[] || [];
 
-            newSkills[category] = definedNames.map(name => {
-                // Handle Spacer
+            const processedNames = new Set<string>();
+
+            // A. Update/Add from Rules (Preserve order of rules)
+            const syncedSkills = definedNames.map(name => {
                 if (!name || name.trim() === "") {
-                    return {
-                        id: generateId(),
-                        name: "",
-                        value: 0, creationValue: 0, max: 0, variant: ""
-                    };
+                    return { id: generateId(), name: "", value: 0, creationValue: 0, max: 0, variant: "" };
                 }
 
-                // Find existing
+                processedNames.add(name);
                 const existing = existingEntries.find(e => e && e.name === name);
-
-                // Lookup description from library
                 const libSkill = rules.libraries?.skills?.find(s => s && s.name === name);
                 const isVariable = libSkill?.isVariable === true;
                 const description = libSkill?.description || "";
@@ -150,66 +160,70 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
                 if (existing) {
                     return {
                         ...existing,
-                        // Update Max in case rule changed the cap
                         max: rules.configurations?.global?.maxSkillScore || 10,
-                        // Update Name (case correction)
                         name: name,
-                        // Refresh description from library
                         description: description || existing.description
                     };
                 } else {
-                    // New Skill
                     return {
-                        id: generateId(),
-                        name: name,
-                        description: description,
-                        value: 0,
-                        creationValue: 0,
+                        id: generateId(), name, description, value: 0, creationValue: 0,
                         max: rules.configurations?.global?.maxSkillScore || 10,
                         variant: isVariable ? "" : undefined
                     };
                 }
             });
+
+            // B. Preserve existing skills NOT in rules (Additive)
+            const remainingSkills = existingEntries.filter(e => e && e.name && !processedNames.has(e.name));
+
+            newSkills[category] = [...syncedSkills, ...remainingSkills];
         });
 
-        // Ensure standard categories exist
+        // Ensure standard categories exist for legacy UI support
         const standardCats = ['talents', 'competences', 'competences_col_2', 'connaissances', 'competences2', 'autres_competences', 'autres', 'arrieres_plans'];
         standardCats.forEach(cat => {
-            if (!newSkills[cat]) newSkills[cat] = [];
+            if (!newSkills[cat]) {
+                // If it wasn't in ruleSkills, maybe it was in currentState?
+                newSkills[cat] = currentState.skills[cat as keyof typeof currentState.skills] || [];
+            }
         });
 
         newState.skills = newSkills;
     }
 
     // 4. Backgrounds (Arriere-plans)
-    // These are often "Skills" but defined separately
-    const ruleBackgrounds = rules.definitions.backgrounds;
+    // Backgrounds might be in Col_Comp_8 or in legacy arrieres_plans
+    const ruleBackgrounds = rules.definitions.backgrounds || [];
     if (ruleBackgrounds && Array.isArray(ruleBackgrounds)) {
-        const existingBackgrounds = (currentState.skills as any).arrieres_plans || [];
+        const bgCat = 'arrieres_plans';
+        const existingBackgrounds = (currentState.skills as any)[bgCat] || [];
+        const processedNames = new Set<string>();
 
-        // @ts-ignore
-        newState.skills.arrieres_plans = ruleBackgrounds.map(name => {
+        const syncedBgs = ruleBackgrounds.map(name => {
+            processedNames.add(name);
             const existing = existingBackgrounds.find((e: DotEntry) => e.name === name);
             const libBg = rules.libraries?.backgrounds?.find(b => b.name === name);
             const isVariable = libBg?.isVariable === true;
             const description = libBg?.description || "";
 
             if (existing) {
-                return {
-                    ...existing,
-                    max: 5,
-                    name: name,
-                    description: description || existing.description
-                };
+                return { ...existing, max: 5, name, description: description || existing.description };
             }
             return {
-                id: generateId(),
-                name: name,
-                description: description,
-                value: 0, creationValue: 0, max: 5,
+                id: generateId(), name, description, value: 0, creationValue: 0, max: 5,
                 variant: isVariable ? "" : undefined
             };
         });
+
+        const remainingBgs = existingBackgrounds.filter((e: DotEntry) => e && e.name && !processedNames.has(e.name));
+
+        // @ts-ignore
+        newState.skills[bgCat] = [...syncedBgs, ...remainingBgs];
+
+        // Also sync to Col_Comp_8 if it's the target for generic UI
+        if (newState.skills['Col_Comp_8']) {
+            newState.skills['Col_Comp_8'] = newState.skills[bgCat];
+        }
     }
 
     // 5. Counters
