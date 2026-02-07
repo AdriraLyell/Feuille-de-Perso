@@ -16,11 +16,15 @@ import CreationConfigEditor from './settings/CreationConfigEditor';
 import LibrarySidebar from './settings/LibrarySidebar';
 import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
 import LibraryView from './LibraryView';
-import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Settings } from 'lucide-react';
+import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Settings, Lock } from 'lucide-react';
 
 // Rules Integration
 import { useRules } from '../context/RulesContext';
 import { applyRulesToState } from '../utils/rulesAdapter';
+
+// Expert Mode
+import { useExpertMode } from '../hooks/useExpertMode';
+import ExpertModeWarningModal from './ui/ExpertModeWarningModal';
 
 // Version and App Info
 // Note: APP_VERSION might be global or imported, assuming it was used in previous context but not shown in imports?
@@ -62,7 +66,8 @@ export interface DragItemType {
 
 const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) => {
   const { data, updateData: onUpdate, addLog: onAddLog } = useCharacter();
-  const { rules } = useRules(); // Added Hook
+  const { rules, isOnlineMode } = useRules();
+  const { expertMode, enableExpertMode, disableExpertMode } = useExpertMode();
   const [localData, setLocalData] = useState<CharacterSheetData>(data);
 
   // Drag State (Shared between SkillsEditor and LibrarySidebar)
@@ -70,8 +75,12 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
 
   // Modal States
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showExpertWarning, setShowExpertWarning] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'specializations' | 'creation' | 'library'>('general');
+  // Tab visibility based on Online Mode and Expert Mode
+  const showAdvancedTabs = !isOnlineMode || expertMode;
+
+  const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'specializations' | 'creation' | 'library'>('library');
   const [isDirty, setIsDirty] = useState(false);
 
   // Helper to compare data excluding volatile/computed fields
@@ -119,14 +128,48 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
       {/* --- LEFT COLUMN: Main Content --- */}
       <div className={`flex-grow transition-all duration-300 ${(activeTab === 'skills' || activeTab === 'specializations') ? 'mr-80' : ''}`}>
 
-        {/* Header Navigation */}
-        <div className="sticky top-14 z-40 mb-8 flex justify-center no-print pointer-events-none">
-          <div className="pointer-events-auto flex gap-2 bg-[#fdfbf7]/90 backdrop-blur-sm p-1.5 rounded-full shadow-xl border border-[#bfae85]/30 items-center animate-in fade-in slide-in-from-top-4 duration-300 flex-wrap justify-center">
-            <button onClick={() => setActiveTab('attributes')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'attributes' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><LayoutGrid size={16} /> Attributs</button>
-            <button onClick={() => setActiveTab('skills')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'skills' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><List size={16} /> Compétences</button>
-            <button onClick={() => setActiveTab('specializations')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'specializations' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><Tag size={16} /> Spécialisations</button>
-            <button onClick={() => setActiveTab('creation')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'creation' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><UserPlus size={16} /> Paramètres</button>
 
+        {/* Expert Mode Warning Banner */}
+        {isOnlineMode && expertMode && (
+          <div className="sticky top-14 z-50 mb-2 flex justify-center no-print">
+            <div className="flex items-center gap-3 bg-amber-100 border border-amber-300 text-amber-800 px-4 py-2 rounded-full shadow-md text-xs font-bold animate-in fade-in slide-in-from-top-2 duration-200">
+              <AlertTriangle size={16} />
+              <span>Mode Expert activé — Les modifications peuvent causer des conflits avec les règles de la campagne</span>
+              <button
+                onClick={disableExpertMode}
+                className="ml-2 px-2 py-1 bg-amber-200 hover:bg-amber-300 rounded text-[10px] uppercase tracking-wide"
+              >
+                Désactiver
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Header Navigation */}
+        <div className="sticky top-14 z-40 mb-8 flex justify-center no-print pointer-events-none" style={{ top: isOnlineMode && expertMode ? '4.5rem' : '3.5rem' }}>
+          <div className="pointer-events-auto flex gap-2 bg-[#fdfbf7]/90 backdrop-blur-sm p-1.5 rounded-full shadow-xl border border-[#bfae85]/30 items-center animate-in fade-in slide-in-from-top-4 duration-300 flex-wrap justify-center">
+
+            {/* Advanced tabs - only shown if !isOnlineMode OR expertMode */}
+            {showAdvancedTabs && (
+              <>
+                <button onClick={() => setActiveTab('attributes')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'attributes' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><LayoutGrid size={16} /> Attributs</button>
+                <button onClick={() => setActiveTab('skills')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'skills' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><List size={16} /> Compétences</button>
+                <button onClick={() => setActiveTab('specializations')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'specializations' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><Tag size={16} /> Spécialisations</button>
+                <button onClick={() => setActiveTab('creation')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'creation' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><UserPlus size={16} /> Paramètres</button>
+              </>
+            )}
+
+            {/* Réglages Avancés button - only shown in Online mode when Expert is OFF */}
+            {isOnlineMode && !expertMode && (
+              <button
+                onClick={() => setShowExpertWarning(true)}
+                className="px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all text-amber-700 bg-amber-100/50 hover:bg-amber-200/70 border border-amber-300/50"
+              >
+                <Lock size={16} /> Réglages Avancés
+              </button>
+            )}
+
+            {/* Bibliothèque tab - always visible */}
             <button onClick={() => setActiveTab('library')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'library' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><BookOpen size={16} /> Bibliothèque</button>
           </div>
         </div>
@@ -256,6 +299,16 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
           </div>
         </ThematicModal>
       )}
+
+      {/* Expert Mode Warning Modal */}
+      <ExpertModeWarningModal
+        isOpen={showExpertWarning}
+        onClose={() => setShowExpertWarning(false)}
+        onConfirm={() => {
+          enableExpertMode();
+          setShowExpertWarning(false);
+        }}
+      />
     </div>
   );
 };

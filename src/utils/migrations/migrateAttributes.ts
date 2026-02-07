@@ -125,8 +125,8 @@ export const migrateAttributes = (parsed: any): void => {
         parsed.attributeSettings.forEach((cat: any) => {
             if (!parsed.secondaryAttributes[cat.id]) {
                 parsed.secondaryAttributes[cat.id] = [
-                    { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 1', val1: "", val2: "", val3: "" },
-                    { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 2', val1: "", val2: "", val3: "" }
+                    { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 1', val1: "0", val2: "", val3: "" },
+                    { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 2', val1: "0", val2: "", val3: "" }
                 ];
             }
         });

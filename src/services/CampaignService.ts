@@ -94,6 +94,9 @@ export const CampaignService = {
             libraries: libraries
         });
 
+        // Inject settingId so RulesContext can detect online mode
+        (rules as any).settingId = id;
+
         // Sync definitions.counters with libraries.counters (add new counters, update descriptions)
         if (libraries.counters && libraries.counters.length > 0) {
             const activeCounters = libraries.counters.filter(c => c.isActive !== false);

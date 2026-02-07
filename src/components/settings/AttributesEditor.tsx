@@ -43,7 +43,7 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
             newAttributes[cat.id] = cat.attrs.map((name: string) => ({
                 id: Math.random().toString(36).substr(2, 9),
                 name: name,
-                val1: "", val2: "", val3: "",
+                val1: "0", val2: "", val3: "",
                 creationVal1: 0, creationVal2: 0, creationVal3: 0
             }));
         });
@@ -95,7 +95,7 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
                     return {
                         id: Math.random().toString(36).substr(2, 9),
                         name: attrName,
-                        val1: "", val2: "", val3: ""
+                        val1: "0", val2: "", val3: ""
                     };
                 });
             }
@@ -131,7 +131,7 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
                     attrs.push({
                         id: Math.random().toString(36).substr(2, 9),
                         name: attrName,
-                        val1: "", val2: "", val3: ""
+                        val1: "0", val2: "", val3: ""
                     });
                 }
             } else if (newCount < attrs.length) {
@@ -177,8 +177,8 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
             data.attributeSettings.forEach(cat => {
                 if (!newSecondary[cat.id]) {
                     newSecondary[cat.id] = [
-                        { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 1', val1: "", val2: "", val3: "" },
-                        { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 2', val1: "", val2: "", val3: "" }
+                        { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 1', val1: "0", val2: "", val3: "" },
+                        { id: Math.random().toString(36).substr(2, 9), name: 'Secondaire 2', val1: "0", val2: "", val3: "" }
                     ];
                 }
             });

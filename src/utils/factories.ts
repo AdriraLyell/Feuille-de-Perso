@@ -13,7 +13,7 @@ export const createDotEntry = (name: string, value = 0, variant?: string): any =
 export const createAttributeEntry = (name: string): any => ({
   id: generateId(),
   name,
-  val1: "", // Init as string
+  val1: "0",
   val2: "",
   val3: "",
   creationVal1: 0,

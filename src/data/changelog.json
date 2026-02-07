@@ -1,5 +1,83 @@
 [
     {
+        "version": "2.17.51",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Admin: Réorganisation des Paramètres de Création.",
+            "UX: Déplacement des bornes d'attributs en tête de section pour une meilleure clarté.",
+            "UX: Libellés renommés en 'Attribut Minimal' et 'Attribut Maximal'."
+        ]
+    },
+    {
+        "version": "2.17.50",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Config: Mise à jour des valeurs par défaut pour la répartition des rangs (10, 8, 6, 2, 0)."
+        ]
+    },
+    {
+        "version": "2.17.49",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Admin: Déplacement du 'Coût d'Attribut (XP)' de l'onglet Coûts vers l'onglet Général & Création.",
+            "UX: Centralisation des coûts fondamentaux dans la section Configuration Générale."
+        ]
+    },
+    {
+        "version": "2.17.48",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Refonte visuelle de l'onglet 'Général & Création'.",
+            "UX: Déplacement de la 'Version des Règles' dans un en-tête global.",
+            "UX: Extraction de 'Rangs Étendus' et 'Coût Arrière-Plans' dans une section 'Configuration Générale' premium."
+        ]
+    },
+    {
+        "version": "2.17.47",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Inversion de l'ordre d'affichage de la 'Répartition des Rangs' (désormais de 1 à 5).",
+            "Config: Mise à jour des valeurs par défaut pour les nouveaux settings :",
+            "- Mode Rangs: Attr=12, Plans=7, Attr Min=-1, Coût Arrière-plan=2",
+            "- Mode Pot Commun: XP=450",
+            "- Mode Budgets Séparés: Attr=120, Comp=240, Plans=20"
+        ]
+    },
+    {
+        "version": "2.17.46",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix critique: Les arrière-plans ne deviennent plus tous 'variable' lors du refresh de l'app.",
+            "Core: rulesReconciler vérifie maintenant le flag isVariable depuis la bibliothèque."
+        ]
+    },
+    {
+        "version": "2.17.45",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "UX: Le premier champ de saisie des attributs affiche maintenant '0' par défaut.",
+            "Core: Initialisation automatique de val1 à '0' lors de la création d'attributs."
+        ]
+    },
+    {
+        "version": "2.17.44",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Nouveau: Mode Expert pour les réglages avancés en mode Online.",
+            "Online Mode: Les onglets Attributs, Compétences, Spécialisations et Paramètres sont masqués par défaut.",
+            "UX: Bouton 'Réglages Avancés' avec double confirmation pour activer le Mode Expert.",
+            "UX: Bandeau d'avertissement persistant quand le Mode Expert est actif."
+        ]
+    },
+    {
         "version": "2.17.43",
         "date": "2026-02-07",
         "type": "bugfix",
@@ -156,37 +234,6 @@
         "changes": [
             "Correction d'un crash structurel dans le moteur de layout (erreur .slice).",
             "Amélioration de la résilience du layout pendant le chargement des règles."
-        ]
-    },
-    {
-        "version": "2.17.26",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Refonte du schéma de validation Zod pour supporter les IDs de compétences dynamiques.",
-            "Correction d'un bug critique de migration écrasant les attributs par 'undefined'.",
-            "Stabilisation de la vue Spécialisations (rendu dynamique via les règles).",
-            "Résolution des crashs TypeError au chargement en mode hors-ligne."
-        ]
-    },
-    {
-        "version": "2.17.25",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Sécurisation des scripts de migration et de réconciliation pour le mode hors-ligne.",
-            "Correction du décalage d'affichage de la version dans l'interface.",
-            "Ajout de protections contre les données malformées lors du chargement initial."
-        ]
-    },
-    {
-        "version": "2.17.24",
-        "date": "2026-02-06",
-        "type": "cleanup",
-        "changes": [
-            "Suppression de la section redondante 'Limites & Bornes' dans l'onglet Coûts.",
-            "Consolidation des paramètres de limites d'attributs exclusivement dans l'onglet Création.",
-            "Retrait du réglage 'Score Maximal Absolu' (non fonctionnel)."
         ]
     }
 ]

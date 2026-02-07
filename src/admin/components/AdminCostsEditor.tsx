@@ -147,32 +147,6 @@ const AdminCostsEditor: React.FC<AdminCostsEditorProps> = ({ rules, onUpdate }) 
                 </div>
             </div>
 
-            {/* ATTRIBUTES SECTION */}
-            <div className="bg-white p-8 rounded shadow-sm border border-slate-200">
-                <h3 className="font-bold text-slate-800 text-lg mb-6 flex items-center gap-2 border-b pb-2 px-2">
-                    <Calculator size={20} className="text-blue-500" /> Gestion des Attributs
-                </h3>
-
-                <div className="bg-slate-50 p-6 rounded border border-slate-200 max-w-md">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <label className="text-sm font-bold text-slate-700">Coût d'Attribut (XP)</label>
-                            <p className="text-[10px] text-slate-400 italic">Prix d'un point lors de la progression (Linéaire).</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="number"
-                                step="1"
-                                value={costs.attributeFactor ?? 6}
-                                onChange={(e) => updateFactor('attributeFactor', parseFloat(e.target.value) || 0)}
-                                className="w-16 p-2 border border-slate-200 rounded text-center font-bold text-sm bg-white outline-none focus:ring-2 focus:ring-blue-100"
-                            />
-                            <span className="text-xs text-slate-300 font-bold uppercase">XP</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     );
 };

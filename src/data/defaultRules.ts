@@ -12,14 +12,19 @@ export const defaultRules: RulesData = {
         },
         creation: {
             mode: "rangs",
-            startingXP: 0,
-            attributePoints: 15,
-            backgroundPoints: 5,
-            attributeMin: 1,
+            startingXP: 450,
+            attributePoints: 12,
+            backgroundPoints: 7,
+            attributeMin: -1,
             attributeMax: 3,
             attributeCost: 1,
-            backgroundCost: 1,
-            rankSlots: { "1": 5, "2": 4, "3": 3, "4": 2, "5": 1 }
+            backgroundCost: 2,
+            rankSlots: { "1": 10, "2": 8, "3": 6, "4": 2, "5": 0 },
+            pointsBuckets: {
+                attributes: 120,
+                skills: 240,
+                backgrounds: 20
+            }
         },
         xpCosts: {
             attributeFactor: 6,

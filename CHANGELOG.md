@@ -1,5 +1,23 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.12.14] - 2026-02-02
+
+- Remplacement de la modale native par une modale thématique lors de l'ajout de compétences variables.
+- Amélioration de l'UX lors du glisser-déposer de compétences.
+
+## [2.12.13] - 2026-02-02
+
+- Ajout du système de Compétences Variables (ex: Artisanat : Forge).
+- La bibliothèque permet de marquer une compétence comme variable.
+- À l'ajout, une boîte de dialogue demande de préciser la spécialité.
+- L'éditeur de configuration permet de modifier la variante ultérieurement.
+
+## [2.12.12] - 2026-02-01
+
+- Ajout du système de Traits Variables (ex: Allergie : Chats).
+- Mise à jour de l'éditeur de traits (Page 2) pour supporter les variantes et compléments.
+- Mise à jour de la Bibliothèque pour permettre la configuration de traits variables.
+
 ## [2.12.11] - 2026-02-01
 
 - Harmonisation des boutons d'action (Importer/Créer) sur l'ensemble des bibliothèques.

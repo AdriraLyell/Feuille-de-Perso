@@ -1,5 +1,36 @@
 [
     {
+        "version": "2.17.26",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Refonte du schéma de validation Zod pour supporter les IDs de compétences dynamiques.",
+            "Correction d'un bug critique de migration écrasant les attributs par 'undefined'.",
+            "Stabilisation de la vue Spécialisations (rendu dynamique via les règles).",
+            "Résolution des crashs TypeError au chargement en mode hors-ligne."
+        ]
+    },
+    {
+        "version": "2.17.25",
+        "date": "2026-02-06",
+        "type": "patch",
+        "changes": [
+            "Sécurisation des scripts de migration et de réconciliation pour le mode hors-ligne.",
+            "Correction du décalage d'affichage de la version dans l'interface.",
+            "Ajout de protections contre les données malformées lors du chargement initial."
+        ]
+    },
+    {
+        "version": "2.17.24",
+        "date": "2026-02-06",
+        "type": "cleanup",
+        "changes": [
+            "Suppression de la section redondante 'Limites & Bornes' dans l'onglet Coûts.",
+            "Consolidation des paramètres de limites d'attributs exclusivement dans l'onglet Création.",
+            "Retrait du réglage 'Score Maximal Absolu' (non fonctionnel)."
+        ]
+    },
+    {
         "version": "2.17.23",
         "date": "2026-02-06",
         "type": "cleanup",
@@ -857,33 +888,6 @@
         "changes": [
             "Les compétences \"variables\" resten désomais dans la réserve après ajout, pour permettre des ajouts multiples (ex: plusieurs Artisanats).",
             "Correction mineure de l'affichage de la réserve."
-        ]
-    },
-    {
-        "version": "2.12.14",
-        "date": "2026-02-02",
-        "changes": [
-            "Remplacement de la modale native par une modale thématique lors de l'ajout de compétences variables.",
-            "Amélioration de l'UX lors du glisser-déposer de compétences."
-        ]
-    },
-    {
-        "version": "2.12.13",
-        "date": "2026-02-02",
-        "changes": [
-            "Ajout du système de Compétences Variables (ex: Artisanat : Forge).",
-            "La bibliothèque permet de marquer une compétence comme variable.",
-            "À l'ajout, une boîte de dialogue demande de préciser la spécialité.",
-            "L'éditeur de configuration permet de modifier la variante ultérieurement."
-        ]
-    },
-    {
-        "version": "2.12.12",
-        "date": "2026-02-01",
-        "changes": [
-            "Ajout du système de Traits Variables (ex: Allergie : Chats).",
-            "Mise à jour de l'éditeur de traits (Page 2) pour supporter les variantes et compléments.",
-            "Mise à jour de la Bibliothèque pour permettre la configuration de traits variables."
         ]
     }
 ]

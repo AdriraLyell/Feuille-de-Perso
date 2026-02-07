@@ -13,7 +13,7 @@ const RankSlotsConfig: React.FC<RankSlotsConfigProps> = ({ rankSlots, onUpdateRa
                 <List size={18} className="text-blue-500" /> Répartition des Rangs
             </h4>
             <div className="space-y-3">
-                {[5, 4, 3, 2, 1].map(rank => (
+                {[1, 2, 3, 4, 5].map(rank => (
                     <div key={rank} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded">
                         <span className="font-bold text-slate-600">Rang {rank}</span>
                         <div className="flex items-center gap-2">

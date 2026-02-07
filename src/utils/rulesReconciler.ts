@@ -61,7 +61,7 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
                     return {
                         id: generateId(),
                         name: name,
-                        val1: "", val2: "", val3: "",
+                        val1: "0", val2: "", val3: "",
                         creationVal1: 0, creationVal2: 0, creationVal3: 0
                     };
                 }
@@ -107,7 +107,7 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
                 return {
                     id: generateId(),
                     name: name,
-                    val1: "", val2: "", val3: "",
+                    val1: "0", val2: "", val3: "",
                     creationVal1: 0, creationVal2: 0, creationVal3: 0
                 };
             }
@@ -191,6 +191,7 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
         newState.skills.arrieres_plans = ruleBackgrounds.map(name => {
             const existing = existingBackgrounds.find((e: DotEntry) => e.name === name);
             const libBg = rules.libraries?.backgrounds?.find(b => b.name === name);
+            const isVariable = libBg?.isVariable === true;
             const description = libBg?.description || "";
 
             if (existing) {
@@ -205,7 +206,8 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
                 id: generateId(),
                 name: name,
                 description: description,
-                value: 0, creationValue: 0, max: 5, variant: ""
+                value: 0, creationValue: 0, max: 5,
+                variant: isVariable ? "" : undefined
             };
         });
     }
