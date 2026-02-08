@@ -1,5 +1,32 @@
 [
     {
+        "version": "2.24.4",
+        "date": "2026-02-08",
+        "type": "bugfix",
+        "changes": [
+            "Fiche: Correction critique de la perte de campagne (SyncInfo) liée à une omission dans le schéma de validation Zod.",
+            "Core: Nettoyage et consolidation du moteur de réconciliation des règles."
+        ]
+    },
+    {
+        "version": "2.24.3",
+        "date": "2026-02-08",
+        "type": "bugfix",
+        "changes": [
+            "Fiche: Correction de la perte de connexion à la campagne lors de la reprise de session (migration des règles corrigée).",
+            "Fiche: Nettoyage intelligent des compétences obsolètes lors du changement de campagne (on ne garde que les scores > 0).",
+            "Core: Persistance du lien vers la campagne (Sync Info) assurée lors de la réconciliation."
+        ]
+    },
+    {
+        "version": "2.24.2",
+        "date": "2026-02-08",
+        "type": "bugfix",
+        "changes": [
+            "Fiche: Correction du bug de restauration des arrières-plans lors de la reprise de session (dynamisation de l'ID de catégorie)."
+        ]
+    },
+    {
         "version": "2.24.1",
         "date": "2026-02-08",
         "type": "bugfix",
@@ -166,37 +193,6 @@
             "Migration: Correction d'un bug où les règles chargées depuis GitHub restaient en format legacy, causant des conflits d'affichage.",
             "Stabilité: Ajout de logs de débogage avancés dans le CharacterContext pour tracer les flux de données.",
             "Fix: Résolution du blocage (boucle infinie) lors de la résolution des conflits de session au démarrage."
-        ]
-    },
-    {
-        "version": "2.20.14",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix: Correction de la perte des compétences lors du chargement des campagnes en ligne (reconstruction du layout depuis la bibliothèque).",
-            "Fix: Correction d'une boucle infinie (UI bloquée) lors d'un conflit de campagne au démarrage.",
-            "Stabilité: Ajout de garde-fous globaux et gestion d'erreurs sur le chargement des données Supabase."
-        ]
-    },
-    {
-        "version": "2.20.13",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Sécurité: Ajout d'une modale de conflit lors du changement de campagne pour éviter les pertes de données.",
-            "UX: Nouveau bouton 'Reprendre ma session' pour charger instantanément la campagne associée au personnage local.",
-            "Sauvegarde: Option de sauvegarde de secours (JSON) intégrée directement dans la modale de conflit.",
-            "Core: Extraction de la logique d'exportation vers un utilitaire partagé."
-        ]
-    },
-    {
-        "version": "2.20.12",
-        "date": "2026-02-07",
-        "type": "refactor",
-        "changes": [
-            "Optimisation: Évitement de la re-compression des images déjà optimisées (prévention de la perte de qualité).",
-            "Core: Décompression à la volée uniquement lors de l'affichage (données stockées compressées partout).",
-            "Fix: Correction des imports et de la gestion de la mémoire à l'affichage des images."
         ]
     }
 ]

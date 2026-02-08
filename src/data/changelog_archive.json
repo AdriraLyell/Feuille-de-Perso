@@ -1,5 +1,36 @@
 [
     {
+        "version": "2.20.14",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fix: Correction de la perte des compétences lors du chargement des campagnes en ligne (reconstruction du layout depuis la bibliothèque).",
+            "Fix: Correction d'une boucle infinie (UI bloquée) lors d'un conflit de campagne au démarrage.",
+            "Stabilité: Ajout de garde-fous globaux et gestion d'erreurs sur le chargement des données Supabase."
+        ]
+    },
+    {
+        "version": "2.20.13",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Sécurité: Ajout d'une modale de conflit lors du changement de campagne pour éviter les pertes de données.",
+            "UX: Nouveau bouton 'Reprendre ma session' pour charger instantanément la campagne associée au personnage local.",
+            "Sauvegarde: Option de sauvegarde de secours (JSON) intégrée directement dans la modale de conflit.",
+            "Core: Extraction de la logique d'exportation vers un utilitaire partagé."
+        ]
+    },
+    {
+        "version": "2.20.12",
+        "date": "2026-02-07",
+        "type": "refactor",
+        "changes": [
+            "Optimisation: Évitement de la re-compression des images déjà optimisées (prévention de la perte de qualité).",
+            "Core: Décompression à la volée uniquement lors de l'affichage (données stockées compressées partout).",
+            "Fix: Correction des imports et de la gestion de la mémoire à l'affichage des images."
+        ]
+    },
+    {
         "version": "2.20.11",
         "date": "2026-02-07",
         "type": "feature",
@@ -941,28 +972,6 @@
         "changes": [
             "Technique : Refactoring global pour améliorer la maintenabilité (LibraryView, mechanics.ts).",
             "Optimisation : Migration du journal des modifications vers un format léger (JSON) pour accélérer le chargement initial."
-        ]
-    },
-    {
-        "version": "2.12.56",
-        "date": "2026-02-04",
-        "changes": [
-            "Système : Correction de la gestion des Arrière-Plans variables. Ils respectent désormais correctement la propriété `isVariable` définie dans les règles (ex: Alliés, Contacts)."
-        ]
-    },
-    {
-        "version": "2.12.55",
-        "date": "2026-02-04",
-        "changes": [
-            "Système : Correction de la boucle de rafraîchissement des règles. L'application charge maintenant correctement la dernière version détectée via l'API.",
-            "Affichage : Correction du bug où toutes les compétences apparaissaient comme \"Variables\" après une mise à jour. Désormais, seules les compétences configurées comme telles (ex: Artisanat) afficheront le champ de sous-type."
-        ]
-    },
-    {
-        "version": "2.12.54",
-        "date": "2026-02-04",
-        "changes": [
-            "Système : Optimisation majeure de la détection des mises à jour. L'application utilise désormais l'API GitHub (mode rapide) pour contourner le délai de 5 minutes du CDN, avec repli automatique sur le CDN en cas de limite atteinte."
         ]
     }
 ]

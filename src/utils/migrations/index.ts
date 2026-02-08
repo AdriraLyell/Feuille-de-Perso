@@ -138,13 +138,27 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
     }
 
     // 5. Ensure configurations structure
-    if (!rules.configurations) rules.configurations = INITIAL_DATA.creationConfig;
-    if (!rules.configurations.xpCosts) {
-        rules.configurations.xpCosts = {
-            attributeFactor: 6,
-            skillFactor: 1,
-            specializationFactor: 0
+    if (!rules.configurations) {
+        rules.configurations = {
+            global: { maxAttributeScore: 5, maxSkillScore: 10, secondaryAttributes: false },
+            creation: INITIAL_DATA.creationConfig,
+            xpCosts: { attributeFactor: 6, skillFactor: 1, specializationFactor: 0 },
+            cards: INITIAL_DATA.creationConfig.cardConfig as any
         };
+    } else {
+        // Ensure sub-sections exist
+        if (!rules.configurations.global) rules.configurations.global = { maxAttributeScore: 5, maxSkillScore: 10 };
+        if (!rules.configurations.creation) rules.configurations.creation = INITIAL_DATA.creationConfig;
+        if (!rules.configurations.xpCosts) {
+            rules.configurations.xpCosts = {
+                attributeFactor: 6,
+                skillFactor: 1,
+                specializationFactor: 0
+            };
+        }
+        if (!rules.configurations.cards && rules.configurations.creation.cardConfig) {
+            rules.configurations.cards = rules.configurations.creation.cardConfig;
+        }
     }
 
     return rules as RulesData;

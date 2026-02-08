@@ -1,5 +1,18 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.12.56] - 2026-02-04
+
+- Système : Correction de la gestion des Arrière-Plans variables. Ils respectent désormais correctement la propriété `isVariable` définie dans les règles (ex: Alliés, Contacts).
+
+## [2.12.55] - 2026-02-04
+
+- Système : Correction de la boucle de rafraîchissement des règles. L'application charge maintenant correctement la dernière version détectée via l'API.
+- Affichage : Correction du bug où toutes les compétences apparaissaient comme "Variables" après une mise à jour. Désormais, seules les compétences configurées comme telles (ex: Artisanat) afficheront le champ de sous-type.
+
+## [2.12.54] - 2026-02-04
+
+- Système : Optimisation majeure de la détection des mises à jour. L'application utilise désormais l'API GitHub (mode rapide) pour contourner le délai de 5 minutes du CDN, avec repli automatique sur le CDN en cas de limite atteinte.
+
 ## [2.12.53] - 2026-02-03
 
 - Admin : Ajout du "Moniteur de Déploiement". Une fois la publication lancée, une barre de progression en bas d'écran vous informe en temps réel de l'avancement du build sur GitHub Actions (En attente -> Construction -> Terminé).

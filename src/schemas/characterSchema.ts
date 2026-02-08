@@ -43,6 +43,13 @@ export const HeaderInfoSchema = z.object({
     eyes: z.string()
 });
 
+export const SyncInfoSchema = z.object({
+    settingId: z.string().optional(),
+    settingName: z.string().optional(),
+    syncId: z.string().optional(),
+    lastSynced: z.number().optional()
+});
+
 export const CombatEntrySchema = z.object({
     id: z.string(),
     weapon: z.string(),
@@ -269,7 +276,8 @@ export const CharacterSheetDataSchema = z.object({
             player: z.number()
         }).optional()
     }),
-    appVersion: z.string().optional()
+    appVersion: z.string().optional(),
+    syncInfo: SyncInfoSchema.optional()
 });
 
 export type ValidatedCharacterData = z.infer<typeof CharacterSheetDataSchema>;

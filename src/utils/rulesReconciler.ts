@@ -11,6 +11,18 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
     const newState: CharacterSheetData = JSON.parse(JSON.stringify(currentState));
 
     // 1. Update Configuration (Costs, etc.)
+    // Note: syncInfo must be preserved and updated if rules come from a specific setting
+    const ruleSettingId = (rules as any).settingId;
+    if (ruleSettingId) {
+        newState.syncInfo = {
+            ...newState.syncInfo,
+            settingId: ruleSettingId,
+            settingName: (rules as any).settingName || newState.syncInfo?.settingName || 'Inconnue',
+            syncId: newState.syncInfo?.syncId || '',
+            lastSynced: Date.now()
+        };
+    }
+
     // These are safe to simply overwrite as they are "System Rules"
     if (rules.configurations && rules.configurations.xpCosts) {
         newState.xpCosts = {
@@ -173,8 +185,11 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
                 }
             });
 
-            // B. Preserve existing skills NOT in rules (Additive)
-            const remainingSkills = existingEntries.filter(e => e && e.name && !processedNames.has(e.name));
+            // B. Preserve existing skills NOT in rules (Semi-Additive)
+            // We only keep skills that have a value > 0 or a variant defined (custom skills)
+            const remainingSkills = existingEntries.filter(e =>
+                e && e.name && !processedNames.has(e.name) && ((e.value || 0) > 0 || e.variant !== undefined)
+            );
 
             newSkills[category] = [...syncedSkills, ...remainingSkills];
         });
@@ -192,11 +207,18 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
     }
 
     // 4. Backgrounds (Arriere-plans)
-    // Backgrounds might be in Col_Comp_8 or in legacy arrieres_plans
     const ruleBackgrounds = rules.definitions.backgrounds || [];
     if (ruleBackgrounds && Array.isArray(ruleBackgrounds)) {
-        const bgCat = 'arrieres_plans';
-        const existingBackgrounds = (currentState.skills as any)[bgCat] || [];
+        // Find the actual category ID for backgrounds from rules (behavior: 'Arrière-plan')
+        const dynamicBgCat = rules.definitions.skillCategories?.find(c => c.behavior === 'Arrière-plan')?.id || 'Col_Comp_8';
+
+        // We look for existing data in both the dynamic cat and the legacy 'arrieres_plans'
+        const existingInDynamic = (currentState.skills as any)[dynamicBgCat] || [];
+        const existingInLegacy = (currentState.skills as any)['arrieres_plans'] || [];
+
+        // Merge to avoid losing data if user migrated manually or if it was stored elsewhere
+        const existingBackgrounds = existingInDynamic.length > 0 ? existingInDynamic : existingInLegacy;
+
         const processedNames = new Set<string>();
 
         const syncedBgs = ruleBackgrounds.map(name => {
@@ -215,14 +237,19 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
             };
         });
 
-        const remainingBgs = existingBackgrounds.filter((e: DotEntry) => e && e.name && !processedNames.has(e.name));
+        // Semi-Additive Cleanup: Only keep remaining backgrounds if they have a value or a variant
+        const remainingBgs = existingBackgrounds.filter((e: DotEntry) =>
+            e && e.name && !processedNames.has(e.name) && ((e.value || 0) > 0 || e.variant !== undefined)
+        );
 
+        // Update the dynamic category with reconciled backgrounds
         // @ts-ignore
-        newState.skills[bgCat] = [...syncedBgs, ...remainingBgs];
+        newState.skills[dynamicBgCat] = [...syncedBgs, ...remainingBgs];
 
-        // Also sync to Col_Comp_8 if it's the target for generic UI
-        if (newState.skills['Col_Comp_8']) {
-            newState.skills['Col_Comp_8'] = newState.skills[bgCat];
+        // If 'arrieres_plans' was the legacy key, ensure we don't end up with duplicate categories in UI 
+        if (dynamicBgCat !== 'arrieres_plans' && newState.skills['arrieres_plans']) {
+            // We can safely clear the legacy one if we successfully moved data to the dynamic one
+            (newState.skills as any)['arrieres_plans'] = [];
         }
     }
 
