@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { X, GitCommit, Calendar, Tag, ChevronDown, ExternalLink } from 'lucide-react';
 import CHANGELOG_DATA from '../data/changelog.json';
+import { ErrorService } from '../services/ErrorService';
 
 interface ChangelogModalProps {
     isOpen: boolean;
@@ -24,7 +25,7 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ isOpen, onClose }) => {
             setDisplayEntries([...CHANGELOG_DATA, ...archiveData]);
             setHasLoadedArchive(true);
         } catch (error) {
-            console.error('Erreur lors du chargement de l\'archive du journal:', error);
+            ErrorService.handleError(error, { context: 'ChangelogModal.loadArchive', userMessage: "Impossible de charger l'historique complet." });
         } finally {
             setIsLoadingArchive(false);
         }

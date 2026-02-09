@@ -1,5 +1,77 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.16.2] - 2026-02-05 [PATCH]
+
+- Correction du remplissage automatique des noms d'attributs secondaires par défaut (basé sur le libellé du pavé)
+- Mise à jour des préréglages codés en dur pour inclure les attributs secondaires par défaut
+- Sécurisation du script de migration SQL (Unique Constraint)
+
+## [2.16.1] - 2026-02-05 [PATCH]
+
+- Inclusion des attributs secondaires dans les préréglages (sauvegarde et chargement)
+- Amélioration de l'UI : Déplacement du commutateur 'Secondaires' à côté du bouton d'ajout de pavé
+- Correction et synchronisation des types de préréglages avec la base de données
+
+## [2.16.0] - 2026-02-05 [MINOR]
+
+- Refontes des préréglages d'attributs (Renommage Standard -> v2 et Complet -> v4)
+- Gestion dynamique des préréglages via la base de données (Table attribute_presets)
+- Amélioration de l'interface Admin : Grille de cartes ergonomique pour la sélection
+- Nouvelle fonctionnalité : Sauvegarder la structure actuelle en tant que préréglage réutilisable
+- Possibilité de supprimer ses propres préréglages personnalisés
+
+## [2.15.0] - 2026-02-05 [MINOR]
+
+- ARCH : Migration vers des IDs d'attributs génériques (pave_attributs_1, etc.) pour une indépendance totale vis-à-vis des thèmes.
+- SYSTEM : Implémentation d'un moteur de migration runtime pour convertir automatiquement les anciens personnages sans perte de données.
+- ADMIN : Les éditeurs d'attributs (Admin & Joueur) génèrent désormais ces nouveaux IDs génériques par défaut.
+
+## [2.14.3] - 2026-02-05 [PATCH]
+
+- FIX: Ajout des noms par défaut pour les attributs secondaires (Corpulence, Beauté, Conscience, etc.).
+- IMPROVE: L'éditeur utilise désormais ces noms par défaut lors de l'activation des attributs secondaires.
+
+## [2.14.2] - 2026-02-05 [PATCH]
+
+- FIX: Les attributs par défaut suivent désormais la structure Standard (3 pavés de 4 attributs).
+- IMPROVE: L'éditeur d'attributs impose désormais une symétrie globale (le nombre d'attributs est identique pour tous les pavés).
+- IMPROVE: Support débloqué pour un 5ème pavé d'attributs.
+
+## [2.14.1] - 2026-02-05 [PATCH]
+
+- FIX: Nettoyage des compteurs par défaut (Suppression 'Points de Vie').
+- FIX: Le compteur 'Confiance' est désormais actif par défaut.
+- IMPROVE: Liaison automatique des éléments pré-existants (Layout) avec la Bibliothèque Globale.
+
+## [2.14.0] - 2026-02-05 [MINOR]
+
+- Feature (Bibliothèques Unifiées) : Extension de la bibliothèque globale pour inclure les Arrières-Plans et les Compteurs.
+- Admin UI : Mise à jour de la barre latérale 'Réserve' avec des onglets pour gérer Compétences, Arrières-Plans et Compteurs.
+- Backend : Persistance en base de données (Supabase) des nouvelles bibliothèques et gestion des liens Global/Local.
+- Admin UI : Support du Glisser-Déposer pour toutes les entités de bibliothèque vers l'éditeur de mise en page.
+
+## [2.13.10] - 2026-02-05 [PATCH]
+
+- Refonte Bibliothèque Globale : Gestion unifiée des compétences.
+- Correction Creation : Les nouvelles campagnes démarrent avec les compétences globales liées.
+- Correction Doublons : Nettoyage de la base de données et masquage intelligent des doublons.
+- Admin : La barre latérale 'Réserve' filtre désormais les compétences inactives.
+
+## [2.13.9] - 2026-02-04 [PATCH]
+
+- Hotfix : Utilisation de crypto.randomUUID() pour les IDs de compétences (compatibilité Supabase UUID).
+- Hotfix : Retour d'erreurs détaillé dans l'UI admin lors de la sauvegarde BDD.
+
+## [2.13.8] - 2026-02-04 [PATCH]
+
+- Admin (DB) : Correction du mapping des champs (SnakeCase vs CamelCase) pour la sauvegarde des bibliothèques (Compétences, Traits, Spécialisations) dans Supabase.
+- Admin : Assurance que les catégories par défaut et les indicateurs 'Variable' sont correctement persistés en base de données.
+
+## [2.13.7] - 2026-02-04 [PATCH]
+
+- Admin : Synchronisation automatique des noms de compétences vers la Bibliothèque lors de l'édition (sur perte de focus).
+- Admin : Ajout d'un bouton 'Synchroniser Bibliothèque' dans l'en-tête pour peupler massivement la réserve avec les compétences existantes.
+
 ## [2.13.6] - 2026-02-04 [PATCH]
 
 - Fix (Admin) : Correction de la persistance des bibliothèques lors de la création/import de campagne. Les données sont désormais correctement injectées dans les tables BDD.

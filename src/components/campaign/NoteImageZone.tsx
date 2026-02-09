@@ -4,6 +4,7 @@ import { ImageConfig } from '../../types';
 import { X, Move, Scaling, WrapText, BoxSelect, Maximize2, Minimize2, StretchHorizontal } from 'lucide-react';
 import { getImage } from '../../imageDB';
 import { ImageCompressionService } from '../../services/ImageCompressionService';
+import { ErrorService } from '../../services/ErrorService';
 
 interface NoteImageZoneProps {
     uniqueId: string; // Placement ID
@@ -74,7 +75,7 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
                     }
                 }
             } catch (e) {
-                console.error("Erreur chargement image note", e);
+                ErrorService.handleError(e, { context: 'NoteImageZone.load', silent: true });
             }
         };
 

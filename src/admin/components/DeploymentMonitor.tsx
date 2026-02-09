@@ -56,7 +56,7 @@ const DeploymentMonitor: React.FC = () => {
             });
 
             // Update current run status if it's the one we are tracking (or just the latest)
-            setCurrentRun(prev => {
+            setCurrentRun((prev: any) => {
                 if (prev && prev.id === run.id) {
                     // Detect Status Change
                     if (prev.status !== run.status || prev.conclusion !== run.conclusion) {

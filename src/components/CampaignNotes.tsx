@@ -4,6 +4,7 @@ import { CharacterSheetData, CampaignNoteEntry, ImageConfig, NoteImage } from '.
 import { Book, Plus, Trash2, ChevronLeft, ChevronRight, Bookmark, Users, PenTool, Image as ImageIcon } from 'lucide-react';
 import { saveImage, deleteImage } from '../imageDB';
 import { useCharacter } from '../context/CharacterContext';
+import { ErrorService } from '../services/ErrorService';
 import NoteImageZone from './campaign/NoteImageZone';
 import NotebookTextarea from './campaign/NotebookTextarea';
 import PartyTable from './campaign/PartyTable';
@@ -68,12 +69,12 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
             // Clean up all images associated with this note
             if (noteToDelete?.images) {
                 noteToDelete.images.forEach(img => {
-                    deleteImage(img.imageId).catch(console.error);
+                    deleteImage(img.imageId).catch(e => ErrorService.handleError(e, { context: 'CampaignNotes.deleteImage', silent: true }));
                 });
             }
             // Fallback for deprecated single image field
             if (noteToDelete?.imageId) {
-                deleteImage(noteToDelete.imageId).catch(console.error);
+                deleteImage(noteToDelete.imageId).catch(e => ErrorService.handleError(e, { context: 'CampaignNotes.deleteImageLegacy', silent: true }));
             }
 
             const newNotes = (data.campaignNotes || []).filter(n => n.id !== noteIdToDelete);
@@ -150,7 +151,7 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
 
             onAddLog("Image ajoutée à la zone dessinée", 'success', 'sheet');
         } catch (err) {
-            console.error(err);
+            ErrorService.handleError(err, { context: 'CampaignNotes.handleImageUpload', userMessage: "Erreur lors de l'ajout de l'image." });
             onAddLog("Erreur lors de l'ajout de l'image", 'danger');
         } finally {
             if (fileInputRef.current) fileInputRef.current.value = "";
@@ -182,7 +183,7 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
 
             onAddLog("Image retirée de la note", 'info', 'sheet');
         } catch (err) {
-            console.error(err);
+            ErrorService.handleError(err, { context: 'CampaignNotes.handleRemoveImage', silent: true });
         }
     };
 

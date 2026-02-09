@@ -6,6 +6,7 @@ import SpecializationLibraryDrawer from './specialization-library/Specialization
 import { Award, Book, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useRules } from '../context/RulesContext';
+import { ErrorService } from '../services/ErrorService';
 
 interface Props {
     isLandscape?: boolean;
@@ -78,7 +79,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                 }
             }
         } catch (err) {
-            console.error("Drop failed", err);
+            ErrorService.handleError(err, { context: 'CharacterSheetSpecializations.Drop', silent: true });
         }
     };
 

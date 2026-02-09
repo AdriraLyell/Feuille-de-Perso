@@ -156,6 +156,9 @@ export const INITIAL_DATA: CharacterSheetData = {
     chronicle: '', nature: '', hair: '',
     status: '', conduct: '', eyes: '',
   },
+  syncInfo: {
+    isAutoSyncEnabled: false
+  },
   experience: { gain: '0', spent: '0', rest: '0' },
   // Default Attributes Configuration
   attributeSettings: [

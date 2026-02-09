@@ -5,9 +5,11 @@
  * Players can sync their sheets manually; Admin can read them.
  */
 
-import { supabase } from './supabase';
+import { DatabaseService } from './DatabaseService';
 import { CharacterSheetData } from '../types/character';
+
 import { ImageCompressionService } from './ImageCompressionService';
+import { ErrorService } from './ErrorService';
 
 // Types for sync operations
 export interface SyncedCharacter {
@@ -53,32 +55,29 @@ export const CharacterSyncService = {
             // Step 1: Compress images in data
             const dataToStore = await this.processImages(cleanData, 'compress');
 
-            const { data: result, error } = await supabase
-                .from('characters')
-                .upsert(
-                    {
-                        setting_id: (settingId === 'orphan' || !settingId) ? null : settingId,
-                        player_name: playerName.trim(),
-                        character_name: characterName.trim(),
-                        data: dataToStore,
-                        last_synced: new Date().toISOString()
-                    },
-                    {
-                        onConflict: 'setting_id,character_name,player_name',
-                        ignoreDuplicates: false
-                    }
-                )
-                .select('id')
-                .single();
+            const result = await DatabaseService.upsert<{ id: string }>(
+                'characters',
+                {
+                    setting_id: (settingId === 'orphan' || !settingId) ? null : settingId,
+                    player_name: playerName.trim(),
+                    character_name: characterName.trim(),
+                    data: dataToStore,
+                    last_synced: new Date().toISOString()
+                },
+                {
+                    onConflict: 'setting_id,character_name,player_name',
+                    ignoreDuplicates: false
+                },
+                'CharacterSyncService.syncCharacter'
+            );
 
-            if (error) {
-                console.error('[CharacterSyncService] Sync error:', error);
-                return { success: false, error: error.message };
+            if (!result) {
+                return { success: false, error: "Erreur de synchronisation (DatabaseService)." };
             }
 
             return { success: true, syncId: result.id };
         } catch (e) {
-            console.error('[CharacterSyncService] Unexpected error:', e);
+            ErrorService.handleError(e, { context: 'CharacterSyncService.syncCharacter' });
             return { success: false, error: (e as Error).message };
         }
     },
@@ -87,107 +86,73 @@ export const CharacterSyncService = {
      * Get all characters synced by a specific player (for cloud loading).
      */
     async getCharactersByPlayerName(playerName: string): Promise<SyncedCharacterSummary[]> {
-        const { data, error } = await supabase
-            .from('characters')
-            .select('id, character_name, player_name, last_synced, setting_id')
-            .eq('player_name', playerName.trim())
-            .order('last_synced', { ascending: false });
-
-        if (error) {
-            console.error('[CharacterSyncService] Fetch by player error:', error);
-            return [];
-        }
-
-        return data || [];
+        return await DatabaseService.fetchAll<SyncedCharacterSummary>(
+            'characters',
+            {
+                select: 'id, character_name, player_name, last_synced, setting_id',
+                eq: { player_name: playerName.trim() },
+                order: { column: 'last_synced', ascending: false }
+            },
+            'CharacterSyncService.getCharactersByPlayerName'
+        );
     },
 
     /**
      * Get ALL characters across all campaigns (for Admin Master List).
      */
     async getAllCharacters(): Promise<SyncedCharacterSummary[]> {
-        const { data, error } = await supabase
-            .from('characters')
-            .select('id, character_name, player_name, last_synced, setting_id')
-            .order('last_synced', { ascending: false });
-
-        if (error) {
-            console.error('[CharacterSyncService] Fetch all error:', error);
-            return [];
-        }
-
-        return data || [];
+        return await DatabaseService.fetchAll<SyncedCharacterSummary>(
+            'characters',
+            {
+                select: 'id, character_name, player_name, last_synced, setting_id',
+                order: { column: 'last_synced', ascending: false }
+            },
+            'CharacterSyncService.getAllCharacters'
+        );
     },
 
     /**
      * Get all characters synced to a specific campaign (for Admin view).
      */
     async getCharactersBySettingId(settingId: string): Promise<SyncedCharacterSummary[]> {
-        const { data, error } = await supabase
-            .from('characters')
-            .select('id, setting_id, character_name, player_name, last_synced')
-            .eq('setting_id', settingId)
-            .order('last_synced', { ascending: false });
-
-        if (error) {
-            console.error('[CharacterSyncService] Fetch error:', error);
-            return [];
-        }
-
-        return data || [];
+        return await DatabaseService.fetchAll<SyncedCharacterSummary>(
+            'characters',
+            {
+                select: 'id, setting_id, character_name, player_name, last_synced',
+                eq: { setting_id: settingId },
+                order: { column: 'last_synced', ascending: false }
+            },
+            'CharacterSyncService.getCharactersBySettingId'
+        );
     },
 
     /**
      * Get a single character by ID (for Admin or Player detail view).
      */
     async getCharacterById(id: string): Promise<SyncedCharacter | null> {
-        const { data, error } = await supabase
-            .from('characters')
-            .select('*')
-            .eq('id', id)
-            .single();
-
-        if (error) {
-            console.error('[CharacterSyncService] Fetch by ID error:', error);
-            return null;
-        }
-
-        // We no longer decompress automatically here to preserve the compressed state 
-        // throughout the app, preventing re-compression quality loss.
-        // UI components will decompress on-the-fly for display.
-
-        return data;
+        return await DatabaseService.fetchOne<SyncedCharacter>(
+            'characters',
+            id,
+            'CharacterSyncService.getCharacterById'
+        );
     },
 
     /**
      * Delete a synced character (Admin only, if needed later).
      */
     async deleteCharacter(id: string): Promise<boolean> {
-        const { error } = await supabase
-            .from('characters')
-            .delete()
-            .eq('id', id);
-
-        if (error) {
-            console.error('[CharacterSyncService] Delete error:', error);
-            return false;
-        }
-
-        return true;
+        return await DatabaseService.delete(
+            'characters',
+            id,
+            'CharacterSyncService.deleteCharacter'
+        );
     },
 
     /**
      * Check if character sync table exists and is accessible.
      */
     async checkSyncAvailable(): Promise<boolean> {
-        try {
-            const { error } = await supabase
-                .from('characters')
-                .select('id', { count: 'exact', head: true });
-
-            return !error;
-        } catch {
-            return false;
-        }
+        return await DatabaseService.checkAvailable('characters');
     },
 
     /**

@@ -27,7 +27,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     onPrintRequest, onToggleLandscape, isLandscape,
     onShowLogs, showLogs, onShowUserGuide, onShowChangelog, onOpenAppearance, onOpenSync, syncStatus, appVersion
 }) => {
-    const { data } = useCharacter();
+    const { data, isSyncing } = useCharacter();
     const { rules } = useRules();
 
     return (
@@ -118,14 +118,24 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                     {/* Sync Button */}
                     <button
                         onClick={onOpenSync}
-                        className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all text-sm font-bold border ${syncStatus === 'synced'
+                        className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all text-sm font-bold border relative ${syncStatus === 'synced'
                             ? 'bg-green-700/20 hover:bg-green-700/40 text-green-500 border-green-700/50'
                             : 'bg-purple-700/20 hover:bg-purple-700/40 text-purple-400 border-purple-700/50'
-                            }`}
-                        title="Synchroniser avec le MJ"
+                            } ${isSyncing ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-800' : ''}`}
+                        title={isSyncing ? "Synchronisation en cours..." : (data.syncInfo?.isAutoSyncEnabled ? "Auto-Sync Actif" : "Synchroniser avec le MJ")}
                     >
-                        <UploadCloud size={18} />
-                        <span className="hidden lg:inline">Sync</span>
+                        <UploadCloud size={18} className={isSyncing ? "animate-spin-slow" : ""} />
+                        <span className="hidden lg:inline">{isSyncing ? "Sync..." : "Sync"}</span>
+                        {data.syncInfo?.isAutoSyncEnabled && !isSyncing && (
+                            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                            </span>
+                        )}
+                        {isSyncing && (
+                            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
+                            </span>
+                        )}
                     </button>
 
                     <div className="w-px h-6 bg-gray-600 mx-1"></div>

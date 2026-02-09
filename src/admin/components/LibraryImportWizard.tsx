@@ -6,6 +6,7 @@ import { LibraryService } from '../../services/LibraryService';
 import { CampaignService, GameSettingSummary } from '../../services/CampaignService';
 import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry } from '../../types/system';
 import { RulesData } from '../../types/rules';
+import { ErrorService } from '../../services/ErrorService';
 
 interface LibraryImportWizardProps {
     character: SyncedCharacter;
@@ -154,7 +155,7 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
 
                 setBackgroundCandidates(backgrounds.map(b => {
                     const existing = libraries.backgrounds.find(eb => eb.name.toLowerCase() === b.name.toLowerCase());
-                    return { data: b, isDuplicate: !!existing, isSelected: !existing, isVariable: b.isVariable };
+                    return { data: b, isDuplicate: !!existing, isSelected: !existing, isVariable: b.isVariable ?? false };
                 }));
 
                 // 6. Scan Counters
@@ -184,7 +185,7 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
 
                 setIsLoading(false);
             } catch (error) {
-                console.error("Error preparing import data:", error);
+                ErrorService.handleError(error, { context: 'LibraryImportWizard.prepare', userMessage: "Erreur lors de la préparation de l'import." });
                 setIsLoading(false);
             }
         };
@@ -224,7 +225,7 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
             if (onSuccess) onSuccess();
             onClose();
         } catch (error) {
-            console.error("Import failed:", error);
+            ErrorService.handleError(error, { context: 'LibraryImportWizard.import', userMessage: "L'import a échoué." });
             setIsSaving(false);
         }
     };

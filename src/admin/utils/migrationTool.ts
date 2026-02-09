@@ -1,6 +1,7 @@
 import { supabase } from '../../services/supabase';
 import { INITIAL_DATA } from '../../data/initialState';
 import { LibrarySkillEntry } from '../../types';
+import { ErrorService } from '../../services/ErrorService';
 
 export const migrateGlobalSkills = async () => {
     console.log("Starting Migration of Global Skills...");
@@ -45,7 +46,7 @@ export const migrateGlobalSkills = async () => {
         .insert(payload);
 
     if (insertError) {
-        console.error("Migration Error:", insertError);
+        ErrorService.handleError(insertError, { context: 'migrationTool.migrateGlobalSkills', userMessage: "Erreur lors de la migration des compétences globales." });
         return { success: false, message: insertError.message };
     }
 

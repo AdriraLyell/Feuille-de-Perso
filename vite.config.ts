@@ -18,8 +18,8 @@ export default defineConfig({
     // Options pour forcer un fichier unique robuste
     modulePreload: false,
     target: 'esnext',
-    assetsInlineLimit: 100000000, // Tout inliner
-    chunkSizeWarningLimit: 100000000,
+    assetsInlineLimit: 10000,
+    chunkSizeWarningLimit: 2000,
     cssCodeSplit: false,
     rollupOptions: {
       input: {

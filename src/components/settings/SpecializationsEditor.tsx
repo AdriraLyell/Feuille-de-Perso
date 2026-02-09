@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../../types';
 import { Plus, Trash2, Award } from 'lucide-react';
 import SpecializationOmnibar from '../specialization-library/SpecializationOmnibar';
+import { ErrorService } from '../../services/ErrorService';
 
 interface SpecializationsEditorProps {
   data: CharacterSheetData;
@@ -123,7 +124,7 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
         }
       }
     } catch (err) {
-      console.error("Drop failed", err);
+      ErrorService.handleError(err, { context: 'SpecializationsEditor.Drop', silent: true });
     }
   };
 

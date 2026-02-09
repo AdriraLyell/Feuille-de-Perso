@@ -1,10 +1,11 @@
-
 import { supabase } from './supabase';
+import { DatabaseService } from './DatabaseService';
 import { GameSetting, RulesData, GameSettingSummary } from '../types/rules';
 export type { GameSetting, RulesData, GameSettingSummary };
-import { INITIAL_DATA } from '../data/initialState';
 import { LibraryService } from './LibraryService';
+import { ErrorService } from './ErrorService';
 import { migrateRulesToV2 } from '../utils/migrations';
+import { RulesDataSchema } from '../utils/validation/rulesSchema';
 
 
 export const CampaignService = {
@@ -13,16 +14,47 @@ export const CampaignService = {
      * List all available settings (campagnes)
      */
     async listSettings(): Promise<GameSettingSummary[] | null> {
-        const { data, error } = await supabase
-            .from('game_settings')
-            .select('id, name, version, last_updated, is_public')
-            .order('last_updated', { ascending: false });
+        return await DatabaseService.fetchAll<GameSettingSummary>('game_settings', {
+            select: 'id, name, version, last_updated, is_public',
+            order: { column: 'last_updated', ascending: false }
+        }, 'CampaignService.listSettings');
+    },
 
-        if (error) {
-            console.error('Error listing settings:', error);
+    /**
+     * Duplicate an existing setting
+     */
+    async duplicateSetting(id: string, newName: string): Promise<string | null> {
+        const originalSetting = await CampaignService.loadSetting(id);
+
+        if (!originalSetting) {
+            ErrorService.handleError(new Error(`Setting with ID ${id} not found for duplication.`), {
+                context: 'CampaignService.duplicateSetting',
+                userMessage: "La campagne originale n'a pas été trouvée."
+            });
             return null;
         }
-        return data;
+
+        // Prepare rules for the new setting
+        const newRules: Partial<RulesData> = {
+            version: originalSetting.version,
+            configurations: originalSetting.configurations,
+            definitions: originalSetting.definitions,
+            libraries: originalSetting.libraries,
+            // Do not copy settingId, settingName, lastUpdated, is_public as they are specific to the original
+        };
+
+        // Create the new setting
+        const newSettingId = await CampaignService.createSetting(newName, newRules);
+
+        if (!newSettingId) {
+            ErrorService.handleError(new Error(`Failed to create new setting for duplication of ${id}.`), {
+                context: 'CampaignService.duplicateSetting',
+                userMessage: "Échec de la création de la nouvelle campagne."
+            });
+            return null;
+        }
+
+        return newSettingId;
     },
 
     /**
@@ -33,24 +65,18 @@ export const CampaignService = {
         const configurations = initialRules.configurations || {};
         const definitions = initialRules.definitions || {};
 
-        const { data, error } = await supabase
-            .from('game_settings')
-            .insert([{
-                name,
-                version: initialRules.version || '1.0.0',
-                configurations,
-                definitions,
-                is_public: false
-            }])
-            .select('id')
-            .single();
+        const inserted = await DatabaseService.insert<{ id: string }>('game_settings', {
+            name,
+            version: initialRules.version || '1.0.0',
+            configurations,
+            definitions,
+            is_public: false
+        }, 'CampaignService.createSetting');
 
-        if (error) {
-            console.error('Error creating setting:', error);
-            return null;
-        }
+        if (!inserted) return null;
 
-        const settingId = data.id;
+        const result = Array.isArray(inserted) ? inserted[0] : inserted;
+        const settingId = result.id;
 
         // Persist Libraries if present
         if (initialRules.libraries) {
@@ -61,39 +87,45 @@ export const CampaignService = {
     },
 
     /**
-     * Load a full setting by ID (including Libraries if we normalize them later, 
-     * but for now we assume they might be in configurations or fetched separately)
-     * For migration step 1: We treat libraries as mostly part of the global rules object structure 
-     * BUT wait, our schema normalized them. So we must fetch them.
+     * Load a full setting by ID
      */
     async loadSetting(id: string): Promise<RulesData | null> {
+        if (!id || id === 'orphan') {
+            return null;
+        }
+
         try {
             // 1. Fetch Main Config
-            const { data: settingData, error: settingError } = await supabase
-                .from('game_settings')
-                .select('*')
-                .eq('id', id)
-                .single();
+            const settingData = await DatabaseService.fetchOne<any>('game_settings', id, 'CampaignService.loadSetting');
 
-            if (settingError || !settingData) {
-                console.error('Error loading setting:', settingError);
+            if (!settingData) {
                 return null;
             }
 
             // 2. Load Libraries
             const libraries = await LibraryService.loadLibraries(id);
 
-            const rules: RulesData = migrateRulesToV2({
+            const rulesRaw: any = migrateRulesToV2({
                 version: settingData.version,
                 lastUpdated: new Date(settingData.last_updated).getTime(),
-                // @ts-ignore
                 configurations: settingData.configurations,
-                // @ts-ignore
                 definitions: settingData.definitions,
-                // @ts-ignore
                 theme: settingData.configurations?.theme || { creationColor: "#000", xpColor: "#000" },
                 libraries: libraries
             });
+
+            // Validate with Zod
+            const validationResult = RulesDataSchema.safeParse(rulesRaw);
+
+            if (!validationResult.success) {
+                console.warn("[CampaignService] Validation Details:", JSON.stringify(validationResult.error.flatten(), null, 2));
+                ErrorService.handleError(new Error("Données de campagne non conformes"), {
+                    context: 'CampaignService.loadSetting',
+                    userMessage: "Certaines données de la campagne ne respectent pas le schéma attendu (voir console)."
+                });
+            }
+
+            const rules = rulesRaw as RulesData;
 
             // Inject setting metadata
             (rules as any).settingId = id;
@@ -177,7 +209,7 @@ export const CampaignService = {
 
             return rules;
         } catch (e) {
-            console.error("[CampaignService] Critical error loading setting:", e);
+            ErrorService.handleError(e, { context: 'CampaignService.loadSetting', userMessage: "Erreur critique lors du chargement de la campagne." });
             return null;
         }
     },
@@ -197,21 +229,17 @@ export const CampaignService = {
         };
         if (name) rootUpdate.name = name;
 
-        const { error: rootError } = await supabase
-            .from('game_settings')
-            .update(rootUpdate)
-            .eq('id', id);
+        const success = await DatabaseService.update('game_settings', id, rootUpdate, 'CampaignService.saveSetting');
 
-        if (rootError) {
-            console.error("Failed to update root setting:", rootError);
-            return { success: false, message: `Erreur MAJ Root: ${rootError.message}` };
+        if (!success) {
+            return { success: false, message: "Erreur MAJ Root" };
         }
 
         // 2. Synchronize Libraries
         try {
             await LibraryService.syncLibraries(id, rules);
         } catch (libError) {
-            console.error("Error saving libraries:", libError);
+            ErrorService.handleError(libError, { context: 'CampaignService.saveSetting', userMessage: "Erreur sauvegarde bibliothèques." });
             return { success: false, message: `Erreur Bibliothèques: ${(libError as Error).message}` };
         }
 
@@ -223,113 +251,23 @@ export const CampaignService = {
      */
     async deleteSetting(id: string): Promise<boolean> {
         // Delete libraries first (manual cascade just in case DB cascade isn't set)
-        await supabase.from('libraries_traits').delete().eq('setting_id', id);
-        await supabase.from('libraries_skills').delete().eq('setting_id', id);
-        await supabase.from('libraries_specializations').delete().eq('setting_id', id);
-        await supabase.from('libraries_backgrounds').delete().eq('setting_id', id);
-        await supabase.from('libraries_counters').delete().eq('setting_id', id);
+        await Promise.all([
+            DatabaseService.deleteBy('libraries_traits', 'setting_id', id, 'CampaignService.deleteSetting.traits'),
+            DatabaseService.deleteBy('libraries_skills', 'setting_id', id, 'CampaignService.deleteSetting.skills'),
+            DatabaseService.deleteBy('libraries_specializations', 'setting_id', id, 'CampaignService.deleteSetting.specs'),
+            DatabaseService.deleteBy('libraries_backgrounds', 'setting_id', id, 'CampaignService.deleteSetting.bgs'),
+            DatabaseService.deleteBy('libraries_counters', 'setting_id', id, 'CampaignService.deleteSetting.counters')
+        ]);
 
         // Delete the setting itself
-        const { error } = await supabase.from('game_settings').delete().eq('id', id);
-
-        if (error) {
-            console.error('Error deleting setting:', error);
-            return false;
-        }
-        return true;
+        return await DatabaseService.delete('game_settings', id, 'CampaignService.deleteSetting');
     },
 
     /**
      * Toggle public/private visibility
      */
     async togglePublic(id: string, isPublic: boolean): Promise<boolean> {
-        const { error } = await supabase
-            .from('game_settings')
-            .update({ is_public: isPublic })
-            .eq('id', id);
-
-        if (error) {
-            console.error('Error toggling visibility:', error);
-            return false;
-        }
-        return true;
-    },
-
-    /**
-     * Duplicate a setting (copy rules and libraries, but no characters)
-     */
-    async duplicateSetting(sourceId: string, newName: string): Promise<string | null> {
-        try {
-            // 1. Load source setting
-            const sourceRules = await this.loadSetting(sourceId);
-            if (!sourceRules) throw new Error("Source setting not found");
-
-            // 2. Clone rules object (Deep Copy)
-            const clonedRules: RulesData = JSON.parse(JSON.stringify(sourceRules));
-
-            // Generate mapping for local IDs to new local IDs
-            // (Globals remain shared)
-            const idMap = new Map<string, string>();
-            const generateNewId = () => crypto.randomUUID();
-
-            // 3. Process Libraries - Generate new IDs for local items
-            // Traits
-            clonedRules.libraries.traits = clonedRules.libraries.traits.map(t => {
-                const newId = generateNewId();
-                idMap.set(t.id, newId);
-                return { ...t, id: newId };
-            });
-
-            // Skills
-            clonedRules.libraries.skills = clonedRules.libraries.skills.map(s => {
-                if (s.isGlobal) return s;
-                const newId = generateNewId();
-                idMap.set(s.id, newId);
-                return { ...s, id: newId };
-            });
-
-            // Specializations
-            clonedRules.libraries.specializations = clonedRules.libraries.specializations.map(s => {
-                const newId = generateNewId();
-                idMap.set(s.id, newId);
-                // Update internal skill links
-                const newSkillIds = (s.skillIds || []).map(sid => idMap.get(sid) || sid);
-                return { ...s, id: newId, skillIds: newSkillIds };
-            });
-
-            // Backgrounds
-            clonedRules.libraries.backgrounds = clonedRules.libraries.backgrounds.map(b => {
-                if (b.isGlobal) return b;
-                const newId = generateNewId();
-                idMap.set(b.id, newId);
-                return { ...b, id: newId };
-            });
-
-            // Counters
-            clonedRules.libraries.counters = clonedRules.libraries.counters.map(c => {
-                if (c.isGlobal) return c;
-                const newId = generateNewId();
-                idMap.set(c.id, newId);
-                return { ...c, id: newId };
-            });
-
-            // 4. Update definitions.counters (if they reference library IDs)
-            if (clonedRules.definitions.counters) {
-                Object.keys(clonedRules.definitions.counters).forEach(key => {
-                    const def = clonedRules.definitions.counters[key];
-                    if (def.id && idMap.has(def.id)) {
-                        def.id = idMap.get(def.id)!;
-                    }
-                });
-            }
-
-            // 5. Create new setting
-            return await this.createSetting(newName, clonedRules);
-
-        } catch (e) {
-            console.error("[CampaignService] Duplication failed:", e);
-            return null;
-        }
+        return await DatabaseService.update('game_settings', id, { is_public: isPublic }, 'CampaignService.togglePublic');
     },
 
     async checkSchema(id: string): Promise<void> {

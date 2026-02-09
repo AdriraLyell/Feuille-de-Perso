@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { RulesData } from '../types/rules';
 import { loadRules } from '../services/RulesLoader';
 import { migrateRulesToV2 } from '../utils/migrations';
+import { ErrorService } from '../services/ErrorService';
+import { get as getCache, set as setCache } from 'idb-keyval';
 
 interface RulesContextType {
     rules: RulesData | null;
@@ -36,6 +38,15 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
         setIsLoading(true);
         setError(null);
         try {
+            // 1. Try to load from cache first for instant UI
+            const cached = await getCache('rpg-rules-cache');
+            if (cached) {
+                console.log('[RulesContext] Loaded from cache');
+                setRules(migrateRulesToV2(cached));
+                setIsLoading(false);
+            }
+
+            // 2. Fetch fresh rules from source
             const data = await loadRules();
             if (data) {
                 const migrated = migrateRulesToV2(data);
@@ -43,12 +54,15 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
 
                 const online = !!(migrated as any)?.settingId || (migrated as any)?.source === 'database';
                 setIsOnlineMode(online);
+
+                // 3. Update cache
+                await setCache('rpg-rules-cache', data);
             }
             // @ts-ignore
-            window.rulesStatus = { loaded: true, error: null, version: data?.version, online };
+            window.rulesStatus = { loaded: true, error: null, version: data?.version, online: !!((data as any)?.settingId || (data as any)?.source === 'database') };
         } catch (err) {
             setError('Failed to load rules');
-            console.error(err);
+            ErrorService.handleError(err, { context: 'RulesContext.fetchRules' });
             setIsOnlineMode(false);
             // @ts-ignore
             window.rulesStatus = { loaded: false, error: err.toString() };
@@ -56,6 +70,10 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchRules();
+    }, []);
 
     // Wrapper for updateRules that auto-detects online mode
     const handleUpdateRules = (newRules: RulesData) => {

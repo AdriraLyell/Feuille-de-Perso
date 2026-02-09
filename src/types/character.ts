@@ -104,7 +104,10 @@ export interface CharacterSheetData {
     settingId?: string;   // Campaign ID
     settingName?: string; // Campaign name (cached for display)
     lastSynced?: number;  // Timestamp of last sync
+    isAutoSyncEnabled?: boolean; // New: Automatic cloud save
   };
+  _rulesVersion?: string; // Version des règles appliquées (pour optimisation de la réconciliation)
+  _schemaVersion?: number; // Version du schéma de données (pour migrations séquentielles)
 }
 
 export type SkillCategoryKey = keyof CharacterSheetData['skills'];

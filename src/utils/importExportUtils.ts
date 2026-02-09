@@ -2,6 +2,7 @@ import { CharacterSheetData, LibraryEntry, LibrarySkillEntry, LibrarySpecializat
 import { APP_VERSION } from '../constants';
 import { getImage, blobToBase64 } from '../imageDB';
 import { ImageCompressionService } from '../services/ImageCompressionService';
+import { ErrorService } from '../services/ErrorService';
 
 /**
  * Utility to export a character as JSON.
@@ -19,7 +20,7 @@ export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (
                 dataToProcess.page2.characterImage = base64;
             }
         } catch (e) {
-            console.error("Failed to export character image from DB", e);
+            ErrorService.handleError(e, { context: 'ExportCharacter', userMessage: "Impossible d'exporter l'image du personnage (BDD)." });
         }
         delete dataToProcess.page2.characterImageId;
     }
@@ -36,7 +37,7 @@ export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (
                                 (img as any).base64Data = await blobToBase64(blob);
                             }
                         } catch (e) {
-                            console.error(`Failed to export note image ${img.id}`, e);
+                            ErrorService.handleError(e, { context: 'ExportCharacter', userMessage: `Impossible d'exporter l'image de la note ${img.id}` });
                         }
                         delete img.imageId;
                     }
@@ -56,7 +57,7 @@ export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (
         finalData = await ImageCompressionService.processImages(dataToProcess, 'compress');
         if (addLog) addLog("Images compressées avec succès.", 'success', 'sheet');
     } catch (e) {
-        console.error("[Export] Compression failed", e);
+        ErrorService.handleError(e, { context: 'ExportCharacter', silent: true });
         if (addLog) addLog("Avertissement : La compression des images a échoué, export brut utilisé.", 'danger', 'sheet');
     }
 

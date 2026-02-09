@@ -3,49 +3,52 @@ import { RulesData, SkillCategoryConfig, SkillBehavior } from '../../types/rules
 import { INITIAL_DATA } from '../../data/initialState';
 
 // Import migration modules
-import { migrateTerminology } from './migrateTerminology';
-import { migrateTraits } from './migrateTraits';
-import { migrateCounters } from './migrateCounters';
-import { migrateAttributes, migrateAttributeId } from './migrateAttributes';
-import { migrateNotebook } from './migrateNotebook';
-import { migrateSkills, LEGACY_SKILL_MAP } from './migrateSkills';
-import { migrateSpecializations } from './migrateSpecializations';
-import { migrateLibrary } from './migrateLibrary';
-import { migrateDefaults } from './migrateDefaults';
+import { MIGRATIONS, CURRENT_SCHEMA_VERSION } from './registry';
+import { LEGACY_SKILL_MAP } from './migrateSkills';
+import { migrateAttributeId } from './migrateAttributes';
 
 /**
  * Main migration function for character sheet data.
- * Applies all migrations in sequence to convert legacy data to current format.
+ * Applies migrations in sequence based on schema version.
  */
 export const migrateData = (parsed: any): CharacterSheetData => {
-    // 1. Terminology (vertus → avantages)
-    migrateTerminology(parsed);
+    // Default to version 0 if _schemaVersion is missing (Legacy data)
+    const currentVersion = parsed._schemaVersion || 0;
 
-    // 2. Traits structure (string[] → object[])
-    migrateTraits(parsed);
+    // If up to date, return as is
+    if (currentVersion >= CURRENT_SCHEMA_VERSION) {
+        return parsed as CharacterSheetData;
+    }
 
-    // 3. Counters (add id, current, creationValue)
-    migrateCounters(parsed);
+    let migrated = { ...parsed };
+    let migrationsApplied = 0;
 
-    // 4. Attributes (numeric → string, generic IDs)
-    migrateAttributes(parsed);
+    // Apply migrations sequentially from current+1 to latest
+    for (let v = currentVersion + 1; v <= CURRENT_SCHEMA_VERSION; v++) {
+        const steps = MIGRATIONS[v];
+        if (steps && steps.length > 0) {
+            // console.debug(`[Migration] Applying v${v} schema updates...`);
+            steps.forEach(step => {
+                try {
+                    step(migrated);
+                } catch (e) {
+                    console.error(`[Migration] Failed to apply migration step in v${v}:`, e);
+                    // Continue best effort? Or throw?
+                    // For now, continue to avoid locking the user out.
+                }
+            });
+            migrationsApplied++;
+        }
+    }
 
-    // 5. Notebook fields (array → string)
-    migrateNotebook(parsed);
+    // Update schema version
+    migrated._schemaVersion = CURRENT_SCHEMA_VERSION;
 
-    // 6. Libraries (skillLibrary, trait library)
-    migrateLibrary(parsed);
+    if (migrationsApplied > 0) {
+        console.log(`[Migration] Successfully migrated data from v${currentVersion} to v${CURRENT_SCHEMA_VERSION}`);
+    }
 
-    // 7. Specializations
-    migrateSpecializations(parsed);
-
-    // 8. Skills (legacy IDs → generic, creationValue)
-    migrateSkills(parsed);
-
-    // 9. Default values (header, xpLogs, etc.)
-    migrateDefaults(parsed);
-
-    return parsed as CharacterSheetData;
+    return migrated as CharacterSheetData;
 };
 
 /**

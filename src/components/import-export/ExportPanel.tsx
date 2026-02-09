@@ -7,6 +7,7 @@ import { createTemplateFromData } from '../../utils/importExportUtils';
 import { getImage, blobToBase64 } from '../../imageDB';
 import { useNotification } from '../../context/NotificationContext';
 import { ImageCompressionService } from '../../services/ImageCompressionService';
+import { ErrorService } from '../../services/ErrorService';
 
 interface ExportPanelProps {
     data: CharacterSheetData;
@@ -42,7 +43,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                     dataToProcess.page2.characterImage = base64;
                 }
             } catch (e) {
-                console.error("Failed to export character image from DB", e);
+                ErrorService.handleError(e, { context: 'ExportPanel.exportCharImage', silent: true });
             }
             delete dataToProcess.page2.characterImageId;
         }
@@ -59,7 +60,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                                     (img as any).base64Data = await blobToBase64(blob);
                                 }
                             } catch (e) {
-                                console.error(`Failed to export note image ${img.id}`, e);
+                                ErrorService.handleError(e, { context: 'ExportPanel.exportNoteImage', silent: true });
                             }
                             delete img.imageId;
                         }
@@ -127,7 +128,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
             exportData = await ImageCompressionService.processImages(exportData, 'compress');
             addLog("Images compressées avec succès.", 'success', 'sheet', 'img-compress');
         } catch (e) {
-            console.error("[Export] Compression failed", e);
+            ErrorService.handleError(e, { context: 'ExportPanel.compression', silent: true });
             addLog("Avertissement : La compression des images a échoué, export brut utilisé.", 'danger', 'sheet', 'img-compress');
         }
 

@@ -272,7 +272,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
 
         if (addedCount > 0) {
             // Sort alphabetically
-            currentLib.sort((a, b) => a.name.localeCompare(b.name));
+            currentLib.sort((a: any, b: any) => a.name.localeCompare(b.name));
             onUpdate({ ...data, skillLibrary: currentLib });
             addLog(`${addedCount} compétence(s) importée(s) depuis la fiche.`, 'success', 'settings');
         } else {

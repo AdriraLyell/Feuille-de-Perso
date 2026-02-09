@@ -10,8 +10,8 @@ export default defineConfig({
         emptyOutDir: false, // DO NOT clean dist (keep main app)
         modulePreload: false,
         target: 'esnext',
-        assetsInlineLimit: 100000000,
-        chunkSizeWarningLimit: 100000000,
+        assetsInlineLimit: 10000,
+        chunkSizeWarningLimit: 2000,
         cssCodeSplit: false,
         rollupOptions: {
             input: {

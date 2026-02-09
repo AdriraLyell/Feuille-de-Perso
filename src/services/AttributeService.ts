@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { AttributePreset } from '../types/system';
+import { ErrorService } from './ErrorService';
 
 export const AttributeService = {
     /**
@@ -13,7 +14,7 @@ export const AttributeService = {
             .order('name', { ascending: true });
 
         if (error) {
-            console.error('Error listing attribute presets:', error);
+            ErrorService.handleError(error, { context: 'AttributeService.listAttributePresets' });
             return null;
         }
 
@@ -44,7 +45,7 @@ export const AttributeService = {
             }]);
 
         if (error) {
-            console.error('Error saving attribute preset:', error);
+            ErrorService.handleError(error, { context: 'AttributeService.saveAttributePreset', userMessage: "Impossible de sauvegarder le preset." });
             return false;
         }
         return true;
@@ -61,7 +62,7 @@ export const AttributeService = {
             .eq('is_official', false); // Safety check
 
         if (error) {
-            console.error('Error deleting attribute preset:', error);
+            ErrorService.handleError(error, { context: 'AttributeService.deleteAttributePreset', userMessage: "Impossible de supprimer le preset." });
             return false;
         }
         return true;
@@ -78,7 +79,7 @@ export const AttributeService = {
             .eq('id', id);
 
         if (error) {
-            console.error('Error updating attribute preset:', error);
+            ErrorService.handleError(error, { context: 'AttributeService.updateAttributePreset', userMessage: "Impossible de mettre à jour le preset." });
             return false;
         }
         return true;

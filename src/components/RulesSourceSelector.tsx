@@ -4,6 +4,7 @@ import { GameSettingSummary } from '../services/CampaignService';
 import { PlayerService } from '../services/PlayerService';
 import { Cloud, Wifi, WifiOff, FileJson, Loader2, ArrowRight, RotateCcw } from 'lucide-react';
 import { RulesData } from '../types/rules';
+import { ErrorService } from '../services/ErrorService';
 
 interface RulesSourceSelectorProps {
     isOpen: boolean;
@@ -40,8 +41,7 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
             setPublicSettings(settings);
             setMode('online_list');
         } catch (e) {
-            console.error("[OnlineClick] Failed to list settings:", e);
-            alert("Erreur de connexion : Impossible de récupérer la liste des campagnes.");
+            ErrorService.handleError(e, { context: 'RulesSourceSelector.OnlineClick', userMessage: "Erreur de connexion : Impossible de récupérer la liste des campagnes." });
         } finally {
             setIsLoading(false);
         }
@@ -61,7 +61,7 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
                 onSelectSource('offline');
             }
         } catch (e) {
-            console.error("[Resume] Failed to load rules:", e);
+            ErrorService.handleError(e, { context: 'RulesSourceSelector.Resume' });
             onSelectSource('offline');
         } finally {
             setIsLoading(false);
@@ -78,8 +78,7 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
                 alert("Erreur : Impossible de charger les règles de cette campagne.");
             }
         } catch (e) {
-            console.error("[SettingClick] Error loading rules:", e);
-            alert("Une erreur critique est survenue lors du chargement.");
+            ErrorService.handleError(e, { context: 'RulesSourceSelector.SettingClick', userMessage: "Une erreur critique est survenue lors du chargement." });
         } finally {
             setIsLoading(false);
         }

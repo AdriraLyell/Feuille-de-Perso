@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, AlertTriangle, CheckCircle } from 'lucide-react';
+import { UploadCloud, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
 import ThematicModal from './ui/ThematicModal';
 import { PlayerService } from '../services/PlayerService';
 import { CharacterSyncService } from '../services/CharacterSyncService';
 import { CharacterSheetData } from '../types/character';
 import { GameSettingSummary } from '../services/CampaignService';
 import { useRules } from '../context/RulesContext';
+import { ErrorService } from '../services/ErrorService';
 
 interface SyncModalProps {
     isOpen: boolean;
@@ -30,6 +31,7 @@ const SyncModal: React.FC<SyncModalProps> = ({
     const [status, setStatus] = useState<SyncStatus>('idle');
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(false);
+    const [isAutoSync, setIsAutoSync] = useState(false);
 
     // Pre-fill from existing syncInfo or header
     useEffect(() => {
@@ -40,12 +42,13 @@ const SyncModal: React.FC<SyncModalProps> = ({
             }
             // Priority 2: Existing sync info (if not online or as fallback)
             else if (characterData.syncInfo) {
-                setSelectedCampaign(characterData.syncInfo.settingId);
+                setSelectedCampaign(characterData.syncInfo?.settingId || '');
             }
 
             // Pre-fill names from header
             setPlayerName(characterData.header?.player || '');
             setCharacterName(characterData.header?.name || '');
+            setIsAutoSync(characterData.syncInfo?.isAutoSyncEnabled || false);
             setStatus('idle');
             setErrorMessage('');
         }
@@ -68,7 +71,7 @@ const SyncModal: React.FC<SyncModalProps> = ({
                 setSelectedCampaign(publicSettings[0].id);
             }
         } catch (e) {
-            console.error('Failed to load campaigns:', e);
+            ErrorService.handleError(e, { context: 'SyncModal.loadCampaigns', userMessage: 'Impossible de charger la liste des campagnes.' });
         } finally {
             setIsLoadingCampaigns(false);
         }
@@ -99,7 +102,8 @@ const SyncModal: React.FC<SyncModalProps> = ({
                 syncId: result.syncId,
                 settingId: selectedCampaign,
                 settingName: campaignData?.name || 'Campagne',
-                lastSynced: Date.now()
+                lastSynced: Date.now(),
+                isAutoSyncEnabled: isAutoSync
             });
 
             // Close after short delay to show success
@@ -140,17 +144,17 @@ const SyncModal: React.FC<SyncModalProps> = ({
                         {status === 'loading' ? (
                             <>
                                 <span className="animate-spin">⏳</span>
-                                Synchronisation...
+                                <span className="ml-2">Synchronisation...</span>
                             </>
                         ) : status === 'success' ? (
                             <>
                                 <CheckCircle size={18} />
-                                Synchronisé !
+                                <span className="ml-2">Synchronisé !</span>
                             </>
                         ) : (
                             <>
                                 <UploadCloud size={18} />
-                                Synchroniser
+                                <span className="ml-2">Synchroniser</span>
                             </>
                         )}
                     </button>
@@ -235,6 +239,28 @@ const SyncModal: React.FC<SyncModalProps> = ({
                     />
                 </div>
 
+                {/* Auto-sync Toggle */}
+                <div className="flex items-center justify-between p-3 bg-indigo-50 border border-indigo-100 rounded-md">
+                    <div>
+                        <div className="text-sm font-bold text-indigo-900 flex items-center gap-2">
+                            <RefreshCw size={14} className={isAutoSync ? "animate-spin-slow" : ""} />
+                            Synchronisation automatique
+                        </div>
+                        <p className="text-[11px] text-indigo-700 mt-0.5">
+                            Sauvegarde vers le cloud après chaque modification (délai 10s).
+                        </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={isAutoSync}
+                            onChange={(e) => setIsAutoSync(e.target.checked)}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                </div>
+
                 {/* Error Message */}
                 {errorMessage && (
                     <div className="bg-red-50 border border-red-300 rounded-md p-3 text-sm text-red-700 flex items-center gap-2">
@@ -254,7 +280,7 @@ const SyncModal: React.FC<SyncModalProps> = ({
                 {/* Existing Sync Info */}
                 {characterData.syncInfo && (
                     <div className="text-xs text-gray-500 border-t border-[#bfae85]/30 pt-3 mt-3">
-                        Dernière sync : {new Date(characterData.syncInfo.lastSynced).toLocaleString('fr-FR')}
+                        Dernière sync : {new Date(characterData.syncInfo.lastSynced || Date.now()).toLocaleString('fr-FR')}
                         <br />
                         Campagne : {characterData.syncInfo.settingName}
                     </div>

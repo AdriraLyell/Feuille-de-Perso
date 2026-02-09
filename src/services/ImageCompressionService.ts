@@ -8,6 +8,7 @@
  */
 
 import pako from 'pako';
+import { ErrorService } from './ErrorService';
 
 export interface CompressionResult {
     compressed: string;
@@ -109,7 +110,7 @@ export const ImageCompressionService = {
             // Add marker to identify compressed data
             return `GZIP:${compressedBase64}`;
         } catch (e) {
-            console.error('[ImageCompressionService] Compression failed:', e);
+            ErrorService.handleError(e, { context: 'ImageCompressionService.compressBase64', silent: true });
             return base64; // Return original on error
         }
     },
@@ -145,7 +146,7 @@ export const ImageCompressionService = {
                 String.fromCharCode.apply(null, Array.from(decompressed))
             );
         } catch (e) {
-            console.error('[ImageCompressionService] Decompression failed:', e);
+            ErrorService.handleError(e, { context: 'ImageCompressionService.decompressBase64', silent: true });
             return compressed; // Return original on error
         }
     },

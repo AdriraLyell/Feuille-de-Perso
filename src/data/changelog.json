@@ -1,5 +1,122 @@
 [
     {
+        "version": "2.29.0",
+        "date": "2026-02-09",
+        "description": "Optimisation API GitHub & Investigation Réconciliation",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "Implémentation d'un délai d'attente (backoff) de 15 minutes pour les appels API GitHub en cas de limitation (403/429) afin d'éviter la pollution de la console.",
+                "category": "core"
+            },
+            {
+                "type": "fixed",
+                "text": "Confirmation que la baisse du nombre de compétences (à 128) lors du changement de campagne est un nettoyage normal des emplacements vides.",
+                "category": "reconciliation"
+            },
+            {
+                "type": "improved",
+                "text": "Le passage automatique au CDN Raw est désormais silencieux lorsque l'API est connue pour être en dépassement de quota.",
+                "category": "core"
+            }
+        ]
+    },
+    {
+        "version": "2.28.1",
+        "date": "2026-02-09",
+        "description": "Correctifs de navigation et de réconciliation.",
+        "changes": [
+            "Fix : Correction du menu 'Source' sauté au démarrage à cause du cache (ajout de de l'état isSourceSelected).",
+            "Fix : Correction des doublons de clés React (IDs dupliqués) dans les blocs de compétences quand les règles ont des noms identiques."
+        ]
+    },
+    {
+        "version": "2.28.0",
+        "date": "2026-02-09",
+        "description": "Phase 3 : Optimisations de performance majeures.",
+        "changes": [
+            "Réduction de l'inlining des assets (limite à 10Ko) pour accélérer le parsing HTML initial.",
+            "Implémentation du Lazy Loading pour les modules Admin et les modales secondaires via React.lazy et Suspense.",
+            "Mise en cache persistante des règles via IndexedDB (idb-keyval) pour un chargement instantané au rafraîchissement.",
+            "Amélioration de la structure de build avec des fallbacks de chargement (loaders)."
+        ]
+    },
+    {
+        "version": "2.27.2",
+        "date": "2026-02-09",
+        "description": "Ajustements visuels de la synchronisation.",
+        "changes": [
+            "Retrait des animations de pulsation sur l'indicateur d'auto-sync pour plus de discrétion."
+        ]
+    },
+    {
+        "version": "2.27.1",
+        "date": "2026-02-09",
+        "description": "Améliorations UX de la synchronisation automatique.",
+        "changes": [
+            "L'onglet 'Cloud' est désormais accessible en tout temps (hors réglages avancés).",
+            "Ajout d'un feedback visuel en temps réel sur le bouton de synchronisation (icône en rotation + texte 'Sync...').",
+            "Correction d'un problème de portée de variable dans le contexte de personnage."
+        ]
+    },
+    {
+        "version": "2.27.0",
+        "date": "2026-02-09",
+        "description": "Implémentation de la synchronisation automatique (Auto-Sync).",
+        "changes": [
+            "Ajout d'un toggle d'auto-sync dans la modale de synchronisation.",
+            "Nouvel onglet 'Cloud' dans les réglages de la fiche pour gérer l'auto-sync.",
+            "Mécanisme de sauvegarde automatique debounced (10s) pour éviter les surcharges.",
+            "Indicateurs visuels d'état de synchronisation dans la barre de navigation."
+        ]
+    },
+    {
+        "version": "2.26.1",
+        "date": "2026-02-09",
+        "changes": [
+            "Fix: Correction d'un bug 400 lors du chargement des personnages orphelins (ID 'orphan')",
+            "Refactor: Migration finale de PlayerService vers DatabaseService",
+            "Robustesse: Centralisation totale des appels Supabase dans la couche service"
+        ]
+    },
+    {
+        "version": "2.26.0",
+        "date": "2026-02-09",
+        "changes": [
+            "Refactoring technique majeur : Centralisation des appels base de données (DatabaseService).",
+            "Optimisation des performances : Utilisation de requêtes groupées pour les bibliothèques.",
+            "Fiabilisation : Gestion d'erreurs uniforme pour les opérations de sauvegarde et chargement."
+        ]
+    },
+    {
+        "version": "2.25.2",
+        "date": "2026-02-09",
+        "changes": [
+            "Validation : Tests E2E pour le RulesReconciler assurant la non-régression",
+            "Optimisation : Versionning interne des règles pour limiter les recalculs",
+            "Maintenance : Stabilisation du build suite au passage en TypeScript Strict"
+        ]
+    },
+    {
+        "version": "2.25.1",
+        "date": "2026-02-09",
+        "changes": [
+            "Tech : Migration complète des logs d'erreurs vers ErrorService pour une meilleure observabilité",
+            "Fix : Correction d'un import dupliqué bloquant le build dans CharacterSyncService",
+            "Refactoring : Nettoyage du code dans les composants d'administration et d'import/export"
+        ]
+    },
+    {
+        "version": "2.25.0",
+        "date": "2026-02-09",
+        "changes": [
+            "🛡️ Activation du mode Strict TypeScript pour une sécurité accrue",
+            "🔧 Correction de +50 erreurs de typage implicites et de null checks",
+            "🐛 Correctifs multiples sur l'import de données et la synchro",
+            "⚡ Optimisation des scripts utilitaires"
+        ]
+    },
+    {
         "version": "2.24.21",
         "date": "2026-02-09",
         "changes": [
@@ -80,117 +197,6 @@
             "Fix: Les points inclus par défaut dans un compteur (ex: 3) sont bien gratuits (cout 0).",
             "Fix: Impossible de descendre un compteur en dessous de sa valeur par défaut.",
             "Fix: Masquage strict des compteurs de bibliothèque non assignés à la feuille."
-        ]
-    },
-    {
-        "version": "2.24.11",
-        "date": "2026-02-09",
-        "changes": [
-            "Critique: Correction des coûts XP ignorés pour les compteurs système (Volonté).",
-            "Fix: Correction de l'ordre d'affichage des compteurs dans la feuille.",
-            "Fix: Rétablissement de l'affichage de la Bibliothèque (bug recherche vide)."
-        ]
-    },
-    {
-        "version": "2.24.10",
-        "date": "2026-02-08",
-        "changes": [
-            "Fix: Correction de la sensibilité aux accents pour la détection des Compteurs (Volonté vs Volonte).",
-            "Fix: Nettoyage et robustesse du calcul des coûts liés aux bibliothèques."
-        ]
-    },
-    {
-        "version": "2.24.9",
-        "date": "2026-02-08",
-        "changes": [
-            "Fix: Amélioration de la détection des Compteurs en Bibliothèque. Le système utilise maintenant le Nom (Name) en plus de l'ID pour faire la correspondance.",
-            "Fix: Résolution définitive du blocage sur Volonté/Confiance (dont les IDs internes différaient des IDs de bibliothèque)."
-        ]
-    },
-    {
-        "version": "2.24.8",
-        "date": "2026-02-08",
-        "changes": [
-            "Fix: Les compteurs utilisent désormais la 'Bibliothèque' (Configuration Utilisateur) comme source de vérité pour le Coût XP et le Blocage, et non plus seulement les définitions système.",
-            "Fix: Résolution du problème où les compteurs personnalisés (TestA, etc.) coûtaient 0 XP.",
-            "Fix: Résolution du problème de blocage incorrect sur des compteurs standards (Volonté) modifiés en bibliothèque."
-        ]
-    },
-    {
-        "version": "2.24.7",
-        "date": "2026-02-08",
-        "type": "bugfix",
-        "changes": [
-            "Coûts: Correction critique de la synchronisation des compteurs (Volonté, Santé...) qui écrasait leur Valeur de Création, rendant leur coût nul.",
-            "Règles: Blocage effectif de l'augmentation des compteurs dont le coût XP est nul ou négatif (sauf en mode Création).",
-            "Logic: Préservation stricte de la 'Valeur de Création' pour les catégories de type 'Compteur' lors des mises à jour."
-        ]
-    },
-    {
-        "version": "2.24.6",
-        "date": "2026-02-08",
-        "type": "bugfix",
-        "changes": [
-            "Coûts: Résolution du bug où les compteurs (Volonté, etc.) coûtaient 0 XP en mode création malgré les réglages MJ.",
-            "HUD: Correction du ciblage des coûts de compteurs pour utiliser l'identifiant de compétence au lieu de la catégorie.",
-            "Fiche: La 'Valeur de Création' des compteurs et historiques est désormais isolée pour permettre le calcul correct du surcoût."
-        ]
-    },
-    {
-        "version": "2.24.5",
-        "date": "2026-02-08",
-        "type": "improvement",
-        "changes": [
-            "Coûts: Unification de la formule de calcul (Base × Multiplicateur) pour les arrières-plans et les compteurs.",
-            "Admin: Renommage des 'Facteurs' en 'Multiplicateurs' pour une meilleure clarté pédagogique.",
-            "Fiche: Correction du calcul des coûts dans le HUD de création pour s'aligner sur les règles dynamiques."
-        ]
-    },
-    {
-        "version": "2.24.4",
-        "date": "2026-02-08",
-        "type": "bugfix",
-        "changes": [
-            "Fiche: Correction critique de la perte de campagne (SyncInfo) liée à une omission dans le schéma de validation Zod.",
-            "Core: Nettoyage et consolidation du moteur de réconciliation des règles."
-        ]
-    },
-    {
-        "version": "2.24.3",
-        "date": "2026-02-08",
-        "type": "bugfix",
-        "changes": [
-            "Fiche: Correction de la perte de connexion à la campagne lors de la reprise de session (migration des règles corrigée).",
-            "Fiche: Nettoyage intelligent des compétences obsolètes lors du changement de campagne (on ne garde que les scores > 0).",
-            "Core: Persistance du lien vers la campagne (Sync Info) assurée lors de la réconciliation."
-        ]
-    },
-    {
-        "version": "2.24.2",
-        "date": "2026-02-08",
-        "type": "bugfix",
-        "changes": [
-            "Fiche: Correction du bug de restauration des arrières-plans lors de la reprise de session (dynamisation de l'ID de catégorie)."
-        ]
-    },
-    {
-        "version": "2.24.1",
-        "date": "2026-02-08",
-        "type": "bugfix",
-        "changes": [
-            "Bibliothèque: Correction d'une erreur 400 lors de l'import des Historiques (suppression de la colonne default_category inexistante)."
-        ]
-    },
-    {
-        "version": "2.24.0",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Bibliothèque: Ajout de cases à cocher d'activation/désactivation pour tous les éléments (Traits, Compétences, Spéc., Historiques, Compteurs).",
-            "Bibliothèque: Les éléments globaux inactifs sont désormais affichés dans la barre latérale pour permettre leur activation.",
-            "Admin: Extension de l'Assistant d'Import pour inclure les Historiques et les Compteurs depuis les fiches personnages.",
-            "Sync: Implémentation d'un mécanisme de rafraîchissement global des règles après import ou modification.",
-            "Fix: Restauration des fonctions de sauvegarde cloud dans l'interface d'administration."
         ]
     }
 ]

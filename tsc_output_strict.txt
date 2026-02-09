@@ -1,0 +1,44 @@
+check_all_test_counters.ts(15,31): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+fix_defaults.ts(15,31): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+inspect_char.ts(15,31): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+list_tables.ts(15,31): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+simple_check.ts(15,31): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/admin/components/DeploymentMonitor.tsx(59,27): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/admin/components/LibraryImportWizard.tsx(155,41): error TS2345: Argument of type '{ data: LibraryBackgroundEntry; isDuplicate: boolean; isSelected: boolean; isVariable: boolean | undefined; }[]' is not assignable to parameter of type 'SetStateAction<ImportCandidate<LibraryBackgroundEntry>[]>'.
+  Type '{ data: LibraryBackgroundEntry; isDuplicate: boolean; isSelected: boolean; isVariable: boolean | undefined; }[]' is not assignable to type 'ImportCandidate<LibraryBackgroundEntry>[]'.
+    Type '{ data: LibraryBackgroundEntry; isDuplicate: boolean; isSelected: boolean; isVariable: boolean | undefined; }' is not assignable to type 'ImportCandidate<LibraryBackgroundEntry>'.
+      Types of property 'isVariable' are incompatible.
+        Type 'boolean | undefined' is not assignable to type 'boolean'.
+          Type 'undefined' is not assignable to type 'boolean'.
+src/components/CharacterSheet.tsx(356,48): error TS2345: Argument of type 'RulesData | null' is not assignable to parameter of type 'RulesData | undefined'.
+  Type 'null' is not assignable to type 'RulesData | undefined'.
+src/components/import-export/ImportPanel.tsx(365,29): error TS2322: Type 'FileAnalysis | null' is not assignable to type '{ hasHeader: boolean; hasStructure: boolean; hasLibrary: boolean; hasSkillLibrary: boolean; hasSpecLibrary: boolean; isFilled: boolean; fileVersion?: string | undefined; versionMismatch: boolean; }'.
+  Type 'null' is not assignable to type '{ hasHeader: boolean; hasStructure: boolean; hasLibrary: boolean; hasSkillLibrary: boolean; hasSpecLibrary: boolean; isFilled: boolean; fileVersion?: string | undefined; versionMismatch: boolean; }'.
+src/components/layout/MainLayout.tsx(373,107): error TS2322: Type '(selection: { p1: boolean; specs: boolean; p2: boolean; xp: boolean; notes: boolean; }) => void' is not assignable to type '(selection: Record<string, boolean>) => void'.
+  Types of parameters 'selection' and 'selection' are incompatible.
+    Type 'Record<string, boolean>' is missing the following properties from type '{ p1: boolean; specs: boolean; p2: boolean; xp: boolean; notes: boolean; }': p1, specs, p2, xp, notes
+src/components/LibraryView.tsx(275,30): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/components/LibraryView.tsx(275,33): error TS7006: Parameter 'b' implicitly has an 'any' type.
+src/components/specialization-library/SpecializationLibraryView.tsx(214,30): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/components/specialization-library/SpecializationLibraryView.tsx(214,33): error TS7006: Parameter 'b' implicitly has an 'any' type.
+src/components/SyncModal.tsx(43,37): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'SetStateAction<string>'.
+  Type 'undefined' is not assignable to type 'SetStateAction<string>'.
+src/components/SyncModal.tsx(257,51): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type 'number | undefined' is not assignable to parameter of type 'string | number | Date'.
+      Type 'undefined' is not assignable to type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type 'number | undefined' is not assignable to parameter of type 'string | number'.
+      Type 'undefined' is not assignable to type 'string | number'.
+src/context/CharacterContext.tsx(160,62): error TS2345: Argument of type 'RulesData | null' is not assignable to parameter of type 'RulesData | undefined'.
+  Type 'null' is not assignable to type 'RulesData | undefined'.
+src/test/migrations.test.ts(273,20): error TS18048: 'result.specializationLibrary' is possibly 'undefined'.
+src/test/migrations.test.ts(274,20): error TS18048: 'result.specializationLibrary' is possibly 'undefined'.
+src/test/migrations.test.ts(340,20): error TS2532: Object is possibly 'undefined'.
+src/test/migrations.test.ts(346,20): error TS2532: Object is possibly 'undefined'.
+src/test/migrations.test.ts(347,20): error TS2532: Object is possibly 'undefined'.

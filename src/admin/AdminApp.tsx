@@ -34,6 +34,7 @@ import { Session } from '@supabase/supabase-js';
 import LoginScreen from './components/LoginScreen';
 import { LogOut } from 'lucide-react';
 import GlobalPlayersView from './components/GlobalPlayersView';
+import { ErrorService } from '../services/ErrorService';
 
 const AdminApp: React.FC = () => {
     // Auth State
@@ -176,8 +177,8 @@ const AdminApp: React.FC = () => {
                 // Let's keep it simple for now.
 
             } catch (error) {
-                console.error(error);
-                alert("Erreur lors de l'import : " + (error as Error).message);
+                ErrorService.handleError(error, { context: 'AdminApp.importFile', userMessage: "Erreur lors de la lecture du fichier." });
+                // alert("Erreur lors de l'import : " + (error as Error).message); // Handled by ErrorService
             }
         };
         reader.readAsText(file);

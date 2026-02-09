@@ -4,6 +4,7 @@ import { Upload, Trash2, Image as ImageIcon } from 'lucide-react';
 import { saveImage, getImage, deleteImage, base64ToBlob } from '../../imageDB';
 import ConfirmationModal from '../ui/ConfirmationModal';
 import { ImageCompressionService } from '../../services/ImageCompressionService';
+import { ErrorService } from '../../services/ErrorService';
 
 interface CharacterImageWidgetProps {
     imageId: string | undefined;
@@ -45,7 +46,7 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
                         }
                     }
                 } catch (e) {
-                    console.error("Failed to load image from DB", e);
+                    ErrorService.handleError(e, { context: 'CharacterImageWidget.load', silent: true });
                 }
             } else if (legacyImage && legacyImage.length > 100) {
                 if (active) setLoading(true);
@@ -62,7 +63,7 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
                         onAddLog("Migration automatique de l'image.", 'success');
                     }
                 } catch (e) {
-                    console.error("Migration failed", e);
+                    ErrorService.handleError(e, { context: 'CharacterImageWidget.migrate', silent: true });
                     if (active) setImageUrl(legacyImage);
                 } finally {
                     if (active) setLoading(false);

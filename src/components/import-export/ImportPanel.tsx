@@ -12,6 +12,7 @@ import ConflictResolver from './ConflictResolver';
 import ThematicButton from '../ui/ThematicButton';
 import ThematicModal from '../ui/ThematicModal';
 import { ImageCompressionService } from '../../services/ImageCompressionService';
+import { ErrorService } from '../../services/ErrorService';
 
 interface ImportPanelProps {
     data: CharacterSheetData; // Current data for merging/conflict detection
@@ -92,7 +93,7 @@ const ImportPanel: React.FC<ImportPanelProps> = ({ data, variant, onImportSucces
                 if (fileInputRef.current) fileInputRef.current.value = "";
 
             } catch (error) {
-                console.error(error);
+                ErrorService.handleError(error, { context: 'ImportPanel.parse', userMessage: "Erreur de lecture du fichier JSON." });
                 addLog("Erreur de lecture du fichier JSON.", 'danger', 'both');
             }
         };
@@ -146,7 +147,7 @@ const ImportPanel: React.FC<ImportPanelProps> = ({ data, variant, onImportSucces
                     dataObj.page2.characterImageId = newId;
                     dataObj.page2.characterImage = "";
                 } catch (e) {
-                    console.error("Failed to import character image to DB", e);
+                    ErrorService.handleError(e, { context: 'ImportPanel.importCharImage', silent: true });
                 }
             }
             // 2. Campaign Note Images
@@ -161,7 +162,7 @@ const ImportPanel: React.FC<ImportPanelProps> = ({ data, variant, onImportSucces
                                     img.imageId = newId;
                                     delete img.base64Data;
                                 } catch (e) {
-                                    console.error("Failed to import note image to DB", e);
+                                    ErrorService.handleError(e, { context: 'ImportPanel.importNoteImage', silent: true });
                                 }
                             }
                         }
@@ -361,12 +362,14 @@ const ImportPanel: React.FC<ImportPanelProps> = ({ data, variant, onImportSucces
                     )}
 
                     <div className="flex-grow overflow-y-auto pr-1">
-                        <ImportOptionsSection
-                            analysis={analysis}
-                            variant={variant}
-                            importAction={importAction}
-                            onActionChange={setImportAction}
-                        />
+                        {analysis && (
+                            <ImportOptionsSection
+                                analysis={analysis}
+                                variant={variant}
+                                importAction={importAction}
+                                onActionChange={setImportAction}
+                            />
+                        )}
                     </div>
 
                     <div className="mt-4 pt-4 border-t border-slate-200">

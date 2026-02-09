@@ -1,5 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
+import { ErrorService } from './ErrorService';
 
 // Access environment variables (Vite prefix is required)
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -23,7 +24,7 @@ export const checkSupabaseConnection = async () => {
         if (error) throw error;
         return true;
     } catch (e) {
-        console.error('Supabase Connection Error:', e);
+        ErrorService.handleError(e, { context: 'SupabaseConnection' });
         return false;
     }
 };

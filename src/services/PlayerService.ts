@@ -1,7 +1,6 @@
-
-import { supabase } from './supabase';
 import { RulesData } from '../types/rules';
 import { CampaignService, GameSettingSummary } from './CampaignService';
+import { DatabaseService } from './DatabaseService';
 
 export const PlayerService = {
 
@@ -9,17 +8,15 @@ export const PlayerService = {
      * List public settings available for players
      */
     async listPublicSettings(): Promise<GameSettingSummary[]> {
-        const { data, error } = await supabase
-            .from('game_settings')
-            .select('id, name, version, last_updated, is_public')
-            .eq('is_public', true)
-            .order('last_updated', { ascending: false });
-
-        if (error) {
-            console.error('Error listing public settings:', error);
-            return [];
-        }
-        return data || [];
+        return await DatabaseService.fetchAll<GameSettingSummary>(
+            'game_settings',
+            {
+                select: 'id, name, version, last_updated, is_public',
+                eq: { is_public: true },
+                order: { column: 'last_updated', ascending: false }
+            },
+            'PlayerService.listPublicSettings'
+        );
     },
 
     /**

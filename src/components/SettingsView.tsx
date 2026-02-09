@@ -16,7 +16,7 @@ import CreationConfigEditor from './settings/CreationConfigEditor';
 import LibrarySidebar from './settings/LibrarySidebar';
 import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
 import LibraryView from './LibraryView';
-import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Settings, Lock } from 'lucide-react';
+import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Settings, Lock, UploadCloud, CheckCircle } from 'lucide-react';
 
 // Rules Integration
 import { useRules } from '../context/RulesContext';
@@ -80,7 +80,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
   // Tab visibility based on Online Mode and Expert Mode
   const showAdvancedTabs = !isOnlineMode || expertMode;
 
-  const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'specializations' | 'creation' | 'library'>('library');
+  const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'specializations' | 'creation' | 'library' | 'cloud'>('library');
   const [isDirty, setIsDirty] = useState(false);
 
   // Helper to compare data excluding volatile/computed fields
@@ -177,6 +177,11 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
               </button>
             )}
 
+            {/* Cloud tab - always visible if syncId exists */}
+            {localData.syncInfo?.syncId && (
+              <button onClick={() => setActiveTab('cloud')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'cloud' ? 'bg-[#2d5a27] text-white shadow-md ring-2 ring-[#2d5a27]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><UploadCloud size={16} /> Cloud</button>
+            )}
+
             {/* Bibliothèque tab - always visible */}
             <button onClick={() => setActiveTab('library')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'library' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><BookOpen size={16} /> Bibliothèque</button>
           </div>
@@ -248,6 +253,74 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
           {activeTab === 'library' && (
             <div className="h-[calc(100vh-250px)] min-h-[600px] border border-[#bfae85]/30 rounded-sm overflow-hidden shadow-sm">
               <LibraryView data={localData} onUpdate={handleLocalUpdate} />
+            </div>
+          )}
+
+          {activeTab === 'cloud' && (
+            <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <div className="bg-white p-8 rounded-sm border border-[#bfae85]/30 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12"><UploadCloud size={120} /></div>
+
+                <h3 className="text-2xl font-serif font-bold text-[#2c241b] mb-6 flex items-center gap-3">
+                  <div className="p-2 bg-indigo-50 text-indigo-700 rounded-sm"><RefreshCw size={24} /></div>
+                  Paramètres Cloud
+                </h3>
+
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between p-4 bg-stone-50 border border-stone-200 rounded-sm hover:border-indigo-300 transition-colors">
+                    <div className="flex-grow">
+                      <div className="font-bold text-[#4a3b32]">Synchronisation Automatique</div>
+                      <p className="text-xs text-stone-500 mt-1 max-w-md">
+                        Sauvegarde automatiquement votre fiche personnage sur le serveur après chaque modification importante (délai de 10 secondes).
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer ml-4">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={localData.syncInfo?.isAutoSyncEnabled || false}
+                        onChange={(e) => handleLocalUpdate({
+                          ...localData,
+                          syncInfo: {
+                            ...localData.syncInfo!,
+                            isAutoSyncEnabled: e.target.checked
+                          }
+                        })}
+                      />
+                      <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-6 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                  </div>
+
+                  <div className="p-4 border border-[#bfae85]/30 rounded-sm bg-[#fdfbf7]">
+                    <h4 className="text-xs font-bold text-[#8b2e2e] uppercase tracking-widest mb-3 border-b border-[#bfae85]/20 pb-2">Informations de Synchronisation</h4>
+                    <div className="grid grid-cols-2 gap-4 text-xs">
+                      <div>
+                        <span className="text-stone-500">ID Unique :</span>
+                        <div className="font-mono mt-1 text-[#4a3b32] truncate bg-stone-100 p-1 rounded" title={localData.syncInfo?.syncId}>{localData.syncInfo?.syncId}</div>
+                      </div>
+                      <div>
+                        <span className="text-stone-500">Campagne :</span>
+                        <div className="font-bold mt-1 text-[#4a3b32]">{localData.syncInfo?.settingName}</div>
+                      </div>
+                      <div>
+                        <span className="text-stone-500">Joueur :</span>
+                        <div className="font-bold mt-1 text-[#4a3b32]">{localData.header.player}</div>
+                      </div>
+                      <div>
+                        <span className="text-stone-500">Dernière Sauvegarde :</span>
+                        <div className="font-bold mt-1 text-[#4a3b32]">
+                          {localData.syncInfo?.lastSynced ? new Date(localData.syncInfo.lastSynced).toLocaleString('fr-FR') : 'Jamais'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-sm text-xs">
+                    <AlertTriangle size={18} className="shrink-0" />
+                    <p>La synchronisation manuelle reste disponible à tout moment via le bouton Sync de la barre de navigation.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>

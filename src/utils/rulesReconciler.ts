@@ -11,6 +11,11 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
     // Deep copy to work safely
     const newState: CharacterSheetData = JSON.parse(JSON.stringify(currentState));
 
+    // Store the version of the rules being applied
+    if (rules.version) {
+        newState._rulesVersion = rules.version;
+    }
+
     // 1. Update Configuration (Costs, etc.)
     const ruleSettingId = (rules as any).settingId;
     if (ruleSettingId) {
@@ -51,10 +56,13 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
             const definedNames = ruleAttributes[category];
             const existingEntries = currentState.attributes[category] || [];
             const processedNames = new Set<string>();
+            const consumedIds = new Set<string>();
+
             const syncedAttributes = definedNames.map(name => {
                 processedNames.add(name);
-                const existing = existingEntries.find(e => e.name === name);
+                const existing = existingEntries.find(e => e.name === name && !consumedIds.has(e.id));
                 if (existing) {
+                    consumedIds.add(existing.id);
                     return { ...existing, name: name };
                 } else {
                     return {
@@ -63,7 +71,7 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
                     };
                 }
             });
-            const remainingAttributes = existingEntries.filter(e => e && e.name && !processedNames.has(e.name));
+            const remainingAttributes = existingEntries.filter(e => e && e.name && !consumedIds.has(e.id) && !processedNames.has(e.name));
             newAttributes[category] = [...syncedAttributes, ...remainingAttributes];
         });
         Object.keys(currentState.attributes).forEach(cat => {
@@ -92,12 +100,17 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
         const definedNames = ruleSecondary[category] || [];
         const existingEntries = currentState.secondaryAttributes?.[category] || [];
         const processedNames = new Set<string>();
+        const consumedIds = new Set<string>();
+
         const syncedSecondary = definedNames.map(name => {
             processedNames.add(name);
-            const existing = existingEntries.find(e => e.name === name);
-            return existing ? { ...existing, name } : { id: generateId(), name, val1: "0", val2: "", val3: "", creationVal1: 0, creationVal2: 0, creationVal3: 0 };
+            const existing = existingEntries.find(e => e.name === name && !consumedIds.has(e.id));
+            if (existing) consumedIds.add(existing.id);
+            return existing
+                ? { ...existing, name }
+                : { id: generateId(), name, val1: "0", val2: "", val3: "", creationVal1: 0, creationVal2: 0, creationVal3: 0 };
         });
-        const remainingSecondary = existingEntries.filter(e => e && e.name && !processedNames.has(e.name));
+        const remainingSecondary = existingEntries.filter(e => e && e.name && !consumedIds.has(e.id) && !processedNames.has(e.name));
         newSecondary[category] = [...syncedSecondary, ...remainingSecondary];
     });
     newState.secondaryAttributes = newSecondary;
@@ -119,26 +132,31 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
             const isCounterCat = behavior === 'Compteur';
             const isBgCat = behavior === 'Arrière-plan';
             const processedNames = new Set<string>();
+            const consumedIds = new Set<string>();
 
             const syncedSkills = definedNames.map(name => {
                 if (!name || name.trim() === "") return { id: generateId(), name: "", value: 0, creationValue: 0, max: 0, variant: "" };
                 processedNames.add(name);
-                const existing = existingEntries.find(e => e && e.name === name);
+
+                const existing = existingEntries.find(e => e && e.name === name && !consumedIds.has(e.id));
                 const libSkill = rules.libraries?.skills?.find(s => s && s.name === name);
                 const isVariable = libSkill?.isVariable === true;
                 const description = libSkill?.description || "";
+
                 let targetId = existing?.id || generateId();
                 if (isCounterCat && rules.definitions.counters) {
                     const counterKey = Object.keys(rules.definitions.counters).find(k => normalizeString(rules.definitions.counters[k].name) === normalizeString(name));
                     if (counterKey) targetId = counterKey;
                 }
+
                 if (existing) {
+                    consumedIds.add(existing.id);
                     return { ...existing, id: targetId, max: isBgCat ? 5 : (rules.configurations?.global?.maxSkillScore || 10), name, description: description || existing.description };
                 } else {
                     return { id: targetId, name, description, value: 0, creationValue: 0, max: isBgCat ? 5 : (rules.configurations?.global?.maxSkillScore || 10), variant: isVariable ? "" : undefined };
                 }
             });
-            const remainingSkills = existingEntries.filter(e => e && e.name && !processedNames.has(e.name) && ((e.value || 0) > 0 || e.variant !== undefined));
+            const remainingSkills = existingEntries.filter(e => e && e.name && !consumedIds.has(e.id) && !processedNames.has(e.name) && ((e.value || 0) > 0 || e.variant !== undefined));
             newSkills[category] = [...syncedSkills, ...remainingSkills];
         });
         const standardCats = ['talents', 'competences', 'competences_col_2', 'connaissances', 'competences2', 'autres_competences', 'autres', 'arrieres_plans'];

@@ -211,7 +211,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
         });
 
         if (addedCount > 0) {
-            currentLib.sort((a, b) => a.name.localeCompare(b.name));
+            currentLib.sort((a: any, b: any) => a.name.localeCompare(b.name));
             onUpdate({ ...data, specializationLibrary: currentLib });
             addLog(`${addedCount} spécialisation(s) importée(s) depuis la fiche.`, 'success', 'settings');
         } else {

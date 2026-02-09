@@ -270,8 +270,8 @@ describe('Data Migrations - migrateData', () => {
             const result = migrateData(clone(LEGACY_V1_STRING_SPECIALIZATIONS));
 
             expect(result.specializationLibrary).toBeDefined();
-            expect(result.specializationLibrary.length).toBeGreaterThan(0);
-            expect(result.specializationLibrary.some((s: any) => s.name === 'Épée')).toBe(true);
+            expect(result.specializationLibrary!.length).toBeGreaterThan(0);
+            expect(result.specializationLibrary!.some((s: any) => s.name === 'Épée')).toBe(true);
         });
 
         it('should merge skill IDs for duplicate specialization names', () => {
@@ -337,21 +337,21 @@ describe('Data Migrations - migrateData', () => {
 
             expect(result.campaignNotes[0].images).toBeDefined();
             expect(Array.isArray(result.campaignNotes[0].images)).toBe(true);
-            expect(result.campaignNotes[0].images.length).toBe(1);
+            expect(result.campaignNotes![0].images!.length).toBe(1);
         });
 
         it('should preserve image config in new structure', () => {
             const result = migrateData(clone(LEGACY_V1_SINGLE_IMAGE_NOTE));
 
-            expect(result.campaignNotes[0].images[0].config.width).toBe(200);
-            expect(result.campaignNotes[0].images[0].config.align).toBe('right');
+            expect(result.campaignNotes![0].images![0].config.width).toBe(200);
+            expect(result.campaignNotes![0].images![0].config.align).toBe('right');
         });
 
         it('should remove old imageId property', () => {
             const result = migrateData(clone(LEGACY_V1_SINGLE_IMAGE_NOTE));
 
-            expect(result.campaignNotes[0].imageId).toBeUndefined();
-            expect(result.campaignNotes[0].imageConfig).toBeUndefined();
+            expect((result.campaignNotes![0] as any).imageId).toBeUndefined();
+            expect((result.campaignNotes![0] as any).imageConfig).toBeUndefined();
         });
     });
 
