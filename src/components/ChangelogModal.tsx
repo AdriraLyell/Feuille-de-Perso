@@ -82,12 +82,21 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ isOpen, onClose }) => {
                                     </div>
 
                                     <ul className="space-y-2">
-                                        {entry.changes.map((change: string, i: number) => (
-                                            <li key={i} className="text-sm text-slate-700 flex gap-2 items-start">
-                                                <Tag size={14} className="mt-1 text-slate-400 shrink-0" />
-                                                <span>{change}</span>
-                                            </li>
-                                        ))}
+                                        {entry.changes.map((change: string | { type: string, text: string, category: string }, i: number) => {
+                                            const text = typeof change === 'string' ? change : change.text;
+                                            const type = typeof change === 'object' ? change.type : 'default';
+
+                                            return (
+                                                <li key={i} className="text-sm text-slate-700 flex gap-2 items-start">
+                                                    <Tag size={14} className={`mt-1 shrink-0 ${type === 'fixed' ? 'text-orange-500' :
+                                                            type === 'improved' ? 'text-blue-500' :
+                                                                type === 'added' ? 'text-green-500' :
+                                                                    'text-slate-400'
+                                                        }`} />
+                                                    <span>{text}</span>
+                                                </li>
+                                            );
+                                        })}
                                     </ul>
                                 </div>
                             </div>
