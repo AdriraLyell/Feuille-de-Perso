@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryCounterEntry } from '../../../types/system';
-import { Search, Plus, Save, AlertOctagon, Edit2, Trash2, Gauge, Hash } from 'lucide-react';
+import { Search, Plus, Save, AlertOctagon, Edit2, Trash2, Gauge, Hash, CheckCircle2, Circle, Lock, Globe } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import { smartIncludes } from '../../../utils/stringUtils';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
@@ -10,9 +10,10 @@ import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 interface AdminCounterLibraryProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
+    globalUsage?: Record<string, number>;
 }
 
-const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpdate }) => {
+const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
     // @ts-ignore
     const list: LibraryCounterEntry[] = rules.libraries?.counters || [];
 
@@ -26,6 +27,16 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
             .filter(c => smartIncludes(c.name, searchTerm) || (c.description && smartIncludes(c.description, searchTerm)))
             .sort((a, b) => a.name.localeCompare(b.name));
     }, [list, searchTerm]);
+
+    const placedNames = useMemo(() => {
+        const names = new Set<string>();
+        const counterCat = rules.definitions.skillCategories?.find((c: any) => c.behavior === 'Compteur')?.id || 'Col_Comp_9';
+        const placed = rules.definitions.skills?.[counterCat] || [];
+        placed.forEach(name => {
+            if (name.trim()) names.add(name.trim().toLowerCase());
+        });
+        return names;
+    }, [rules.definitions]);
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
@@ -93,6 +104,18 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
         setEditingItem(null);
     };
 
+    const handleBulkSelect = (active: boolean) => {
+        const visibleIds = new Set(filteredList.map(item => item.id));
+        const newList = list.map(item =>
+            visibleIds.has(item.id) ? { ...item, isActive: active } : item
+        );
+        onUpdate({
+            ...rules,
+            // @ts-ignore
+            libraries: { ...rules.libraries, counters: newList }
+        });
+    };
+
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-180px)] flex flex-col">
             <div className="flex justify-between items-center mb-6">
@@ -122,6 +145,26 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                 />
             </div>
 
+            {/* Bulk Actions */}
+            {list.length > 0 && (
+                <div className="flex gap-4 mb-4 px-1">
+                    <button
+                        onClick={() => handleBulkSelect(true)}
+                        className="text-xs font-bold text-red-600 hover:text-red-800 flex items-center gap-1.5 transition-colors"
+                    >
+                        <CheckCircle2 size={14} />
+                        Tout activer {searchTerm ? `(${filteredList.length})` : ''}
+                    </button>
+                    <button
+                        onClick={() => handleBulkSelect(false)}
+                        className="text-xs font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1.5 transition-colors"
+                    >
+                        <Circle size={14} />
+                        Tout désactiver {searchTerm ? `(${filteredList.length})` : ''}
+                    </button>
+                </div>
+            )}
+
             <div className="flex-grow overflow-y-auto bg-slate-50 border border-slate-200 rounded p-4 custom-scrollbar">
                 {list.length === 0 ? (
                     <div className="text-center text-slate-400 py-20 italic">Bibliothèque vide.</div>
@@ -129,11 +172,16 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                     <div className="text-center text-slate-400 py-10 italic">Aucun résultat.</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                        {filteredList.map(item => (
-                            <div key={item.id} className={`bg-white border rounded p-3 transition-shadow group flex flex-col justify-between ${item.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
-                                <div>
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="flex items-center gap-1.5 overflow-hidden">
+                        {filteredList.map(item => {
+                            const isPlaced = placedNames.has(item.name.trim().toLowerCase());
+                            const isGloballyUsed = !!globalUsage[item.id];
+                            const isLocked = isPlaced || isGloballyUsed;
+
+                            return (
+                                <div key={item.id} className={`bg-white border rounded p-2 transition-shadow group ${item.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        {/* 1. Toggle */}
+                                        <div className="w-8 flex justify-center shrink-0">
                                             <input
                                                 type="checkbox"
                                                 checked={item.isActive !== false}
@@ -145,23 +193,50 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                                 className="w-4 h-4 text-red-600 rounded cursor-pointer"
                                                 title={item.isActive !== false ? "Désactiver" : "Activer"}
                                             />
-                                            <span className={`font-bold truncate ${item.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={item.name}>{item.name}</span>
                                         </div>
-                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
+
+                                        {/* 2. Status Icons */}
+                                        <div className="w-16 flex items-center gap-1 shrink-0">
+                                            {item.isGlobal && <div title="Item Global"><Globe size={14} className="text-indigo-500" /></div>}
+                                            {isLocked && (
+                                                <div className="text-amber-600" title={isPlaced ? "Utilisé dans cette campagne" : "Utilisé dans d'autres campagnes"}>
+                                                    <Lock size={14} />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* 3. Content */}
+                                        <div className="flex-grow overflow-hidden pr-2">
+                                            <div className={`font-bold truncate text-sm ${item.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={item.name}>
+                                                {item.name}
+                                            </div>
+                                        </div>
+
+                                        {/* 4. Actions */}
+                                        <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                                             <button onClick={() => handleOpenEdit(item)} className="text-blue-600 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
-                                            <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
-                                            {item.isGlobal && <span title="Global" className="text-xs text-amber-500 font-bold border border-amber-200 bg-amber-50 px-1 rounded">GLOBAL</span>}
+                                            <button
+                                                onClick={() => handleDelete(item.id)}
+                                                disabled={isLocked}
+                                                className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
+                                                title={isLocked ? "Suppression bloquée : utilisé" : "Supprimer définitivement"}
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3 text-xs text-slate-500 bg-slate-50 p-1.5 rounded border border-slate-100">
-                                        <span title="Valeur Max"><Hash size={12} className="inline mr-1" />Max: {item.maxValue}</span>
-                                        <span title="Défaut">Départ: {item.defaultValue}</span>
-                                        <span title="Coût XP">Coût: {item.xpCost}</span>
+
+                                    <div className="ml-10"> {/* Aligned with name content start */}
+                                        <div className="flex items-center gap-3 text-[10px] text-slate-500 bg-slate-50 p-1 rounded border border-slate-100 mb-1">
+                                            <span title="Valeur Max" className="flex items-center gap-1"><Hash size={10} />Max: {item.maxValue}</span>
+                                            <span title="Défaut">Départ: {item.defaultValue}</span>
+                                            <span title="Coût XP">Coût: {item.xpCost}</span>
+                                        </div>
+                                        {item.description && <p className="text-[10px] text-slate-500 italic line-clamp-1">{item.description}</p>}
                                     </div>
-                                    {item.description && <p className="text-[10px] text-slate-500 italic line-clamp-1 mt-1">{item.description}</p>}
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

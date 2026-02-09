@@ -1,3 +1,4 @@
+import { supabase } from '../supabase';
 import { DatabaseService } from '../DatabaseService';
 import { RulesData } from '../../types/rules';
 import { LibraryMapper } from './LibraryMapper';
@@ -57,53 +58,60 @@ export const LibraryLoader = {
             }
         });
 
-        const activeTraitIds = new Set(relTraits.map((r: any) => r.trait_id));
-        const activeSkillIds = new Set(relSkills.map((r: any) => r.skill_id));
-        const activeSpecIds = new Set(relSpecs.map((r: any) => r.specialization_id));
-        const activeBgIds = new Set(relBackgrounds.map((r: any) => r.background_id));
-        const activeCounterIds = new Set(relCounters.map((r: any) => r.counter_id));
+        const activeTraitIds = new Set<string>(relTraits.map((r: any) => r.trait_id));
+        const activeSkillIds = new Set<string>(relSkills.map((r: any) => r.skill_id));
+        const activeSpecIds = new Set<string>(relSpecs.map((r: any) => r.specialization_id));
+        const activeBgIds = new Set<string>(relBackgrounds.map((r: any) => r.background_id));
+        const activeCounterIds = new Set<string>(relCounters.map((r: any) => r.counter_id));
+
+        const skillDefaultMap = new Map<string, string>(relSkills.map((r: any) => [r.skill_id, r.default_category]));
+        const bgDefaultMap = new Map<string, string>(relBackgrounds.map((r: any) => [r.background_id, r.default_category]));
+        const counterDefaultMap = new Map<string, string>(relCounters.map((r: any) => [r.counter_id, r.default_category]));
 
         return {
-            traits: (() => {
-                const mappedGlobals = traits.filter(t => t.setting_id === null).map(t => LibraryMapper.mapTrait(t, activeTraitIds, settingId, traitVarMap.get(t.id)));
-                const mappedLocals = traits.filter(t => t.setting_id === settingId).map(t => LibraryMapper.mapTrait(t, activeTraitIds, settingId, traitVarMap.get(t.id)));
-                const traitMap = new Map();
-                mappedGlobals.forEach(t => traitMap.set(t.name.trim().toLowerCase(), t));
-                mappedLocals.forEach(t => traitMap.set(t.name.trim().toLowerCase(), t));
-                return Array.from(traitMap.values()).sort((a, b) => (a as any).name.localeCompare((b as any).name));
-            })(),
-            skills: (() => {
-                const mappedGlobals = skills.filter(s => s.setting_id === null).map(s => LibraryMapper.mapSkill(s, activeSkillIds, settingId, skillVarMap.get(s.id)));
-                const mappedLocals = skills.filter(s => s.setting_id === settingId).map(s => LibraryMapper.mapSkill(s, activeSkillIds, settingId, skillVarMap.get(s.id)));
-                const skillMap = new Map();
-                mappedGlobals.forEach(s => skillMap.set(s.name.trim().toLowerCase(), s));
-                mappedLocals.forEach(s => skillMap.set(s.name.trim().toLowerCase(), s));
-                return Array.from(skillMap.values()).sort((a, b) => (a as any).name.localeCompare((b as any).name));
-            })(),
-            specializations: (() => {
-                const mappedGlobals = specs.filter(s => s.setting_id === null).map(s => LibraryMapper.mapSpec(s, activeSpecIds, settingId));
-                const mappedLocals = specs.filter(s => s.setting_id === settingId).map(s => LibraryMapper.mapSpec(s, activeSpecIds, settingId));
-                const specMap = new Map();
-                mappedGlobals.forEach(s => specMap.set(s.name.trim().toLowerCase(), s));
-                mappedLocals.forEach(s => specMap.set(s.name.trim().toLowerCase(), s));
-                return Array.from(specMap.values()).sort((a, b) => (a as any).name.localeCompare((b as any).name));
-            })(),
-            backgrounds: (() => {
-                const mappedGlobals = backgrounds.filter(b => b.setting_id === null).map(b => LibraryMapper.mapBackground(b, activeBgIds, settingId, bgVarMap.get(b.id)));
-                const mappedLocals = backgrounds.filter(b => b.setting_id === settingId).map(b => LibraryMapper.mapBackground(b, activeBgIds, settingId, bgVarMap.get(b.id)));
-                const bgMap = new Map();
-                mappedGlobals.forEach(b => bgMap.set(b.name.trim().toLowerCase(), b));
-                mappedLocals.forEach(b => bgMap.set(b.name.trim().toLowerCase(), b));
-                return Array.from(bgMap.values()).sort((a, b) => (a as any).name.localeCompare((b as any).name));
-            })(),
-            counters: (() => {
-                const mappedGlobals = counters.filter(c => c.setting_id === null).map(c => LibraryMapper.mapCounter(c, activeCounterIds, settingId));
-                const mappedLocals = counters.filter(c => c.setting_id === settingId).map(c => LibraryMapper.mapCounter(c, activeCounterIds, settingId));
-                const cMap = new Map();
-                mappedGlobals.forEach(c => cMap.set(c.name.trim().toLowerCase(), c));
-                mappedLocals.forEach(c => cMap.set(c.name.trim().toLowerCase(), c));
-                return Array.from(cMap.values()).sort((a, b) => (a as any).name.localeCompare((b as any).name));
-            })()
+            traits: traits.map((t: any) => LibraryMapper.mapTrait(t, activeTraitIds, settingId, traitVarMap.get(t.id))).sort((a: any, b: any) => a.name.localeCompare(b.name)),
+            skills: skills.map((s: any) => LibraryMapper.mapSkill(s, activeSkillIds, settingId, skillVarMap.get(s.id), skillDefaultMap.get(s.id))).sort((a: any, b: any) => a.name.localeCompare(b.name)),
+            specializations: specs.map((s: any) => LibraryMapper.mapSpec(s, activeSpecIds, settingId)).sort((a: any, b: any) => a.name.localeCompare(b.name)),
+            backgrounds: backgrounds.map((b: any) => LibraryMapper.mapBackground(b, activeBgIds, settingId, bgVarMap.get(b.id), bgDefaultMap.get(b.id))).sort((a: any, b: any) => a.name.localeCompare(b.name)),
+            counters: counters.map((c: any) => LibraryMapper.mapCounter(c, activeCounterIds, settingId, counterDefaultMap.get(c.id))).sort((a: any, b: any) => a.name.localeCompare(b.name))
         };
+    },
+
+    /**
+     * Get usage statistics from all settings except the current one
+     */
+    async loadGlobalUsage(currentSettingId: string): Promise<Record<string, number>> {
+        const tables = [
+            { table: 'rel_setting_traits', id: 'trait_id', cat: false },
+            { table: 'rel_setting_skills', id: 'skill_id', cat: true },
+            { table: 'rel_setting_backgrounds', id: 'background_id', cat: true },
+            { table: 'rel_setting_counters', id: 'counter_id', cat: true },
+            { table: 'rel_setting_specializations', id: 'specialization_id', cat: false }
+        ];
+
+        const results = await Promise.all(tables.map(async t => {
+            let query = supabase.from(t.table).select(`${t.id}, setting_id`);
+
+            // Filter out current setting
+            query = query.neq('setting_id', currentSettingId);
+
+            // For tables with categories, only count "placed" items
+            if (t.cat) {
+                query = query.not('default_category', 'is', null);
+            }
+
+            const { data } = await query;
+            return { idKey: t.id, data: data || [] };
+        }));
+
+        const usageMap: Record<string, number> = {};
+        results.forEach(res => {
+            res.data.forEach((row: any) => {
+                const id = row[res.idKey];
+                usageMap[id] = (usageMap[id] || 0) + 1;
+            });
+        });
+
+        return usageMap;
     }
 };

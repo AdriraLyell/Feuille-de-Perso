@@ -47,5 +47,9 @@ export const LibraryService = {
 
     async importCounters(targetId: string | null, counters: LibraryCounterEntry[], linkToSettingId?: string): Promise<boolean> {
         return LibraryImporter.importCounters(targetId, counters, linkToSettingId);
+    },
+
+    async loadGlobalUsage(currentSettingId: string): Promise<Record<string, number>> {
+        return LibraryLoader.loadGlobalUsage(currentSettingId);
     }
 };

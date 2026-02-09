@@ -74,6 +74,8 @@ export interface LibraryEntry {
   effects?: TraitEffect[]; // New Effects System
   isGlobal?: boolean;
   isActive?: boolean;
+  isLocked?: boolean;
+  globalUsage?: number;
 }
 
 // Nouveau : Entrée pour la réserve de compétences
@@ -86,6 +88,8 @@ export interface LibrarySkillEntry {
   variants?: string[]; // Liste des variantes suggérées (ex: "Forge", "Histoire", "Épées")
   isGlobal?: boolean; // True if from global library
   isActive?: boolean; // True if selected for this campaign
+  isLocked?: boolean;
+  globalUsage?: number;
 }
 
 // Nouveau : Entrée pour le catalogue des spécialisations
@@ -97,6 +101,8 @@ export interface LibrarySpecializationEntry {
   description?: string;
   isGlobal?: boolean;
   isActive?: boolean;
+  isLocked?: boolean;
+  globalUsage?: number;
 }
 
 export interface LibraryBackgroundEntry extends LibrarySkillEntry {
@@ -110,8 +116,11 @@ export interface LibraryCounterEntry {
   maxValue: number; // Default 10
   defaultValue: number; // Default 0
   xpCost: number; // 0 = free
+  defaultCategory?: string;
   isGlobal?: boolean;
   isActive?: boolean;
+  isLocked?: boolean;
+  globalUsage?: number;
 }
 
 export interface LogEntry {

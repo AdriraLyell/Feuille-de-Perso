@@ -1,7 +1,6 @@
-
 import React, { useState, useMemo } from 'react';
 import { CharacterSheetData, LibrarySkillEntry } from '../types';
-import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, CheckCircle2, Download, Award, Layers, RefreshCw } from 'lucide-react';
+import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, CheckCircle2, Download, Award, Layers, RefreshCw, Eye, EyeOff, Globe } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import SpecializationLibraryView from './specialization-library/SpecializationLibraryView';
 import { useCharacter } from '../context/CharacterContext';
@@ -36,6 +35,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
 
     // -- Skill Library Logic --
     const [skillSearch, setSkillSearch] = useState('');
+    const [hideKnownSkills, setHideKnownSkills] = useState(true); // Default: Hide known
     const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
     const [editingSkill, setEditingSkill] = useState<LibrarySkillEntry | null>(null);
     const [skillError, setSkillError] = useState<string | null>(null);
@@ -98,9 +98,15 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
     }, [data.skills]);
 
     const filteredSkills = skillsList.filter(m => {
-        const s = m.entry;
-        return smartIncludes(s.name, skillSearch) ||
-            (s.description && smartIncludes(s.description, skillSearch));
+        // 1. Text Search
+        const matchesSearch = smartIncludes(m.entry.name, skillSearch) ||
+            smartIncludes(m.entry.description || '', skillSearch);
+
+        // 2. Hide Known Filter
+        const isKnown = usedSkillNames.has(m.entry.name.trim().toLowerCase());
+        const matchesFilter = hideKnownSkills ? !isKnown : true;
+
+        return matchesSearch && matchesFilter;
     }).sort((a, b) => a.entry.name.localeCompare(b.entry.name));
 
     const handleOpenNewSkill = () => {
@@ -332,14 +338,23 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                         {/* Skill Toolbar */}
                         <div className="p-3 bg-stone-100/30 border-b border-[#bfae85]/30 grid grid-cols-1 lg:grid-cols-3 items-center gap-4 shrink-0">
                             {/* Search Bar - Left */}
-                            <div className="relative w-full max-w-sm">
-                                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
-                                <input
-                                    className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
-                                    placeholder="Rechercher une compétence..."
-                                    value={skillSearch}
-                                    onChange={(e) => setSkillSearch(e.target.value)}
-                                />
+                            <div className="relative w-full max-w-sm flex gap-2">
+                                <div className="relative flex-grow">
+                                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
+                                    <input
+                                        className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
+                                        placeholder="Rechercher une compétence..."
+                                        value={skillSearch}
+                                        onChange={(e) => setSkillSearch(e.target.value)}
+                                    />
+                                </div>
+                                <button
+                                    onClick={() => setHideKnownSkills(!hideKnownSkills)}
+                                    className={`px-2 py-1.5 rounded-sm border transition-colors flex items-center justify-center ${hideKnownSkills ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-white text-[#5c4d41] border-[#bfae85]/50 hover:bg-stone-50'}`}
+                                    title={hideKnownSkills ? "Afficher les compétences acquises" : "Masquer les compétences acquises"}
+                                >
+                                    {hideKnownSkills ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
                             </div>
 
                             {/* Shared Legend - Center */}
@@ -349,8 +364,8 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                                     <span className="text-[9px] font-bold text-green-800/70 uppercase tracking-tight whitespace-nowrap">Présent</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50/50 border border-blue-200/50 rounded-full w-fit">
-                                    <Layers size={10} className="text-blue-600" />
-                                    <span className="text-[9px] font-bold text-blue-800/70 uppercase tracking-tight whitespace-nowrap">À Variations</span>
+                                    <Globe size={10} className="text-indigo-600" />
+                                    <span className="text-[9px] font-bold text-indigo-800/70 uppercase tracking-tight whitespace-nowrap">Officiel</span>
                                 </div>
                             </div>
 
@@ -416,7 +431,9 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                                                                 </span>
                                                             )}
                                                             {isOfficial && (
-                                                                <span title="Compétence Officielle" className="text-[9px] bg-blue-100 text-blue-700 px-1 rounded-sm border border-blue-200 font-bold shrink-0">OFF</span>
+                                                                <span title="Compétence Officielle">
+                                                                    <Globe size={11} className="text-indigo-500 shrink-0" />
+                                                                </span>
                                                             )}
                                                             {isUsed && (
                                                                 <span title="Présent dans la fiche">

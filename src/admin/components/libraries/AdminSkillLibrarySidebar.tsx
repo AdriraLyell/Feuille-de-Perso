@@ -1,7 +1,8 @@
 import React from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibrarySkillEntry } from '../../../types';
-import { BookOpen, Archive, GripVertical, ArrowRight, Layers, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Archive, GripVertical, ArrowRight, Layers, Tag } from 'lucide-react';
+import { disambiguateCategories } from '../../../utils/categoryUtils';
 
 interface AdminSkillLibrarySidebarProps {
     rules: RulesData;
@@ -12,6 +13,11 @@ interface AdminSkillLibrarySidebarProps {
 
 const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rules, onUpdate, draggedItem, setDraggedItem }) => {
     const [activeTab, setActiveTab] = React.useState<'skills' | 'backgrounds' | 'counters'>('skills');
+    const [editingCategory, setEditingCategory] = React.useState<string | null>(null);
+
+    const availableCategories = React.useMemo(() => {
+        return disambiguateCategories(rules.definitions.skillCategories || []);
+    }, [rules.definitions.skillCategories]);
 
     const handleDragStart = (e: React.DragEvent, type: 'admin_lib_skill', dataPayload: any) => {
         setDraggedItem({ type, ...dataPayload });
@@ -57,7 +63,7 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
 
             if (!existingInLib && skillName.trim() !== '') {
                 const newLibEntry: LibrarySkillEntry = {
-                    id: Math.random().toString(36).substr(2, 9),
+                    id: crypto.randomUUID(),
                     name: skillName,
                     description: '',
                     defaultCategory: category
@@ -90,7 +96,7 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                 });
             });
             return (rules.libraries.skills || []).filter(libItem =>
-                (libItem.isVariable || !currentSkillNames.has(libItem.name.trim().toLowerCase()))
+                libItem.isActive !== false && (libItem.isVariable || !currentSkillNames.has(libItem.name.trim().toLowerCase()))
             );
         }
         if (activeTab === 'backgrounds') {
@@ -104,7 +110,7 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                 });
             });
             return (rules.libraries.backgrounds || []).filter(b =>
-                !currentNames.has(b.name.trim().toLowerCase())
+                b.isActive !== false && !currentNames.has(b.name.trim().toLowerCase())
             );
         }
         if (activeTab === 'counters') {
@@ -117,7 +123,7 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
             // We also check defining counters directly in definitions.counters?
             // Actually user wants to place them in SKILL SLOTS for layout.
             return (rules.libraries.counters || []).filter(c =>
-                !currentNames.has(c.name.trim().toLowerCase())
+                c.isActive !== false && !currentNames.has(c.name.trim().toLowerCase())
             );
         }
         return [];
@@ -187,32 +193,78 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                         return (
                             <div
                                 key={item.id}
-                                draggable
-                                onDragStart={(e) => handleDragStart(e, 'admin_lib_skill', { name: item.name, data: item })}
-                                className={`p-2 rounded border shadow-sm cursor-grab active:cursor-grabbing transition-all flex justify-between items-center group bg-white border-gray-300 hover:border-purple-400 hover:shadow-md`}
+                                className="bg-white border border-gray-300 rounded shadow-sm overflow-hidden"
                             >
-                                <div className="flex items-center gap-2 overflow-hidden">
-                                    <GripVertical size={14} className="text-gray-300 shrink-0" />
-                                    <div className="flex flex-col min-w-0">
-                                        <div className="flex items-center gap-1.5">
-                                            <span className={`font-bold text-sm truncate text-slate-700`}>
-                                                {item.name}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            {item.isVariable && (
-                                                <div className="flex items-center gap-0.5 text-[10px] text-blue-600 bg-blue-50 px-1 rounded-sm border border-blue-100">
-                                                    <Layers size={10} />
-                                                    <span className="font-semibold" title="Variable">Var</span>
-                                                </div>
-                                            )}
-                                            {item.isActive === false && (
-                                                <div className="text-[9px] text-red-500 font-bold px-1 rounded-sm border border-red-100 bg-red-50">Inactif</div>
-                                            )}
+                                <div
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, 'admin_lib_skill', { name: item.name, data: item })}
+                                    className={`p-2 cursor-grab active:cursor-grabbing transition-all flex justify-between items-center group hover:bg-slate-50`}
+                                >
+                                    <div className="flex items-center gap-2 overflow-hidden">
+                                        <GripVertical size={14} className="text-gray-300 shrink-0" />
+                                        <div className="flex flex-col min-w-0">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className={`font-bold text-sm truncate text-slate-700`}>
+                                                    {item.name}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                {item.isVariable && (
+                                                    <div className="flex items-center gap-0.5 text-[10px] text-blue-600 bg-blue-50 px-1 rounded-sm border border-blue-100">
+                                                        <Layers size={10} />
+                                                        <span className="font-semibold" title="Variable">Var</span>
+                                                    </div>
+                                                )}
+                                                {item.isActive === false && (
+                                                    <div className="text-[9px] text-red-500 font-bold px-1 rounded-sm border border-red-100 bg-red-50">Inactif</div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
+                                    <ArrowRight size={14} className="text-gray-300 opacity-0 group-hover:opacity-100 shrink-0 mx-1" />
                                 </div>
-                                <ArrowRight size={14} className="text-gray-300 opacity-0 group-hover:opacity-100 shrink-0 mx-1" />
+
+                                {/* Local Category Picker */}
+                                <div className="px-2 pb-2 bg-slate-50/50 flex items-center justify-between border-t border-slate-100 pt-1">
+                                    {editingCategory === item.id ? (
+                                        <select
+                                            autoFocus
+                                            className="text-[10px] bg-white border border-slate-300 rounded px-1 py-0.5 w-full outline-none focus:border-blue-400"
+                                            value={item.defaultCategory || ''}
+                                            onChange={(e) => {
+                                                const cat = e.target.value;
+                                                const key = activeTab === 'skills' ? 'skills' : activeTab === 'backgrounds' ? 'backgrounds' : 'counters';
+                                                const newList = rules.libraries[key].map((libItem: any) =>
+                                                    libItem.id === item.id ? { ...libItem, defaultCategory: cat } : libItem
+                                                );
+                                                onUpdate({
+                                                    ...rules,
+                                                    libraries: {
+                                                        ...rules.libraries,
+                                                        [key]: newList
+                                                    }
+                                                });
+                                                setEditingCategory(null);
+                                            }}
+                                            onBlur={() => setEditingCategory(null)}
+                                        >
+                                            <option value="">(Aucune catégorie)</option>
+                                            {availableCategories.map(c => (
+                                                <option key={c.id} value={c.id}>{c.label}</option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <button
+                                            onClick={() => setEditingCategory(item.id)}
+                                            className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-blue-600 font-medium truncate group/tag"
+                                        >
+                                            <Tag size={10} className="shrink-0 text-slate-400 group-hover/tag:text-blue-400" />
+                                            <span className="truncate">
+                                                {item.defaultCategory ? (availableCategories.find(c => c.id === item.defaultCategory)?.label || item.defaultCategory) : "Définir catégorie..."}
+                                            </span>
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         );
                     })

@@ -7,6 +7,7 @@ import { CampaignService, GameSettingSummary } from '../../services/CampaignServ
 import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry } from '../../types/system';
 import { RulesData } from '../../types/rules';
 import { ErrorService } from '../../services/ErrorService';
+import { normalizeString } from '../../utils/stringUtils';
 
 interface LibraryImportWizardProps {
     character: SyncedCharacter;
@@ -95,7 +96,7 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
 
                 const allTraits = [...advantages, ...disadvantages];
                 setTraitCandidates(allTraits.map(t => {
-                    const existing = libraries.traits.find(et => et.name.toLowerCase() === t.name.toLowerCase());
+                    const existing = libraries.traits.find(et => normalizeString(et.name) === normalizeString(t.name));
                     const v = !!(t as any).isVariable || !!(t as any).is_variable;
                     return { data: t, isDuplicate: !!existing, isSelected: !existing && !v, isVariable: v, existingId: existing?.id };
                 }));
@@ -103,6 +104,17 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                 // 3. Scan Skills
                 const rawSkills: LibrarySkillEntry[] = [];
                 Object.entries(data.skills || {}).forEach(([cat, list]) => {
+                    const catLower = cat.toLowerCase();
+                    // FILTER: Exclude Backgrounds (Col_Comp_8, arrieres_plans, etc.)
+                    if (
+                        cat === 'Col_Comp_8' ||
+                        cat === 'arrieres_plans' ||
+                        catLower.includes('background') ||
+                        catLower.includes('arrière-plan')
+                    ) {
+                        return;
+                    }
+
                     (list as any[]).filter(s => s.name && s.value > 0).forEach(s => {
                         rawSkills.push({
                             id: crypto.randomUUID(),
@@ -115,7 +127,7 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                 });
 
                 setSkillCandidates(rawSkills.map(s => {
-                    const existing = libraries.skills.find(es => es.name.toLowerCase() === s.name.toLowerCase());
+                    const existing = libraries.skills.find(es => normalizeString(es.name) === normalizeString(s.name));
                     const v = !!s.isVariable;
                     return { data: s, isDuplicate: !!existing, isSelected: !existing && !v, isVariable: v, existingId: existing?.id };
                 }));
@@ -137,7 +149,7 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                 });
 
                 setSpecCandidates(allSpecs.map(s => {
-                    const existing = libraries.specializations.find(es => es.name.toLowerCase() === s.name.toLowerCase());
+                    const existing = libraries.specializations.find(es => normalizeString(es.name) === normalizeString(s.name));
                     return { data: s, isDuplicate: !!existing, isSelected: !existing, isVariable: false, existingId: existing?.id };
                 }));
 
@@ -154,18 +166,18 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                     }));
 
                 setBackgroundCandidates(backgrounds.map(b => {
-                    const existing = libraries.backgrounds.find(eb => eb.name.toLowerCase() === b.name.toLowerCase());
+                    const existing = libraries.backgrounds.find(eb => normalizeString(eb.name) === normalizeString(b.name));
                     return { data: b, isDuplicate: !!existing, isSelected: !existing, isVariable: b.isVariable ?? false };
                 }));
 
                 // 6. Scan Counters
                 const allCounters: LibraryCounterEntry[] = [];
+                const processedCounterNames = new Set<string>();
 
-                // Scan dynamic counters
-                Object.entries(data.counters).forEach(([key, value]) => {
-                    const items = Array.isArray(value) ? value : [value];
-                    items.forEach(c => {
-                        if (c.name && c.name.trim() !== '') {
+                const processCounter = (c: any) => {
+                    if (c.name && c.name.trim() !== '') {
+                        const norm = normalizeString(c.name);
+                        if (!processedCounterNames.has(norm)) {
                             allCounters.push({
                                 id: crypto.randomUUID(),
                                 name: c.name,
@@ -174,8 +186,17 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                                 defaultValue: c.current ?? 0,
                                 xpCost: 0
                             });
+                            processedCounterNames.add(norm);
                         }
-                    });
+                    }
+                };
+
+                // Scan dynamic counters
+                Object.entries(data.counters).forEach(([key, value]) => {
+                    // Skip 'custom' here if it's handled separately, OR handle it and dedup
+                    // We handle everything here and use the Set to dedup
+                    const items = Array.isArray(value) ? value : [value];
+                    items.forEach(processCounter);
                 });
 
                 setCounterCandidates(allCounters.map(c => {

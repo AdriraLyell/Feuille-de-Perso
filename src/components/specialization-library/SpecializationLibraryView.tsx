@@ -1,6 +1,5 @@
-
 import React, { useState, useMemo } from 'react';
-import { Search, Plus, Award, CheckCircle2, Edit2, Trash2, Download, HelpCircle, Save, X, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Search, Plus, Award, CheckCircle2, Edit2, Trash2, Download, HelpCircle, Save, X, AlertTriangle, RefreshCw, Eye, EyeOff, Globe } from 'lucide-react';
 import { CharacterSheetData } from '../../types';
 import { useNotification } from '../../context/NotificationContext';
 import { LibrarySpecializationEntry } from '../../types';
@@ -18,6 +17,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
     const addLog = useNotification();
 
     const [searchTerm, setSearchTerm] = useState('');
+    const [hideKnown, setHideKnown] = useState(true); // Default: Hide known
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEntry, setEditingEntry] = useState<LibrarySpecializationEntry | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -60,14 +60,6 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
         );
     }, [allSkills, skillSearch, editingEntry?.skillIds]);
 
-    // Filtrer et trier la bibliothèque
-    const filteredLibrary = useMemo(() => {
-        return library.filter(m =>
-            smartIncludes(m.entry.name, searchTerm) ||
-            (m.entry.description && smartIncludes(m.entry.description, searchTerm))
-        ).sort((a, b) => a.entry.name.localeCompare(b.entry.name));
-    }, [library, searchTerm]);
-
     // Déterminer quelles spécialisations sont déjà utilisées sur la fiche
     const usedSpecializations = useMemo(() => {
         const names = new Set<string>();
@@ -79,6 +71,19 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
         });
         return names;
     }, [data.specializations, data.imposedSpecializations]);
+
+    // Filtrer et trier la bibliothèque
+    const filteredLibrary = useMemo(() => {
+        return library.filter(m => {
+            const matchesSearch = smartIncludes(m.entry.name, searchTerm) ||
+                (m.entry.description && smartIncludes(m.entry.description, searchTerm));
+
+            const isUsed = usedSpecializations.has(m.entry.name.trim().toLowerCase());
+            const matchesFilter = hideKnown ? !isUsed : true;
+
+            return matchesSearch && matchesFilter;
+        }).sort((a, b) => a.entry.name.localeCompare(b.entry.name));
+    }, [library, searchTerm, hideKnown, usedSpecializations]);
 
     const handleOpenNew = () => {
         setError(null);
@@ -243,14 +248,23 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
         <div className="absolute inset-0 flex flex-col bg-[#fdfbf7]">
             {/* Toolbar */}
             <div className="p-4 bg-stone-100/30 border-b border-[#bfae85]/30 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0">
-                <div className="relative flex-grow max-w-md w-full">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
-                    <input
-                        className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
-                        placeholder="Rechercher une spécialisation..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                <div className="relative flex-grow max-w-md w-full flex gap-2">
+                    <div className="relative flex-grow">
+                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
+                        <input
+                            className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
+                            placeholder="Rechercher une spécialisation..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <button
+                        onClick={() => setHideKnown(!hideKnown)}
+                        className={`px-2 py-1.5 rounded-sm border transition-colors flex items-center justify-center ${hideKnown ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-white text-[#5c4d41] border-[#bfae85]/50 hover:bg-stone-50'}`}
+                        title={hideKnown ? "Afficher les spécialisations acquises" : "Masquer les spécialisations acquises"}
+                    >
+                        {hideKnown ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
                     <button
@@ -307,7 +321,9 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                                                     {entry.name}
                                                 </span>
                                                 {isOfficial && (
-                                                    <span className="text-[8px] bg-blue-100 text-blue-700 px-1 rounded-sm border border-blue-200 font-bold w-fit mt-0.5">OFFICIEL</span>
+                                                    <div title="Spécialisation Officielle" className="w-fit mt-0.5">
+                                                        <Globe size={11} className="text-indigo-500" />
+                                                    </div>
                                                 )}
                                             </div>
 
@@ -349,7 +365,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                 )}
             </div>
 
-            {/* Modals ... (à implémenter ou intégrer) */}
+            {/* Modals */}
             {isModalOpen && editingEntry && (
                 <div className="fixed inset-0 z-[150] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in zoom-in duration-200 border-2 border-[#bfae85]/50">

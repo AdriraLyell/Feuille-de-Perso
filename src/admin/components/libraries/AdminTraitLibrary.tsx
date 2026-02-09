@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryEntry, TraitEffect } from '../../../types';
-import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, UploadCloud } from 'lucide-react';
+import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, UploadCloud, CheckCircle2, Circle, Globe } from 'lucide-react';
 import TraitCard from '../../../components/trait-library/TraitCard';
 import TraitForm from '../../../components/trait-library/TraitForm';
 import { smartIncludes } from '../../../utils/stringUtils';
@@ -12,12 +12,13 @@ import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 interface AdminTraitLibraryProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
+    globalUsage?: Record<string, number>;
 }
 
 type SortOption = 'name' | 'cost' | 'type';
 type SortOrder = 'asc' | 'desc';
 
-const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }) => {
+const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
     // Safe access to library
     const library = rules.libraries?.traits || [];
 
@@ -72,7 +73,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
         setError(null);
         setTagInput('');
         setEditForm({
-            id: Math.random().toString(36).substr(2, 9),
+            id: crypto.randomUUID(),
             name: '',
             type: filterType === 'desavantage' ? 'desavantage' : 'avantage',
             cost: '1',
@@ -138,6 +139,20 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
         });
         setIsModalOpen(false);
         setEditForm(null);
+    };
+
+    const handleBulkSelect = (active: boolean) => {
+        const visibleIds = new Set(processedList.map(t => t.id));
+        const newList = library.map(trait =>
+            visibleIds.has(trait.id) ? { ...trait, isActive: active } : trait
+        );
+        onUpdate({
+            ...rules,
+            libraries: {
+                ...rules.libraries,
+                traits: newList
+            }
+        });
     };
 
     const handlePublishClick = () => {
@@ -231,7 +246,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
     // Effects manipulation
     const addEffect = () => {
         if (!editForm) return;
-        const newEffect: TraitEffect = { id: Math.random().toString(36).substr(2, 9), type: 'xp_bonus', value: 0 };
+        const newEffect: TraitEffect = { id: crypto.randomUUID(), type: 'xp_bonus', value: 0 };
         setEditForm({ ...editForm, effects: [...(editForm.effects || []), newEffect] });
     };
 
@@ -326,6 +341,26 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
                 )
             }
 
+            {/* Bulk Actions */}
+            {library.length > 0 && (
+                <div className="flex gap-4 mb-4 px-1">
+                    <button
+                        onClick={() => handleBulkSelect(true)}
+                        className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1.5 transition-colors"
+                    >
+                        <CheckCircle2 size={14} />
+                        Tout activer {searchTerm ? `(${processedList.length})` : ''}
+                    </button>
+                    <button
+                        onClick={() => handleBulkSelect(false)}
+                        className="text-xs font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1.5 transition-colors"
+                    >
+                        <Circle size={14} />
+                        Tout désactiver {searchTerm ? `(${processedList.length})` : ''}
+                    </button>
+                </div>
+            )}
+
             {/* List */}
             <div className="flex-grow overflow-y-auto bg-slate-50 border border-slate-200 rounded p-2">
                 {library.length === 0 && <div className="text-center text-slate-400 py-20 italic">La bibliothèque est vide.</div>}
@@ -333,19 +368,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
                 <div className="space-y-1">
                     {processedList.map(entry => (
                         <div key={entry.id} className="relative group">
-                            <div className="absolute left-3 top-4 z-10">
-                                <input
-                                    type="checkbox"
-                                    checked={entry.isActive !== false}
-                                    onChange={() => {
-                                        const newList = library.map(l => l.id === entry.id ? { ...l, isActive: !l.isActive } : l);
-                                        onUpdate({ ...rules, libraries: { ...rules.libraries, traits: newList } });
-                                    }}
-                                    className="w-4 h-4 text-blue-600 rounded cursor-pointer"
-                                    title={entry.isActive !== false ? "Désactiver" : "Activer"}
-                                />
-                            </div>
-                            <div className="pl-6">
+                            <div className="pl-2">
                                 <TraitCard
                                     entry={entry}
                                     isEditable={true}
@@ -355,12 +378,8 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate }
                                     onDelete={handleDelete}
                                     showMultiSelect={false}
                                     source={entry.isGlobal ? 'official' : 'local'}
+                                    isLocked={!!globalUsage[entry.id]}
                                 />
-                                {entry.isGlobal && (
-                                    <div className="absolute top-3 right-12 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <span className="text-[10px] text-amber-500 font-bold border border-amber-200 bg-amber-50 px-1 rounded">GLOBAL</span>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     ))}

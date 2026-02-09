@@ -149,8 +149,8 @@ const reconcileSkillsAndBackgrounds = (newState: CharacterSheetData, currentStat
             processedNames.add(name);
             processedNamesGlobal.add(name);
 
-            const existing = existingEntries.find(e => e && e.name === name && !consumedIds.has(e.id));
-            const libSkill = rules.libraries?.skills?.find(s => s && s.name === name);
+            const existing = existingEntries.find(e => e && normalizeString(e.name) === normalizeString(name) && !consumedIds.has(e.id));
+            const libSkill = rules.libraries?.skills?.find(s => s && normalizeString(s.name) === normalizeString(name));
             const isVariable = libSkill?.isVariable === true;
             const description = libSkill?.description || "";
 
@@ -200,8 +200,8 @@ const reconcileSkillsAndBackgrounds = (newState: CharacterSheetData, currentStat
 
         const syncedBgs = ruleBackgrounds.map(name => {
             namesAddedToBgs.add(name);
-            const existing = allExistingSkills.find((e: DotEntry) => e && e.name === name);
-            const libBg = rules.libraries?.backgrounds?.find(b => b.name === name);
+            const existing = allExistingSkills.find((e: DotEntry) => e && normalizeString(e.name) === normalizeString(name));
+            const libBg = rules.libraries?.backgrounds?.find(b => normalizeString(b.name) === normalizeString(name));
             const isVariable = libBg?.isVariable === true;
             const description = libBg?.description || "";
 

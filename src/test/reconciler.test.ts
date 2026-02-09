@@ -1,3 +1,4 @@
+
 import { describe, it, expect } from 'vitest';
 import { reconcileRulesWithState } from '../utils/rulesReconciler';
 import { INITIAL_DATA } from '../data/initialState';
@@ -33,4 +34,37 @@ describe('RulesReconciler', () => {
         // It should have ID 'volonte' to match the counter ID
         expect(skill?.id).toBe('volonte');
     });
+    it('should match existing skill with different case', () => {
+        const initialState = {
+            ...INITIAL_DATA,
+            skills: {
+                'fighter': [
+                    { id: '1', name: 'Force', value: 3, max: 5 } // Existing "Force"
+                ]
+            }
+        };
+
+        const rules: RulesData = {
+            definitions: {
+                skillCategories: [{ id: 'fighter', label: 'Combat', behavior: 'Normal', costConfig: { factor: 1, type: 'linear' } }],
+                skills: { 'fighter': ['force'] }, // Rules has "force" (lowercase)
+                counters: {},
+                labels: {}
+            },
+            configurations: {
+                global: { secondaryAttributes: false, maxAttributeScore: 5, maxSkillScore: 5 },
+                creation: { mode: 'rangs', startingXP: 350, rankSlots: {} },
+                xpCosts: { attributeFactor: 6, skillFactor: 1, specializationFactor: 0 }
+            }
+        } as any;
+
+        const result = reconcileRulesWithState(initialState, rules);
+        const fighterSkills = result.skills['fighter'];
+
+        // Should have only 1 skill (merged), not 2
+        expect(fighterSkills.length).toBe(1);
+        expect(fighterSkills[0].name.toLowerCase()).toBe('force'); // Name matches rule (case might change)
+        expect(fighterSkills[0].value).toBe(3); // Preserves local value
+    });
+
 });

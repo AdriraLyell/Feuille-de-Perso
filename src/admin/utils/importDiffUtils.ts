@@ -166,7 +166,7 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
                         map.set(item.id, item);
                     } else if (options.libraryStrategy === 'copy') {
                         // Create copy with new ID
-                        const copy = { ...item, id: Math.random().toString(36).substr(2, 9) };
+                        const copy = { ...item, id: crypto.randomUUID() };
                         map.set(copy.id, copy);
                     }
                     // if 'ignore', do nothing

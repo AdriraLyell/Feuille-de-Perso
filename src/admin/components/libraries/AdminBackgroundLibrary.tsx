@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryBackgroundEntry } from '../../../types/system'; // Ensure this type is exported from where it was defined (src/types/system.ts)
-import { Search, Plus, Users, Save, AlertOctagon, Edit2, Trash2, Layers } from 'lucide-react';
+import { Search, Plus, Users, Save, AlertOctagon, Edit2, Trash2, Layers, CheckCircle2, Circle, Lock, Globe } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import { smartIncludes } from '../../../utils/stringUtils';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
@@ -10,9 +10,10 @@ import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 interface AdminBackgroundLibraryProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
+    globalUsage?: Record<string, number>;
 }
 
-const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, onUpdate }) => {
+const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
     // @ts-ignore - types might need strict alignment, but runtime is safe if shape matches
     const list: LibraryBackgroundEntry[] = rules.libraries?.backgrounds || [];
 
@@ -27,17 +28,25 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
             .sort((a, b) => a.name.localeCompare(b.name));
     }, [list, searchTerm]);
 
+    const placedNames = useMemo(() => {
+        const names = new Set<string>();
+        const bgCat = rules.definitions.skillCategories?.find((c: any) => c.behavior === 'Arrière-plan')?.id || 'Col_Comp_8';
+        const placed = rules.definitions.skills?.[bgCat] || [];
+        placed.forEach(name => {
+            if (name.trim()) names.add(name.trim().toLowerCase());
+        });
+        return names;
+    }, [rules.definitions]);
+
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
     const handleOpenNew = () => {
         setError(null);
         setEditingItem({
-            id: Math.random().toString(36).substr(2, 9),
+            id: crypto.randomUUID(),
             name: '',
             description: '',
-            isVariable: false,
-            // defaultCategory is not relevant for Backgrounds usually, or fixed to 'arrieres_plans'
-            defaultCategory: 'arrieres_plans'
+            isVariable: false
         });
         setIsModalOpen(true);
     };
@@ -85,6 +94,18 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
         setEditingItem(null);
     };
 
+    const handleBulkSelect = (active: boolean) => {
+        const visibleIds = new Set(filteredList.map(item => item.id));
+        const newList = list.map(item =>
+            visibleIds.has(item.id) ? { ...item, isActive: active } : item
+        );
+        onUpdate({
+            ...rules,
+            // @ts-ignore
+            libraries: { ...rules.libraries, backgrounds: newList }
+        });
+    };
+
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-180px)] flex flex-col">
             <div className="flex justify-between items-center mb-6">
@@ -114,6 +135,26 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                 />
             </div>
 
+            {/* Bulk Actions */}
+            {list.length > 0 && (
+                <div className="flex gap-4 mb-4 px-1">
+                    <button
+                        onClick={() => handleBulkSelect(true)}
+                        className="text-xs font-bold text-purple-600 hover:text-purple-800 flex items-center gap-1.5 transition-colors"
+                    >
+                        <CheckCircle2 size={14} />
+                        Tout activer {searchTerm ? `(${filteredList.length})` : ''}
+                    </button>
+                    <button
+                        onClick={() => handleBulkSelect(false)}
+                        className="text-xs font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1.5 transition-colors"
+                    >
+                        <Circle size={14} />
+                        Tout désactiver {searchTerm ? `(${filteredList.length})` : ''}
+                    </button>
+                </div>
+            )}
+
             <div className="flex-grow overflow-y-auto bg-slate-50 border border-slate-200 rounded p-4 custom-scrollbar">
                 {list.length === 0 ? (
                     <div className="text-center text-slate-400 py-20 italic">Bibliothèque vide.</div>
@@ -121,35 +162,60 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                     <div className="text-center text-slate-400 py-10 italic">Aucun résultat.</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                        {filteredList.map(item => (
-                            <div key={item.id} className={`bg-white border rounded p-3 transition-shadow group flex flex-col justify-between ${item.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
-                                <div>
-                                    <div className="flex justify-between items-start mb-1">
-                                        <div className="flex items-center gap-1.5 overflow-hidden">
-                                            <input
-                                                type="checkbox"
-                                                checked={item.isActive !== false}
-                                                onChange={() => {
-                                                    const newList = list.map(b => b.id === item.id ? { ...b, isActive: !b.isActive } : b);
-                                                    // @ts-ignore
-                                                    onUpdate({ ...rules, libraries: { ...rules.libraries, backgrounds: newList } });
-                                                }}
-                                                className="w-4 h-4 text-purple-600 rounded cursor-pointer"
-                                                title={item.isActive !== false ? "Désactiver" : "Activer"}
-                                            />
-                                            {item.isVariable && <span title="Variable"><Layers size={14} className="text-purple-500 shrink-0" /></span>}
-                                            <span className={`font-bold truncate ${item.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={item.name}>{item.name}</span>
+                        {filteredList.map(item => {
+                            const isPlaced = placedNames.has(item.name.trim().toLowerCase());
+                            const isGloballyUsed = !!globalUsage[item.id];
+                            const isLocked = isPlaced || isGloballyUsed;
+
+                            return (
+                                <div key={item.id} className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${item.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
+                                    {/* 1. Toggle */}
+                                    <div className="w-8 flex justify-center shrink-0">
+                                        <input
+                                            type="checkbox"
+                                            checked={item.isActive !== false}
+                                            onChange={() => {
+                                                const newList = list.map(b => b.id === item.id ? { ...b, isActive: !b.isActive } : b);
+                                                // @ts-ignore
+                                                onUpdate({ ...rules, libraries: { ...rules.libraries, backgrounds: newList } });
+                                            }}
+                                            className="w-4 h-4 text-purple-600 rounded cursor-pointer"
+                                            title={item.isActive !== false ? "Désactiver" : "Activer"}
+                                        />
+                                    </div>
+
+                                    {/* 2. Content */}
+                                    <div className="flex-grow overflow-hidden pr-2">
+                                        <div className={`font-bold truncate text-sm ${item.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={item.name}>
+                                            {item.name}
                                         </div>
-                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
-                                            <button onClick={() => handleOpenEdit(item)} className="text-blue-600 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
-                                            <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
-                                            {item.isGlobal && <span title="Global" className="text-xs text-amber-500 font-bold border border-amber-200 bg-amber-50 px-1 rounded">GLOBAL</span>}
+                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                            {item.isGlobal && <div title="Global Reservoir"><Globe size={11} className="text-indigo-400 shrink-0" /></div>}
+                                            {item.isVariable && <div title="Variable"><Layers size={11} className="text-purple-400 shrink-0" /></div>}
+                                            {isLocked && <div className="text-amber-500 shrink-0" title={isPlaced ? "Utilisé dans cette campagne" : "Utilisé dans d'autres campagnes"}><Lock size={11} /></div>}
+                                            {item.description && (
+                                                <div className="text-[10px] text-slate-500 italic truncate" title={item.description}>
+                                                    {item.description}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                    {item.description && <p className="text-xs text-slate-500 italic line-clamp-2 mb-2">{item.description}</p>}
+
+                                    {/* 4. Actions */}
+                                    <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                        <button onClick={() => handleOpenEdit(item)} className="text-blue-600 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
+                                        <button
+                                            onClick={() => handleDelete(item.id)}
+                                            disabled={isLocked}
+                                            className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
+                                            title={isLocked ? "Suppression bloquée : utilisé" : "Supprimer définitivement"}
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

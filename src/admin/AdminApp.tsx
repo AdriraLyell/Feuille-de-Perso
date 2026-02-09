@@ -35,6 +35,7 @@ import LoginScreen from './components/LoginScreen';
 import { LogOut } from 'lucide-react';
 import GlobalPlayersView from './components/GlobalPlayersView';
 import { ErrorService } from '../services/ErrorService';
+import { LibraryService } from '../services/LibraryService';
 
 const AdminApp: React.FC = () => {
     // Auth State
@@ -65,6 +66,7 @@ const AdminApp: React.FC = () => {
     const [showDeployModal, setShowDeployModal] = useState(false);
     const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'costs' | 'libraries' | 'players'>('general');
     const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters'>('traits');
+    const [globalUsage, setGlobalUsage] = useState<Record<string, number>>({});
 
     // Import Modal State
     const [showImportResult, setShowImportResult] = useState(false);
@@ -97,11 +99,16 @@ const AdminApp: React.FC = () => {
     // Persistence Hook
     const { hasUnsavedChanges, markAsSaved, resetPersistence } = usePersistence(rules);
 
-    const handleSelectSetting = (id: string, name: string, loadedRules: RulesData) => {
+    const handleSelectSetting = async (id: string, name: string, loadedRules: RulesData) => {
         setCurrentSettingId(id);
         setCurrentSettingName(name);
         setRules(loadedRules);
         resetPersistence(); // Reset dirty state for new load
+
+        // Load global usage stats
+        const usage = await LibraryService.loadGlobalUsage(id);
+        setGlobalUsage(usage || {});
+
         setViewMode('editor');
     };
 
@@ -466,19 +473,19 @@ const AdminApp: React.FC = () => {
                         </div>
 
                         {activeLibraryTab === 'traits' && (
-                            <AdminTraitLibrary rules={rules} onUpdate={handleUpdateRules} />
+                            <AdminTraitLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />
                         )}
                         {activeLibraryTab === 'skills' && (
-                            <AdminSkillLibrary rules={rules} onUpdate={handleUpdateRules} />
+                            <AdminSkillLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />
                         )}
                         {activeLibraryTab === 'backgrounds' && (
-                            <AdminBackgroundLibrary rules={rules} onUpdate={handleUpdateRules} />
+                            <AdminBackgroundLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />
                         )}
                         {activeLibraryTab === 'counters' && (
-                            <AdminCounterLibrary rules={rules} onUpdate={handleUpdateRules} />
+                            <AdminCounterLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />
                         )}
                         {activeLibraryTab === 'specializations' && (
-                            <AdminSpecializationLibrary rules={rules} onUpdate={handleUpdateRules} />
+                            <AdminSpecializationLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />
                         )}
                     </div>
                 )}
@@ -506,7 +513,7 @@ const AdminApp: React.FC = () => {
                         onClose={() => { setWizardOpen(false); setCandidateRules(null); }}
                         currentRules={rules}
                         candidateRules={candidateRules}
-                        onConfirm={(merged) => {
+                        onConfirm={(merged: RulesData) => {
                             handleUpdateRules(merged);
                             setWizardOpen(false);
                             setCandidateRules(null);

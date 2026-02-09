@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibrarySkillEntry } from '../../../types';
-import { Search, Plus, GraduationCap, Save, AlertOctagon, HelpCircle, X, Layers, Edit2, Trash2, UploadCloud } from 'lucide-react';
+import { Search, Plus, GraduationCap, Save, AlertOctagon, HelpCircle, X, Layers, Edit2, Trash2, UploadCloud, CheckCircle2, Circle, Lock, Globe } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import { CATEGORY_HELP } from '../../../data/constants';
 import { smartIncludes } from '../../../utils/stringUtils';
@@ -13,9 +13,10 @@ import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 interface AdminSkillLibraryProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
+    globalUsage?: Record<string, number>;
 }
 
-const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }) => {
+const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
     const list = rules.libraries?.skills || [];
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -51,6 +52,18 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
         return availableCategories.find(c => c.code === code)?.label || code;
     };
 
+    const placedSkillNames = useMemo(() => {
+        const names = new Set<string>();
+        if (rules.definitions.skills) {
+            Object.values(rules.definitions.skills).forEach((skillsArray: string[]) => {
+                skillsArray.forEach(name => {
+                    if (name.trim()) names.add(name.trim().toLowerCase());
+                });
+            });
+        }
+        return names;
+    }, [rules.definitions.skills]);
+
     const [showPublishConfirm, setShowPublishConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
     const [publishResult, setPublishResult] = useState<{ success: boolean; message: string } | null>(null);
@@ -59,10 +72,9 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
     const handleOpenNew = () => {
         setError(null);
         setEditingSkill({
-            id: Math.random().toString(36).substr(2, 9),
+            id: crypto.randomUUID(),
             name: '',
             description: '',
-            defaultCategory: '',
             isVariable: false
         });
         setIsModalOpen(true);
@@ -107,6 +119,17 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
         });
         setIsModalOpen(false);
         setEditingSkill(null);
+    };
+
+    const handleBulkSelect = (active: boolean) => {
+        const visibleIds = new Set(filteredList.map(s => s.id));
+        const newList = list.map(skill =>
+            visibleIds.has(skill.id) ? { ...skill, isActive: active } : skill
+        );
+        onUpdate({
+            ...rules,
+            libraries: { ...rules.libraries, skills: newList }
+        });
     };
 
     const handlePublishClick = () => {
@@ -190,6 +213,26 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
                 />
             </div>
 
+            {/* Bulk Actions */}
+            {list.length > 0 && (
+                <div className="flex gap-4 mb-4 px-1">
+                    <button
+                        onClick={() => handleBulkSelect(true)}
+                        className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1.5 transition-colors"
+                    >
+                        <CheckCircle2 size={14} />
+                        Tout activer {searchTerm ? `(${filteredList.length})` : ''}
+                    </button>
+                    <button
+                        onClick={() => handleBulkSelect(false)}
+                        className="text-xs font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1.5 transition-colors"
+                    >
+                        <Circle size={14} />
+                        Tout désactiver {searchTerm ? `(${filteredList.length})` : ''}
+                    </button>
+                </div>
+            )}
+
             <div className="flex-grow overflow-y-auto bg-slate-50 border border-slate-200 rounded p-4 custom-scrollbar">
                 {list.length === 0 ? (
                     <div className="text-center text-slate-400 py-20 italic">La réserve est vide.</div>
@@ -197,45 +240,65 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
                     <div className="text-center text-slate-400 py-10 italic">Aucun résultat.</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                        {filteredList.map(skill => (
-                            <div key={skill.id} className={`bg-white border rounded p-3 transition-shadow group flex flex-col justify-between ${skill.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
-                                <div>
-                                    <div className="flex justify-between items-start mb-1">
-                                        <div className="flex items-center gap-1.5 overflow-hidden">
-                                            {/* Selection Toggle */}
-                                            <input
-                                                type="checkbox"
-                                                checked={skill.isActive !== false}
-                                                onChange={() => {
-                                                    const newList = list.map(s => s.id === skill.id ? { ...s, isActive: !s.isActive } : s);
-                                                    onUpdate({ ...rules, libraries: { ...rules.libraries, skills: newList } });
-                                                }}
-                                                className="w-4 h-4 text-blue-600 rounded cursor-pointer"
-                                                title={skill.isActive !== false ? "Désactiver (Retirer de la campagne)" : "Activer (Ajouter à la campagne)"}
-                                            />
-                                            {skill.isVariable && <span title="Compétence à variantes"><Layers size={14} className="text-blue-500 shrink-0" /></span>}
-                                            <span className={`font-bold truncate ${skill.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={skill.name}>{skill.name}</span>
-                                        </div>
-                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
-                                            {/* Edit */}
-                                            <button onClick={() => handleOpenEdit(skill)} className="text-blue-600 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
+                        {filteredList.map(skill => {
+                            const isPlaced = placedSkillNames.has(skill.name.trim().toLowerCase());
+                            const isGloballyUsed = !!globalUsage[skill.id];
+                            const isLocked = isPlaced || isGloballyUsed;
 
-                                            {/* Delete: Only for Local. Global is handled via checkbox */}
-                                            {!skill.isGlobal && (
-                                                <button onClick={() => handleDelete(skill.id)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
+                            return (
+                                <div key={skill.id} className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${skill.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
+                                    {/* 1. Toggle (Fixed width) */}
+                                    <div className="w-8 flex justify-center shrink-0">
+                                        <input
+                                            type="checkbox"
+                                            checked={skill.isActive !== false}
+                                            onChange={() => {
+                                                const newList = list.map(s => s.id === skill.id ? { ...s, isActive: !s.isActive } : s);
+                                                onUpdate({ ...rules, libraries: { ...rules.libraries, skills: newList } });
+                                            }}
+                                            className="w-4 h-4 text-blue-600 rounded cursor-pointer"
+                                            title={skill.isActive !== false ? "Désactiver (Retirer de la campagne)" : "Activer (Ajouter à la campagne)"}
+                                        />
+                                    </div>
+
+                                    {/* 2. Content (Flexible) */}
+                                    <div className="flex-grow overflow-hidden pr-2">
+                                        <div className={`font-bold truncate text-sm ${skill.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={skill.name}>
+                                            {skill.name}
+                                        </div>
+                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                            {skill.isGlobal && <div title="Global Reservoir"><Globe size={11} className="text-indigo-400 shrink-0" /></div>}
+                                            {skill.isVariable && <div title="Compétence à variantes"><Layers size={11} className="text-blue-400 shrink-0" /></div>}
+                                            {isLocked && <div className="text-amber-500 shrink-0" title={isPlaced ? "Utilisée dans cette campagne" : "Utilisée dans d'autres campagnes"}><Lock size={11} /></div>}
+                                            {skill.description && (
+                                                <div className="text-[10px] text-slate-500 italic truncate" title={skill.description}>
+                                                    {skill.description}
+                                                </div>
                                             )}
-                                            {skill.isGlobal && <span title="Compétence Globale (Lecture Seule)" className="text-xs text-amber-500 font-bold border border-amber-200 bg-amber-50 px-1 rounded">GLOBAL</span>}
                                         </div>
                                     </div>
-                                    {skill.description && <p className="text-xs text-slate-500 italic line-clamp-2 mb-2">{skill.description}</p>}
+
+                                    {/* 4. Actions (Fixed width) */}
+                                    <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                        <button
+                                            onClick={() => handleOpenEdit(skill)}
+                                            className="text-blue-600 hover:bg-blue-50 p-1 rounded"
+                                            title="Modifier"
+                                        >
+                                            <Edit2 size={14} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(skill.id)}
+                                            disabled={isLocked}
+                                            className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
+                                            title={isLocked ? "Suppression bloquée : compétence utilisée" : "Supprimer définitivement du repository"}
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
                                 </div>
-                                {skill.defaultCategory && (
-                                    <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200 self-start">
-                                        {getCategoryLabel(skill.defaultCategory)}
-                                    </span>
-                                )}
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
@@ -256,82 +319,66 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate }
                         </>
                     }
                 >
-                    <div className="flex flex-col lg:flex-row gap-8 py-2">
+                    <div className="flex flex-col gap-5 py-2">
                         {/* Editor Form */}
-                        <div className="flex-grow flex flex-col gap-5">
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nom</label>
-                                <input
-                                    className="w-full border border-slate-300 rounded px-3 py-2 font-bold focus:border-blue-500 outline-none"
-                                    value={editingSkill.name}
-                                    onChange={(e) => setEditingSkill({ ...editingSkill, name: e.target.value })}
-                                    autoFocus
-                                />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="flex flex-col gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nom</label>
+                                    <input
+                                        className="w-full border border-slate-300 rounded px-3 py-2 font-bold focus:border-blue-500 outline-none"
+                                        value={editingSkill.name}
+                                        onChange={(e) => setEditingSkill({ ...editingSkill, name: e.target.value })}
+                                        autoFocus
+                                    />
+                                </div>
+                                <div className="bg-blue-50 border border-blue-200 rounded p-3 flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        id="isVariableSkill"
+                                        className="w-4 h-4 text-blue-600 rounded cursor-pointer"
+                                        checked={editingSkill.isVariable || false}
+                                        onChange={(e) => setEditingSkill({ ...editingSkill, isVariable: e.target.checked })}
+                                    />
+                                    <label htmlFor="isVariableSkill" className="cursor-pointer select-none">
+                                        <span className="block text-sm font-bold text-blue-900 leading-tight">Variantes requises</span>
+                                        <span className="block text-[10px] text-blue-700 leading-tight">Ex: "Artisanat : Forge"</span>
+                                    </label>
+                                </div>
                             </div>
-                            <div>
+                            <div className="flex flex-col">
                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Description</label>
                                 <textarea
-                                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm min-h-[100px] focus:border-blue-500 outline-none resize-none"
+                                    className="w-full flex-grow border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 outline-none resize-none min-h-[120px]"
                                     value={editingSkill.description || ''}
                                     onChange={(e) => setEditingSkill({ ...editingSkill, description: e.target.value })}
                                 />
                             </div>
-                            <div>
-                                <div className="flex justify-between items-center mb-1">
-                                    <label className="block text-xs font-bold text-slate-500 uppercase">Catégorie par défaut</label>
-                                    <button onClick={() => setShowCategoryHelp(!showCategoryHelp)} className="text-xs text-blue-600 flex items-center gap-1 hover:underline">
-                                        <HelpCircle size={12} /> Aide
-                                    </button>
-                                </div>
-                                <select
-                                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 outline-none"
-                                    value={editingSkill.defaultCategory || ''}
-                                    onChange={(e) => setEditingSkill({ ...editingSkill, defaultCategory: e.target.value })}
-                                >
-                                    <option value="">-- Aucune --</option>
-                                    {availableCategories.map(cat => (
-                                        <option key={cat.code} value={cat.code}>{cat.label}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="bg-blue-50 border border-blue-200 rounded p-3 flex items-center gap-3">
-                                <input
-                                    type="checkbox"
-                                    id="isVariableSkill"
-                                    className="w-4 h-4 text-blue-600 rounded"
-                                    checked={editingSkill.isVariable || false}
-                                    onChange={(e) => setEditingSkill({ ...editingSkill, isVariable: e.target.checked })}
-                                />
-                                <label htmlFor="isVariableSkill" className="cursor-pointer select-none">
-                                    <span className="block text-sm font-bold text-blue-900">Compétence à Variantes</span>
-                                    <span className="block text-xs text-blue-700">Cochez si le joueur doit préciser quelque chose (ex: "Artisanat : Forge").</span>
-                                </label>
-                            </div>
-                            {error && (
-                                <div className="bg-red-50 text-red-800 text-xs p-3 rounded border border-red-200 font-bold flex items-center gap-2">
-                                    <AlertOctagon size={16} /> {error}
-                                </div>
-                            )}
                         </div>
-
-                        {/* Help Panel */}
-                        {showCategoryHelp && (
-                            <div className="w-full lg:w-72 shrink-0 animate-in slide-in-from-right-4 duration-300 bg-slate-50 p-4 rounded border border-slate-200">
-                                <div className="flex justify-between items-center mb-2 pb-2 border-b border-slate-200">
-                                    <h4 className="font-bold text-slate-700 text-sm">Codes Catégories</h4>
-                                    <button onClick={() => setShowCategoryHelp(false)}><X size={14} /></button>
-                                </div>
-                                <div className="space-y-2 text-xs">
-                                    {availableCategories.map(cat => (
-                                        <div key={cat.code} className="grid grid-cols-[1fr_2fr] gap-2">
-                                            <code className="bg-slate-200 px-1 rounded font-mono text-slate-700">{cat.code}</code>
-                                            <span className="text-slate-500">{cat.label}</span>
-                                        </div>
-                                    ))}
-                                </div>
+                        {error && (
+                            <div className="bg-red-50 text-red-800 text-xs p-3 rounded border border-red-200 font-bold flex items-center gap-2">
+                                <AlertOctagon size={16} /> {error}
                             </div>
                         )}
                     </div>
+
+                    {/* Help Panel */}
+                    {showCategoryHelp && (
+                        <div className="w-full lg:w-72 shrink-0 animate-in slide-in-from-right-4 duration-300 bg-slate-50 p-4 rounded border border-slate-200">
+                            <div className="flex justify-between items-center mb-2 pb-2 border-b border-slate-200">
+                                <h4 className="font-bold text-slate-700 text-sm">Codes Catégories</h4>
+                                <button onClick={() => setShowCategoryHelp(false)}><X size={14} /></button>
+                            </div>
+                            <div className="space-y-2 text-xs">
+                                {availableCategories.map(cat => (
+                                    <div key={cat.code} className="grid grid-cols-[1fr_2fr] gap-2">
+                                        <code className="bg-slate-200 px-1 rounded font-mono text-slate-700">{cat.code}</code>
+                                        <span className="text-slate-500">{cat.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </ThematicModal>
             )}
 

@@ -1,5 +1,234 @@
 [
     {
+        "version": "2.32.4",
+        "date": "2026-02-10",
+        "description": "Filtre 'Masquer acquis' pour les Bibliothèques.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Ajout d'un filtre (œil) pour masquer les compétences et spécialisations déjà acquises dans la bibliothèque.",
+                "category": "feature"
+            },
+            {
+                "type": "modified",
+                "text": "Remplacement du badge 'OFF'/'OFFICIEL' par une icône Globe pour uniformiser l'interface.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.32.3",
+        "date": "2026-02-10",
+        "description": "Correction des doublons dans la Bibliothèque (Joueur & Admin).",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "Élimination des compétences et traits dupliqués dans la bibliothèque du joueur (fusion insensible à la casse).",
+                "category": "core"
+            },
+            {
+                "type": "fixed",
+                "text": "Correction de l'assistant d'import Admin : exclusion des Historiques dans l'onglet Compétences et dédoublonnage des Compteurs.",
+                "category": "fix"
+            },
+            {
+                "type": "improved",
+                "text": "Renforcement de la sécurité backend : vérification anti-doublon lors de l'import de bibliothèque.",
+                "category": "core"
+            }
+        ]
+    },
+    {
+        "version": "2.32.2",
+        "date": "2026-02-10",
+        "description": "Ajustement layout : Noms sur une ligne, icônes déportées.",
+        "changes": [
+            {
+                "type": "modified",
+                "text": "Retour au nom sur une seule ligne avec icônes de statut déplacées sur la ligne de description (Skills/Backgrounds).",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.32.1",
+        "date": "2026-02-10",
+        "description": "Amélioration layout : Noms multi-lignes.",
+        "changes": [
+            {
+                "type": "modified",
+                "text": "Support des noms sur deux lignes pour les cartes Compétences et Arrières-plans dans l'admin.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.32.0",
+        "date": "2026-02-10",
+        "description": "Harmonisation UI des bibliothèques Administrateur.",
+        "changes": [
+            {
+                "type": "modified",
+                "text": "Refonte visuelle premium des onglets Compétences, Origines, Compteurs, Spécialisations et Traits.",
+                "category": "ui"
+            },
+            {
+                "type": "added",
+                "text": "Colonnes interactives à largeur fixe pour une navigation plus fluide.",
+                "category": "ui"
+            },
+            {
+                "type": "modified",
+                "text": "Remplacement des badges textuels par des icônes intuitives (Global, Lock, Variantes).",
+                "category": "ui"
+            },
+            {
+                "type": "fixed",
+                "text": "Correction de types TypeScript sur les icônes Lucide pour assurer l'intégrité du build.",
+                "category": "fix"
+            }
+        ]
+    },
+    {
+        "version": "2.31.0",
+        "date": "2026-02-09",
+        "description": "Sécurisation de l'intégrité des données : Verrouillage des items.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Indicateurs visuels (cadenas) pour les items de bibliothèque en cours d'utilisation.",
+                "category": "ui"
+            },
+            {
+                "type": "added",
+                "text": "Blocage de la suppression des items 'placés' dans la configuration ou actifs dans d'autres campagnes.",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Suivi global de l'utilisation des items à travers toutes les campagnes via Supabase.",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Mise à jour de toutes les bibliothèques (Compétences, Historiques, Compteurs, Traits, Spécialisations).",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.30.5",
+        "date": "2026-02-09",
+        "description": "Généralisation des actions en masse (Admin).",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Extension des actions 'Tout activer / Tout désactiver' aux bibliothèques d'Historiques, Compteurs, Spécialisations et Traits.",
+                "category": "ui"
+            },
+            {
+                "type": "improved",
+                "text": "Cohérence visuelle et fonctionnelle des actions en masse sur l'ensemble de la section Admin.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.30.4",
+        "date": "2026-02-09",
+        "description": "Amélioration ergonomie Bibliothèque (Admin).",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Ajout d'actions en masse (Tout activer / Tout désactiver) dans la réserve de compétences.",
+                "category": "ui"
+            },
+            {
+                "type": "improved",
+                "text": "Les actions en masse respectent le filtre de recherche actif.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.30.3",
+        "date": "2026-02-09",
+        "description": "Sécurisation de la persistance (Admin).",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "Correction d'une faille de synchronisation provoquant la perte de données lors de l'ajout de nouveaux items ou de l'activation massive.",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Standardisation de la génération d'ID via UUID pour une meilleure compatibilité avec Supabase.",
+                "category": "core"
+            }
+        ]
+    },
+    {
+        "version": "2.30.2",
+        "date": "2026-02-09",
+        "description": "Optimisation Admin v2.",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "Rétablissement de la suppression pour les items de bibliothèque partagés (Repository).",
+                "category": "fix"
+            },
+            {
+                "type": "improved",
+                "text": "Refonte ergonomique de la modale d'édition des compétences (meilleur équilibre Nom/Description/Variante).",
+                "category": "ui"
+            },
+            {
+                "type": "removed",
+                "text": "Nettoyage des items dupliqués entre les bibliothèques de compétences, compteurs et historiques.",
+                "category": "cleanup"
+            }
+        ]
+    },
+    {
+        "version": "2.30.1",
+        "date": "2026-02-09",
+        "description": "Correctif de la Réserve (Admin).",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "La réserve de l'admin ne montre désormais que les compétences/historiques/compteurs explicitement sélectionnés pour la campagne.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.30.0",
+        "date": "2026-02-09",
+        "description": "Architecture 'Global Repository' & Gestion localisée des catégories.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Migration vers le modèle 'Global Repository' : tous les items de bibliothèque sont désormais partagés.",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Gestion des catégories par défaut déplacée dans le contexte local de la campagne (Réserve).",
+                "category": "ui"
+            },
+            {
+                "type": "changed",
+                "text": "Refonte des services LibraryLoader et LibraryPersistence pour garantir l'intégrité des items globaux.",
+                "category": "core"
+            },
+            {
+                "type": "fixed",
+                "text": "Suppression des risques de perte de données lors de la synchronisation des bibliothèques.",
+                "category": "fix"
+            }
+        ]
+    },
+    {
         "version": "2.29.3",
         "date": "2026-02-09",
         "description": "Audit & Online First : Supabase Integration",
@@ -118,119 +347,6 @@
             "L'onglet 'Cloud' est désormais accessible en tout temps (hors réglages avancés).",
             "Ajout d'un feedback visuel en temps réel sur le bouton de synchronisation (icône en rotation + texte 'Sync...').",
             "Correction d'un problème de portée de variable dans le contexte de personnage."
-        ]
-    },
-    {
-        "version": "2.27.0",
-        "date": "2026-02-09",
-        "description": "Implémentation de la synchronisation automatique (Auto-Sync).",
-        "changes": [
-            "Ajout d'un toggle d'auto-sync dans la modale de synchronisation.",
-            "Nouvel onglet 'Cloud' dans les réglages de la fiche pour gérer l'auto-sync.",
-            "Mécanisme de sauvegarde automatique debounced (10s) pour éviter les surcharges.",
-            "Indicateurs visuels d'état de synchronisation dans la barre de navigation."
-        ]
-    },
-    {
-        "version": "2.26.1",
-        "date": "2026-02-09",
-        "changes": [
-            "Fix: Correction d'un bug 400 lors du chargement des personnages orphelins (ID 'orphan')",
-            "Refactor: Migration finale de PlayerService vers DatabaseService",
-            "Robustesse: Centralisation totale des appels Supabase dans la couche service"
-        ]
-    },
-    {
-        "version": "2.26.0",
-        "date": "2026-02-09",
-        "changes": [
-            "Refactoring technique majeur : Centralisation des appels base de données (DatabaseService).",
-            "Optimisation des performances : Utilisation de requêtes groupées pour les bibliothèques.",
-            "Fiabilisation : Gestion d'erreurs uniforme pour les opérations de sauvegarde et chargement."
-        ]
-    },
-    {
-        "version": "2.25.2",
-        "date": "2026-02-09",
-        "changes": [
-            "Validation : Tests E2E pour le RulesReconciler assurant la non-régression",
-            "Optimisation : Versionning interne des règles pour limiter les recalculs",
-            "Maintenance : Stabilisation du build suite au passage en TypeScript Strict"
-        ]
-    },
-    {
-        "version": "2.25.1",
-        "date": "2026-02-09",
-        "changes": [
-            "Tech : Migration complète des logs d'erreurs vers ErrorService pour une meilleure observabilité",
-            "Fix : Correction d'un import dupliqué bloquant le build dans CharacterSyncService",
-            "Refactoring : Nettoyage du code dans les composants d'administration et d'import/export"
-        ]
-    },
-    {
-        "version": "2.25.0",
-        "date": "2026-02-09",
-        "changes": [
-            "🛡️ Activation du mode Strict TypeScript pour une sécurité accrue",
-            "🔧 Correction de +50 erreurs de typage implicites et de null checks",
-            "🐛 Correctifs multiples sur l'import de données et la synchro",
-            "⚡ Optimisation des scripts utilitaires"
-        ]
-    },
-    {
-        "version": "2.24.21",
-        "date": "2026-02-09",
-        "changes": [
-            "Fix : La liste des historiques est désormais complète même si certains ne sont définis que dans les colonnes de compétences",
-            "Amélioration : Fusion automatique des définitions d'historiques pour garantir l'intégrité des données"
-        ]
-    },
-    {
-        "version": "2.24.20",
-        "date": "2026-02-09",
-        "changes": [
-            "Fix : Correction majeure des doublons de compétences dans les Historiques",
-            "Amélioration : Algorithme de déduplication globale lors de la réconciliation des règles",
-            "Sécurité : Critère de migration des Historiques affiné pour éviter les faux positifs"
-        ]
-    },
-    {
-        "version": "2.24.19",
-        "date": "2026-02-09",
-        "changes": [
-            "Fix : Robustesse des Historiques lors du chargement cloud",
-            "Fix : Plus aucune perte de biographies personnalisées lors d'un changement de campagne",
-            "Amélioration : Le système scanne désormais toutes les colonnes pour préserver les données historiques",
-            "Fix : Correction d'une erreur potentielle (TypeError) dans le moteur de réconciliation"
-        ]
-    },
-    {
-        "version": "2.24.18",
-        "date": "2026-02-09",
-        "changes": [
-            "Hotfix UX : Amélioration de la réactivité après chargement cloud (plus besoin de rafraîchir)",
-            "Correction : Réconciliation immédiate des données cloud avec les règles de la campagne active",
-            "Amélioration : Forçage de la synchronisation des règles même si la campagne reste identique"
-        ]
-    },
-    {
-        "version": "2.24.17",
-        "date": "2026-02-09",
-        "changes": [
-            "Fix: Disparition des compteurs lors du chargement Cloud (IDs de catégories dynamiques)",
-            "Fix: Migration non-destructive des compteurs pour préserver les compteurs personnalisés et système",
-            "Fix: Crash du moteur de réconciliation dû à un import manquant (normalizeString)",
-            "Fix: Robustesse accrue du calcul XP pour les compteurs personnalisés"
-        ]
-    },
-    {
-        "version": "2.24.16",
-        "date": "2026-02-09",
-        "changes": [
-            "Hotfix : Réalignement strict des IDs entre Compteurs et Compétences",
-            "Correctif : Synchronisation des définitions utilisant les UUIDs de la bibliothèque",
-            "Correctif : Réactivation de la réactivité du calcul d'XP sur les compteurs",
-            "Amélioration de la réconciliation des règles pour préserver l'intégrité des IDs"
         ]
     }
 ]

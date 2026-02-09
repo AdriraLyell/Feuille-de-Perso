@@ -1,5 +1,76 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.17.10] - 2026-02-06 [PATCH]
+
+- UI : Suppression des doublons de texte 'X Pavés' dans les widgets de préréglages.
+- UI : Unification du rendu entre les préréglages officiels et personnalisés.
+
+## [2.17.9] - 2026-02-06 [PATCH]
+
+- Hotfix : Correction de l'import manquant de l'icône Shield.
+- Hotfix : Suppression de la prop résiduelle onAddAttribute dans l'éditeur d'attributs.
+
+## [2.17.8] - 2026-02-06 [PATCH]
+
+- UI : Dé placement du bouton 'Ajouter un Attribut' dans le header de la section Attributs pour plus de clarté.
+- Nettoyage : Suppression des boutons d'ajout redondants sur chaque pavé d'attributs.
+
+## [2.17.7] - 2026-02-06 [PATCH]
+
+- Refactorisation majeure de l'éditeur d'attributs Admin (AdminAttributesEditor).
+- Extraction de la logique métier dans un hook personnalisé useAttributeEditor.ts.
+- Réduction de 70% de la taille du composant UI AdminAttributesEditor.
+- Amélioration de la maintenance et de la lisibilité de la gestion des attributs.
+
+## [2.17.6] - 2026-02-06 [PATCH]
+
+- Hotfix : Correction des imports brisés suite au renommage de AdminService en CampaignService.
+- Hotfix : Restauration des imports manquants (RulesData, React) dans AdminCreationEditor.
+- Fix : Correction d'une erreur de type TypeScript sur le Drag & Drop des compétences.
+
+## [2.17.5] - 2026-02-06 [PATCH]
+
+- Refactorisation finale des services Admin (AdminService)
+- Renommage de AdminService en CampaignService (gestion CRUD des campagnes)
+- Création de RuleCalculationsService pour centraliser les formules de calcul (XP, Coûts, Cartes)
+- Unification de la logique de calcul entre MJ et Joueur via mechanics.ts
+
+## [2.17.4] - 2026-02-06 [PATCH]
+
+- Refactorisation de l'éditeur de création (AdminCreationEditor)
+- Extraction des sous-composants : CreationGeneralSettings, RankSlotsConfig, CreationPointsPreview et CardSystemConfig
+- Simplification du fichier principal et isolation des zones de configuration
+
+## [2.17.3] - 2026-02-06 [PATCH]
+
+- Modularisation de l'éditeur de compétences (AdminSkillsEditor)
+- Extraction du composant SkillCategoryCard pour une meilleure gestion des colonnes
+- Simplification de la logique de Drag & Drop inter-colonnes
+
+## [2.17.2] - 2026-02-06 [PATCH]
+
+- Optimisation du journal des modifications (split JSON et automatisation de l'archivage)
+- Chargement asynchrone (lazy-loading) de l'historique ancien pour améliorer les performances au démarrage
+- Mise en place d'une rotation automatique : Top 20 (Main) / Top 100 (Archive) / Legacy (Markdown)
+
+## [2.17.1] - 2026-02-06 [PATCH]
+
+- Modularisation massive de l'éditeur d'attributs (AdminAttributesEditor)
+- Création du sous-composant AttributeCategoryCard (gestion d'un pavé)
+- Création du sous-composant AttributePresetManager (gestion des préréglages et sauvegarde)
+- Optimisation du code et réduction de la complexité du fichier principal
+
+## [2.17.0] - 2026-02-06 [MINOR]
+
+- Refactoring majeur de AdminService : extraction des responsabilités vers AttributeService et LibraryService
+- Centralisation des constantes d'attributs (defaults/attributes.ts) pour une meilleure cohérence MJ/Joueur et support Offline
+- Optimisation du moteur de synchronisation des bibliothèques (Traits, Compétences, Arrières-plans, Compteurs)
+- Amélioration de la robustesse du typage global (RulesData, GameSetting)
+
+## [2.16.6] - 2026-02-05 [PATCH]
+
+- Correction du placement par défaut des compteurs (Volonté/Confiance) lors de la création d'une nouvelle campagne
+
 ## [2.16.5] - 2026-02-05 [PATCH]
 
 - Finalisation de l'intégration du Dot-System dans le header des cartes de préréglages

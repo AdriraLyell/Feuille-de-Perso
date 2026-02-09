@@ -1,5 +1,118 @@
 [
     {
+        "version": "2.27.0",
+        "date": "2026-02-09",
+        "description": "Implémentation de la synchronisation automatique (Auto-Sync).",
+        "changes": [
+            "Ajout d'un toggle d'auto-sync dans la modale de synchronisation.",
+            "Nouvel onglet 'Cloud' dans les réglages de la fiche pour gérer l'auto-sync.",
+            "Mécanisme de sauvegarde automatique debounced (10s) pour éviter les surcharges.",
+            "Indicateurs visuels d'état de synchronisation dans la barre de navigation."
+        ]
+    },
+    {
+        "version": "2.26.1",
+        "date": "2026-02-09",
+        "changes": [
+            "Fix: Correction d'un bug 400 lors du chargement des personnages orphelins (ID 'orphan')",
+            "Refactor: Migration finale de PlayerService vers DatabaseService",
+            "Robustesse: Centralisation totale des appels Supabase dans la couche service"
+        ]
+    },
+    {
+        "version": "2.26.0",
+        "date": "2026-02-09",
+        "changes": [
+            "Refactoring technique majeur : Centralisation des appels base de données (DatabaseService).",
+            "Optimisation des performances : Utilisation de requêtes groupées pour les bibliothèques.",
+            "Fiabilisation : Gestion d'erreurs uniforme pour les opérations de sauvegarde et chargement."
+        ]
+    },
+    {
+        "version": "2.25.2",
+        "date": "2026-02-09",
+        "changes": [
+            "Validation : Tests E2E pour le RulesReconciler assurant la non-régression",
+            "Optimisation : Versionning interne des règles pour limiter les recalculs",
+            "Maintenance : Stabilisation du build suite au passage en TypeScript Strict"
+        ]
+    },
+    {
+        "version": "2.25.1",
+        "date": "2026-02-09",
+        "changes": [
+            "Tech : Migration complète des logs d'erreurs vers ErrorService pour une meilleure observabilité",
+            "Fix : Correction d'un import dupliqué bloquant le build dans CharacterSyncService",
+            "Refactoring : Nettoyage du code dans les composants d'administration et d'import/export"
+        ]
+    },
+    {
+        "version": "2.25.0",
+        "date": "2026-02-09",
+        "changes": [
+            "🛡️ Activation du mode Strict TypeScript pour une sécurité accrue",
+            "🔧 Correction de +50 erreurs de typage implicites et de null checks",
+            "🐛 Correctifs multiples sur l'import de données et la synchro",
+            "⚡ Optimisation des scripts utilitaires"
+        ]
+    },
+    {
+        "version": "2.24.21",
+        "date": "2026-02-09",
+        "changes": [
+            "Fix : La liste des historiques est désormais complète même si certains ne sont définis que dans les colonnes de compétences",
+            "Amélioration : Fusion automatique des définitions d'historiques pour garantir l'intégrité des données"
+        ]
+    },
+    {
+        "version": "2.24.20",
+        "date": "2026-02-09",
+        "changes": [
+            "Fix : Correction majeure des doublons de compétences dans les Historiques",
+            "Amélioration : Algorithme de déduplication globale lors de la réconciliation des règles",
+            "Sécurité : Critère de migration des Historiques affiné pour éviter les faux positifs"
+        ]
+    },
+    {
+        "version": "2.24.19",
+        "date": "2026-02-09",
+        "changes": [
+            "Fix : Robustesse des Historiques lors du chargement cloud",
+            "Fix : Plus aucune perte de biographies personnalisées lors d'un changement de campagne",
+            "Amélioration : Le système scanne désormais toutes les colonnes pour préserver les données historiques",
+            "Fix : Correction d'une erreur potentielle (TypeError) dans le moteur de réconciliation"
+        ]
+    },
+    {
+        "version": "2.24.18",
+        "date": "2026-02-09",
+        "changes": [
+            "Hotfix UX : Amélioration de la réactivité après chargement cloud (plus besoin de rafraîchir)",
+            "Correction : Réconciliation immédiate des données cloud avec les règles de la campagne active",
+            "Amélioration : Forçage de la synchronisation des règles même si la campagne reste identique"
+        ]
+    },
+    {
+        "version": "2.24.17",
+        "date": "2026-02-09",
+        "changes": [
+            "Fix: Disparition des compteurs lors du chargement Cloud (IDs de catégories dynamiques)",
+            "Fix: Migration non-destructive des compteurs pour préserver les compteurs personnalisés et système",
+            "Fix: Crash du moteur de réconciliation dû à un import manquant (normalizeString)",
+            "Fix: Robustesse accrue du calcul XP pour les compteurs personnalisés"
+        ]
+    },
+    {
+        "version": "2.24.16",
+        "date": "2026-02-09",
+        "changes": [
+            "Hotfix : Réalignement strict des IDs entre Compteurs et Compétences",
+            "Correctif : Synchronisation des définitions utilisant les UUIDs de la bibliothèque",
+            "Correctif : Réactivation de la réactivité du calcul d'XP sur les compteurs",
+            "Amélioration de la réconciliation des règles pour préserver l'intégrité des IDs"
+        ]
+    },
+    {
         "version": "2.24.15",
         "date": "2026-02-08",
         "changes": [
@@ -861,125 +974,6 @@
             "UI : Alignement vertical parfait des titres de préréglages.",
             "UI : Unification visuelle des cartes (bordures arrondies, ombres, fonds blancs).",
             "UX : Ajout de hauteurs minimales garanties pour éviter les décalages de grille."
-        ]
-    },
-    {
-        "version": "2.17.10",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "UI : Suppression des doublons de texte 'X Pavés' dans les widgets de préréglages.",
-            "UI : Unification du rendu entre les préréglages officiels et personnalisés."
-        ]
-    },
-    {
-        "version": "2.17.9",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Hotfix : Correction de l'import manquant de l'icône Shield.",
-            "Hotfix : Suppression de la prop résiduelle onAddAttribute dans l'éditeur d'attributs."
-        ]
-    },
-    {
-        "version": "2.17.8",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "UI : Dé placement du bouton 'Ajouter un Attribut' dans le header de la section Attributs pour plus de clarté.",
-            "Nettoyage : Suppression des boutons d'ajout redondants sur chaque pavé d'attributs."
-        ]
-    },
-    {
-        "version": "2.17.7",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Refactorisation majeure de l'éditeur d'attributs Admin (AdminAttributesEditor).",
-            "Extraction de la logique métier dans un hook personnalisé useAttributeEditor.ts.",
-            "Réduction de 70% de la taille du composant UI AdminAttributesEditor.",
-            "Amélioration de la maintenance et de la lisibilité de la gestion des attributs."
-        ]
-    },
-    {
-        "version": "2.17.6",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Hotfix : Correction des imports brisés suite au renommage de AdminService en CampaignService.",
-            "Hotfix : Restauration des imports manquants (RulesData, React) dans AdminCreationEditor.",
-            "Fix : Correction d'une erreur de type TypeScript sur le Drag & Drop des compétences."
-        ]
-    },
-    {
-        "version": "2.17.5",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Refactorisation finale des services Admin (AdminService)",
-            "Renommage de AdminService en CampaignService (gestion CRUD des campagnes)",
-            "Création de RuleCalculationsService pour centraliser les formules de calcul (XP, Coûts, Cartes)",
-            "Unification de la logique de calcul entre MJ et Joueur via mechanics.ts"
-        ]
-    },
-    {
-        "version": "2.17.4",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Refactorisation de l'éditeur de création (AdminCreationEditor)",
-            "Extraction des sous-composants : CreationGeneralSettings, RankSlotsConfig, CreationPointsPreview et CardSystemConfig",
-            "Simplification du fichier principal et isolation des zones de configuration"
-        ]
-    },
-    {
-        "version": "2.17.3",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Modularisation de l'éditeur de compétences (AdminSkillsEditor)",
-            "Extraction du composant SkillCategoryCard pour une meilleure gestion des colonnes",
-            "Simplification de la logique de Drag & Drop inter-colonnes"
-        ]
-    },
-    {
-        "version": "2.17.2",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Optimisation du journal des modifications (split JSON et automatisation de l'archivage)",
-            "Chargement asynchrone (lazy-loading) de l'historique ancien pour améliorer les performances au démarrage",
-            "Mise en place d'une rotation automatique : Top 20 (Main) / Top 100 (Archive) / Legacy (Markdown)"
-        ]
-    },
-    {
-        "version": "2.17.1",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Modularisation massive de l'éditeur d'attributs (AdminAttributesEditor)",
-            "Création du sous-composant AttributeCategoryCard (gestion d'un pavé)",
-            "Création du sous-composant AttributePresetManager (gestion des préréglages et sauvegarde)",
-            "Optimisation du code et réduction de la complexité du fichier principal"
-        ]
-    },
-    {
-        "version": "2.17.0",
-        "date": "2026-02-06",
-        "type": "minor",
-        "changes": [
-            "Refactoring majeur de AdminService : extraction des responsabilités vers AttributeService et LibraryService",
-            "Centralisation des constantes d'attributs (defaults/attributes.ts) pour une meilleure cohérence MJ/Joueur et support Offline",
-            "Optimisation du moteur de synchronisation des bibliothèques (Traits, Compétences, Arrières-plans, Compteurs)",
-            "Amélioration de la robustesse du typage global (RulesData, GameSetting)"
-        ]
-    },
-    {
-        "version": "2.16.6",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "Correction du placement par défaut des compteurs (Volonté/Confiance) lors de la création d'une nouvelle campagne"
         ]
     }
 ]

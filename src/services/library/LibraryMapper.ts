@@ -28,11 +28,11 @@ export const LibraryMapper = {
         isActive: activeIds.has(t.id) || t.setting_id === sid
     }),
 
-    mapSkill: (s: any, activeIds: Set<string>, sid: string, variants: string[] = []): LibrarySkillEntry => ({
+    mapSkill: (s: any, activeIds: Set<string>, sid: string, variants: string[] = [], localDefaultCategory?: string): LibrarySkillEntry => ({
         id: s.id,
         name: s.name,
         description: s.description,
-        defaultCategory: legacySkillMap[s.default_category] || s.default_category,
+        defaultCategory: legacySkillMap[localDefaultCategory || ''] || localDefaultCategory || s.default_category,
         isVariable: s.is_variable,
         variants: variants,
         isGlobal: s.setting_id === null,
@@ -49,23 +49,25 @@ export const LibraryMapper = {
         isActive: activeIds.has(s.id) || s.setting_id === sid
     }),
 
-    mapBackground: (b: any, activeIds: Set<string>, sid: string, variants: string[] = []): LibraryBackgroundEntry => ({
+    mapBackground: (b: any, activeIds: Set<string>, sid: string, variants: string[] = [], localDefaultCategory?: string): LibraryBackgroundEntry => ({
         id: b.id,
         name: b.name,
         description: b.description,
+        defaultCategory: localDefaultCategory,
         isVariable: b.is_variable,
         variants: variants,
         isGlobal: b.setting_id === null,
         isActive: activeIds.has(b.id) || b.setting_id === sid
     }),
 
-    mapCounter: (c: any, activeIds: Set<string>, sid: string): LibraryCounterEntry => ({
+    mapCounter: (c: any, activeIds: Set<string>, sid: string, localDefaultCategory?: string): LibraryCounterEntry => ({
         id: c.id,
         name: c.name,
         description: c.description,
         maxValue: c.max_value,
         defaultValue: c.default_value,
         xpCost: c.xp_cost,
+        defaultCategory: localDefaultCategory,
         isGlobal: c.setting_id === null,
         isActive: activeIds.has(c.id) || c.setting_id === sid
     })

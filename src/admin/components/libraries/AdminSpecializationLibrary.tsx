@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Plus, Award, Edit2, Trash2, HelpCircle, Save, X, AlertTriangle, Layers, UploadCloud } from 'lucide-react';
+import { Search, Plus, Award, Edit2, Trash2, HelpCircle, Save, X, AlertTriangle, Layers, UploadCloud, CheckCircle2, Circle, Lock, Globe } from 'lucide-react';
 import { RulesData } from '../../../types/rules';
 import { LibrarySpecializationEntry } from '../../../types';
 import { smartIncludes } from '../../../utils/stringUtils';
@@ -11,9 +11,10 @@ import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 interface AdminSpecializationLibraryProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
+    globalUsage?: Record<string, number>;
 }
 
-const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({ rules, onUpdate }) => {
+const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
     const addLog = useNotification();
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -80,7 +81,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
     const handleOpenNew = () => {
         setError(null);
         setEditingEntry({
-            id: Math.random().toString(36).substr(2, 9),
+            id: crypto.randomUUID(),
             name: '',
             skillIds: [],
             defaultMinLevel: 1,
@@ -156,6 +157,21 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         setEditingEntry(null);
     };
 
+    const handleBulkSelect = (active: boolean) => {
+        const visibleIds = new Set(filteredLibrary.map(s => s.id));
+        const currentList = rules.libraries.specializations || [];
+        const newList = currentList.map(item =>
+            visibleIds.has(item.id) ? { ...item, isActive: active } : item
+        );
+        onUpdate({
+            ...rules,
+            libraries: {
+                ...rules.libraries,
+                specializations: newList
+            }
+        });
+    };
+
     const handlePublishClick = () => {
         const token = localStorage.getItem('GITHUB_TOKEN');
         const owner = localStorage.getItem('GITHUB_OWNER');
@@ -215,6 +231,26 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
+
+                {/* Bulk Actions */}
+                {library.length > 0 && (
+                    <div className="flex gap-4 px-4 py-2 bg-stone-50/50 border-b border-[#bfae85]/20">
+                        <button
+                            onClick={() => handleBulkSelect(true)}
+                            className="text-[10px] font-bold text-amber-700 hover:text-amber-900 flex items-center gap-1.5 transition-colors uppercase tracking-wider"
+                        >
+                            <CheckCircle2 size={12} />
+                            Tout activer {searchTerm ? `(${filteredLibrary.length})` : ''}
+                        </button>
+                        <button
+                            onClick={() => handleBulkSelect(false)}
+                            className="text-[10px] font-bold text-stone-500 hover:text-stone-700 flex items-center gap-1.5 transition-colors uppercase tracking-wider"
+                        >
+                            <Circle size={12} />
+                            Tout désactiver {searchTerm ? `(${filteredLibrary.length})` : ''}
+                        </button>
+                    </div>
+                )}
                 <div className="flex gap-2 w-full sm:w-auto">
                     <button
                         onClick={handlePublishClick}
@@ -245,52 +281,75 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         {filteredLibrary.map(entry => {
-                            return (
-                                <div
-                                    key={entry.id}
-                                    className="border rounded-sm p-3 transition-all bg-white/60 group flex flex-col justify-between border-[#bfae85]/30 hover:border-amber-400/50 hover:shadow-sm"
-                                >
-                                    <div>
-                                        <div className="flex justify-between items-start mb-1">
-                                            <div className="flex items-center gap-1.5 overflow-hidden">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={entry.isActive !== false}
-                                                    onChange={() => {
-                                                        const currentList = rules.libraries.specializations || [];
-                                                        const newList = currentList.map(s => s.id === entry.id ? { ...s, isActive: !s.isActive } : s);
-                                                        onUpdate({ ...rules, libraries: { ...rules.libraries, specializations: newList } });
-                                                    }}
-                                                    className="w-4 h-4 text-amber-600 rounded cursor-pointer"
-                                                    title={entry.isActive !== false ? "Désactiver" : "Activer"}
-                                                />
-                                                <span className={`font-serif font-black uppercase text-xs tracking-wide ${entry.isActive === false ? 'text-slate-500 line-through' : 'text-[#4a3b32]'}`}>
-                                                    {entry.name}
-                                                </span>
-                                                {entry.isGlobal && <span title="Global" className="text-[8px] text-amber-500 font-bold border border-amber-200 bg-amber-50 px-1 rounded shrink-0">GLOB</span>}
-                                            </div>
+                            const isGloballyUsed = globalUsage[entry.id] > 0;
+                            const isLocked = isGloballyUsed;
 
-                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => handleOpenEdit(entry)} className="text-blue-500 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
-                                                <button onClick={() => handleDelete(entry.id, entry.name)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
+                            return (
+                                <div key={entry.id} className={`bg-white border rounded p-2 transition-shadow group ${entry.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        {/* 1. Toggle */}
+                                        <div className="w-8 flex justify-center shrink-0">
+                                            <input
+                                                type="checkbox"
+                                                checked={entry.isActive !== false}
+                                                onChange={() => {
+                                                    const currentList = rules.libraries.specializations || [];
+                                                    const newList = currentList.map(s => s.id === entry.id ? { ...s, isActive: !s.isActive } : s);
+                                                    onUpdate({ ...rules, libraries: { ...rules.libraries, specializations: newList } });
+                                                }}
+                                                className="w-4 h-4 text-amber-600 rounded cursor-pointer"
+                                                title={entry.isActive !== false ? "Désactiver" : "Activer"}
+                                            />
+                                        </div>
+
+                                        {/* 2. Status Icons */}
+                                        <div className="w-16 flex items-center gap-1 shrink-0">
+                                            {entry.isGlobal && <div title="Item Global"><Globe size={14} className="text-indigo-500" /></div>}
+                                            {isLocked && (
+                                                <div className="text-amber-600" title="Utilisée dans d'autres campagnes">
+                                                    <Lock size={14} />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* 3. Content */}
+                                        <div className="flex-grow overflow-hidden pr-2">
+                                            <div className={`font-serif font-black uppercase text-xs tracking-wide truncate ${entry.isActive === false ? 'text-slate-500 line-through' : 'text-[#4a3b32]'}`} title={entry.name}>
+                                                {entry.name}
                                             </div>
                                         </div>
+
+                                        {/* 4. Actions */}
+                                        <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                            <button onClick={() => handleOpenEdit(entry)} className="text-blue-500 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
+                                            <button
+                                                onClick={() => handleDelete(entry.id, entry.name)}
+                                                disabled={isLocked}
+                                                className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
+                                                title={isLocked ? "Suppression bloquée : utilisée" : "Supprimer définitivement"}
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="ml-10"> {/* Aligned with name content start */}
                                         {entry.description && (
-                                            <p className="text-[10px] text-[#5c4d41] italic line-clamp-2 mb-2 leading-tight opacity-80">{entry.description}</p>
+                                            <p className="text-[10px] text-[#5c4d41] italic line-clamp-1 mb-1 opacity-80">{entry.description}</p>
                                         )}
-                                        <div className="flex flex-wrap gap-1 mt-1">
+                                        <div className="flex flex-wrap gap-1 mb-1">
                                             {entry.skillIds.map(sid => {
                                                 const s = allSkills.find(sk => sk.id === sid);
                                                 return (
-                                                    <span key={sid} className="text-[9px] bg-stone-100/50 text-[#5c4d41] px-1.5 py-0.5 rounded-sm border border-[#bfae85]/20">
+                                                    <span key={sid} className="text-[8px] bg-stone-50 text-[#5c4d41]/60 px-1 py-0.5 rounded-sm border border-[#bfae85]/10">
                                                         {s ? s.name : sid}
                                                     </span>
                                                 );
                                             })}
                                         </div>
-                                    </div>
-                                    <div className="mt-2 text-[10px] text-[#5c4d41]/60 flex justify-between items-center border-t border-[#bfae85]/20 pt-1">
-                                        <span>Seuil : <span className="font-bold text-amber-700">{entry.defaultMinLevel}</span></span>
+                                        <div className="text-[9px] text-[#5c4d41]/50 border-t border-stone-100 pt-0.5">
+                                            Seuil : <span className="font-bold text-amber-700">{entry.defaultMinLevel}</span>
+                                        </div>
                                     </div>
                                 </div>
                             );

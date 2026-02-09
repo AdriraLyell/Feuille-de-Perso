@@ -9,52 +9,58 @@ export interface MergedEntry<T> {
     originalId: string; // The ID in the official library (if applicable)
 }
 
+import { normalizeString } from './stringUtils';
+
 /**
  * Merges the local library with the official library.
  * - Local items always appear.
- * - Official items appear UNLESS they are already in the local library (by ID).
+ * - Official items appear UNLESS they are already in the local library (by ID or Normalized Name).
  *   - If they are in local, it means the player "owns" it (modified or not).
- *   - Ideally, we should detect if it's a conflict or a modification.
  * 
  * Strategy:
  * 1. Start with ALL Local items (Source: 'local').
- * 2. Add Official items that are NOT in Local ID list. (Source: 'official').
- * 3. (Optional Enhancement) If a Local item has same ID as Official, check content diff -> 'modified'.
+ * 2. Add Official items that are NOT in Local ID list AND NOT matching a Local Name (normalized).
  */
-export const mergeLibraries = <T extends { id: string }>(
+export const mergeLibraries = <T extends { id: string, name: string }>(
     localList: T[],
     officialList: T[]
 ): MergedEntry<T>[] => {
-    // 1. Map Local Items
     const mergedMap = new Map<string, MergedEntry<T>>();
+    const localNames = new Set<string>();
+    const localIds = new Set<string>();
 
-    // Add all local items first (Priority)
+    // 1. Add all local items first (Priority)
     localList.forEach(item => {
         mergedMap.set(item.id, {
             entry: item,
-            source: 'local', // Assumed local unless we track upstream link
+            source: 'local',
+            originalId: item.id
+        });
+        localIds.add(item.id);
+        if (item.name) {
+            localNames.add(normalizeString(item.name));
+        }
+    });
+
+    // 2. Add Official items if missing (check ID AND Name)
+    officialList.forEach(item => {
+        const normName = normalizeString(item.name);
+
+        // Skip if ID exists in local
+        if (localIds.has(item.id)) return;
+
+        // Skip if Name exists in local (Deduplication by content)
+        if (localNames.has(normName)) return;
+
+        mergedMap.set(item.id, {
+            entry: item,
+            source: 'official',
             originalId: item.id
         });
     });
 
-    // 2. Add Official items if missing
-    officialList.forEach(item => {
-        if (!mergedMap.has(item.id)) {
-            mergedMap.set(item.id, {
-                entry: item,
-                source: 'official',
-                originalId: item.id
-            });
-        } else {
-            // It exists in local.
-            // If we wanted to distinguish "Modified" vs "Just Copy", we would compare JSON here.
-            // For now, let's just mark it as 'local' (User copy).
-            // But maybe we can flag it?
-            const existing = mergedMap.get(item.id)!;
-            // existing.source = 'modified'; // Could be useful later
-        }
-    });
-
-    // Return as array
-    return Array.from(mergedMap.values());
+    // Return as array, sorted by name
+    return Array.from(mergedMap.values()).sort((a, b) =>
+        a.entry.name.localeCompare(b.entry.name)
+    );
 };
