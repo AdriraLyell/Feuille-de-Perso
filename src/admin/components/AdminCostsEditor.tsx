@@ -70,7 +70,7 @@ const AdminCostsEditor: React.FC<AdminCostsEditorProps> = ({ rules, onUpdate }) 
                                 <th className="pb-3 px-2 font-bold">Catégorie</th>
                                 <th className="pb-3 px-2 font-bold">Behavior</th>
                                 <th className="pb-3 px-4 font-bold text-center">Formule</th>
-                                <th className="pb-3 px-2 font-bold text-right w-32">Facteur</th>
+                                <th className="pb-3 px-2 font-bold text-right w-32">Multiplicateur</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -142,8 +142,8 @@ const AdminCostsEditor: React.FC<AdminCostsEditorProps> = ({ rules, onUpdate }) 
 
                 <div className="mt-6 bg-slate-50 p-4 rounded border border-dashed border-slate-200 text-xs text-slate-500 italic flex gap-3 items-center">
                     <Info size={16} className="text-slate-400 shrink-0" />
-                    Le coût total d'une compétence est calculé ainsi : [Valeur selon Formule] × [Facteur].
-                    Par exemple, Rang 3 en Triangulaire (1+2+3=6) avec un facteur de x3 coûte 18 XP.
+                    Le coût total d'un élément est calculé ainsi : [Valeur de Base] × [Multiplicateur].
+                    Par exemple, Rang 3 en Triangulaire (1+2+3=6) avec un multiplicateur de x3 coûte 18 XP.
                 </div>
             </div>
 

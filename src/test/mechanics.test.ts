@@ -13,9 +13,10 @@ describe('Mechanics Utils', () => {
 
         it('should calculate spent XP for a skill upgrade', () => {
             const data: CharacterSheetData = JSON.parse(JSON.stringify(INITIAL_DATA));
-            // Talents are standard skills. Upgrade from 0 to 2 dots.
+            // Col_Comp_1 is a standard skill category. Upgrade first skill from 0 to 2 dots.
             // Cost = triangular(2) - triangular(0) = (1+2) - 0 = 3
-            data.skills.talents[0] = { ...data.skills.talents[0], value: 2, creationValue: 0 };
+            if (!data.skills.Col_Comp_1) data.skills.Col_Comp_1 = [{ id: 's1', name: 'Skill 1', value: 0, creationValue: 0, max: 10 }];
+            data.skills.Col_Comp_1[0] = { ...data.skills.Col_Comp_1[0], value: 2, creationValue: 0 };
 
             const result = calculateExperienceResults(data);
             expect(result.spent).toBe("3");
@@ -25,7 +26,8 @@ describe('Mechanics Utils', () => {
             const data: CharacterSheetData = JSON.parse(JSON.stringify(INITIAL_DATA));
             // Upgrade from 2 creation dots to 3 dots
             // Cost = triangular(3) - triangular(2) = (1+2+3) - (1+2) = 6 - 3 = 3
-            data.skills.talents[0] = { ...data.skills.talents[0], value: 3, creationValue: 2 };
+            if (!data.skills.Col_Comp_1) data.skills.Col_Comp_1 = [{ id: 's1', name: 'Skill 1', value: 0, creationValue: 0, max: 10 }];
+            data.skills.Col_Comp_1[0] = { ...data.skills.Col_Comp_1[0], value: 3, creationValue: 2 };
 
             const result = calculateExperienceResults(data);
             expect(result.spent).toBe("3");
@@ -81,12 +83,65 @@ describe('Mechanics Utils', () => {
             // 2 skills at 3 dots -> average 3.0
             // delta = 3.0 - 2.0 = 1.0
             // steps = 1.0 / 0.5 = 2 -> "Deux Valets"
-            // Wait, delta 0.5 -> step 1 -> "Un Valet"
-            // delta 1.0 -> step 2 -> "Deux Valets"
-            data.skills.talents[0].value = 3;
-            data.skills.talents[1].value = 3;
+            if (!data.skills.Col_Comp_1) data.skills.Col_Comp_1 = [
+                { id: 's1', name: 'Skill 1', value: 0, creationValue: 0, max: 10 },
+                { id: 's2', name: 'Skill 2', value: 0, creationValue: 0, max: 10 }
+            ];
+            data.skills.Col_Comp_1[0].value = 3;
+            data.skills.Col_Comp_1[1].value = 3;
 
             expect(calculateCardValue(data)).toBe("Deux Valets");
+        });
+    });
+
+    describe('Unified Cost Logic (Base * Multiplier)', () => {
+        it('should apply background cost * multiplier', () => {
+            const data: CharacterSheetData = JSON.parse(JSON.stringify(INITIAL_DATA));
+            data.creationConfig.backgroundCost = 5; // Base = 5
+
+            // Background category: Col_Comp_8
+            data.skills.Col_Comp_8 = [
+                { id: 'bg1', name: 'Background 1', value: 2, creationValue: 0, max: 5 }
+            ];
+
+            const mockRules = {
+                definitions: {
+                    skillCategories: [
+                        { id: 'Col_Comp_8', behavior: 'Arrière-plan', costConfig: { factor: 3.0, type: 'linear' } }
+                    ]
+                }
+            } as any;
+
+            const result = calculateExperienceResults(data, mockRules);
+            // Cost = (value - creation) * (Base * Multiplier)
+            // Cost = (2 - 0) * (5 * 3) = 2 * 15 = 30
+            expect(result.spent).toBe("30");
+        });
+
+        it('should apply counter xpCost * multiplier and avoid double-counting', () => {
+            const data: CharacterSheetData = JSON.parse(JSON.stringify(INITIAL_DATA));
+
+            // Skill and Counter with same ID 'v1'
+            data.skills.Col_Comp_9 = [
+                { id: 'v1', name: 'Volonté', value: 2, creationValue: 0, max: 10 }
+            ];
+            // Counter entry
+            data.counters.v1 = { id: 'v1', name: 'Volonté', value: 2, creationValue: 0, max: 10 };
+
+            const mockRules = {
+                definitions: {
+                    skillCategories: [
+                        { id: 'Col_Comp_9', behavior: 'Compteur', costConfig: { factor: 2.0, type: 'linear' } }
+                    ],
+                    counters: {
+                        v1: { id: 'v1', name: 'Volonté', xpCost: 10, max: 10 }
+                    }
+                }
+            } as any;
+
+            const result = calculateExperienceResults(data, mockRules);
+            // Cost = (2 - 0) * (10 * 2) = 2 * 20 = 40
+            expect(result.spent).toBe("40");
         });
     });
 });

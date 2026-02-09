@@ -142,8 +142,8 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
                             <Coins size={20} />
                         </div>
                         <div>
-                            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Coût Arrière-Plans</h4>
-                            <p className="text-[10px] text-slate-400 font-medium italic">XP par point d'arrière-plan</p>
+                            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Coût de base Arrière-Plans</h4>
+                            <p className="text-[10px] text-slate-400 font-medium italic">XP de base (avant multiplicateur de colonne)</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">

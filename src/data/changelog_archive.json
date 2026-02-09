@@ -1,5 +1,154 @@
 [
     {
+        "version": "2.23.1",
+        "date": "2026-02-07",
+        "changes": [
+            "Correction critique des erreurs de syntaxe UUID (22P02)",
+            "Normalisation de la génération d'identifiants (crypto.randomUUID)",
+            "Ajout d'une couche de sécurité dans LibraryService pour la conversion automatique des IDs legacy"
+        ],
+        "type": "patch"
+    },
+    {
+        "version": "2.23.0",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Réserve Universelle: Implémentation de la 'Réserve de Variantes' pour les traits, compétences et historiques.",
+            "Admin: Nouveau système de gestion des variantes suggérées par module, permettant aux MJ de définir des choix rapides.",
+            "Joueur: Interface de sélection de variante intégrée au drag-and-drop de compétences et à l'édition de traits.",
+            "Database: Création de tables dédiées pour le stockage des variantes globales et locales avec support RLS.",
+            "Performance: Optimisation du chargement des bibliothèques avec mapping intelligent des variantes."
+        ]
+    },
+    {
+        "version": "2.22.0",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Architecture: Implémentation de la 'Réserve Universelle' (Master Reserve) pour une gestion centralisée des traits et spécialisations.",
+            "Database: Migration vers un modèle hybride permettant l'héritage et la pioche de ressources globales par les campagnes.",
+            "Admin: Mise à jour de l'Assistant d'Import permettant de choisir la destination (Campagne locale vs Réserve Universelle).",
+            "Core: Stratégie de 'Snapshot de Déploiement' garantissant le fonctionnement offline total des ressources universelles piochées."
+        ]
+    },
+    {
+        "version": "2.21.9",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Nouvel 'Assistant d'Import Bibliothèque' permettant d'importer des traits, compétences et spécialisations directement depuis une fiche personnage vers la bibliothèque de campagne.",
+            "Admin: Détection automatique des doublons lors de l'import pour préserver l'intégrité des données.",
+            "Admin: Interface multi-onglets interactive pour le tri et la sélection des éléments à importer."
+        ]
+    },
+    {
+        "version": "2.21.8",
+        "date": "2026-02-07",
+        "type": "improvement",
+        "changes": [
+            "Admin: Renommage des catégories de compétences par leurs noms réels (Talents, Compétences, etc.) dans la vue personnage.",
+            "Admin: Récupération dynamique des labels depuis les règles de la campagne associée."
+        ]
+    },
+    {
+        "version": "2.21.7",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Ajout de la visualisation des spécialisations dans la vue 'Fiche Personnage'.",
+            "Admin: Les spécialisations imposées s'affichent sous forme de badges contrastés, les spécialisations libres en italique."
+        ]
+    },
+    {
+        "version": "2.21.6",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Fiche: Correction du verrouillage automatique des règles lors du chargement d'un personnage depuis le Cloud.",
+            "Fiche: Synchronisation automatique de la campagne lors de l'import d'un fichier JSON ou d'un personnage Cloud.",
+            "UX: Redirection automatique vers l'onglet 'Bibliothèque' si l'utilisateur est en mode 'Online'."
+        ]
+    },
+    {
+        "version": "2.21.5",
+        "date": "2026-02-07",
+        "type": "improvement",
+        "changes": [
+            "Admin: Extension de la désambiguïsation visuelle à l'onglet 'Compétences' de l'administration.",
+            "UX Admin: Les colonnes portant le même nom affichent désormais le suffixe ' (suite)' pour une meilleure clarté lors de l'édition."
+        ]
+    },
+    {
+        "version": "2.21.4",
+        "date": "2026-02-07",
+        "type": "improvement",
+        "changes": [
+            "Bibliothèque: Ajout d'une gestion automatique des labels en doublon (Désambiguïsation).",
+            "Bibliothèque: Ajout automatique du suffixe ' (suite)' pour les colonnes portant le même nom dans les listes de sélection."
+        ]
+    },
+    {
+        "version": "2.21.3",
+        "date": "2026-02-07",
+        "type": "improvement",
+        "changes": [
+            "Bibliothèque: Alignement des codes techniques de catégories avec la structure réelle (`Col_Comp_X`).",
+            "Bibliothèque: Résolution dynamique des labels de catégories basés sur les règles du Setting actif.",
+            "UX Admin: Correction de l'affichage 'Aucune' dans la bibliothèque de compétences.",
+            "UX Admin: Amélioration de l'aide contextuelle pour afficher la correspondance exacte des colonnes par Setting."
+        ]
+    },
+    {
+        "version": "2.21.2",
+        "date": "2026-02-07",
+        "type": "improvement",
+        "changes": [
+            "Admin: Remplacement du `confirm` navigateur par une modale thématique dans la Master List des joueurs.",
+            "UX: Amélioration de la cohérence visuelle pour toutes les actions de suppression dans l'administration."
+        ]
+    },
+    {
+        "version": "2.21.1",
+        "date": "2026-02-07",
+        "type": "improvement",
+        "changes": [
+            "Admin: Remplacement de la fenêtre de saisie navigateur par une modale thématique pour la duplication de campagne.",
+            "UX: Amélioration de l'esthétique et de la cohérence visuelle lors de la création d'une copie."
+        ]
+    },
+    {
+        "version": "2.21.0",
+        "date": "2026-02-07",
+        "type": "feature",
+        "changes": [
+            "Admin: Ajout de la possibilité de dupliquer une campagne existante.",
+            "Admin: La duplication crée une nouvelle campagne avec les mêmes règles et bibliothèques, mais sans copier les personnages.",
+            "Admin: Les identifiants des bibliothèques locales sont régénérés lors de la duplication pour garantir l'indépendance des données."
+        ]
+    },
+    {
+        "version": "2.20.16",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Data: Correction du bug de remise à zéro des attributs lors de la reprise de session.",
+            "Migration: Normalisation systématique des identifiants de catégories d'attributs dans les règles (ex: 'Physique' -> 'pave_attributs_1').",
+            "Sécurité: La réconciliation des attributs est désormais additive, empêchant la suppression accidentelle de valeurs si les règles sont incomplètes ou mal formées."
+        ]
+    },
+    {
+        "version": "2.20.15",
+        "date": "2026-02-07",
+        "type": "bugfix",
+        "changes": [
+            "Sécurité: Changement de stratégie de réconciliation (Additve). Les compétences existantes du personnage ne sont plus jamais supprimées lors du chargement d'une nouvelle campagne, même si la campagne est incomplète.",
+            "Migration: Correction d'un bug où les règles chargées depuis GitHub restaient en format legacy, causant des conflits d'affichage.",
+            "Stabilité: Ajout de logs de débogage avancés dans le CharacterContext pour tracer les flux de données.",
+            "Fix: Résolution du blocage (boucle infinie) lors de la résolution des conflits de session au démarrage."
+        ]
+    },
+    {
         "version": "2.20.14",
         "date": "2026-02-07",
         "type": "bugfix",
@@ -842,136 +991,6 @@
         "changes": [
             "Admin : Synchronisation automatique des noms de compétences vers la Bibliothèque lors de l'édition (sur perte de focus).",
             "Admin : Ajout d'un bouton 'Synchroniser Bibliothèque' dans l'en-tête pour peupler massivement la réserve avec les compétences existantes."
-        ]
-    },
-    {
-        "version": "2.13.6",
-        "date": "2026-02-04",
-        "type": "patch",
-        "changes": [
-            "Fix (Admin) : Correction de la persistance des bibliothèques lors de la création/import de campagne. Les données sont désormais correctement injectées dans les tables BDD.",
-            "UI (Admin) : Ajustement du sticky de la barre latérale pour éviter le chevauchement avec l'en-tête."
-        ]
-    },
-    {
-        "version": "2.13.5",
-        "date": "2026-02-04",
-        "type": "patch",
-        "changes": [
-            "UI (Admin) : Élargissement de la vue 'Compétences' (1600px) pour compenser la barre latérale et garantir que les colonnes conservent la même largeur que sur la fiche joueur.",
-            "UI (Admin) : Conversion de la barre latérale de réserve en mode 'Sticky' pour un meilleur comportement de défilement."
-        ]
-    },
-    {
-        "version": "2.13.4",
-        "date": "2026-02-04",
-        "type": "patch",
-        "changes": [
-            "UI (Admin) : Correction finale du padding et de la structure des widgets de compétences pour un alignement pixel-perfect avec la vue Joueur."
-        ]
-    },
-    {
-        "version": "2.13.3",
-        "date": "2026-02-04",
-        "type": "patch",
-        "changes": [
-            "UI (Admin) : Adoption complète du thème 'Grimoire' (Sépia/Papier) pour l'éditeur de compétences, identique à la fiche joueur.",
-            "UI (Admin) : Harmonisation des couleurs de police, bordures et arrière-plans."
-        ]
-    },
-    {
-        "version": "2.13.2",
-        "date": "2026-02-04",
-        "type": "patch",
-        "changes": [
-            "UI (Admin) : Harmonisation de l'éditeur de compétences avec le style 'Réglages'. Ajout d'ascenseurs verticaux (Scroll) et ajustement des hauteurs.",
-            "UX (Admin) : Correction du Drag & Drop pour les 'Espaceurs' (lignes vides) qui étaient inamovibles."
-        ]
-    },
-    {
-        "version": "2.13.1",
-        "date": "2026-02-04",
-        "type": "patch",
-        "changes": [
-            "Admin : Ajout de la 'Réserve de Compétences' dans l'éditeur. Permet d'ajouter/archiver des compétences par glisser-déposer (Drag & Drop) depuis la bibliothèque globale.",
-            "Admin : Intégration de l'assistant d'importation JSON pour peupler rapidement la base de données depuis des fichiers existants.",
-            "Admin : Simplification de la persistance (Suppression de la restauration complexe) au profit d'une protection native contre la fermeture accidentelle.",
-            "Admin : Ajout du champ 'Version' dans la configuration des règles."
-        ]
-    },
-    {
-        "version": "2.13.0",
-        "date": "2026-02-04",
-        "type": "major",
-        "changes": [
-            "Architecture : Migration majeure vers une Base de Données (Supabase) pour le stockage des règles.",
-            "Admin : Nouveau Tableau de Bord permettant de gérer plusieurs Campagnes (Settings) en parallèle.",
-            "Admin : Gestion avancée des campagnes (Suppression, Visibilité Public/Privé) depuis le dashboard.",
-            "Joueur : Nouveau mode 'Hybride'. Au démarrage, choisissez entre 'En Ligne' (Campagnes Publiques à jour) ou 'Hors Ligne' (Fichier Local).",
-            "Admin : Sauvegarde des règles directement dans le Cloud.",
-            "Technique : Refonte du moteur de chargement pour supporter le lazy-loading et la sélection de source."
-        ]
-    },
-    {
-        "version": "2.12.64",
-        "date": "2026-02-04",
-        "changes": [
-            "UI (Admin) : Épuration visuelle de l'indicateur de sauvegarde (Icone seule pour plus de discrétion)."
-        ]
-    },
-    {
-        "version": "2.12.63",
-        "date": "2026-02-04",
-        "changes": [
-            "UI (Admin) : Remplacement de l'alerte système native par une modale thématique (Style Grimoire) lors de la restauration de session.",
-            "UI (Admin) : Remplacement de la barre de notification intrusive par un indicateur discret (Nuage) dans l'en-tête pour le statut de sauvegarde."
-        ]
-    },
-    {
-        "version": "2.12.62",
-        "date": "2026-02-04",
-        "changes": [
-            "Admin : Ajout d'une protection contre la perte de données (Alerte navigateur avant de quitter).",
-            "Admin : Implémentation d'une sauvegarde automatique locale (secours) en cas de crash/rafraîchissement avec restauration de session."
-        ]
-    },
-    {
-        "version": "2.12.61",
-        "date": "2026-02-04",
-        "changes": [
-            "UI : Correction cosmetique de la modale de confirmation (disparition du bouton 'annuler' vide pour les messages d'information)."
-        ]
-    },
-    {
-        "version": "2.12.60",
-        "date": "2026-02-04",
-        "changes": [
-            "Admin : Remplacement des dernières alertes navigateur par des modales lors de la publication des bibliothèques.",
-            "UI : Correction de la version affichée dans la barre de navigation et sur les boutons du journal de modification."
-        ]
-    },
-    {
-        "version": "2.12.59",
-        "date": "2026-02-04",
-        "changes": [
-            "UI : Finalisation de la migration des alertes navigateur vers des modales thématiques (Bibliothèques Joueur, Imports, Images).",
-            "Maintenance : Harmonisation globale des dialogues de confirmation."
-        ]
-    },
-    {
-        "version": "2.12.58",
-        "date": "2026-02-04",
-        "changes": [
-            "UI : Remplacement des alertes système (navigateur) par des modales thématiques (Design Grimoire) pour toutes les actions d'Import/Export de bibliothèques.",
-            "Admin : Harmonisation des dialogues de confirmation pour la publication."
-        ]
-    },
-    {
-        "version": "2.12.57",
-        "date": "2026-02-04",
-        "changes": [
-            "Technique : Refactoring global pour améliorer la maintenabilité (LibraryView, mechanics.ts).",
-            "Optimisation : Migration du journal des modifications vers un format léger (JSON) pour accélérer le chargement initial."
         ]
     }
 ]

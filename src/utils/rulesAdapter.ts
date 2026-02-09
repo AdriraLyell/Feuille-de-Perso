@@ -173,7 +173,11 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
     // 7. Update Backgrounds (if defined in rules as string array)
     const ruleBackgrounds = rules.definitions.backgrounds;
     if (ruleBackgrounds && Array.isArray(ruleBackgrounds)) {
-        // Map to DotEntry[] for legacy arrieres_plans and Col_Comp_8
+        // Find background category ID by behavior
+        const bgCatDef = ruleCategories?.find(c => c.behavior === 'Arrière-plan');
+        const bgCatId = bgCatDef?.id || 'Col_Comp_8';
+
+        // Map to DotEntry[]
         const bgEntries = ruleBackgrounds.map(name => {
             const libBg = rules.libraries?.backgrounds?.find(b => b.name === name);
             const isVariable = libBg?.isVariable === true;
@@ -188,7 +192,7 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
             };
         });
 
-        newState.skills.Col_Comp_8 = bgEntries;
+        newState.skills[bgCatId] = bgEntries;
     }
 
     // 8. Update Counters

@@ -76,8 +76,8 @@ export const defaultRules: RulesData = {
             "Col_Comp_9": ["Volonté", "Confiance"]
         },
         counters: {
-            "volonte": { id: "volonte", name: "Volonté", max: 10, xpCost: 0 },
-            "confiance": { id: "confiance", name: "Confiance", max: 10, xpCost: 0 }
+            "volonte": { id: "volonte", name: "Volonté", max: 10, xpCost: 5 },
+            "confiance": { id: "confiance", name: "Confiance", max: 10, xpCost: 5 }
         },
         backgrounds: ["Ressources", "Alliés", "Contacts", "Mentor"],
         labels: {

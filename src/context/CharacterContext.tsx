@@ -180,10 +180,12 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         data.secondaryAttributesActive,
         data.xpLogs,
         data.attributeSettings,
-        data.creationConfig?.attributeCost,
         data.page2.avantages,
         data.page2.desavantages,
         data.library,
+        data.counters,
+        data.xpCosts,
+        data.creationConfig,
         rules
     ]);
 
@@ -237,13 +239,17 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         try {
             const migrated = migrateData(newData);
             const validated = validateCharacterData(migrated);
-            setData(validated);
+
+            // Reconcile with current rules if available to ensure MJ definitions are applied
+            const finalData = rules ? reconcileRulesWithState(validated, rules) : validated;
+
+            setData(finalData);
             addLog("Données importées avec succès", 'success', 'settings');
         } catch (e) {
             console.error("Import validation/migration failed", e);
             addLog("Échec de l'import : les données sont malformées ou incompatibles", 'danger', 'settings');
         }
-    }, [addLog]);
+    }, [addLog, rules]);
 
     // 5. Providers Wrapper
     const stateValue = useMemo(() => ({ data }), [data]);

@@ -2,6 +2,7 @@
 import React, { useCallback } from 'react';
 import { DotEntry, CombatEntry, SkillCategoryKey } from '../types';
 import { resetCharacterValues } from '../utils/characterUtils';
+import { normalizeString } from '../utils/stringUtils';
 import { calculateCardValue } from '../utils/mechanics';
 
 // Imports des sous-composants refactorisés
@@ -75,15 +76,24 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
             if (!list) return prev;
 
             const isCreationMode = prev.creationConfig && prev.creationConfig.active;
+            const catDef = rules?.definitions?.skillCategories?.find(c => c.id === category);
+            const behavior = catDef?.behavior;
+            const isBaseSkill = !behavior || behavior === 'Compétence' || behavior === 'Secondaire';
+
             const newList = list.map(item => {
                 if (item.id !== id) return item;
-                return isCreationMode ? { ...item, value, creationValue: value } : { ...item, value };
+                // Only update creationValue for base skills (to mark them as creation-acquired)
+                // Counters and backgrounds should maintain their baseline creationValue to allow cost calculation in HUD
+                if (isCreationMode && isBaseSkill) {
+                    return { ...item, value, creationValue: value };
+                }
+                return { ...item, value };
             });
 
             const itemName = list.find(item => item.id === id)?.name || 'Compétence';
             onAddLog(`Modification ${String(itemName)} : ${value}`, 'info', 'sheet', `dot_${String(id)}`);
 
-            return {
+            const updatedState = {
                 ...prev,
                 [section]: {
                     // @ts-ignore
@@ -91,6 +101,20 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                     [String(category)]: newList
                 }
             };
+
+            // SYNC: Also update counter if ID matches
+            if (section === 'skills' && prev.counters) {
+                const counterKey = Object.keys(prev.counters).find(k => k === id);
+                if (counterKey) {
+                    const currentCounter = prev.counters[counterKey];
+                    if (!Array.isArray(currentCounter)) {
+                        const newCounter = { ...currentCounter, value, creationValue: isCreationMode ? value : currentCounter.creationValue };
+                        updatedState.counters = { ...prev.counters, [counterKey]: newCounter };
+                    }
+                }
+            }
+
+            return updatedState;
         });
     }, [onChange, onAddLog]);
 
@@ -256,18 +280,75 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 // Guard against Array (should not happen for non-custom ID but types say DotEntry | DotEntry[])
                 if (Array.isArray(current) || !current) return prev;
 
+                // CHECK: Block modification if strictly blocked by admin (xpCost <= 0)
+                // Appliable in BOTH Creation Mode and Game Mode
+                const sysDef = rules?.definitions?.counters?.[id] || rules?.definitions?.counters?.[counterKey];
+                const displayName = current.name || sysDef?.name || id;
+
+                const libDef = rules?.libraries?.counters?.find(c => c.id === id)
+                    || rules?.libraries?.counters?.find(c => normalizeString(c.name) === normalizeString(displayName));
+
+                const xpCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 0);
+                const defaultValue = libDef?.defaultValue !== undefined ? libDef.defaultValue : (sysDef?.defaultValue ?? 0);
+
+                // If defined, and has xpCost <= 0, prevent increasing value
+                if (field === 'value' && (libDef || sysDef)) {
+                    if (xpCost <= 0) {
+                        if (value > current.value) return prev;
+                    }
+                    // Enforce Floor: cannot go below defaultValue logic
+                    if (value < defaultValue) return prev;
+                }
+
                 const newItem = { ...current };
 
                 if (field === 'value') {
                     newItem.value = value;
-                    if (isCreationMode) newItem.creationValue = value;
+                    // Note: for counters, we DON'T update creationValue during creation mode
+                    // because they must cost XP from the budget.
                     if ((newItem.current || 0) > value) newItem.current = value;
                 } else {
                     newItem.current = Math.min(value, newItem.value);
                 }
 
                 onAddLog(`Modification ${String(newItem.name)} (${field === 'value' ? 'Maxi' : 'Utilisé'}) : ${value}`, 'info', 'sheet', `counter_${String(id)}_${String(field)}`);
-                return { ...prev, counters: { ...prev.counters, [counterKey]: newItem } };
+
+                const updatedState = { ...prev, counters: { ...prev.counters, [counterKey]: newItem } };
+
+                // SYNC: Also update skill if ID matches
+                if (field === 'value' && prev.skills) {
+                    const newSkills = { ...prev.skills };
+                    let skillFound = false;
+                    Object.keys(newSkills).forEach(catId => {
+                        const list = newSkills[catId];
+                        if (Array.isArray(list)) {
+                            // Identify if valid Category for Counters
+                            const catDef = rules?.definitions?.skillCategories?.find(c => c.id === catId);
+                            const isCounterCat = catDef?.behavior === 'Compteur';
+
+                            const idx = list.findIndex(s => s.id === id);
+                            if (idx !== -1) {
+                                const newList = [...list];
+                                // FIX: If it is a Counter Category, we MUST PRESERVE creationValue to ensure cost calculation works
+                                // Otherwise it thinks we started at this new level.
+                                const shouldUpdateCreation = isCreationMode && !isCounterCat;
+
+                                newList[idx] = {
+                                    ...newList[idx],
+                                    value,
+                                    creationValue: shouldUpdateCreation ? value : newList[idx].creationValue
+                                };
+                                newSkills[catId] = newList;
+                                skillFound = true;
+                            }
+                        }
+                    });
+                    if (skillFound) {
+                        updatedState.skills = newSkills;
+                    }
+                }
+
+                return updatedState;
             }
         });
     }, [onChange, onAddLog]);

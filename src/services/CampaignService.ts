@@ -121,7 +121,9 @@ export const CampaignService = {
 
             // Ensure categories from libraries exist in skillCategories if migrateRules didn't find them
             // Backgrounds
-            const bgCat = 'Col_Comp_8';
+            const bgCatDef = rules.definitions.skillCategories?.find((c: any) => c.behavior === 'Arrière-plan');
+            const bgCat = bgCatDef?.id || 'Col_Comp_8';
+
             if (!rules.definitions.skills[bgCat]) rules.definitions.skills[bgCat] = [];
             libraries.backgrounds.forEach(b => {
                 if (b.isActive !== false && !rules.definitions.skills[bgCat].includes(b.name)) {
@@ -130,7 +132,8 @@ export const CampaignService = {
             });
 
             // Counters
-            const counterCat = 'Col_Comp_9';
+            const counterCatDef = rules.definitions.skillCategories?.find((c: any) => c.behavior === 'Compteur');
+            const counterCat = counterCatDef?.id || 'Col_Comp_9';
             if (!rules.definitions.skills[counterCat]) rules.definitions.skills[counterCat] = [];
             libraries.counters.forEach(c => {
                 if (c.isActive !== false && !rules.definitions.skills[counterCat].includes(c.name)) {
@@ -147,7 +150,8 @@ export const CampaignService = {
                 }
 
                 activeCounters.forEach(libCounter => {
-                    const key = libCounter.name
+                    // Determine stable key: ID preferred for global, slug for local
+                    const key = libCounter.id || libCounter.name
                         .normalize('NFD')
                         .replace(/[\u0300-\u036f]/g, '')
                         .toLowerCase()
@@ -155,19 +159,19 @@ export const CampaignService = {
                         .replace(/_+/g, '_')
                         .replace(/^_|_$/g, '');
 
-                    if (!rules.definitions.counters[key]) {
-                        rules.definitions.counters[key] = {
-                            id: libCounter.id,
-                            name: libCounter.name,
-                            description: libCounter.description || '',
-                            max: (libCounter as any).maxValue || 10,
-                            value: (libCounter as any).defaultValue || 0,
-                            defaultValue: (libCounter as any).defaultValue || 0,
-                            xpCost: (libCounter as any).xpCost || 0
-                        };
-                    } else {
-                        rules.definitions.counters[key].description = libCounter.description || rules.definitions.counters[key].description;
-                    }
+                    // Always synchronize definition with library data to prevent stale values (from legacy JSON)
+                    rules.definitions.counters[key] = {
+                        id: libCounter.id,
+                        name: libCounter.name,
+                        description: libCounter.description || rules.definitions.counters[key]?.description || '',
+                        // @ts-ignore
+                        max: libCounter.maxValue ?? rules.definitions.counters[key]?.max ?? 10,
+                        // @ts-ignore
+                        value: libCounter.defaultValue ?? rules.definitions.counters[key]?.value ?? 0,
+                        // @ts-ignore
+                        defaultValue: libCounter.defaultValue ?? rules.definitions.counters[key]?.defaultValue ?? 0,
+                        xpCost: libCounter.xpCost ?? rules.definitions.counters[key]?.xpCost ?? 0
+                    };
                 });
             }
 
@@ -350,6 +354,6 @@ export const CampaignService = {
 
         if (traitsError) console.error("Traits Schema Error:", traitsError);
         else console.log("Traits Sample:", traits?.[0] ? Object.keys(traits[0]) : "Empty Table");
-    },
+    }
 
 }

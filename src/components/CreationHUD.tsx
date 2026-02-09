@@ -4,9 +4,11 @@ import { useNotification } from '../context/NotificationContext';
 import { useCharacter } from '../context/CharacterContext';
 import { CharacterSheetData, AttributeCategoryKey, DotEntry } from '../types';
 import { Check, Info, Calculator, AlertTriangle, X, ShieldAlert, CreditCard, Sliders, Feather, AlertOctagon, ThumbsUp, CheckSquare } from 'lucide-react';
+import { useRules } from '../context/RulesContext';
 
 const CreationHUD: React.FC = () => {
     const { data, updateData: setData, addLog } = useCharacter();
+    const { rules } = useRules();
     const onValidate = () => {
         setData(prev => ({
             ...prev,
@@ -42,19 +44,31 @@ const CreationHUD: React.FC = () => {
         let backgroundsUsed = 0;
         const attributeErrors: string[] = [];
 
-        const countSkill = (val: number, isBackground: boolean, category: string) => {
+        const countSkill = (skill: DotEntry, catId: string) => {
+            const val = skill.value;
             if (val > 0) {
                 const cost = getCost(val);
-                const isSecondary = category === 'competences2';
+                const cat = rules?.definitions?.skillCategories?.find(c => c.id === catId);
+                const behavior = cat?.behavior;
+                const multiplier = cat?.costConfig?.factor ?? 1.0;
+                const isSecondary = behavior === 'Secondaire' || catId === 'competences2' || catId === 'Col_Comp_6';
 
                 // Calcul du coût réel (XP Value)
                 let realCost = 0;
-                if (isBackground) {
-                    realCost = val * 2;
+
+                if (behavior === 'Arrière-plan') {
+                    // Formula: Base * Multiplier
+                    const base = data.creationConfig?.backgroundCost ?? 2;
+                    realCost = val * base * multiplier;
+                } else if (behavior === 'Compteur') {
+                    // Formula: Base * Multiplier
+                    const counterDef = rules?.definitions?.counters?.[skill.id]; // Use skill.id
+                    const base = Math.max(0, counterDef?.xpCost ?? 5);
+                    realCost = val * base * multiplier;
                 } else if (isSecondary) {
-                    realCost = cost / 2;
+                    realCost = (cost / 2) * multiplier;
                 } else {
-                    realCost = cost;
+                    realCost = cost * multiplier;
                 }
 
                 xpEquivalence += realCost;
@@ -64,7 +78,7 @@ const CreationHUD: React.FC = () => {
                     xpSpentTotal += realCost;
 
                     // Track by category for budgets
-                    if (isBackground) {
+                    if (behavior === 'Arrière-plan') {
                         xpSpentBackgrounds += realCost;
                     } else {
                         // Both Skills and Secondary Skills count towards "Skills" budget
@@ -72,7 +86,7 @@ const CreationHUD: React.FC = () => {
                     }
                 } else {
                     // Rangs Mode
-                    if (!isBackground) {
+                    if (behavior !== 'Arrière-plan') {
                         if (val <= 5) {
                             // Si c'est une compétence secondaire, elle vaut 0.5 slot, sinon 1 slot
                             const slotWeight = isSecondary ? 0.5 : 1;
@@ -87,11 +101,10 @@ const CreationHUD: React.FC = () => {
 
         // Skills
         Object.keys(data.skills).forEach(key => {
-            const isBackground = key === 'arrieres_plans';
             // @ts-ignore
             data.skills[key].forEach(skill => {
                 if (skill.name) {
-                    countSkill(skill.value, isBackground, key);
+                    countSkill(skill, key);
                 }
             });
         });

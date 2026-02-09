@@ -82,7 +82,9 @@ export const LibraryService = {
         }
 
         // D. Backgrounds
-        const layoutBgNames = initialRules.definitions?.skills?.['Col_Comp_8'] || [];
+        const bgCatDef = initialRules.definitions?.skillCategories?.find((c: any) => c.behavior === 'Arrière-plan');
+        const bgCatId = bgCatDef?.id || 'Col_Comp_8';
+        const layoutBgNames = initialRules.definitions?.skills?.[bgCatId] || [];
         const libBgNames = initialRules.libraries?.backgrounds?.map(b => b.name) || [];
         const targetBgNames = new Set([...layoutBgNames, ...libBgNames].map(n => n.trim().toLowerCase()).filter(n => n !== ""));
 
@@ -121,7 +123,9 @@ export const LibraryService = {
         }
 
         // E. Counters
-        const layoutCounterNamesFromSkills = initialRules.definitions?.skills?.['Col_Comp_9'] || [];
+        const counterCatDef = initialRules.definitions?.skillCategories?.find((c: any) => c.behavior === 'Compteur');
+        const counterCatId = counterCatDef?.id || 'Col_Comp_9';
+        const layoutCounterNamesFromSkills = initialRules.definitions?.skills?.[counterCatId] || [];
         const layoutCounterNamesFromDefs = Object.values(initialRules.definitions?.counters || {}).map((c: any) => c.name);
         const libCounterNames = initialRules.libraries?.counters?.map(c => c.name) || [];
         const targetCounterNames = new Set([...layoutCounterNamesFromSkills, ...layoutCounterNamesFromDefs, ...libCounterNames].map(n => n.trim().toLowerCase()));

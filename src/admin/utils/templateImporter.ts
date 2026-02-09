@@ -76,10 +76,10 @@ export const extractRulesFromCharacter = (
             ...newRules.configurations.xpCosts,
             ...sheet.xpCosts
         };
-        success.push("Configuration des Coûts XP (Facteurs)");
+        success.push("Configuration des Coûts XP (Multiplicateurs)");
     } else {
         // Fallback: If not present in sheet (old version), keep current rules
-        warnings.push("Coûts XP manquants dans le fichier (ignoré).");
+        warnings.push("Coûts XP (Multiplicateurs) manquants dans le fichier (ignoré).");
     }
 
 

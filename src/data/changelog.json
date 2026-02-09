@@ -1,5 +1,152 @@
 [
     {
+        "version": "2.24.21",
+        "date": "2026-02-09",
+        "changes": [
+            "Fix : La liste des historiques est désormais complète même si certains ne sont définis que dans les colonnes de compétences",
+            "Amélioration : Fusion automatique des définitions d'historiques pour garantir l'intégrité des données"
+        ]
+    },
+    {
+        "version": "2.24.20",
+        "date": "2026-02-09",
+        "changes": [
+            "Fix : Correction majeure des doublons de compétences dans les Historiques",
+            "Amélioration : Algorithme de déduplication globale lors de la réconciliation des règles",
+            "Sécurité : Critère de migration des Historiques affiné pour éviter les faux positifs"
+        ]
+    },
+    {
+        "version": "2.24.19",
+        "date": "2026-02-09",
+        "changes": [
+            "Fix : Robustesse des Historiques lors du chargement cloud",
+            "Fix : Plus aucune perte de biographies personnalisées lors d'un changement de campagne",
+            "Amélioration : Le système scanne désormais toutes les colonnes pour préserver les données historiques",
+            "Fix : Correction d'une erreur potentielle (TypeError) dans le moteur de réconciliation"
+        ]
+    },
+    {
+        "version": "2.24.18",
+        "date": "2026-02-09",
+        "changes": [
+            "Hotfix UX : Amélioration de la réactivité après chargement cloud (plus besoin de rafraîchir)",
+            "Correction : Réconciliation immédiate des données cloud avec les règles de la campagne active",
+            "Amélioration : Forçage de la synchronisation des règles même si la campagne reste identique"
+        ]
+    },
+    {
+        "version": "2.24.17",
+        "date": "2026-02-09",
+        "changes": [
+            "Fix: Disparition des compteurs lors du chargement Cloud (IDs de catégories dynamiques)",
+            "Fix: Migration non-destructive des compteurs pour préserver les compteurs personnalisés et système",
+            "Fix: Crash du moteur de réconciliation dû à un import manquant (normalizeString)",
+            "Fix: Robustesse accrue du calcul XP pour les compteurs personnalisés"
+        ]
+    },
+    {
+        "version": "2.24.16",
+        "date": "2026-02-09",
+        "changes": [
+            "Hotfix : Réalignement strict des IDs entre Compteurs et Compétences",
+            "Correctif : Synchronisation des définitions utilisant les UUIDs de la bibliothèque",
+            "Correctif : Réactivation de la réactivité du calcul d'XP sur les compteurs",
+            "Amélioration de la réconciliation des règles pour préserver l'intégrité des IDs"
+        ]
+    },
+    {
+        "version": "2.24.15",
+        "date": "2026-02-08",
+        "changes": [
+            "Hotfix : Forçage de la synchronisation des définitions de compteurs avec la bibliothèque",
+            "Correctif : Calcul du coût XP basé sur les valeurs de la bibliothèque (defaultValue/xpCost)",
+            "Amélioration du mapping des éléments globaux au chargement de la campagne"
+        ]
+    },
+    {
+        "version": "2.24.14",
+        "date": "2026-02-09",
+        "changes": [
+            "Hotfix: Globalisation des compteurs de test ('testa', 'testb') pour corriger le coût XP nul et l'invisibilité entre campagnes.",
+            "Cleanup: Suppression de l'ancienne section 'Compteurs Personnalisés' (redondante avec la Bibliothèque).",
+            "Admin: Retrait du bouton de correctif temporaire après exécution réussie."
+        ]
+    },
+    {
+        "version": "2.24.12",
+        "date": "2026-02-09",
+        "changes": [
+            "Fix: Les points inclus par défaut dans un compteur (ex: 3) sont bien gratuits (cout 0).",
+            "Fix: Impossible de descendre un compteur en dessous de sa valeur par défaut.",
+            "Fix: Masquage strict des compteurs de bibliothèque non assignés à la feuille."
+        ]
+    },
+    {
+        "version": "2.24.11",
+        "date": "2026-02-09",
+        "changes": [
+            "Critique: Correction des coûts XP ignorés pour les compteurs système (Volonté).",
+            "Fix: Correction de l'ordre d'affichage des compteurs dans la feuille.",
+            "Fix: Rétablissement de l'affichage de la Bibliothèque (bug recherche vide)."
+        ]
+    },
+    {
+        "version": "2.24.10",
+        "date": "2026-02-08",
+        "changes": [
+            "Fix: Correction de la sensibilité aux accents pour la détection des Compteurs (Volonté vs Volonte).",
+            "Fix: Nettoyage et robustesse du calcul des coûts liés aux bibliothèques."
+        ]
+    },
+    {
+        "version": "2.24.9",
+        "date": "2026-02-08",
+        "changes": [
+            "Fix: Amélioration de la détection des Compteurs en Bibliothèque. Le système utilise maintenant le Nom (Name) en plus de l'ID pour faire la correspondance.",
+            "Fix: Résolution définitive du blocage sur Volonté/Confiance (dont les IDs internes différaient des IDs de bibliothèque)."
+        ]
+    },
+    {
+        "version": "2.24.8",
+        "date": "2026-02-08",
+        "changes": [
+            "Fix: Les compteurs utilisent désormais la 'Bibliothèque' (Configuration Utilisateur) comme source de vérité pour le Coût XP et le Blocage, et non plus seulement les définitions système.",
+            "Fix: Résolution du problème où les compteurs personnalisés (TestA, etc.) coûtaient 0 XP.",
+            "Fix: Résolution du problème de blocage incorrect sur des compteurs standards (Volonté) modifiés en bibliothèque."
+        ]
+    },
+    {
+        "version": "2.24.7",
+        "date": "2026-02-08",
+        "type": "bugfix",
+        "changes": [
+            "Coûts: Correction critique de la synchronisation des compteurs (Volonté, Santé...) qui écrasait leur Valeur de Création, rendant leur coût nul.",
+            "Règles: Blocage effectif de l'augmentation des compteurs dont le coût XP est nul ou négatif (sauf en mode Création).",
+            "Logic: Préservation stricte de la 'Valeur de Création' pour les catégories de type 'Compteur' lors des mises à jour."
+        ]
+    },
+    {
+        "version": "2.24.6",
+        "date": "2026-02-08",
+        "type": "bugfix",
+        "changes": [
+            "Coûts: Résolution du bug où les compteurs (Volonté, etc.) coûtaient 0 XP en mode création malgré les réglages MJ.",
+            "HUD: Correction du ciblage des coûts de compteurs pour utiliser l'identifiant de compétence au lieu de la catégorie.",
+            "Fiche: La 'Valeur de Création' des compteurs et historiques est désormais isolée pour permettre le calcul correct du surcoût."
+        ]
+    },
+    {
+        "version": "2.24.5",
+        "date": "2026-02-08",
+        "type": "improvement",
+        "changes": [
+            "Coûts: Unification de la formule de calcul (Base × Multiplicateur) pour les arrières-plans et les compteurs.",
+            "Admin: Renommage des 'Facteurs' en 'Multiplicateurs' pour une meilleure clarté pédagogique.",
+            "Fiche: Correction du calcul des coûts dans le HUD de création pour s'aligner sur les règles dynamiques."
+        ]
+    },
+    {
         "version": "2.24.4",
         "date": "2026-02-08",
         "type": "bugfix",
@@ -44,155 +191,6 @@
             "Admin: Extension de l'Assistant d'Import pour inclure les Historiques et les Compteurs depuis les fiches personnages.",
             "Sync: Implémentation d'un mécanisme de rafraîchissement global des règles après import ou modification.",
             "Fix: Restauration des fonctions de sauvegarde cloud dans l'interface d'administration."
-        ]
-    },
-    {
-        "version": "2.23.1",
-        "date": "2026-02-07",
-        "changes": [
-            "Correction critique des erreurs de syntaxe UUID (22P02)",
-            "Normalisation de la génération d'identifiants (crypto.randomUUID)",
-            "Ajout d'une couche de sécurité dans LibraryService pour la conversion automatique des IDs legacy"
-        ],
-        "type": "patch"
-    },
-    {
-        "version": "2.23.0",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Réserve Universelle: Implémentation de la 'Réserve de Variantes' pour les traits, compétences et historiques.",
-            "Admin: Nouveau système de gestion des variantes suggérées par module, permettant aux MJ de définir des choix rapides.",
-            "Joueur: Interface de sélection de variante intégrée au drag-and-drop de compétences et à l'édition de traits.",
-            "Database: Création de tables dédiées pour le stockage des variantes globales et locales avec support RLS.",
-            "Performance: Optimisation du chargement des bibliothèques avec mapping intelligent des variantes."
-        ]
-    },
-    {
-        "version": "2.22.0",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Architecture: Implémentation de la 'Réserve Universelle' (Master Reserve) pour une gestion centralisée des traits et spécialisations.",
-            "Database: Migration vers un modèle hybride permettant l'héritage et la pioche de ressources globales par les campagnes.",
-            "Admin: Mise à jour de l'Assistant d'Import permettant de choisir la destination (Campagne locale vs Réserve Universelle).",
-            "Core: Stratégie de 'Snapshot de Déploiement' garantissant le fonctionnement offline total des ressources universelles piochées."
-        ]
-    },
-    {
-        "version": "2.21.9",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin: Nouvel 'Assistant d'Import Bibliothèque' permettant d'importer des traits, compétences et spécialisations directement depuis une fiche personnage vers la bibliothèque de campagne.",
-            "Admin: Détection automatique des doublons lors de l'import pour préserver l'intégrité des données.",
-            "Admin: Interface multi-onglets interactive pour le tri et la sélection des éléments à importer."
-        ]
-    },
-    {
-        "version": "2.21.8",
-        "date": "2026-02-07",
-        "type": "improvement",
-        "changes": [
-            "Admin: Renommage des catégories de compétences par leurs noms réels (Talents, Compétences, etc.) dans la vue personnage.",
-            "Admin: Récupération dynamique des labels depuis les règles de la campagne associée."
-        ]
-    },
-    {
-        "version": "2.21.7",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin: Ajout de la visualisation des spécialisations dans la vue 'Fiche Personnage'.",
-            "Admin: Les spécialisations imposées s'affichent sous forme de badges contrastés, les spécialisations libres en italique."
-        ]
-    },
-    {
-        "version": "2.21.6",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fiche: Correction du verrouillage automatique des règles lors du chargement d'un personnage depuis le Cloud.",
-            "Fiche: Synchronisation automatique de la campagne lors de l'import d'un fichier JSON ou d'un personnage Cloud.",
-            "UX: Redirection automatique vers l'onglet 'Bibliothèque' si l'utilisateur est en mode 'Online'."
-        ]
-    },
-    {
-        "version": "2.21.5",
-        "date": "2026-02-07",
-        "type": "improvement",
-        "changes": [
-            "Admin: Extension de la désambiguïsation visuelle à l'onglet 'Compétences' de l'administration.",
-            "UX Admin: Les colonnes portant le même nom affichent désormais le suffixe ' (suite)' pour une meilleure clarté lors de l'édition."
-        ]
-    },
-    {
-        "version": "2.21.4",
-        "date": "2026-02-07",
-        "type": "improvement",
-        "changes": [
-            "Bibliothèque: Ajout d'une gestion automatique des labels en doublon (Désambiguïsation).",
-            "Bibliothèque: Ajout automatique du suffixe ' (suite)' pour les colonnes portant le même nom dans les listes de sélection."
-        ]
-    },
-    {
-        "version": "2.21.3",
-        "date": "2026-02-07",
-        "type": "improvement",
-        "changes": [
-            "Bibliothèque: Alignement des codes techniques de catégories avec la structure réelle (`Col_Comp_X`).",
-            "Bibliothèque: Résolution dynamique des labels de catégories basés sur les règles du Setting actif.",
-            "UX Admin: Correction de l'affichage 'Aucune' dans la bibliothèque de compétences.",
-            "UX Admin: Amélioration de l'aide contextuelle pour afficher la correspondance exacte des colonnes par Setting."
-        ]
-    },
-    {
-        "version": "2.21.2",
-        "date": "2026-02-07",
-        "type": "improvement",
-        "changes": [
-            "Admin: Remplacement du `confirm` navigateur par une modale thématique dans la Master List des joueurs.",
-            "UX: Amélioration de la cohérence visuelle pour toutes les actions de suppression dans l'administration."
-        ]
-    },
-    {
-        "version": "2.21.1",
-        "date": "2026-02-07",
-        "type": "improvement",
-        "changes": [
-            "Admin: Remplacement de la fenêtre de saisie navigateur par une modale thématique pour la duplication de campagne.",
-            "UX: Amélioration de l'esthétique et de la cohérence visuelle lors de la création d'une copie."
-        ]
-    },
-    {
-        "version": "2.21.0",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin: Ajout de la possibilité de dupliquer une campagne existante.",
-            "Admin: La duplication crée une nouvelle campagne avec les mêmes règles et bibliothèques, mais sans copier les personnages.",
-            "Admin: Les identifiants des bibliothèques locales sont régénérés lors de la duplication pour garantir l'indépendance des données."
-        ]
-    },
-    {
-        "version": "2.20.16",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Data: Correction du bug de remise à zéro des attributs lors de la reprise de session.",
-            "Migration: Normalisation systématique des identifiants de catégories d'attributs dans les règles (ex: 'Physique' -> 'pave_attributs_1').",
-            "Sécurité: La réconciliation des attributs est désormais additive, empêchant la suppression accidentelle de valeurs si les règles sont incomplètes ou mal formées."
-        ]
-    },
-    {
-        "version": "2.20.15",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Sécurité: Changement de stratégie de réconciliation (Additve). Les compétences existantes du personnage ne sont plus jamais supprimées lors du chargement d'une nouvelle campagne, même si la campagne est incomplète.",
-            "Migration: Correction d'un bug où les règles chargées depuis GitHub restaient en format legacy, causant des conflits d'affichage.",
-            "Stabilité: Ajout de logs de débogage avancés dans le CharacterContext pour tracer les flux de données.",
-            "Fix: Résolution du blocage (boucle infinie) lors de la résolution des conflits de session au démarrage."
         ]
     }
 ]

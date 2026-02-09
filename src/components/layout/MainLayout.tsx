@@ -37,7 +37,7 @@ import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, Tre
 
 const MainLayout: React.FC = () => {
     // Consume Context
-    const { data, updateData: setData, addLog } = useCharacter();
+    const { data, updateData: setData, addLog, importData } = useCharacter();
     const { rules, updateRules } = useRules();
 
     // UI State
@@ -169,8 +169,11 @@ const MainLayout: React.FC = () => {
     };
 
     const handleImportSuccess = async (newData: CharacterSheetData) => {
+        // Use the centralized importData which ensures migration + validation + reconciliation
+        importData(newData);
+
+        // We still need to migrate locally to check for rules sync info
         const migrated = migrateData(newData);
-        setData(migrated);
 
         // -- Rules Synchronization --
         // If the imported character has sync info, we should try to load the corresponding rules
@@ -193,6 +196,23 @@ const MainLayout: React.FC = () => {
                     }
                 } catch (e) {
                     console.error("[MainLayout] Failed to auto-sync rules on import:", e);
+                }
+            } else {
+                // If the setting is the same, we might still want to refresh rules 
+                // just in case MJ updated them since we last loaded.
+                // But the user said "works after refresh", so forcing a load here might help.
+                try {
+                    const freshRules = await PlayerService.loadSetting(migrated.syncInfo.settingId);
+                    if (freshRules) {
+                        updateRules({
+                            ...freshRules,
+                            // @ts-ignore
+                            settingId: migrated.syncInfo.settingId,
+                            settingName: migrated.syncInfo.settingName
+                        });
+                    }
+                } catch (e) {
+                    console.warn("[MainLayout] Optional rules refresh failed", e);
                 }
             }
         }

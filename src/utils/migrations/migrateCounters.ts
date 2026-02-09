@@ -9,13 +9,19 @@ export const migrateCounters = (parsed: any): void => {
     if (!parsed.counters) return;
 
     // Convert old structure to new DotEntry structure
+    // We only perform the "full wipe and reset" if the structure is truly ancient (no id on volonte)
+    // BUT we should be additive, not subtractive.
     if (parsed.counters.volonte && !parsed.counters.volonte.id) {
-        const oldCounters = parsed.counters;
-        parsed.counters = {
-            volonte: { id: 'volonte', name: 'Volonté', value: oldCounters.volonte.max || 3, creationValue: 3, max: 10, current: 0 },
-            confiance: { id: 'confiance', name: 'Confiance', value: oldCounters.confiance.max || 3, creationValue: 3, max: 10, current: 0 },
-            custom: INITIAL_DATA.counters.custom
-        };
+        const oldVolonte = parsed.counters.volonte;
+        const oldConfiance = parsed.counters.confiance;
+        
+        // Update standard ones in place
+        parsed.counters.volonte = { id: 'volonte', name: 'Volonté', value: oldVolonte.max || oldVolonte.value || 3, creationValue: 3, max: 10, current: 0 };
+        parsed.counters.confiance = { id: 'confiance', name: 'Confiance', value: oldConfiance.max || oldConfiance.value || 3, creationValue: 3, max: 10, current: 0 };
+        
+        if (!parsed.counters.custom) {
+            parsed.counters.custom = INITIAL_DATA.counters.custom;
+        }
     }
 
     // Ensure counters have 'current' property

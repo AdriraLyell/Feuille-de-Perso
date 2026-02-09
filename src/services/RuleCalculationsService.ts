@@ -1,5 +1,6 @@
 
 import { CharacterSheetData, ExperienceData, TraitEffect, SkillCategoryKey, DotEntry, RulesData } from '../types';
+import { normalizeString } from '../utils/stringUtils';
 
 /**
  * Service centralisant les formules de calcul des règles du jeu.
@@ -44,8 +45,8 @@ export const RuleCalculationsService = {
             }
         };
 
-        data.page2.avantages.forEach(t => findEffects(t.name));
-        data.page2.desavantages.forEach(t => findEffects(t.name));
+        data.page2?.avantages?.forEach(t => findEffects(t.name));
+        data.page2?.desavantages?.forEach(t => findEffects(t.name));
 
         const traitXPBonus = activeEffects
             .filter(e => e.type === 'xp_bonus')
@@ -75,6 +76,9 @@ export const RuleCalculationsService = {
             return effect ? effect.value : 0;
         };
 
+        // Set of handled counter IDs to avoid double-counting
+        const handledCounters = new Set<string>();
+
         // Calcul des Compétences basé sur skillCategories (Dynamique)
         const categories = rules?.definitions?.skillCategories;
 
@@ -83,13 +87,53 @@ export const RuleCalculationsService = {
                 const skillList = data.skills[cat.id];
                 if (!Array.isArray(skillList)) return;
 
-                const factor = cat.costConfig?.factor ?? skillFactor;
+                const multiplier = cat.costConfig?.factor ?? 1.0;
                 const isTriangular = cat.costConfig?.type === 'triangular';
+                const behavior = cat.behavior;
 
                 skillList.forEach(skill => {
                     const freeLimit = getFreeRankLimit(skill.name);
                     const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
-                    totalSpent += this.getXPCost(skill.value, effectiveCreationValue, factor, isTriangular);
+
+                    let baseFactor = multiplier;
+
+                    // Apply Base * Multiplier logic based on behavior
+                    if (behavior === 'Arrière-plan') {
+                        // Base for backgrounds is backgroundCost from config
+                        const baseCost = data.creationConfig?.backgroundCost ?? 2;
+                        baseFactor = baseCost * multiplier;
+                    }
+
+                    if (behavior === 'Compteur') {
+                        // Base for counters is defined in counter definition (System or Library)
+                        // Prioritize Library Definition
+                        const rulesCounters = rules?.definitions?.counters || {};
+                        const libCounters = rules?.libraries?.counters || [];
+
+                        const sysDef = rulesCounters[skill.id];
+                        const displayName = skill.name || sysDef?.name || skill.id;
+
+                        const libDef = libCounters.find(c => c.id === skill.id)
+                            || libCounters.find(c => normalizeString(c.name) === normalizeString(displayName));
+
+                        const baseCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 5);
+
+
+                        const freeBase = libDef?.defaultValue !== undefined ? libDef.defaultValue : (sysDef?.defaultValue ?? 0);
+
+                        // Effective creation value is MAX(creationValue, defaultValue)
+                        // If user created at 0 but default is 3, they get 3 for free.
+                        const effectiveBase = Math.max(skill.creationValue || 0, freeBase);
+
+                        baseFactor = baseCost * multiplier;
+                        handledCounters.add(skill.id);
+
+                        const valCost = this.getXPCost(skill.value, effectiveBase, baseFactor, false);
+                        totalSpent += valCost;
+                    } else {
+                        // Standard calculation (Normal Skills, Backgrounds, etc.)
+                        totalSpent += this.getXPCost(skill.value, effectiveCreationValue, baseFactor, isTriangular);
+                    }
                 });
             });
         } else {
@@ -115,31 +159,98 @@ export const RuleCalculationsService = {
                 });
             }
 
-            const bgCostValue = data.creationConfig?.backgroundCost ?? 2;
+            const bgCostBase = data.creationConfig?.backgroundCost ?? 2;
             const backgroundSkills = data.skills.arrieres_plans || data.skills.Col_Comp_8;
             if (Array.isArray(backgroundSkills)) {
                 backgroundSkills.forEach(skill => {
-                    totalSpent += this.getXPCost(skill.value, skill.creationValue || 0, bgCostValue, false);
+                    // Legacy fallback: assume multiplier 1 if not in categories
+                    totalSpent += this.getXPCost(skill.value, skill.creationValue || 0, bgCostBase, false);
                 });
             }
         }
 
-        // Compteurs (toujours géré par rules.definitions.counters pour l'instant)
-        const rulesCounters = rules?.definitions?.counters;
-        if (rulesCounters && data.counters) {
+        // Compteurs (traitement des compteurs restant non gérés dans les catégories)
+        // Priorité : Bibliothèque (Custom) > Définitions (System)
+        const rulesCounters = rules?.definitions?.counters || {};
+        const libCounters = rules?.libraries?.counters || [];
+
+        if (data.counters) {
             Object.keys(data.counters).forEach(key => {
-                if (key === 'custom') return;
+                if (key === 'custom' || handledCounters.has(key)) return;
+
                 // @ts-ignore
                 const counterEntry = data.counters[key];
-                const def = rulesCounters[key];
-                if (counterEntry && !Array.isArray(counterEntry) && def && def.xpCost > 0) {
-                    totalSpent += this.getXPCost(counterEntry.value, counterEntry.creationValue || 0, def.xpCost, false);
+
+                // Guard against Array (should not happen for non-custom ID but types say DotEntry | DotEntry[])
+                if (Array.isArray(counterEntry)) return;
+
+                // Find definition: definitions first, then library fallback? 
+                // OR Library override? usually Library overrides system defaults in this app design.
+                // Lookup strict ID first, then fuzzy name match using normalization (accent insensitive)
+                const sysDef = rulesCounters[key];
+                const displayName = counterEntry.name || sysDef?.name || key;
+
+                const libDef = libCounters.find(c => c.id === key)
+                    || libCounters.find(c => normalizeString(c.name) === normalizeString(displayName));
+
+
+                const xpCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 0);
+
+
+                if (counterEntry && !Array.isArray(counterEntry) && xpCost > 0) {
+                    // Check if this counter is assigned to a category to get its multiplier
+                    let multiplier = 1.0;
+                    const catId = Object.keys(data.skills).find(cid => {
+                        const list = data.skills[cid];
+                        return Array.isArray(list) && list.some(s => s.id === key);
+                    });
+
+                    if (catId && categories) {
+                        const cat = categories.find(c => c.id === catId);
+                        if (cat) multiplier = cat.costConfig?.factor ?? 1.0;
+                    }
+
+                    totalSpent += this.getXPCost(counterEntry.value, counterEntry.creationValue || 0, xpCost * multiplier, false);
                 }
             });
-        } else {
-            const v = data.counters.volonte;
-            if (v && !Array.isArray(v)) {
-                totalSpent += this.getXPCost(v.value, v.creationValue || 0, 5, false);
+
+            // Traitement des compteurs "Custom" (Legacy / Ad-hoc)
+            if (data.counters.custom && Array.isArray(data.counters.custom)) {
+                data.counters.custom.forEach(counter => {
+                    // Ignorer si déjà traité (peu probable car custom n'est pas une clé racine, mais sécurité)
+                    if (handledCounters.has(counter.id)) return;
+
+
+                    // Recherche de définition (Bibliothèque)
+                    const libDef = libCounters.find(c => c.id === counter.id)
+                        || libCounters.find(c => normalizeString(c.name) === normalizeString(counter.name));
+
+
+                    // Fallback vers définition système (via nom)
+                    const sysDef = Object.values(rulesCounters).find(c => c.name === counter.name);
+
+                    // Coût XP effectif
+                    const xpCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 0);
+
+                    if (counter.name.toLowerCase().includes('test')) {
+                        console.log(`[XP Debug] - Final xpCost: ${xpCost}`);
+                    }
+
+                    if (xpCost > 0) {
+                        // Compteur Custom = Toujours facteur 1.0 (sauf si un jour on les lie aux catégories, mais c'est le cas désactivé plus haut)
+                        // On ne vérifie pas l'appartenance à une catégorie pour les "custom array" car ils ne devraient pas y être (c'est les IDs système qui y sont).
+
+                        // Base de calcul : Max(creationValue, defaultValue du modèle)
+                        // Souvent pour custom, creationValue est 0 ou correct.
+                        const modelDefault = libDef?.defaultValue ?? (sysDef?.defaultValue ?? 0);
+                        const creationValue = Math.max(counter.creationValue || 0, modelDefault);
+
+                        const cost = this.getXPCost(counter.value, creationValue, xpCost, false);
+                        if (counter.name.toLowerCase().includes('test')) console.log(`[XP Debug] - Calculated Cost: ${cost} (val=${counter.value}, base=${creationValue})`);
+
+                        totalSpent += cost;
+                    }
+                });
             }
         }
 

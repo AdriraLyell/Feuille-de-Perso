@@ -1,5 +1,83 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.13.6] - 2026-02-04 [PATCH]
+
+- Fix (Admin) : Correction de la persistance des bibliothèques lors de la création/import de campagne. Les données sont désormais correctement injectées dans les tables BDD.
+- UI (Admin) : Ajustement du sticky de la barre latérale pour éviter le chevauchement avec l'en-tête.
+
+## [2.13.5] - 2026-02-04 [PATCH]
+
+- UI (Admin) : Élargissement de la vue 'Compétences' (1600px) pour compenser la barre latérale et garantir que les colonnes conservent la même largeur que sur la fiche joueur.
+- UI (Admin) : Conversion de la barre latérale de réserve en mode 'Sticky' pour un meilleur comportement de défilement.
+
+## [2.13.4] - 2026-02-04 [PATCH]
+
+- UI (Admin) : Correction finale du padding et de la structure des widgets de compétences pour un alignement pixel-perfect avec la vue Joueur.
+
+## [2.13.3] - 2026-02-04 [PATCH]
+
+- UI (Admin) : Adoption complète du thème 'Grimoire' (Sépia/Papier) pour l'éditeur de compétences, identique à la fiche joueur.
+- UI (Admin) : Harmonisation des couleurs de police, bordures et arrière-plans.
+
+## [2.13.2] - 2026-02-04 [PATCH]
+
+- UI (Admin) : Harmonisation de l'éditeur de compétences avec le style 'Réglages'. Ajout d'ascenseurs verticaux (Scroll) et ajustement des hauteurs.
+- UX (Admin) : Correction du Drag & Drop pour les 'Espaceurs' (lignes vides) qui étaient inamovibles.
+
+## [2.13.1] - 2026-02-04 [PATCH]
+
+- Admin : Ajout de la 'Réserve de Compétences' dans l'éditeur. Permet d'ajouter/archiver des compétences par glisser-déposer (Drag & Drop) depuis la bibliothèque globale.
+- Admin : Intégration de l'assistant d'importation JSON pour peupler rapidement la base de données depuis des fichiers existants.
+- Admin : Simplification de la persistance (Suppression de la restauration complexe) au profit d'une protection native contre la fermeture accidentelle.
+- Admin : Ajout du champ 'Version' dans la configuration des règles.
+
+## [2.13.0] - 2026-02-04 [MAJOR]
+
+- Architecture : Migration majeure vers une Base de Données (Supabase) pour le stockage des règles.
+- Admin : Nouveau Tableau de Bord permettant de gérer plusieurs Campagnes (Settings) en parallèle.
+- Admin : Gestion avancée des campagnes (Suppression, Visibilité Public/Privé) depuis le dashboard.
+- Joueur : Nouveau mode 'Hybride'. Au démarrage, choisissez entre 'En Ligne' (Campagnes Publiques à jour) ou 'Hors Ligne' (Fichier Local).
+- Admin : Sauvegarde des règles directement dans le Cloud.
+- Technique : Refonte du moteur de chargement pour supporter le lazy-loading et la sélection de source.
+
+## [2.12.64] - 2026-02-04
+
+- UI (Admin) : Épuration visuelle de l'indicateur de sauvegarde (Icone seule pour plus de discrétion).
+
+## [2.12.63] - 2026-02-04
+
+- UI (Admin) : Remplacement de l'alerte système native par une modale thématique (Style Grimoire) lors de la restauration de session.
+- UI (Admin) : Remplacement de la barre de notification intrusive par un indicateur discret (Nuage) dans l'en-tête pour le statut de sauvegarde.
+
+## [2.12.62] - 2026-02-04
+
+- Admin : Ajout d'une protection contre la perte de données (Alerte navigateur avant de quitter).
+- Admin : Implémentation d'une sauvegarde automatique locale (secours) en cas de crash/rafraîchissement avec restauration de session.
+
+## [2.12.61] - 2026-02-04
+
+- UI : Correction cosmetique de la modale de confirmation (disparition du bouton 'annuler' vide pour les messages d'information).
+
+## [2.12.60] - 2026-02-04
+
+- Admin : Remplacement des dernières alertes navigateur par des modales lors de la publication des bibliothèques.
+- UI : Correction de la version affichée dans la barre de navigation et sur les boutons du journal de modification.
+
+## [2.12.59] - 2026-02-04
+
+- UI : Finalisation de la migration des alertes navigateur vers des modales thématiques (Bibliothèques Joueur, Imports, Images).
+- Maintenance : Harmonisation globale des dialogues de confirmation.
+
+## [2.12.58] - 2026-02-04
+
+- UI : Remplacement des alertes système (navigateur) par des modales thématiques (Design Grimoire) pour toutes les actions d'Import/Export de bibliothèques.
+- Admin : Harmonisation des dialogues de confirmation pour la publication.
+
+## [2.12.57] - 2026-02-04
+
+- Technique : Refactoring global pour améliorer la maintenabilité (LibraryView, mechanics.ts).
+- Optimisation : Migration du journal des modifications vers un format léger (JSON) pour accélérer le chargement initial.
+
 ## [2.12.56] - 2026-02-04
 
 - Système : Correction de la gestion des Arrière-Plans variables. Ils respectent désormais correctement la propriété `isVariable` définie dans les règles (ex: Alliés, Contacts).

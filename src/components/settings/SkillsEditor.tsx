@@ -147,56 +147,9 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
         }
     };
 
-    // --- COUNTER LOGIC ---
-
-    const updateCounterName = (id: string, newName: string) => {
-        const custom = data.counters.custom;
-        if (!custom) return;
-
-        onUpdate({
-            ...data,
-            counters: {
-                ...data.counters,
-                custom: custom.map(c => c.id === id ? { ...c, name: newName } : c)
-            }
-        });
-    };
-
-    const removeCounter = (id: string) => {
-        const custom = data.counters.custom;
-        if (!custom) return;
-
-        const counterName = custom.find(c => c.id === id)?.name;
-        onUpdate({
-            ...data,
-            counters: {
-                ...data.counters,
-                custom: custom.filter(c => c.id !== id)
-            }
-        });
-        onAddLog(`Suppression Compteur : ${counterName}`, 'danger', 'settings');
-    };
-
-    const addCounter = (defaultName = 'Nouveau Compteur') => {
-        const newId = Math.random().toString(36).substr(2, 9);
-        const custom = data.counters.custom || [];
-        const newCounter: DotEntry = {
-            id: newId,
-            name: defaultName,
-            value: 0,
-            creationValue: 0,
-            max: 10
-        };
-        onUpdate({
-            ...data,
-            counters: {
-                ...data.counters,
-                custom: [...custom, newCounter]
-            }
-        });
-        setNewlyAddedId(newId);
-        onAddLog(`Ajout : Compteur personnalisé`, 'success', 'settings');
-    };
+    // --- COUNTER LOGIC REMOVED ---
+    // User requested to manage counters only via Library/System definitions.
+    // data.counters.custom is still supported for display but not editable here.
 
     // --- DRAG & DROP LOGIC ---
 
@@ -225,16 +178,7 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
             // Same pos check
             if (sourceCategory === targetCategory && sourceIndex === targetIndex) return;
 
-            // Counters special case
-            if (sourceCategory === 'counters') {
-                if (targetCategory !== 'counters') return;
-                const newList = [...(data.counters.custom || [])];
-                const [itemToMove] = newList.splice(sourceIndex, 1);
-                newList.splice(targetIndex, 0, itemToMove);
-                onUpdate({ ...data, counters: { ...data.counters, custom: newList } });
-                setDraggedItem(null);
-                return;
-            }
+            // Counters special case logic removed
 
             const newSkills = { ...data.skills };
             const sourceList = [...(newSkills[sourceCategory as SkillCategoryKey] || [])];
@@ -340,22 +284,20 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
             <div
                 className={`bg-[#fdfbf7]/80 backdrop-blur-sm p-4 rounded-sm shadow-md flex flex-col ${heightClass} border border-[#bfae85]/30 transition-all duration-300 ${draggedItem && !isCounters ? 'border-dashed border-amber-400 bg-amber-50/50 scale-[1.01]' : ''}`}
                 onDragOver={handleDragOver}
-                onDrop={(e) => !isCounters && handleDropOnSheet(e, category, list.length)}
+                onDrop={(e) => handleDropOnSheet(e, category, list.length)}
             >
                 <h3 className="font-bold text-[10px] mb-4 text-[#5c4d41] border-b border-[#bfae85]/30 pb-2 flex justify-between items-center select-none uppercase tracking-widest">
                     {title}
                     <div className="flex gap-1">
-                        {!isCounters && (
-                            <button
-                                onClick={() => addSkill(category as SkillCategoryKey, true)}
-                                className="text-[9px] bg-stone-500 text-white px-2 py-1 rounded-sm flex items-center gap-1 hover:bg-stone-600 transition-colors font-bold shadow-sm"
-                                title="Ajouter un espaceur"
-                            >
-                                <Minus size={12} /> Espace
-                            </button>
-                        )}
                         <button
-                            onClick={() => isCounters ? addCounter(defaultItemName) : addSkill(category as SkillCategoryKey, false, defaultItemName)}
+                            onClick={() => addSkill(category as SkillCategoryKey, true)}
+                            className="text-[9px] bg-stone-500 text-white px-2 py-1 rounded-sm flex items-center gap-1 hover:bg-stone-600 transition-colors font-bold shadow-sm"
+                            title="Ajouter un espaceur"
+                        >
+                            <Minus size={12} /> Espace
+                        </button>
+                        <button
+                            onClick={() => addSkill(category as SkillCategoryKey, false, defaultItemName)}
                             className="text-[9px] bg-[#166534] text-white px-2 py-1 rounded-sm flex items-center gap-1 hover:bg-[#114b27] transition-colors font-bold shadow-sm"
                         >
                             <Plus size={12} /> Ajouter
@@ -363,7 +305,7 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                     </div>
                 </h3>
                 <div className="flex-grow overflow-y-auto space-y-2 pr-1 max-h-[500px] min-h-[50px] custom-scrollbar">
-                    {list.length === 0 && !isCounters && (
+                    {list.length === 0 && (
                         <div className="h-16 border-2 border-dashed border-[#bfae85]/30 rounded-sm flex items-center justify-center text-[#5c4d41]/40 text-[10px] pointer-events-none italic">
                             Zone de dépôt
                         </div>
@@ -411,9 +353,7 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                                                     onAddLog(`Modification : "${focusedValue}" renommé en "${e.target.value}" dans [${label}]`, 'info', 'settings');
 
                                                     // SYNC WITH LIBRARY ON BLUR
-                                                    if (!isCounters) {
-                                                        syncSkillWithLibrary(e.target.value, category as SkillCategoryKey);
-                                                    }
+                                                    syncSkillWithLibrary(e.target.value, category as SkillCategoryKey);
                                                 }
                                                 setFocusedValue(null);
                                             }}
@@ -422,7 +362,7 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                                                     e.currentTarget.blur();
                                                 }
                                             }}
-                                            onChange={(e) => isCounters ? updateCounterName(item.id, e.target.value) : updateSkillName(category as SkillCategoryKey, item.id, e.target.value)}
+                                            onChange={(e) => updateSkillName(category as SkillCategoryKey, item.id, e.target.value)}
                                             className={`border border-[#bfae85]/30 p-1 rounded-sm w-full focus:border-[#8b2e2e] outline-none bg-white/50 text-xs font-bold text-[#2c241b] transition-all ${item.variant ? 'bg-stone-100 text-stone-500 italic' : ''}`}
                                         />
                                         {item.variant !== undefined && (
@@ -440,7 +380,7 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                                     </div>
                                 )}
                                 <button
-                                    onClick={() => isCounters ? removeCounter(item.id) : removeSkill(category as SkillCategoryKey, item.id)}
+                                    onClick={() => removeSkill(category as SkillCategoryKey, item.id)}
                                     className="text-red-500 hover:text-red-700 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                     title="Supprimer (remettre en réserve)"
                                 >
@@ -466,12 +406,7 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                 </div>
             </div>
 
-            {/* Custom Counters section if needed (usually those are not in skillCategories if they are completely custom, but here we manage them too) */}
-            <div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {renderCategoryEditor("Compteurs Personnalisés", "counters", "h-full", "Nouveau Compteur")}
-                </div>
-            </div>
+            {/* Custom Counters section removed per user request (counters managed in Library/System only) */}
 
             {/* Variable Skill Modal */}
             {variantModalOpen && pendingSkillDrop && (
