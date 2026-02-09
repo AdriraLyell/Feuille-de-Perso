@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.24.15",
+        "date": "2026-02-08",
+        "changes": [
+            "Hotfix : Forçage de la synchronisation des définitions de compteurs avec la bibliothèque",
+            "Correctif : Calcul du coût XP basé sur les valeurs de la bibliothèque (defaultValue/xpCost)",
+            "Amélioration du mapping des éléments globaux au chargement de la campagne"
+        ]
+    },
+    {
+        "version": "2.24.14",
+        "date": "2026-02-09",
+        "changes": [
+            "Hotfix: Globalisation des compteurs de test ('testa', 'testb') pour corriger le coût XP nul et l'invisibilité entre campagnes.",
+            "Cleanup: Suppression de l'ancienne section 'Compteurs Personnalisés' (redondante avec la Bibliothèque).",
+            "Admin: Retrait du bouton de correctif temporaire après exécution réussie."
+        ]
+    },
+    {
         "version": "2.24.12",
         "date": "2026-02-09",
         "changes": [
@@ -962,25 +980,6 @@
         "type": "patch",
         "changes": [
             "Correction du placement par défaut des compteurs (Volonté/Confiance) lors de la création d'une nouvelle campagne"
-        ]
-    },
-    {
-        "version": "2.16.5",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "Finalisation de l'intégration du Dot-System dans le header des cartes de préréglages",
-            "Harmonisation des préréglages codés en dur avec le nouveau design de visualisation",
-            "Nettoyage structurel et optimisation de l'affichage des points d'attributs"
-        ]
-    },
-    {
-        "version": "2.16.4",
-        "date": "2026-02-05",
-        "type": "patch",
-        "changes": [
-            "Affinement de la visualisation Dot-System : design ultra-compact avec séparation claire entre attributs primaires (bleu) et secondaires (ambre)",
-            "Suppression des labels textuels superflus dans la bibliothèque de préréglages pour une interface plus épurée"
         ]
     }
 ]

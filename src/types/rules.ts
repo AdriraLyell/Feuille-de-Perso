@@ -62,6 +62,9 @@ export interface RulesCounterDefinition {
 
 export interface RulesData {
     version: string;
+    settingId?: string; // ID de la campagne source (si chargé depuis DB)
+    settingName?: string; // Nom de la campagne source
+    source?: 'database' | 'file' | 'api' | 'legacy'; // Source des règles
     lastUpdated?: number;
     configurations: {
         global: {

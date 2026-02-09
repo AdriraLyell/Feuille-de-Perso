@@ -311,9 +311,17 @@ const AdminApp: React.FC = () => {
                         </button>
 
                         <button
+                            onClick={handleExport}
+                            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded font-bold transition-colors shadow-lg shadow-emerald-900/20"
+                            title="Exporter le fichier rules.js pour usage offline"
+                        >
+                            <Download size={16} /> Exporter
+                        </button>
+
+                        <button
                             onClick={() => setShowDeployModal(true)}
                             className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded font-bold transition-colors shadow-lg shadow-purple-900/20"
-                            title="Publier / Exporter le fichier"
+                            title="Publier sur GitHub"
                         >
                             <Upload size={16} /> Publier
                         </button>

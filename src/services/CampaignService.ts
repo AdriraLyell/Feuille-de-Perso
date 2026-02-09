@@ -7,6 +7,16 @@ import { ErrorService } from './ErrorService';
 import { migrateRulesToV2 } from '../utils/migrations';
 import { RulesDataSchema } from '../utils/validation/rulesSchema';
 
+// Interface de la base de données (table game_settings)
+interface DBGameSetting {
+    id: string;
+    name: string;
+    version: string;
+    last_updated: string;
+    configurations: any; // JSONB
+    definitions: any; // JSONB
+    is_public: boolean;
+}
 
 export const CampaignService = {
 
@@ -96,7 +106,7 @@ export const CampaignService = {
 
         try {
             // 1. Fetch Main Config
-            const settingData = await DatabaseService.fetchOne<any>('game_settings', id, 'CampaignService.loadSetting');
+            const settingData = await DatabaseService.fetchOne<DBGameSetting>('game_settings', id, 'CampaignService.loadSetting');
 
             if (!settingData) {
                 return null;
@@ -128,8 +138,9 @@ export const CampaignService = {
             const rules = rulesRaw as RulesData;
 
             // Inject setting metadata
-            (rules as any).settingId = id;
-            (rules as any).settingName = settingData.name;
+            rules.settingId = id;
+            rules.settingName = settingData.name;
+            rules.source = 'database';
 
             // 3. REBUILD definitions.skills layout from libraries if needed
             // Only rebuild if the current layout is empty or significantly different
@@ -196,12 +207,9 @@ export const CampaignService = {
                         id: libCounter.id,
                         name: libCounter.name,
                         description: libCounter.description || rules.definitions.counters[key]?.description || '',
-                        // @ts-ignore
                         max: libCounter.maxValue ?? rules.definitions.counters[key]?.max ?? 10,
-                        // @ts-ignore
-                        value: libCounter.defaultValue ?? rules.definitions.counters[key]?.value ?? 0,
-                        // @ts-ignore
-                        defaultValue: libCounter.defaultValue ?? rules.definitions.counters[key]?.defaultValue ?? 0,
+                        value: libCounter.defaultValue ?? rules.definitions.counters[key]?.value,
+                        defaultValue: libCounter.defaultValue ?? rules.definitions.counters[key]?.defaultValue,
                         xpCost: libCounter.xpCost ?? rules.definitions.counters[key]?.xpCost ?? 0
                     };
                 });

@@ -178,7 +178,6 @@ export const RuleCalculationsService = {
             Object.keys(data.counters).forEach(key => {
                 if (key === 'custom' || handledCounters.has(key)) return;
 
-                // @ts-ignore
                 const counterEntry = data.counters[key];
 
                 // Guard against Array (should not happen for non-custom ID but types say DotEntry | DotEntry[])
@@ -233,7 +232,7 @@ export const RuleCalculationsService = {
                     const xpCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 0);
 
                     if (counter.name.toLowerCase().includes('test')) {
-                        console.log(`[XP Debug] - Final xpCost: ${xpCost}`);
+                        /* console.log(`[XP Debug] - Final xpCost: ${xpCost}`); */
                     }
 
                     if (xpCost > 0) {
@@ -246,7 +245,7 @@ export const RuleCalculationsService = {
                         const creationValue = Math.max(counter.creationValue || 0, modelDefault);
 
                         const cost = this.getXPCost(counter.value, creationValue, xpCost, false);
-                        if (counter.name.toLowerCase().includes('test')) console.log(`[XP Debug] - Calculated Cost: ${cost} (val=${counter.value}, base=${creationValue})`);
+                        if (counter.name.toLowerCase().includes('test')) { /* console.log(`[XP Debug] - Calculated Cost: ${cost} (val=${counter.value}, base=${creationValue})`); */ }
 
                         totalSpent += cost;
                     }

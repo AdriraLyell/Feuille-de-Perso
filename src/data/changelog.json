@@ -1,5 +1,44 @@
 [
     {
+        "version": "2.29.3",
+        "date": "2026-02-09",
+        "description": "Audit & Online First : Supabase Integration",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Support du chargement direct des campagnes Supabase via URL (?s=id) dans l'app Joueur.",
+                "category": "core"
+            },
+            {
+                "type": "fixed",
+                "text": "Nettoyage complet du Type Safety (zéro @ts-ignore) dans les services de données.",
+                "category": "core"
+            },
+            {
+                "type": "changed",
+                "text": "Refactoring de RulesReconciler pour une meilleure modularité et tests automatisés.",
+                "category": "core"
+            }
+        ]
+    },
+    {
+        "version": "2.29.2",
+        "date": "2026-02-09",
+        "description": "Correction Audit : Export Offline",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Ajout du bouton 'Exporter' dans l'Admin pour générer le fichier rules.js (Fallback Offline).",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Mise à jour du rapport d'audit technique (v2.29.2).",
+                "category": "docs"
+            }
+        ]
+    },
+    {
         "version": "2.29.1",
         "date": "2026-02-09",
         "description": "Premium UI Upgrade (Admin) & Corrections.",
@@ -192,24 +231,6 @@
             "Correctif : Synchronisation des définitions utilisant les UUIDs de la bibliothèque",
             "Correctif : Réactivation de la réactivité du calcul d'XP sur les compteurs",
             "Amélioration de la réconciliation des règles pour préserver l'intégrité des IDs"
-        ]
-    },
-    {
-        "version": "2.24.15",
-        "date": "2026-02-08",
-        "changes": [
-            "Hotfix : Forçage de la synchronisation des définitions de compteurs avec la bibliothèque",
-            "Correctif : Calcul du coût XP basé sur les valeurs de la bibliothèque (defaultValue/xpCost)",
-            "Amélioration du mapping des éléments globaux au chargement de la campagne"
-        ]
-    },
-    {
-        "version": "2.24.14",
-        "date": "2026-02-09",
-        "changes": [
-            "Hotfix: Globalisation des compteurs de test ('testa', 'testb') pour corriger le coût XP nul et l'invisibilité entre campagnes.",
-            "Cleanup: Suppression de l'ancienne section 'Compteurs Personnalisés' (redondante avec la Bibliothèque).",
-            "Admin: Retrait du bouton de correctif temporaire après exécution réussie."
         ]
     }
 ]

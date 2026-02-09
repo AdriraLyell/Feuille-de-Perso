@@ -47,25 +47,25 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
             }
 
             // 2. Fetch fresh rules from source
-            const data = await loadRules();
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlSettingId = urlParams.get('s') || urlParams.get('setting');
+            const data = await loadRules(urlSettingId || undefined);
             if (data) {
                 const migrated = migrateRulesToV2(data);
                 setRules(migrated);
-
-                const online = !!(migrated as any)?.settingId || (migrated as any)?.source === 'database';
+                const online = !!migrated.settingId || migrated.source === 'database';
                 setIsOnlineMode(online);
 
                 // 3. Update cache
                 await setCache('rpg-rules-cache', data);
             }
-            // @ts-ignore
-            window.rulesStatus = { loaded: true, error: null, version: data?.version, online: !!((data as any)?.settingId || (data as any)?.source === 'database') };
+            window.rulesStatus = { loaded: true, error: null, version: data?.version, online: !!(data?.settingId || data?.source === 'database') };
         } catch (err) {
             setError('Failed to load rules');
             ErrorService.handleError(err, { context: 'RulesContext.fetchRules' });
             setIsOnlineMode(false);
-            // @ts-ignore
-            window.rulesStatus = { loaded: false, error: err.toString() };
+            setIsOnlineMode(false);
+            window.rulesStatus = { loaded: false, error: err instanceof Error ? err.toString() : String(err) };
         } finally {
             setIsLoading(false);
         }
@@ -80,7 +80,7 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
         const migrated = migrateRulesToV2(newRules);
         setRules(migrated);
         // Auto-detect online mode from rules data
-        const online = !!(migrated as any)?.settingId || (migrated as any)?.source === 'database';
+        const online = !!migrated.settingId || migrated.source === 'database';
         setIsOnlineMode(online);
         setIsLoading(false); // Ensure loading is stopped
         console.log('[RulesContext] Rules updated, online mode:', online);

@@ -1,5 +1,16 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.16.5] - 2026-02-05 [PATCH]
+
+- Finalisation de l'intégration du Dot-System dans le header des cartes de préréglages
+- Harmonisation des préréglages codés en dur avec le nouveau design de visualisation
+- Nettoyage structurel et optimisation de l'affichage des points d'attributs
+
+## [2.16.4] - 2026-02-05 [PATCH]
+
+- Affinement de la visualisation Dot-System : design ultra-compact avec séparation claire entre attributs primaires (bleu) et secondaires (ambre)
+- Suppression des labels textuels superflus dans la bibliothèque de préréglages pour une interface plus épurée
+
 ## [2.16.3] - 2026-02-05 [PATCH]
 
 - Nouvelle visualisation des préréglages : ajout d'une micro-structure (grille de points) affichant le nombre d'attributs par pavé
