@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Copy, X } from 'lucide-react';
+import { Copy } from 'lucide-react';
+import ThematicModal from '../../components/ui/ThematicModal';
 
 interface DuplicateSettingModalProps {
     isOpen: boolean;
@@ -23,10 +24,7 @@ const DuplicateSettingModal: React.FC<DuplicateSettingModalProps> = ({
         }
     }, [isOpen, oldName]);
 
-    if (!isOpen) return null;
-
-    const handleSubmit = (e?: React.FormEvent) => {
-        if (e) e.preventDefault();
+    const handleSubmit = () => {
         if (newName.trim()) {
             onConfirm(newName.trim());
             onClose();
@@ -34,50 +32,54 @@ const DuplicateSettingModal: React.FC<DuplicateSettingModalProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in zoom-in duration-200 border-2 border-slate-100">
-                <div className="p-6">
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm bg-blue-100 text-blue-600 border-blue-200">
-                        <Copy size={24} />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 font-serif text-center">Dupliquer la campagne</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed mb-6 text-center">
-                        Créez une copie complète des règles et bibliothèques de <strong>{oldName}</strong>.
-                        Les personnages ne seront pas copiés.
-                    </p>
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="block text-xs font-bold text-slate-400 uppercase mb-1 px-1">Nom de la nouvelle campagne</label>
-                            <input
-                                autoFocus
-                                type="text"
-                                value={newName}
-                                onChange={(e) => setNewName(e.target.value)}
-                                className="w-full border-2 border-slate-100 rounded-lg p-3 outline-none focus:border-blue-500 transition-all font-serif text-lg"
-                                placeholder="Nom de la campagne..."
-                            />
-                        </div>
-                    </form>
-                </div>
-
-                <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-200">
+        <ThematicModal
+            isOpen={isOpen}
+            onClose={onClose}
+            title="Dupliquer la Campagne"
+            icon={<Copy size={24} />}
+            size="sm"
+            footer={
+                <>
                     <button
                         onClick={onClose}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-white transition-colors text-sm"
+                        className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold transition-colors uppercase text-xs tracking-wider"
                     >
                         Annuler
                     </button>
                     <button
-                        onClick={() => handleSubmit()}
+                        onClick={handleSubmit}
                         disabled={!newName.trim()}
-                        className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-sm transition-colors text-sm disabled:opacity-50"
+                        className="px-6 py-2 bg-[#8b2e2e] text-white rounded-sm font-bold shadow-md hover:bg-[#a33939] flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-wider"
                     >
+                        <Copy size={16} />
                         Dupliquer
                     </button>
+                </>
+            }
+        >
+            <div className="flex flex-col gap-6">
+                <div className="bg-amber-50/50 border border-amber-200/50 p-4 rounded-sm text-sm text-[#5c4d41] italic leading-relaxed">
+                    Vous êtes sur le point de créer une copie des règles et bibliothèques de <strong className="text-[#8b2e2e] not-italic">{oldName}</strong>.
+                    <br />
+                    <span className="text-xs opacity-80 not-italic block mt-1">⚠️ Les personnages et les données de jeu (sessions) ne seront pas copiés.</span>
+                </div>
+
+                <div>
+                    <label className="block text-xs font-bold text-[#bfae85] uppercase mb-1 tracking-widest px-1">
+                        Nom de la nouvelle campagne
+                    </label>
+                    <input
+                        autoFocus
+                        type="text"
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                        className="w-full border-b-2 border-[#bfae85]/50 bg-[#fdfbf7] p-2 outline-none focus:border-[#8b2e2e] transition-all font-serif text-xl text-[#2c241b] placeholder-amber-900/20"
+                        placeholder="Ex: Campagne (Copie)..."
+                    />
                 </div>
             </div>
-        </div>
+        </ThematicModal>
     );
 };
 

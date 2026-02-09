@@ -22,7 +22,30 @@ export const useAttributeEditor = (rules: RulesData, onUpdate: (newRules: RulesD
         return a.localeCompare(b);
     });
 
-    // States
+    // --- CONFIRMATION STATE ---
+    const [confirmState, setConfirmState] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        type: 'danger' | 'warning' | 'info' | 'success';
+    }>({
+        isOpen: false,
+        title: "",
+        message: "",
+        onConfirm: () => { },
+        type: 'info'
+    });
+
+    const closeConfirm = () => {
+        setConfirmState(prev => ({ ...prev, isOpen: false }));
+    };
+
+    const requestConfirm = (title: string, message: string, onConfirm: () => void, type: 'danger' | 'warning' | 'info' = 'warning') => {
+        setConfirmState({ isOpen: true, title, message, onConfirm, type });
+    };
+
+    // --- PRESETS STATE ---
     const [showPresetConfirm, setShowPresetConfirm] = useState(false);
     const [pendingPreset, setPendingPreset] = useState<any>(null);
     const [dbPresets, setDbPresets] = useState<AttributePreset[]>([]);
@@ -66,10 +89,16 @@ export const useAttributeEditor = (rules: RulesData, onUpdate: (newRules: RulesD
         }
     };
 
-    const handleDeletePreset = async (id: string) => {
-        if (!confirm("Supprimer ce préréglage ?")) return;
-        const success = await AttributeService.deleteAttributePreset(id);
-        if (success) loadDBPresets();
+    const handleDeletePreset = (id: string) => {
+        requestConfirm(
+            "Supprimer le Préréglage ?",
+            "Cette action est irréversible.",
+            async () => {
+                const success = await AttributeService.deleteAttributePreset(id);
+                if (success) loadDBPresets();
+            },
+            'danger'
+        );
     };
 
     const handleUpdatePreset = async (id: string, name: string, description: string) => {
@@ -164,25 +193,43 @@ export const useAttributeEditor = (rules: RulesData, onUpdate: (newRules: RulesD
 
     const removeCategory = (categoryId: string) => {
         if (categories.length <= 1) return;
-        if (!confirm(`Supprimer le pavé "${labelsMap[categoryId] || categoryId}" ?`)) return;
+        requestConfirm(
+            `Supprimer le pavé "${labelsMap[categoryId] || categoryId}" ?`,
+            "Toutes les données associées seront perdues.",
+            () => {
+                const newAttributes = { ...attributesMap };
+                delete newAttributes[categoryId];
+                const newSecondary = { ...secondaryMap };
+                delete newSecondary[categoryId];
+                const newLabels = { ...labelsMap };
+                delete newLabels[categoryId];
 
-        const newAttributes = { ...attributesMap };
-        delete newAttributes[categoryId];
-        const newSecondary = { ...secondaryMap };
-        delete newSecondary[categoryId];
-        const newLabels = { ...labelsMap };
-        delete newLabels[categoryId];
-
-        onUpdate({
-            ...rules,
-            definitions: {
-                ...rules.definitions,
-                attributes: newAttributes,
-                secondaryAttributes: newSecondary,
-                labels: newLabels
-            }
-        });
+                onUpdate({
+                    ...rules,
+                    definitions: {
+                        ...rules.definitions,
+                        attributes: newAttributes,
+                        secondaryAttributes: newSecondary,
+                        labels: newLabels
+                    }
+                });
+            },
+            'danger'
+        );
     };
+
+    // ... (rest of functions like toggleSecondaryGlobal, etc. remain unchanged but need to be included in replacement if I'm replacing a block.
+    // Wait, the block I'm replacing is from line 43 to 324? No, that's too big and risky for "ReplacementChunk" if I can avoid it.
+    // I should use ReplaceFileContent with a smaller chunk or multiple chunks?
+    // The previous tool was ReplaceFileContent.
+    // I will replace the logic for `removeCategory` and `handleDeletePreset` specifically, and add the state at the top.
+    // But `removeCategory` is at 165, `handleDeletePreset` at 69.
+    // I'll try to replace the whole return statement and the state definition first?
+    // No, I need to replace the specific functions. I'll use multi_replace? No, I'll use `replace_file_content` but I have to be careful.
+    // Actually, I can replace the whole file content starting from line 25 where states are defined.
+    // It's cleaner to use `replace_file_content` for the whole Hook body if I'm changing state AND functions.
+    // But I must include `toggleSecondaryGlobal` etc.
+    // I will use `replace_file_content` from line 26 to the end.
 
     const toggleSecondaryGlobal = () => {
         const isActive = !!rules.configurations.global.secondaryAttributes;
@@ -265,18 +312,27 @@ export const useAttributeEditor = (rules: RulesData, onUpdate: (newRules: RulesD
         const newAttributesMap = { ...attributesMap };
         const count = attributesMap[categories[0]]?.length || 0;
         if (count <= 1) return;
-        Object.keys(newAttributesMap).forEach(cat => {
-            const newList = [...newAttributesMap[cat]];
-            newList.splice(index, 1);
-            newAttributesMap[cat] = newList;
-        });
-        onUpdate({
-            ...rules,
-            definitions: {
-                ...rules.definitions,
-                attributes: newAttributesMap
-            }
-        });
+
+        // ADDING CONFIRM HERE TOO as it's a destructive action often
+        requestConfirm(
+            "Supprimer l'attribut ?",
+            "Cet attribut sera retiré de tous les pavés.",
+            () => {
+                Object.keys(newAttributesMap).forEach(cat => {
+                    const newList = [...newAttributesMap[cat]];
+                    newList.splice(index, 1);
+                    newAttributesMap[cat] = newList;
+                });
+                onUpdate({
+                    ...rules,
+                    definitions: {
+                        ...rules.definitions,
+                        attributes: newAttributesMap
+                    }
+                });
+            },
+            'danger'
+        );
     };
 
     const updateItemName = (category: string, index: number, newName: string) => {
@@ -302,7 +358,10 @@ export const useAttributeEditor = (rules: RulesData, onUpdate: (newRules: RulesD
             pendingPreset,
             setPendingPreset,
             dbPresets,
-            isLoadingPresets
+            isLoadingPresets,
+            // New state
+            confirmState,
+            closeConfirm
         },
         actions: {
             addCategory,

@@ -1,5 +1,27 @@
 [
     {
+        "version": "2.29.1",
+        "date": "2026-02-09",
+        "description": "Premium UI Upgrade (Admin) & Corrections.",
+        "changes": [
+            {
+                "type": "improved",
+                "text": "Refonte complète des modales de confirmation (Suppression, Navigation, Duplication) avec le style Premium (Ambre/Parchemin).",
+                "category": "ui"
+            },
+            {
+                "type": "fixed",
+                "text": "Correction d'un crash critique (ReferenceError) dans l'éditeur d'attributs suite à la refonte de l'état.",
+                "category": "fix"
+            },
+            {
+                "type": "removed",
+                "text": "Suppression définitive des alertes natives 'window.confirm' dans la section Admin.",
+                "category": "cleanup"
+            }
+        ]
+    },
+    {
         "version": "2.29.0",
         "date": "2026-02-09",
         "description": "Optimisation API GitHub & Investigation Réconciliation",
@@ -188,15 +210,6 @@
             "Hotfix: Globalisation des compteurs de test ('testa', 'testb') pour corriger le coût XP nul et l'invisibilité entre campagnes.",
             "Cleanup: Suppression de l'ancienne section 'Compteurs Personnalisés' (redondante avec la Bibliothèque).",
             "Admin: Retrait du bouton de correctif temporaire après exécution réussie."
-        ]
-    },
-    {
-        "version": "2.24.12",
-        "date": "2026-02-09",
-        "changes": [
-            "Fix: Les points inclus par défaut dans un compteur (ex: 3) sont bien gratuits (cout 0).",
-            "Fix: Impossible de descendre un compteur en dessous de sa valeur par défaut.",
-            "Fix: Masquage strict des compteurs de bibliothèque non assignés à la feuille."
         ]
     }
 ]

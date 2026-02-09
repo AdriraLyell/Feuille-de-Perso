@@ -2,6 +2,7 @@
 import { RulesData } from '../../types/rules';
 import { Zap, LayoutGrid, Info, Shield } from 'lucide-react';
 import ThematicModal from '../../components/ui/ThematicModal';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import AttributeCategoryCard from './attributes/AttributeCategoryCard';
 import AttributePresetManager from './attributes/AttributePresetManager';
 import { useAttributeEditor } from '../hooks/useAttributeEditor';
@@ -134,7 +135,16 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                     </div>
                 </ThematicModal>
             )}
-        </div>
+
+            <ConfirmationModal
+                isOpen={states.confirmState.isOpen}
+                onClose={states.closeConfirm}
+                onConfirm={states.confirmState.onConfirm}
+                title={states.confirmState.title}
+                message={states.confirmState.message}
+                type={states.confirmState.type}
+            />
+        </div >
     );
 };
 

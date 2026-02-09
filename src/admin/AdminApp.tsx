@@ -79,6 +79,21 @@ const AdminApp: React.FC = () => {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    // Confirmation State
+    const [confirmState, setConfirmState] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        type: 'danger' | 'warning' | 'info' | 'success';
+    }>({
+        isOpen: false,
+        title: "",
+        message: "",
+        onConfirm: () => { },
+        type: 'info'
+    });
+
     // Persistence Hook
     const { hasUnsavedChanges, markAsSaved, resetPersistence } = usePersistence(rules);
 
@@ -92,8 +107,21 @@ const AdminApp: React.FC = () => {
 
     const handleBackToDashboard = () => {
         if (hasUnsavedChanges) {
-            if (!confirm("Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter ?")) return;
+            setConfirmState({
+                isOpen: true,
+                title: "Modifications non sauvegardées",
+                message: "Vous avez des modifications en attente qui seront perdues si vous quittez. Confirmer ?",
+                type: 'warning',
+                onConfirm: () => {
+                    performBackToDashboard();
+                }
+            });
+            return;
         }
+        performBackToDashboard();
+    };
+
+    const performBackToDashboard = () => {
         setViewMode('dashboard');
         setCurrentSettingId(null);
         setRules(null);
@@ -500,6 +528,16 @@ const AdminApp: React.FC = () => {
                     />
                 )
             }
+
+            {/* Navigation Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={confirmState.isOpen}
+                onClose={() => setConfirmState(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmState.onConfirm}
+                title={confirmState.title}
+                message={confirmState.message}
+                type={confirmState.type}
+            />
 
             <DeploymentMonitor />
         </div >

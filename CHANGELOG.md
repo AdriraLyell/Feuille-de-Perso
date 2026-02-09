@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.16.3] - 2026-02-05 [PATCH]
+
+- Nouvelle visualisation des préréglages : ajout d'une micro-structure (grille de points) affichant le nombre d'attributs par pavé
+- Indicateur visuel pour les attributs secondaires (couleur ambre + icône éclair ⚡)
+- Amélioration de la lisibilité de la bibliothèque de préréglages
+
 ## [2.16.2] - 2026-02-05 [PATCH]
 
 - Correction du remplissage automatique des noms d'attributs secondaires par défaut (basé sur le libellé du pavé)
