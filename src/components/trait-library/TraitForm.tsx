@@ -40,6 +40,17 @@ const TraitForm: React.FC<TraitFormProps> = ({
     updateEffect,
     removeEffect
 }) => {
+    const [variantDraft, setVariantDraft] = React.useState(editForm.variants?.join(', ') || '');
+
+    React.useEffect(() => {
+        setVariantDraft(editForm.variants?.join(', ') || '');
+    }, [editForm.id, editForm.variants?.join(',')]);
+
+    const handleSave = () => {
+        const cleaned = variantDraft.split(',').map(v => v.trim()).filter(Boolean);
+        setEditForm({ ...editForm, variants: cleaned });
+        onSave();
+    };
     const isNew = !library.some(l => l.id === editForm.id);
 
     return (
@@ -58,7 +69,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
                         Annuler
                     </button>
                     <button
-                        onClick={onSave}
+                        onClick={handleSave}
                         className={`px-6 py-2 text-white rounded-sm font-bold shadow-md flex items-center gap-2 transition-transform hover:scale-105 ${editForm.type === 'avantage' ? 'bg-[#2d5a27] hover:bg-[#1e3d1a]' : 'bg-[#8b2e2e] hover:bg-[#6a2424]'}`}
                     >
                         <Save size={18} />
@@ -166,8 +177,12 @@ const TraitForm: React.FC<TraitFormProps> = ({
                         <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Variantes suggérées (Réserve)</label>
                         <input
                             className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-xs text-[#1c1917] bg-[#fdfbf7] focus:border-amber-500 outline-none shadow-sm font-bold placeholder:italic placeholder:font-normal"
-                            value={(editForm.variants || []).join(', ')}
-                            onChange={(e) => setEditForm({ ...editForm, variants: e.target.value.split(',').map(v => v.trim()).filter(v => v !== '') })}
+                            value={variantDraft}
+                            onChange={(e) => setVariantDraft(e.target.value)}
+                            onBlur={() => {
+                                const cleaned = variantDraft.split(',').map(v => v.trim()).filter(Boolean);
+                                setEditForm({ ...editForm, variants: cleaned });
+                            }}
                             placeholder="Ex: Chats, Pollen, Poussière..."
                         />
                         <p className="text-[9px] text-[#5c4d41]/70 mt-1 italic px-1">Séparez par des virgules. Ces options seront proposées lors de l'édition du trait sur la fiche perso.</p>

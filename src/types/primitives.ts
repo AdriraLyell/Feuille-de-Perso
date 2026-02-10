@@ -7,6 +7,7 @@ export interface DotEntry {
   current?: number; // Valeur temporaire (Utilisé / Carrés)
   max: number;
   variant?: string; // Précision pour les compétences variables (ex: "Artisanat : Forge")
+  definitionId?: string; // ID de la définition parente (pour lien solide)
   description?: string; // New: Description info-bubble
 }
 
@@ -70,6 +71,7 @@ export interface TraitEntry {
   description?: string;
   tag?: string;
   variant?: string; // Précision (ex: pour "Allergie", variant="Chats")
+  definitionId?: string; // ID de la définition parente
 }
 
 export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus';

@@ -2,8 +2,9 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryBackgroundEntry } from '../../../types/system'; // Ensure this type is exported from where it was defined (src/types/system.ts)
-import { Search, Plus, Users, Save, AlertOctagon, Edit2, Trash2, Layers, CheckCircle2, Circle, Lock, Globe } from 'lucide-react';
+import { Search, Plus, Users, Save, AlertOctagon, Edit2, Trash2, Layers, CheckCircle2, Circle, Lock, Globe, Filter, X } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
+import TriStateChip from '../../../components/ui/TriStateChip';
 import { smartIncludes } from '../../../utils/stringUtils';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 
@@ -22,11 +23,36 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
     const [editingItem, setEditingItem] = useState<LibraryBackgroundEntry | null>(null);
     const [error, setError] = useState<string | null>(null);
 
+    // Advanced Filters
+    const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
+    const [sourceFilter, setSourceFilter] = useState<boolean | null>(null);
+    const [typeFilter, setTypeFilter] = useState<boolean | null>(null);
+
     const filteredList = useMemo(() => {
         return list
-            .filter(b => smartIncludes(b.name, searchTerm) || (b.description && smartIncludes(b.description, searchTerm)))
+            .filter(b => {
+                const matchesSearch = smartIncludes(b.name, searchTerm) || (b.description && smartIncludes(b.description, searchTerm));
+                if (!matchesSearch) return false;
+
+                if (activeFilter !== null) {
+                    const isActive = b.isActive !== false;
+                    if (activeFilter !== isActive) return false;
+                }
+
+                if (sourceFilter !== null) {
+                    const isGlobal = b.isGlobal === true;
+                    if (sourceFilter !== isGlobal) return false;
+                }
+
+                if (typeFilter !== null) {
+                    const isVariable = b.isVariable === true;
+                    if (typeFilter !== isVariable) return false;
+                }
+
+                return true;
+            })
             .sort((a, b) => a.name.localeCompare(b.name));
-    }, [list, searchTerm]);
+    }, [list, searchTerm, activeFilter, sourceFilter, typeFilter]);
 
     const placedNames = useMemo(() => {
         const names = new Set<string>();
@@ -133,6 +159,46 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center mb-4 p-2 bg-slate-50 border border-slate-200 rounded">
+                <div className="flex items-center gap-1.5 px-2 text-slate-400 border-r border-slate-200 mr-1 py-1">
+                    <Filter size={14} />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Filtres</span>
+                </div>
+
+                <TriStateChip
+                    label="Actifs"
+                    value={activeFilter}
+                    onChange={setActiveFilter}
+                    icon={CheckCircle2}
+                    activeColor="green"
+                />
+
+                <TriStateChip
+                    label="Officiels"
+                    value={sourceFilter}
+                    onChange={setSourceFilter}
+                    icon={Globe}
+                    activeColor="indigo"
+                />
+
+                <TriStateChip
+                    label="Variable"
+                    value={typeFilter}
+                    onChange={setTypeFilter}
+                    icon={Layers}
+                    activeColor="purple"
+                />
+
+                {(activeFilter !== null || sourceFilter !== null || typeFilter !== null) && (
+                    <button
+                        onClick={() => { setActiveFilter(null); setSourceFilter(null); setTypeFilter(null); }}
+                        className="text-[10px] font-bold text-red-500 hover:text-red-700 ml-auto px-2"
+                    >
+                        RESET
+                    </button>
+                )}
             </div>
 
             {/* Bulk Actions */}

@@ -165,18 +165,16 @@ export const SkillBlock = React.memo<{
     onDefineVariant?: (category: string, id: string, name: string) => void;
     allowExtendedSkills?: boolean;
     description?: string;
-    icon?: string;
     isEditing?: boolean;
     categoryBehavior?: 'Compétence' | 'Secondaire' | 'Arrière-plan' | 'Compteur';
     onDrop?: (category: string, item: any, targetIndex: number) => void;
     onRemove?: (category: string, id: string) => void;
-}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, icon, isEditing = false, onDrop, onRemove }) => {
+}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, isEditing = false, onDrop, onRemove }) => {
     const [showDesc, setShowDesc] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
     const [dropIndex, setDropIndex] = useState<number>(-1);
 
-    // Resolve Icon if it's a valid Lucide name
-    const IconComponent = icon ? (LucideIcons[icon as keyof typeof LucideIcons] as LucideIcon) : null;
+
 
     const handleDragOver = (e: React.DragEvent) => {
         if (!isEditing) return;
@@ -227,7 +225,6 @@ export const SkillBlock = React.memo<{
                 <SectionHeader
                     title={
                         <div className="flex items-center gap-1.5 justify-center">
-                            {IconComponent && <IconComponent size={12} className="text-[#bfae85]/70" />}
                             {title}
                             {description && (
                                 <button

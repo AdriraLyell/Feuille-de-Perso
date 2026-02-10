@@ -1,40 +1,72 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { CharacterSheetData, CampaignNoteEntry, ImageConfig, NoteImage } from '../types';
-import { Book, Plus, Trash2, ChevronLeft, ChevronRight, Bookmark, Users, PenTool, Image as ImageIcon } from 'lucide-react';
+import { Book, Plus, Trash2, ChevronLeft, ChevronRight, Bookmark, Users, PenTool, Image as ImageIcon, Wand2 } from 'lucide-react';
 import { saveImage, deleteImage } from '../imageDB';
 import { useCharacter } from '../context/CharacterContext';
 import { ErrorService } from '../services/ErrorService';
-import NoteImageZone from './campaign/NoteImageZone';
-import NotebookTextarea from './campaign/NotebookTextarea';
+import { NotebookTextareaHandle } from './campaign/NotebookTextarea';
 import PartyTable from './campaign/PartyTable';
+import JournalPage from './campaign/JournalPage';
+import {
+    JOURNAL_LINE_HEIGHT,
+    JOURNAL_PAGE_WIDTH_LANDSCAPE,
+    JOURNAL_PAGE_HEIGHT_LANDSCAPE,
+    JOURNAL_PAGE_WIDTH_PORTRAIT,
+    JOURNAL_PAGE_HEIGHT_PORTRAIT,
+    JOURNAL_CONTENT_PADDING_X,
+    JOURNAL_CONTENT_PADDING_Y
+} from './campaign/constants';
 
 interface Props {
     isLandscape?: boolean;
 }
 
-const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
+const CampaignNotes: React.FC<Props> = ({ isLandscape: _ignored = false }) => {
+    // FORCE LANDSCAPE MODE: The Journal/Party tab is always displayed in landscape refering to user feedback
+    const isLandscape = true;
     const { data, updateData: onChange, addLog: onAddLog } = useCharacter();
     const [activeTab, setActiveTab] = useState<'journal' | 'party'>('journal');
     const [isDrawingImage, setIsDrawingImage] = useState(false);
     const [pendingImageConfig, setPendingImageConfig] = useState<ImageConfig | null>(null);
+    const [pendingImageNoteId, setPendingImageNoteId] = useState<string | null>(null);
+
+    // const lineHeight = 28; // Replaced by constant
+    const paddingTop = 0;
+
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const noteRefs = useRef<{ [key: string]: NotebookTextareaHandle | null }>({});
 
     // --- JOURNAL STATES ---
-    const [currentIndex, setCurrentIndex] = useState(() => {
-        return data.campaignNotes && data.campaignNotes.length > 0 ? data.campaignNotes.length - 1 : 0;
-    });
+    const [currentPage, setCurrentPage] = useState(0);
     const [noteIdToDelete, setNoteIdToDelete] = useState<string | null>(null);
-    const totalPages = data.campaignNotes?.length || 0;
-    const currentNote = totalPages > 0 && data.campaignNotes ? data.campaignNotes[currentIndex] : null;
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const totalNotes = data.campaignNotes?.length || 0;
+    const shouldScrollToEnd = useRef(false);
 
-    // --- EFFECTS ---
-    useEffect(() => {
-        if (totalPages > 0 && currentIndex >= totalPages) {
-            setCurrentIndex(totalPages - 1);
+    // Handle scroll to update current page indicator
+    const handleScroll = () => {
+        if (scrollContainerRef.current) {
+            const { scrollLeft, clientWidth } = scrollContainerRef.current;
+            const page = Math.round(scrollLeft / clientWidth);
+            setCurrentPage(page);
         }
-    }, [totalPages]);
+    };
+
+    // Scroll effect when adding a new note
+    useEffect(() => {
+        if (scrollContainerRef.current && totalNotes > 0 && shouldScrollToEnd.current) {
+            shouldScrollToEnd.current = false;
+            // Scroll to the end when a note is added
+            setTimeout(() => {
+                scrollContainerRef.current?.scrollTo({
+                    left: scrollContainerRef.current.scrollWidth,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        }
+    }, [totalNotes]);
 
     // --- JOURNAL ACTIONS ---
     const addNote = () => {
@@ -47,12 +79,12 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
         };
 
         const newNotes = [...(data.campaignNotes || []), newNote];
+        shouldScrollToEnd.current = true;
         onChange({
             ...data,
             campaignNotes: newNotes
         });
 
-        setCurrentIndex(newNotes.length - 1);
         setActiveTab('journal');
         onAddLog("Nouvelle page ajoutée au journal", 'success', 'sheet');
     };
@@ -60,6 +92,26 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
     const updateNote = (id: string, field: keyof CampaignNoteEntry, value: any) => {
         const newNotes = (data.campaignNotes || []).map(n => n.id === id ? { ...n, [field]: value } : n);
         onChange({ ...data, campaignNotes: newNotes });
+    };
+
+    const insertPageAfter = (index: number) => {
+        const newNote: CampaignNoteEntry = {
+            id: Math.random().toString(36).substr(2, 9),
+            date: new Date().toLocaleDateString('fr-CA'),
+            title: 'Nouvelle Session',
+            content: '',
+            images: []
+        };
+
+        const notes = data.campaignNotes || [];
+        const newNotes = [
+            ...notes.slice(0, index + 1),
+            newNote,
+            ...notes.slice(index + 1)
+        ];
+
+        onChange({ ...data, campaignNotes: newNotes });
+        onAddLog("Page insérée", 'success', 'sheet');
     };
 
     const confirmDeleteNote = () => {
@@ -82,18 +134,80 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
             onAddLog("Page du journal arrachée", 'danger', 'sheet');
             setNoteIdToDelete(null);
 
-            if (currentIndex >= newNotes.length) {
-                setCurrentIndex(Math.max(0, newNotes.length - 1));
+            if (newNotes.length === 0) {
+                setCurrentPage(0);
             }
         }
     };
 
+    const handleOverflow = (noteId: string, overflowContent: string) => {
+        const notes = data.campaignNotes || [];
+        const currentIndex = notes.findIndex(n => n.id === noteId);
+        if (currentIndex === -1) return;
+
+        const nextIndex = currentIndex + 1;
+
+        // Remove the overflowing content from current note first
+        const currentNote = notes[currentIndex];
+        // Note: The NotebookTextarea already removed it from DOM and called onOverflow, 
+        // but it still exists in the 'content' string of the note in the state.
+        // We need to sync the current note too.
+        // Actually, NotebookTextarea calls onChange right before onOverflow.
+        // So we just need to handle the destination.
+
+        if (nextIndex < notes.length) {
+            // Prepend overflow to next note
+            const nextNote = notes[nextIndex];
+            // Check if next note is effectively empty (just title/date) to convert it to continuation
+            const startEmpty = !nextNote.content || nextNote.content.trim() === '';
+            const isDefaultTitle = nextNote.title === 'Nouvelle Session';
+
+            const updatedNextContent = overflowContent + (nextNote.content || '');
+
+            const newNotes = notes.map((n, i) =>
+                i === nextIndex ? {
+                    ...n,
+                    content: updatedNextContent,
+                    // If it was empty/default, treat it as a continuation of previous page
+                    isContinuation: n.isContinuation || (startEmpty && isDefaultTitle)
+                } : n
+            );
+
+            onChange({ ...data, campaignNotes: newNotes });
+        } else {
+            // Create a new note
+            const newNote: CampaignNoteEntry = {
+                id: Math.random().toString(36).substr(2, 9),
+                date: currentNote.date, // Keep same date
+                title: `${currentNote.title} (suite)`,
+                content: overflowContent,
+                images: [],
+                isContinuation: true // Mark as continuation
+            };
+
+            onChange({
+                ...data,
+                campaignNotes: [...notes, newNote]
+            });
+        }
+    };
+
     const goToPrevious = () => {
-        if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({
+                left: -scrollContainerRef.current.clientWidth,
+                behavior: 'smooth'
+            });
+        }
     };
 
     const goToNext = () => {
-        if (currentIndex < totalPages - 1) setCurrentIndex(currentIndex + 1);
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({
+                left: scrollContainerRef.current.clientWidth,
+                behavior: 'smooth'
+            });
+        }
     };
 
     // --- IMAGE HANDLING ---
@@ -104,8 +218,9 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
         }
     };
 
-    const handleDrawComplete = (rect: { x: number, y: number, w: number, h: number, containerWidth: number }) => {
+    const handleDrawComplete = (rect: { x: number, y: number, w: number, h: number, containerWidth: number }, noteId: string) => {
         setIsDrawingImage(false);
+        setPendingImageNoteId(noteId);
 
         // Calculate Align based on center of drawn box relative to container center
         const centerBox = rect.x + (rect.w / 2);
@@ -129,7 +244,7 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file || !currentNote || !pendingImageConfig) return;
+        if (!file || !pendingImageNoteId || !pendingImageConfig) return;
 
         try {
             const blobId = await saveImage(file);
@@ -140,10 +255,13 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
                 config: pendingImageConfig
             };
 
-            const newImages = [...(currentNote.images || []), newImage];
+            const targetNote = (data.campaignNotes || []).find(n => n.id === pendingImageNoteId);
+            if (!targetNote) return;
+
+            const newImages = [...(targetNote.images || []), newImage];
 
             const newNotes = (data.campaignNotes || []).map(n =>
-                n.id === currentNote.id
+                n.id === pendingImageNoteId
                     ? { ...n, images: newImages }
                     : n
             );
@@ -156,30 +274,33 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
         } finally {
             if (fileInputRef.current) fileInputRef.current.value = "";
             setPendingImageConfig(null);
+            setPendingImageNoteId(null);
         }
     };
 
-    const handleUpdateImageConfig = (uniqueId: string, newConfig: ImageConfig) => {
-        if (!currentNote) return;
+    const handleUpdateImageConfig = (noteId: string, uniqueId: string, newConfig: ImageConfig) => {
+        const targetNote = (data.campaignNotes || []).find(n => n.id === noteId);
+        if (!targetNote) return;
 
-        const newImages = (currentNote.images || []).map(img =>
+        const newImages = (targetNote.images || []).map(img =>
             img.id === uniqueId ? { ...img, config: newConfig } : img
         );
 
-        updateNote(currentNote.id, 'images', newImages);
+        updateNote(noteId, 'images', newImages);
     };
 
-    const handleRemoveImage = async (uniqueId: string) => {
-        if (!currentNote) return;
+    const handleRemoveImage = async (noteId: string, uniqueId: string) => {
+        const targetNote = (data.campaignNotes || []).find(n => n.id === noteId);
+        if (!targetNote) return;
 
-        const imageToRemove = (currentNote.images || []).find(img => img.id === uniqueId);
+        const imageToRemove = (targetNote.images || []).find(img => img.id === uniqueId);
         if (!imageToRemove) return;
 
         try {
             await deleteImage(imageToRemove.imageId);
 
-            const newImages = (currentNote.images || []).filter(img => img.id !== uniqueId);
-            updateNote(currentNote.id, 'images', newImages);
+            const newImages = (targetNote.images || []).filter(img => img.id !== uniqueId);
+            updateNote(noteId, 'images', newImages);
 
             onAddLog("Image retirée de la note", 'info', 'sheet');
         } catch (err) {
@@ -191,6 +312,10 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
 
     return (
         <div className={`w-full flex items-center justify-center bg-stone-900 py-8 px-4 md:px-12 relative overflow-auto transition-all duration-300 ${isLandscape ? 'min-h-[1200px]' : 'min-h-[1400px]'}`}>
+            <style>{`
+                .hide-scrollbar::-webkit-scrollbar { display: none; }
+                .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+            `}</style>
 
             <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]"></div>
 
@@ -201,8 +326,8 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
                     {activeTab === 'journal' && (
                         <button
                             onClick={goToPrevious}
-                            disabled={currentIndex <= 0}
-                            className={`p-3 rounded-full bg-stone-800 text-stone-200 shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-stone-600 hover:bg-stone-700 hover:scale-110 hover:text-white transition-all duration-300 ${currentIndex <= 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                            disabled={currentPage === 0}
+                            className={`p-3 rounded-full bg-stone-800 text-stone-200 shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-stone-600 hover:bg-stone-700 hover:scale-110 hover:text-white transition-all duration-300 ${currentPage === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                             title="Page précédente"
                         >
                             <ChevronLeft size={28} strokeWidth={3} />
@@ -211,34 +336,46 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
                 </div>
 
                 {/* --- THE BOOK CONTAINER --- */}
-                <div className={`relative bg-[#fdfbf7] shadow-2xl transition-all duration-500 flex flex-col overflow-hidden z-10 shrink-0
-              ${isLandscape
-                        ? 'w-[1560px] h-[1100px]'
-                        : 'w-[900px] h-[1270px]'
-                    } 
-              rounded-r-md rounded-l-sm border-r-8 border-r-stone-200 border-l-[12px] border-l-stone-800
-          `}>
+                <div className={`relative shadow-2xl transition-all duration-500 flex flex-col overflow-hidden z-10 shrink-0
+              rounded-r-md rounded-l-sm border-r-[10px] border-r-stone-300 border-l-[10px] border-l-stone-950
+              bg-[#fdfbf7]
+          `}
+                    style={{
+                        width: isLandscape ? `${JOURNAL_PAGE_WIDTH_LANDSCAPE * 2 + 60}px` : `${JOURNAL_PAGE_WIDTH_PORTRAIT + 40}px`,
+                        // Tight height: Page (1092) + Header (64) + border/safety (8) = 1164px
+                        height: isLandscape ? `${JOURNAL_PAGE_HEIGHT_LANDSCAPE + 72}px` : `${JOURNAL_PAGE_HEIGHT_PORTRAIT + 72}px`,
+                    }}
+                >
 
-                    <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-stone-400 opacity-20 z-20 pointer-events-none shadow-[2px_0_5px_rgba(0,0,0,0.2)]"></div>
+                    {/* Central Gutter / Spine - Perfectly centered at 1/2 */}
+                    {isLandscape && (
+                        <div
+                            className="absolute left-1/2 top-0 bottom-0 w-[40px] -ml-[20px] z-30 pointer-events-none flex items-center justify-center"
+                        >
+                            <div className="flex-1 h-full bg-gradient-to-r from-transparent to-black/10"></div>
+                            <div className="w-px bg-stone-300/30 h-full"></div>
+                            <div className="flex-1 h-full bg-gradient-to-l from-transparent to-black/10"></div>
+                        </div>
+                    )}
 
                     {/* BOOK HEADER */}
-                    <div className="shrink-0 pt-6 pb-2 px-8 md:px-12 bg-[#fdfbf7] z-20 flex items-end justify-between border-b-2 border-stone-800 relative">
+                    <div className="shrink-0 h-[64px] px-8 md:px-12 bg-[#fdfbf7] z-20 flex items-center justify-between border-b border-stone-200 relative">
 
-                        <div className="flex items-end gap-6">
+                        <div className="flex items-center gap-6">
                             <button
                                 onClick={() => setActiveTab('journal')}
-                                className={`group flex items-center gap-2 pb-1 transition-all ${activeTab === 'journal' ? 'text-indigo-950 border-b-4 border-indigo-900' : 'text-stone-400 hover:text-stone-600'}`}
+                                className={`group flex items-center gap-2 pb-1 transition-all ${activeTab === 'journal' ? 'text-indigo-950 border-b-2 border-indigo-900 font-bold' : 'text-stone-400 hover:text-stone-600'}`}
                             >
-                                <Book size={28} strokeWidth={activeTab === 'journal' ? 2.5 : 2} className="transition-transform group-hover:-translate-y-1" />
-                                <span className={`text-2xl font-black uppercase tracking-[0.1em] font-serif leading-none hidden sm:inline`}>Journal</span>
+                                <Book size={24} strokeWidth={activeTab === 'journal' ? 2.5 : 2} className="transition-transform group-hover:-translate-y-1" />
+                                <span className={`text-xl font-black uppercase tracking-[0.1em] font-serif leading-none hidden sm:inline`}>Journal</span>
                             </button>
 
                             <button
                                 onClick={() => setActiveTab('party')}
-                                className={`group flex items-center gap-2 pb-1 transition-all ${activeTab === 'party' ? 'text-indigo-950 border-b-4 border-indigo-900' : 'text-stone-400 hover:text-stone-600'}`}
+                                className={`group flex items-center gap-2 pb-1 transition-all ${activeTab === 'party' ? 'text-indigo-950 border-b-2 border-indigo-900 font-bold' : 'text-stone-400 hover:text-stone-600'}`}
                             >
-                                <Users size={28} strokeWidth={activeTab === 'party' ? 2.5 : 2} className="transition-transform group-hover:-translate-y-1" />
-                                <span className={`text-2xl font-black uppercase tracking-[0.1em] font-serif leading-none hidden sm:inline`}>Groupe</span>
+                                <Users size={24} strokeWidth={activeTab === 'party' ? 2.5 : 2} className="transition-transform group-hover:-translate-y-1" />
+                                <span className={`text-xl font-black uppercase tracking-[0.1em] font-serif leading-none hidden sm:inline`}>Groupe</span>
                             </button>
                         </div>
 
@@ -262,13 +399,21 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
                     </div>
 
                     {/* --- CONTENT AREA --- */}
-                    <div className="flex-grow flex flex-col overflow-hidden bg-stone-50/20 relative">
+                    <div className="flex-grow flex flex-col overflow-hidden bg-white/10 relative">
 
                         {activeTab === 'journal' && (
                             <>
-                                <div className="flex-grow flex flex-col overflow-hidden p-6 md:p-12">
-                                    {!currentNote && (
-                                        <div className="flex-grow flex flex-col items-center justify-center text-stone-400 italic gap-6 opacity-60 animate-in fade-in duration-1000">
+                                <div
+                                    ref={scrollContainerRef}
+                                    onScroll={handleScroll}
+                                    className="flex-grow overflow-x-auto overflow-y-hidden flex snap-x snap-mandatory hide-scrollbar relative"
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                    }}
+                                >
+                                    {(!data.campaignNotes || data.campaignNotes.length === 0) ? (
+                                        <div className="min-w-full flex-shrink-0 flex flex-col items-center justify-center text-stone-400 italic gap-6 opacity-60 animate-in fade-in duration-1000">
                                             <div className="w-24 h-24 border-4 border-stone-300 rounded-full flex items-center justify-center">
                                                 <Book size={48} strokeWidth={1} />
                                             </div>
@@ -277,98 +422,115 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
                                                 <p className="text-sm mt-2 font-handwriting text-xl text-stone-400">Cliquez sur "Nouvelle Page" pour commencer l'histoire.</p>
                                             </div>
                                         </div>
-                                    )}
+                                    ) : (
+                                        <div
+                                            className="h-full flex flex-nowrap"
+                                            style={{
+                                                width: 'max-content',
+                                                minWidth: '100%'
+                                            }}
+                                        >
+                                            {/* SPREAD COMPONENT: Groups pages by 2 to ensure perfect book layout */}
+                                            {Array.from({ length: Math.ceil((data.campaignNotes || []).length / 2) }).map((_, spreadIdx) => {
+                                                const firstNoteIdx = spreadIdx * 2;
+                                                const firstNote = data.campaignNotes?.[firstNoteIdx];
+                                                const secondNote = data.campaignNotes?.[firstNoteIdx + 1];
 
-                                    {currentNote && (
-                                        <div className="w-full h-full flex flex-col animate-in fade-in zoom-in duration-300">
-                                            <div className="bg-white border border-stone-300 shadow-sm relative w-full h-full flex flex-col rounded-sm overflow-hidden flex-grow min-h-0">
-
-                                                {/* Note Header */}
-                                                <div className="bg-stone-100 border-b border-stone-200 p-3 flex items-center justify-between pl-4 shrink-0 rounded-t-sm z-20">
-                                                    <div className="flex items-center gap-3 flex-grow min-w-0">
-                                                        <div className="w-[130px] shrink-0">
-                                                            <input
-                                                                type="date"
-                                                                className="w-full bg-transparent border-b border-dotted border-stone-400 focus:border-indigo-500 outline-none text-base font-handwriting text-stone-800 font-bold"
-                                                                value={currentNote.date}
-                                                                onChange={(e) => updateNote(currentNote.id, 'date', e.target.value)}
-                                                                style={{ colorScheme: 'light' }}
+                                                return (
+                                                    <div key={spreadIdx} className="h-full flex-shrink-0 min-w-full flex justify-between snap-start relative">
+                                                        {firstNote && (
+                                                            <JournalPage
+                                                                key={firstNote.id}
+                                                                note={firstNote}
+                                                                pageIndex={firstNoteIdx}
+                                                                isEven={true}
+                                                                isLandscape={isLandscape}
+                                                                onUpdate={updateNote}
+                                                                onDelete={(id) => setNoteIdToDelete(id)}
+                                                                onInsertAfter={() => insertPageAfter(firstNoteIdx)}
+                                                                onOverflow={handleOverflow}
+                                                                onAddLog={(msg, type) => onAddLog(msg, type, 'sheet')}
+                                                                onForceReflow={(id) => {
+                                                                    if (noteRefs.current[id]) {
+                                                                        noteRefs.current[id]?.forceReflow();
+                                                                        onAddLog("Repagination forcée", 'info', 'sheet');
+                                                                    }
+                                                                }}
+                                                                registerNoteRef={(id, ref) => { if (ref) noteRefs.current[id] = ref; else delete noteRefs.current[id]; }}
+                                                                isDrawing={isDrawingImage}
+                                                                onDrawComplete={handleDrawComplete}
+                                                                onUpdateImageConfig={handleUpdateImageConfig}
+                                                                onRemoveImage={handleRemoveImage}
                                                             />
-                                                        </div>
+                                                        )}
 
-                                                        <div className="h-8 w-px bg-stone-300 mx-1"></div>
-                                                        <input
-                                                            type="text"
-                                                            value={currentNote.title}
-                                                            onChange={(e) => updateNote(currentNote.id, 'title', e.target.value)}
-                                                            placeholder="Titre de la session..."
-                                                            className="bg-transparent text-lg font-serif font-bold text-indigo-950 focus:outline-none flex-grow placeholder-stone-300"
-                                                        />
+                                                        {/* Physical Gap for the Spine */}
+                                                        <div className="w-[40px] shrink-0 pointer-events-none" />
+
+                                                        {secondNote ? (
+                                                            <JournalPage
+                                                                key={secondNote.id}
+                                                                note={secondNote}
+                                                                pageIndex={firstNoteIdx + 1}
+                                                                isEven={false}
+                                                                isLandscape={isLandscape}
+                                                                onUpdate={updateNote}
+                                                                onDelete={(id) => setNoteIdToDelete(id)}
+                                                                onInsertAfter={() => insertPageAfter(firstNoteIdx + 1)}
+                                                                onOverflow={handleOverflow}
+                                                                onAddLog={(msg, type) => onAddLog(msg, type, 'sheet')}
+                                                                onForceReflow={(id) => {
+                                                                    if (noteRefs.current[id]) {
+                                                                        noteRefs.current[id]?.forceReflow();
+                                                                        onAddLog("Repagination forcée", 'info', 'sheet');
+                                                                    }
+                                                                }}
+                                                                registerNoteRef={(id, ref) => { if (ref) noteRefs.current[id] = ref; else delete noteRefs.current[id]; }}
+                                                                isDrawing={isDrawingImage}
+                                                                onDrawComplete={handleDrawComplete}
+                                                                onUpdateImageConfig={handleUpdateImageConfig}
+                                                                onRemoveImage={handleRemoveImage}
+                                                            />
+                                                        ) : (
+                                                            /* Ghost Page at the end of an odd note count spread */
+                                                            <div
+                                                                className="h-full flex-shrink-0 snap-start relative flex flex-col page-shadow-right"
+                                                                style={{
+                                                                    width: isLandscape ? `${JOURNAL_PAGE_WIDTH_LANDSCAPE}px` : `${JOURNAL_PAGE_WIDTH_PORTRAIT}px`,
+                                                                    height: isLandscape ? `${JOURNAL_PAGE_HEIGHT_LANDSCAPE}px` : `${JOURNAL_PAGE_HEIGHT_PORTRAIT}px`,
+                                                                    borderLeft: 'none'
+                                                                }}
+                                                            >
+                                                                <div
+                                                                    className="h-full flex flex-col bg-[#fdfbf7] overflow-hidden relative"
+                                                                    style={{ padding: `${JOURNAL_CONTENT_PADDING_Y}px ${JOURNAL_CONTENT_PADDING_X}px` }}
+                                                                >
+                                                                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/paper-fibers.png')]"></div>
+
+                                                                    {/* Ghost Header - Tighter margin */}
+                                                                    <div className="border-b-2 border-transparent mb-2 pb-2 flex items-center justify-between shrink-0 z-20 opacity-0 pointer-events-none select-none">
+                                                                        <div className="flex items-center gap-4 flex-grow min-w-0">
+                                                                            <div className="h-[20px]"></div>
+                                                                            <div className="h-[32px]"></div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Ghost Lines */}
+                                                                    <div className="flex-grow min-h-0 bg-transparent relative book-lines"></div>
+
+                                                                    {/* Ghost Page Number */}
+                                                                    {/* Ghost Page Number - Simplified, lower position */}
+                                                                    <div className="absolute bottom-4 right-10 text-[18px] font-serif text-stone-900/40 font-bold italic z-40 pointer-events-none">
+                                                                        {firstNoteIdx + 2}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
-
-                                                    <div className="flex items-center gap-1 no-print shrink-0 ml-2">
-                                                        {/* Image Draw Button */}
-                                                        <button
-                                                            onClick={toggleDrawMode}
-                                                            className={`p-2 rounded transition-colors flex items-center gap-1 ${isDrawingImage ? 'bg-indigo-600 text-white shadow-inner animate-pulse' : 'text-stone-400 hover:text-indigo-600 hover:bg-indigo-50'}`}
-                                                            title={isDrawingImage ? "Mode dessin actif - Cliquez pour annuler" : "Dessiner une zone pour l'image"}
-                                                        >
-                                                            <ImageIcon size={18} />
-                                                            {isDrawingImage && <span className="text-xs font-bold px-1">Annuler</span>}
-                                                        </button>
-                                                        <input
-                                                            type="file"
-                                                            ref={fileInputRef}
-                                                            className="hidden"
-                                                            accept="image/*"
-                                                            onChange={handleImageUpload}
-                                                        />
-
-                                                        <button
-                                                            onClick={() => setNoteIdToDelete(currentNote.id)}
-                                                            className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                                            title="Arracher cette page"
-                                                        >
-                                                            <Trash2 size={18} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                {/* Note Content Wrapper */}
-                                                <div className="flex-grow min-h-0 bg-white relative rounded-b-sm">
-                                                    <NotebookTextarea
-                                                        value={currentNote.content}
-                                                        onChange={(v) => updateNote(currentNote.id, 'content', v)}
-                                                        placeholder="Récit des événements..."
-                                                        isDrawing={isDrawingImage}
-                                                        onDrawComplete={handleDrawComplete}
-                                                        imageNodes={
-                                                            currentNote.images && currentNote.images.map((img) => (
-                                                                <NoteImageZone
-                                                                    key={img.id}
-                                                                    uniqueId={img.id}
-                                                                    imageId={img.imageId}
-                                                                    config={img.config}
-                                                                    onUpdateConfig={(cfg) => handleUpdateImageConfig(img.id, cfg)}
-                                                                    onDelete={() => handleRemoveImage(img.id)}
-                                                                />
-                                                            ))
-                                                        }
-                                                    />
-                                                </div>
-                                            </div>
+                                                );
+                                            })}
                                         </div>
                                     )}
-                                </div>
-                                {/* BOOK FOOTER */}
-                                <div className="shrink-0 bg-[#fdfbf7] py-3 border-t border-stone-200 flex justify-center items-center px-8 md:px-12 text-stone-500 font-serif select-none relative z-30">
-                                    <div className="font-mono text-xs uppercase tracking-widest text-stone-400 font-bold">
-                                        {totalPages > 0 ? (
-                                            <span>Page {currentIndex + 1} <span className="mx-1 text-stone-300">/</span> {totalPages}</span>
-                                        ) : (
-                                            <span>-</span>
-                                        )}
-                                    </div>
                                 </div>
                             </>
                         )}
@@ -387,8 +549,7 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
                     {activeTab === 'journal' && (
                         <button
                             onClick={goToNext}
-                            disabled={currentIndex >= totalPages - 1}
-                            className={`p-3 rounded-full bg-stone-800 text-stone-200 shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-stone-600 hover:bg-stone-700 hover:scale-110 hover:text-white transition-all duration-300 ${currentIndex >= totalPages - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                            className={`p-3 rounded-full bg-stone-800 text-stone-200 shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-stone-600 hover:bg-stone-700 hover:scale-110 hover:text-white transition-all duration-300 opacity-100`}
                             title="Page suivante"
                         >
                             <ChevronRight size={28} strokeWidth={3} />
@@ -399,40 +560,42 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape = false }) => {
             </div>
 
             {/* MODAL DE CONFIRMATION */}
-            {noteIdToDelete && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/40 animate-in fade-in duration-200 no-print">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100 animate-in zoom-in duration-200 border-2 border-stone-200">
-                        <div className="bg-stone-50 p-6 flex flex-col items-center text-center">
-                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 text-red-600 shadow-inner">
-                                <Trash2 size={32} />
+            {
+                noteIdToDelete && (
+                    <div className="absolute inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/40 animate-in fade-in duration-200 no-print">
+                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-100 animate-in zoom-in duration-200 border-2 border-stone-200">
+                            <div className="bg-stone-50 p-6 flex flex-col items-center text-center">
+                                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 text-red-600 shadow-inner">
+                                    <Trash2 size={32} />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">Arracher cette page ?</h3>
+                                <div className="bg-white p-3 rounded border border-stone-200 shadow-sm w-full mb-4 text-left">
+                                    <span className="block font-bold text-gray-800 truncate">{noteToDelete?.title || 'Note sans titre'}</span>
+                                    <span className="text-xs text-gray-500 block">{noteToDelete?.date}</span>
+                                </div>
+                                <p className="text-gray-500 text-xs">
+                                    Cette action est définitive. Le contenu sera perdu à jamais.
+                                </p>
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Arracher cette page ?</h3>
-                            <div className="bg-white p-3 rounded border border-stone-200 shadow-sm w-full mb-4 text-left">
-                                <span className="block font-bold text-gray-800 truncate">{noteToDelete?.title || 'Note sans titre'}</span>
-                                <span className="text-xs text-gray-500 block">{noteToDelete?.date}</span>
+                            <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-100">
+                                <button
+                                    onClick={() => setNoteIdToDelete(null)}
+                                    className="flex-1 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-bold transition-colors text-sm"
+                                >
+                                    Garder
+                                </button>
+                                <button
+                                    onClick={confirmDeleteNote}
+                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold shadow-md transition-colors text-sm"
+                                >
+                                    Détruire
+                                </button>
                             </div>
-                            <p className="text-gray-500 text-xs">
-                                Cette action est définitive. Le contenu sera perdu à jamais.
-                            </p>
-                        </div>
-                        <div className="bg-gray-50 px-6 py-4 flex gap-3 justify-center border-t border-gray-100">
-                            <button
-                                onClick={() => setNoteIdToDelete(null)}
-                                className="flex-1 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-bold transition-colors text-sm"
-                            >
-                                Garder
-                            </button>
-                            <button
-                                onClick={confirmDeleteNote}
-                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold shadow-md transition-colors text-sm"
-                            >
-                                Détruire
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 

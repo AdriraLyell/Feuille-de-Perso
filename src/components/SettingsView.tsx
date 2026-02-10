@@ -16,7 +16,8 @@ import CreationConfigEditor from './settings/CreationConfigEditor';
 import LibrarySidebar from './settings/LibrarySidebar';
 import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
 import LibraryView from './LibraryView';
-import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Settings, Lock, UploadCloud, CheckCircle } from 'lucide-react';
+import AdminSuggestions from './settings/AdminSuggestions'; // NEW
+import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Settings, Lock, UploadCloud, CheckCircle, Lightbulb } from 'lucide-react';
 
 // Rules Integration
 import { useRules } from '../context/RulesContext';
@@ -80,7 +81,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
   // Tab visibility based on Online Mode and Expert Mode
   const showAdvancedTabs = !isOnlineMode || expertMode;
 
-  const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'specializations' | 'creation' | 'library' | 'cloud'>('library');
+  const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'specializations' | 'creation' | 'library' | 'cloud' | 'suggestions'>('library');
   const [isDirty, setIsDirty] = useState(false);
 
   // Helper to compare data excluding volatile/computed fields
@@ -164,6 +165,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
                 <button onClick={() => setActiveTab('skills')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'skills' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><List size={16} /> Compétences</button>
                 <button onClick={() => setActiveTab('specializations')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'specializations' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><Tag size={16} /> Spécialisations</button>
                 <button onClick={() => setActiveTab('creation')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'creation' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><UserPlus size={16} /> Paramètres</button>
+                <button onClick={() => setActiveTab('suggestions')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'suggestions' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}>
+                  <Lightbulb size={16} /> Suggestions {localData.suggestions && localData.suggestions.length > 0 ? `(${localData.suggestions.length})` : ''}
+                </button>
               </>
             )}
 
@@ -244,6 +248,14 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
 
           {activeTab === 'creation' && (
             <CreationConfigEditor
+              data={localData}
+              onUpdate={handleLocalUpdate}
+              onAddLog={onAddLog}
+            />
+          )}
+
+          {activeTab === 'suggestions' && (
+            <AdminSuggestions
               data={localData}
               onUpdate={handleLocalUpdate}
               onAddLog={onAddLog}
@@ -343,6 +355,14 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
           onUpdate={handleLocalUpdate}
           onAddLog={onAddLog}
         />
+      )}
+
+      {activeTab === 'suggestions' && (
+        <div className="hidden lg:block w-80 shrink-0 ml-6 bg-white border border-[#bfae85]/30 rounded-sm p-4 h-fit sticky top-24">
+          <div className="text-xs text-stone-500 italic text-center">
+            Les suggestions validées modifient immédiatement les règles chargées en mémoire. Pensez à exporter vos règles ensuite.
+          </div>
+        </div>
       )}
 
       {/* Reset Confirmation Modal */}

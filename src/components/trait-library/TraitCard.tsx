@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { LibraryEntry } from '../../types';
-import { Zap, Edit2, Trash2, Plus, CheckSquare, Square, Lock, Globe } from 'lucide-react';
+import { Zap, Edit2, Trash2, Plus, CheckSquare, Square, Lock, Globe, Layers } from 'lucide-react';
 
 interface TraitCardProps {
     entry: LibraryEntry;
@@ -14,6 +14,7 @@ interface TraitCardProps {
     showMultiSelect: boolean;
     source?: 'local' | 'official' | 'modified';
     isLocked?: boolean;
+    isActive?: boolean;
 }
 
 const TraitCard: React.FC<TraitCardProps> = ({
@@ -26,13 +27,14 @@ const TraitCard: React.FC<TraitCardProps> = ({
     onDelete,
     showMultiSelect,
     source = 'local',
-    isLocked = false
+    isLocked = false,
+    isActive = true
 }) => {
     if (!entry) return null;
 
     return (
         <div
-            className={`p-2 transition-colors group cursor-pointer select-none border-b border-slate-100 last:border-0 flex items-center gap-2 ${isSelected ? 'bg-amber-50/50 hover:bg-amber-100/50' : 'hover:bg-stone-50'}`}
+            className={`p-2 transition-colors group cursor-pointer select-none border-b border-slate-100 last:border-0 flex items-center gap-2 ${isSelected ? 'bg-amber-50/50 hover:bg-amber-100/50' : 'hover:bg-stone-50'} ${!isActive ? 'opacity-60 grayscale' : ''}`}
             onClick={() => {
                 if (showMultiSelect && onMultiSelect) {
                     onMultiSelect(entry.id);
@@ -54,6 +56,7 @@ const TraitCard: React.FC<TraitCardProps> = ({
 
             {/* 2. Status Icons (Fixed width) */}
             <div className="w-16 flex items-center gap-1 shrink-0">
+                {entry.isVariable && <div title="Trait à variantes"><Layers size={14} className="text-blue-500" /></div>}
                 {source === 'official' && <div title="Trait Officiel"><Globe size={14} className="text-indigo-500" /></div>}
                 {entry.effects && entry.effects.length > 0 && <div title="Effets mécaniques"><Zap size={14} className="text-amber-500 fill-amber-500" /></div>}
                 {isLocked && <div title="Trait utilisé"><Lock size={14} className="text-amber-600" /></div>}
@@ -62,7 +65,7 @@ const TraitCard: React.FC<TraitCardProps> = ({
             {/* 3. Content (Flexible) */}
             <div className="flex-grow overflow-hidden pr-2">
                 <div className="flex justify-between items-baseline gap-2">
-                    <span className={`font-bold text-sm truncate ${isSelected ? 'text-amber-900' : 'text-[#4a3b32]'}`} title={entry.name}>
+                    <span className={`font-bold text-sm truncate ${isSelected ? 'text-amber-900' : 'text-[#4a3b32]'} ${!isActive ? 'line-through text-slate-500' : ''}`} title={entry.name}>
                         {entry.name}
                     </span>
                     <span className="text-[10px] font-mono font-bold text-[#5c4d41] bg-[#bfae85]/20 px-1 rounded-sm border border-[#bfae85]/10 shrink-0">

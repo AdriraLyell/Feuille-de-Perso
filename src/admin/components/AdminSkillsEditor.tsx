@@ -105,6 +105,18 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
         });
     };
 
+    const updateCategoryMetadata = (category: string, updates: Partial<any>) => {
+        onUpdate({
+            ...rules,
+            definitions: {
+                ...rules.definitions,
+                skillCategories: skillCategories.map(cat =>
+                    cat.id === category ? { ...cat, ...updates } : cat
+                )
+            }
+        });
+    };
+
     const updateBehavior = (category: string, behavior: any) => {
         // Déterminer les coûts par défaut selon le behavior
         let factor = 1;
@@ -255,6 +267,7 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
                             isDraggingSidebarItem={draggedItem?.type === 'admin_lib_skill'}
                             onUpdateLabel={updateLabel}
                             onUpdateBehavior={updateBehavior}
+                            onUpdateCategory={(updates) => updateCategoryMetadata(cat.id, updates)}
                             onUpdateSkill={updateSkillName}
                             onAddSkill={addSkill}
                             onRemoveSkill={removeSkill}

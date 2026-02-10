@@ -1,22 +1,23 @@
 
 import React from 'react';
 import { TraitEntry } from '../../../types';
-import { Edit } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 
 interface TraitRowProps {
     item: TraitEntry;
     onClick: () => void;
+    onRemove: (e: React.MouseEvent) => void;
 }
 
-const TraitRow: React.FC<TraitRowProps> = ({ item, onClick }) => {
+const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove }) => {
     const isEmpty = !item.name.trim();
 
     return (
         <div
             onClick={onClick}
             className={`flex gap-1 items-center h-[22px] px-1 transition-all rounded-sm cursor-pointer group select-none ${isEmpty
-                    ? 'hover:bg-slate-50 border-b border-dotted border-stone-200'
-                    : 'hover:bg-blue-50 bg-white/50 border-b border-stone-300 shadow-sm'
+                ? 'hover:bg-slate-50 border-b border-dotted border-stone-200'
+                : 'hover:bg-blue-50 bg-white/50 border-b border-stone-300 shadow-sm'
                 }`}
         >
             <div className={`w-8 shrink-0 text-center font-bold text-xs h-full flex items-center justify-center border-r border-stone-300 ${isEmpty ? 'text-stone-300' : 'text-stone-800 font-handwriting bg-white'
@@ -32,6 +33,15 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, onClick }) => {
                 </span>
             </div>
 
+            {!isEmpty && (
+                <div
+                    onClick={onRemove}
+                    className="opacity-0 group-hover:opacity-100 text-stone-400 hover:text-red-500 scale-75 transition-all shrink-0 p-1 hover:bg-red-50 rounded"
+                    title="Supprimer"
+                >
+                    <Trash2 size={14} />
+                </div>
+            )}
             <div className="opacity-0 group-hover:opacity-100 text-stone-400 scale-75 transition-opacity shrink-0">
                 <Edit size={14} />
             </div>

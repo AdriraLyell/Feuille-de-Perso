@@ -1,5 +1,671 @@
 [
     {
+        "version": "2.32.1",
+        "date": "2026-02-10",
+        "description": "Amélioration layout : Noms multi-lignes.",
+        "changes": [
+            {
+                "type": "modified",
+                "text": "Support des noms sur deux lignes pour les cartes Compétences et Arrières-plans dans l'admin.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.32.0",
+        "date": "2026-02-10",
+        "description": "Harmonisation UI des bibliothèques Administrateur.",
+        "changes": [
+            {
+                "type": "modified",
+                "text": "Refonte visuelle premium des onglets Compétences, Origines, Compteurs, Spécialisations et Traits.",
+                "category": "ui"
+            },
+            {
+                "type": "added",
+                "text": "Colonnes interactives à largeur fixe pour une navigation plus fluide.",
+                "category": "ui"
+            },
+            {
+                "type": "modified",
+                "text": "Remplacement des badges textuels par des icônes intuitives (Global, Lock, Variantes).",
+                "category": "ui"
+            },
+            {
+                "type": "fixed",
+                "text": "Correction de types TypeScript sur les icônes Lucide pour assurer l'intégrité du build.",
+                "category": "fix"
+            }
+        ]
+    },
+    {
+        "version": "2.31.0",
+        "date": "2026-02-09",
+        "description": "Sécurisation de l'intégrité des données : Verrouillage des items.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Indicateurs visuels (cadenas) pour les items de bibliothèque en cours d'utilisation.",
+                "category": "ui"
+            },
+            {
+                "type": "added",
+                "text": "Blocage de la suppression des items 'placés' dans la configuration ou actifs dans d'autres campagnes.",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Suivi global de l'utilisation des items à travers toutes les campagnes via Supabase.",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Mise à jour de toutes les bibliothèques (Compétences, Historiques, Compteurs, Traits, Spécialisations).",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.30.5",
+        "date": "2026-02-09",
+        "description": "Généralisation des actions en masse (Admin).",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Extension des actions 'Tout activer / Tout désactiver' aux bibliothèques d'Historiques, Compteurs, Spécialisations et Traits.",
+                "category": "ui"
+            },
+            {
+                "type": "improved",
+                "text": "Cohérence visuelle et fonctionnelle des actions en masse sur l'ensemble de la section Admin.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.30.4",
+        "date": "2026-02-09",
+        "description": "Amélioration ergonomie Bibliothèque (Admin).",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Ajout d'actions en masse (Tout activer / Tout désactiver) dans la réserve de compétences.",
+                "category": "ui"
+            },
+            {
+                "type": "improved",
+                "text": "Les actions en masse respectent le filtre de recherche actif.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.30.3",
+        "date": "2026-02-09",
+        "description": "Sécurisation de la persistance (Admin).",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "Correction d'une faille de synchronisation provoquant la perte de données lors de l'ajout de nouveaux items ou de l'activation massive.",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Standardisation de la génération d'ID via UUID pour une meilleure compatibilité avec Supabase.",
+                "category": "core"
+            }
+        ]
+    },
+    {
+        "version": "2.30.2",
+        "date": "2026-02-09",
+        "description": "Optimisation Admin v2.",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "Rétablissement de la suppression pour les items de bibliothèque partagés (Repository).",
+                "category": "fix"
+            },
+            {
+                "type": "improved",
+                "text": "Refonte ergonomique de la modale d'édition des compétences (meilleur équilibre Nom/Description/Variante).",
+                "category": "ui"
+            },
+            {
+                "type": "removed",
+                "text": "Nettoyage des items dupliqués entre les bibliothèques de compétences, compteurs et historiques.",
+                "category": "cleanup"
+            }
+        ]
+    },
+    {
+        "version": "2.30.1",
+        "date": "2026-02-09",
+        "description": "Correctif de la Réserve (Admin).",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "La réserve de l'admin ne montre désormais que les compétences/historiques/compteurs explicitement sélectionnés pour la campagne.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.30.0",
+        "date": "2026-02-09",
+        "description": "Architecture 'Global Repository' & Gestion localisée des catégories.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Migration vers le modèle 'Global Repository' : tous les items de bibliothèque sont désormais partagés.",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Gestion des catégories par défaut déplacée dans le contexte local de la campagne (Réserve).",
+                "category": "ui"
+            },
+            {
+                "type": "changed",
+                "text": "Refonte des services LibraryLoader et LibraryPersistence pour garantir l'intégrité des items globaux.",
+                "category": "core"
+            },
+            {
+                "type": "fixed",
+                "text": "Suppression des risques de perte de données lors de la synchronisation des bibliothèques.",
+                "category": "fix"
+            }
+        ]
+    },
+    {
+        "version": "2.29.3",
+        "date": "2026-02-09",
+        "description": "Audit & Online First : Supabase Integration",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Support du chargement direct des campagnes Supabase via URL (?s=id) dans l'app Joueur.",
+                "category": "core"
+            },
+            {
+                "type": "fixed",
+                "text": "Nettoyage complet du Type Safety (zéro @ts-ignore) dans les services de données.",
+                "category": "core"
+            },
+            {
+                "type": "changed",
+                "text": "Refactoring de RulesReconciler pour une meilleure modularité et tests automatisés.",
+                "category": "core"
+            }
+        ]
+    },
+    {
+        "version": "2.34.3",
+        "date": "2026-02-10",
+        "changes": [
+            "Restauration du champ Variantes dans la réserve de l'Administration.",
+            "Correction du bug de suppression/espaces ('sticky text') dans les saisies de variantes (Admin & Librairies).",
+            "Support de l'édition des descriptions et icônes de catégories dans l'Admin pour éviter la perte de données.",
+            "Mappage complet des métadonnées (bulles d'info) pour les Arrière-plans et Compteurs."
+        ]
+    },
+    {
+        "version": "2.34.2",
+        "date": "2026-02-10",
+        "changes": [
+            "Correction des bulles d'info (descriptions) sur les pavés de compétences de la fiche perso.",
+            "Amélioration de la saisie des variantes dans l'administration (gestion fluide des virgules et espaces).",
+            "Restauration des icônes de catégorie sur la fiche perso."
+        ]
+    },
+    {
+        "version": "2.34.1",
+        "date": "2026-02-10",
+        "description": "Correctifs : Gestion des Variantes et Spacers.",
+        "changes": [
+            {
+                "type": "fix",
+                "text": "Correction du bug des 'spacers' (lignes vides) dans les compétences.",
+                "category": "system"
+            },
+            {
+                "type": "fix",
+                "text": "Correction de la saisie des variantes (virgules) dans l'admin.",
+                "category": "admin"
+            },
+            {
+                "type": "ui",
+                "text": "Ajout d'une icône pour identifier les traits à variantes.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.34.0",
+        "date": "2026-02-10",
+        "description": "Système de Variantes dynamiques et Suggestions Joueurs/MJ.",
+        "changes": [
+            {
+                "type": "feature",
+                "text": "Nouvelle interface de sélection de variantes pour les Compétences (ex: Artisanat : Forge).",
+                "category": "feature"
+            },
+            {
+                "type": "feature",
+                "text": "Système de Suggestions : les variantes créées par les joueurs sont proposées au MJ pour validation.",
+                "category": "admin"
+            },
+            {
+                "type": "added",
+                "text": "Onglet 'Suggestions' dans les réglages (Mode Expert) pour valider/rejeter les contributions des joueurs.",
+                "category": "admin"
+            },
+            {
+                "type": "modified",
+                "text": "Refonte de l'édition des compétences sur la fiche pour supporter nativement les définitions variables.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.33.2",
+        "date": "2026-02-10",
+        "changes": [
+            {
+                "type": "feature",
+                "text": "Verrouillage des scores en Mode Édition : désactivation de la modification des bulles pendant la réorganisation pour éviter les erreurs de saisie.",
+                "category": "ux"
+            }
+        ]
+    },
+    {
+        "version": "2.33.1",
+        "date": "2026-02-10",
+        "changes": [
+            {
+                "type": "feature",
+                "text": "Sécurisation du Mode Édition : interdiction de supprimer une compétence ayant des points investis (le déplacement reste autorisé).",
+                "category": "ux"
+            }
+        ]
+    },
+    {
+        "version": "2.33.0",
+        "date": "2026-02-10",
+        "description": "Refonte intégrale du Guide Utilisateur Joueur.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Nouveau guide utilisateur structuré par thématiques (Modes, Usage, Création/Édition, Outils).",
+                "category": "docs"
+            },
+            {
+                "type": "added",
+                "text": "Documentation détaillée des trois modes de fonctionnement : En Ligne (Cloud), JSON (Fichiers) et Hors Ligne.",
+                "category": "docs"
+            },
+            {
+                "type": "added",
+                "text": "Guide pas-à-pas pour le Mode Création (répartition des points) et le Mode Édition Directe (structure).",
+                "category": "docs"
+            },
+            {
+                "type": "improved",
+                "text": "Nettoyage du guide : suppression des sections MJ redondantes dans l'app joueur pour plus de clarté.",
+                "category": "ux"
+            }
+        ]
+    },
+    {
+        "version": "2.32.8",
+        "date": "2026-02-10",
+        "description": "Synchronisation Admin et amélioration de la remontée d'infos.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Notifications au MJ pour TOUT ajout (Compétences & Arrière-plans, y compris bibliothèque officielle).",
+                "category": "admin"
+            },
+            {
+                "type": "added",
+                "text": "Nouvelle section 'Suggestions' dans la vue Admin pour visualiser les éléments même à 0 points.",
+                "category": "admin"
+            },
+            {
+                "type": "modified",
+                "text": "Nettoyage UI : Suppression du bouton de validation redondant dans le Header pour centraliser sur le bandeau.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.32.7",
+        "date": "2026-02-10",
+        "description": "Sécurité et clarté du Mode Édition.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Nouveau bandeau d'état 'Mode Édition' avec bouton de validation rapide.",
+                "category": "ui"
+            },
+            {
+                "type": "added",
+                "text": "Avertissement et explications pédagogiques avant d'activer le mode édition.",
+                "category": "ux"
+            }
+        ]
+    },
+    {
+        "version": "2.32.6",
+        "date": "2026-02-10",
+        "description": "Améliorations UX du Mode Édition Directe.",
+        "changes": [
+            {
+                "type": "modified",
+                "text": "Repositionnement des boutons d'actions (Édition sous Création) pour une meilleure visibilité.",
+                "category": "ui"
+            },
+            {
+                "type": "added",
+                "text": "Indicateurs visuels de placement lors du Drag & Drop (ligne d'insertion).",
+                "category": "ui"
+            },
+            {
+                "type": "modified",
+                "text": "Amélioration de la logique de réorganisation : insertion précise à l'index visé.",
+                "category": "feature"
+            },
+            {
+                "type": "added",
+                "text": "Possibilité de déplacer les espaceurs déjà présents sur la fiche.",
+                "category": "feature"
+            }
+        ]
+    },
+    {
+        "version": "2.32.5",
+        "date": "2026-02-10",
+        "description": "Implémentation du Mode Édition Directe.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Nouveau Mode Édition Directe permettant d'ajouter, supprimer et déplacer des éléments directement sur la feuille.",
+                "category": "feature"
+            },
+            {
+                "type": "added",
+                "text": "Barre latérale d'édition avec recherche dans les bibliothèques de compétences et d'historiques.",
+                "category": "ui"
+            },
+            {
+                "type": "added",
+                "text": "Possibilité de créer des éléments personnalisés (suggestions automatiques pour le MJ).",
+                "category": "feature"
+            },
+            {
+                "type": "added",
+                "text": "Support du Drag & Drop pour réorganiser les compétences ou ajouter des espaceurs vides.",
+                "category": "ui"
+            },
+            {
+                "type": "fixed",
+                "text": "Correction de la gestion des catégories lors de l'édition pour respecter les types de blocs (Compétences vs Historiques).",
+                "category": "fix"
+            }
+        ]
+    },
+    {
+        "version": "2.32.4",
+        "date": "2026-02-10",
+        "description": "Filtre 'Masquer acquis' pour les Bibliothèques.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Ajout d'un filtre (œil) pour masquer les compétences et spécialisations déjà acquises dans la bibliothèque.",
+                "category": "feature"
+            },
+            {
+                "type": "modified",
+                "text": "Remplacement du badge 'OFF'/'OFFICIEL' par une icône Globe pour uniformiser l'interface.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.32.3",
+        "date": "2026-02-10",
+        "description": "Correction des doublons dans la Bibliothèque (Joueur & Admin).",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "Élimination des compétences et traits dupliqués dans la bibliothèque du joueur (fusion insensible à la casse).",
+                "category": "core"
+            },
+            {
+                "type": "fixed",
+                "text": "Correction de l'assistant d'import Admin : exclusion des Historiques dans l'onglet Compétences et dédoublonnage des Compteurs.",
+                "category": "fix"
+            },
+            {
+                "type": "improved",
+                "text": "Renforcement de la sécurité backend : vérification anti-doublon lors de l'import de bibliothèque.",
+                "category": "core"
+            }
+        ]
+    },
+    {
+        "version": "2.32.2",
+        "date": "2026-02-10",
+        "description": "Ajustement layout : Noms sur une ligne, icônes déportées.",
+        "changes": [
+            {
+                "type": "modified",
+                "text": "Retour au nom sur une seule ligne avec icônes de statut déplacées sur la ligne de description (Skills/Backgrounds).",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.32.1",
+        "date": "2026-02-10",
+        "description": "Amélioration layout : Noms multi-lignes.",
+        "changes": [
+            {
+                "type": "modified",
+                "text": "Support des noms sur deux lignes pour les cartes Compétences et Arrières-plans dans l'admin.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.32.0",
+        "date": "2026-02-10",
+        "description": "Harmonisation UI des bibliothèques Administrateur.",
+        "changes": [
+            {
+                "type": "modified",
+                "text": "Refonte visuelle premium des onglets Compétences, Origines, Compteurs, Spécialisations et Traits.",
+                "category": "ui"
+            },
+            {
+                "type": "added",
+                "text": "Colonnes interactives à largeur fixe pour une navigation plus fluide.",
+                "category": "ui"
+            },
+            {
+                "type": "modified",
+                "text": "Remplacement des badges textuels par des icônes intuitives (Global, Lock, Variantes).",
+                "category": "ui"
+            },
+            {
+                "type": "fixed",
+                "text": "Correction de types TypeScript sur les icônes Lucide pour assurer l'intégrité du build.",
+                "category": "fix"
+            }
+        ]
+    },
+    {
+        "version": "2.31.0",
+        "date": "2026-02-09",
+        "description": "Sécurisation de l'intégrité des données : Verrouillage des items.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Indicateurs visuels (cadenas) pour les items de bibliothèque en cours d'utilisation.",
+                "category": "ui"
+            },
+            {
+                "type": "added",
+                "text": "Blocage de la suppression des items 'placés' dans la configuration ou actifs dans d'autres campagnes.",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Suivi global de l'utilisation des items à travers toutes les campagnes via Supabase.",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Mise à jour de toutes les bibliothèques (Compétences, Historiques, Compteurs, Traits, Spécialisations).",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.30.5",
+        "date": "2026-02-09",
+        "description": "Généralisation des actions en masse (Admin).",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Extension des actions 'Tout activer / Tout désactiver' aux bibliothèques d'Historiques, Compteurs, Spécialisations et Traits.",
+                "category": "ui"
+            },
+            {
+                "type": "improved",
+                "text": "Cohérence visuelle et fonctionnelle des actions en masse sur l'ensemble de la section Admin.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.30.4",
+        "date": "2026-02-09",
+        "description": "Amélioration ergonomie Bibliothèque (Admin).",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Ajout d'actions en masse (Tout activer / Tout désactiver) dans la réserve de compétences.",
+                "category": "ui"
+            },
+            {
+                "type": "improved",
+                "text": "Les actions en masse respectent le filtre de recherche actif.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.30.3",
+        "date": "2026-02-09",
+        "description": "Sécurisation de la persistance (Admin).",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "Correction d'une faille de synchronisation provoquant la perte de données lors de l'ajout de nouveaux items ou de l'activation massive.",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Standardisation de la génération d'ID via UUID pour une meilleure compatibilité avec Supabase.",
+                "category": "core"
+            }
+        ]
+    },
+    {
+        "version": "2.30.2",
+        "date": "2026-02-09",
+        "description": "Optimisation Admin v2.",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "Rétablissement de la suppression pour les items de bibliothèque partagés (Repository).",
+                "category": "fix"
+            },
+            {
+                "type": "improved",
+                "text": "Refonte ergonomique de la modale d'édition des compétences (meilleur équilibre Nom/Description/Variante).",
+                "category": "ui"
+            },
+            {
+                "type": "removed",
+                "text": "Nettoyage des items dupliqués entre les bibliothèques de compétences, compteurs et historiques.",
+                "category": "cleanup"
+            }
+        ]
+    },
+    {
+        "version": "2.30.1",
+        "date": "2026-02-09",
+        "description": "Correctif de la Réserve (Admin).",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "La réserve de l'admin ne montre désormais que les compétences/historiques/compteurs explicitement sélectionnés pour la campagne.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.30.0",
+        "date": "2026-02-09",
+        "description": "Architecture 'Global Repository' & Gestion localisée des catégories.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Migration vers le modèle 'Global Repository' : tous les items de bibliothèque sont désormais partagés.",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Gestion des catégories par défaut déplacée dans le contexte local de la campagne (Réserve).",
+                "category": "ui"
+            },
+            {
+                "type": "changed",
+                "text": "Refonte des services LibraryLoader et LibraryPersistence pour garantir l'intégrité des items globaux.",
+                "category": "core"
+            },
+            {
+                "type": "fixed",
+                "text": "Suppression des risques de perte de données lors de la synchronisation des bibliothèques.",
+                "category": "fix"
+            }
+        ]
+    },
+    {
+        "version": "2.29.3",
+        "date": "2026-02-09",
+        "description": "Audit & Online First : Supabase Integration",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Support du chargement direct des campagnes Supabase via URL (?s=id) dans l'app Joueur.",
+                "category": "core"
+            },
+            {
+                "type": "fixed",
+                "text": "Nettoyage complet du Type Safety (zéro @ts-ignore) dans les services de données.",
+                "category": "core"
+            },
+            {
+                "type": "changed",
+                "text": "Refactoring de RulesReconciler pour une meilleure modularité et tests automatisés.",
+                "category": "core"
+            }
+        ]
+    },
+    {
         "version": "2.29.2",
         "date": "2026-02-09",
         "description": "Correction Audit : Export Offline",
@@ -674,336 +1340,6 @@
             "Admin: Nouvel onglet 'Joueurs' affichant la liste des fiches synchronisées.",
             "Admin: Vue lecture seule des fiches de personnages soumises.",
             "Infra: Nouveau service CharacterSyncService pour la gestion BDD des personnages."
-        ]
-    },
-    {
-        "version": "2.17.51",
-        "date": "2026-02-07",
-        "type": "refactor",
-        "changes": [
-            "Admin: Réorganisation des Paramètres de Création.",
-            "UX: Déplacement des bornes d'attributs en tête de section pour une meilleure clarté.",
-            "UX: Libellés renommés en 'Attribut Minimal' et 'Attribut Maximal'."
-        ]
-    },
-    {
-        "version": "2.17.50",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Config: Mise à jour des valeurs par défaut pour la répartition des rangs (10, 8, 6, 2, 0)."
-        ]
-    },
-    {
-        "version": "2.17.49",
-        "date": "2026-02-07",
-        "type": "refactor",
-        "changes": [
-            "Admin: Déplacement du 'Coût d'Attribut (XP)' de l'onglet Coûts vers l'onglet Général & Création.",
-            "UX: Centralisation des coûts fondamentaux dans la section Configuration Générale."
-        ]
-    },
-    {
-        "version": "2.17.48",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin: Refonte visuelle de l'onglet 'Général & Création'.",
-            "UX: Déplacement de la 'Version des Règles' dans un en-tête global.",
-            "UX: Extraction de 'Rangs Étendus' et 'Coût Arrière-Plans' dans une section 'Configuration Générale' premium."
-        ]
-    },
-    {
-        "version": "2.17.47",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin: Inversion de l'ordre d'affichage de la 'Répartition des Rangs' (désormais de 1 à 5).",
-            "Config: Mise à jour des valeurs par défaut pour les nouveaux settings :",
-            "- Mode Rangs: Attr=12, Plans=7, Attr Min=-1, Coût Arrière-plan=2",
-            "- Mode Pot Commun: XP=450",
-            "- Mode Budgets Séparés: Attr=120, Comp=240, Plans=20"
-        ]
-    },
-    {
-        "version": "2.17.46",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix critique: Les arrière-plans ne deviennent plus tous 'variable' lors du refresh de l'app.",
-            "Core: rulesReconciler vérifie maintenant le flag isVariable depuis la bibliothèque."
-        ]
-    },
-    {
-        "version": "2.17.45",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "UX: Le premier champ de saisie des attributs affiche maintenant '0' par défaut.",
-            "Core: Initialisation automatique de val1 à '0' lors de la création d'attributs."
-        ]
-    },
-    {
-        "version": "2.17.44",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Nouveau: Mode Expert pour les réglages avancés en mode Online.",
-            "Online Mode: Les onglets Attributs, Compétences, Spécialisations et Paramètres sont masqués par défaut.",
-            "UX: Bouton 'Réglages Avancés' avec double confirmation pour activer le Mode Expert.",
-            "UX: Bandeau d'avertissement persistant quand le Mode Expert est actif."
-        ]
-    },
-    {
-        "version": "2.17.43",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix: Le système de cartes activé dans Admin est maintenant correctement chargé dans l'App Joueur.",
-            "Sync: rulesReconciler fusionne désormais configurations.cards vers creationConfig.cardConfig."
-        ]
-    },
-    {
-        "version": "2.17.42",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix critique: Cliquer sur un nouveau compteur ne crée plus de doublon fantôme.",
-            "Fix: updateCounter recherche maintenant correctement par id du compteur."
-        ]
-    },
-    {
-        "version": "2.17.41",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix: Les nouveaux compteurs créés dans Admin sont maintenant correctement sauvegardés en BDD (format UUID).",
-            "Fix: Correction de la duplication des compteurs avec accents (ex: Volonté).",
-            "Sync: Les valeurs par défaut sont maintenant correctement appliquées lors de la création de compteurs."
-        ]
-    },
-    {
-        "version": "2.17.40",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin→Joueur: Les nouveaux compteurs créés dans la bibliothèque Admin apparaissent maintenant automatiquement dans la fiche joueur.",
-            "Sync: CampaignService synchronise definitions.counters avec libraries.counters au chargement."
-        ]
-    },
-    {
-        "version": "2.17.39",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin: Les Compétences et Arrière-plans Globaux sont maintenant éditables et propagent leurs modifications à toutes les campagnes.",
-            "Sync: LibraryService met à jour les Globaux (Skills, Backgrounds, Counters) lors de la sauvegarde."
-        ]
-    },
-    {
-        "version": "2.17.38",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix critique: Les descriptions de compteurs provenant de l'Admin (mode Online) sont maintenant correctement synchronisées vers la fiche joueur.",
-            "Pont: rulesReconciler utilise désormais libraries.counters comme source secondaire pour les descriptions."
-        ]
-    },
-    {
-        "version": "2.17.37",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Admin: Les compteurs Globaux sont maintenant éditables et propagent leurs modifications à toutes les campagnes.",
-            "Sync: LibraryService met à jour les Globaux (setting_id = NULL) lors de la sauvegarde."
-        ]
-    },
-    {
-        "version": "2.17.36",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix: La description des compteurs est maintenant correctement persistée en BDD (mode Online).",
-            "Sync: LibraryService inclut désormais 'description' dans les insert/load de counters."
-        ]
-    },
-    {
-        "version": "2.17.35",
-        "date": "2026-02-07",
-        "type": "bugfix",
-        "changes": [
-            "Fix: Le thème (couleurs des points) est maintenant correctement réinitialisé lors de la création d'un nouveau personnage.",
-            "Cleanup: Suppression de la gestion du thème dans les règles Admin (non utilisée)."
-        ]
-    },
-    {
-        "version": "2.17.34",
-        "date": "2026-02-06",
-        "type": "bugfix",
-        "changes": [
-            "Fix critique: Les compteurs utilisent maintenant 'Départ' au lieu de 'Max' pour la valeur initiale.",
-            "Sync: La description des compteurs est maintenant synchronisée depuis Admin vers Joueur."
-        ]
-    },
-    {
-        "version": "2.17.33",
-        "date": "2026-02-06",
-        "type": "bugfix",
-        "changes": [
-            "Fix critique: Correction de la duplication des compétences lors de l'import d'anciens personnages.",
-            "Migration: Les clés legacy sont maintenant migrées AVANT l'injection des valeurs par défaut."
-        ]
-    },
-    {
-        "version": "2.17.32",
-        "date": "2026-02-06",
-        "type": "refactor",
-        "changes": [
-            "Refactoring majeur: Découpage de migrations.ts (687→15 lignes) en 9 modules spécialisés.",
-            "Architecture: Nouveau dossier utils/migrations/ avec modules par domaine.",
-            "Maintenabilité: Chaque migration isolée, testable indépendamment."
-        ]
-    },
-    {
-        "version": "2.17.31",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Tests: Suite de tests exhaustive pour migrations.ts (51 tests).",
-            "Tests: Création de fixtures legacy pour valider toutes les migrations de données.",
-            "Build: Intégration du script sync-version dans le processus de build."
-        ]
-    },
-    {
-        "version": "2.17.30",
-        "date": "2026-02-06",
-        "type": "feature",
-        "changes": [
-            "Admin: Autorisation de l'édition des éléments 'Globaux' dans les bibliothèques.",
-            "Admin: Ajout de 'Description' et 'Départ' dans la gestion des compteurs.",
-            "Core: Correction du bug d'initialisation des compteurs à 10/10.",
-            "Core: Synchronisation forcée des descriptions d'Admin vers les fiches Joueurs."
-        ]
-    },
-    {
-        "version": "2.17.29",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Rollback: Suppression de l'édition locale sur la fiche joueur.",
-            "Layout: Mappage déterministe des colonnes de compétences (1234/5678)."
-        ]
-    },
-    {
-        "version": "2.17.28",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Alignement dynamique des colonnes de compétences sur les catégories d'attributs.",
-            "Correction d'un problème de superposition des blocs de compétences.",
-            "Optimisation de l'algorithme de distribution pour préserver l'espace de l'XP et des Arrière-plans."
-        ]
-    },
-    {
-        "version": "2.17.27",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Correction d'un crash structurel dans le moteur de layout (erreur .slice).",
-            "Amélioration de la résilience du layout pendant le chargement des règles."
-        ]
-    },
-    {
-        "version": "2.17.26",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Refonte du schéma de validation Zod pour supporter les IDs de compétences dynamiques.",
-            "Correction d'un bug critique de migration écrasant les attributs par 'undefined'.",
-            "Stabilisation de la vue Spécialisations (rendu dynamique via les règles).",
-            "Résolution des crashs TypeError au chargement en mode hors-ligne."
-        ]
-    },
-    {
-        "version": "2.17.25",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Sécurisation des scripts de migration et de réconciliation pour le mode hors-ligne.",
-            "Correction du décalage d'affichage de la version dans l'interface.",
-            "Ajout de protections contre les données malformées lors du chargement initial."
-        ]
-    },
-    {
-        "version": "2.17.24",
-        "date": "2026-02-06",
-        "type": "cleanup",
-        "changes": [
-            "Suppression de la section redondante 'Limites & Bornes' dans l'onglet Coûts.",
-            "Consolidation des paramètres de limites d'attributs exclusivement dans l'onglet Création.",
-            "Retrait du réglage 'Score Maximal Absolu' (non fonctionnel)."
-        ]
-    },
-    {
-        "version": "2.17.23",
-        "date": "2026-02-06",
-        "type": "cleanup",
-        "changes": [
-            "Simplification de la gestion des attributs : suppression du coût initial redondant.",
-            "Standardisation du coût de progression des attributs à 6 XP par défaut.",
-            "Nettoyage des facteurs de coûts globaux (Spécialisations à 0, Skills à 1)."
-        ]
-    },
-    {
-        "version": "2.17.22",
-        "date": "2026-02-06",
-        "type": "cleanup",
-        "changes": [
-            "Suppression du coût en XP des spécialisations : elles sont désormais gratuites par défaut.",
-            "Nettoyage de l'interface Admin : retrait du multiplicateur de spécialisation.",
-            "Simplification de la section de gestion des attributs."
-        ]
-    },
-    {
-        "version": "2.17.21",
-        "date": "2026-02-06",
-        "type": "cleanup",
-        "changes": [
-            "Nettoyage de l'onglet Coûts & Limites : Suppression des widgets redondants 'Formule de Progression' et 'Progression Linéaire'.",
-            "Consolidation des réglages d'Attributs et Spécialisations dans une section unifiée.",
-            "Amélioration de la lisibilité de l'interface Admin par la suppression du facteur global de compétence devenu obsolète.",
-            "Optimisation du layout pour mettre l'accent sur l'Économie des Compétences."
-        ]
-    },
-    {
-        "version": "2.17.20",
-        "date": "2026-02-06",
-        "type": "feature",
-        "changes": [
-            "Automatisation des coûts par Behavior : Changer le type d'une catégorie (ex: Secondaire) met à jour automatiquement sa formule et son facteur.",
-            "Affinement des économies par défaut : Compétences (x1 Triangulaire), Secondaires (x0.5 Triangulaire), Arrière-plans (x1 Linéaire), Compteurs (x1 Linéaire).",
-            "Harmonisation de la migration des règles héritées vers les nouveaux standards économiques.",
-            "Mise à jour des règles par défaut pour les nouvelles fiches personnages."
-        ]
-    },
-    {
-        "version": "2.17.19",
-        "date": "2026-02-06",
-        "type": "feature",
-        "changes": [
-            "Centralisation de la gestion des coûts de compétences dans l'onglet 'Coûts & Limites'.",
-            "Nouvelle interface 'Économie des Compétences' permettant de régler Facteurs et Formules (Linéaire/Triangulaire) par catégorie.",
-            "Nettoyage de l'éditeur de layout (Compétences) pour une interface plus aérée.",
-            "Amélioration de la cohérence visuelle des indicateurs de behavior."
-        ]
-    },
-    {
-        "version": "2.17.18",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Correction de la synchronisation des bibliothèques (Arrière-plans et Compteurs) lors de la création d'un nouveau setting.",
-            "Alignement du LibraryService sur les identifiants de colonnes génériques (Col_Comp_8/9) pour la détection des éléments actifs."
         ]
     }
 ]

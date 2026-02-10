@@ -78,8 +78,7 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
                 title: cat.label,
                 items,
                 cat: cat.id,
-                description: cat.description,
-                icon: cat.icon
+                description: cat.description
             };
 
             if (map.row === 'top') {
@@ -92,8 +91,17 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
         return {
             columns,
             columnCount,
-            backgrounds: backgrounds.map(cat => ({ title: cat.label, items: data.skills[cat.id] || [], cat: cat.id })),
-            counters: counters.map(cat => ({ title: cat.label, id: cat.id }))
+            backgrounds: backgrounds.map(cat => ({
+                title: cat.label,
+                items: data.skills[cat.id] || [],
+                cat: cat.id,
+                description: cat.description
+            })),
+            counters: counters.map(cat => ({
+                title: cat.label,
+                id: cat.id,
+                description: cat.description
+            }))
         };
     }, [data.skills, rules?.definitions?.skillCategories]);
 

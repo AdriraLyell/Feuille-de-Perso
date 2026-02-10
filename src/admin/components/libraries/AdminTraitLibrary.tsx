@@ -2,9 +2,10 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryEntry, TraitEffect } from '../../../types';
-import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, UploadCloud, CheckCircle2, Circle, Globe } from 'lucide-react';
+import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, UploadCloud, CheckCircle2, Circle, Globe, X } from 'lucide-react';
 import TraitCard from '../../../components/trait-library/TraitCard';
 import TraitForm from '../../../components/trait-library/TraitForm';
+import TriStateChip from '../../../components/ui/TriStateChip';
 import { smartIncludes } from '../../../utils/stringUtils';
 import { publishFileToGitHub } from '../../../services/githubService';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
@@ -23,8 +24,12 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
     const library = rules.libraries?.traits || [];
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterType, setFilterType] = useState<'all' | 'avantage' | 'desavantage'>('all');
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+    // Advanced Filters
+    const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
+    const [sourceFilter, setSourceFilter] = useState<boolean | null>(null);
+    const [typeFilter, setTypeFilter] = useState<boolean | null>(null); // true = Avantage, false = Desavantage
 
     // Sorting
     const [sortBy, setSortBy] = useState<SortOption>('name');
@@ -75,7 +80,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
         setEditForm({
             id: crypto.randomUUID(),
             name: '',
-            type: filterType === 'desavantage' ? 'desavantage' : 'avantage',
+            type: typeFilter === false ? 'desavantage' : 'avantage',
             cost: '1',
             description: '',
             tags: [],
@@ -206,11 +211,15 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
             const matchesSearch = smartIncludes(entry.name, searchTerm) ||
                 smartIncludes(entry.description, searchTerm) ||
                 entryTags.some(t => smartIncludes(t, searchTerm));
-            const matchesType = filterType === 'all' || entry.type === filterType;
+
+            const matchesType = typeFilter === null || (typeFilter ? entry.type === 'avantage' : entry.type === 'desavantage');
+            const matchesActive = activeFilter === null || (entry.isActive !== false) === activeFilter;
+            const matchesSource = sourceFilter === null || (entry.isGlobal === true) === sourceFilter;
+
             const matchesTags = selectedTags.length === 0 || selectedTags.every(sel =>
                 entryTags.some(t => t.toLowerCase() === sel.toLowerCase())
             );
-            return matchesSearch && matchesType && matchesTags;
+            return matchesSearch && matchesType && matchesActive && matchesSource && matchesTags;
         });
 
         list.sort((a, b) => {
@@ -224,7 +233,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
         });
 
         return list;
-    }, [library, searchTerm, filterType, selectedTags, sortBy, sortOrder]);
+    }, [library, searchTerm, typeFilter, activeFilter, sourceFilter, selectedTags, sortBy, sortOrder]);
 
     const allAvailableTags = useMemo(() => {
         const tags = new Set<string>();
@@ -289,9 +298,9 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
                 </div>
             </div>
 
-            {/* Toolbar */}
-            <div className="flex gap-4 items-center mb-4 p-3 bg-slate-50 rounded border border-slate-200">
-                <div className="relative flex-grow max-w-md">
+            {/* Toolbar & Filters */}
+            <div className="flex flex-wrap gap-4 items-center mb-4 p-3 bg-slate-50 rounded border border-slate-200">
+                <div className="relative flex-grow max-w-sm">
                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                         className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded focus:border-blue-500 outline-none"
@@ -300,19 +309,43 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="flex bg-white rounded border border-slate-300 p-1">
-                    {['all', 'avantage', 'desavantage'].map((t) => (
-                        <button
-                            key={t}
-                            onClick={() => setFilterType(t as any)}
-                            className={`px-3 py-1 text-xs font-bold rounded transition-colors ${filterType === t ? 'bg-slate-700 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
-                        >
-                            {t === 'all' ? 'Tout' : t === 'avantage' ? 'Avantages' : 'Désavantages'}
-                        </button>
-                    ))}
 
+                <div className="flex flex-wrap items-center gap-2">
+                    <TriStateChip
+                        label="Actifs"
+                        value={activeFilter}
+                        onChange={setActiveFilter}
+                        icon={CheckCircle2}
+                        activeColor="green"
+                    />
+
+                    <TriStateChip
+                        label="Officiels"
+                        value={sourceFilter}
+                        onChange={setSourceFilter}
+                        icon={Globe}
+                        activeColor="indigo"
+                    />
+
+                    <TriStateChip
+                        label="Avantages"
+                        value={typeFilter}
+                        onChange={setTypeFilter}
+                        icon={Layers}
+                        activeColor="blue"
+                    />
+
+                    {(activeFilter !== null || sourceFilter !== null || typeFilter !== null) && (
+                        <button
+                            onClick={() => { setActiveFilter(null); setSourceFilter(null); setTypeFilter(null); }}
+                            className="text-[10px] font-bold text-red-500 hover:text-red-700 ml-2"
+                        >
+                            RESET
+                        </button>
+                    )}
                 </div>
-                <div className="border-l border-slate-300 pl-4 flex gap-2">
+
+                <div className="ml-auto flex gap-2 border-l border-slate-300 pl-4">
                     <button onClick={() => { setSortBy('name'); setSortOrder(o => o === 'asc' ? 'desc' : 'asc'); }} className={`p-2 rounded border ${sortBy === 'name' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-300 text-slate-600'}`}>
                         {sortBy === 'name' && sortOrder === 'asc' ? <ArrowDownAZ size={16} /> : <ArrowUpAZ size={16} />}
                     </button>
@@ -368,18 +401,40 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
                 <div className="space-y-1">
                     {processedList.map(entry => (
                         <div key={entry.id} className="relative group">
-                            <div className="pl-2">
-                                <TraitCard
-                                    entry={entry}
-                                    isEditable={true}
-                                    isSelected={entry.isActive === false} // Reuse for "ghosted" look if inactive
-                                    onSelect={() => { }}
-                                    onEdit={handleOpenEdit}
-                                    onDelete={handleDelete}
-                                    showMultiSelect={false}
-                                    source={entry.isGlobal ? 'official' : 'local'}
-                                    isLocked={!!globalUsage[entry.id]}
-                                />
+                            <div className="flex items-center gap-1 group">
+                                {/* 1. Toggle (Fixed width) */}
+                                <div className="w-8 flex justify-center shrink-0">
+                                    <input
+                                        type="checkbox"
+                                        checked={entry.isActive !== false}
+                                        onChange={() => {
+                                            const newList = library.map(t => t.id === entry.id ? { ...t, isActive: !t.isActive } : t);
+                                            onUpdate({
+                                                ...rules,
+                                                libraries: {
+                                                    ...rules.libraries,
+                                                    traits: newList
+                                                }
+                                            });
+                                        }}
+                                        className="w-4 h-4 text-blue-600 rounded cursor-pointer"
+                                        title={entry.isActive !== false ? "Désactiver (Retirer de la campagne)" : "Activer (Ajouter à la campagne)"}
+                                    />
+                                </div>
+
+                                <div className="flex-grow">
+                                    <TraitCard
+                                        entry={entry}
+                                        isEditable={true}
+                                        isSelected={false}
+                                        isActive={entry.isActive !== false}
+                                        onEdit={handleOpenEdit}
+                                        onDelete={handleDelete}
+                                        showMultiSelect={false}
+                                        source={entry.isGlobal ? 'official' : 'local'}
+                                        isLocked={!!globalUsage[entry.id]}
+                                    />
+                                </div>
                             </div>
                         </div>
                     ))}

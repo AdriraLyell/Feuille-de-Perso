@@ -2,8 +2,9 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibrarySkillEntry } from '../../../types';
-import { Search, Plus, GraduationCap, Save, AlertOctagon, HelpCircle, X, Layers, Edit2, Trash2, UploadCloud, CheckCircle2, Circle, Lock, Globe } from 'lucide-react';
+import { Search, Plus, GraduationCap, Save, AlertOctagon, HelpCircle, X, Layers, Edit2, Trash2, UploadCloud, CheckCircle2, Circle, Lock, Globe, Filter } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
+import TriStateChip from '../../../components/ui/TriStateChip';
 import { CATEGORY_HELP } from '../../../data/constants';
 import { smartIncludes } from '../../../utils/stringUtils';
 import { publishFileToGitHub } from '../../../services/githubService';
@@ -22,14 +23,63 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingSkill, setEditingSkill] = useState<LibrarySkillEntry | null>(null);
+    const [variantDraft, setVariantDraft] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [showCategoryHelp, setShowCategoryHelp] = useState(false);
 
+    // Advanced Filters
+    const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
+    const [sourceFilter, setSourceFilter] = useState<boolean | null>(null);
+    const [typeFilter, setTypeFilter] = useState<boolean | null>(null);
+    const [usageFilter, setUsageFilter] = useState<boolean | null>(null);
+
+    const placedSkillNames = useMemo(() => {
+        const names = new Set<string>();
+        if (rules.definitions.skills) {
+            Object.values(rules.definitions.skills).forEach((skillsArray: string[]) => {
+                skillsArray.forEach(name => {
+                    if (name.trim()) names.add(name.trim().toLowerCase());
+                });
+            });
+        }
+        return names;
+    }, [rules.definitions.skills]);
+
     const filteredList = useMemo(() => {
         return list
-            .filter(s => smartIncludes(s.name, searchTerm) || (s.description && smartIncludes(s.description, searchTerm)))
+            .filter(s => {
+                // 1. Text Search
+                const matchesSearch = smartIncludes(s.name, searchTerm) || (s.description && smartIncludes(s.description, searchTerm));
+                if (!matchesSearch) return false;
+
+                // 2. Active in Campaign
+                if (activeFilter !== null) {
+                    const isActive = s.isActive !== false;
+                    if (activeFilter !== isActive) return false;
+                }
+
+                // 3. Source (Global vs Local)
+                if (sourceFilter !== null) {
+                    const isGlobal = s.isGlobal === true;
+                    if (sourceFilter !== isGlobal) return false;
+                }
+
+                // 4. Type (Variable vs Simple)
+                if (typeFilter !== null) {
+                    const isVariable = s.isVariable === true;
+                    if (typeFilter !== isVariable) return false;
+                }
+
+                // 5. Usage (Placed vs Unplaced)
+                if (usageFilter !== null) {
+                    const isPlaced = placedSkillNames.has(s.name.trim().toLowerCase());
+                    if (usageFilter !== isPlaced) return false;
+                }
+
+                return true;
+            })
             .sort((a, b) => a.name.localeCompare(b.name));
-    }, [list, searchTerm]);
+    }, [list, searchTerm, activeFilter, sourceFilter, typeFilter, usageFilter, placedSkillNames]);
 
     // Dynamic Categories Source of Truth
     const availableCategories = useMemo(() => {
@@ -52,17 +102,6 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
         return availableCategories.find(c => c.code === code)?.label || code;
     };
 
-    const placedSkillNames = useMemo(() => {
-        const names = new Set<string>();
-        if (rules.definitions.skills) {
-            Object.values(rules.definitions.skills).forEach((skillsArray: string[]) => {
-                skillsArray.forEach(name => {
-                    if (name.trim()) names.add(name.trim().toLowerCase());
-                });
-            });
-        }
-        return names;
-    }, [rules.definitions.skills]);
 
     const [showPublishConfirm, setShowPublishConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
@@ -77,12 +116,14 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
             description: '',
             isVariable: false
         });
+        setVariantDraft('');
         setIsModalOpen(true);
     };
 
     const handleOpenEdit = (skill: LibrarySkillEntry) => {
         setError(null);
         setEditingSkill({ ...skill });
+        setVariantDraft(skill.variants?.join(', ') || '');
         setIsModalOpen(true);
     };
 
@@ -106,9 +147,16 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
         const duplicate = list.find(s => s.id !== editingSkill.id && s.name.trim().toLowerCase() === editingSkill.name.trim().toLowerCase());
         if (duplicate) { setError("Une compétence portant ce nom existe déjà."); return; }
 
-        const newList = list.some(s => s.id === editingSkill.id)
-            ? list.map(s => s.id === editingSkill.id ? editingSkill : s)
-            : [...list, editingSkill];
+        const cleanedVariants = variantDraft
+            .split(',')
+            .map(v => v.trim())
+            .filter(v => v !== '');
+
+        const skillToSave = { ...editingSkill, variants: cleanedVariants };
+
+        const newList = list.some(s => s.id === skillToSave.id)
+            ? list.map(s => s.id === skillToSave.id ? skillToSave : s)
+            : [...list, skillToSave];
 
         // Sort
         newList.sort((a, b) => a.name.localeCompare(b.name));
@@ -211,6 +259,54 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center mb-4 p-2 bg-slate-50 border border-slate-200 rounded">
+                <div className="flex items-center gap-1.5 px-2 text-slate-400 border-r border-slate-200 mr-1 py-1">
+                    <Filter size={14} />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Filtres</span>
+                </div>
+
+                <TriStateChip
+                    label="Actifs"
+                    value={activeFilter}
+                    onChange={setActiveFilter}
+                    icon={CheckCircle2}
+                    activeColor="green"
+                />
+
+                <TriStateChip
+                    label="Officiels"
+                    value={sourceFilter}
+                    onChange={setSourceFilter}
+                    icon={Globe}
+                    activeColor="indigo"
+                />
+
+                <TriStateChip
+                    label="Variantes"
+                    value={typeFilter}
+                    onChange={setTypeFilter}
+                    icon={Layers}
+                    activeColor="blue"
+                />
+
+                <TriStateChip
+                    label="Placés"
+                    value={usageFilter}
+                    onChange={setUsageFilter}
+                    icon={GraduationCap}
+                    activeColor="amber"
+                />
+
+                {(activeFilter !== null || sourceFilter !== null || typeFilter !== null || usageFilter !== null) && (
+                    <button
+                        onClick={() => { setActiveFilter(null); setSourceFilter(null); setTypeFilter(null); setUsageFilter(null); }}
+                        className="text-[10px] font-bold text-red-500 hover:text-red-700 ml-auto px-2"
+                    >
+                        RÉINITIALISER
+                    </button>
+                )}
             </div>
 
             {/* Bulk Actions */}
@@ -345,6 +441,17 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                         <span className="block text-[10px] text-blue-700 leading-tight">Ex: "Artisanat : Forge"</span>
                                     </label>
                                 </div>
+                                {editingSkill.isVariable && (
+                                    <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Exemples de variantes (séparés par des virgules)</label>
+                                        <input
+                                            className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 outline-none"
+                                            placeholder="Ex: Forge, Menuiserie, Peinture..."
+                                            value={variantDraft}
+                                            onChange={(e) => setVariantDraft(e.target.value)}
+                                        />
+                                    </div>
+                                )}
                             </div>
                             <div className="flex flex-col">
                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Description</label>

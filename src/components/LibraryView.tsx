@@ -155,7 +155,12 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
             return;
         }
 
-        finalizeSaveSkill(skillToSave);
+        const cleanedSkill = {
+            ...skillToSave,
+            variants: skillToSave.variants ? skillToSave.variants.map(v => v.trim()).filter(v => v !== '') : []
+        };
+
+        finalizeSaveSkill(cleanedSkill);
     };
 
     const finalizeSaveSkill = (skillToSave: LibrarySkillEntry, renameOnSheet: boolean = false) => {

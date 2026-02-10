@@ -32,6 +32,8 @@ export interface CampaignNoteEntry {
     imageConfig?: ImageConfig;
     // New Array Field
     images?: NoteImage[];
+    isBookmarked?: boolean;
+    isContinuation?: boolean; // New: If true, this page continues the previous one (no header)
 }
 
 // --- NEW TYPES FOR PARTY MEMBERS ---

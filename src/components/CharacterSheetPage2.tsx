@@ -5,6 +5,9 @@ import { BookOpen, X, Edit, Trash2, Check, CheckSquare } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import { useCharacter } from '../context/CharacterContext';
 
+import { useRules } from '../context/RulesContext';
+import { normalizeString } from '../utils/stringUtils';
+
 // Imports Refactorisés
 import { useNotification } from '../context/NotificationContext';
 import NotebookInput from './shared/NotebookInput';
@@ -18,7 +21,10 @@ interface Props {
 
 const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
     const { data, updateData: onChange, addLog: onAddLog } = useCharacter();
+    const { rules } = useRules();
+
     const [editingSlot, setEditingSlot] = useState<{ type: 'avantages' | 'desavantages', index: number } | null>(null);
+    const [showLibraryInEditor, setShowLibraryInEditor] = useState(false);
     const [multiSelectTarget, setMultiSelectTarget] = useState<'avantages' | 'desavantages' | null>(null);
     const [focusNewReputation, setFocusNewReputation] = useState<number | null>(null);
     const [editorName, setEditorName] = useState('');
@@ -27,6 +33,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
     const [editorVariant, setEditorVariant] = useState('');
     const [editorVariants, setEditorVariants] = useState<string[]>([]);
     const [editorDescription, setEditorDescription] = useState('');
+    const [editorDefinitionId, setEditorDefinitionId] = useState<string | undefined>(undefined);
+    const [editorIsVariable, setEditorIsVariable] = useState(false);
 
     useEffect(() => {
         if (editingSlot) {
@@ -36,8 +44,29 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             setEditorDescription(item.description || '');
             setEditorTag(item.tag || '');
             setEditorVariant(item.variant || '');
+
+            // Resolve Definition & Variants
+            let defId = item.definitionId;
+            let variants: string[] = [];
+
+            // Try to find by ID first, then Name
+            const libEntry = rules?.libraries?.traits?.find(t =>
+                (defId && t.id === defId) ||
+                normalizeString(t.name) === normalizeString(item.name)
+            );
+
+            if (libEntry) {
+                defId = libEntry.id;
+                variants = libEntry.variants || [];
+                setEditorIsVariable(libEntry.isVariable || false);
+            } else {
+                setEditorIsVariable(false);
+            }
+
+            setEditorDefinitionId(defId);
+            setEditorVariants(variants);
         }
-    }, [editingSlot, data.page2]);
+    }, [editingSlot, data.page2, rules?.libraries?.traits]);
 
     useEffect(() => {
         if (focusNewReputation !== null) {
@@ -55,24 +84,56 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         onChange({ ...data, page2: { ...data.page2, characterImageId: id, characterImage: '' } });
     };
 
+    const openEditor = (type: 'avantages' | 'desavantages', index: number) => {
+        setEditingSlot({ type, index });
+    };
+
     const saveTraitFromEditor = () => {
         if (!editingSlot) return;
         const newList = [...data.page2[editingSlot.type]];
-        newList[editingSlot.index] = { name: editorName, value: editorValue, description: editorDescription, tag: editorTag, variant: editorVariant };
+        newList[editingSlot.index] = {
+            name: editorName,
+            value: editorValue,
+            description: editorDescription,
+            tag: editorTag,
+            variant: editorVariant,
+            definitionId: editorDefinitionId
+        };
         onChange({ ...data, page2: { ...data.page2, [editingSlot.type]: newList } });
         onAddLog(`Modification ${editingSlot.type === 'avantages' ? 'Avantage' : 'Désavantage'}`, 'info', 'sheet');
         setEditingSlot(null);
+        setShowLibraryInEditor(false);
     };
 
-    const handleMultiAdd = (entries: LibraryEntry[]) => {
+    const removeTrait = (type: 'avantages' | 'desavantages', index: number) => {
+        onChange(prev => {
+            const list = [...prev.page2[type]];
+            list[index] = { name: '', value: '', variant: '', description: '', tag: '', definitionId: undefined }; // Clear all fields
+            onAddLog(`Suppression ${type === 'avantages' ? 'Avantage' : 'Désavantage'}`, 'info', 'sheet');
+            return {
+                ...prev,
+                page2: { ...prev.page2, [type]: list }
+            };
+        });
+    };
+
+    const handleMultiAdd = (instances: { entry: LibraryEntry; variant?: string }[]) => {
         if (!multiSelectTarget) return;
         const currentList = [...data.page2[multiSelectTarget]];
         let addedCount = 0;
         let listIndex = 0;
-        entries.forEach(entry => {
+        instances.forEach(instance => {
+            const entry = instance.entry;
             while (listIndex < currentList.length && currentList[listIndex].name.trim() !== '') { listIndex++; }
             if (listIndex < currentList.length) {
-                currentList[listIndex] = { name: entry.name, value: entry.cost };
+                currentList[listIndex] = {
+                    name: entry.name,
+                    value: entry.cost,
+                    description: entry.description,
+                    tag: entry.tags?.[0] || '',
+                    variant: instance.variant || '',
+                    definitionId: entry.id // LINKING
+                };
                 addedCount++;
             }
         });
@@ -103,15 +164,39 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
 
     const AvantagesColumn = (
         <div className="col-span-1 border-r border-stone-400 p-1.5 flex flex-col h-full overflow-hidden">
-            <Page2SectionHeader title="Avantages" total={calculateTotal(data.page2.avantages)} totalColor="text-green-700 bg-green-50 border-green-200" onOpenLibrary={() => setMultiSelectTarget('avantages')} />
-            <div className="space-y-0.5 flex-grow overflow-auto min-h-0 custom-scrollbar">{data.page2.avantages.map((item, i) => (<TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'avantages', index: i })} />))}</div>
+            <Page2SectionHeader title="Avantages" total={calculateTotal(data.page2.avantages)} onOpenLibrary={() => setMultiSelectTarget('avantages')} totalColor="text-green-700 bg-green-50 border-green-200" />
+            <div className="space-y-0.5 flex-grow overflow-auto min-h-0 custom-scrollbar">
+                {data.page2.avantages.map((item, i) => (
+                    <TraitRow
+                        key={i}
+                        item={item}
+                        onClick={() => openEditor('avantages', i)}
+                        onRemove={(e) => {
+                            e.stopPropagation();
+                            removeTrait('avantages', i);
+                        }}
+                    />
+                ))}
+            </div>
         </div>
     );
 
     const DesavantagesColumn = (
         <div className="col-span-1 p-1.5 flex flex-col h-full overflow-hidden">
-            <Page2SectionHeader title="Désavantages" total={calculateTotal(data.page2.desavantages)} totalColor="text-red-700 bg-red-50 border-red-200" onOpenLibrary={() => setMultiSelectTarget('desavantages')} />
-            <div className="space-y-0.5 flex-grow overflow-auto min-h-0 custom-scrollbar">{data.page2.desavantages.map((item, i) => (<TraitRow key={i} item={item} onClick={() => setEditingSlot({ type: 'desavantages', index: i })} />))}</div>
+            <Page2SectionHeader title="Désavantages" total={calculateTotal(data.page2.desavantages)} onOpenLibrary={() => setMultiSelectTarget('desavantages')} totalColor="text-red-700 bg-red-50 border-red-200" />
+            <div className="space-y-0.5 flex-grow overflow-auto min-h-0 custom-scrollbar">
+                {data.page2.desavantages.map((item, i) => (
+                    <TraitRow
+                        key={i}
+                        item={item}
+                        onClick={() => openEditor('desavantages', i)}
+                        onRemove={(e) => {
+                            e.stopPropagation();
+                            removeTrait('desavantages', i);
+                        }}
+                    />
+                ))}
+            </div>
         </div>
     );
 
@@ -190,52 +275,95 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
 
             {editingSlot && (
                 <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl h-[85vh] flex flex-col overflow-hidden">
+                    <div className={`bg-white rounded-xl shadow-2xl w-full max-w-xl transition-all duration-300 flex flex-col overflow-hidden ${showLibraryInEditor ? 'h-[85vh]' : 'max-h-[85vh]'}`}>
                         <div className={`p-4 border-b flex justify-between items-center text-white shrink-0 ${editingSlot.type === 'avantages' ? 'bg-green-700' : 'bg-red-700'}`}>
                             <h3 className="font-bold text-lg flex items-center gap-2"><Edit size={20} />Éditer {editingSlot.type === 'avantages' ? 'Avantage' : 'Désavantage'}</h3>
-                            <button onClick={() => setEditingSlot(null)} className="hover:bg-white/20 p-1 rounded"><X size={24} /></button>
+                            <button onClick={() => { setEditingSlot(null); setShowLibraryInEditor(false); }} className="hover:bg-white/20 p-1 rounded"><X size={24} /></button>
                         </div>
-                        <div className="flex-grow flex flex-col overflow-hidden min-h-0">
+                        <div className={`flex flex-col overflow-hidden min-h-0 ${showLibraryInEditor ? 'flex-grow' : ''}`}>
                             <div className="p-5 bg-gray-50 border-b border-gray-200 shrink-0">
-                                <div className="flex gap-4 items-end mb-4">
-                                    <div className="w-1/3"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom du Trait</label><input className="w-full border border-gray-300 rounded px-3 py-2 font-bold text-gray-900 focus:border-blue-500 outline-none" value={editorName} onChange={(e) => setEditorName(e.target.value)} autoFocus /></div>
-                                    <div className="flex-grow">
-                                        <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Complément (Variant)</label>
-                                        <input className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorVariant} onChange={(e) => setEditorVariant(e.target.value)} placeholder="Ex: Chats, Pollen..." />
-                                        {/* Suggested Variants */}
-                                        {editorVariants.length > 0 && (
-                                            <div className="flex flex-wrap gap-1.5 mt-2">
-                                                {editorVariants.map(v => (
-                                                    <button
-                                                        key={v}
-                                                        onClick={() => setEditorVariant(v)}
-                                                        className={`px-2 py-0.5 text-[10px] font-bold rounded-full border transition-all ${editorVariant === v ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:border-blue-400'}`}
-                                                    >
-                                                        {v}
-                                                    </button>
-                                                ))}
+                                <div className="flex gap-4 items-start mb-4">
+                                    <div className="w-1/3 shrink-0"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom du Trait</label><input className="w-full border border-gray-300 rounded px-3 py-2 font-bold text-gray-900 focus:border-blue-500 outline-none" value={editorName} onChange={(e) => setEditorName(e.target.value)} autoFocus /></div>
+
+                                    {(editorIsVariable || editorVariant || editorVariants.length > 0) ? (
+                                        <div className="flex-grow flex gap-4 items-end animate-in slide-in-from-top-1 duration-200">
+                                            <div className="flex-grow">
+                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Complément (Variant)</label>
+                                                <input className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorVariant} onChange={(e) => setEditorVariant(e.target.value)} placeholder="Ex: Chats, Pollen..." />
+                                                {/* Suggested Variants */}
+                                                {editorVariants.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1.5 mt-2">
+                                                        {editorVariants.map(v => (
+                                                            <button
+                                                                key={v}
+                                                                onClick={() => setEditorVariant(v)}
+                                                                className={`px-2 py-0.5 text-[10px] font-bold rounded-full border transition-all ${editorVariant === v ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:border-blue-400'}`}
+                                                            >
+                                                                {v}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
-                                    <div className="w-24"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tag</label><input className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorTag} onChange={(e) => setEditorTag(e.target.value)} placeholder="Ex: Mental..." /></div>
-                                    <div className="w-20"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Valeur</label><input className="w-full border border-gray-300 rounded px-3 py-2 font-mono text-center focus:border-blue-500 outline-none" value={editorValue} onChange={(e) => setEditorValue(e.target.value)} /></div>
+                                            <div className="w-24 shrink-0"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tag</label><input className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorTag} onChange={(e) => setEditorTag(e.target.value)} placeholder="Ex: Mental..." /></div>
+                                            <div className="w-20 shrink-0"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Valeur</label><input className="w-full border border-gray-300 rounded px-3 py-2 font-mono text-center focus:border-blue-500 outline-none" value={editorValue} onChange={(e) => setEditorValue(e.target.value)} /></div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex-grow flex gap-4 items-end">
+                                            <div className="flex-grow">
+                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tag</label>
+                                                <input className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorTag} onChange={(e) => setEditorTag(e.target.value)} placeholder="Ex: Mental..." />
+                                            </div>
+                                            <div className="w-40 shrink-0">
+                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Valeur</label>
+                                                <input className="w-full border border-gray-300 rounded px-3 py-2 font-mono text-center focus:border-blue-500 outline-none" value={editorValue} onChange={(e) => setEditorValue(e.target.value)} />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="mb-2">
                                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description / Effets</label>
                                     <textarea className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-700 h-24 focus:border-blue-500 outline-none resize-none" value={editorDescription} onChange={(e) => setEditorDescription(e.target.value)} placeholder="Description détaillée du trait..." />
                                 </div>
-                                <div className="flex justify-end"><button onClick={() => { setEditorName(''); setEditorValue(''); setEditorDescription(''); setEditorTag(''); setEditorVariant(''); setEditorVariants([]); }} className="text-gray-500 text-xs hover:text-red-600 px-3 py-1.5 flex items-center gap-1 hover:bg-red-50 rounded"><Trash2 size={14} /> Vider</button></div>
+                                <div className="flex justify-end"><button onClick={() => { setEditorName(''); setEditorValue(''); setEditorDescription(''); setEditorTag(''); setEditorVariant(''); setEditorVariants([]); setEditorIsVariable(false); }} className="text-gray-500 text-xs hover:text-red-600 px-3 py-1.5 flex items-center gap-1 hover:bg-red-50 rounded"><Trash2 size={14} /> Vider</button></div>
                             </div>
-                            <div className="flex-grow flex flex-col min-h-0 border-t border-gray-200">
+                            <div className={`flex flex-col min-h-0 border-t border-gray-200 transition-all duration-300 ${showLibraryInEditor ? 'flex-grow' : 'h-10'}`}>
                                 <div className="bg-blue-50 px-4 py-2 border-b border-blue-100 flex items-center justify-between text-blue-800 text-sm font-bold shrink-0">
-                                    <div className="flex items-center gap-2"><BookOpen size={16} />Bibliothèque</div>
-                                    <button onClick={() => { const target = editingSlot.type; setEditingSlot(null); setMultiSelectTarget(target); }} className="text-xs bg-white border border-blue-200 hover:bg-blue-100 px-2 py-1 rounded text-blue-700 flex items-center gap-1 shadow-sm"><CheckSquare size={12} /> Sélection multiple</button>
+                                    <button
+                                        onClick={() => setShowLibraryInEditor(!showLibraryInEditor)}
+                                        className="flex items-center gap-2 hover:text-blue-600 transition-colors"
+                                    >
+                                        <BookOpen size={16} />
+                                        <span>Bibliothèque de traits</span>
+                                        <span className="text-[10px] font-normal opacity-70">({showLibraryInEditor ? 'Cliquer pour masquer' : 'Cliquer pour parcourir'})</span>
+                                    </button>
+                                    <button onClick={() => { const target = editingSlot.type; setEditingSlot(null); setMultiSelectTarget(target); setShowLibraryInEditor(false); }} className="text-xs bg-white border border-blue-200 hover:bg-blue-100 px-2 py-1 rounded text-blue-700 flex items-center gap-1 shadow-sm"><CheckSquare size={12} /> Sélection multiple</button>
                                 </div>
-                                <div className="flex-grow overflow-hidden relative"><TraitLibrary data={data} onUpdate={onChange} onSelect={(e) => { setEditorName(e.name); setEditorValue(e.cost); setEditorDescription(e.description); setEditorTag(e.tags?.[0] || ''); setEditorVariant(''); setEditorVariants(e.variants || []); }} isEditable={false} defaultFilter={editingSlot.type === 'avantages' ? 'avantage' : 'desavantage'} /></div>
+                                {showLibraryInEditor && (
+                                    <div className="flex-grow overflow-hidden relative animate-in slide-in-from-top-2 duration-300">
+                                        <TraitLibrary
+                                            data={data}
+                                            onUpdate={onChange}
+                                            onSelect={(e) => {
+                                                setEditorName(e.name);
+                                                setEditorValue(e.cost);
+                                                setEditorDescription(e.description);
+                                                setEditorTag(e.tags?.[0] || '');
+                                                setEditorVariant('');
+                                                setEditorVariants(e.variants || []);
+                                                setEditorDefinitionId(e.id);
+                                                setEditorIsVariable(e.isVariable || false);
+                                                setShowLibraryInEditor(false); // Hide after selection
+                                            }}
+                                            isEditable={false}
+                                            defaultFilter={editingSlot.type === 'avantages' ? 'avantage' : 'desavantage'}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="p-4 bg-gray-100 border-t border-gray-200 flex justify-between items-center shrink-0">
-                            <button onClick={() => setEditingSlot(null)} className="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg font-medium">Annuler</button>
+                            <button onClick={() => { setEditingSlot(null); setShowLibraryInEditor(false); }} className="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg font-medium">Annuler</button>
                             <button onClick={saveTraitFromEditor} className={`px-6 py-2 text-white rounded-lg font-bold shadow-md flex items-center gap-2 transition-transform hover:scale-105 ${editingSlot.type === 'avantages' ? 'bg-green-700' : 'bg-red-700'}`}><Check size={18} />Enregistrer</button>
                         </div>
                     </div>

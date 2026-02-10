@@ -22,7 +22,9 @@ import { useSheetLayout } from '../hooks/useSheetLayout';
 import { useRules } from '../context/RulesContext';
 
 import ThematicModal from './ui/ThematicModal';
+import VariantSelectionModal from './ui/VariantSelectionModal'; // NEW
 import { Layers, Save, PencilLine, Check } from 'lucide-react';
+import { generateId } from '../utils/factories'; // NEW
 
 interface Props {
     isLandscape?: boolean;
@@ -38,8 +40,9 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         category: string;
         id: string;
         skillName: string;
-        inputValue: string;
-    }>({ isOpen: false, category: '', id: '', skillName: '', inputValue: '' });
+        definitionId?: string;
+        variants: string[];
+    }>({ isOpen: false, category: '', id: '', skillName: '', variants: [] });
 
     const [isEditMode, setIsEditMode] = React.useState(false);
     const [showEditWarning, setShowEditWarning] = React.useState(false);
@@ -134,18 +137,35 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
 
     // --- Variable Skill Logic ---
     const handleDefineVariant = useCallback((category: string, id: string, name: string) => {
+        // Find existing entry to see if it already has a definitionId
+        const existingEntry = data.skills[category]?.find(s => s.id === id);
+        let definitionId = existingEntry?.definitionId;
+        let variants: string[] = [];
+
+        // Look up in library to find definitionId and suggested variants
+        const libSkill = rules?.libraries?.skills?.find(s =>
+            (definitionId && s.id === definitionId) ||
+            normalizeString(s.name) === normalizeString(name)
+        );
+
+        if (libSkill) {
+            definitionId = libSkill.id;
+            variants = libSkill.variants || [];
+        }
+
         setVariantModalState({
             isOpen: true,
             category,
             id,
             skillName: name,
-            inputValue: ''
+            definitionId,
+            variants
         });
-    }, []);
+    }, [data.skills, rules?.libraries?.skills]);
 
-    const finalizeVariantDefinition = () => {
-        const { category, id, inputValue } = variantModalState;
-        if (!inputValue.trim()) return;
+    const finalizeVariantDefinition = (variantName: string) => {
+        const { category, id, definitionId } = variantModalState;
+        if (!variantName.trim()) return;
 
         onChange(prev => {
             const list = prev.skills[category];
@@ -159,19 +179,19 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
             // 1. Update existing item (Define the variant)
             newList[index] = {
                 ...newList[index],
-                variant: inputValue.trim()
+                variant: variantName.trim(),
+                definitionId: definitionId || newList[index].definitionId // Ensure definitionId is linked
             };
 
             // 2. Clone and Insert new empty variable skill below
-            // We clone basic properties but generate new ID and reset variant to "" (empty)
-            // Ideally we check if there is space? Infinite list? user didn't specify limit, so just insert.
             const newItem: DotEntry = {
-                id: Math.random().toString(36).substr(2, 9),
+                id: generateId(),
                 name: newList[index].name,
                 value: 0,
                 creationValue: 0,
                 max: 5,
-                variant: "" // Ready for next input
+                variant: "", // Ready for next input
+                definitionId: definitionId // Propagate definitionId to the new empty slot
             };
 
             // Insert at index + 1
@@ -179,13 +199,45 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
 
             onAddLog(`Définition variante : ${newList[index].name} : ${newList[index].variant}`, 'success', 'sheet');
 
-            return {
+            const newState = {
                 ...prev,
                 skills: {
                     ...prev.skills,
                     [category]: newList
                 }
             };
+
+            // 3. Suggestion Logic for Variants
+            if (definitionId && variantName.trim()) {
+                const libSkill = rules?.libraries?.skills?.find(s => s.id === definitionId);
+                const normalizedVariant = normalizeString(variantName);
+
+                // Only suggest if not in library variants (normalized check)
+                const isKnown = libSkill?.variants?.some(v => normalizeString(v) === normalizedVariant);
+
+                if (libSkill && !isKnown) {
+                    const alreadySuggested = prev.suggestions?.some(s =>
+                        s.type === 'variant' &&
+                        s.parentId === definitionId &&
+                        normalizeString(s.name) === normalizedVariant
+                    );
+
+                    if (!alreadySuggested) {
+                        const suggestion: SuggestionEntry = {
+                            id: generateId(),
+                            type: 'variant',
+                            name: variantName.trim(),
+                            category: category,
+                            parentId: definitionId,
+                            timestamp: Date.now()
+                        };
+                        newState.suggestions = [...(prev.suggestions || []), suggestion];
+                        onAddLog(`Suggestion de variante envoyée : ${variantName}`, 'info', 'sheet');
+                    }
+                }
+            }
+
+            return newState;
         });
 
         setVariantModalState(prev => ({ ...prev, isOpen: false }));
@@ -212,13 +264,14 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         const newEntry: DotEntry = type === 'sheet_item'
             ? itemData
             : {
-                id: Math.random().toString(36).substring(2, 11),
+                id: generateId(),
                 name: itemData.name,
                 value: 0,
                 creationValue: 0,
                 max: 5,
                 description: itemData.description,
-                isVariable: itemData.isVariable
+                isVariable: itemData.isVariable,
+                definitionId: itemData.id // Link to library ID if possible
             };
 
         // 3. Mise à jour des données
@@ -254,7 +307,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 const suggestionType = categoryType || (category.toLowerCase().includes('background') || category.toLowerCase().includes('arrière-plan') ? 'background' : 'skill');
 
                 const suggestion: SuggestionEntry = {
-                    id: Math.random().toString(36).substring(2, 11),
+                    id: generateId(),
                     type: suggestionType as 'skill' | 'background',
                     name: itemData.name,
                     category: category,
@@ -541,6 +594,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                         theme={data.theme}
                                         onDefineVariant={handleDefineVariant}
                                         allowExtendedSkills={allowExtendedSkills}
+                                        description={block.description}
                                         isEditing={isEditMode}
                                         categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
                                         onDrop={handleDropItem}
@@ -565,6 +619,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                     theme={data.theme}
                                     onDefineVariant={handleDefineVariant}
                                     allowExtendedSkills={allowExtendedSkills}
+                                    description={bg.description}
                                     isEditing={isEditMode}
                                     categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === bg.cat)?.behavior}
                                     onDrop={handleDropItem}
@@ -598,6 +653,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                         theme={data.theme}
                                         onDefineVariant={handleDefineVariant}
                                         allowExtendedSkills={allowExtendedSkills}
+                                        description={block.description}
                                         isEditing={isEditMode}
                                         categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
                                         onDrop={handleDropItem}
@@ -623,6 +679,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                         theme={data.theme}
                                         onDefineVariant={handleDefineVariant}
                                         allowExtendedSkills={allowExtendedSkills}
+                                        description={block.description}
                                         isEditing={isEditMode}
                                         categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
                                         onDrop={handleDropItem}
@@ -643,6 +700,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                             theme={data.theme}
                                             onDefineVariant={handleDefineVariant}
                                             allowExtendedSkills={allowExtendedSkills}
+                                            description={bg.description}
                                             isEditing={isEditMode}
                                             categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === bg.cat)?.behavior}
                                             onDrop={handleDropItem}
@@ -714,52 +772,17 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
             )}
 
             {/* Variable Skill Definition Modal */}
-            <ThematicModal
+            {/* Variable Skill Definition Modal */}
+            <VariantSelectionModal
                 isOpen={variantModalState.isOpen}
                 onClose={() => setVariantModalState(prev => ({ ...prev, isOpen: false }))}
-                title="Préciser la compétence"
-                icon={<Layers size={24} />}
-                size="md"
-                footer={
-                    <>
-                        <button
-                            onClick={() => setVariantModalState(prev => ({ ...prev, isOpen: false }))}
-                            className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold"
-                        >
-                            Annuler
-                        </button>
-                        <button
-                            onClick={finalizeVariantDefinition}
-                            className="px-6 py-2 bg-[#5c4d41] text-white rounded-sm font-bold shadow-md hover:bg-[#4a3b32] flex items-center gap-2"
-                        >
-                            <Save size={16} /> Valider
-                        </button>
-                    </>
-                }
-            >
-                <div className="flex flex-col gap-4 py-2">
-                    <div className="bg-amber-50/50 border border-amber-200/50 p-3 rounded-sm text-sm text-[#5c4d41]">
-                        Vous définissez une variante pour la compétence <strong>{variantModalState.skillName}</strong>.
-                        <br />
-                        <span className="text-xs italic mt-1 block">Une nouvelle ligne vide sera créée automatiquement en dessous pour d'autres variantes.</span>
-                    </div>
-
-                    <div>
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">
-                            Spécialité / Variante (ex: Forge, Histoire, Épées...)
-                        </label>
-                        <input
-                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm text-lg"
-                            value={variantModalState.inputValue}
-                            onChange={(e) => setVariantModalState(prev => ({ ...prev, inputValue: e.target.value }))}
-                            autoFocus
-                            onKeyDown={(e) => e.key === 'Enter' && finalizeVariantDefinition()}
-                        />
-                    </div>
-                </div>
-            </ThematicModal>
+                onConfirm={finalizeVariantDefinition}
+                skillName={variantModalState.skillName}
+                variants={variantModalState.variants}
+            />
         </div>
     );
 };
+
 
 export default CharacterSheet;

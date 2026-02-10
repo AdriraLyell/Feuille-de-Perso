@@ -20,18 +20,18 @@ export interface CompressionResult {
 export const ImageCompressionService = {
 
     /**
-     * Compress an image (base64) with JPEG quality reduction and resize.
+     * Compress an image (base64) with WebP quality reduction and resize.
      * Preserves aspect ratio - only resizes if width > maxWidth.
      * 
      * @param base64 - Image in base64 format (data:image/...)
-     * @param quality - JPEG quality (0-1), default 0.85
-     * @param maxWidth - Maximum width in pixels, default 1920
+     * @param quality - WebP quality (0-1), default 0.5 (User Request)
+     * @param maxWidth - Maximum width in pixels, default 1024 (Optimization)
      * @returns Compressed base64 image
      */
     async compressImage(
         base64: string,
-        quality: number = 0.85,
-        maxWidth: number = 1920
+        quality: number = 0.5,
+        maxWidth: number = 1024
     ): Promise<string> {
         return new Promise((resolve, reject) => {
             // Create image element
@@ -63,9 +63,18 @@ export const ImageCompressionService = {
 
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Convert to JPEG with quality setting
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
-                    resolve(compressedBase64);
+                    // Convert to WebP with quality setting
+                    // Fallback to JPEG if WebP is not supported (older browsers)
+                    const compressedBase64 = canvas.toDataURL('image/webp', quality);
+
+                    // Basic check: if it turned into png (default fallback), force jpeg
+                    if (compressedBase64.startsWith('data:image/png')) {
+                        const jpegFallback = canvas.toDataURL('image/jpeg', quality);
+                        resolve(jpegFallback);
+                    } else {
+                        resolve(compressedBase64);
+                    }
+
                 } catch (e) {
                     reject(e);
                 }
@@ -87,6 +96,9 @@ export const ImageCompressionService = {
      */
     compressBase64(base64: string): string {
         try {
+            // WebP is already highly compressed. GZIP might add overhead or gain little.
+            // But we keep it for now as "double safety" especially for the Base64 string overhead.
+
             // Remove data URL prefix if present
             const base64Data = base64.includes(',')
                 ? base64.split(',')[1]

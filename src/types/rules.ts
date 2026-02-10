@@ -42,7 +42,6 @@ export interface SkillCategoryConfig {
     behavior: SkillBehavior;
     label: string;            // Titre affiché
     description?: string;     // Info-bulle optionnelle
-    icon?: string;            // Nom de l'icône Lucide ou Emoji
     allowSpecializations: boolean;
     costConfig: {
         factor: number;

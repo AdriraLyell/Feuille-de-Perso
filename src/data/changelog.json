@@ -1,5 +1,96 @@
 [
     {
+        "version": "2.35.13",
+        "date": "2026-02-10",
+        "changes": [
+            "[FIX] Suppression des espaces vides excessifs (gaps) en haut et en bas des pages.",
+            "[FIX] Refonte des numéros de page : suppression du texte 'PAGE', déplacement plus bas.",
+            "[DEV] Réduction de la hauteur du bandeau d'onglets et des marges internes du journal.",
+            "[DEV] Alignement vertical optimisé sur la première ligne de texte."
+        ]
+    },
+    {
+        "version": "2.35.12",
+        "date": "2026-02-10",
+        "changes": [
+            "[FIX] Suppression d'un trait vertical résiduel non centré.",
+            "[FIX] Centrage parfait du trait du milieu (spine).",
+            "[FIX] Réduction des espaces vides (gaps) en haut et en bas du journal.",
+            "[FIX] Amélioration de la visibilité des numéros de page (plus hauts, plus foncés)."
+        ]
+    },
+    {
+        "version": "2.35.11",
+        "date": "2026-02-10",
+        "changes": [
+            "[FIX] Groupement des pages par deux (Spreads) pour un rendu livre parfait.",
+            "[FIX] Centrage absolu de l'ombre centrale (Spine) et du pli du livre.",
+            "[FIX] Élimination totale du débordement ('leak') des pages suivantes.",
+            "[FIX] Augmentation de la hauteur du livre pour éviter de couper les numéros de page."
+        ]
+    },
+    {
+        "version": "2.35.10",
+        "date": "2026-02-10",
+        "changes": [
+            "[FIX] Centrage précis de l'ombre centrale (spine) du journal.",
+            "[FIX] Correction du débordement (leak) des pages voisines.",
+            "[FIX] Restauration et amélioration de la visibilité des numéros de page.",
+            "[DEV] Gestion dynamique de la hauteur de l'éditeur pour éviter le tronçonnage."
+        ]
+    },
+    {
+        "version": "2.35.9",
+        "date": "2026-02-10",
+        "changes": [
+            "[FIX] Redimensionnement du journal pour restaurer une taille plus grande (Upscaling A4/A5).",
+            "[DEV] Précision du ratio A4 (1.414) et de l'alignement sur 35 lignes."
+        ]
+    },
+    {
+        "version": "2.35.8",
+        "date": "2026-02-10",
+        "changes": [
+            "[FIX] Harmonisation du journal : format A4 Paysage (2x A5) par défaut.",
+            "[FIX] Correction de l'alignement du texte sur les lignes du journal.",
+            "[DEV] Suppression des paddings internes parasites dans l'éditeur.",
+            "[DEV] Refactoring des constantes de dimension pour A4/A5."
+        ]
+    },
+    {
+        "version": "2.35.7",
+        "date": "2026-02-10",
+        "changes": [
+            "Refactoring technique du Journal : Centralisation des constantes de dimensions et de mise en page."
+        ]
+    },
+    {
+        "version": "2.35.6",
+        "date": "2026-02-10",
+        "changes": [
+            "Refactoring majeur du Journal : Extraction du composant JournalPage.",
+            "Optimisation du code de CampaignNotes (~150 lignes retirées)."
+        ]
+    },
+    {
+        "version": "2.34.16",
+        "date": "2026-02-10",
+        "changes": [
+            {
+                "type": "feature",
+                "text": "Filtres 'Smart Chips' pour les bibliothèques Admin (Compétences, Traits, Historiques).",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.35.7",
+        "date": "2026-02-10",
+        "changes": [
+            "Refactoring technique du Journal : Centralisation des constantes de dimensions et de mise en page."
+        ]
+    },
+    {
         "version": "2.33.2",
         "date": "2026-02-10",
         "changes": [
@@ -194,206 +285,6 @@
                 "type": "modified",
                 "text": "Retour au nom sur une seule ligne avec icônes de statut déplacées sur la ligne de description (Skills/Backgrounds).",
                 "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.1",
-        "date": "2026-02-10",
-        "description": "Amélioration layout : Noms multi-lignes.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Support des noms sur deux lignes pour les cartes Compétences et Arrières-plans dans l'admin.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.0",
-        "date": "2026-02-10",
-        "description": "Harmonisation UI des bibliothèques Administrateur.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Refonte visuelle premium des onglets Compétences, Origines, Compteurs, Spécialisations et Traits.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Colonnes interactives à largeur fixe pour une navigation plus fluide.",
-                "category": "ui"
-            },
-            {
-                "type": "modified",
-                "text": "Remplacement des badges textuels par des icônes intuitives (Global, Lock, Variantes).",
-                "category": "ui"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction de types TypeScript sur les icônes Lucide pour assurer l'intégrité du build.",
-                "category": "fix"
-            }
-        ]
-    },
-    {
-        "version": "2.31.0",
-        "date": "2026-02-09",
-        "description": "Sécurisation de l'intégrité des données : Verrouillage des items.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Indicateurs visuels (cadenas) pour les items de bibliothèque en cours d'utilisation.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Blocage de la suppression des items 'placés' dans la configuration ou actifs dans d'autres campagnes.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Suivi global de l'utilisation des items à travers toutes les campagnes via Supabase.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Mise à jour de toutes les bibliothèques (Compétences, Historiques, Compteurs, Traits, Spécialisations).",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.5",
-        "date": "2026-02-09",
-        "description": "Généralisation des actions en masse (Admin).",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Extension des actions 'Tout activer / Tout désactiver' aux bibliothèques d'Historiques, Compteurs, Spécialisations et Traits.",
-                "category": "ui"
-            },
-            {
-                "type": "improved",
-                "text": "Cohérence visuelle et fonctionnelle des actions en masse sur l'ensemble de la section Admin.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.4",
-        "date": "2026-02-09",
-        "description": "Amélioration ergonomie Bibliothèque (Admin).",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Ajout d'actions en masse (Tout activer / Tout désactiver) dans la réserve de compétences.",
-                "category": "ui"
-            },
-            {
-                "type": "improved",
-                "text": "Les actions en masse respectent le filtre de recherche actif.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.3",
-        "date": "2026-02-09",
-        "description": "Sécurisation de la persistance (Admin).",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Correction d'une faille de synchronisation provoquant la perte de données lors de l'ajout de nouveaux items ou de l'activation massive.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Standardisation de la génération d'ID via UUID pour une meilleure compatibilité avec Supabase.",
-                "category": "core"
-            }
-        ]
-    },
-    {
-        "version": "2.30.2",
-        "date": "2026-02-09",
-        "description": "Optimisation Admin v2.",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Rétablissement de la suppression pour les items de bibliothèque partagés (Repository).",
-                "category": "fix"
-            },
-            {
-                "type": "improved",
-                "text": "Refonte ergonomique de la modale d'édition des compétences (meilleur équilibre Nom/Description/Variante).",
-                "category": "ui"
-            },
-            {
-                "type": "removed",
-                "text": "Nettoyage des items dupliqués entre les bibliothèques de compétences, compteurs et historiques.",
-                "category": "cleanup"
-            }
-        ]
-    },
-    {
-        "version": "2.30.1",
-        "date": "2026-02-09",
-        "description": "Correctif de la Réserve (Admin).",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "La réserve de l'admin ne montre désormais que les compétences/historiques/compteurs explicitement sélectionnés pour la campagne.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.0",
-        "date": "2026-02-09",
-        "description": "Architecture 'Global Repository' & Gestion localisée des catégories.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Migration vers le modèle 'Global Repository' : tous les items de bibliothèque sont désormais partagés.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Gestion des catégories par défaut déplacée dans le contexte local de la campagne (Réserve).",
-                "category": "ui"
-            },
-            {
-                "type": "changed",
-                "text": "Refonte des services LibraryLoader et LibraryPersistence pour garantir l'intégrité des items globaux.",
-                "category": "core"
-            },
-            {
-                "type": "fixed",
-                "text": "Suppression des risques de perte de données lors de la synchronisation des bibliothèques.",
-                "category": "fix"
-            }
-        ]
-    },
-    {
-        "version": "2.29.3",
-        "date": "2026-02-09",
-        "description": "Audit & Online First : Supabase Integration",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Support du chargement direct des campagnes Supabase via URL (?s=id) dans l'app Joueur.",
-                "category": "core"
-            },
-            {
-                "type": "fixed",
-                "text": "Nettoyage complet du Type Safety (zéro @ts-ignore) dans les services de données.",
-                "category": "core"
-            },
-            {
-                "type": "changed",
-                "text": "Refactoring de RulesReconciler pour une meilleure modularité et tests automatisés.",
-                "category": "core"
             }
         ]
     }

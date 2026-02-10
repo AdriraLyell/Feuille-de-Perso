@@ -49,7 +49,12 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
             // 2. Fetch fresh rules from source
             const urlParams = new URLSearchParams(window.location.search);
             const urlSettingId = urlParams.get('s') || urlParams.get('setting');
-            const data = await loadRules(urlSettingId || undefined);
+
+            // ROBUSTNESS: Use stored setting ID if no URL param (to survive refresh/navigation)
+            const storedSettingId = localStorage.getItem('rpg-active-setting-id');
+            const targetId = urlSettingId || storedSettingId || undefined;
+
+            const data = await loadRules(targetId);
             if (data) {
                 const migrated = migrateRulesToV2(data);
                 setRules(migrated);
@@ -82,6 +87,17 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
         // Auto-detect online mode from rules data
         const online = !!migrated.settingId || migrated.source === 'database';
         setIsOnlineMode(online);
+
+        // PERSISTENCE FIX: Save to cache so it survives refresh
+        setCache('rpg-rules-cache', newRules).catch(err =>
+            console.error('[RulesContext] Failed to update cache:', err)
+        );
+
+        // ROBUSTNESS: Persist the active setting ID
+        if (newRules.settingId) {
+            localStorage.setItem('rpg-active-setting-id', newRules.settingId);
+        }
+
         setIsLoading(false); // Ensure loading is stopped
         console.log('[RulesContext] Rules updated, online mode:', online);
     };

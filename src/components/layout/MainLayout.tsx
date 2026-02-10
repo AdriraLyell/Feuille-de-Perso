@@ -243,6 +243,34 @@ const MainLayout: React.FC = () => {
         setLastSavedState(JSON.stringify(newData));
     };
 
+    // 4. Synchronization Rules <-> Character (Restore Rules on Refresh)
+    useEffect(() => {
+        if (!data || !data.syncInfo?.settingId || !rules) return;
+
+        const syncInfo = data.syncInfo;
+        if (!syncInfo.settingId) return;
+
+        // If we have a character linked to a campaign, but the current rules are NOT that campaign
+        // (e.g. we refreshed and RulesContext loaded defaults because URL param is missing)
+        if ((rules as any).settingId !== syncInfo.settingId) {
+            console.log(`[MainLayout] Rules Mismatch Detected. Current: ${(rules as any).settingId}, Expected: ${syncInfo.settingId}. Restoring...`);
+
+            PlayerService.loadSetting(syncInfo.settingId).then(restoredRules => {
+                if (restoredRules) {
+                    updateRules({
+                        ...restoredRules,
+                        // @ts-ignore
+                        settingId: syncInfo.settingId,
+                        settingName: syncInfo.settingName
+                    });
+                    addLog(`Règles de la campagne "${syncInfo.settingName}" restaurées.`, 'info', 'settings');
+                }
+            }).catch(err => {
+                console.error("[MainLayout] Failed to restore rules", err);
+            });
+        }
+    }, [data.syncInfo?.settingId, (rules as any)?.settingId]); // Dependency checks
+
     const handleConfirmReset = () => {
         if (!pendingRules) return;
 

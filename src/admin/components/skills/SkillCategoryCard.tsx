@@ -10,6 +10,7 @@ interface SkillCategoryCardProps {
     isDraggingSidebarItem: boolean;
     onUpdateLabel: (id: string, val: string) => void;
     onUpdateBehavior: (id: string, behavior: SkillBehavior) => void;
+    onUpdateCategory: (updates: Partial<SkillCategoryConfig>) => void;
     onUpdateSkill: (id: string, idx: number, val: string) => void;
     onAddSkill: (id: string, isSpacer: boolean) => void;
     onRemoveSkill: (id: string, idx: number) => void;
@@ -27,6 +28,7 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
     isDraggingSidebarItem,
     onUpdateLabel,
     onUpdateBehavior,
+    onUpdateCategory,
     onUpdateSkill,
     onAddSkill,
     onRemoveSkill,
@@ -85,7 +87,19 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
                         <option value="Compteur">Compteur</option>
                     </select>
 
+
+
                     <span className="text-[9px] text-[#bfae85] uppercase tracking-tighter shrink-0">{id}</span>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                    <label className="text-[9px] font-bold text-stone-400 uppercase">Description (Bulle d'info)</label>
+                    <textarea
+                        value={categoryConfig.description || ''}
+                        onChange={(e) => onUpdateCategory({ description: e.target.value })}
+                        className="w-full bg-white/40 border border-[#bfae85]/20 rounded p-1 text-[10px] text-[#5c4d41] outline-none resize-none h-12 shadow-inner"
+                        placeholder="Texte de la bulle d'info..."
+                    />
                 </div>
             </div>
 

@@ -1,5 +1,199 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.17.51] - 2026-02-07 [REFACTOR]
+
+- Admin: Réorganisation des Paramètres de Création.
+- UX: Déplacement des bornes d'attributs en tête de section pour une meilleure clarté.
+- UX: Libellés renommés en 'Attribut Minimal' et 'Attribut Maximal'.
+
+## [2.17.50] - 2026-02-07 [FEATURE]
+
+- Config: Mise à jour des valeurs par défaut pour la répartition des rangs (10, 8, 6, 2, 0).
+
+## [2.17.49] - 2026-02-07 [REFACTOR]
+
+- Admin: Déplacement du 'Coût d'Attribut (XP)' de l'onglet Coûts vers l'onglet Général & Création.
+- UX: Centralisation des coûts fondamentaux dans la section Configuration Générale.
+
+## [2.17.48] - 2026-02-07 [FEATURE]
+
+- Admin: Refonte visuelle de l'onglet 'Général & Création'.
+- UX: Déplacement de la 'Version des Règles' dans un en-tête global.
+- UX: Extraction de 'Rangs Étendus' et 'Coût Arrière-Plans' dans une section 'Configuration Générale' premium.
+
+## [2.17.47] - 2026-02-07 [FEATURE]
+
+- Admin: Inversion de l'ordre d'affichage de la 'Répartition des Rangs' (désormais de 1 à 5).
+- Config: Mise à jour des valeurs par défaut pour les nouveaux settings :
+- - Mode Rangs: Attr=12, Plans=7, Attr Min=-1, Coût Arrière-plan=2
+- - Mode Pot Commun: XP=450
+- - Mode Budgets Séparés: Attr=120, Comp=240, Plans=20
+
+## [2.17.46] - 2026-02-07 [BUGFIX]
+
+- Fix critique: Les arrière-plans ne deviennent plus tous 'variable' lors du refresh de l'app.
+- Core: rulesReconciler vérifie maintenant le flag isVariable depuis la bibliothèque.
+
+## [2.17.45] - 2026-02-07 [FEATURE]
+
+- UX: Le premier champ de saisie des attributs affiche maintenant '0' par défaut.
+- Core: Initialisation automatique de val1 à '0' lors de la création d'attributs.
+
+## [2.17.44] - 2026-02-07 [FEATURE]
+
+- Nouveau: Mode Expert pour les réglages avancés en mode Online.
+- Online Mode: Les onglets Attributs, Compétences, Spécialisations et Paramètres sont masqués par défaut.
+- UX: Bouton 'Réglages Avancés' avec double confirmation pour activer le Mode Expert.
+- UX: Bandeau d'avertissement persistant quand le Mode Expert est actif.
+
+## [2.17.43] - 2026-02-07 [BUGFIX]
+
+- Fix: Le système de cartes activé dans Admin est maintenant correctement chargé dans l'App Joueur.
+- Sync: rulesReconciler fusionne désormais configurations.cards vers creationConfig.cardConfig.
+
+## [2.17.42] - 2026-02-07 [BUGFIX]
+
+- Fix critique: Cliquer sur un nouveau compteur ne crée plus de doublon fantôme.
+- Fix: updateCounter recherche maintenant correctement par id du compteur.
+
+## [2.17.41] - 2026-02-07 [BUGFIX]
+
+- Fix: Les nouveaux compteurs créés dans Admin sont maintenant correctement sauvegardés en BDD (format UUID).
+- Fix: Correction de la duplication des compteurs avec accents (ex: Volonté).
+- Sync: Les valeurs par défaut sont maintenant correctement appliquées lors de la création de compteurs.
+
+## [2.17.40] - 2026-02-07 [FEATURE]
+
+- Admin→Joueur: Les nouveaux compteurs créés dans la bibliothèque Admin apparaissent maintenant automatiquement dans la fiche joueur.
+- Sync: CampaignService synchronise definitions.counters avec libraries.counters au chargement.
+
+## [2.17.39] - 2026-02-07 [FEATURE]
+
+- Admin: Les Compétences et Arrière-plans Globaux sont maintenant éditables et propagent leurs modifications à toutes les campagnes.
+- Sync: LibraryService met à jour les Globaux (Skills, Backgrounds, Counters) lors de la sauvegarde.
+
+## [2.17.38] - 2026-02-07 [BUGFIX]
+
+- Fix critique: Les descriptions de compteurs provenant de l'Admin (mode Online) sont maintenant correctement synchronisées vers la fiche joueur.
+- Pont: rulesReconciler utilise désormais libraries.counters comme source secondaire pour les descriptions.
+
+## [2.17.37] - 2026-02-07 [FEATURE]
+
+- Admin: Les compteurs Globaux sont maintenant éditables et propagent leurs modifications à toutes les campagnes.
+- Sync: LibraryService met à jour les Globaux (setting_id = NULL) lors de la sauvegarde.
+
+## [2.17.36] - 2026-02-07 [BUGFIX]
+
+- Fix: La description des compteurs est maintenant correctement persistée en BDD (mode Online).
+- Sync: LibraryService inclut désormais 'description' dans les insert/load de counters.
+
+## [2.17.35] - 2026-02-07 [BUGFIX]
+
+- Fix: Le thème (couleurs des points) est maintenant correctement réinitialisé lors de la création d'un nouveau personnage.
+- Cleanup: Suppression de la gestion du thème dans les règles Admin (non utilisée).
+
+## [2.17.34] - 2026-02-06 [BUGFIX]
+
+- Fix critique: Les compteurs utilisent maintenant 'Départ' au lieu de 'Max' pour la valeur initiale.
+- Sync: La description des compteurs est maintenant synchronisée depuis Admin vers Joueur.
+
+## [2.17.33] - 2026-02-06 [BUGFIX]
+
+- Fix critique: Correction de la duplication des compétences lors de l'import d'anciens personnages.
+- Migration: Les clés legacy sont maintenant migrées AVANT l'injection des valeurs par défaut.
+
+## [2.17.32] - 2026-02-06 [REFACTOR]
+
+- Refactoring majeur: Découpage de migrations.ts (687→15 lignes) en 9 modules spécialisés.
+- Architecture: Nouveau dossier utils/migrations/ avec modules par domaine.
+- Maintenabilité: Chaque migration isolée, testable indépendamment.
+
+## [2.17.31] - 2026-02-06 [PATCH]
+
+- Tests: Suite de tests exhaustive pour migrations.ts (51 tests).
+- Tests: Création de fixtures legacy pour valider toutes les migrations de données.
+- Build: Intégration du script sync-version dans le processus de build.
+
+## [2.17.30] - 2026-02-06 [FEATURE]
+
+- Admin: Autorisation de l'édition des éléments 'Globaux' dans les bibliothèques.
+- Admin: Ajout de 'Description' et 'Départ' dans la gestion des compteurs.
+- Core: Correction du bug d'initialisation des compteurs à 10/10.
+- Core: Synchronisation forcée des descriptions d'Admin vers les fiches Joueurs.
+
+## [2.17.29] - 2026-02-06 [PATCH]
+
+- Rollback: Suppression de l'édition locale sur la fiche joueur.
+- Layout: Mappage déterministe des colonnes de compétences (1234/5678).
+
+## [2.17.28] - 2026-02-06 [PATCH]
+
+- Alignement dynamique des colonnes de compétences sur les catégories d'attributs.
+- Correction d'un problème de superposition des blocs de compétences.
+- Optimisation de l'algorithme de distribution pour préserver l'espace de l'XP et des Arrière-plans.
+
+## [2.17.27] - 2026-02-06 [PATCH]
+
+- Correction d'un crash structurel dans le moteur de layout (erreur .slice).
+- Amélioration de la résilience du layout pendant le chargement des règles.
+
+## [2.17.26] - 2026-02-06 [PATCH]
+
+- Refonte du schéma de validation Zod pour supporter les IDs de compétences dynamiques.
+- Correction d'un bug critique de migration écrasant les attributs par 'undefined'.
+- Stabilisation de la vue Spécialisations (rendu dynamique via les règles).
+- Résolution des crashs TypeError au chargement en mode hors-ligne.
+
+## [2.17.25] - 2026-02-06 [PATCH]
+
+- Sécurisation des scripts de migration et de réconciliation pour le mode hors-ligne.
+- Correction du décalage d'affichage de la version dans l'interface.
+- Ajout de protections contre les données malformées lors du chargement initial.
+
+## [2.17.24] - 2026-02-06 [CLEANUP]
+
+- Suppression de la section redondante 'Limites & Bornes' dans l'onglet Coûts.
+- Consolidation des paramètres de limites d'attributs exclusivement dans l'onglet Création.
+- Retrait du réglage 'Score Maximal Absolu' (non fonctionnel).
+
+## [2.17.23] - 2026-02-06 [CLEANUP]
+
+- Simplification de la gestion des attributs : suppression du coût initial redondant.
+- Standardisation du coût de progression des attributs à 6 XP par défaut.
+- Nettoyage des facteurs de coûts globaux (Spécialisations à 0, Skills à 1).
+
+## [2.17.22] - 2026-02-06 [CLEANUP]
+
+- Suppression du coût en XP des spécialisations : elles sont désormais gratuites par défaut.
+- Nettoyage de l'interface Admin : retrait du multiplicateur de spécialisation.
+- Simplification de la section de gestion des attributs.
+
+## [2.17.21] - 2026-02-06 [CLEANUP]
+
+- Nettoyage de l'onglet Coûts & Limites : Suppression des widgets redondants 'Formule de Progression' et 'Progression Linéaire'.
+- Consolidation des réglages d'Attributs et Spécialisations dans une section unifiée.
+- Amélioration de la lisibilité de l'interface Admin par la suppression du facteur global de compétence devenu obsolète.
+- Optimisation du layout pour mettre l'accent sur l'Économie des Compétences.
+
+## [2.17.20] - 2026-02-06 [FEATURE]
+
+- Automatisation des coûts par Behavior : Changer le type d'une catégorie (ex: Secondaire) met à jour automatiquement sa formule et son facteur.
+- Affinement des économies par défaut : Compétences (x1 Triangulaire), Secondaires (x0.5 Triangulaire), Arrière-plans (x1 Linéaire), Compteurs (x1 Linéaire).
+- Harmonisation de la migration des règles héritées vers les nouveaux standards économiques.
+- Mise à jour des règles par défaut pour les nouvelles fiches personnages.
+
+## [2.17.19] - 2026-02-06 [FEATURE]
+
+- Centralisation de la gestion des coûts de compétences dans l'onglet 'Coûts & Limites'.
+- Nouvelle interface 'Économie des Compétences' permettant de régler Facteurs et Formules (Linéaire/Triangulaire) par catégorie.
+- Nettoyage de l'éditeur de layout (Compétences) pour une interface plus aérée.
+- Amélioration de la cohérence visuelle des indicateurs de behavior.
+
+## [2.17.18] - 2026-02-06 [PATCH]
+
+- Correction de la synchronisation des bibliothèques (Arrière-plans et Compteurs) lors de la création d'un nouveau setting.
+- Alignement du LibraryService sur les identifiants de colonnes génériques (Col_Comp_8/9) pour la détection des éléments actifs.
+
 ## [2.17.17] - 2026-02-06 [PATCH]
 
 - Migration automatique des anciens 'Settings' (campagnes) vers le système de compétences v2.

@@ -26,6 +26,20 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
     categories = CATEGORY_HELP
 }) => {
     const [showCategoryHelp, setShowCategoryHelp] = useState(false);
+    const [variantDraft, setVariantDraft] = useState(skill.variants?.join(', ') || '');
+
+    React.useEffect(() => {
+        setVariantDraft(skill.variants?.join(', ') || '');
+    }, [skill.variants?.join(',')]);
+
+    const handleSave = () => {
+        const cleaned = variantDraft.split(',').map(v => v.trim()).filter(Boolean);
+        onSkillChange({ ...skill, variants: cleaned });
+        // Since setState is async, we can't rely on skill prop being updated yet if onSave uses it.
+        // But most of our onSave functions in this project use the latest 'skill' object passed to onSkillChange.
+        // Actually, let's look at how LibrarySkillLibrary.tsx handleSave works.
+        onSave();
+    };
 
     return (
         <ThematicModal
@@ -37,7 +51,7 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
             footer={
                 <>
                     <button onClick={onClose} className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold">Annuler</button>
-                    <button onClick={onSave} className="px-6 py-2 bg-[#5c4d41] text-white rounded-sm font-bold shadow-md hover:bg-[#4a3b32] flex items-center gap-2">
+                    <button onClick={handleSave} className="px-6 py-2 bg-[#5c4d41] text-white rounded-sm font-bold shadow-md hover:bg-[#4a3b32] flex items-center gap-2">
                         <Save size={16} /> Enregistrer
                     </button>
                 </>
@@ -107,8 +121,12 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
                             <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Variantes suggérées (Réserve)</label>
                             <input
                                 className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-xs text-[#1c1917] bg-[#fdfbf7] focus:border-amber-500 outline-none shadow-sm font-bold placeholder:italic placeholder:font-normal"
-                                value={(skill.variants || []).join(', ')}
-                                onChange={(e) => onSkillChange({ ...skill, variants: e.target.value.split(',').map(v => v.trim()).filter(v => v !== '') })}
+                                value={variantDraft}
+                                onChange={(e) => setVariantDraft(e.target.value)}
+                                onBlur={() => {
+                                    const cleaned = variantDraft.split(',').map(v => v.trim()).filter(v => v !== '');
+                                    onSkillChange({ ...skill, variants: cleaned });
+                                }}
                                 placeholder="Forge, Histoire, Épées..."
                             />
                             <p className="text-[9px] text-[#5c4d41]/70 mt-1 italic px-1">Séparez par des virgules. Ces options seront proposées lors du drag-and-drop.</p>

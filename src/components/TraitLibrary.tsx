@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { CharacterSheetData, LibraryEntry, TraitEffect } from '../types';
-import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, Download, RefreshCw } from 'lucide-react';
+import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, Download, RefreshCw, X, CheckSquare } from 'lucide-react';
 import TraitCard from './trait-library/TraitCard';
 import TraitForm from './trait-library/TraitForm';
 import TraitImportModal from './trait-library/TraitImportModal';
@@ -14,7 +14,7 @@ interface TraitLibraryProps {
     data: CharacterSheetData;
     onUpdate: (newData: CharacterSheetData) => void;
     onSelect?: (entry: LibraryEntry) => void;
-    onMultiSelect?: (entries: LibraryEntry[]) => void;
+    onMultiSelect?: (instances: { entry: LibraryEntry; variant?: string }[]) => void;
     isEditable?: boolean;
     defaultFilter?: 'all' | 'avantage' | 'desavantage';
 }
@@ -48,7 +48,13 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
     // Multi-select State
-    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    interface SelectedInstance {
+        tempId: string;
+        entry: LibraryEntry;
+        variant?: string;
+    }
+    const [selection, setSelection] = useState<SelectedInstance[]>([]);
+    const [variantPicker, setVariantPicker] = useState<LibraryEntry | null>(null);
 
     // Modal & Edit States
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,20 +68,44 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
 
     // Toggle Selection for Multi-select
     const toggleSelection = (id: string) => {
-        setSelectedIds(prev =>
-            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-        );
+        const entry = findEntry(id)?.entry;
+        if (!entry) return;
+
+        if (entry.isVariable) {
+            // If variable, we MUST open the picker, unless we want to allow deselecting everything with that ID?
+            // Actually, Option A says: click -> ask precision.
+            // If it's already selected, clicking it again should probably just add another instance or we could have a "remove" UI in the footer.
+            // Let's stick to: if variable -> open picker. If not variable -> toggle ON/OFF.
+            setVariantPicker(entry);
+        } else {
+            setSelection(prev => {
+                const isAlreadySelected = prev.some(s => s.entry.id === id);
+                if (isAlreadySelected) {
+                    return prev.filter(s => s.entry.id !== id);
+                } else {
+                    return [...prev, { tempId: Math.random().toString(36).substr(2, 9), entry }];
+                }
+            });
+        }
     };
 
     const handleConfirmMultiSelect = () => {
         if (onMultiSelect) {
-            // Must map back to LibraryEntry for parent consumers
-            const selectedEntries = hybridList
-                .filter(m => selectedIds.includes(m.entry.id))
-                .map(m => m.entry);
-            onMultiSelect(selectedEntries);
-            setSelectedIds([]);
+            onMultiSelect(selection.map(s => ({ entry: s.entry, variant: s.variant })));
+            setSelection([]);
         }
+    };
+
+    const addInstanceWithVariant = (entry: LibraryEntry, variant: string) => {
+        setSelection(prev => [
+            ...prev,
+            { tempId: Math.random().toString(36).substr(2, 9), entry, variant }
+        ]);
+        setVariantPicker(null);
+    };
+
+    const removeInstance = (tempId: string) => {
+        setSelection(prev => prev.filter(s => s.tempId !== tempId));
     };
 
     // Gather all available skills and attributes for dropdowns
@@ -179,10 +209,16 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
         // If ID does NOT exist in Local (was official or new) -> Add to Local.
         // This effectively "Clones" official items to local on edit.
 
-        const existsLocally = local.some(l => l.id === editForm.id);
+        // Cleanup Variants
+        const formToSave = {
+            ...editForm,
+            variants: editForm.variants ? editForm.variants.map(v => v.trim()).filter(v => v !== '') : []
+        };
+
+        const existsLocally = local.some(l => l.id === formToSave.id);
         const newLibrary = existsLocally
-            ? local.map(l => l.id === editForm.id ? editForm : l)
-            : [editForm, ...local]; // Add new or cloned official to top
+            ? local.map(l => l.id === formToSave.id ? formToSave : l)
+            : [formToSave, ...local]; // Add new or cloned official to top
 
         onUpdate({ ...data, library: newLibrary });
         setIsModalOpen(false);
@@ -430,7 +466,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                             key={merged.entry.id}
                             entry={merged.entry}
                             isEditable={isEditable} // Always allow opening edit modal (it acts as view/clone for official)
-                            isSelected={selectedIds.includes(merged.entry.id)}
+                            isSelected={selection.some(s => s.entry.id === merged.entry.id)}
                             onSelect={onSelect ? (entry) => onSelect(entry) : undefined}
                             onMultiSelect={toggleSelection}
                             onEdit={() => handleOpenEdit(merged)}
@@ -444,15 +480,28 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
 
             {/* Multi-Select Footer */}
             {showFooter && (
-                <div className="absolute bottom-0 left-0 right-0 p-3 bg-[#fdfbf7] border-t border-[#bfae85]/30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex justify-between items-center z-20">
-                    <span className="text-xs font-bold text-[#5c4d41]">{selectedIds.length} trait(s) sélectionné(s)</span>
-                    <button
-                        onClick={handleConfirmMultiSelect}
-                        disabled={selectedIds.length === 0}
-                        className="bg-[#5c4d41] hover:bg-[#4a3b32] disabled:item-stone-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-sm font-bold text-sm flex items-center gap-2 shadow-sm transition-all"
-                    >
-                        <Plus size={16} /> Ajouter la sélection
-                    </button>
+                <div className="absolute bottom-0 left-0 right-0 p-3 bg-[#fdfbf7] border-t border-[#bfae85]/30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex flex-col gap-2 z-20">
+                    {selection.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto py-1">
+                            {selection.map(s => (
+                                <div key={s.tempId} className="flex items-center gap-1 bg-amber-100/50 border border-amber-200 rounded-full pl-2 pr-1 py-0.5 text-[10px] text-amber-900 group/item animate-in zoom-in-50 duration-200">
+                                    <span className="font-bold">{s.entry.name}</span>
+                                    {s.variant && <span className="opacity-60 italic">: {s.variant}</span>}
+                                    <button onClick={() => removeInstance(s.tempId)} className="p-0.5 hover:bg-amber-200 rounded-full transition-colors"><X size={10} /></button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-[#5c4d41]">{selection.length} trait(s) sélectionné(s)</span>
+                        <button
+                            onClick={handleConfirmMultiSelect}
+                            disabled={selection.length === 0}
+                            className="bg-[#5c4d41] hover:bg-[#4a3b32] disabled:item-stone-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-sm font-bold text-sm flex items-center gap-2 shadow-sm transition-all"
+                        >
+                            <Plus size={16} /> Ajouter la sélection
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -463,6 +512,62 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                     onClose={() => setIsImportModalOpen(false)}
                     onImport={handleImportTraits}
                 />
+            )}
+
+            {/* VARIANT PICKER MODAL */}
+            {variantPicker && (
+                <div className="fixed inset-0 bg-black/40 z-[110] flex items-center justify-center p-4 backdrop-blur-[2px] animate-in fade-in duration-200">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md border border-amber-200 overflow-hidden">
+                        <div className="p-3 bg-stone-100 border-b border-stone-200 flex justify-between items-center">
+                            <h4 className="font-bold text-[#4a3b32] text-sm">Choisir une variante : {variantPicker.name}</h4>
+                            <button onClick={() => setVariantPicker(null)} className="text-stone-400 hover:text-stone-600"><X size={18} /></button>
+                        </div>
+                        <div className="p-4 flex flex-col gap-4">
+                            {variantPicker.variants && variantPicker.variants.length > 0 && (
+                                <div>
+                                    <label className="block text-[10px] font-bold text-stone-500 uppercase mb-2">Suggestions</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {variantPicker.variants.map(v => (
+                                            <button
+                                                key={v}
+                                                onClick={() => addInstanceWithVariant(variantPicker, v)}
+                                                className="px-3 py-1.5 text-xs bg-stone-50 border border-stone-200 hover:border-amber-400 hover:bg-amber-50 rounded text-stone-700 transition-all font-medium"
+                                            >
+                                                {v}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            <div>
+                                <label className="block text-[10px] font-bold text-stone-500 uppercase mb-2">Saisie Libre</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        autoFocus
+                                        id="variant-custom-input"
+                                        placeholder="Ex: Chats, Pollen..."
+                                        className="flex-grow border border-stone-200 rounded px-3 py-1.5 text-sm focus:border-amber-500 outline-none"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                const val = (e.target as HTMLInputElement).value;
+                                                if (val.trim()) addInstanceWithVariant(variantPicker, val.trim());
+                                            } else if (e.key === 'Escape') setVariantPicker(null);
+                                        }}
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            const input = document.getElementById('variant-custom-input') as HTMLInputElement;
+                                            if (input.value.trim()) addInstanceWithVariant(variantPicker, input.value.trim());
+                                        }}
+                                        className="bg-[#5c4d41] text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-[#4a3b32] transition-colors"
+                                    >
+                                        OK
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {/* EDIT MODAL */}

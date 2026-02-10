@@ -48,9 +48,9 @@ describe('RulesReconciler Snapshot', () => {
                 },
                 secondaryAttributes: {},
                 skillCategories: [
-                    { id: 'Col_Comp_1', label: 'Général', icon: 'zap', behavior: 'Compétence', allowSpecializations: true, costConfig: { factor: 1, type: 'linear' } },
-                    { id: 'Col_Comp_8', label: 'Historiques', icon: 'book', behavior: 'Arrière-plan', allowSpecializations: false, costConfig: { factor: 1, type: 'linear' } },
-                    { id: 'Col_Comp_9', label: 'Compteurs', icon: 'clock', behavior: 'Compteur', allowSpecializations: false, costConfig: { factor: 1, type: 'linear' } }
+                    { id: 'Col_Comp_1', label: 'Général', behavior: 'Compétence', allowSpecializations: true, costConfig: { factor: 1, type: 'linear' } },
+                    { id: 'Col_Comp_8', label: 'Historiques', behavior: 'Arrière-plan', allowSpecializations: false, costConfig: { factor: 1, type: 'linear' } },
+                    { id: 'Col_Comp_9', label: 'Compteurs', behavior: 'Compteur', allowSpecializations: false, costConfig: { factor: 1, type: 'linear' } }
                 ],
                 skills: {
                     'Col_Comp_1': ['Attention', 'Repérage', 'T.O.C', 'Athlétisme'],
