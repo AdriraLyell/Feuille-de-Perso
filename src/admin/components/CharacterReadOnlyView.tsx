@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Star, Book, Shield, Backpack, Award, Zap, Download } from 'lucide-react';
+import { X, User, Star, Book, Shield, Backpack, Award, Zap, Download, Sparkles, Clock } from 'lucide-react';
 import { SyncedCharacter } from '../../services/CharacterSyncService';
 import { CharacterSheetData } from '../../types/character';
 import { CampaignService } from '../../services/CampaignService';
@@ -114,6 +114,39 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
                             </div>
                         </div>
                     </section>
+
+                    {/* Suggestions / Notifications */}
+                    {data.suggestions && data.suggestions.length > 0 && (
+                        <section className="bg-indigo-50 p-4 rounded-lg border border-indigo-200 shadow-sm animate-in slide-in-from-top duration-500">
+                            <h3 className="text-lg font-bold text-indigo-800 mb-3 flex items-center gap-2 border-b border-indigo-200 pb-1">
+                                <Sparkles size={18} /> Suggestions de modifications
+                            </h3>
+                            <div className="space-y-2">
+                                {data.suggestions.map((suggestion, idx) => (
+                                    <div key={idx} className="bg-white p-3 rounded shadow-sm border border-indigo-100 flex justify-between items-center">
+                                        <div className="flex flex-col">
+                                            <div className="flex items-center gap-2">
+                                                <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${suggestion.type === 'background' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>
+                                                    {suggestion.type === 'background' ? 'Historique' : 'Compétence'}
+                                                </span>
+                                                <span className="font-bold text-slate-800">{suggestion.name}</span>
+                                            </div>
+                                            <span className="text-[10px] text-slate-500 italic mt-1">
+                                                Ajouté dans : {getCategoryLabel ? getCategoryLabel(suggestion.category) : suggestion.category}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-slate-400 text-[10px]">
+                                            <Clock size={12} />
+                                            {new Date(suggestion.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                    </div>
+                                ))}
+                                <p className="text-[10px] text-indigo-600/70 italic mt-2">
+                                    Ces éléments ont été ajoutés par le joueur. Vous pouvez les importer officiellement dans la bibliothèque via le bouton en haut à droite.
+                                </p>
+                            </div>
+                        </section>
+                    )}
 
                     {/* Attributes */}
                     <section className="bg-amber-50 p-4 rounded-lg">

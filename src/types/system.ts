@@ -156,3 +156,11 @@ export interface AttributePreset {
   }[];
   isOfficial: boolean;
 }
+
+export interface SuggestionEntry {
+  id: string; // UUID
+  type: 'skill' | 'background';
+  name: string;
+  category: string;
+  timestamp: number;
+}

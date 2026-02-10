@@ -1,5 +1,46 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.17.17] - 2026-02-06 [PATCH]
+
+- Migration automatique des anciens 'Settings' (campagnes) vers le système de compétences v2.
+- Correction de l'onglet Compétences vide pour les anciens paramètres via injection dynamique de 'skillCategories'.
+- Mise à jour de la bibliothèque de compétences pour supporter les identifiants de colonnes génériques.
+
+## [2.17.16] - 2026-02-06 [FEATURE]
+
+- Refonte majeure de l'ID des colonnes de compétences (Generic IDs Col_Comp_1..9).
+- Support des configurations dynamiques : Libellés, Behaviors (Compétence, Secondaire, etc.) et Coûts configurables par catégorie.
+- Ajout des info-bulles (description) et icônes optionnelles pour les catégories de compétences.
+- Migration automatique des anciennes données de personnages vers le nouveau format.
+- Rendu dynamique des colonnes côté Admin et Joueur respectant l'ordre défini par le MJ.
+- Adaptation du moteur de calcul d'XP pour supporter les facteurs de coût par catégorie.
+
+## [2.17.15] - 2026-02-06 [PATCH]
+
+- UI : Restauration de la taille des icônes d'action à 12.
+- UI : Correction du chevauchement entre la structure (rectangles) et les icônes d'édition.
+
+## [2.17.14] - 2026-02-06 [PATCH]
+
+- UI : Alignement invariant des icônes d'action sur les préréglages (indépendant de la hauteur de la structure).
+
+## [2.17.13] - 2026-02-06 [FEATURE]
+
+- Admin : Possibilité d'éditer le nom et la description des préréglages d'attributs.
+- Sécurité : Le nom des préréglages officiels est verrouillé en édition (seule la description est modifiable).
+- UI : Ajout d'icônes d'édition (Crayon) sur les widgets de préréglages.
+
+## [2.17.12] - 2026-02-06 [PATCH]
+
+- UI : Fix définitif de l'alignement vertical inter-widgets dans les préréglages d'attributs.
+- UI : Alignement par le haut (items-start) pour garantir une ligne de lecture constante.
+
+## [2.17.11] - 2026-02-06 [PATCH]
+
+- UI : Alignement vertical parfait des titres de préréglages.
+- UI : Unification visuelle des cartes (bordures arrondies, ombres, fonds blancs).
+- UX : Ajout de hauteurs minimales garanties pour éviter les décalages de grille.
+
 ## [2.17.10] - 2026-02-06 [PATCH]
 
 - UI : Suppression des doublons de texte 'X Pavés' dans les widgets de préréglages.

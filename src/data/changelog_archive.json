@@ -1,5 +1,104 @@
 [
     {
+        "version": "2.29.2",
+        "date": "2026-02-09",
+        "description": "Correction Audit : Export Offline",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Ajout du bouton 'Exporter' dans l'Admin pour générer le fichier rules.js (Fallback Offline).",
+                "category": "core"
+            },
+            {
+                "type": "improved",
+                "text": "Mise à jour du rapport d'audit technique (v2.29.2).",
+                "category": "docs"
+            }
+        ]
+    },
+    {
+        "version": "2.29.1",
+        "date": "2026-02-09",
+        "description": "Premium UI Upgrade (Admin) & Corrections.",
+        "changes": [
+            {
+                "type": "improved",
+                "text": "Refonte complète des modales de confirmation (Suppression, Navigation, Duplication) avec le style Premium (Ambre/Parchemin).",
+                "category": "ui"
+            },
+            {
+                "type": "fixed",
+                "text": "Correction d'un crash critique (ReferenceError) dans l'éditeur d'attributs suite à la refonte de l'état.",
+                "category": "fix"
+            },
+            {
+                "type": "removed",
+                "text": "Suppression définitive des alertes natives 'window.confirm' dans la section Admin.",
+                "category": "cleanup"
+            }
+        ]
+    },
+    {
+        "version": "2.29.0",
+        "date": "2026-02-09",
+        "description": "Optimisation API GitHub & Investigation Réconciliation",
+        "changes": [
+            {
+                "type": "fixed",
+                "text": "Implémentation d'un délai d'attente (backoff) de 15 minutes pour les appels API GitHub en cas de limitation (403/429) afin d'éviter la pollution de la console.",
+                "category": "core"
+            },
+            {
+                "type": "fixed",
+                "text": "Confirmation que la baisse du nombre de compétences (à 128) lors du changement de campagne est un nettoyage normal des emplacements vides.",
+                "category": "reconciliation"
+            },
+            {
+                "type": "improved",
+                "text": "Le passage automatique au CDN Raw est désormais silencieux lorsque l'API est connue pour être en dépassement de quota.",
+                "category": "core"
+            }
+        ]
+    },
+    {
+        "version": "2.28.1",
+        "date": "2026-02-09",
+        "description": "Correctifs de navigation et de réconciliation.",
+        "changes": [
+            "Fix : Correction du menu 'Source' sauté au démarrage à cause du cache (ajout de de l'état isSourceSelected).",
+            "Fix : Correction des doublons de clés React (IDs dupliqués) dans les blocs de compétences quand les règles ont des noms identiques."
+        ]
+    },
+    {
+        "version": "2.28.0",
+        "date": "2026-02-09",
+        "description": "Phase 3 : Optimisations de performance majeures.",
+        "changes": [
+            "Réduction de l'inlining des assets (limite à 10Ko) pour accélérer le parsing HTML initial.",
+            "Implémentation du Lazy Loading pour les modules Admin et les modales secondaires via React.lazy et Suspense.",
+            "Mise en cache persistante des règles via IndexedDB (idb-keyval) pour un chargement instantané au rafraîchissement.",
+            "Amélioration de la structure de build avec des fallbacks de chargement (loaders)."
+        ]
+    },
+    {
+        "version": "2.27.2",
+        "date": "2026-02-09",
+        "description": "Ajustements visuels de la synchronisation.",
+        "changes": [
+            "Retrait des animations de pulsation sur l'indicateur d'auto-sync pour plus de discrétion."
+        ]
+    },
+    {
+        "version": "2.27.1",
+        "date": "2026-02-09",
+        "description": "Améliorations UX de la synchronisation automatique.",
+        "changes": [
+            "L'onglet 'Cloud' est désormais accessible en tout temps (hors réglages avancés).",
+            "Ajout d'un feedback visuel en temps réel sur le bouton de synchronisation (icône en rotation + texte 'Sync...').",
+            "Correction d'un problème de portée de variable dans le contexte de personnage."
+        ]
+    },
+    {
         "version": "2.27.0",
         "date": "2026-02-09",
         "description": "Implémentation de la synchronisation automatique (Auto-Sync).",
@@ -905,75 +1004,6 @@
         "changes": [
             "Correction de la synchronisation des bibliothèques (Arrière-plans et Compteurs) lors de la création d'un nouveau setting.",
             "Alignement du LibraryService sur les identifiants de colonnes génériques (Col_Comp_8/9) pour la détection des éléments actifs."
-        ]
-    },
-    {
-        "version": "2.17.17",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "Migration automatique des anciens 'Settings' (campagnes) vers le système de compétences v2.",
-            "Correction de l'onglet Compétences vide pour les anciens paramètres via injection dynamique de 'skillCategories'.",
-            "Mise à jour de la bibliothèque de compétences pour supporter les identifiants de colonnes génériques."
-        ]
-    },
-    {
-        "version": "2.17.16",
-        "date": "2026-02-06",
-        "type": "feature",
-        "changes": [
-            "Refonte majeure de l'ID des colonnes de compétences (Generic IDs Col_Comp_1..9).",
-            "Support des configurations dynamiques : Libellés, Behaviors (Compétence, Secondaire, etc.) et Coûts configurables par catégorie.",
-            "Ajout des info-bulles (description) et icônes optionnelles pour les catégories de compétences.",
-            "Migration automatique des anciennes données de personnages vers le nouveau format.",
-            "Rendu dynamique des colonnes côté Admin et Joueur respectant l'ordre défini par le MJ.",
-            "Adaptation du moteur de calcul d'XP pour supporter les facteurs de coût par catégorie."
-        ]
-    },
-    {
-        "version": "2.17.15",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "UI : Restauration de la taille des icônes d'action à 12.",
-            "UI : Correction du chevauchement entre la structure (rectangles) et les icônes d'édition."
-        ]
-    },
-    {
-        "version": "2.17.14",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "UI : Alignement invariant des icônes d'action sur les préréglages (indépendant de la hauteur de la structure)."
-        ]
-    },
-    {
-        "version": "2.17.13",
-        "date": "2026-02-06",
-        "type": "feature",
-        "changes": [
-            "Admin : Possibilité d'éditer le nom et la description des préréglages d'attributs.",
-            "Sécurité : Le nom des préréglages officiels est verrouillé en édition (seule la description est modifiable).",
-            "UI : Ajout d'icônes d'édition (Crayon) sur les widgets de préréglages."
-        ]
-    },
-    {
-        "version": "2.17.12",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "UI : Fix définitif de l'alignement vertical inter-widgets dans les préréglages d'attributs.",
-            "UI : Alignement par le haut (items-start) pour garantir une ligne de lecture constante."
-        ]
-    },
-    {
-        "version": "2.17.11",
-        "date": "2026-02-06",
-        "type": "patch",
-        "changes": [
-            "UI : Alignement vertical parfait des titres de préréglages.",
-            "UI : Unification visuelle des cartes (bordures arrondies, ombres, fonds blancs).",
-            "UX : Ajout de hauteurs minimales garanties pour éviter les décalages de grille."
         ]
     }
 ]

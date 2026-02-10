@@ -1,5 +1,152 @@
 [
     {
+        "version": "2.33.2",
+        "date": "2026-02-10",
+        "changes": [
+            {
+                "type": "feature",
+                "text": "Verrouillage des scores en Mode Édition : désactivation de la modification des bulles pendant la réorganisation pour éviter les erreurs de saisie.",
+                "category": "ux"
+            }
+        ]
+    },
+    {
+        "version": "2.33.1",
+        "date": "2026-02-10",
+        "changes": [
+            {
+                "type": "feature",
+                "text": "Sécurisation du Mode Édition : interdiction de supprimer une compétence ayant des points investis (le déplacement reste autorisé).",
+                "category": "ux"
+            }
+        ]
+    },
+    {
+        "version": "2.33.0",
+        "date": "2026-02-10",
+        "description": "Refonte intégrale du Guide Utilisateur Joueur.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Nouveau guide utilisateur structuré par thématiques (Modes, Usage, Création/Édition, Outils).",
+                "category": "docs"
+            },
+            {
+                "type": "added",
+                "text": "Documentation détaillée des trois modes de fonctionnement : En Ligne (Cloud), JSON (Fichiers) et Hors Ligne.",
+                "category": "docs"
+            },
+            {
+                "type": "added",
+                "text": "Guide pas-à-pas pour le Mode Création (répartition des points) et le Mode Édition Directe (structure).",
+                "category": "docs"
+            },
+            {
+                "type": "improved",
+                "text": "Nettoyage du guide : suppression des sections MJ redondantes dans l'app joueur pour plus de clarté.",
+                "category": "ux"
+            }
+        ]
+    },
+    {
+        "version": "2.32.8",
+        "date": "2026-02-10",
+        "description": "Synchronisation Admin et amélioration de la remontée d'infos.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Notifications au MJ pour TOUT ajout (Compétences & Arrière-plans, y compris bibliothèque officielle).",
+                "category": "admin"
+            },
+            {
+                "type": "added",
+                "text": "Nouvelle section 'Suggestions' dans la vue Admin pour visualiser les éléments même à 0 points.",
+                "category": "admin"
+            },
+            {
+                "type": "modified",
+                "text": "Nettoyage UI : Suppression du bouton de validation redondant dans le Header pour centraliser sur le bandeau.",
+                "category": "ui"
+            }
+        ]
+    },
+    {
+        "version": "2.32.7",
+        "date": "2026-02-10",
+        "description": "Sécurité et clarté du Mode Édition.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Nouveau bandeau d'état 'Mode Édition' avec bouton de validation rapide.",
+                "category": "ui"
+            },
+            {
+                "type": "added",
+                "text": "Avertissement et explications pédagogiques avant d'activer le mode édition.",
+                "category": "ux"
+            }
+        ]
+    },
+    {
+        "version": "2.32.6",
+        "date": "2026-02-10",
+        "description": "Améliorations UX du Mode Édition Directe.",
+        "changes": [
+            {
+                "type": "modified",
+                "text": "Repositionnement des boutons d'actions (Édition sous Création) pour une meilleure visibilité.",
+                "category": "ui"
+            },
+            {
+                "type": "added",
+                "text": "Indicateurs visuels de placement lors du Drag & Drop (ligne d'insertion).",
+                "category": "ui"
+            },
+            {
+                "type": "modified",
+                "text": "Amélioration de la logique de réorganisation : insertion précise à l'index visé.",
+                "category": "feature"
+            },
+            {
+                "type": "added",
+                "text": "Possibilité de déplacer les espaceurs déjà présents sur la fiche.",
+                "category": "feature"
+            }
+        ]
+    },
+    {
+        "version": "2.32.5",
+        "date": "2026-02-10",
+        "description": "Implémentation du Mode Édition Directe.",
+        "changes": [
+            {
+                "type": "added",
+                "text": "Nouveau Mode Édition Directe permettant d'ajouter, supprimer et déplacer des éléments directement sur la feuille.",
+                "category": "feature"
+            },
+            {
+                "type": "added",
+                "text": "Barre latérale d'édition avec recherche dans les bibliothèques de compétences et d'historiques.",
+                "category": "ui"
+            },
+            {
+                "type": "added",
+                "text": "Possibilité de créer des éléments personnalisés (suggestions automatiques pour le MJ).",
+                "category": "feature"
+            },
+            {
+                "type": "added",
+                "text": "Support du Drag & Drop pour réorganiser les compétences ou ajouter des espaceurs vides.",
+                "category": "ui"
+            },
+            {
+                "type": "fixed",
+                "text": "Correction de la gestion des catégories lors de l'édition pour respecter les types de blocs (Compétences vs Historiques).",
+                "category": "fix"
+            }
+        ]
+    },
+    {
         "version": "2.32.4",
         "date": "2026-02-10",
         "description": "Filtre 'Masquer acquis' pour les Bibliothèques.",
@@ -248,105 +395,6 @@
                 "text": "Refactoring de RulesReconciler pour une meilleure modularité et tests automatisés.",
                 "category": "core"
             }
-        ]
-    },
-    {
-        "version": "2.29.2",
-        "date": "2026-02-09",
-        "description": "Correction Audit : Export Offline",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Ajout du bouton 'Exporter' dans l'Admin pour générer le fichier rules.js (Fallback Offline).",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Mise à jour du rapport d'audit technique (v2.29.2).",
-                "category": "docs"
-            }
-        ]
-    },
-    {
-        "version": "2.29.1",
-        "date": "2026-02-09",
-        "description": "Premium UI Upgrade (Admin) & Corrections.",
-        "changes": [
-            {
-                "type": "improved",
-                "text": "Refonte complète des modales de confirmation (Suppression, Navigation, Duplication) avec le style Premium (Ambre/Parchemin).",
-                "category": "ui"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction d'un crash critique (ReferenceError) dans l'éditeur d'attributs suite à la refonte de l'état.",
-                "category": "fix"
-            },
-            {
-                "type": "removed",
-                "text": "Suppression définitive des alertes natives 'window.confirm' dans la section Admin.",
-                "category": "cleanup"
-            }
-        ]
-    },
-    {
-        "version": "2.29.0",
-        "date": "2026-02-09",
-        "description": "Optimisation API GitHub & Investigation Réconciliation",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Implémentation d'un délai d'attente (backoff) de 15 minutes pour les appels API GitHub en cas de limitation (403/429) afin d'éviter la pollution de la console.",
-                "category": "core"
-            },
-            {
-                "type": "fixed",
-                "text": "Confirmation que la baisse du nombre de compétences (à 128) lors du changement de campagne est un nettoyage normal des emplacements vides.",
-                "category": "reconciliation"
-            },
-            {
-                "type": "improved",
-                "text": "Le passage automatique au CDN Raw est désormais silencieux lorsque l'API est connue pour être en dépassement de quota.",
-                "category": "core"
-            }
-        ]
-    },
-    {
-        "version": "2.28.1",
-        "date": "2026-02-09",
-        "description": "Correctifs de navigation et de réconciliation.",
-        "changes": [
-            "Fix : Correction du menu 'Source' sauté au démarrage à cause du cache (ajout de de l'état isSourceSelected).",
-            "Fix : Correction des doublons de clés React (IDs dupliqués) dans les blocs de compétences quand les règles ont des noms identiques."
-        ]
-    },
-    {
-        "version": "2.28.0",
-        "date": "2026-02-09",
-        "description": "Phase 3 : Optimisations de performance majeures.",
-        "changes": [
-            "Réduction de l'inlining des assets (limite à 10Ko) pour accélérer le parsing HTML initial.",
-            "Implémentation du Lazy Loading pour les modules Admin et les modales secondaires via React.lazy et Suspense.",
-            "Mise en cache persistante des règles via IndexedDB (idb-keyval) pour un chargement instantané au rafraîchissement.",
-            "Amélioration de la structure de build avec des fallbacks de chargement (loaders)."
-        ]
-    },
-    {
-        "version": "2.27.2",
-        "date": "2026-02-09",
-        "description": "Ajustements visuels de la synchronisation.",
-        "changes": [
-            "Retrait des animations de pulsation sur l'indicateur d'auto-sync pour plus de discrétion."
-        ]
-    },
-    {
-        "version": "2.27.1",
-        "date": "2026-02-09",
-        "description": "Améliorations UX de la synchronisation automatique.",
-        "changes": [
-            "L'onglet 'Cloud' est désormais accessible en tout temps (hors réglages avancés).",
-            "Ajout d'un feedback visuel en temps réel sur le bouton de synchronisation (icône en rotation + texte 'Sync...').",
-            "Correction d'un problème de portée de variable dans le contexte de personnage."
         ]
     }
 ]

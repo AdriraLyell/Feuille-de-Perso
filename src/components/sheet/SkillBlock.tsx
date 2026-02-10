@@ -15,12 +15,37 @@ const DotRow: React.FC<{
     imposedSpecs?: { name: string, minLevel: number }[];
     onDefineVariant?: (category: string, id: string, name: string) => void;
     allowExtendedSkills?: boolean;
-}> = ({ entry, category, onUpdate, specializations = [], theme, imposedSpecs = [], onDefineVariant, allowExtendedSkills = false }) => {
+    isEditing?: boolean;
+    onRemove?: (category: string, id: string) => void;
+}> = ({ entry, category, onUpdate, specializations = [], theme, imposedSpecs = [], onDefineVariant, allowExtendedSkills = false, isEditing = false, onRemove }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     // Spacer logic
     if (!entry.name) {
-        return <div className="h-5 border-b border-transparent"></div>;
+        return (
+            <div
+                className={`h-5 border-b border-dotted transition-colors relative group ${isEditing ? 'border-[#bfae85]/40 bg-[#bfae85]/5 hover:bg-[#bfae85]/10 cursor-grab active:cursor-grabbing' : 'border-transparent'}`}
+                draggable={isEditing}
+                onDragStart={isEditing ? (e) => {
+                    const payload = {
+                        type: 'sheet_item',
+                        originCategory: category,
+                        data: entry,
+                        categoryType: category === 'Arrière-plan' ? 'background' : 'skill'
+                    };
+                    e.dataTransfer.setData('application/json', JSON.stringify(payload));
+                } : undefined}
+            >
+                {isEditing && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onRemove?.(category, entry.id); }}
+                        className="absolute -right-1 top-1/2 -translate-y-1/2 p-0.5 text-red-400 opacity-0 group-hover:opacity-100 bg-white/80 rounded-full shadow-sm hover:text-red-600 transition-all z-10"
+                    >
+                        <LucideIcons.Trash2 size={10} />
+                    </button>
+                )}
+            </div>
+        );
     }
 
     const visibleImposed = entry.value > 0
@@ -54,7 +79,17 @@ const DotRow: React.FC<{
 
     return (
         <div
-            className="flex justify-between items-center px-2 border-b border-dotted border-stone-300 h-5 hover:bg-stone-50 transition-colors relative group"
+            className={`flex justify-between items-center px-2 border-b border-dotted border-stone-300 h-5 hover:bg-stone-50 transition-colors relative group ${isEditing ? 'cursor-grab active:cursor-grabbing select-none' : ''}`}
+            draggable={isEditing}
+            onDragStart={isEditing ? (e) => {
+                const payload = {
+                    type: 'sheet_item',
+                    originCategory: category,
+                    data: entry,
+                    categoryType: category === 'Arrière-plan' ? 'background' : 'skill'
+                };
+                e.dataTransfer.setData('application/json', JSON.stringify(payload));
+            } : undefined}
             onMouseLeave={() => setIsOpen(false)}
         >
             <span
@@ -104,7 +139,17 @@ const DotRow: React.FC<{
                 xpColor={theme?.xpColor}
                 symbol={theme?.dotSymbol}
                 max={effectiveMax}
+                readOnly={isEditing}
             />
+
+            {isEditing && (entry.value === 0 || !entry.name) && (
+                <button
+                    onClick={(e) => { e.stopPropagation(); onRemove?.(category, entry.id); }}
+                    className="absolute -right-1 top-1/2 -translate-y-1/2 p-0.5 text-red-400 opacity-0 group-hover:opacity-100 bg-white/80 rounded-full shadow-sm hover:text-red-600 transition-all z-10"
+                >
+                    <LucideIcons.Trash2 size={10} />
+                </button>
+            )}
         </div >
     );
 };
@@ -121,14 +166,63 @@ export const SkillBlock = React.memo<{
     allowExtendedSkills?: boolean;
     description?: string;
     icon?: string;
-}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, icon }) => {
+    isEditing?: boolean;
+    categoryBehavior?: 'Compétence' | 'Secondaire' | 'Arrière-plan' | 'Compteur';
+    onDrop?: (category: string, item: any, targetIndex: number) => void;
+    onRemove?: (category: string, id: string) => void;
+}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, icon, isEditing = false, onDrop, onRemove }) => {
     const [showDesc, setShowDesc] = useState(false);
+    const [isDragOver, setIsDragOver] = useState(false);
+    const [dropIndex, setDropIndex] = useState<number>(-1);
 
     // Resolve Icon if it's a valid Lucide name
     const IconComponent = icon ? (LucideIcons[icon as keyof typeof LucideIcons] as LucideIcon) : null;
 
+    const handleDragOver = (e: React.DragEvent) => {
+        if (!isEditing) return;
+        e.preventDefault();
+        setIsDragOver(true);
+        e.dataTransfer.dropEffect = 'copy';
+
+        // Calculate drop index based on mouse position
+        const rect = e.currentTarget.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+        const rowHeight = 20; // h-5 is 20px
+        const headerPadding = 24; // approx height of SectionHeader + padding
+        const relativeY = y - headerPadding;
+
+        // Items start after header padding
+        let index = Math.round(relativeY / rowHeight);
+        index = Math.max(0, Math.min(index, items.length));
+        setDropIndex(index);
+    };
+
+    const handleDragLeave = () => {
+        setIsDragOver(false);
+        setDropIndex(-1);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        if (!isEditing) return;
+        e.preventDefault();
+        setIsDragOver(false);
+        const finalDropIndex = dropIndex;
+        setDropIndex(-1);
+        try {
+            const payload = JSON.parse(e.dataTransfer.getData('application/json'));
+            onDrop?.(cat, payload, finalDropIndex);
+        } catch (err) {
+            console.error('Failed to parse drop payload', err);
+        }
+    };
+
     return (
-        <div className="flex flex-col">
+        <div
+            className={`flex flex-col transition-all duration-200 ${isEditing ? 'relative' : ''} ${isDragOver ? 'bg-[#bfae85]/10 ring-2 ring-[#bfae85]/40 rounded-sm scale-[1.02] shadow-lg z-10' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+        >
             <div className="relative group/header">
                 <SectionHeader
                     title={
@@ -156,8 +250,19 @@ export const SkillBlock = React.memo<{
                 )}
             </div>
 
-            <div className="flex-grow py-1">
-                {(items || []).map(item => {
+            <div className="flex-grow py-1 relative">
+                {/* Drop Indicator Logic */}
+                {isEditing && isDragOver && dropIndex !== -1 && (
+                    <div
+                        className="absolute left-0 right-0 h-0.5 bg-[#bfae85] z-20 pointer-events-none"
+                        style={{ top: `${(dropIndex * 20) + 4}px` }} // 4px padding in py-1? No, py-1 is 4px top/bottom.
+                    >
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-[#bfae85] rotate-45"></div>
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-2 h-2 bg-[#bfae85] rotate-45"></div>
+                    </div>
+                )}
+
+                {(items || []).map((item, idx) => {
                     const iSpecs = imposedSpecs[item.id] || [];
                     const uSpecs = userSpecs[item.id] || [];
 
@@ -172,9 +277,17 @@ export const SkillBlock = React.memo<{
                             theme={theme}
                             onDefineVariant={onDefineVariant}
                             allowExtendedSkills={allowExtendedSkills}
+                            isEditing={isEditing}
+                            onRemove={onRemove}
                         />
                     );
                 })}
+
+                {items.length === 0 && isEditing && (
+                    <div className="h-20 flex items-center justify-center border border-dashed border-[#bfae85]/30 rounded text-[10px] text-[#bfae85]/50 italic">
+                        Glissez ici
+                    </div>
+                )}
             </div>
         </div>
     );

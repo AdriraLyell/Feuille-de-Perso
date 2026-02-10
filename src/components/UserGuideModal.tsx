@@ -1,6 +1,10 @@
 
 import React, { useState } from 'react';
-import { X, HelpCircle, User, Crown, Book, MousePointer, Settings, Save, LayoutGrid, Zap, Layers, TrendingUp, Image as ImageIcon } from 'lucide-react';
+import {
+    X, HelpCircle, User, Book, MousePointer, Settings, Save,
+    LayoutGrid, Zap, Layers, TrendingUp, Image as ImageIcon,
+    Cloud, WifiOff, FileJson, PencilLine, Target, RefreshCw, Palette, Download, UploadCloud
+} from 'lucide-react';
 
 interface UserGuideModalProps {
     isOpen: boolean;
@@ -19,7 +23,7 @@ const GuideSection: React.FC<{ title: string; icon: React.ReactNode; children: R
 );
 
 const UserGuideModal: React.FC<UserGuideModalProps> = ({ isOpen, onClose }) => {
-    const [activeTab, setActiveTab] = useState<'general' | 'player' | 'gm'>('general');
+    const [activeTab, setActiveTab] = useState<'modes' | 'usage' | 'edit' | 'tools'>('modes');
 
     if (!isOpen) return null;
 
@@ -32,9 +36,9 @@ const UserGuideModal: React.FC<UserGuideModalProps> = ({ isOpen, onClose }) => {
                     <div>
                         <h3 className="font-bold text-xl flex items-center gap-2 font-serif tracking-wide">
                             <Book className="text-amber-500" />
-                            Documentation
+                            Guide de l'Aventurier
                         </h3>
-                        <p className="text-xs text-stone-600 opacity-90 italic">Manuel complet de l'application</p>
+                        <p className="text-xs text-stone-600 opacity-90 italic">Manuel d'utilisation de la feuille de personnage</p>
                     </div>
                     <button onClick={onClose} className="text-stone-500 hover:text-white hover:bg-[#8b2e2e] p-2 rounded-full transition-colors">
                         <X size={24} />
@@ -44,172 +48,137 @@ const UserGuideModal: React.FC<UserGuideModalProps> = ({ isOpen, onClose }) => {
                 {/* Tabs */}
                 <div className="flex bg-stone-100 border-b border-stone-200 shrink-0">
                     <button
-                        onClick={() => setActiveTab('general')}
-                        className={`flex-1 py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'general' ? 'bg-white border-blue-600 text-blue-700' : 'border-transparent text-stone-500 hover:bg-stone-200'}`}
+                        onClick={() => setActiveTab('modes')}
+                        className={`flex-1 py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'modes' ? 'bg-white border-blue-600 text-blue-700' : 'border-transparent text-stone-500 hover:bg-stone-200'}`}
                     >
-                        <HelpCircle size={18} /> Généralités
+                        <Cloud size={18} /> Modes & Cloud
                     </button>
                     <button
-                        onClick={() => setActiveTab('player')}
-                        className={`flex-1 py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'player' ? 'bg-white border-green-600 text-green-700' : 'border-transparent text-stone-500 hover:bg-stone-200'}`}
+                        onClick={() => setActiveTab('usage')}
+                        className={`flex-1 py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'usage' ? 'bg-white border-green-600 text-green-700' : 'border-transparent text-stone-500 hover:bg-stone-200'}`}
                     >
-                        <User size={18} /> Guide Joueur
+                        <MousePointer size={18} /> Usage de la Feuille
                     </button>
                     <button
-                        onClick={() => setActiveTab('gm')}
-                        className={`flex-1 py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'gm' ? 'bg-white border-purple-600 text-purple-700' : 'border-transparent text-stone-500 hover:bg-stone-200'}`}
+                        onClick={() => setActiveTab('edit')}
+                        className={`flex-1 py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'edit' ? 'bg-white border-amber-600 text-amber-700' : 'border-transparent text-stone-500 hover:bg-stone-200'}`}
                     >
-                        <Crown size={18} /> Guide MJ
+                        <Zap size={18} /> Création & Édition
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('tools')}
+                        className={`flex-1 py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 transition-colors border-b-2 ${activeTab === 'tools' ? 'bg-white border-purple-600 text-purple-700' : 'border-transparent text-stone-500 hover:bg-stone-200'}`}
+                    >
+                        <Layers size={18} /> Journal & Outils
                     </button>
                 </div>
 
                 {/* Content */}
                 <div className="flex-grow overflow-y-auto p-6 bg-white custom-scrollbar">
 
-                    {/* --- GENERAL TAB --- */}
-                    {activeTab === 'general' && (
+                    {/* --- MODES & CLOUD --- */}
+                    {activeTab === 'modes' && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-900 mb-6">
-                                <p className="font-bold mb-1">Bienvenue sur le gestionnaire de fiche Seigneurs des Mystères.</p>
-                                <p>Cette application est conçue pour être utilisée aussi bien sur ordinateur (clavier/souris) que sur tablette (tactile). Elle remplace la fiche papier en automatisant les calculs fastidieux.</p>
+                            <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-900">
+                                <p className="font-bold mb-1">Architecture Hybride</p>
+                                <p>L'application privilégie toujours la connexion au serveur (Cloud), mais reste parfaitement fonctionnelle sans réseau grâce à ses mécanismes de secours.</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <GuideSection title="Sauvegarde Automatique" icon={<Save size={18} className="text-blue-500" />}>
-                                    <p>
-                                        L'application sauvegarde <strong>instantanément</strong> chaque modification dans la mémoire de votre navigateur (Local Storage).
-                                    </p>
-                                    <p className="mt-2 text-xs italic text-stone-500">
-                                        Attention : Si vous videz le cache de votre navigateur, vous perdrez vos données. Pensez à utiliser la fonction "Sauvegarder / Charger" régulièrement.
-                                    </p>
-                                </GuideSection>
-
-                                <GuideSection title="Interface Adaptative" icon={<LayoutGrid size={18} className="text-indigo-500" />}>
-                                    <p>
-                                        Utilisez le bouton <strong>Portrait / Paysage</strong> en haut à gauche pour adapter l'affichage à votre écran.
-                                    </p>
+                                <GuideSection title="Mode En Ligne (Cloud)" icon={<Cloud size={18} className="text-blue-500" />}>
+                                    <p>Lorsqu'un identifiant de campagne est présent, l'app récupère les règles directement depuis la base de données.</p>
                                     <ul className="list-disc list-inside mt-2 text-xs">
-                                        <li><strong>Portrait :</strong> Idéal pour smartphone ou fenêtre verticale. Les blocs s'empilent.</li>
-                                        <li><strong>Paysage :</strong> Vue panoramique type "Tableau de bord", optimisée pour ordinateur/tablette.</li>
+                                        <li><strong>Sync Auto :</strong> Vos changements sont sauvegardés sur le serveur toutes les 10s.</li>
+                                        <li><strong>Bouton Sync :</strong> Forcez une synchronisation manuelle à tout moment.</li>
                                     </ul>
+                                </GuideSection>
+
+                                <GuideSection title="Mode JSON (Fichiers)" icon={<FileJson size={18} className="text-amber-500" />}>
+                                    <p>Utilisez le menu <strong>Sauvegarder / Charger</strong> pour gérer vos fichiers `.json`.</p>
+                                    <ul className="list-disc list-inside mt-2 text-xs">
+                                        <li><strong>Export MJ :</strong> Un fichier contenant uniquement la structure et la bibliothèque (pour vos joueurs).</li>
+                                        <li><strong>Export Perso :</strong> Contient toutes vos données, y compris journal et images.</li>
+                                    </ul>
+                                </GuideSection>
+
+                                <GuideSection title="Mode Hors Ligne" icon={<WifiOff size={18} className="text-slate-500" />}>
+                                    <p>En cas de coupure réseau, l'application utilise un fichier de règles local (`default_rules.json`) et le cache de votre navigateur.</p>
+                                    <p className="mt-2 text-xs italic">La synchronisation reprendra dès le retour de la connexion.</p>
+                                </GuideSection>
+
+                                <GuideSection title="Note sur la Mémoire" icon={<RefreshCw size={18} className="text-indigo-500" />}>
+                                    <p>L'app stocke vos données dans le <strong>Local Storage</strong> du navigateur. Si vous videz votre cache, vous perdrez vos données non synchronisées ou non exportées.</p>
                                 </GuideSection>
                             </div>
                         </div>
                     )}
 
-                    {/* --- PLAYER TAB --- */}
-                    {activeTab === 'player' && (
+                    {/* --- USAGE --- */}
+                    {activeTab === 'usage' && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-
-                            <GuideSection title="Remplir sa Fiche" icon={<MousePointer size={18} className="text-green-600" />}>
+                            <GuideSection title="Interactions de Base" icon={<MousePointer size={18} className="text-green-600" />}>
                                 <ul className="list-disc list-inside space-y-2">
-                                    <li><span className="font-bold">Compétences (Ronds) :</span> Cliquez sur un cercle pour définir le niveau. Cliquez à nouveau sur le niveau actuel pour le diminuer d'un point (ex: cliquer sur le 3ème point si vous êtes à 3 repasse à 2).</li>
-                                    <li><span className="font-bold">Compteurs (Carrés) :</span> La volonté et la confiance ont deux jauges. Les cercles représentent le <strong>Maximum</strong>, les carrés en dessous représentent les points <strong>Actuels</strong> (temporaires).</li>
-                                    <li><span className="font-bold">Champs Texte :</span> Cliquez simplement pour écrire. Les polices manuscrites sont utilisées pour l'immersion.</li>
+                                    <li><strong>Compétences (Cercles) :</strong> Cliquez pour définir le niveau. Cliquez sur le niveau actuel pour le diminuer.</li>
+                                    <li><strong>Compteurs (Carrés/Cercles) :</strong> Les cercles (extérieurs) sont le <strong>Maximum</strong>, les carrés (intérieurs) sont la valeur <strong>Actuelle</strong>. Ils peuvent être synchronisés.</li>
+                                    <li><strong>Attributs :</strong> Cliquez sur les champs pour modifier les valeurs. Le coût en XP est calculé dynamiquement.</li>
                                 </ul>
                             </GuideSection>
 
-                            <GuideSection title="Gestion de l'Expérience (XP)" icon={<TrendingUp size={18} className="text-amber-600" />}>
-                                <p>
-                                    L'application calcule automatiquement le coût en XP de vos compétences et attributs.
-                                </p>
-                                <div className="mt-2 bg-amber-50 p-2 rounded text-xs text-amber-900 border border-amber-200">
-                                    <strong>Important :</strong> Pour que le calcul soit juste, vous devez définir vos valeurs de départ via le <strong>Mode Création</strong> (voir Guide MJ) ou considérer que tout ce qui est ajouté manuellement coûte de l'XP.
-                                </div>
-                                <p className="mt-2">
-                                    Allez dans l'onglet <strong>Gestion XP</strong> pour ajouter vos gains d'expérience (fin de scénario). Le panneau latéral "Expérience" sur la fiche principale se mettra à jour automatiquement (Reste = Gains - Dépenses calculées).
-                                </p>
-                            </GuideSection>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <GuideSection title="Gestion de l'Expérience" icon={<TrendingUp size={18} className="text-amber-600" />}>
+                                    <p>L'onglet <strong>Gestion XP</strong> permet d'ajouter vos gains. L'application déduit automatiquement le coût de vos attributs et compétences (hors valeurs de départ).</p>
+                                </GuideSection>
 
-                            <GuideSection title="Journal & Notes" icon={<Book size={18} className="text-stone-600" />}>
-                                <p>
-                                    L'onglet <strong>Notes de Campagne</strong> est un journal interactif.
-                                </p>
-                                <ul className="list-disc list-inside mt-2">
-                                    <li>Ajoutez des pages pour chaque session.</li>
-                                    <li><strong>Images :</strong> Vous pouvez dessiner un rectangle sur la page avec votre souris pour insérer une image à cet endroit précis. Les images sont redimensionnables et déplaçables.</li>
-                                    <li><strong>Groupe :</strong> L'onglet "Groupe" dans le journal permet de suivre les informations des autres PJ ou PNJ importants sous forme de tableau.</li>
+                                <GuideSection title="Spécialisations" icon={<Target size={18} className="text-red-600" />}>
+                                    <p>L'onglet <strong>Spécialisations</strong> n'affiche que les compétences où vous possédez au moins 1 point. Vos bonus d'historique s'y ajoutent automatiquement.</p>
+                                </GuideSection>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* --- CREATION & EDITION --- */}
+                    {activeTab === 'edit' && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <GuideSection title="Mode Création" icon={<Zap size={18} className="text-yellow-600" />}>
+                                <p>Activé au démarrage ou via les réglages, ce mode permet de répartir vos points initiaux sans coût d'XP.</p>
+                                <ul className="list-disc list-inside mt-2 text-xs space-y-1">
+                                    <li><strong>HUD de contrôle :</strong> Un bandeau en bas d'écran affiche vos budgets restants (Attributs, Rangs, Backgrounds).</li>
+                                    <li><strong>Validation :</strong> Une fois terminé, validez pour figer vos bases. Toute modification ultérieure consommera de l'XP.</li>
                                 </ul>
                             </GuideSection>
 
-                            <GuideSection title="Spécialisations" icon={<Layers size={18} className="text-purple-600" />}>
-                                <p>
-                                    L'onglet <strong>Spécialisations</strong> n'affiche que les compétences pertinentes.
-                                </p>
-                                <p>
-                                    Une compétence apparaît dans cette liste uniquement si vous avez au moins <strong>1 point</strong> dedans, ou si le MJ a défini une spécialisation imposée. Le nombre de lignes disponibles dépend de votre score dans la compétence.
-                                </p>
+                            <GuideSection title="Édition Directe (Structure)" icon={<PencilLine size={18} className="text-indigo-600" />}>
+                                <p>L'icône "Crayon" permet de modifier la structure même de la fiche.</p>
+                                <ul className="list-disc list-inside mt-2 text-xs space-y-1">
+                                    <li><strong>Barre Latérale :</strong> Glissez-déposez des compétences ou historiques depuis la bibliothèque vers la fiche.</li>
+                                    <li><strong>Réorganisation :</strong> Déplacez les blocs d'une catégorie à une autre.</li>
+                                    <li><strong>Suppression :</strong> Une icône poubelle apparaît pour retirer les éléments inutiles.</li>
+                                    <li><strong>Suggestions :</strong> Les éléments ajoutés ainsi sont notifiés au MJ pour validation.</li>
+                                </ul>
                             </GuideSection>
                         </div>
                     )}
 
-                    {/* --- GM TAB --- */}
-                    {activeTab === 'gm' && (
+                    {/* --- TOOLS --- */}
+                    {activeTab === 'tools' && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-
-                            <div className="bg-purple-50 border-l-4 border-purple-600 p-4 rounded text-sm mb-6 shadow-sm">
-                                <h4 className="font-bold text-purple-900 mb-1">Philosophie de l'outil</h4>
-                                <p className="text-purple-800">
-                                    Cette application permet au MJ de créer un "Système" (ou Template) personnalisé, de l'exporter, et de l'envoyer à ses joueurs pour qu'ils commencent avec une fiche pré-configurée.
-                                </p>
-                            </div>
-
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                <GuideSection title="Configuration de la Fiche" icon={<Settings size={18} className="text-slate-600" />}>
-                                    <p>Via le bouton <strong>Configurer</strong> (roue crantée), vous pouvez :</p>
-                                    <ul className="list-disc list-inside mt-2 text-xs space-y-1">
-                                        <li>Renommer n'importe quelle compétence ou catégorie.</li>
-                                        <li>Ajouter des compétences personnalisées.</li>
-                                        <li>Réorganiser l'ordre des compétences (Glisser-Déposer).</li>
-                                        <li>Activer/Désactiver les <strong>Attributs Secondaires</strong>.</li>
-                                        <li>Définir des <strong>Spécialisations Imposées</strong> (visible dans l'onglet Spécialisations).</li>
-                                    </ul>
-                                </GuideSection>
-
-                                <GuideSection title="Mode Création" icon={<Zap size={18} className="text-yellow-600" />}>
-                                    <p>
-                                        Le <strong>Mode Création</strong> (activable dans les Paramètres ou via l'icône sur la fiche) est crucial.
-                                    </p>
-                                    <p className="mt-2 text-xs">
-                                        Lorsqu'il est actif, toutes les modifications de points sont considérées comme "gratuites" (Valeur de base).
-                                        Un bandeau en bas d'écran aide à répartir les points (Attributs, Compétences, Arrière-plans) selon les règles définies (Rangs ou Points).
-                                    </p>
-                                    <p className="mt-2 text-xs font-bold">
-                                        Une fois la création validée, le mode se désactive et toute modification ultérieure coûtera de l'XP.
-                                    </p>
-                                </GuideSection>
-                            </div>
-
-                            <GuideSection title="Bibliothèque de Traits & Effets" icon={<Layers size={18} className="text-teal-600" />}>
-                                <p>
-                                    La <strong>Bibliothèque</strong> permet de créer des Avantages/Désavantages standards.
-                                </p>
-                                <p className="mt-2">
-                                    <span className="font-bold text-slate-800">Effets Mécaniques :</span> Vous pouvez attacher des scripts aux traits.
-                                </p>
-                                <ul className="list-disc list-inside mt-1 text-xs space-y-1">
-                                    <li><strong>Bonus XP :</strong> Ajoute ou retire de l'XP total (ex: un désavantage donnant +10 XP).</li>
-                                    <li><strong>Bonus Attribut :</strong> Ajoute des points "gratuits" dans un attribut (ex: +1 Force). Ces points ne comptent pas dans le calcul du coût XP.</li>
-                                    <li><strong>Rang Gratuit :</strong> Définit qu'une compétence est gratuite jusqu'à un certain rang (ex: Langue maternelle à 5).</li>
+                            <GuideSection title="Journal & Notes" icon={<Book size={18} className="text-stone-600" />}>
+                                <p>L'onglet <strong>Notes de Campagne</strong> est votre journal de bord interactif.</p>
+                                <ul className="list-disc list-inside mt-2 text-xs space-y-1">
+                                    <li><strong>Images :</strong> Dessinez un rectangle avec la souris pour insérer une image (redimensionnable).</li>
+                                    <li><strong>Groupe :</strong> Suivez les informations essentielles du reste de l'équipe.</li>
                                 </ul>
                             </GuideSection>
 
-                            <GuideSection title="Export & Distribution" icon={<Save size={18} className="text-blue-600" />}>
-                                <p>Le menu <strong>Sauvegarder / Charger</strong> propose plusieurs formats :</p>
-                                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                                    <div className="border p-2 rounded bg-slate-50">
-                                        <span className="font-bold block text-slate-800">Personnage Complet</span>
-                                        Sauvegarde tout (valeurs, images, journal). C'est la sauvegarde du joueur.
-                                    </div>
-                                    <div className="border p-2 rounded bg-orange-50 border-orange-200">
-                                        <span className="font-bold block text-orange-800">Système de Jeu (MJ)</span>
-                                        Exporte la <strong>Structure</strong> (noms des compétences, configuration) et la <strong>Bibliothèque</strong>, mais <span className="underline">efface</span> toutes les valeurs et données personnelles.
-                                        <br /><br />
-                                        <em>C'est le fichier à envoyer à vos joueurs avant la partie !</em>
-                                    </div>
-                                </div>
-                            </GuideSection>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <GuideSection title="Personnalisation" icon={<Palette size={18} className="text-pink-600" />}>
+                                    <p>Changez l'apparence de la fiche (Thèmes, Polices) via le menu <strong>Thème</strong> dans la barre de navigation.</p>
+                                </GuideSection>
 
+                                <GuideSection title="Interface & Affichage" icon={<LayoutGrid size={18} className="text-indigo-500" />}>
+                                    <p>Basculez entre le mode <strong>Portrait</strong> (smartphone) et <strong>Paysage</strong> (tablette/PC) pour optimiser votre visibilité.</p>
+                                </GuideSection>
+                            </div>
                         </div>
                     )}
 
@@ -221,7 +190,7 @@ const UserGuideModal: React.FC<UserGuideModalProps> = ({ isOpen, onClose }) => {
                         onClick={onClose}
                         className="bg-stone-800 hover:bg-stone-900 text-white px-6 py-2 rounded-lg font-bold transition-colors shadow-sm"
                     >
-                        Fermer
+                        Fermer le guide
                     </button>
                 </div>
 

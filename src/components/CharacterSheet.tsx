@@ -1,7 +1,6 @@
 
 import React, { useCallback } from 'react';
-import { DotEntry, CombatEntry, SkillCategoryKey } from '../types';
-import { resetCharacterValues } from '../utils/characterUtils';
+import { DotEntry, SkillCategoryKey, SuggestionEntry } from '../types';
 import { normalizeString } from '../utils/stringUtils';
 import { calculateCardValue } from '../utils/mechanics';
 
@@ -13,6 +12,7 @@ import { CountersSection } from './sheet/CountersSection';
 import SheetHeader from './sheet/SheetHeader';
 import ExperienceSummary from './sheet/ExperienceSummary';
 import CreationModeModal from './sheet/CreationModeModal';
+import EditionSidebar from './sheet/EditionSidebar';
 
 // Hooks
 import { useCharacterData, useCharacterActions } from '../context/CharacterContext';
@@ -22,7 +22,7 @@ import { useSheetLayout } from '../hooks/useSheetLayout';
 import { useRules } from '../context/RulesContext';
 
 import ThematicModal from './ui/ThematicModal';
-import { Layers, Save } from 'lucide-react';
+import { Layers, Save, PencilLine, Check } from 'lucide-react';
 
 interface Props {
     isLandscape?: boolean;
@@ -41,6 +41,9 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         inputValue: string;
     }>({ isOpen: false, category: '', id: '', skillName: '', inputValue: '' });
 
+    const [isEditMode, setIsEditMode] = React.useState(false);
+    const [showEditWarning, setShowEditWarning] = React.useState(false);
+
     // --- Hooks logic ---
     const attributeBonuses = useCharacterBonuses(
         data.page2.avantages,
@@ -57,6 +60,19 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
 
     const { rules } = useRules();
 
+    const handleToggleEditMode = useCallback(() => {
+        if (!isEditMode) {
+            setShowEditWarning(true);
+        } else {
+            setIsEditMode(false);
+        }
+    }, [isEditMode]);
+
+    const executeEditModeActivation = () => {
+        setIsEditMode(true);
+        setShowEditWarning(false);
+    };
+
     const {
         attributeCategories,
         getAttributesGridClass,
@@ -71,8 +87,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
 
     const updateDot = useCallback((section: 'skills', category: string, id: string, value: number) => {
         onChange(prev => {
-            // @ts-ignore - dynamic access
-            const list = prev[section]?.[category] as DotEntry[];
+            const list = prev[section][category];
             if (!list) return prev;
 
             const isCreationMode = prev.creationConfig && prev.creationConfig.active;
@@ -96,7 +111,6 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
             const updatedState = {
                 ...prev,
                 [section]: {
-                    // @ts-ignore
                     ...prev[section],
                     [String(category)]: newList
                 }
@@ -134,8 +148,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         if (!inputValue.trim()) return;
 
         onChange(prev => {
-            // @ts-ignore
-            const list = prev.skills[category] as DotEntry[];
+            const list = prev.skills[category];
             if (!list) return prev;
 
             const index = list.findIndex(s => s.id === id);
@@ -169,7 +182,6 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
             return {
                 ...prev,
                 skills: {
-                    // @ts-ignore
                     ...prev.skills,
                     [category]: newList
                 }
@@ -178,6 +190,108 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
 
         setVariantModalState(prev => ({ ...prev, isOpen: false }));
     };
+
+    // --- Direct Edit Logic ---
+    const handleDropItem = useCallback((category: string, payload: any, targetIndex?: number) => {
+        const { type, data: itemData, categoryType, originCategory } = payload;
+
+        // 1. Validation de catégorie
+        const catDef = rules?.definitions?.skillCategories?.find(c => c.id === category);
+        const behavior = catDef?.behavior || 'Compétence';
+
+        if (categoryType === 'skill' && (behavior !== 'Compétence' && behavior !== 'Secondaire')) {
+            onAddLog("Action bloquée : Cette catégorie n'accepte pas les compétences.", 'danger', 'sheet');
+            return;
+        }
+        if (categoryType === 'background' && behavior !== 'Arrière-plan') {
+            onAddLog("Action bloquée : Cette catégorie n'accepte pas les historiques.", 'danger', 'sheet');
+            return;
+        }
+
+        // 2. Préparation de l'entrée
+        const newEntry: DotEntry = type === 'sheet_item'
+            ? itemData
+            : {
+                id: Math.random().toString(36).substring(2, 11),
+                name: itemData.name,
+                value: 0,
+                creationValue: 0,
+                max: 5,
+                description: itemData.description,
+                isVariable: itemData.isVariable
+            };
+
+        // 3. Mise à jour des données
+        onChange(prev => {
+            let updatedSkills = { ...prev.skills };
+
+            // Si c'est un déplacement (interne ou externe), on l'enlève d'abord partout
+            if (type === 'sheet_item') {
+                Object.keys(updatedSkills).forEach(cat => {
+                    updatedSkills[cat] = (updatedSkills[cat] || []).filter(s => s.id !== newEntry.id);
+                });
+            }
+
+            const currentList = [...(updatedSkills[category] || [])];
+
+            // Éviter les doublons exacts (sauf variables ou espaceurs)
+            if (newEntry.name && !itemData.isVariable && currentList.some(s => s.name?.toLowerCase() === itemData.name.toLowerCase() && s.id !== newEntry.id)) {
+                return prev;
+            }
+
+            // Insertion à l'index cible ou à la fin
+            if (targetIndex !== undefined && targetIndex >= 0 && targetIndex <= currentList.length) {
+                currentList.splice(targetIndex, 0, newEntry);
+            } else {
+                currentList.push(newEntry);
+            }
+
+            updatedSkills[category] = currentList;
+            const newState = { ...prev, skills: updatedSkills };
+
+            // 4. Gestion des suggestions si c'est un nouvel item (lib ou custom)
+            if (type === 'custom_lib_item' || type === 'lib_skill') {
+                const suggestionType = categoryType || (category.toLowerCase().includes('background') || category.toLowerCase().includes('arrière-plan') ? 'background' : 'skill');
+
+                const suggestion: SuggestionEntry = {
+                    id: Math.random().toString(36).substring(2, 11),
+                    type: suggestionType as 'skill' | 'background',
+                    name: itemData.name,
+                    category: category,
+                    timestamp: Date.now()
+                };
+                newState.suggestions = [...(prev.suggestions || []), suggestion];
+                onAddLog(`Suggestion créée pour le MJ : ${itemData.name}`, 'info', 'sheet');
+            }
+
+            return newState;
+        });
+
+        onAddLog(type === 'sheet_item' ? `Déplacement : ${itemData.name || 'Espaceur'}` : `Ajout réussi : ${itemData.name || 'Espaceur'}`, 'success', 'sheet');
+    }, [onChange, onAddLog, rules]);
+
+    const handleRemoveItem = useCallback((category: string, id: string) => {
+        onChange(prev => {
+            const currentList = prev.skills[category] || [];
+            const itemToRemove = currentList.find(s => s.id === id);
+
+            if (itemToRemove && itemToRemove.name && (itemToRemove.value || 0) > 0) {
+                onAddLog(`Action bloquée : Impossible de supprimer une compétence avec des points investis.`, 'danger', 'sheet');
+                return prev;
+            }
+
+            const updatedList = currentList.filter(s => s.id !== id);
+
+            return {
+                ...prev,
+                skills: {
+                    ...prev.skills,
+                    [category]: updatedList
+                }
+            };
+        });
+        onAddLog("Élément supprimé de la fiche", 'info', 'sheet');
+    }, [onChange, onAddLog]);
 
     const updateAttribute = useCallback((category: string, id: string, field: 'val1' | 'val2' | 'val3', value: string) => {
         onChange(prev => {
@@ -275,8 +389,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                     return !Array.isArray(c) && c?.id === id;
                 }) || id; // Fallback to using id as key for legacy compatibility
 
-                // @ts-ignore
-                const current = prev.counters[counterKey];
+                const current = (prev.counters as any)[counterKey];
                 // Guard against Array (should not happen for non-custom ID but types say DotEntry | DotEntry[])
                 if (Array.isArray(current) || !current) return prev;
 
@@ -351,13 +464,13 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 return updatedState;
             }
         });
-    }, [onChange, onAddLog]);
+    }, [onChange, onAddLog, rules?.definitions?.counters, rules?.libraries?.counters]);
 
     const cardValue = calculateCardValue(data, rules);
     const creationActive = data.creationConfig?.active;
     const allowExtendedSkills = data.creationConfig?.extendedSkills || false;
 
-    const { columns, backgrounds, counters } = getDynamicColumns(isLandscape) as any;
+    const { columns, backgrounds } = getDynamicColumns(isLandscape) as any;
 
     return (
         <div className={`sheet-container ${isLandscape ? 'landscape' : ''}`}>
@@ -367,7 +480,31 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 creationActive={!!creationActive}
                 onUpdateHeader={updateHeader}
                 onToggleCreationMode={handleToggleCreationMode}
+                editModeActive={isEditMode}
+                onToggleEditMode={handleToggleEditMode}
             />
+
+            {isEditMode && (
+                <div className="bg-amber-600 text-white py-2 px-4 flex justify-between items-center shadow-md animate-in slide-in-from-top duration-300 no-print">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-white/20 p-1.5 rounded-full">
+                            <PencilLine size={18} />
+                        </div>
+                        <div>
+                            <p className="font-bold text-sm">Mode Édition Actif</p>
+                            <p className="text-[10px] opacity-90">Glissez-déposez pour réorganiser ou supprimer. Vos changements sont enregistrés localement.</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => setIsEditMode(false)}
+                        className="bg-white text-amber-700 px-4 py-1.5 rounded-sm font-black text-xs uppercase hover:bg-amber-50 transition-colors shadow-sm flex items-center gap-2"
+                    >
+                        <Check size={14} /> Valider mes changements
+                    </button>
+                </div>
+            )}
+
+            {isEditMode && <EditionSidebar onClose={() => setIsEditMode(false)} />}
 
             {/* Attributes Section */}
             <div className="grid grid-cols-12 border-b-2 border-stone-800">
@@ -392,8 +529,8 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 <div className="flex-grow grid grid-cols-6 border-b-2 border-stone-800">
                     {columns.map((col: any, idx: number) => (
                         <div key={idx} className="border-r border-stone-400 flex flex-col">
-                            {col.blocks.map((block: any, bIdx: number) => (
-                                <div key={bIdx} className={bIdx < col.blocks.length - 1 ? 'flex-grow border-b border-stone-300' : 'flex-grow'}>
+                            {col.blocks.map((block: any) => (
+                                <div key={block.cat} className="flex-grow border-b border-stone-300 last:border-b-0">
                                     <SkillBlock
                                         title={block.title}
                                         items={block.items}
@@ -404,6 +541,10 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                         theme={data.theme}
                                         onDefineVariant={handleDefineVariant}
                                         allowExtendedSkills={allowExtendedSkills}
+                                        isEditing={isEditMode}
+                                        categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
+                                        onDrop={handleDropItem}
+                                        onRemove={handleRemoveItem}
                                     />
                                 </div>
                             ))}
@@ -424,6 +565,10 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                     theme={data.theme}
                                     onDefineVariant={handleDefineVariant}
                                     allowExtendedSkills={allowExtendedSkills}
+                                    isEditing={isEditMode}
+                                    categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === bg.cat)?.behavior}
+                                    onDrop={handleDropItem}
+                                    onRemove={handleRemoveItem}
                                 />
                             </div>
                         ))}
@@ -453,6 +598,10 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                         theme={data.theme}
                                         onDefineVariant={handleDefineVariant}
                                         allowExtendedSkills={allowExtendedSkills}
+                                        isEditing={isEditMode}
+                                        categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
+                                        onDrop={handleDropItem}
+                                        onRemove={handleRemoveItem}
                                     />
                                 ))}
                             </div>
@@ -474,6 +623,10 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                         theme={data.theme}
                                         onDefineVariant={handleDefineVariant}
                                         allowExtendedSkills={allowExtendedSkills}
+                                        isEditing={isEditMode}
+                                        categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
+                                        onDrop={handleDropItem}
+                                        onRemove={handleRemoveItem}
                                     />
                                 ))}
                                 {idx === 3 && (
@@ -490,6 +643,10 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                             theme={data.theme}
                                             onDefineVariant={handleDefineVariant}
                                             allowExtendedSkills={allowExtendedSkills}
+                                            isEditing={isEditMode}
+                                            categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === bg.cat)?.behavior}
+                                            onDrop={handleDropItem}
+                                            onRemove={handleRemoveItem}
                                         />
                                     ))
                                 )}
@@ -506,6 +663,45 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                         </div>
                     </div>
                 </>
+            )}
+
+            {showEditWarning && (
+                <ThematicModal
+                    isOpen={showEditWarning}
+                    onClose={() => setShowEditWarning(false)}
+                    title="Activer le Mode Édition ?"
+                    icon={<PencilLine size={24} />}
+                    size="md"
+                    footer={
+                        <>
+                            <button
+                                onClick={() => setShowEditWarning(false)}
+                                className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={executeEditModeActivation}
+                                className="px-6 py-2 bg-amber-600 text-white rounded-sm font-bold shadow-md hover:bg-amber-700 flex items-center gap-2"
+                            >
+                                <Check size={16} /> Compris, j'active
+                            </button>
+                        </>
+                    }
+                >
+                    <div className="flex flex-col gap-4 py-2">
+                        <div className="bg-amber-50 border border-amber-200 p-4 rounded-sm text-sm text-[#5c4d41] leading-relaxed">
+                            <p className="font-bold mb-2">Qu'est-ce que le Mode Édition ?</p>
+                            <ul className="list-disc list-inside space-y-2 text-xs">
+                                <li><strong>Ajout direct</strong> : Glissez des compétences depuis la barre latérale.</li>
+                                <li><strong>Réorganisation</strong> : Déplacez vos compétences d'un bloc à l'autre.</li>
+                                <li><strong>Nettoyage</strong> : Supprimez des éléments inutiles via l'icône poubelle.</li>
+                                <li><strong>Suggestions</strong> : Les nouveaux éléments sont suggérés au MJ.</li>
+                            </ul>
+                            <p className="mt-4 text-[10px] italic opacity-70">Note : Ce mode est réservé aux ajustements de structure. Pour remplir vos points, utilisez le mode standard ou le mode création.</p>
+                        </div>
+                    </div>
+                </ThematicModal>
             )}
 
             {/* Creation Mode Activation Warning Modal */}

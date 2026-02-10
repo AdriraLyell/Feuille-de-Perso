@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, PencilLine, Check } from 'lucide-react';
 import { HeaderInput } from './Shared';
 
 interface SheetHeaderProps {
@@ -21,13 +21,17 @@ interface SheetHeaderProps {
     creationActive: boolean;
     onUpdateHeader: (field: any, value: string) => void;
     onToggleCreationMode: () => void;
+    editModeActive: boolean;
+    onToggleEditMode: () => void;
 }
 
 const SheetHeader: React.FC<SheetHeaderProps> = ({
     headerData,
     creationActive,
     onUpdateHeader,
-    onToggleCreationMode
+    onToggleCreationMode,
+    editModeActive,
+    onToggleEditMode
 }) => {
     return (
         <>
@@ -36,19 +40,36 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
                 <h1 className="text-4xl font-black text-center uppercase tracking-[0.2em] text-indigo-950 font-serif">
                     Seigneurs des Mystères
                 </h1>
-                {/* Creation Mode Toggle Button */}
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center no-print">
+                {/* Action Buttons */}
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-1 no-print">
+                    {/* Creation Mode Toggle Button */}
+                    {!editModeActive && (
+                        <button
+                            onClick={onToggleCreationMode}
+                            className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold transition-all shadow-sm ${creationActive
+                                ? 'bg-green-100 text-green-700 border border-green-300'
+                                : 'bg-stone-100 text-stone-500 border border-stone-300 hover:bg-stone-200'
+                                }`}
+                            title={creationActive ? "Désactiver le Mode Création" : "Activer le Mode Création (Réinitialise la fiche !)"}
+                        >
+                            <UserPlus size={14} />
+                            <span>Creation</span>
+                            <div className={`w-1.5 h-1.5 rounded-full ${creationActive ? 'bg-green-500 animate-pulse' : 'bg-stone-300'}`} />
+                        </button>
+                    )}
+
+                    {/* Edit Mode Toggle */}
                     <button
-                        onClick={onToggleCreationMode}
-                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold transition-all ${creationActive
-                            ? 'bg-green-100 text-green-700 border border-green-300 shadow-sm'
+                        onClick={onToggleEditMode}
+                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold transition-all shadow-sm ${editModeActive
+                            ? 'bg-amber-100 text-amber-700 border border-amber-300'
                             : 'bg-stone-100 text-stone-500 border border-stone-300 hover:bg-stone-200'
                             }`}
-                        title={creationActive ? "Désactiver le Mode Création" : "Activer le Mode Création (Réinitialise la fiche !)"}
+                        title={editModeActive ? "Valider les modifications" : "Mode Édition (Ajout/Déplacement de compétences)"}
                     >
-                        <UserPlus size={16} />
-                        <span>Mode Création</span>
-                        <div className={`w-2 h-2 rounded-full ${creationActive ? 'bg-green-500 animate-pulse' : 'bg-stone-300'}`} />
+                        {editModeActive ? <Check size={14} /> : <PencilLine size={14} />}
+                        <span>{editModeActive ? 'Édition' : 'Éditer'}</span>
+                        <div className={`w-1.5 h-1.5 rounded-full ${editModeActive ? 'bg-amber-500 animate-pulse' : 'bg-stone-300'}`} />
                     </button>
                 </div>
             </div>

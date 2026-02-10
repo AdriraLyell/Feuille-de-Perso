@@ -16,7 +16,8 @@ import {
   LibrarySkillEntry,
   LibrarySpecializationEntry,
   XPEntry,
-  LogEntry
+  LogEntry,
+  SuggestionEntry
 } from './system';
 import {
   CampaignNoteEntry,
@@ -108,6 +109,7 @@ export interface CharacterSheetData {
   };
   _rulesVersion?: string; // Version des règles appliquées (pour optimisation de la réconciliation)
   _schemaVersion?: number; // Version du schéma de données (pour migrations séquentielles)
+  suggestions?: SuggestionEntry[]; // Nouveau : Suggestions envoyées au MJ
 }
 
 export type SkillCategoryKey = keyof CharacterSheetData['skills'];
