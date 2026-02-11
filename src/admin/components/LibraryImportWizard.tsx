@@ -1,13 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { X, CheckCircle2, AlertCircle, Library, Zap, Book, Award, Loader2, Save, Search, Users, Gauge } from 'lucide-react';
+import React from 'react';
+import { X, Library, Zap, Book, Award, Loader2, Save, Users, Gauge } from 'lucide-react';
 import { SyncedCharacter } from '../../services/CharacterSyncService';
-import { CharacterSheetData } from '../../types/character';
-import { LibraryService } from '../../services/LibraryService';
-import { CampaignService, GameSettingSummary } from '../../services/CampaignService';
-import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry } from '../../types/system';
-import { RulesData } from '../../types/rules';
-import { ErrorService } from '../../services/ErrorService';
-import { normalizeString } from '../../utils/stringUtils';
+import { useLibraryImport, ImportCandidate, TabType } from '../hooks/useLibraryImport';
+import CandidateLine from './import/CandidateLine';
 
 interface LibraryImportWizardProps {
     character: SyncedCharacter;
@@ -15,249 +10,26 @@ interface LibraryImportWizardProps {
     onSuccess?: () => void;
 }
 
-type TabType = 'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters';
-
-interface ImportCandidate<T> {
-    data: T;
-    isDuplicate: boolean;
-    isSelected: boolean;
-    isVariable: boolean;
-    existingId?: string;
-}
-
 const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, onClose, onSuccess }) => {
-    const data = character.data;
-    const [targetSettingId, setTargetSettingId] = useState<string | null>(character.setting_id || null);
-    const [settings, setSettings] = useState<GameSettingSummary[]>([]);
-
-    const [activeTab, setActiveTab] = useState<TabType>('traits');
-    const [isLoading, setIsLoading] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
-    const [importDestination, setImportDestination] = useState<'campaign' | 'global'>('campaign');
-    const [currentLibrary, setCurrentLibrary] = useState<RulesData['libraries'] | null>(null);
-
-    // Candidates
-    const [traitCandidates, setTraitCandidates] = useState<ImportCandidate<LibraryEntry>[]>([]);
-    const [skillCandidates, setSkillCandidates] = useState<ImportCandidate<LibrarySkillEntry>[]>([]);
-    const [specCandidates, setSpecCandidates] = useState<ImportCandidate<LibrarySpecializationEntry>[]>([]);
-    const [backgroundCandidates, setBackgroundCandidates] = useState<ImportCandidate<LibraryBackgroundEntry>[]>([]);
-    const [counterCandidates, setCounterCandidates] = useState<ImportCandidate<LibraryCounterEntry>[]>([]);
-
-    // 0. Load settings if orphan
-    useEffect(() => {
-        if (!targetSettingId) {
-            const loadSettings = async () => {
-                const list = await CampaignService.listSettings();
-                setSettings(list || []);
-            };
-            loadSettings();
-        }
-    }, [targetSettingId]);
-
-    // 1. Prepare Data when targetSettingId is set
-    useEffect(() => {
-        const prepareData = async () => {
-            if (!targetSettingId) return;
-            setIsLoading(true);
-
-            try {
-                // 1. Fetch current campaign library
-                const libraries = await LibraryService.loadLibraries(targetSettingId);
-                setCurrentLibrary(libraries);
-
-                // 2. Scan Traits
-                const rawAdvantages = (data.page2?.avantages || []);
-                const advantages: LibraryEntry[] = rawAdvantages
-                    .filter(t => t.name && t.name.trim() !== '')
-                    .map(t => ({
-                        id: crypto.randomUUID(),
-                        type: 'avantage' as const,
-                        name: t.name,
-                        cost: t.value || '0',
-                        description: t.variant || '',
-                        tags: [],
-                        is_variable: !!t.variant,
-                        effects: []
-                    }));
-
-                const rawDisadvantages = (data.page2?.desavantages || []);
-                const disadvantages: LibraryEntry[] = rawDisadvantages
-                    .filter(t => t.name && t.name.trim() !== '')
-                    .map(t => ({
-                        id: crypto.randomUUID(),
-                        type: 'desavantage' as const,
-                        name: t.name,
-                        cost: t.value || '0',
-                        description: t.variant || '',
-                        tags: [],
-                        is_variable: !!t.variant,
-                        effects: []
-                    }));
-
-                const allTraits = [...advantages, ...disadvantages];
-                setTraitCandidates(allTraits.map(t => {
-                    const existing = libraries.traits.find(et => normalizeString(et.name) === normalizeString(t.name));
-                    const v = !!(t as any).isVariable || !!(t as any).is_variable;
-                    return { data: t, isDuplicate: !!existing, isSelected: !existing && !v, isVariable: v, existingId: existing?.id };
-                }));
-
-                // 3. Scan Skills
-                const rawSkills: LibrarySkillEntry[] = [];
-                Object.entries(data.skills || {}).forEach(([cat, list]) => {
-                    const catLower = cat.toLowerCase();
-                    // FILTER: Exclude Backgrounds (Col_Comp_8, arrieres_plans, etc.)
-                    if (
-                        cat === 'Col_Comp_8' ||
-                        cat === 'arrieres_plans' ||
-                        catLower.includes('background') ||
-                        catLower.includes('arrière-plan')
-                    ) {
-                        return;
-                    }
-
-                    (list as any[]).filter(s => s.name && s.value > 0).forEach(s => {
-                        rawSkills.push({
-                            id: crypto.randomUUID(),
-                            name: s.name,
-                            description: '',
-                            defaultCategory: cat,
-                            isVariable: !!s.variant
-                        });
-                    });
-                });
-
-                setSkillCandidates(rawSkills.map(s => {
-                    const existing = libraries.skills.find(es => normalizeString(es.name) === normalizeString(s.name));
-                    const v = !!s.isVariable;
-                    return { data: s, isDuplicate: !!existing, isSelected: !existing && !v, isVariable: v, existingId: existing?.id };
-                }));
-
-                // 4. Scan Specializations
-                const allSpecs: LibrarySpecializationEntry[] = [];
-                Object.entries(data.specializations || {}).forEach(([skillId, specs]) => {
-                    const skillName = Object.values(data.skills || {}).flat().find((s: any) => (s as any).id === skillId)?.name || skillId;
-
-                    specs.forEach(specName => {
-                        allSpecs.push({
-                            id: crypto.randomUUID(),
-                            name: specName,
-                            skillIds: [],
-                            defaultMinLevel: 1,
-                            description: `Importé de ${skillName}`
-                        });
-                    });
-                });
-
-                setSpecCandidates(allSpecs.map(s => {
-                    const existing = libraries.specializations.find(es => normalizeString(es.name) === normalizeString(s.name));
-                    return { data: s, isDuplicate: !!existing, isSelected: !existing, isVariable: false, existingId: existing?.id };
-                }));
-
-                // 5. Scan Backgrounds (Historique is in Col_Comp_8 of skills)
-                const rawBackgrounds = data.skills['Col_Comp_8'] || [];
-                const backgrounds: LibraryBackgroundEntry[] = rawBackgrounds
-                    .filter((b: any) => b.name && b.name.trim() !== '')
-                    .map((b: any) => ({
-                        id: crypto.randomUUID(),
-                        name: b.name,
-                        description: b.description || '',
-                        isVariable: !!b.variant,
-                        defaultCategory: 'arrieres_plans'
-                    }));
-
-                setBackgroundCandidates(backgrounds.map(b => {
-                    const existing = libraries.backgrounds.find(eb => normalizeString(eb.name) === normalizeString(b.name));
-                    return { data: b, isDuplicate: !!existing, isSelected: !existing, isVariable: b.isVariable ?? false };
-                }));
-
-                // 6. Scan Counters
-                const allCounters: LibraryCounterEntry[] = [];
-                const processedCounterNames = new Set<string>();
-
-                const processCounter = (c: any) => {
-                    if (c.name && c.name.trim() !== '') {
-                        const norm = normalizeString(c.name);
-                        if (!processedCounterNames.has(norm)) {
-                            allCounters.push({
-                                id: crypto.randomUUID(),
-                                name: c.name,
-                                description: c.description || '',
-                                maxValue: c.max || 10,
-                                defaultValue: c.current ?? 0,
-                                xpCost: 0
-                            });
-                            processedCounterNames.add(norm);
-                        }
-                    }
-                };
-
-                // Scan dynamic counters
-                Object.entries(data.counters).forEach(([key, value]) => {
-                    // Skip 'custom' here if it's handled separately, OR handle it and dedup
-                    // We handle everything here and use the Set to dedup
-                    const items = Array.isArray(value) ? value : [value];
-                    items.forEach(processCounter);
-                });
-
-                setCounterCandidates(allCounters.map(c => {
-                    const existing = libraries.counters.find(ec => ec.name.toLowerCase() === c.name.toLowerCase());
-                    return { data: c, isDuplicate: !!existing, isSelected: !existing, isVariable: false };
-                }));
-
-                setIsLoading(false);
-            } catch (error) {
-                ErrorService.handleError(error, { context: 'LibraryImportWizard.prepare', userMessage: "Erreur lors de la préparation de l'import." });
-                setIsLoading(false);
-            }
-        };
-
-        prepareData();
-    }, [targetSettingId, data]);
-
-    const handleImport = async () => {
-        if (!targetSettingId || !currentLibrary) return;
-        setIsSaving(true);
-
-        try {
-            const sid = importDestination === 'campaign' ? targetSettingId : null;
-
-            // 1. Import Traits
-            const traitsToImport = traitCandidates.filter(c => c.isSelected && !c.isDuplicate).map(c => c.data);
-            if (traitsToImport.length > 0) await LibraryService.importTraits(sid as any, traitsToImport, targetSettingId);
-
-            // 2. Import Skills
-            const skillsToImport = skillCandidates.filter(c => c.isSelected && !c.isDuplicate).map(c => c.data);
-            // Skills remain local for now in this wizard (as they often depend on categories)
-            if (skillsToImport.length > 0) await LibraryService.importSkills(sid as any, skillsToImport, targetSettingId);
-
-            // 3. Import Specializations
-            const specsToImport = specCandidates.filter(c => c.isSelected && !c.isDuplicate).map(c => c.data);
-            if (specsToImport.length > 0) await LibraryService.importSpecializations(sid as any, specsToImport, targetSettingId);
-
-            // 4. Import Backgrounds
-            const bgsToImport = backgroundCandidates.filter(c => c.isSelected && !c.isDuplicate).map(c => c.data);
-            if (bgsToImport.length > 0) await LibraryService.importBackgrounds(sid as any, bgsToImport, targetSettingId);
-
-            // 5. Import Counters
-            const ctrsToImport = counterCandidates.filter(c => c.isSelected && !c.isDuplicate).map(c => c.data);
-            if (ctrsToImport.length > 0) await LibraryService.importCounters(sid as any, ctrsToImport, targetSettingId);
-
-            setIsSaving(false);
-            if (onSuccess) onSuccess();
-            onClose();
-        } catch (error) {
-            ErrorService.handleError(error, { context: 'LibraryImportWizard.import', userMessage: "L'import a échoué." });
-            setIsSaving(false);
-        }
-    };
-
-    const getSelectedCount = () => {
-        return traitCandidates.filter(c => c.isSelected && !c.isDuplicate).length +
-            skillCandidates.filter(c => c.isSelected && !c.isDuplicate).length +
-            specCandidates.filter(c => c.isSelected && !c.isDuplicate).length +
-            backgroundCandidates.filter(c => c.isSelected && !c.isDuplicate).length +
-            counterCandidates.filter(c => c.isSelected && !c.isDuplicate).length;
-    };
+    const {
+        targetSettingId,
+        setTargetSettingId,
+        settings,
+        activeTab,
+        handleTabChange,
+        isLoading,
+        isSaving,
+        importDestination,
+        updateImportDestination,
+        traitCandidates,
+        skillCandidates,
+        specCandidates,
+        backgroundCandidates,
+        counterCandidates,
+        toggleCandidateSelection,
+        handleImport,
+        getSelectedCount
+    } = useLibraryImport(character, onSuccess, onClose);
 
     return (
         <div className="fixed inset-0 bg-slate-900/80 z-[60] flex items-center justify-center p-4 backdrop-blur-md">
@@ -294,7 +66,7 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                                     Chargement des campagnes...
                                 </div>
                             ) : (
-                                settings.map(s => (
+                                settings.map((s: any) => (
                                     <button
                                         key={s.id}
                                         onClick={() => setTargetSettingId(s.id)}
@@ -314,36 +86,21 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                     <>
                         {/* Tabs */}
                         <div className="flex bg-slate-50 border-b border-slate-200">
-                            <button
-                                onClick={() => setActiveTab('traits')}
-                                className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition-all ${activeTab === 'traits' ? 'border-indigo-600 text-indigo-600 bg-white' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
-                            >
-                                <Zap size={16} /> Traits
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('skills')}
-                                className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition-all ${activeTab === 'skills' ? 'border-indigo-600 text-indigo-600 bg-white' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
-                            >
-                                <Book size={16} /> Compétences
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('specializations')}
-                                className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition-all ${activeTab === 'specializations' ? 'border-indigo-600 text-indigo-600 bg-white' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
-                            >
-                                <Award size={16} /> Spéc.
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('backgrounds')}
-                                className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition-all ${activeTab === 'backgrounds' ? 'border-indigo-600 text-indigo-600 bg-white' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
-                            >
-                                <Users size={16} /> Hist.
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('counters')}
-                                className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition-all ${activeTab === 'counters' ? 'border-indigo-600 text-indigo-600 bg-white' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
-                            >
-                                <Gauge size={16} /> Compteurs
-                            </button>
+                            {[
+                                { id: 'traits', icon: Zap, label: 'Traits' },
+                                { id: 'skills', icon: Book, label: 'Compétences' },
+                                { id: 'specializations', icon: Award, label: 'Spéc.' },
+                                { id: 'backgrounds', icon: Users, label: 'Hist.' },
+                                { id: 'counters', icon: Gauge, label: 'Compteurs' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => handleTabChange(tab.id as any)}
+                                    className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition-all ${activeTab === tab.id ? 'border-indigo-600 text-indigo-600 bg-white' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                                >
+                                    <tab.icon size={16} /> {tab.label}
+                                </button>
+                            ))}
                         </div>
 
                         {/* Content */}
@@ -360,7 +117,7 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                                         <h4 className="text-xs font-bold text-slate-500 uppercase mb-3 px-1">Destination de l'Import</h4>
                                         <div className="grid grid-cols-2 gap-3">
                                             <button
-                                                onClick={() => setImportDestination('campaign')}
+                                                onClick={() => updateImportDestination('campaign')}
                                                 className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${importDestination === 'campaign' ? 'bg-white border-indigo-500 shadow-md ring-2 ring-indigo-500/10' : 'bg-slate-100/50 border-slate-200 hover:bg-white'}`}
                                             >
                                                 <Book size={20} className={importDestination === 'campaign' ? 'text-indigo-600' : 'text-slate-400'} />
@@ -370,13 +127,7 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                                                 </div>
                                             </button>
                                             <button
-                                                onClick={() => {
-                                                    setImportDestination('global');
-                                                    // Auto-deselect variables
-                                                    setTraitCandidates(prev => prev.map(c => c.isVariable ? { ...c, isSelected: false } : c));
-                                                    // Relax restriction on skills: only deselect if variable AND duplicate
-                                                    setSkillCandidates(prev => prev.map(c => (c.isVariable && c.isDuplicate) ? { ...c, isSelected: false } : c));
-                                                }}
+                                                onClick={() => updateImportDestination('global')}
                                                 className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${importDestination === 'global' ? 'bg-white border-purple-600 shadow-md ring-2 ring-purple-600/10' : 'bg-slate-100/50 border-slate-200 hover:bg-white'}`}
                                             >
                                                 <Library size={20} className={importDestination === 'global' ? 'text-purple-600' : 'text-slate-400'} />
@@ -386,12 +137,6 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                                                 </div>
                                             </button>
                                         </div>
-                                        {importDestination === 'global' && (
-                                            <div className="mt-3 flex items-start gap-2 text-[10px] bg-amber-50 text-amber-700 p-2 rounded-lg border border-amber-100">
-                                                <AlertCircle size={14} className="flex-shrink-0" />
-                                                <p>Les éléments avec <strong>variantes</strong> (ex: "Artisanat : Forge") sont exclus de l'import global pour éviter de polluer la réserve avec des données spécifiques à un personnage.</p>
-                                            </div>
-                                        )}
                                     </div>
 
                                     <div className="space-y-4">
@@ -401,42 +146,15 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                                                 {traitCandidates.length === 0 ? (
                                                     <div className="text-center py-10 text-slate-400 italic">Aucun trait détecté.</div>
                                                 ) : (
-                                                    traitCandidates.map((candidate, idx) => (
-                                                        <div key={idx} className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${candidate.isDuplicate ? 'bg-slate-50 opacity-60 border-slate-100' : 'bg-white border-slate-200 hover:border-indigo-200'}`}>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={candidate.isSelected}
-                                                                disabled={candidate.isDuplicate || (importDestination === 'global' && candidate.isVariable)}
-                                                                onChange={() => {
-                                                                    const newC = [...traitCandidates];
-                                                                    newC[idx].isSelected = !newC[idx].isSelected;
-                                                                    setTraitCandidates(newC);
-                                                                }}
-                                                                className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer disabled:opacity-30"
-                                                            />
-                                                            <div className="flex-grow">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${candidate.data.type === 'avantage' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-                                                                        {candidate.data.type === 'avantage' ? 'Avantage' : 'Désavantage'}
-                                                                    </span>
-                                                                    <span className="font-bold text-slate-800 text-sm">{candidate.data.name}</span>
-                                                                    {candidate.isVariable && (
-                                                                        <span className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase flex items-center gap-1">
-                                                                            <Zap size={10} /> Variable
-                                                                        </span>
-                                                                    )}
-                                                                    <span className="text-xs text-slate-400 font-mono">({candidate.data.cost} pts)</span>
-                                                                </div>
-                                                                {candidate.data.description && (
-                                                                    <p className={`text-xs text-slate-500 italic mt-0.5 ${candidate.isVariable ? 'text-amber-600/70' : ''}`}>{candidate.data.description}</p>
-                                                                )}
-                                                            </div>
-                                                            {candidate.isDuplicate && (
-                                                                <div className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">
-                                                                    <CheckCircle2 size={12} /> Doublon
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                    traitCandidates.map((c: ImportCandidate<any>, idx: number) => (
+                                                        <CandidateLine
+                                                            key={idx}
+                                                            candidate={c}
+                                                            onToggle={() => toggleCandidateSelection('traits', idx)}
+                                                            importDestination={importDestination}
+                                                            showType={true}
+                                                            typeLabel={c.data.type === 'avantage' ? 'Avantage' : 'Désavantage'}
+                                                        />
                                                     ))
                                                 )}
                                             </div>
@@ -448,36 +166,14 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                                                 {skillCandidates.length === 0 ? (
                                                     <div className="text-center py-10 text-slate-400 italic">Aucune compétence détectée.</div>
                                                 ) : (
-                                                    skillCandidates.map((candidate, idx) => (
-                                                        <div key={idx} className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${candidate.isDuplicate ? 'bg-slate-50 opacity-60 border-slate-100' : 'bg-white border-slate-200 hover:border-indigo-200'}`}>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={candidate.isSelected}
-                                                                disabled={candidate.isDuplicate || (importDestination === 'global' && candidate.isVariable)}
-                                                                onChange={() => {
-                                                                    const newC = [...skillCandidates];
-                                                                    newC[idx].isSelected = !newC[idx].isSelected;
-                                                                    setSkillCandidates(newC);
-                                                                }}
-                                                                className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer disabled:opacity-30"
-                                                            />
-                                                            <div className="flex-grow">
-                                                                <div className="flex items-center gap-2">
-                                                                    <div className="font-bold text-slate-800 text-sm">{candidate.data.name}</div>
-                                                                    {candidate.isVariable && (
-                                                                        <span className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase flex items-center gap-1">
-                                                                            <Zap size={10} /> Variable
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                                <div className="text-[10px] text-indigo-500 font-bold uppercase">{candidate.data.defaultCategory?.replace('Col_Comp_', 'Série ')}</div>
-                                                            </div>
-                                                            {candidate.isDuplicate && (
-                                                                <div className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">
-                                                                    <CheckCircle2 size={12} /> Doublon
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                    skillCandidates.map((c: ImportCandidate<any>, idx: number) => (
+                                                        <CandidateLine
+                                                            key={idx}
+                                                            candidate={c}
+                                                            onToggle={() => toggleCandidateSelection('skills', idx)}
+                                                            importDestination={importDestination}
+                                                            extraInfo={<div className="text-[10px] text-indigo-500 font-bold uppercase mt-0.5">{c.data.defaultCategory?.replace('Col_Comp_', 'Série ')}</div>}
+                                                        />
                                                     ))
                                                 )}
                                             </div>
@@ -489,29 +185,13 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                                                 {specCandidates.length === 0 ? (
                                                     <div className="text-center py-10 text-slate-400 italic">Aucune spécialisation détectée.</div>
                                                 ) : (
-                                                    specCandidates.map((candidate, idx) => (
-                                                        <div key={idx} className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${candidate.isDuplicate ? 'bg-slate-50 opacity-60 border-slate-100' : 'bg-white border-slate-200 hover:border-indigo-200'}`}>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={candidate.isSelected}
-                                                                disabled={candidate.isDuplicate}
-                                                                onChange={() => {
-                                                                    const newC = [...specCandidates];
-                                                                    newC[idx].isSelected = !newC[idx].isSelected;
-                                                                    setSpecCandidates(newC);
-                                                                }}
-                                                                className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                                                            />
-                                                            <div className="flex-grow">
-                                                                <div className="font-bold text-slate-800 text-sm">{candidate.data.name}</div>
-                                                                <p className="text-xs text-slate-500 italic">{candidate.data.description}</p>
-                                                            </div>
-                                                            {candidate.isDuplicate && (
-                                                                <div className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">
-                                                                    <CheckCircle2 size={12} /> Doublon
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                    specCandidates.map((c: ImportCandidate<any>, idx: number) => (
+                                                        <CandidateLine
+                                                            key={idx}
+                                                            candidate={c}
+                                                            onToggle={() => toggleCandidateSelection('specializations', idx)}
+                                                            importDestination={importDestination}
+                                                        />
                                                     ))
                                                 )}
                                             </div>
@@ -523,36 +203,13 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                                                 {backgroundCandidates.length === 0 ? (
                                                     <div className="text-center py-10 text-slate-400 italic">Aucun historique détecté.</div>
                                                 ) : (
-                                                    backgroundCandidates.map((candidate, idx) => (
-                                                        <div key={idx} className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${candidate.isDuplicate ? 'bg-slate-50 opacity-60 border-slate-100' : 'bg-white border-slate-200 hover:border-indigo-200'}`}>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={candidate.isSelected}
-                                                                disabled={candidate.isDuplicate || (importDestination === 'global' && candidate.isVariable)}
-                                                                onChange={() => {
-                                                                    const newC = [...backgroundCandidates];
-                                                                    newC[idx].isSelected = !newC[idx].isSelected;
-                                                                    setBackgroundCandidates(newC);
-                                                                }}
-                                                                className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer disabled:opacity-30"
-                                                            />
-                                                            <div className="flex-grow">
-                                                                <div className="flex items-center gap-2">
-                                                                    <div className="font-bold text-slate-800 text-sm">{candidate.data.name}</div>
-                                                                    {candidate.isVariable && (
-                                                                        <span className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase flex items-center gap-1">
-                                                                            <Zap size={10} /> Variable
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                                {candidate.data.description && <p className="text-xs text-slate-500 italic">{candidate.data.description}</p>}
-                                                            </div>
-                                                            {candidate.isDuplicate && (
-                                                                <div className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">
-                                                                    <CheckCircle2 size={12} /> Doublon
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                    backgroundCandidates.map((c: ImportCandidate<any>, idx: number) => (
+                                                        <CandidateLine
+                                                            key={idx}
+                                                            candidate={c}
+                                                            onToggle={() => toggleCandidateSelection('backgrounds', idx)}
+                                                            importDestination={importDestination}
+                                                        />
                                                     ))
                                                 )}
                                             </div>
@@ -564,32 +221,19 @@ const LibraryImportWizard: React.FC<LibraryImportWizardProps> = ({ character, on
                                                 {counterCandidates.length === 0 ? (
                                                     <div className="text-center py-10 text-slate-400 italic">Aucun compteur détecté.</div>
                                                 ) : (
-                                                    counterCandidates.map((candidate, idx) => (
-                                                        <div key={idx} className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${candidate.isDuplicate ? 'bg-slate-50 opacity-60 border-slate-100' : 'bg-white border-slate-200 hover:border-indigo-200'}`}>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={candidate.isSelected}
-                                                                disabled={candidate.isDuplicate}
-                                                                onChange={() => {
-                                                                    const newC = [...counterCandidates];
-                                                                    newC[idx].isSelected = !newC[idx].isSelected;
-                                                                    setCounterCandidates(newC);
-                                                                }}
-                                                                className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                                                            />
-                                                            <div className="flex-grow">
-                                                                <div className="font-bold text-slate-800 text-sm">{candidate.data.name}</div>
+                                                    counterCandidates.map((c: ImportCandidate<any>, idx: number) => (
+                                                        <CandidateLine
+                                                            key={idx}
+                                                            candidate={c}
+                                                            onToggle={() => toggleCandidateSelection('counters', idx)}
+                                                            importDestination={importDestination}
+                                                            extraInfo={
                                                                 <div className="flex items-center gap-3 text-[10px] text-slate-500">
-                                                                    <span>Max: {candidate.data.maxValue}</span>
-                                                                    <span>Départ: {candidate.data.defaultValue}</span>
+                                                                    <span>Max: {c.data.maxValue}</span>
+                                                                    <span>Départ: {c.data.defaultValue}</span>
                                                                 </div>
-                                                            </div>
-                                                            {candidate.isDuplicate && (
-                                                                <div className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">
-                                                                    <CheckCircle2 size={12} /> Doublon
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                            }
+                                                        />
                                                     ))
                                                 )}
                                             </div>

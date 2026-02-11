@@ -1,11 +1,7 @@
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
+import { ArrowLeft, LogOut, BookOpen, Users } from 'lucide-react';
 import { extractRulesFromCharacter } from './utils/templateImporter';
-import { loadRules } from './utils/rulesLoader';
-import { generateRulesJSContent } from './utils/rulesGenerator';
-import { Settings, Save, Download, Upload, ArrowLeft, UploadCloud, Users } from 'lucide-react';
 import { RulesData } from '../types/rules';
-import { APP_VERSION } from '../constants';
 import AdminCreationEditor from './components/AdminCreationEditor';
 import AdminAttributesEditor from './components/AdminAttributesEditor';
 import AdminSkillsEditor from './components/AdminSkillsEditor';
@@ -22,102 +18,59 @@ import AdminSpecializationLibrary from './components/libraries/AdminSpecializati
 import AdminBackgroundLibrary from './components/libraries/AdminBackgroundLibrary';
 import AdminCounterLibrary from './components/libraries/AdminCounterLibrary';
 import DeployToGithubModal from './components/DeployModal';
-import { BookOpen, Save as SaveIcon, Cloud, AlertTriangle } from 'lucide-react';
-import { usePersistence } from './hooks/usePersistence';
 import AdminDashboard from './components/AdminDashboard';
 import CampaignCharactersView from './components/CampaignCharactersView';
-import { CampaignService } from '../services/CampaignService';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
-import { useNotification } from '../context/NotificationContext'; // Assuming we have this, or use alert for now
-import { supabase } from '../services/supabase';
-import { Session } from '@supabase/supabase-js';
 import LoginScreen from './components/LoginScreen';
-import { LogOut } from 'lucide-react';
 import GlobalPlayersView from './components/GlobalPlayersView';
 import { ErrorService } from '../services/ErrorService';
-import { LibraryService } from '../services/LibraryService';
 import UnauthorizedScreen from './components/UnauthorizedScreen';
-import { useIdleTimeout } from './hooks/useIdleTimeout';
+import { useAdminAuth } from './hooks/useAdminAuth';
+import { useAdminRulesHandler } from './hooks/useAdminRulesHandler';
+import AdminHeader from './components/AdminHeader';
+import { CampaignService } from '../services/CampaignService';
 
 const AdminApp: React.FC = () => {
-    // Auth State
-    const [session, setSession] = useState<Session | null>(null);
+    const { session, isAdmin, logout } = useAdminAuth();
+    const {
+        rules,
+        currentSettingId,
+        currentSettingName,
+        globalUsage,
+        isSaving,
+        saveFeedback,
+        setSaveFeedback,
+        hasUnsavedChanges,
+        handleSelectSetting,
+        handleUpdateRules,
+        refreshRules,
+        handleSaveToCloud,
+        handleExport,
+        clearRules
+    } = useAdminRulesHandler();
 
-    // Auto-logout after 30 minutes of inactivity
-    useIdleTimeout(30 * 60 * 1000);
-
-    // Mode: 'dashboard' | 'editor' | 'players'
     const [viewMode, setViewMode] = useState<'dashboard' | 'editor' | 'players'>('dashboard');
-    const [currentSettingId, setCurrentSettingId] = useState<string | null>(null);
-    const [currentSettingName, setCurrentSettingName] = useState<string>("");
-
-    useEffect(() => {
-        // Get initial session
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-        });
-
-        // Listen for changes
-        const {
-            data: { subscription },
-        } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-        });
-
-        return () => subscription.unsubscribe();
-    }, []);
-
-    const [rules, setRules] = useState<RulesData | null>(null);
-    const [showDeployModal, setShowDeployModal] = useState(false);
     const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'costs' | 'libraries' | 'players'>('general');
     const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters'>('traits');
-    const [globalUsage, setGlobalUsage] = useState<Record<string, number>>({});
 
-    // Import Modal State
+    const [showDeployModal, setShowDeployModal] = useState(false);
     const [showImportResult, setShowImportResult] = useState(false);
     const [importReport, setImportReport] = useState<{ success: string[], warnings: string[] } | null>(null);
     const [showChangelog, setShowChangelog] = useState(false);
-
-    // Wizard State
     const [wizardOpen, setWizardOpen] = useState(false);
     const [candidateRules, setCandidateRules] = useState<RulesData | null>(null);
-    const [isSaving, setIsSaving] = useState(false);
-    const [saveFeedback, setSaveFeedback] = useState<{ isOpen: boolean; success: boolean; message: string } | null>(null);
 
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    // Confirmation State
     const [confirmState, setConfirmState] = useState<{
         isOpen: boolean;
         title: string;
         message: string;
         onConfirm: () => void;
         type: 'danger' | 'warning' | 'info' | 'success';
-    }>({
-        isOpen: false,
-        title: "",
-        message: "",
-        onConfirm: () => { },
-        type: 'info'
-    });
+    }>({ isOpen: false, title: "", message: "", onConfirm: () => { }, type: 'info' });
 
-    // Persistence Hook
-    const { hasUnsavedChanges, markAsSaved, resetPersistence } = usePersistence(rules);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleSelectSetting = async (id: string, name: string, loadedRules: RulesData) => {
-        setCurrentSettingId(id);
-        setCurrentSettingName(name);
-        setRules(loadedRules);
-        resetPersistence(); // Reset dirty state for new load
-
-        // Load global usage stats
-        const usage = await LibraryService.loadGlobalUsage(id);
-        setGlobalUsage(usage || {});
-
-        setViewMode('editor');
-    };
-
-    const handleBackToDashboard = () => {
+    const handleBackToDashboard = useCallback(() => {
         if (hasUnsavedChanges) {
             setConfirmState({
                 isOpen: true,
@@ -125,76 +78,16 @@ const AdminApp: React.FC = () => {
                 message: "Vous avez des modifications en attente qui seront perdues si vous quittez. Confirmer ?",
                 type: 'warning',
                 onConfirm: () => {
-                    performBackToDashboard();
+                    setViewMode('dashboard');
+                    clearRules();
+                    setConfirmState(prev => ({ ...prev, isOpen: false }));
                 }
             });
             return;
         }
-        performBackToDashboard();
-    };
-
-    const performBackToDashboard = () => {
         setViewMode('dashboard');
-        setCurrentSettingId(null);
-        setRules(null);
-    };
-
-    const handleSaveToCloud = async () => {
-        if (!currentSettingId || !rules) return;
-        setIsSaving(true);
-        const result = await CampaignService.saveSetting(currentSettingId, rules);
-        if (result.success) {
-            markAsSaved();
-            setSaveFeedback({
-                isOpen: true,
-                success: true,
-                message: "Les règles ont été sauvegardées avec succès dans la base de données."
-            });
-        } else {
-            setSaveFeedback({
-                isOpen: true,
-                success: false,
-                message: result.message || "Une erreur inconnue est survenue."
-            });
-        }
-        setIsSaving(false);
-    };
-
-    const refreshRules = async () => {
-        if (!currentSettingId) return;
-        const loadedRules = await CampaignService.loadSetting(currentSettingId);
-        if (loadedRules) {
-            setRules(loadedRules);
-            // Optionally reset persistence if we want to discard local changes? 
-            // In case of Import, we definitely want the new state.
-            resetPersistence();
-        }
-    };
-
-    const handleUpdateRules = (newRules: RulesData) => {
-        setRules(newRules);
-        // Update window object too for immediate "preview"
-        // @ts-ignore
-        window.EXTERNAL_RULES = newRules;
-    };
-
-    const handleExport = () => {
-        if (!rules) return;
-        const ruleString = generateRulesJSContent(rules);
-        const blob = new Blob([ruleString], { type: 'text/javascript' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'rules.js';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    };
-
-    const handleImportClick = () => {
-        fileInputRef.current?.click();
-    };
+        clearRules();
+    }, [hasUnsavedChanges, clearRules]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -204,49 +97,26 @@ const AdminApp: React.FC = () => {
         reader.onload = (e) => {
             try {
                 const json = JSON.parse(e.target?.result as string);
-
-                // Extract candidate rules (Prepare for Wizard)
-                // We pass current rules so it can fill blanks, but we want to see diffs
-                const { rules: extractedCandidate, report } = extractRulesFromCharacter(json, rules);
-
+                const { rules: extractedCandidate } = extractRulesFromCharacter(json, rules);
                 setCandidateRules(extractedCandidate);
                 setWizardOpen(true);
-                // We don't set importReport/showImportResult here anymore, the wizard handles the "Pre-flight" check.
-                // But if we want to show the "Extraction Report" (Success/Warnings), we could pass it to Wizard too?
-                // The Wizard re-calculates Diff, which is better. The Extraction Report is technical (missing fields).
-                // Let's keep it simple for now.
-
             } catch (error) {
                 ErrorService.handleError(error, { context: 'AdminApp.importFile', userMessage: "Erreur lors de la lecture du fichier." });
-                // alert("Erreur lors de l'import : " + (error as Error).message); // Handled by ErrorService
             }
         };
         reader.readAsText(file);
-        // Reset input
         event.target.value = '';
     };
 
-
-    if (!session) {
-        return <LoginScreen />;
-    }
-
-    const userMetadata = session?.user?.user_metadata;
-    const appMetadata = session?.user?.app_metadata;
-
-    // Check both metadata locations for the 'admin' role
-    const isAdmin = userMetadata?.role === 'admin' || appMetadata?.role === 'admin';
-
-    if (!isAdmin) {
-        return <UnauthorizedScreen session={session} />;
-    }
+    if (!session) return <LoginScreen />;
+    if (!isAdmin) return <UnauthorizedScreen session={session} />;
 
     if (viewMode === 'dashboard') {
         return (
             <AdminDashboard
-                onSelectSetting={handleSelectSetting}
+                onSelectSetting={(id, name, rules) => { handleSelectSetting(id, name, rules); setViewMode('editor'); }}
                 onViewPlayers={() => setViewMode('players')}
-                onLogout={() => supabase.auth.signOut()}
+                onLogout={logout}
             />
         );
     }
@@ -256,21 +126,11 @@ const AdminApp: React.FC = () => {
             <div className="min-h-screen bg-gray-50 p-8">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex justify-between items-center mb-6">
-                        <button
-                            onClick={() => setViewMode('dashboard')}
-                            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold transition-colors"
-                        >
-                            <ArrowLeft size={20} />
-                            Retour au Tableau de Bord
+                        <button onClick={() => setViewMode('dashboard')} className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold transition-colors">
+                            <ArrowLeft size={20} /> Retour au Tableau de Bord
                         </button>
-
-                        <button
-                            onClick={() => supabase.auth.signOut()}
-                            className="flex items-center gap-2 bg-[#5c4d41] hover:bg-[#8b2e2e] text-white px-4 py-2 rounded-md font-bold transition-all shadow-md group"
-                            title="Se déconnecter"
-                        >
-                            <LogOut size={18} className="group-hover:rotate-12 transition-transform" />
-                            Déconnexion
+                        <button onClick={logout} className="flex items-center gap-2 bg-[#5c4d41] hover:bg-[#8b2e2e] text-white px-4 py-2 rounded-md font-bold transition-all shadow-md group">
+                            <LogOut size={18} className="group-hover:rotate-12 transition-transform" /> Déconnexion
                         </button>
                     </div>
                     <GlobalPlayersView />
@@ -290,293 +150,110 @@ const AdminApp: React.FC = () => {
         );
     }
 
-
     return (
         <div className="min-h-screen bg-gray-50 text-slate-800 font-sans pb-20">
-            {/* Header */}
-            <header className="bg-slate-900 text-white p-4 shadow-md sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <AdminHeader
+                currentSettingName={currentSettingName}
+                hasUnsavedChanges={hasUnsavedChanges}
+                isSaving={isSaving}
+                onBack={handleBackToDashboard}
+                onSave={handleSaveToCloud}
+                onImport={() => fileInputRef.current?.click()}
+                onExport={handleExport}
+                onPublish={() => setShowDeployModal(true)}
+                onLogout={logout}
+                onShowChangelog={() => setShowChangelog(true)}
+                onCheckSchema={() => currentSettingId && (CampaignService as any).checkSchema?.(currentSettingId)}
+            />
 
-                    <div className="flex items-center gap-3">
-                        <button onClick={handleBackToDashboard} className="text-slate-400 hover:text-white transition-colors" title="Retour au tableau de bord">
-                            <ArrowLeft size={24} />
-                        </button>
-                        <Settings className="text-blue-400" />
-                        <h1 className="text-xl font-bold tracking-wide">Éditeur <span className="text-slate-400 font-normal">| {currentSettingName || "Campagne"}</span></h1>
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
 
-                        {/* Hidden Debug Button (Ctrl+Click on Settings) */}
-                        <div className="ml-4 pl-4 border-l border-slate-700 flex items-center" title={hasUnsavedChanges ? "Modifications locales non publiées" : "Synchronisé"}>
-                            {hasUnsavedChanges ? (
-                                <div className="flex items-center gap-2 text-amber-400 animate-pulse">
-                                    <AlertTriangle size={20} />
-                                </div>
-                            ) : (
-                                <div
-                                    className="flex items-center gap-2 text-green-400/50 cursor-pointer"
-                                    onClick={() => currentSettingId && (CampaignService as any).checkSchema?.(currentSettingId)}
-                                >
-                                    <Cloud size={20} />
-                                </div>
-                            )}
-                        </div>
-
-
-                    </div>
-                    <div className="flex items-center gap-4 text-sm">
-                        <button
-                            onClick={() => setShowChangelog(true)}
-                            className="bg-slate-800 px-3 py-1 rounded hover:bg-slate-700 transition-colors"
-                            title="Voir le journal des versions"
-                        >
-                            v{APP_VERSION}
-                        </button>
-
-                        <button
-                            onClick={handleSaveToCloud}
-                            disabled={isSaving}
-                            className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded font-bold transition-colors shadow-lg shadow-amber-900/20"
-                            title="Sauvegarder en BDD"
-                        >
-                            <UploadCloud size={16} />
-                            {isSaving ? "Sauvegarde..." : "Sauver"}
-                        </button>
-
-                        <button
-                            onClick={handleImportClick}
-                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-bold transition-colors shadow-lg shadow-blue-900/20"
-                            title="Importer un JSON (Personnage ou Règles)"
-                        >
-                            <UploadCloud size={16} className="rotate-180" /> Importer
-                        </button>
-
-                        <button
-                            onClick={handleExport}
-                            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded font-bold transition-colors shadow-lg shadow-emerald-900/20"
-                            title="Exporter le fichier rules.js pour usage offline"
-                        >
-                            <Download size={16} /> Exporter
-                        </button>
-
-                        <button
-                            onClick={() => setShowDeployModal(true)}
-                            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded font-bold transition-colors shadow-lg shadow-purple-900/20"
-                            title="Publier sur GitHub"
-                        >
-                            <Upload size={16} /> Publier
-                        </button>
-
-                        <button
-                            onClick={() => supabase.auth.signOut()}
-                            className="bg-slate-800 p-2 rounded hover:bg-red-900 text-slate-400 hover:text-white transition-colors"
-                            title="Se déconnecter"
-                        >
-                            <LogOut size={20} />
-                        </button>
-
-                        {/* Hidden Input for File Upload */}
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            className="hidden"
-                            accept=".json"
-                        />
-                    </div>
-
-                </div>
-                {/* Persistence Status Bar Removed - Replaced by Header Icon */}
-            </header>
-
-            {showDeployModal && rules && (
-                <DeployToGithubModal
-                    isOpen={showDeployModal}
-                    onClose={() => setShowDeployModal(false)}
-                    rules={rules}
-                />
-            )}
-
-            {/* Tabs Navigation */}
             <nav className="bg-white border-b border-gray-200 mt-0 sticky top-16 z-40">
                 <div className="max-w-7xl mx-auto flex">
-                    <button
-                        onClick={() => setActiveTab('general')}
-                        className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === 'general' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
-                    >
-                        Général & Création
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('attributes')}
-                        className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === 'attributes' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
-                    >
-                        Attributs
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('skills')}
-                        className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === 'skills' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
-                    >
-                        Compétences
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('costs')}
-                        className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === 'costs' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
-                    >
-                        Coûts & Limites
-                    </button>
-
-                    <button
-                        onClick={() => setActiveTab('libraries')}
-                        className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === 'libraries' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
-                    >
-                        <div className="flex items-center justify-center gap-2">
-                            <BookOpen size={16} /> Bibliothèques
-                        </div>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('players')}
-                        className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === 'players' ? 'border-purple-600 text-purple-600 bg-purple-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
-                    >
-                        <div className="flex items-center justify-center gap-2">
-                            <Users size={16} /> Joueurs
-                        </div>
-                    </button>
+                    {[
+                        { id: 'general', label: 'Général & Création' },
+                        { id: 'attributes', label: 'Attributs' },
+                        { id: 'skills', label: 'Compétences' },
+                        { id: 'costs', label: 'Coûts & Limites' },
+                        { id: 'libraries', label: <div className="flex items-center justify-center gap-2"><BookOpen size={16} /> Bibliothèques</div> },
+                        { id: 'players', label: <div className="flex items-center justify-center gap-2"><Users size={16} /> Joueurs</div> }
+                    ].map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as any)}
+                            className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === tab.id ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
                 </div>
             </nav>
 
-            {/* Main Content */}
             <main className={`mx-auto p-6 transition-all duration-300 ${activeTab === 'skills' ? 'max-w-[1600px]' : 'max-w-7xl'}`}>
-
                 {activeTab === 'general' && (
                     <div className="bg-white p-8 rounded-lg shadow-sm border border-slate-200 animate-in fade-in slide-in-from-bottom-4">
                         <h2 className="text-2xl font-bold mb-4 text-slate-900 border-b pb-2">Configuration Générale</h2>
-                        <p className="text-slate-500 italic mb-6">Paramètres de création de personnage, modes de distribution et système de cartes.</p>
-
                         <AdminCreationEditor rules={rules} onUpdate={handleUpdateRules} />
                     </div>
                 )}
-
-                {activeTab === 'attributes' && (
-                    <AdminAttributesEditor rules={rules} onUpdate={handleUpdateRules} />
-                )}
-
-                {activeTab === 'skills' && (
-                    <AdminSkillsEditor rules={rules} onUpdate={handleUpdateRules} />
-                )}
-
-                {activeTab === 'costs' && (
-                    <AdminCostsEditor rules={rules} onUpdate={handleUpdateRules} />
-                )}
-
-
-
+                {activeTab === 'attributes' && <AdminAttributesEditor rules={rules} onUpdate={handleUpdateRules} />}
+                {activeTab === 'skills' && <AdminSkillsEditor rules={rules} onUpdate={handleUpdateRules} />}
+                {activeTab === 'costs' && <AdminCostsEditor rules={rules} onUpdate={handleUpdateRules} />}
                 {activeTab === 'libraries' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4">
-
                         <div className="flex gap-4 mb-4 bg-white p-2 rounded-lg shadow-sm border border-slate-200 w-fit mx-auto overflow-x-auto">
-                            <button
-                                onClick={() => setActiveLibraryTab('traits')}
-                                className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === 'traits' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
-                            >
-                                Traits (Avantages/Défauts)
-                            </button>
-                            <button
-                                onClick={() => setActiveLibraryTab('skills')}
-                                className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === 'skills' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
-                            >
-                                Compétences
-                            </button>
-                            <button
-                                onClick={() => setActiveLibraryTab('backgrounds')}
-                                className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === 'backgrounds' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
-                            >
-                                Arrières-Plans
-                            </button>
-                            <button
-                                onClick={() => setActiveLibraryTab('counters')}
-                                className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === 'counters' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
-                            >
-                                Compteurs
-                            </button>
-                            <button
-                                onClick={() => setActiveLibraryTab('specializations')}
-                                className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === 'specializations' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
-                            >
-                                Spécialisations
-                            </button>
+                            {['traits', 'skills', 'backgrounds', 'counters', 'specializations'].map((lt) => (
+                                <button
+                                    key={lt}
+                                    onClick={() => setActiveLibraryTab(lt as any)}
+                                    className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === lt ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                                >
+                                    {lt.charAt(0).toUpperCase() + lt.slice(1)}
+                                </button>
+                            ))}
                         </div>
-
-                        {activeLibraryTab === 'traits' && (
-                            <AdminTraitLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />
-                        )}
-                        {activeLibraryTab === 'skills' && (
-                            <AdminSkillLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />
-                        )}
-                        {activeLibraryTab === 'backgrounds' && (
-                            <AdminBackgroundLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />
-                        )}
-                        {activeLibraryTab === 'counters' && (
-                            <AdminCounterLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />
-                        )}
-                        {activeLibraryTab === 'specializations' && (
-                            <AdminSpecializationLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />
-                        )}
+                        {activeLibraryTab === 'traits' && <AdminTraitLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
+                        {activeLibraryTab === 'skills' && <AdminSkillLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
+                        {activeLibraryTab === 'backgrounds' && <AdminBackgroundLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
+                        {activeLibraryTab === 'counters' && <AdminCounterLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
+                        {activeLibraryTab === 'specializations' && <AdminSpecializationLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
                     </div>
                 )}
+                {activeTab === 'players' && currentSettingId && <CampaignCharactersView settingId={currentSettingId} onRefreshRules={refreshRules} />}
+            </main>
 
-                {activeTab === 'players' && currentSettingId && (
-                    <CampaignCharactersView settingId={currentSettingId} onRefreshRules={refreshRules} />
-                )}
-            </main >
+            <ImportResultModal isOpen={showImportResult} onClose={() => setShowImportResult(false)} report={importReport} />
+            <ChangelogModal isOpen={showChangelog} onClose={() => setShowChangelog(false)} />
 
-            <ImportResultModal
-                isOpen={showImportResult}
-                onClose={() => setShowImportResult(false)}
-                report={importReport}
-            />
+            {wizardOpen && candidateRules && rules && (
+                <ImportWizardModal
+                    isOpen={wizardOpen}
+                    onClose={() => { setWizardOpen(false); setCandidateRules(null); }}
+                    currentRules={rules}
+                    candidateRules={candidateRules}
+                    onConfirm={(merged: RulesData) => {
+                        handleUpdateRules(merged);
+                        setWizardOpen(false);
+                        setCandidateRules(null);
+                        setImportReport({ success: ["Fusion effectuée avec succès"], warnings: [] });
+                        setShowImportResult(true);
+                    }}
+                />
+            )}
 
-            <ChangelogModal
-                isOpen={showChangelog}
-                onClose={() => setShowChangelog(false)}
-            />
+            {saveFeedback && (
+                <ConfirmationModal
+                    isOpen={saveFeedback.isOpen}
+                    onClose={() => setSaveFeedback(null)}
+                    onConfirm={() => setSaveFeedback(null)}
+                    title={saveFeedback.success ? "Sauvegarde Réussie" : "Erreur de Sauvegarde"}
+                    message={saveFeedback.message}
+                    type={saveFeedback.success ? 'success' : 'danger'}
+                    confirmLabel="OK"
+                    cancelLabel=""
+                />
+            )}
 
-            {
-                wizardOpen && candidateRules && rules && (
-                    <ImportWizardModal
-                        isOpen={wizardOpen}
-                        onClose={() => { setWizardOpen(false); setCandidateRules(null); }}
-                        currentRules={rules}
-                        candidateRules={candidateRules}
-                        onConfirm={(merged: RulesData) => {
-                            handleUpdateRules(merged);
-                            setWizardOpen(false);
-                            setCandidateRules(null);
-                            // Optionally show success message?
-                            setImportReport({
-                                success: ["Fusion effectuée avec succès"],
-                                warnings: []
-                            });
-                            setShowImportResult(true);
-                        }}
-                    />
-                )
-            }
-
-            {/* Save Feedback Modal */}
-            {
-                saveFeedback && (
-                    <ConfirmationModal
-                        isOpen={saveFeedback.isOpen}
-                        onClose={() => setSaveFeedback(null)}
-                        onConfirm={() => setSaveFeedback(null)}
-                        title={saveFeedback.success ? "Sauvegarde Réussie" : "Erreur de Sauvegarde"}
-                        message={saveFeedback.message}
-                        type={saveFeedback.success ? 'success' : 'danger'}
-                        confirmLabel="OK"
-                        cancelLabel="" // Hide cancel button
-                    />
-                )
-            }
-
-            {/* Navigation Confirmation Modal */}
             <ConfirmationModal
                 isOpen={confirmState.isOpen}
                 onClose={() => setConfirmState(prev => ({ ...prev, isOpen: false }))}
@@ -585,10 +262,9 @@ const AdminApp: React.FC = () => {
                 message={confirmState.message}
                 type={confirmState.type}
             />
-
             <DeploymentMonitor />
-        </div >
+        </div>
     );
 };
-export default AdminApp;
 
+export default AdminApp;

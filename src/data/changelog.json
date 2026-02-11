@@ -1,5 +1,18 @@
 [
     {
+        "version": "2.43.0",
+        "date": "2026-02-11",
+        "type": "minor",
+        "changes": [
+            "🏗️ Refonte majeure architecturale : Extraction de plus de 1500 lignes de logique vers des hooks personnalisés",
+            "🧩 AdminApp : Extraction de useAdminAuth et useAdminRulesHandler (Optimisation de 60%)",
+            "📖 CampaignNotes : Refonte complète du journal avec useJournal et useJournalImages",
+            "🎨 TraitLibrary : Modularisation de la bibliothèque de traits et des sélections",
+            "🧙 LibraryImportWizard : Simplification de l'assistant d'importation via useLibraryImport",
+            "🛡️ Renforcement du typage TypeScript Strict sur l'ensemble des nouveaux modules"
+        ]
+    },
+    {
         "version": "2.42.1",
         "date": "2026-02-11",
         "type": "patch",
