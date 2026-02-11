@@ -3,9 +3,12 @@ import { DatabaseService } from './DatabaseService';
 import { GameSetting, RulesData, GameSettingSummary } from '../types/rules';
 export type { GameSetting, RulesData, GameSettingSummary };
 import { LibraryService } from './LibraryService';
+import { logger } from '../utils/logger';
 import { ErrorService } from './ErrorService';
 import { migrateRulesToV2 } from '../utils/migrations';
 import { RulesDataSchema } from '../utils/validation/rulesSchema';
+import { TABLE_GAME_SETTINGS, TABLE_LIBRARIES_TRAITS, TABLE_LIBRARIES_SKILLS, TABLE_LIBRARIES_SPECIALIZATIONS, TABLE_LIBRARIES_BACKGROUNDS, TABLE_LIBRARIES_COUNTERS } from '../constants/db';
+import { SKILL_COLUMNS } from '../constants';
 
 // Interface de la base de données (table game_settings)
 interface DBGameSetting {
@@ -24,7 +27,7 @@ export const CampaignService = {
      * List all available settings (campagnes)
      */
     async listSettings(): Promise<GameSettingSummary[] | null> {
-        return await DatabaseService.fetchAll<GameSettingSummary>('game_settings', {
+        return await DatabaseService.fetchAll<GameSettingSummary>(TABLE_GAME_SETTINGS, {
             select: 'id, name, version, last_updated, is_public',
             order: { column: 'last_updated', ascending: false }
         }, 'CampaignService.listSettings');
@@ -75,7 +78,7 @@ export const CampaignService = {
         const configurations = initialRules.configurations || {};
         const definitions = initialRules.definitions || {};
 
-        const inserted = await DatabaseService.insert<{ id: string }>('game_settings', {
+        const inserted = await DatabaseService.insert<{ id: string }>(TABLE_GAME_SETTINGS, {
             name,
             version: initialRules.version || '1.0.0',
             configurations,
@@ -106,7 +109,7 @@ export const CampaignService = {
 
         try {
             // 1. Fetch Main Config
-            const settingData = await DatabaseService.fetchOne<DBGameSetting>('game_settings', id, 'CampaignService.loadSetting');
+            const settingData = await DatabaseService.fetchOne<DBGameSetting>(TABLE_GAME_SETTINGS, id, 'CampaignService.loadSetting');
 
             if (!settingData) {
                 return null;
@@ -128,14 +131,15 @@ export const CampaignService = {
             const validationResult = RulesDataSchema.safeParse(rulesRaw);
 
             if (!validationResult.success) {
-                console.warn("[CampaignService] Validation Details:", JSON.stringify(validationResult.error.flatten(), null, 2));
+                logger.warn("[CampaignService] Validation Details:", JSON.stringify(validationResult.error.flatten(), null, 2));
                 ErrorService.handleError(new Error("Données de campagne non conformes"), {
                     context: 'CampaignService.loadSetting',
                     userMessage: "Certaines données de la campagne ne respectent pas le schéma attendu (voir console)."
                 });
+                return null; // Don't proceed with invalid data
             }
 
-            const rules = rulesRaw as RulesData;
+            const rules = validationResult.data as RulesData;
 
             // Inject setting metadata
             rules.settingId = id;
@@ -148,12 +152,12 @@ export const CampaignService = {
             const hasExistingLayout = currentLayoutKeys.length > 0 && currentLayoutKeys.some(k => (rules.definitions.skills as any)[k]?.length > 0);
 
             if (!hasExistingLayout && libraries.skills.length > 0) {
-                console.log("[CampaignService] Rebuilding skill layout from library (empty layout detected)");
+                logger.log("[CampaignService] Rebuilding skill layout from library (empty layout detected)");
                 if (!rules.definitions.skills) rules.definitions.skills = {};
 
                 libraries.skills.forEach(s => {
                     if (s.isActive !== false) {
-                        const cat = s.defaultCategory || 'Col_Comp_2';
+                        const cat = s.defaultCategory || SKILL_COLUMNS.COL_2;
                         if (!rules.definitions.skills[cat]) rules.definitions.skills[cat] = [];
                         if (!rules.definitions.skills[cat].includes(s.name)) {
                             rules.definitions.skills[cat].push(s.name);
@@ -165,7 +169,7 @@ export const CampaignService = {
             // Ensure categories from libraries exist in skillCategories if migrateRules didn't find them
             // Backgrounds
             const bgCatDef = rules.definitions.skillCategories?.find((c: any) => c.behavior === 'Arrière-plan');
-            const bgCat = bgCatDef?.id || 'Col_Comp_8';
+            const bgCat = bgCatDef?.id || SKILL_COLUMNS.COL_8;
 
             if (!rules.definitions.skills[bgCat]) rules.definitions.skills[bgCat] = [];
             libraries.backgrounds.forEach(b => {
@@ -176,7 +180,7 @@ export const CampaignService = {
 
             // Counters
             const counterCatDef = rules.definitions.skillCategories?.find((c: any) => c.behavior === 'Compteur');
-            const counterCat = counterCatDef?.id || 'Col_Comp_9';
+            const counterCat = counterCatDef?.id || SKILL_COLUMNS.COL_9;
             if (!rules.definitions.skills[counterCat]) rules.definitions.skills[counterCat] = [];
             libraries.counters.forEach(c => {
                 if (c.isActive !== false && !rules.definitions.skills[counterCat].includes(c.name)) {
@@ -237,7 +241,7 @@ export const CampaignService = {
         };
         if (name) rootUpdate.name = name;
 
-        const success = await DatabaseService.update('game_settings', id, rootUpdate, 'CampaignService.saveSetting');
+        const success = await DatabaseService.update(TABLE_GAME_SETTINGS, id, rootUpdate, 'CampaignService.saveSetting');
 
         if (!success) {
             return { success: false, message: "Erreur MAJ Root" };
@@ -259,13 +263,21 @@ export const CampaignService = {
      */
     async deleteSetting(id: string): Promise<boolean> {
         // Delete libraries first (manual cascade just in case DB cascade isn't set)
-        await Promise.all([
-            DatabaseService.deleteBy('libraries_traits', 'setting_id', id, 'CampaignService.deleteSetting.traits'),
-            DatabaseService.deleteBy('libraries_skills', 'setting_id', id, 'CampaignService.deleteSetting.skills'),
-            DatabaseService.deleteBy('libraries_specializations', 'setting_id', id, 'CampaignService.deleteSetting.specs'),
-            DatabaseService.deleteBy('libraries_backgrounds', 'setting_id', id, 'CampaignService.deleteSetting.bgs'),
-            DatabaseService.deleteBy('libraries_counters', 'setting_id', id, 'CampaignService.deleteSetting.counters')
+        const results = await Promise.allSettled([
+            DatabaseService.deleteBy(TABLE_LIBRARIES_TRAITS, 'setting_id', id, 'CampaignService.deleteSetting.traits'),
+            DatabaseService.deleteBy(TABLE_LIBRARIES_SKILLS, 'setting_id', id, 'CampaignService.deleteSetting.skills'),
+            DatabaseService.deleteBy(TABLE_LIBRARIES_SPECIALIZATIONS, 'setting_id', id, 'CampaignService.deleteSetting.specs'),
+            DatabaseService.deleteBy(TABLE_LIBRARIES_BACKGROUNDS, 'setting_id', id, 'CampaignService.deleteSetting.bgs'),
+            DatabaseService.deleteBy(TABLE_LIBRARIES_COUNTERS, 'setting_id', id, 'CampaignService.deleteSetting.counters')
         ]);
+
+        const failures = results.filter(r => r.status === 'rejected');
+        if (failures.length > 0) {
+            ErrorService.handleError(new Error(`${failures.length} suppressions de bibliothèques échouées`), {
+                context: 'CampaignService.deleteSetting'
+            });
+            return false;
+        }
 
         // Delete the setting itself
         return await DatabaseService.delete('game_settings', id, 'CampaignService.deleteSetting');
@@ -275,31 +287,7 @@ export const CampaignService = {
      * Toggle public/private visibility
      */
     async togglePublic(id: string, isPublic: boolean): Promise<boolean> {
-        return await DatabaseService.update('game_settings', id, { is_public: isPublic }, 'CampaignService.togglePublic');
-    },
-
-    async checkSchema(id: string): Promise<void> {
-        console.log("--- DEBUG SCHEMA ---");
-
-        // Check Skills Table
-        const { data: skills, error: skillsError } = await supabase
-            .from('libraries_skills')
-            .select('*')
-            .eq('setting_id', id)
-            .limit(1);
-
-        if (skillsError) console.error("Skills Schema Error:", skillsError);
-        else console.log("Skills Sample:", skills?.[0] ? Object.keys(skills[0]) : "Empty Table");
-
-        // Check Traits Table
-        const { data: traits, error: traitsError } = await supabase
-            .from('libraries_traits')
-            .select('*')
-            .eq('setting_id', id)
-            .limit(1);
-
-        if (traitsError) console.error("Traits Schema Error:", traitsError);
-        else console.log("Traits Sample:", traits?.[0] ? Object.keys(traits[0]) : "Empty Table");
+        return await DatabaseService.update(TABLE_GAME_SETTINGS, id, { is_public: isPublic }, 'CampaignService.togglePublic');
     }
 
 }

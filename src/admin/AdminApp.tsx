@@ -36,10 +36,15 @@ import { LogOut } from 'lucide-react';
 import GlobalPlayersView from './components/GlobalPlayersView';
 import { ErrorService } from '../services/ErrorService';
 import { LibraryService } from '../services/LibraryService';
+import UnauthorizedScreen from './components/UnauthorizedScreen';
+import { useIdleTimeout } from './hooks/useIdleTimeout';
 
 const AdminApp: React.FC = () => {
     // Auth State
     const [session, setSession] = useState<Session | null>(null);
+
+    // Auto-logout after 30 minutes of inactivity
+    useIdleTimeout(30 * 60 * 1000);
 
     // Mode: 'dashboard' | 'editor' | 'players'
     const [viewMode, setViewMode] = useState<'dashboard' | 'editor' | 'players'>('dashboard');
@@ -226,21 +231,48 @@ const AdminApp: React.FC = () => {
         return <LoginScreen />;
     }
 
+    const userMetadata = session?.user?.user_metadata;
+    const appMetadata = session?.user?.app_metadata;
+
+    // Check both metadata locations for the 'admin' role
+    const isAdmin = userMetadata?.role === 'admin' || appMetadata?.role === 'admin';
+
+    if (!isAdmin) {
+        return <UnauthorizedScreen session={session} />;
+    }
+
     if (viewMode === 'dashboard') {
-        return <AdminDashboard onSelectSetting={handleSelectSetting} onViewPlayers={() => setViewMode('players')} />;
+        return (
+            <AdminDashboard
+                onSelectSetting={handleSelectSetting}
+                onViewPlayers={() => setViewMode('players')}
+                onLogout={() => supabase.auth.signOut()}
+            />
+        );
     }
 
     if (viewMode === 'players') {
         return (
             <div className="min-h-screen bg-gray-50 p-8">
                 <div className="max-w-7xl mx-auto">
-                    <button
-                        onClick={() => setViewMode('dashboard')}
-                        className="mb-6 flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold transition-colors"
-                    >
-                        <ArrowLeft size={20} />
-                        Retour au Tableau de Bord
-                    </button>
+                    <div className="flex justify-between items-center mb-6">
+                        <button
+                            onClick={() => setViewMode('dashboard')}
+                            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold transition-colors"
+                        >
+                            <ArrowLeft size={20} />
+                            Retour au Tableau de Bord
+                        </button>
+
+                        <button
+                            onClick={() => supabase.auth.signOut()}
+                            className="flex items-center gap-2 bg-[#5c4d41] hover:bg-[#8b2e2e] text-white px-4 py-2 rounded-md font-bold transition-all shadow-md group"
+                            title="Se déconnecter"
+                        >
+                            <LogOut size={18} className="group-hover:rotate-12 transition-transform" />
+                            Déconnexion
+                        </button>
+                    </div>
                     <GlobalPlayersView />
                 </div>
             </div>
@@ -281,7 +313,7 @@ const AdminApp: React.FC = () => {
                             ) : (
                                 <div
                                     className="flex items-center gap-2 text-green-400/50 cursor-pointer"
-                                    onClick={() => currentSettingId && CampaignService.checkSchema(currentSettingId)}
+                                    onClick={() => currentSettingId && (CampaignService as any).checkSchema?.(currentSettingId)}
                                 >
                                     <Cloud size={20} />
                                 </div>

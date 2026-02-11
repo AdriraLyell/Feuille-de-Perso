@@ -38,15 +38,25 @@ export class ErrorService {
                 : JSON.stringify(error);
 
         // 1. Console Log enrichi
+        const isForbidden = technicalMessage.includes('403') || (error as any)?.status === 403 || (error as any)?.code === '42501';
+
         const timestamp = new Date().toLocaleTimeString();
         console.groupCollapsed(`%c[${timestamp}] [${context}] Error`, 'color: red; font-weight: bold;');
         console.error('Original Error:', error);
         if (userMessage) console.log('User Message:', userMessage);
+        if (isForbidden) {
+            console.warn('💡 Tip: This 403 error might be due to missing "admin" role in your Supabase app_metadata.');
+        }
         console.groupEnd();
 
         // 2. Notification Utilisateur
         if (!silent && this.notifier) {
-            const displayMsg = userMessage || `Erreur (${context}): ${technicalMessage}`;
+            let displayMsg = userMessage || `Erreur (${context}): ${technicalMessage}`;
+            if (isForbidden && !userMessage) {
+                displayMsg = `Accès refusé (${context}). Vérifiez vos droits administrateur.`;
+            } else if (isForbidden) {
+                displayMsg += " (Vérifiez vos droits administrateur)";
+            }
             // On utilise 'danger' pour les erreurs
             // On log dans 'both' pour être sûr que ce soit visible dans l'historique global
             this.notifier(displayMsg, 'danger', 'both');

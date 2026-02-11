@@ -2,6 +2,27 @@ import { useCallback, useMemo } from 'react';
 import { CharacterSheetData, DotEntry } from '../types';
 import { RulesData } from '../types/rules';
 
+export interface SkillBlock {
+    title: string;
+    items: DotEntry[];
+    cat: string;
+    description?: string;
+}
+
+export interface SheetColumn {
+    id: number;
+    topBlocks: SkillBlock[];
+    bottomBlocks: SkillBlock[];
+    readonly blocks: SkillBlock[];
+}
+
+export interface SheetLayout {
+    columns: SheetColumn[];
+    columnCount: number;
+    backgrounds: SkillBlock[];
+    counters: { title: string; id: string; description?: string }[];
+}
+
 export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null) => {
 
     const attributeCategories = useMemo(() => data.attributeSettings || [
@@ -19,9 +40,9 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
         return 'grid-cols-3'; // fallback
     }, [attributeCategories]);
 
-    const getDynamicColumns = useCallback((isLandscape: boolean = false) => {
+    const getDynamicColumns = useCallback((isLandscape: boolean = false): SheetLayout => {
         const skillCats = rules?.definitions?.skillCategories || [];
-        if (skillCats.length === 0) return { columns: [], backgrounds: [], counters: [] }; // Fallback empty structure
+        if (skillCats.length === 0) return { columns: [], columnCount: isLandscape ? 5 : 4, backgrounds: [], counters: [] }; // Fallback empty structure
 
         // 1. Separate by behavior
         const skills = skillCats.filter(c => c.behavior === 'Compétence' || c.behavior === 'Secondaire');
@@ -30,10 +51,10 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
 
         // 2. Base columns: 4 for portrait, 5 for landscape
         const columnCount = isLandscape ? 5 : 4;
-        const columns = Array.from({ length: columnCount }, (_, id) => ({
+        const columns: SheetColumn[] = Array.from({ length: columnCount }, (_, id) => ({
             id,
-            topBlocks: [] as any[],
-            bottomBlocks: [] as any[],
+            topBlocks: [],
+            bottomBlocks: [],
             get blocks() { return [...this.topBlocks, ...this.bottomBlocks]; }
         }));
 

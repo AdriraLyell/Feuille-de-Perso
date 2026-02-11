@@ -9,6 +9,8 @@ import { applyRulesToState } from '../utils/rulesAdapter';
 import { reconcileRulesWithState } from '../utils/rulesReconciler';
 import { ErrorService } from '../services/ErrorService';
 import { CharacterSyncService } from '../services/CharacterSyncService';
+import { logger } from '../utils/logger';
+
 
 // --- Context Definitions ---
 
@@ -197,7 +199,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         }
 
         const timer = setTimeout(async () => {
-            console.log(`[CharacterContext] Auto-syncing character "${characterName}"...`);
+            logger.log(`[CharacterContext] Auto-syncing character "${characterName}"...`);
             setIsSyncing(true);
 
             const result = await CharacterSyncService.syncCharacter(
@@ -225,7 +227,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
                 });
                 addLog("Synchronisation automatique réussie", 'success', 'settings', 'auto-sync-success');
             } else if (result.error) {
-                console.warn("[CharacterContext] Auto-sync failed:", result.error);
+                logger.warn("[CharacterContext] Auto-sync failed:", result.error);
                 // We don't use ErrorService.handleError here to avoid spamming the user
                 // but we could log it silently.
                 addLog("Échec de la synchronisation automatique", 'danger', 'settings', 'auto-sync-failure');
@@ -275,15 +277,15 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
 
             try {
                 const skillsBefore = Object.values(currentData.skills).flat().filter(s => s.name).length;
-                console.log(`[CharacterContext] Reconciling with rules v${rules.version} (was v${currentData._rulesVersion}). Skills before: ${skillsBefore}`);
+                logger.log(`[CharacterContext] Reconciling with rules v${rules.version} (was v${currentData._rulesVersion}). Skills before: ${skillsBefore}`);
 
                 const newData = reconcileRulesWithState(currentData, rules);
 
                 const skillsAfter = Object.values(newData.skills).flat().filter(s => s.name).length;
-                console.log(`[CharacterContext] Reconciliation complete. Skills after: ${skillsAfter}`);
+                logger.log(`[CharacterContext] Reconciliation complete. Skills after: ${skillsAfter}`);
 
                 if (skillsAfter < skillsBefore && skillsBefore > 0) {
-                    console.warn(`[CharacterContext] Skills count dropped from ${skillsBefore} to ${skillsAfter}! Check rules for missing definitions.`);
+                    logger.warn(`[CharacterContext] Skills count dropped from ${skillsBefore} to ${skillsAfter}! Check rules for missing definitions.`);
                 }
 
                 return newData;

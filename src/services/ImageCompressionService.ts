@@ -10,6 +10,29 @@
 import pako from 'pako';
 import { ErrorService } from './ErrorService';
 
+export const GZIP_MARKER = 'GZIP:';
+
+/**
+ * Image compression constants
+ * Quality range: 0-1 (0 = worst, 1 = best)
+ * 0.8 = good balance between quality and size
+ */
+const IMAGE_COMPRESSION_CONFIG = {
+    // Standard compression for avatars/thumbnails
+    STANDARD: {
+        quality: 0.8,
+        maxWidth: 1200,
+        format: 'webp' as const
+    },
+
+    // Full resolution for documents/detailed images
+    FULL: {
+        quality: 0.85,
+        maxWidth: 1920,
+        format: 'webp' as const
+    }
+};
+
 export interface CompressionResult {
     compressed: string;
     originalSize: number;
@@ -24,14 +47,14 @@ export const ImageCompressionService = {
      * Preserves aspect ratio - only resizes if width > maxWidth.
      * 
      * @param base64 - Image in base64 format (data:image/...)
-     * @param quality - WebP quality (0-1), default 0.5 (User Request)
-     * @param maxWidth - Maximum width in pixels, default 1024 (Optimization)
+     * @param quality - WebP quality (0-1)
+     * @param maxWidth - Maximum width in pixels
      * @returns Compressed base64 image
      */
     async compressImage(
         base64: string,
-        quality: number = 0.5,
-        maxWidth: number = 1024
+        quality: number = IMAGE_COMPRESSION_CONFIG.STANDARD.quality,
+        maxWidth: number = IMAGE_COMPRESSION_CONFIG.STANDARD.maxWidth
     ): Promise<string> {
         return new Promise((resolve, reject) => {
             // Create image element
@@ -120,7 +143,7 @@ export const ImageCompressionService = {
             );
 
             // Add marker to identify compressed data
-            return `GZIP:${compressedBase64}`;
+            return `${GZIP_MARKER}${compressedBase64}`;
         } catch (e) {
             ErrorService.handleError(e, { context: 'ImageCompressionService.compressBase64', silent: true });
             return base64; // Return original on error
@@ -136,12 +159,12 @@ export const ImageCompressionService = {
     decompressBase64(compressed: string): string {
         try {
             // Check if data is compressed
-            if (!compressed.startsWith('GZIP:')) {
+            if (!compressed.startsWith(GZIP_MARKER)) {
                 return compressed; // Not compressed, return as-is
             }
 
             // Remove marker
-            const compressedData = compressed.substring(5);
+            const compressedData = compressed.substring(GZIP_MARKER.length);
 
             // Convert base64 to binary
             const binaryString = atob(compressedData);
@@ -173,8 +196,8 @@ export const ImageCompressionService = {
      */
     async compressFull(
         base64: string,
-        quality: number = 0.85,
-        maxWidth: number = 1920
+        quality: number = IMAGE_COMPRESSION_CONFIG.FULL.quality,
+        maxWidth: number = IMAGE_COMPRESSION_CONFIG.FULL.maxWidth
     ): Promise<CompressionResult> {
         const originalSize = base64.length;
 
@@ -224,10 +247,10 @@ export const ImageCompressionService = {
                 if (action === 'compress' && value.startsWith('data:image/')) {
                     const result = await this.compressFull(value);
                     processed[key] = result.compressed;
-                } else if (action === 'compress' && value.startsWith('GZIP:')) {
+                } else if (action === 'compress' && value.startsWith(GZIP_MARKER)) {
                     // ALREADY COMPRESSED - SKIP to avoid generation loss
                     processed[key] = value;
-                } else if (action === 'decompress' && value.startsWith('GZIP:')) {
+                } else if (action === 'decompress' && value.startsWith(GZIP_MARKER)) {
                     processed[key] = this.decompressFull(value);
                 } else {
                     processed[key] = value;

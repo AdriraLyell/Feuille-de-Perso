@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import { AttributePreset } from '../types/system';
 import { ErrorService } from './ErrorService';
+import { TABLE_ATTRIBUTE_PRESETS } from '../constants/db';
 
 export const AttributeService = {
     /**
@@ -8,7 +9,7 @@ export const AttributeService = {
      */
     async listAttributePresets(): Promise<AttributePreset[] | null> {
         const { data, error } = await supabase
-            .from('attribute_presets')
+            .from(TABLE_ATTRIBUTE_PRESETS)
             .select('*')
             .order('is_official', { ascending: false })
             .order('name', { ascending: true });
@@ -35,7 +36,7 @@ export const AttributeService = {
      */
     async saveAttributePreset(name: string, description: string, structure: any, hasSecondary: boolean): Promise<boolean> {
         const { error } = await supabase
-            .from('attribute_presets')
+            .from(TABLE_ATTRIBUTE_PRESETS)
             .insert([{
                 name,
                 description,
@@ -56,7 +57,7 @@ export const AttributeService = {
      */
     async deleteAttributePreset(id: string): Promise<boolean> {
         const { error } = await supabase
-            .from('attribute_presets')
+            .from(TABLE_ATTRIBUTE_PRESETS)
             .delete()
             .eq('id', id)
             .eq('is_official', false); // Safety check
@@ -74,7 +75,7 @@ export const AttributeService = {
     async updateAttributePreset(id: string, updates: { name?: string; description?: string }): Promise<boolean> {
         // Map camelCase to snake_case if needed (none here as name/description are same)
         const { error } = await supabase
-            .from('attribute_presets')
+            .from(TABLE_ATTRIBUTE_PRESETS)
             .update(updates)
             .eq('id', id);
 

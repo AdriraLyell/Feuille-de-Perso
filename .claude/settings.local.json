@@ -1,0 +1,13 @@
+{
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "github",
+    "supabase",
+    "typescript",
+    "eslint",
+    "sequential-thinking",
+    "playwright",
+    "prettier",
+    "npm"
+  ]
+}

@@ -33,3 +33,6 @@ dist-ssr
 .env.test
 .env.production
 
+# MCP configuration with sensitive tokens
+.mcp.json
+

@@ -141,7 +141,7 @@ export const DatabaseService = {
     async update<T>(
         table: string,
         id: string,
-        data: any,
+        data: Partial<T>,
         context: string = `DatabaseService.update(${table})`
     ): Promise<boolean> {
         const { error } = await supabase
@@ -202,10 +202,18 @@ export const DatabaseService = {
      */
     async upsert<T>(
         table: string,
-        data: any,
+        data: Partial<T> | any, // Use any for raw data if T is complex, but Partial<T> is preferred
         options: { onConflict?: string, ignoreDuplicates?: boolean } = {},
         context: string = `DatabaseService.upsert(${table})`
     ): Promise<T | null> {
+        // Automatically add owner if missing and user is logged in
+        if (table === 'characters' && !data.created_by) {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                data.created_by = user.id;
+            }
+        }
+
         const { data: result, error } = await supabase
             .from(table)
             .upsert(data, options)

@@ -1,5 +1,4 @@
-
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import RichTextToolbar from './RichTextToolbar';
 
 interface NotebookTextareaProps {
@@ -13,7 +12,6 @@ interface NotebookTextareaProps {
     lineHeight: number;
 }
 
-// Define ref handle
 export interface NotebookTextareaHandle {
     forceReflow: () => void;
     focusAtEnd: () => void;
@@ -33,13 +31,12 @@ const NotebookTextarea = React.forwardRef<NotebookTextareaHandle, NotebookTextar
     const containerRef = useRef<HTMLDivElement>(null);
     const [drawStart, setDrawStart] = useState<{ x: number, y: number } | null>(null);
     const [currentRect, setCurrentRect] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
-
-    // Toolbar state
     const [showToolbar, setShowToolbar] = useState(false);
     const [toolbarPos, setToolbarPos] = useState({ top: 0, left: 0 });
     const [activeCommands, setActiveCommands] = useState<string[]>([]);
+    const overflowCheckRafRef = useRef<number | null>(null);
 
-    // Sync content
+    // Sync external value to editor
     useEffect(() => {
         if (editableRef.current && editableRef.current.innerHTML !== value) {
             editableRef.current.innerHTML = value || '';
@@ -49,288 +46,149 @@ const NotebookTextarea = React.forwardRef<NotebookTextareaHandle, NotebookTextar
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
         const content = e.currentTarget.innerHTML;
         onChange(content);
-        checkOverflow();
+        scheduleOverflowCheck();
     };
 
-    const checkOverflow = () => {
-        // Deboredment check (Pagination)
-        if (onOverflow && editableRef.current && containerRef.current) {
-            const editable = editableRef.current;
+    const scheduleOverflowCheck = useCallback(() => {
+        if (overflowCheckRafRef.current !== null) {
+            cancelAnimationFrame(overflowCheckRafRef.current);
+        }
+        overflowCheckRafRef.current = requestAnimationFrame(() => {
+            checkOverflow();
+            overflowCheckRafRef.current = null;
+        });
+    }, []);
 
-            // 0. SANITY CHECK: content must be rendered
-            if (editable.clientHeight < 50) return;
+    // Overflow detection using absolute positions (getBoundingClientRect)
+    // Does NOT use scrollHeight - works correctly with overflow:visible contenteditable
+    const checkOverflow = useCallback(() => {
+        if (!onOverflow || !editableRef.current) return;
 
-            // 1. GATEKEEPER REMOVED:
-            // We rely purely on strict Box Model calculation now.
-            // scrollHeight was causing false negatives (infinite typing).
+        const editable = editableRef.current;
+        if (editable.clientHeight < 100) return;
 
-            const containerRect = editable.getBoundingClientRect();
+        // Absolute bottom limit of the page content area
+        const pageBottom = editable.getBoundingClientRect().bottom;
 
-            // 2. PRECISE LIMIT: Accurate Box Model Calculation
-            // containerRect.top = Top of Border Box
-            // editable.clientTop = Top Border Width
-            // editable.clientHeight = Padding Box Height (Content + Padding)
-            // Limit = Top + Border + Height
-            const absoluteBottomLimit = containerRect.top + editable.clientTop + editable.clientHeight;
+        // Helper: does this node visually overflow the page?
+        const nodeOverflows = (node: Node): boolean => {
+            const range = document.createRange();
+            range.selectNode(node);
+            const rects = range.getClientRects();
+            for (let i = 0; i < rects.length; i++) {
+                // 5px tolerance for descenders (g, y, p)
+                if (rects[i].bottom > pageBottom + 5) return true;
+            }
+            return false;
+        };
 
-            // Helper to check if a range or node overflows
-            const getRangeOverflow = (range: Range) => {
-                const rects = range.getClientRects();
-                if (rects.length === 0) return false;
-                for (let i = 0; i < rects.length; i++) {
-                    // Precise check against the absolute limit
-                    // We allow 5px tolerance: it's better to have a slightly cut descender (g, y, p)
-                    // than to move an entire perfectly readable line.
-                    if (rects[i].bottom > absoluteBottomLimit + 5) return true;
-                }
-                return false;
-            };
+        const children = Array.from(editable.childNodes);
+        if (children.length === 0) return;
 
-            const totalRange = document.createRange();
-            totalRange.selectNodeContents(editable);
+        // Quick check: if last node doesn't overflow, nothing to do
+        if (!nodeOverflows(children[children.length - 1])) return;
 
-            // Double check with Range to be sure
-            if (getRangeOverflow(totalRange)) {
-                // Save selection info
-                const selection = window.getSelection();
-                let shouldFocusNext = false;
-                let savedCursorPosition: { node: Node | null; offset: number } | null = null;
-                if (selection && selection.rangeCount > 0) {
-                    savedCursorPosition = { node: selection.anchorNode, offset: selection.anchorOffset };
-                }
-
-                const children = Array.from(editable.childNodes);
-                let firstOverflowNodeIndex = -1;
-                const range = document.createRange();
-
-                // 1. Find first overflowing node
-                for (let i = 0; i < children.length; i++) {
-                    range.selectNode(children[i]);
-                    // Optimization: check if the Top of the node is already below limit
-                    // If so, it's definitely overflowing.
-                    // If Top is inside but Bottom is outside, it's a candidate for splitting.
-                    if (getRangeOverflow(range)) {
-                        firstOverflowNodeIndex = i;
-                        break;
-                    }
-                }
-
-                if (firstOverflowNodeIndex === -1) return;
-
-                const splitTarget = children[firstOverflowNodeIndex];
-                let overflowNodes: Node[] = [];
-
-                // Collect all nodes after the culprit
-                for (let i = firstOverflowNodeIndex + 1; i < children.length; i++) {
-                    overflowNodes.push(children[i]);
-                    editable.removeChild(children[i]);
-                }
-
-                // 2. Split the culprit meticulously
-                if (splitTarget.nodeType === Node.TEXT_NODE) {
-                    const text = splitTarget.textContent || "";
-                    let low = 0, high = text.length, bestFit = 0;
-
-                    while (low <= high) {
-                        const mid = Math.floor((low + high) / 2);
-                        range.setStart(splitTarget, 0);
-                        range.setEnd(splitTarget, mid);
-
-                        if (!getRangeOverflow(range)) {
-                            bestFit = mid;
-                            low = mid + 1;
-                        } else {
-                            high = mid - 1;
-                        }
-                    }
-
-                    // Word boundary adjustment
-                    let finalSplit = bestFit;
-                    if (finalSplit < text.length && finalSplit > 0) {
-                        const lastSpace = text.lastIndexOf(' ', finalSplit - 1);
-                        if (lastSpace >= 0 && (finalSplit - lastSpace) < 40) {
-                            if (lastSpace > 0) finalSplit = lastSpace + 1;
-                        }
-                    }
-
-                    // SAFETY VALVE: If word boundary logic pushed us to 0, but we CAN fit some text...
-                    // Revert to bestFit to avoid moving the entire massive node.
-                    if (finalSplit === 0 && bestFit > 0) {
-                        finalSplit = bestFit;
-                    }
-
-                    if (finalSplit <= 0 && bestFit === 0) {
-                        // Move whole node (only if it's NOT index 0)
-                        if (firstOverflowNodeIndex === 0 && text.trim().length > 0) {
-                            // ABORT: refuse to move first node entirely
-                            overflowNodes.forEach(n => editable.appendChild(n));
-                            return;
-                        }
-                        overflowNodes.unshift(splitTarget);
-                        editable.removeChild(splitTarget);
-                        if (savedCursorPosition?.node === splitTarget) shouldFocusNext = true;
-                    } else {
-                        if (savedCursorPosition?.node === splitTarget && savedCursorPosition.offset > finalSplit) {
-                            shouldFocusNext = true;
-                        }
-                        const tail = text.substring(finalSplit);
-                        splitTarget.textContent = text.substring(0, finalSplit);
-                        if (tail) overflowNodes.unshift(document.createTextNode(tail));
-                    }
-                } else if (splitTarget.nodeType === Node.ELEMENT_NODE) {
-                    // Split element by its children
-                    const el = splitTarget as HTMLElement;
-                    const elChildren = Array.from(el.childNodes);
-                    const elCloned = el.cloneNode(false) as HTMLElement;
-
-                    // Safe check: if Index 0 and we are about to move it entirely -> ABORT
-                    if (firstOverflowNodeIndex === 0) {
-                        range.selectNode(el);
-                        // If rect.top is < limit, it STARTS inside.
-                        const rects = range.getClientRects();
-                        if (rects.length > 0 && rects[0].top < absoluteBottomLimit) {
-                            // It starts inside, but we decided to move it?
-                            // We should try to split children.
-                            // (Proceed to split logic)
-                        } else {
-                            // It starts BELOW the limit? That's weird for Index 0.
-                            // Unless padding is huge.
-                            // Restore and abort.
-                            overflowNodes.forEach(n => editable.appendChild(n));
-                            return;
-                        }
-                    }
-
-                    let firstChildOverflow = -1;
-                    let l = 0;
-                    let r = elChildren.length - 1;
-
-                    // Binary search within the element
-                    while (l <= r) {
-                        const m = Math.floor((l + r) / 2);
-                        range.selectNode(elChildren[m]);
-
-                        if (getRangeOverflow(range)) {
-                            firstChildOverflow = m;
-                            r = m - 1;
-                        } else {
-                            l = m + 1;
-                        }
-                    }
-
-                    if (firstChildOverflow === -1) {
-                        // All children fit? Shouldn't happen if el is the culprit.
-                        // But if it does, it's the element's block properties causing overflow.
-                        overflowNodes.unshift(splitTarget);
-                        editableRef.current.removeChild(splitTarget);
-                        if (savedCursorPosition && (savedCursorPosition.node === splitTarget || el.contains(savedCursorPosition.node as Node))) {
-                            shouldFocusNext = true;
-                        }
-                    } else {
-                        // Split the child that overflows
-                        const childToSplit = elChildren[firstChildOverflow];
-
-                        // Collect siblings after
-                        for (let i = firstChildOverflow + 1; i < elChildren.length; i++) {
-                            elCloned.appendChild(elChildren[i]);
-                        }
-
-                        // Re-restore el to have everything up to the split point
-                        while (el.firstChild) el.removeChild(el.firstChild);
-                        for (let i = 0; i < firstChildOverflow; i++) el.appendChild(elChildren[i]);
-
-                        // Handle the childToSplit itself
-                        if (childToSplit.nodeType === Node.TEXT_NODE) {
-                            const txt = childToSplit.textContent || "";
-                            const tempNode = document.createTextNode("");
-                            el.appendChild(tempNode);
-
-                            let lc = 0, hc = txt.length, bc = 0;
-                            while (lc <= hc) {
-                                const mc = Math.floor((lc + hc) / 2);
-                                range.setStart(childToSplit, 0);
-                                range.setEnd(childToSplit, mc);
-
-                                if (!getRangeOverflow(range)) {
-                                    bc = mc; lc = mc + 1;
-                                } else {
-                                    hc = mc - 1;
-                                }
-                            }
-
-                            let fcs = bc;
-                            if (fcs < txt.length && fcs > 0) {
-                                const ls = txt.lastIndexOf(' ', fcs - 1);
-                                if (ls >= 0 && (fcs - ls) < 40) {
-                                    if (ls > 0) fcs = ls + 1;
-                                }
-                            }
-
-                            // SAFETY VALVE (Nested): Don't move whole text if part fits
-                            if (fcs === 0 && bc > 0) fcs = bc;
-
-                            if (fcs > 0) {
-                                tempNode.textContent = txt.substring(0, fcs);
-                                const tail = txt.substring(fcs);
-                                if (tail) elCloned.insertBefore(document.createTextNode(tail), elCloned.firstChild);
-                                if (savedCursorPosition?.node === childToSplit && savedCursorPosition.offset > fcs) {
-                                    shouldFocusNext = true;
-                                }
-                            } else {
-                                el.removeChild(tempNode);
-                                elCloned.insertBefore(childToSplit, elCloned.firstChild);
-                                if (savedCursorPosition?.node === childToSplit) shouldFocusNext = true;
-                            }
-                        } else {
-                            // Non-text child, move entirely
-                            elCloned.insertBefore(childToSplit, elCloned.firstChild);
-                            if (savedCursorPosition && (savedCursorPosition.node === childToSplit || (childToSplit instanceof Element && childToSplit.contains(savedCursorPosition.node as Node)))) {
-                                shouldFocusNext = true;
-                            }
-                        }
-
-                        if (elCloned.childNodes.length > 0) overflowNodes.unshift(elCloned);
-                        if (el.childNodes.length === 0) editableRef.current.removeChild(el);
-                    }
-                }
-
-                // Final check: if cursor is no longer in the editor, it must have moved
-                if (savedCursorPosition && savedCursorPosition.node && !editableRef.current.contains(savedCursorPosition.node)) {
-                    shouldFocusNext = true;
-                }
-
-                if (overflowNodes.length > 0) {
-                    const tempDiv = document.createElement('div');
-                    overflowNodes.forEach(node => tempDiv.appendChild(node));
-                    onOverflow(editableRef.current.innerHTML, tempDiv.innerHTML, shouldFocusNext);
-                }
-
-                // CRITICAL: Restore cursor position ONLY if we're NOT transferring focus
-                if (!shouldFocusNext) {
-                    setTimeout(() => {
-                        if (editableRef.current) {
-                            const lastChild = editableRef.current.lastChild;
-                            if (lastChild) {
-                                const range = document.createRange();
-                                const sel = window.getSelection();
-
-                                // Place cursor at the end of the last remaining node
-                                if (lastChild.nodeType === Node.TEXT_NODE) {
-                                    range.setStart(lastChild, lastChild.textContent?.length || 0);
-                                } else {
-                                    range.setStart(lastChild, lastChild.childNodes.length);
-                                }
-                                range.collapse(true);
-
-                                sel?.removeAllRanges();
-                                sel?.addRange(range);
-                            }
-                        }
-                    }, 0);
-                }
+        // Find first overflowing node
+        let firstOverflowIndex = -1;
+        for (let i = 0; i < children.length; i++) {
+            if (nodeOverflows(children[i])) {
+                firstOverflowIndex = i;
+                break;
             }
         }
-    };
+        if (firstOverflowIndex === -1) return;
+
+        const overflowNodes: Node[] = [];
+        const splitTarget = children[firstOverflowIndex];
+
+        // Collect all nodes after the first overflowing one
+        for (let i = firstOverflowIndex + 1; i < children.length; i++) {
+            overflowNodes.push(children[i]);
+            editable.removeChild(children[i]);
+        }
+
+        // Split the first overflowing node
+        if (splitTarget.nodeType === Node.TEXT_NODE) {
+            const text = splitTarget.textContent || '';
+            let lo = 0, hi = text.length, bestFit = 0;
+
+            // Binary search: find the longest prefix that fits on the page
+            while (lo <= hi) {
+                const mid = Math.floor((lo + hi) / 2);
+                splitTarget.textContent = text.substring(0, mid);
+                if (!nodeOverflows(splitTarget)) {
+                    bestFit = mid;
+                    lo = mid + 1;
+                } else {
+                    hi = mid - 1;
+                }
+            }
+
+            // Snap to word boundary
+            const spaceIdx = text.lastIndexOf(' ', bestFit - 1);
+            const splitAt = (spaceIdx > 0 && (bestFit - spaceIdx) < 40) ? spaceIdx + 1 : bestFit;
+            const finalSplit = (splitAt === 0 && bestFit > 0) ? bestFit : splitAt;
+
+            if (finalSplit > 0) {
+                splitTarget.textContent = text.substring(0, finalSplit);
+                const tail = text.substring(finalSplit);
+                if (tail) overflowNodes.unshift(document.createTextNode(tail));
+            } else {
+                // Entire node overflows (e.g., first node on an empty page) → abort
+                if (firstOverflowIndex === 0) {
+                    overflowNodes.forEach(n => editable.appendChild(n));
+                    return;
+                }
+                overflowNodes.unshift(splitTarget);
+                editable.removeChild(splitTarget);
+            }
+        } else {
+            // Element node → move entirely to overflow
+            // Abort if it's the first (and only) node to avoid empty page loop
+            if (firstOverflowIndex === 0 && children.length === 1) {
+                overflowNodes.forEach(n => editable.appendChild(n));
+                return;
+            }
+            overflowNodes.unshift(splitTarget);
+            editable.removeChild(splitTarget);
+        }
+
+        // Build overflow HTML
+        const tempDiv = document.createElement('div');
+        overflowNodes.forEach(n => tempDiv.appendChild(n));
+        const overflow = tempDiv.innerHTML;
+
+        if (!overflow.trim() || overflow.replace(/<[^>]*>/g, '').trim() === '') return;
+
+        // Check if cursor moved into overflow
+        const selection = window.getSelection();
+        let shouldFocusNext = false;
+        if (selection && selection.rangeCount > 0 && !editable.contains(selection.anchorNode)) {
+            shouldFocusNext = true;
+        }
+
+        onChange(editable.innerHTML);
+        onOverflow(editable.innerHTML, overflow, shouldFocusNext);
+    }, [onOverflow, onChange]);
+
+    React.useImperativeHandle(ref, () => ({
+        forceReflow: () => {
+            if (editableRef.current) {
+                checkOverflow();
+            }
+        },
+        focusAtEnd: () => {
+            if (editableRef.current) {
+                editableRef.current.focus();
+                const selection = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(editableRef.current);
+                range.collapse(false); // End of content
+                selection?.removeAllRanges();
+                selection?.addRange(range);
+            }
+        }
+    }), [checkOverflow]);
 
     const handleSelectionChange = () => {
         if (isDrawing) return;
@@ -371,7 +229,6 @@ const NotebookTextarea = React.forwardRef<NotebookTextareaHandle, NotebookTextar
         }
     };
 
-    // Drawing Logic
     const handleMouseDown = (e: React.MouseEvent) => {
         if (!isDrawing || !containerRef.current) return;
         const rect = containerRef.current.getBoundingClientRect();
@@ -406,22 +263,6 @@ const NotebookTextarea = React.forwardRef<NotebookTextareaHandle, NotebookTextar
         setDrawStart(null);
         setCurrentRect(null);
     };
-
-    // Expose forceReflow to parent
-    React.useImperativeHandle(ref, () => ({
-        forceReflow: checkOverflow,
-        focusAtEnd: () => {
-            if (editableRef.current) {
-                editableRef.current.focus();
-                const selection = window.getSelection();
-                const range = document.createRange();
-                range.selectNodeContents(editableRef.current);
-                range.collapse(false); // END of content (false = end, true = start)
-                selection?.removeAllRanges();
-                selection?.addRange(range);
-            }
-        }
-    }));
 
     return (
         <div className="relative w-full h-full rounded-sm bg-transparent flex flex-col">
@@ -465,7 +306,7 @@ const NotebookTextarea = React.forwardRef<NotebookTextareaHandle, NotebookTextar
 
                 {imageNodes}
 
-                {/* Text Content */}
+                {/* Contenteditable Text Content */}
                 <div
                     ref={editableRef}
                     contentEditable={!isDrawing}
@@ -488,7 +329,6 @@ const NotebookTextarea = React.forwardRef<NotebookTextareaHandle, NotebookTextar
                     color: #a8a29e;
                     cursor: text;
                 }
-                /* Ensure consistent line heights for Rich Text elements */
                 [contentEditable] div, [contentEditable] p {
                     margin: 0;
                     min-height: ${lineHeight}px;

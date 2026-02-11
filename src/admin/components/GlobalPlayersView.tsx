@@ -12,6 +12,8 @@ import CharacterReadOnlyView from './CharacterReadOnlyView';
 import { PlayerService } from '../../services/PlayerService';
 import { GameSettingSummary } from '../../services/CampaignService';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import { logger } from '../../utils/logger';
+import { Loader2 } from 'lucide-react';
 
 const GlobalPlayersView: React.FC = () => {
     const [characters, setCharacters] = useState<SyncedCharacterSummary[]>([]);
@@ -28,13 +30,18 @@ const GlobalPlayersView: React.FC = () => {
 
     const loadData = async () => {
         setIsLoading(true);
-        const [charData, campaignData] = await Promise.all([
-            CharacterSyncService.getAllCharacters(),
-            PlayerService.listPublicSettings() // To match setting_id with names
-        ]);
-        setCharacters(charData);
-        setCampaigns(campaignData);
-        setIsLoading(false);
+        try {
+            const [charData, campaignData] = await Promise.all([
+                CharacterSyncService.getAllCharacters(),
+                PlayerService.listPublicSettings() // To match setting_id with names
+            ]);
+            setCharacters(charData);
+            setCampaigns(campaignData);
+        } catch (error) {
+            logger.error("GlobalPlayersView: Failed to load data", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const getCampaignName = (settingId: string | null) => {
@@ -44,9 +51,13 @@ const GlobalPlayersView: React.FC = () => {
     };
 
     const handleViewDetails = async (id: string) => {
-        const fullChar = await CharacterSyncService.getCharacterById(id);
-        if (fullChar) {
-            setSelectedCharacter(fullChar);
+        try {
+            const fullChar = await CharacterSyncService.getCharacterById(id);
+            if (fullChar) {
+                setSelectedCharacter(fullChar);
+            }
+        } catch (error) {
+            logger.error("GlobalPlayersView: Failed to fetch character details", error);
         }
     };
 
@@ -56,11 +67,16 @@ const GlobalPlayersView: React.FC = () => {
 
     const confirmDelete = async () => {
         if (!characterToDelete) return;
-        const success = await CharacterSyncService.deleteCharacter(characterToDelete);
-        if (success) {
-            setCharacters(prev => prev.filter(c => c.id !== characterToDelete));
+        try {
+            const success = await CharacterSyncService.deleteCharacter(characterToDelete);
+            if (success) {
+                setCharacters(prev => prev.filter(c => c.id !== characterToDelete));
+            }
+        } catch (error) {
+            logger.error("GlobalPlayersView: Failed to delete character", error);
+        } finally {
+            setCharacterToDelete(null);
         }
-        setCharacterToDelete(null);
     };
 
     const filteredCharacters = characters.filter(char => {
@@ -120,7 +136,7 @@ const GlobalPlayersView: React.FC = () => {
 
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-20 text-slate-400 bg-white rounded-xl border border-slate-200 shadow-sm">
-                    <Loader2 className="animate-spin mb-4" size={40} />
+                    <Loader2 className="animate-spin mb-4 text-indigo-600" size={40} />
                     <p>Chargement de la base de données joueurs...</p>
                 </div>
             ) : filteredCharacters.length === 0 ? (
@@ -218,7 +234,9 @@ const GlobalPlayersView: React.FC = () => {
     );
 };
 
-const Loader2: React.FC<{ className?: string, size?: number }> = ({ className, size = 24 }) => (
+// Loader2 is already imported from lucide-react if available, otherwise defining a fallback
+// Correcting the duplicate/local definition if it clashes with lucide-react or replacing with themed one
+const CustomLoader: React.FC<{ className?: string, size?: number }> = ({ className, size = 24 }) => (
     <div className={`animate-spin ${className}`} style={{ width: size, height: size }}>
         <Users size={size} />
     </div>

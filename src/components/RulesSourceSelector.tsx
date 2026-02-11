@@ -30,7 +30,13 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
                     settingId: parsed.syncInfo?.settingId || 'orphan'
                 };
             }
-        } catch (e) { }
+        } catch (e) {
+            ErrorService.handleError(e, {
+                context: 'RulesSourceSelector.parseLocalStorage',
+                userMessage: 'Impossible de restaurer la session précédente',
+                silent: true
+            });
+        }
     }
 
     // Try to load public settings when opening online mode

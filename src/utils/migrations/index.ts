@@ -20,31 +20,43 @@ export const migrateData = (parsed: any): CharacterSheetData => {
         return parsed as CharacterSheetData;
     }
 
-    let migrated = { ...parsed };
+    // Deep copy to prevent mutating the original until success
+    let migrated = JSON.parse(JSON.stringify(parsed));
     let migrationsApplied = 0;
+    const failedSteps: { version: number, index: number, error: string }[] = [];
 
     // Apply migrations sequentially from current+1 to latest
     for (let v = currentVersion + 1; v <= CURRENT_SCHEMA_VERSION; v++) {
         const steps = MIGRATIONS[v];
         if (steps && steps.length > 0) {
-            // console.debug(`[Migration] Applying v${v} schema updates...`);
-            steps.forEach(step => {
+            steps.forEach((step, i) => {
                 try {
                     step(migrated);
                 } catch (e) {
-                    console.error(`[Migration] Failed to apply migration step in v${v}:`, e);
-                    // Continue best effort? Or throw?
-                    // For now, continue to avoid locking the user out.
+                    console.error(`[Migration] Failed to apply migration step in v${v} (index ${i}):`, e);
+                    failedSteps.push({
+                        version: v,
+                        index: i,
+                        error: e instanceof Error ? e.message : String(e)
+                    });
                 }
             });
-            migrationsApplied++;
+
+            // Only update schema version if ALL steps for this version passed
+            if (failedSteps.length === 0) {
+                migrated._schemaVersion = v;
+                migrationsApplied++;
+            } else {
+                // Stop migration if a step fails to avoid inconsistent data state
+                break;
+            }
         }
     }
 
-    // Update schema version
-    migrated._schemaVersion = CURRENT_SCHEMA_VERSION;
-
-    if (migrationsApplied > 0) {
+    if (failedSteps.length > 0) {
+        migrated._migrationFailures = failedSteps;
+        console.warn(`[Migration] Data migration completed with ${failedSteps.length} failures. Schema version stayed at ${migrated._schemaVersion}`);
+    } else if (migrationsApplied > 0) {
         console.log(`[Migration] Successfully migrated data from v${currentVersion} to v${CURRENT_SCHEMA_VERSION}`);
     }
 

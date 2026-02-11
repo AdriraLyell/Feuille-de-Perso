@@ -15,7 +15,14 @@ export interface RulesCreationConfig {
     attributeMax: number;
     attributeCost?: number;
     backgroundCost?: number; // Default 2
-    rankSlots: Record<string, number>;
+    rankSlots: {
+        1: number;
+        2: number;
+        3: number;
+        4: number;
+        5: number;
+        [key: number]: number; // Allow for extended ranks if needed
+    };
     extendedSkills?: boolean;
 }
 

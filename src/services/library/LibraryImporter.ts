@@ -52,9 +52,9 @@ export const LibraryImporter = {
         // However, if it was a duplicate, it implies it's already there. 
         // For simplicity and safety (avoiding duplicate primary key errors if we tried to re-insert), we only insert unique.
 
-        let result: any = true;
+        let result = true;
         if (uniquePayload.length > 0) {
-            result = (await DatabaseService.insert('libraries_traits', uniquePayload as any, 'LibraryImporter.importTraits')) as any;
+            result = !!(await DatabaseService.insert('libraries_traits', uniquePayload, 'LibraryImporter.importTraits'));
         }
 
         if (!result) return false;
@@ -93,9 +93,9 @@ export const LibraryImporter = {
 
         const uniquePayload = await filterDuplicates('libraries_skills', targetId, payload);
 
-        let result: any = true;
+        let result = true;
         if (uniquePayload.length > 0) {
-            result = (await DatabaseService.insert('libraries_skills', uniquePayload as any, 'LibraryImporter.importSkills')) as any;
+            result = !!(await DatabaseService.insert('libraries_skills', uniquePayload, 'LibraryImporter.importSkills'));
         }
         if (!result) return false;
 
@@ -121,9 +121,9 @@ export const LibraryImporter = {
 
         const uniquePayload = await filterDuplicates('libraries_specializations', targetId, payload);
 
-        let result: any = true;
+        let result = true;
         if (uniquePayload.length > 0) {
-            result = (await DatabaseService.insert('libraries_specializations', uniquePayload as any, 'LibraryImporter.importSpecializations')) as any;
+            result = !!(await DatabaseService.insert('libraries_specializations', uniquePayload, 'LibraryImporter.importSpecializations'));
         }
         if (!result) return false;
 
@@ -148,9 +148,9 @@ export const LibraryImporter = {
 
         const uniquePayload = await filterDuplicates('libraries_backgrounds', targetId, payload);
 
-        let result: any = true;
+        let result = true;
         if (uniquePayload.length > 0) {
-            result = (await DatabaseService.insert('libraries_backgrounds', uniquePayload as any, 'LibraryImporter.importBackgrounds')) as any;
+            result = !!(await DatabaseService.insert('libraries_backgrounds', uniquePayload, 'LibraryImporter.importBackgrounds'));
         }
         if (!result) return false;
 
@@ -176,9 +176,9 @@ export const LibraryImporter = {
 
         const uniquePayload = await filterDuplicates('libraries_counters', targetId, payload);
 
-        let result: any = true;
+        let result = true;
         if (uniquePayload.length > 0) {
-            result = (await DatabaseService.insert('libraries_counters', uniquePayload as any, 'LibraryImporter.importCounters')) as any;
+            result = !!(await DatabaseService.insert('libraries_counters', uniquePayload, 'LibraryImporter.importCounters'));
         }
         if (!result) return false;
 

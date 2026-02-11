@@ -15,7 +15,7 @@ describe('RulesReconciler E2E', () => {
                 startingXP: 350,
                 attributeMin: -1,
                 attributeMax: 3,
-                rankSlots: {}
+                rankSlots: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
             },
             xpCosts: { attributeFactor: 1, skillFactor: 1, specializationFactor: 1 },
             cards: {

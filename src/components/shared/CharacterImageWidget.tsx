@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Upload, Trash2, Image as ImageIcon } from 'lucide-react';
 import { saveImage, getImage, deleteImage, base64ToBlob } from '../../imageDB';
 import ConfirmationModal from '../ui/ConfirmationModal';
-import { ImageCompressionService } from '../../services/ImageCompressionService';
+import { ImageCompressionService, GZIP_MARKER } from '../../services/ImageCompressionService';
 import { ErrorService } from '../../services/ErrorService';
 
 interface CharacterImageWidgetProps {
@@ -33,7 +33,7 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
                         const text = await new Response(blob).text();
                         let finalUrl = "";
 
-                        if (text.startsWith('GZIP:')) {
+                        if (text.startsWith(GZIP_MARKER)) {
                             const decompressed = ImageCompressionService.decompressFull(text);
                             finalUrl = decompressed; // It's already a data URL
                         } else {
@@ -52,7 +52,7 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
                 if (active) setLoading(true);
                 try {
                     // If legacy image is gzipped, decompress for migration
-                    const toMigrate = legacyImage.startsWith('GZIP:')
+                    const toMigrate = legacyImage.startsWith(GZIP_MARKER)
                         ? ImageCompressionService.decompressFull(legacyImage)
                         : legacyImage;
 
@@ -92,7 +92,8 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
             onImageUpdate(newId);
             onAddLog("Image enregistrée.", 'success');
         } catch (error) {
-            onAddLog("Erreur de sauvegarde.", 'danger');
+            const message = error instanceof Error ? error.message : "Erreur de sauvegarde.";
+            onAddLog(message, 'danger');
         } finally {
             setLoading(false);
             e.target.value = '';

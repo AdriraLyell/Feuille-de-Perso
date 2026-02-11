@@ -76,7 +76,13 @@ export const RulesCreationConfigSchema = z.object({
     attributeMax: z.number(),
     attributeCost: z.number().optional(),
     backgroundCost: z.number().optional(),
-    rankSlots: z.record(z.string(), z.number()),
+    rankSlots: z.object({
+        1: z.number(),
+        2: z.number(),
+        3: z.number(),
+        4: z.number(),
+        5: z.number(),
+    }).catchall(z.number()),
     extendedSkills: z.boolean().optional(),
 });
 

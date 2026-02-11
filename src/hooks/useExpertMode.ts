@@ -17,6 +17,17 @@ export const useExpertMode = () => {
         localStorage.setItem(STORAGE_KEY, String(expertMode));
     }, [expertMode]);
 
+    // Listen to storage changes from other tabs
+    useEffect(() => {
+        const handleStorageChange = (event: StorageEvent) => {
+            if (event.key === STORAGE_KEY && event.newValue !== null) {
+                setExpertModeState(event.newValue === 'true');
+            }
+        };
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
     const enableExpertMode = useCallback(() => {
         setExpertModeState(true);
     }, []);

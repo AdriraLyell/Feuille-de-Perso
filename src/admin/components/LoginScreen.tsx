@@ -7,11 +7,13 @@ const LoginScreen: React.FC = () => {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError(null);
+        setSuccessMessage(null);
 
         const { error } = await supabase.auth.signInWithPassword({
             email,
@@ -21,9 +23,29 @@ const LoginScreen: React.FC = () => {
         if (error) {
             setError(error.message);
             setIsLoading(false);
-        } else {
-            // Auth state change will be picked up by AdminApp
         }
+    };
+
+    const handleForgotPassword = async () => {
+        if (!email) {
+            setError("Veuillez saisir votre email pour réinitialiser votre mot de passe.");
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+        setSuccessMessage(null);
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + '/admin',
+        });
+
+        if (error) {
+            setError(error.message);
+        } else {
+            setSuccessMessage("Un email de réinitialisation a été envoyé.");
+        }
+        setIsLoading(false);
     };
 
     return (
@@ -48,6 +70,13 @@ const LoginScreen: React.FC = () => {
                         </div>
                     )}
 
+                    {successMessage && (
+                        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm flex items-start gap-3">
+                            <ShieldCheck size={18} className="mt-0.5 shrink-0" />
+                            <span>{successMessage}</span>
+                        </div>
+                    )}
+
                     <div className="space-y-4">
                         <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label>
@@ -62,11 +91,20 @@ const LoginScreen: React.FC = () => {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Mot de passe</label>
+                            <div className="flex justify-between items-center mb-1">
+                                <label className="block text-xs font-bold text-gray-500 uppercase">Mot de passe</label>
+                                <button
+                                    type="button"
+                                    onClick={handleForgotPassword}
+                                    className="text-[10px] font-bold text-amber-700 hover:text-amber-900 uppercase tracking-wider"
+                                >
+                                    Oublié ?
+                                </button>
+                            </div>
                             <div className="relative">
                                 <input
                                     type="password"
-                                    required
+                                    required={!successMessage}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="w-full px-4 py-3 pl-10 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-amber-600 focus:ring-1 focus:ring-amber-600 outline-none transition-all font-sans"
@@ -84,7 +122,7 @@ const LoginScreen: React.FC = () => {
                     >
                         {isLoading ? (
                             <>
-                                <Loader2 size={20} className="animate-spin" /> Connexion...
+                                <Loader2 size={20} className="animate-spin" /> Action en cours...
                             </>
                         ) : (
                             "Accéder au Dashboard"

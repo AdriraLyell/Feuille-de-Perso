@@ -32,7 +32,7 @@ describe('RulesReconciler Snapshot', () => {
                 creation: {
                     mode: 'rangs',
                     startingXP: 100,
-                    rankSlots: {},
+                    rankSlots: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
                     attributePoints: 10,
                     attributeMin: 1,
                     attributeMax: 5,

@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { ImageConfig } from '../../types';
 import { X, Move, Scaling, WrapText, BoxSelect, Maximize2, Minimize2, StretchHorizontal } from 'lucide-react';
 import { getImage } from '../../imageDB';
-import { ImageCompressionService } from '../../services/ImageCompressionService';
+import { ImageCompressionService, GZIP_MARKER } from '../../services/ImageCompressionService';
 import { ErrorService } from '../../services/ErrorService';
 
 interface NoteImageZoneProps {
@@ -62,7 +62,7 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
                     const text = await new Response(blob).text();
                     let finalUrl = "";
 
-                    if (text.startsWith('GZIP:')) {
+                    if (text.startsWith(GZIP_MARKER)) {
                         const decompressed = ImageCompressionService.decompressFull(text);
                         finalUrl = decompressed;
                     } else {

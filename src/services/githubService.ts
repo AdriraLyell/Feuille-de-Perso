@@ -1,3 +1,5 @@
+import { logger } from '../utils/logger';
+import { GithubRateLimiter } from '../utils/githubUtils';
 
 export interface GitHubConnectConfig {
     token: string;
@@ -12,6 +14,8 @@ export interface PublishResult {
     message?: string;
 }
 
+// Rate limit handled by GithubRateLimiter utility
+
 /**
  * Checks if a file exists on GitHub and returns its SHA.
  */
@@ -19,6 +23,7 @@ export async function getFileSha(
     filePath: string,
     config: GitHubConnectConfig
 ): Promise<string | null> {
+    if (GithubRateLimiter.isLimited()) return null;
     const apiUrl = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${filePath}?ref=${config.branch}`;
 
     try {
@@ -35,7 +40,7 @@ export async function getFileSha(
         }
         return null;
     } catch (error) {
-        console.warn('GitHub Service: Check file failed', error);
+        logger.warn('GitHub Service: Check file failed', error);
         return null;
     }
 }
@@ -50,6 +55,7 @@ export async function publishFileToGitHub(
     message: string,
     config: GitHubConnectConfig
 ): Promise<PublishResult> {
+    if (GithubRateLimiter.isLimited()) return { success: false, message: "Limite de requêtes GitHub atteinte (Session)." };
     const apiUrl = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${filePath}?ref=${config.branch}`;
 
     try {
@@ -100,6 +106,7 @@ export async function publishFileToGitHub(
 export async function getLatestWorkflowRun(
     config: GitHubConnectConfig
 ): Promise<any | null> {
+    if (GithubRateLimiter.isLimited()) return null;
     // List runs for the branch, event=push is likely what we want, but just latest is safer
     const apiUrl = `https://api.github.com/repos/${config.owner}/${config.repo}/actions/runs?branch=${config.branch}&per_page=1`;
 
@@ -117,7 +124,7 @@ export async function getLatestWorkflowRun(
         }
         return null;
     } catch (error) {
-        console.warn('GitHub Service: Get workflow failed', error);
+        logger.warn('GitHub Service: Get workflow failed', error);
         return null;
     }
 }
@@ -157,7 +164,7 @@ export async function waitForWorkflowCompletion(
                 }
             }
         } catch (error) {
-            console.warn('Polling error:', error);
+            logger.warn('Polling error:', error);
         }
 
         await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL));

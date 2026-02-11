@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { GameSettingSummary, CampaignService } from '../../services/CampaignService';
 import { RulesData } from '../../types/rules';
-import { Plus, Loader2, FileCog, Scroll, Trash2, Eye, EyeOff, Users, Copy } from 'lucide-react';
+import { Plus, Loader2, FileCog, Trash2, Eye, EyeOff, Users, Copy, LogOut } from 'lucide-react';
 import { defaultRules } from '../../data/defaultRules'; // We might need a default template
 import { INITIAL_DATA, INITIAL_SKILLS } from '../../data/initialState';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
@@ -11,9 +11,10 @@ import DuplicateSettingModal from './DuplicateSettingModal';
 interface AdminDashboardProps {
     onSelectSetting: (id: string, name: string, rules: RulesData) => void;
     onViewPlayers: () => void;
+    onLogout: () => void;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onViewPlayers }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onViewPlayers, onLogout }) => {
     // ... (state lines 14-19 are unchanged, but we need to include them in context or skip safely)
     const [settings, setSettings] = useState<GameSettingSummary[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -147,6 +148,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onView
                     <Users size={18} />
                     Tous les Joueurs
                 </button>
+
+                <button
+                    onClick={onLogout}
+                    className="flex items-center gap-2 bg-[#5c4d41] hover:bg-[#8b2e2e] text-white px-4 py-2 rounded-md font-bold transition-all shadow-md group"
+                    title="Se déconnecter"
+                >
+                    <LogOut size={18} className="group-hover:rotate-12 transition-transform" />
+                    Déconnexion
+                </button>
             </div>
             <p className="text-[#5c4d41] mb-8 italic">Gérez vos campagnes et configurations de règles.</p>
 
@@ -172,75 +182,77 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onView
             </div>
 
             {/* List */}
-            {isLoading && settings.length === 0 ? (
-                <div className="flex justify-center py-20">
-                    <Loader2 size={48} className="animate-spin text-amber-900/20" />
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {settings.length === 0 && !isLoading && (
-                        <div className="col-span-full text-center py-10 text-gray-400 italic">
-                            Aucune campagne trouvée. Créez-en une pour commencer.
-                        </div>
-                    )}
-                    {settings.map(setting => (
-                        <div
-                            key={setting.id}
-                            onClick={() => handleSelect(setting.id)}
-                            className="bg-white group cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-300 rounded-xl border border-[#bfae85]/30 overflow-hidden relative"
-                        >
-                            <div className="h-2 bg-amber-700 w-full" />
-                            <div className="p-6">
-                                <h3 className="font-serif font-bold text-xl text-[#4a3b32] mb-1 group-hover:text-amber-700 transition-colors pr-8">
-                                    {setting.name}
-                                </h3>
+            {
+                isLoading && settings.length === 0 ? (
+                    <div className="flex justify-center py-20">
+                        <Loader2 size={48} className="animate-spin text-amber-900/20" />
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {settings.length === 0 && !isLoading && (
+                            <div className="col-span-full text-center py-10 text-gray-400 italic">
+                                Aucune campagne trouvée. Créez-en une pour commencer.
+                            </div>
+                        )}
+                        {settings.map(setting => (
+                            <div
+                                key={setting.id}
+                                onClick={() => handleSelect(setting.id)}
+                                className="bg-white group cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-300 rounded-xl border border-[#bfae85]/30 overflow-hidden relative"
+                            >
+                                <div className="h-2 bg-amber-700 w-full" />
+                                <div className="p-6">
+                                    <h3 className="font-serif font-bold text-xl text-[#4a3b32] mb-1 group-hover:text-amber-700 transition-colors pr-8">
+                                        {setting.name}
+                                    </h3>
 
-                                {/* Absolute Actions Top Right */}
-                                <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                        onClick={(e) => handleDuplicate(e, setting.id, setting.name)}
-                                        className="p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-                                        title="Dupliquer la campagne"
-                                    >
-                                        <Copy size={18} />
-                                    </button>
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); setSettingToDelete(setting.id); }}
-                                        className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                                        title="Supprimer la campagne"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
-                                </div>
+                                    {/* Absolute Actions Top Right */}
+                                    <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            onClick={(e) => handleDuplicate(e, setting.id, setting.name)}
+                                            className="p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                                            title="Dupliquer la campagne"
+                                        >
+                                            <Copy size={18} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setSettingToDelete(setting.id); }}
+                                            className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                                            title="Supprimer la campagne"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
 
-                                <div className="flex items-center gap-2 text-xs text-[#bfae85] font-bold uppercase tracking-wider mb-4">
-                                    <span className="bg-amber-50 px-2 py-1 rounded">v{setting.version}</span>
-                                    <span>•</span>
-                                    <span>{new Date(setting.last_updated).toLocaleString()}</span>
-                                </div>
+                                    <div className="flex items-center gap-2 text-xs text-[#bfae85] font-bold uppercase tracking-wider mb-4">
+                                        <span className="bg-amber-50 px-2 py-1 rounded">v{setting.version}</span>
+                                        <span>•</span>
+                                        <span>{new Date(setting.last_updated).toLocaleString()}</span>
+                                    </div>
 
-                                <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
-                                    <button
-                                        onClick={(e) => handleToggleVisibility(e, setting.id, setting.is_public)}
-                                        className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full font-bold transition-all ${setting.is_public
-                                            ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                                            }`}
-                                        title={setting.is_public ? "Cliquer pour rendre Privé" : "Cliquer pour rendre Public"}
-                                    >
-                                        {setting.is_public ? <Eye size={12} /> : <EyeOff size={12} />}
-                                        {setting.is_public ? 'PUBLIQUE' : 'PRIVÉE'}
-                                    </button>
+                                    <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
+                                        <button
+                                            onClick={(e) => handleToggleVisibility(e, setting.id, setting.is_public)}
+                                            className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full font-bold transition-all ${setting.is_public
+                                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                                }`}
+                                            title={setting.is_public ? "Cliquer pour rendre Privé" : "Cliquer pour rendre Public"}
+                                        >
+                                            {setting.is_public ? <Eye size={12} /> : <EyeOff size={12} />}
+                                            {setting.is_public ? 'PUBLIQUE' : 'PRIVÉE'}
+                                        </button>
 
-                                    <button className="text-amber-700 font-bold text-sm bg-amber-50 px-3 py-1 rounded group-hover:bg-amber-700 group-hover:text-white transition-colors">
-                                        Ouvrir
-                                    </button>
+                                        <button className="text-amber-700 font-bold text-sm bg-amber-50 px-3 py-1 rounded group-hover:bg-amber-700 group-hover:text-white transition-colors">
+                                            Ouvrir
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                        ))}
+                    </div>
+                )
+            }
 
             <ConfirmationModal
                 isOpen={!!settingToDelete}
@@ -258,7 +270,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onView
                 oldName={settingToDuplicate?.name || ''}
                 onConfirm={confirmDuplicate}
             />
-        </div>
+        </div >
     );
 };
 

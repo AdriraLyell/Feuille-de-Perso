@@ -1,6 +1,7 @@
 import { RulesData } from '../types/rules';
 import { CampaignService, GameSettingSummary } from './CampaignService';
 import { DatabaseService } from './DatabaseService';
+import { TABLE_GAME_SETTINGS } from '../constants/db';
 
 export const PlayerService = {
 
@@ -9,7 +10,7 @@ export const PlayerService = {
      */
     async listPublicSettings(): Promise<GameSettingSummary[]> {
         return await DatabaseService.fetchAll<GameSettingSummary>(
-            'game_settings',
+            TABLE_GAME_SETTINGS,
             {
                 select: 'id, name, version, last_updated, is_public',
                 eq: { is_public: true },
