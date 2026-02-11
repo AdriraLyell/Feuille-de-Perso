@@ -8,6 +8,7 @@ import { ErrorService } from '../services/ErrorService';
 import { NotebookTextareaHandle } from './campaign/NotebookTextarea';
 import PartyTable from './campaign/PartyTable';
 import JournalPage from './campaign/JournalPage';
+import TableOfContents from './campaign/TableOfContents';
 import {
     JOURNAL_LINE_HEIGHT,
     JOURNAL_PAGE_WIDTH_LANDSCAPE,
@@ -140,54 +141,95 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape: _ignored = false }) => {
         }
     };
 
-    const handleOverflow = (noteId: string, overflowContent: string) => {
+    const pendingFocusRef = useRef<string | null>(null);
+
+    useEffect(() => {
+        if (pendingFocusRef.current) {
+            const nextId = pendingFocusRef.current;
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    if (noteRefs.current[nextId]) {
+                        noteRefs.current[nextId]?.focusAtEnd();
+                    }
+                }, 100);
+            });
+            pendingFocusRef.current = null;
+        }
+    }, [data.campaignNotes]);
+
+    const handleOverflow = (noteId: string, remainingContent: string, overflowContent: string, focusNext?: boolean) => {
         const notes = data.campaignNotes || [];
         const currentIndex = notes.findIndex(n => n.id === noteId);
         if (currentIndex === -1) return;
 
+        const currentNote = notes[currentIndex];
         const nextIndex = currentIndex + 1;
 
-        // Remove the overflowing content from current note first
-        const currentNote = notes[currentIndex];
-        // Note: The NotebookTextarea already removed it from DOM and called onOverflow, 
-        // but it still exists in the 'content' string of the note in the state.
-        // We need to sync the current note too.
-        // Actually, NotebookTextarea calls onChange right before onOverflow.
-        // So we just need to handle the destination.
+        // 1. Prepare updated notes array
+        // Start by updating the current note to remove overflow (fixes duplication)
+        let updatedNotes = notes.map((n, i) =>
+            i === currentIndex ? { ...n, content: remainingContent } : n
+        );
 
-        if (nextIndex < notes.length) {
-            // Prepend overflow to next note
-            const nextNote = notes[nextIndex];
-            // Check if next note is effectively empty (just title/date) to convert it to continuation
-            const startEmpty = !nextNote.content || nextNote.content.trim() === '';
-            const isDefaultTitle = nextNote.title === 'Nouvelle Session';
+        if (nextIndex < updatedNotes.length) {
+            const nextNote = updatedNotes[nextIndex];
 
-            const updatedNextContent = overflowContent + (nextNote.content || '');
+            // Case A & B : Merge into next page?
+            // Merge if it's already a continuation OR if it's effectively empty/default
+            const isNextContinuation = nextNote.isContinuation;
+            const isNextEmpty = !nextNote.content || (nextNote.content.replace(/<[^>]*>/g, '').trim() === '');
+            const isDefaultTitle = nextNote.title === 'Nouvelle Session' || nextNote.title === `${currentNote.title} (suite)`;
 
-            const newNotes = notes.map((n, i) =>
-                i === nextIndex ? {
-                    ...n,
-                    content: updatedNextContent,
-                    // If it was empty/default, treat it as a continuation of previous page
-                    isContinuation: n.isContinuation || (startEmpty && isDefaultTitle)
-                } : n
-            );
+            if (isNextContinuation || (isNextEmpty && isDefaultTitle)) {
+                // Merge
+                if (focusNext) pendingFocusRef.current = nextNote.id;
+                updatedNotes = updatedNotes.map((n, i) =>
+                    i === nextIndex ? {
+                        ...n,
+                        content: overflowContent + (n.content || ''),
+                        isContinuation: true
+                    } : n
+                );
+                onChange({ ...data, campaignNotes: updatedNotes });
+            } else {
+                // Case C : Insertion
+                const newId = Math.random().toString(36).substr(2, 9);
+                if (focusNext) pendingFocusRef.current = newId;
 
-            onChange({ ...data, campaignNotes: newNotes });
+                const newNote: CampaignNoteEntry = {
+                    id: newId,
+                    date: currentNote.date,
+                    title: `${currentNote.title} (suite)`,
+                    content: overflowContent,
+                    images: [],
+                    isContinuation: true
+                };
+
+                updatedNotes = [
+                    ...updatedNotes.slice(0, nextIndex),
+                    newNote,
+                    ...updatedNotes.slice(nextIndex)
+                ];
+                onChange({ ...data, campaignNotes: updatedNotes });
+                onAddLog("Page de suite insérée", 'info', 'sheet');
+            }
         } else {
-            // Create a new note
+            // End of book: Create a new note
+            const newId = Math.random().toString(36).substr(2, 9);
+            if (focusNext) pendingFocusRef.current = newId;
+
             const newNote: CampaignNoteEntry = {
-                id: Math.random().toString(36).substr(2, 9),
-                date: currentNote.date, // Keep same date
+                id: newId,
+                date: currentNote.date,
                 title: `${currentNote.title} (suite)`,
                 content: overflowContent,
                 images: [],
-                isContinuation: true // Mark as continuation
+                isContinuation: true
             };
 
             onChange({
                 ...data,
-                campaignNotes: [...notes, newNote]
+                campaignNotes: [...updatedNotes, newNote]
             });
         }
     };
@@ -205,6 +247,18 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape: _ignored = false }) => {
         if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollBy({
                 left: scrollContainerRef.current.clientWidth,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    const jumpToPage = (index: number) => {
+        if (scrollContainerRef.current) {
+            // index 0 is TOC. Spreads are (TOC, P1), (P2, P3)...
+            // Spread index = floor(index / 2)
+            const spreadIndex = Math.floor(index / 2);
+            scrollContainerRef.current.scrollTo({
+                left: spreadIndex * scrollContainerRef.current.clientWidth,
                 behavior: 'smooth'
             });
         }
@@ -430,105 +484,95 @@ const CampaignNotes: React.FC<Props> = ({ isLandscape: _ignored = false }) => {
                                                 minWidth: '100%'
                                             }}
                                         >
-                                            {/* SPREAD COMPONENT: Groups pages by 2 to ensure perfect book layout */}
-                                            {Array.from({ length: Math.ceil((data.campaignNotes || []).length / 2) }).map((_, spreadIdx) => {
-                                                const firstNoteIdx = spreadIdx * 2;
-                                                const firstNote = data.campaignNotes?.[firstNoteIdx];
-                                                const secondNote = data.campaignNotes?.[firstNoteIdx + 1];
+                                            {/* PRE-PROCESS PAGES: Combine TOC and Notes into a flat array for easy spread mapping */}
+                                            {(() => {
+                                                const notes = data.campaignNotes || [];
+                                                const allPages = [
+                                                    { type: 'toc' as const },
+                                                    ...notes.map((note, index) => ({ type: 'note' as const, note, originalIndex: index }))
+                                                ];
 
-                                                return (
-                                                    <div key={spreadIdx} className="h-full flex-shrink-0 min-w-full flex justify-between snap-start relative">
-                                                        {firstNote && (
-                                                            <JournalPage
-                                                                key={firstNote.id}
-                                                                note={firstNote}
-                                                                pageIndex={firstNoteIdx}
-                                                                isEven={true}
-                                                                isLandscape={isLandscape}
-                                                                onUpdate={updateNote}
-                                                                onDelete={(id) => setNoteIdToDelete(id)}
-                                                                onInsertAfter={() => insertPageAfter(firstNoteIdx)}
-                                                                onOverflow={handleOverflow}
-                                                                onAddLog={(msg, type) => onAddLog(msg, type, 'sheet')}
-                                                                onForceReflow={(id) => {
-                                                                    if (noteRefs.current[id]) {
-                                                                        noteRefs.current[id]?.forceReflow();
-                                                                        onAddLog("Repagination forcée", 'info', 'sheet');
-                                                                    }
-                                                                }}
-                                                                registerNoteRef={(id, ref) => { if (ref) noteRefs.current[id] = ref; else delete noteRefs.current[id]; }}
-                                                                isDrawing={isDrawingImage}
-                                                                onDrawComplete={handleDrawComplete}
-                                                                onUpdateImageConfig={handleUpdateImageConfig}
-                                                                onRemoveImage={handleRemoveImage}
-                                                            />
-                                                        )}
+                                                return Array.from({ length: Math.ceil(allPages.length / 2) }).map((_, spreadIdx) => {
+                                                    const p1 = allPages[spreadIdx * 2];
+                                                    const p2 = allPages[spreadIdx * 2 + 1];
 
-                                                        {/* Physical Gap for the Spine */}
-                                                        <div className="w-[40px] shrink-0 pointer-events-none" />
-
-                                                        {secondNote ? (
-                                                            <JournalPage
-                                                                key={secondNote.id}
-                                                                note={secondNote}
-                                                                pageIndex={firstNoteIdx + 1}
-                                                                isEven={false}
-                                                                isLandscape={isLandscape}
-                                                                onUpdate={updateNote}
-                                                                onDelete={(id) => setNoteIdToDelete(id)}
-                                                                onInsertAfter={() => insertPageAfter(firstNoteIdx + 1)}
-                                                                onOverflow={handleOverflow}
-                                                                onAddLog={(msg, type) => onAddLog(msg, type, 'sheet')}
-                                                                onForceReflow={(id) => {
-                                                                    if (noteRefs.current[id]) {
-                                                                        noteRefs.current[id]?.forceReflow();
-                                                                        onAddLog("Repagination forcée", 'info', 'sheet');
-                                                                    }
-                                                                }}
-                                                                registerNoteRef={(id, ref) => { if (ref) noteRefs.current[id] = ref; else delete noteRefs.current[id]; }}
-                                                                isDrawing={isDrawingImage}
-                                                                onDrawComplete={handleDrawComplete}
-                                                                onUpdateImageConfig={handleUpdateImageConfig}
-                                                                onRemoveImage={handleRemoveImage}
-                                                            />
-                                                        ) : (
-                                                            /* Ghost Page at the end of an odd note count spread */
-                                                            <div
-                                                                className="h-full flex-shrink-0 snap-start relative flex flex-col page-shadow-right"
-                                                                style={{
-                                                                    width: isLandscape ? `${JOURNAL_PAGE_WIDTH_LANDSCAPE}px` : `${JOURNAL_PAGE_WIDTH_PORTRAIT}px`,
-                                                                    height: isLandscape ? `${JOURNAL_PAGE_HEIGHT_LANDSCAPE}px` : `${JOURNAL_PAGE_HEIGHT_PORTRAIT}px`,
-                                                                    borderLeft: 'none'
-                                                                }}
-                                                            >
+                                                    const renderPage = (page: typeof allPages[0], idx: number, isEven: boolean) => {
+                                                        if (!page) {
+                                                            /* Ghost Page - Right side only for now by design */
+                                                            return (
                                                                 <div
-                                                                    className="h-full flex flex-col bg-[#fdfbf7] overflow-hidden relative"
-                                                                    style={{ padding: `${JOURNAL_CONTENT_PADDING_Y}px ${JOURNAL_CONTENT_PADDING_X}px` }}
+                                                                    className="h-full flex-shrink-0 snap-start relative flex flex-col page-shadow-right"
+                                                                    style={{
+                                                                        width: isLandscape ? `${JOURNAL_PAGE_WIDTH_LANDSCAPE}px` : `${JOURNAL_PAGE_WIDTH_PORTRAIT}px`,
+                                                                        height: isLandscape ? `${JOURNAL_PAGE_HEIGHT_LANDSCAPE}px` : `${JOURNAL_PAGE_HEIGHT_PORTRAIT}px`,
+                                                                        borderLeft: 'none'
+                                                                    }}
                                                                 >
-                                                                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/paper-fibers.png')]"></div>
-
-                                                                    {/* Ghost Header - Tighter margin */}
-                                                                    <div className="border-b-2 border-transparent mb-2 pb-2 flex items-center justify-between shrink-0 z-20 opacity-0 pointer-events-none select-none">
-                                                                        <div className="flex items-center gap-4 flex-grow min-w-0">
-                                                                            <div className="h-[20px]"></div>
-                                                                            <div className="h-[32px]"></div>
+                                                                    <div
+                                                                        className="h-full flex flex-col bg-[#fdfbf7] overflow-hidden relative"
+                                                                        style={{ padding: `${JOURNAL_CONTENT_PADDING_Y}px ${JOURNAL_CONTENT_PADDING_X}px` }}
+                                                                    >
+                                                                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/paper-fibers.png')]"></div>
+                                                                        <div className="flex-grow min-h-0 bg-transparent relative book-lines"></div>
+                                                                        <div className="absolute bottom-4 right-10 text-[18px] font-serif text-stone-900/40 font-bold italic z-40 pointer-events-none">
+                                                                            {idx + 1}
                                                                         </div>
                                                                     </div>
-
-                                                                    {/* Ghost Lines */}
-                                                                    <div className="flex-grow min-h-0 bg-transparent relative book-lines"></div>
-
-                                                                    {/* Ghost Page Number */}
-                                                                    {/* Ghost Page Number - Simplified, lower position */}
-                                                                    <div className="absolute bottom-4 right-10 text-[18px] font-serif text-stone-900/40 font-bold italic z-40 pointer-events-none">
-                                                                        {firstNoteIdx + 2}
-                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                );
-                                            })}
+                                                            );
+                                                        }
+
+                                                        if (page.type === 'toc') {
+                                                            return (
+                                                                <TableOfContents
+                                                                    key="toc"
+                                                                    notes={notes}
+                                                                    isLandscape={isLandscape}
+                                                                    onJumpToPage={jumpToPage}
+                                                                />
+                                                            );
+                                                        }
+
+                                                        return (
+                                                            <JournalPage
+                                                                key={page.note.id}
+                                                                note={page.note}
+                                                                pageIndex={page.originalIndex}
+                                                                bookPageIndex={idx}
+                                                                isEven={isEven}
+                                                                isLandscape={isLandscape}
+                                                                onUpdate={updateNote}
+                                                                onDelete={(id) => setNoteIdToDelete(id)}
+                                                                onInsertAfter={() => insertPageAfter(page.originalIndex)}
+                                                                onOverflow={handleOverflow}
+                                                                onAddLog={(msg, type) => onAddLog(msg, type, 'sheet')}
+                                                                onForceReflow={(id) => {
+                                                                    if (noteRefs.current[id]) {
+                                                                        noteRefs.current[id]?.forceReflow();
+                                                                        onAddLog("Repagination forcée", 'info', 'sheet');
+                                                                    }
+                                                                }}
+                                                                registerNoteRef={(id, ref) => { if (ref) noteRefs.current[id] = ref; else delete noteRefs.current[id]; }}
+                                                                isDrawing={isDrawingImage}
+                                                                onDrawComplete={handleDrawComplete}
+                                                                onUpdateImageConfig={handleUpdateImageConfig}
+                                                                onRemoveImage={handleRemoveImage}
+                                                            />
+                                                        );
+                                                    };
+
+                                                    return (
+                                                        <div key={spreadIdx} className="h-full flex-shrink-0 min-w-full flex justify-between snap-start relative">
+                                                            {renderPage(p1, spreadIdx * 2, true)}
+
+                                                            {/* Physical Gap for the Spine */}
+                                                            <div className="w-[40px] shrink-0 pointer-events-none" />
+
+                                                            {renderPage(p2, spreadIdx * 2 + 1, false)}
+                                                        </div>
+                                                    );
+                                                });
+                                            })()}
                                         </div>
                                     )}
                                 </div>

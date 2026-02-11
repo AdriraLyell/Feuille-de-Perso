@@ -1,5 +1,89 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.20.10] - 2026-02-07 [REFACTOR]
+
+- Admin: Calcul du total réel des attributs (somme des 3 champs de score).
+- Admin: Restauration du groupement par catégories (Séries) pour les compétences.
+- Admin: Optimisation de la structure et du filtrage des fiches personnages.
+
+## [2.20.9] - 2026-02-07 [FIX]
+
+- Admin: Correction de l'affichage des scores d'attributs (passage de value à val1).
+
+## [2.20.8] - 2026-02-07 [REFACTOR]
+
+- Admin: Restauration des catégories d'Attributs (Physique, Social, Mental) dans la vue personnage.
+- Admin: Correction de l'affichage des Arrière-plans (filtrage amélioré).
+- Admin: Les sections Avantages/Désavantages sont désormais masquées si elles sont vides.
+- Admin: Nettoyage de la structure de code de la vue personnage.
+
+## [2.20.7] - 2026-02-07 [FEATURE]
+
+- Admin: Amélioration de la vue lecture seule des personnages (compacte et détaillée).
+- Admin: Affichage des Arrière-plans et des Traits.
+
+## [2.20.6] - 2026-02-07 [REFACTOR]
+
+- Layout: Restauration du mode portrait original (4 colonnes de compétences).
+- Layout: Maintien de l'optimisation paysage (5 colonnes) avec détection dynamique.
+- Core: Le moteur de rendu adapte désormais la distribution des catégories selon l'orientation.
+
+## [2.20.5] - 2026-02-07 [REFACTOR]
+
+- Layout: Optimisation du mode paysage avec 5 colonnes de compétences.
+- UX: Suppression de l'espace vide à droite de la feuille en mode paysage.
+- Core: Redistribution intelligente des catégories sur la grille 6-cols.
+
+## [2.20.4] - 2026-02-07 [BUGFIX]
+
+- Hotfix: Correction d'un crash lors du passage en mode paysage (isLandscape).
+- Fix: Correction de l'application de la largeur A4 dans les réglages (portrait).
+- Core: Restauration des propriétés de colonnes attendues par le moteur de rendu.
+
+## [2.20.3] - 2026-02-07 [REFACTOR]
+
+- UX/UI: Les bibliothèques utilisent désormais le format A4 (1100px) en mode standard.
+- UX: Centrage dynamique du contenu pour une meilleure lisibilité sur grands écrans.
+
+## [2.20.2] - 2026-02-07 [FEATURE]
+
+- Joueur: Affichage du nom de la campagne active dans la barre de navigation.
+- Sync: Verrouillage intelligent du sélecteur de campagne en mode 'En Ligne'.
+- UX: Badge dynamique indiquant le contexte de jeu actuel.
+
+## [2.20.1] - 2026-02-07 [BUGFIX]
+
+- Fix critique: Les attributs ne sont plus réinitialisés à 0 lors de l'import d'un personnage.
+- Fix: Migration automatique des données lors de l'import (permet de charger d'anciennes fiches).
+- Fix: Correction de la conversion des valeurs 0 numériques en chaînes '0' pour les attributs.
+
+## [2.20.0] - 2026-02-07 [FEATURE]
+
+- Nouveau: Archivage et Master List Admin !
+- Admin: Nouveau bouton 'Tous les Joueurs' pour voir les fiches de toutes les campagnes.
+- Admin: Conservation des fiches même après suppression d'une campagne (Fiches orphelines).
+- Infra: Intégration de la compression d'images (JPEG 85% + gzip base64) lors de la synchronisation.
+- Optimisation: Gain de place significatif en base de données pour les images de personnages.
+- Joueur: Support des fiches 'Indépendantes' récupérées depuis le cloud.
+
+## [2.19.0] - 2026-02-07 [FEATURE]
+
+- Nouveau: Chargement des personnages depuis le cloud !
+- Joueur: Nouvel onglet 'Cloud' dans Import/Export pour récupérer ses fiches synchronisées.
+- Joueur: Recherche par nom de joueur avec liste des personnages disponibles.
+- Joueur: Confirmation avant écrasement de la fiche locale.
+- Infra: Service ImageCompressionService créé (compression JPEG + gzip, intégration à venir).
+- Infra: Nouvelle méthode getCharactersByPlayerName() dans CharacterSyncService.
+
+## [2.18.0] - 2026-02-07 [FEATURE]
+
+- Nouveau: Synchronisation des fiches joueurs avec le MJ !
+- Joueur: Bouton 'Sync' dans la navigation pour envoyer sa fiche à une campagne.
+- Joueur: Modal de synchronisation avec sélection de campagne et pré-remplissage des noms.
+- Admin: Nouvel onglet 'Joueurs' affichant la liste des fiches synchronisées.
+- Admin: Vue lecture seule des fiches de personnages soumises.
+- Infra: Nouveau service CharacterSyncService pour la gestion BDD des personnages.
+
 ## [2.17.51] - 2026-02-07 [REFACTOR]
 
 - Admin: Réorganisation des Paramètres de Création.

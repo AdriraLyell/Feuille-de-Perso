@@ -1,291 +1,128 @@
 [
     {
-        "version": "2.35.13",
-        "date": "2026-02-10",
+        "version": "2.36.22",
+        "date": "2026-02-11",
+        "description": "Unification de la Logique de Split",
         "changes": [
-            "[FIX] Suppression des espaces vides excessifs (gaps) en haut et en bas des pages.",
-            "[FIX] Refonte des numéros de page : suppression du texte 'PAGE', déplacement plus bas.",
-            "[DEV] Réduction de la hauteur du bandeau d'onglets et des marges internes du journal.",
-            "[DEV] Alignement vertical optimisé sur la première ligne de texte."
+            "Application de la 'Safety Valve' aux blocs `div` et `p` (empêche le déplacement de blocs complets).",
+            "Correction de la régression où une ligne entière sautait si elle était dans un bloc formaté.",
+            "Renforcement de la protection de l'index 0 pour garantir qu'aucune page ne commence par un vide technique."
         ]
     },
     {
-        "version": "2.35.12",
-        "date": "2026-02-10",
+        "version": "2.36.21",
+        "date": "2026-02-11",
+        "description": "Ajustement Tolérance - Ligne Complète",
         "changes": [
-            "[FIX] Suppression d'un trait vertical résiduel non centré.",
-            "[FIX] Centrage parfait du trait du milieu (spine).",
-            "[FIX] Réduction des espaces vides (gaps) en haut et en bas du journal.",
-            "[FIX] Amélioration de la visibilité des numéros de page (plus hauts, plus foncés)."
+            "Augmentation de la marge de tolérance (+5px) pour éviter de déplacer une ligne 'valide' dont seuls les jambages (g, j, y) dépasseraient.",
+            "Interdiction stricte du saut de ligne complet si une partie de la ligne est affichable (force la coupe du dernier mot si nécessaire).",
+            "Correction du bug 'Dernière ligne complète qui saute'."
         ]
     },
     {
-        "version": "2.35.11",
-        "date": "2026-02-10",
+        "version": "2.36.20",
+        "date": "2026-02-11",
+        "description": "Déblocage de l'Overflow",
         "changes": [
-            "[FIX] Groupement des pages par deux (Spreads) pour un rendu livre parfait.",
-            "[FIX] Centrage absolu de l'ombre centrale (Spine) et du pli du livre.",
-            "[FIX] Élimination totale du débordement ('leak') des pages suivantes.",
-            "[FIX] Augmentation de la hauteur du livre pour éviter de couper les numéros de page."
+            "Suppression du 'Gatekeeper' (scrollHeight) qui bloquait la détection de débordement.",
+            "Le système vérifie désormais chaque modification avec la précision Range API, sans pré-filtrage.",
+            "Correction du bug 'Saisie infinie' (le texte continuait sans créer de nouvelle page)."
         ]
     },
     {
-        "version": "2.35.10",
-        "date": "2026-02-10",
+        "version": "2.36.19",
+        "date": "2026-02-11",
+        "description": "Correction Mathématique - Modèle de Boîte (Box Model)",
         "changes": [
-            "[FIX] Centrage précis de l'ombre centrale (spine) du journal.",
-            "[FIX] Correction du débordement (leak) des pages voisines.",
-            "[FIX] Restauration et amélioration de la visibilité des numéros de page.",
-            "[DEV] Gestion dynamique de la hauteur de l'éditeur pour éviter le tronçonnage."
+            "Prise en compte de la bordure (`clientTop`) dans le calcul de la limite de débordement.",
+            "Correction du décalage systématique qui provoquait des faux positifs sur la première ligne.",
+            "Stabilisation définitive des coordonnées."
         ]
     },
     {
-        "version": "2.35.9",
-        "date": "2026-02-10",
+        "version": "2.36.18",
+        "date": "2026-02-11",
+        "description": "Protection Maximale - Anti-Page Blanche",
         "changes": [
-            "[FIX] Redimensionnement du journal pour restaurer une taille plus grande (Upscaling A4/A5).",
-            "[DEV] Précision du ratio A4 (1.414) et de l'alignement sur 35 lignes."
+            "Ajout d'une sécurité critique : Annulation du split si celui-ci aboutit à déplacer 100% de la première ligne (évite de vider la page).",
+            "Relaxation de la tolérance de débordement (+4px) pour absorber les rendus de police atypiques.",
+            "Optimisation logicielle pour préférer un léger débordement visuel plutôt qu'une rupture brutale de mise en page."
         ]
     },
     {
-        "version": "2.35.8",
-        "date": "2026-02-10",
+        "version": "2.36.17",
+        "date": "2026-02-11",
+        "description": "Protection Zero-Height & Coordonnées Relatives",
         "changes": [
-            "[FIX] Harmonisation du journal : format A4 Paysage (2x A5) par défaut.",
-            "[FIX] Correction de l'alignement du texte sur les lignes du journal.",
-            "[DEV] Suppression des paddings internes parasites dans l'éditeur.",
-            "[DEV] Refactoring des constantes de dimension pour A4/A5."
+            "Ajout d'une protection contre les calculs d'overflow sur conteneur non-rendu (Hauteur < 50px).",
+            "Passage en coordonnées relatives (rect.bottom - container.top) pour une fiabilité totale quel que soit le scroll.",
+            "Durcissement des conditions de validation pour empêcher les faux positifs."
         ]
     },
     {
-        "version": "2.35.7",
-        "date": "2026-02-10",
+        "version": "2.36.16",
+        "date": "2026-02-11",
+        "description": "Stratégie Hybride d'Overflow",
         "changes": [
-            "Refactoring technique du Journal : Centralisation des constantes de dimensions et de mise en page."
+            "Mise en place d'un 'Gatekeeper' (scrollHeight) pour empêcher les faux-positifs 'Toute la page saute'.",
+            "Combinaison avec la précision 'Range API' pour la découpe une fois l'overflow confirmé.",
+            "Solution définitive pour la stabilité curseur/page."
         ]
     },
     {
-        "version": "2.35.6",
-        "date": "2026-02-10",
+        "version": "2.36.15",
+        "date": "2026-02-11",
+        "description": "Correction Finale - Stabilité Overflow et Coordonnées",
         "changes": [
-            "Refactoring majeur du Journal : Extraction du composant JournalPage.",
-            "Optimisation du code de CampaignNotes (~150 lignes retirées)."
+            "Rebasculement sur le calcul de coordonnées 'top + height' pour éviter les décalages de viewport (Fix 'Page Vide').",
+            "Ajout d'une 'Safety Valve' sur la découpe des mots : empêche le système de déplacer une ligne entière si un mot est à cheval.",
+            "Optimisation de la tolérance de détection pour les écrans zoomés."
         ]
     },
     {
-        "version": "2.34.16",
-        "date": "2026-02-10",
+        "version": "2.36.14",
+        "date": "2026-02-11",
+        "description": "Correction de la Synchronisation des Coordonnées",
         "changes": [
-            {
-                "type": "feature",
-                "text": "Filtres 'Smart Chips' pour les bibliothèques Admin (Compétences, Traits, Historiques).",
-                "category": "ui"
-            }
+            "Alignement des calculs d'overflow sur le référentiel visuel (BoundingBox).",
+            "Correction du bug 'Toute la page se déplace' lié au zoom ou au scroll.",
+            "Ajustement de la tolérance de split pour les mots longs."
         ]
     },
     {
-        "version": "2.35.7",
-        "date": "2026-02-10",
+        "version": "2.36.13",
+        "date": "2026-02-11",
+        "description": "Pagination avec Précision Atomique (Range API)",
         "changes": [
-            "Refactoring technique du Journal : Centralisation des constantes de dimensions et de mise en page."
+            "Abandon de 'scrollHeight' au profit de 'Range.getClientRects()' pour la détection d'overflow.",
+            "Mesure au pixel près de la position de chaque caractère.",
+            "Résolution du bug de 'saut de ligne' et du 'débordement tardif'.",
+            "Stabilité maximale de la découpe intra-bloc HTML."
         ]
     },
     {
-        "version": "2.33.2",
-        "date": "2026-02-10",
+        "version": "2.36.12",
+        "date": "2026-02-11",
+        "description": "Correction chirurgicale de l'overflow (Pagination Top-Down)",
         "changes": [
-            {
-                "type": "feature",
-                "text": "Verrouillage des scores en Mode Édition : désactivation de la modification des bulles pendant la réorganisation pour éviter les erreurs de saisie.",
-                "category": "ux"
-            }
+            "Nouvel algorithme de recherche binaire Top-Down pour le calcul du débordement.",
+            "Support du découpage intra-div précis (évite que toute la ligne ne saute).",
+            "Stabilité accrue du curseur lors de la saisie à l'endroit du split.",
+            "Précision au caractère près pour la distribution du texte entre pages."
         ]
     },
     {
-        "version": "2.33.1",
+        "version": "2.36.11",
         "date": "2026-02-10",
+        "description": "Correction Granulaire & Build",
         "changes": [
-            {
-                "type": "feature",
-                "text": "Sécurisation du Mode Édition : interdiction de supprimer une compétence ayant des points investis (le déplacement reste autorisé).",
-                "category": "ux"
-            }
+            "Le système de débordement est maintenant chirurgical : pagination intra-div.",
+            "Correction d'une erreur de syntaxe JSX empêchant le build."
         ]
     },
     {
-        "version": "2.33.0",
+        "version": "2.36.10",
         "date": "2026-02-10",
-        "description": "Refonte intégrale du Guide Utilisateur Joueur.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Nouveau guide utilisateur structuré par thématiques (Modes, Usage, Création/Édition, Outils).",
-                "category": "docs"
-            },
-            {
-                "type": "added",
-                "text": "Documentation détaillée des trois modes de fonctionnement : En Ligne (Cloud), JSON (Fichiers) et Hors Ligne.",
-                "category": "docs"
-            },
-            {
-                "type": "added",
-                "text": "Guide pas-à-pas pour le Mode Création (répartition des points) et le Mode Édition Directe (structure).",
-                "category": "docs"
-            },
-            {
-                "type": "improved",
-                "text": "Nettoyage du guide : suppression des sections MJ redondantes dans l'app joueur pour plus de clarté.",
-                "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.32.8",
-        "date": "2026-02-10",
-        "description": "Synchronisation Admin et amélioration de la remontée d'infos.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Notifications au MJ pour TOUT ajout (Compétences & Arrière-plans, y compris bibliothèque officielle).",
-                "category": "admin"
-            },
-            {
-                "type": "added",
-                "text": "Nouvelle section 'Suggestions' dans la vue Admin pour visualiser les éléments même à 0 points.",
-                "category": "admin"
-            },
-            {
-                "type": "modified",
-                "text": "Nettoyage UI : Suppression du bouton de validation redondant dans le Header pour centraliser sur le bandeau.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.7",
-        "date": "2026-02-10",
-        "description": "Sécurité et clarté du Mode Édition.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Nouveau bandeau d'état 'Mode Édition' avec bouton de validation rapide.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Avertissement et explications pédagogiques avant d'activer le mode édition.",
-                "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.32.6",
-        "date": "2026-02-10",
-        "description": "Améliorations UX du Mode Édition Directe.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Repositionnement des boutons d'actions (Édition sous Création) pour une meilleure visibilité.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Indicateurs visuels de placement lors du Drag & Drop (ligne d'insertion).",
-                "category": "ui"
-            },
-            {
-                "type": "modified",
-                "text": "Amélioration de la logique de réorganisation : insertion précise à l'index visé.",
-                "category": "feature"
-            },
-            {
-                "type": "added",
-                "text": "Possibilité de déplacer les espaceurs déjà présents sur la fiche.",
-                "category": "feature"
-            }
-        ]
-    },
-    {
-        "version": "2.32.5",
-        "date": "2026-02-10",
-        "description": "Implémentation du Mode Édition Directe.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Nouveau Mode Édition Directe permettant d'ajouter, supprimer et déplacer des éléments directement sur la feuille.",
-                "category": "feature"
-            },
-            {
-                "type": "added",
-                "text": "Barre latérale d'édition avec recherche dans les bibliothèques de compétences et d'historiques.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Possibilité de créer des éléments personnalisés (suggestions automatiques pour le MJ).",
-                "category": "feature"
-            },
-            {
-                "type": "added",
-                "text": "Support du Drag & Drop pour réorganiser les compétences ou ajouter des espaceurs vides.",
-                "category": "ui"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction de la gestion des catégories lors de l'édition pour respecter les types de blocs (Compétences vs Historiques).",
-                "category": "fix"
-            }
-        ]
-    },
-    {
-        "version": "2.32.4",
-        "date": "2026-02-10",
-        "description": "Filtre 'Masquer acquis' pour les Bibliothèques.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Ajout d'un filtre (œil) pour masquer les compétences et spécialisations déjà acquises dans la bibliothèque.",
-                "category": "feature"
-            },
-            {
-                "type": "modified",
-                "text": "Remplacement du badge 'OFF'/'OFFICIEL' par une icône Globe pour uniformiser l'interface.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.3",
-        "date": "2026-02-10",
-        "description": "Correction des doublons dans la Bibliothèque (Joueur & Admin).",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Élimination des compétences et traits dupliqués dans la bibliothèque du joueur (fusion insensible à la casse).",
-                "category": "core"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction de l'assistant d'import Admin : exclusion des Historiques dans l'onglet Compétences et dédoublonnage des Compteurs.",
-                "category": "fix"
-            },
-            {
-                "type": "improved",
-                "text": "Renforcement de la sécurité backend : vérification anti-doublon lors de l'import de bibliothèque.",
-                "category": "core"
-            }
-        ]
-    },
-    {
-        "version": "2.32.2",
-        "date": "2026-02-10",
-        "description": "Ajustement layout : Noms sur une ligne, icônes déportées.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Retour au nom sur une seule ligne avec icônes de statut déplacées sur la ligne de description (Skills/Backgrounds).",
-                "category": "ui"
-            }
-        ]
+        "description": "Refactoring technique du Journal : Centralisation des constantes de dimensions et de mise en page."
     }
 ]

@@ -7,12 +7,13 @@ import NoteImageZone from './NoteImageZone';
 interface JournalPageProps {
     note: CampaignNoteEntry;
     pageIndex: number;
+    bookPageIndex: number;
     isEven: boolean;
     isLandscape: boolean;
     onUpdate: (id: string, field: keyof CampaignNoteEntry, value: any) => void;
     onDelete: (id: string) => void;
     onInsertAfter: (index: number) => void;
-    onOverflow: (id: string, content: string) => void;
+    onOverflow: (id: string, remaining: string, overflow: string, focusNext?: boolean) => void;
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info') => void;
     onForceReflow: (id: string) => void;
     registerNoteRef: (id: string, ref: NotebookTextareaHandle | null) => void;
@@ -49,7 +50,8 @@ const JournalPage: React.FC<JournalPageProps> = ({
     isDrawing,
     onDrawComplete,
     onUpdateImageConfig,
-    onRemoveImage
+    onRemoveImage,
+    bookPageIndex
 }) => {
     // const lineHeight = 28; // Replaced by constant
 
@@ -174,7 +176,7 @@ const JournalPage: React.FC<JournalPageProps> = ({
                         ref={(el) => registerNoteRef(note.id, el)}
                         value={note.content}
                         onChange={(v) => onUpdate(note.id, 'content', v)}
-                        onOverflow={(content) => onOverflow(note.id, content)}
+                        onOverflow={(remaining, overflow, focusNext) => onOverflow(note.id, remaining, overflow, focusNext)}
                         placeholder={note.isContinuation ? "" : "Récit des événements..."}
                         isDrawing={isDrawing}
                         onDrawComplete={(rect) => onDrawComplete(rect, note.id)}
@@ -197,7 +199,7 @@ const JournalPage: React.FC<JournalPageProps> = ({
 
             {/* Page Number - Simplified, lower position, integrated look */}
             <div className={`absolute bottom-4 ${isEven ? 'left-10' : 'right-10'} text-[18px] font-serif text-stone-900/40 font-bold italic z-40 selection:bg-transparent pointer-events-none`}>
-                {pageIndex + 1}
+                {bookPageIndex + 1}
             </div>
         </div>
     );
