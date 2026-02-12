@@ -142,7 +142,7 @@ export const CampaignService = {
                 lastUpdated: new Date(settingData.last_updated).getTime(),
                 configurations: settingData.configurations,
                 definitions: settingData.definitions,
-                theme: settingData.configurations?.theme || { creationColor: "#000", xpColor: "#000" },
+                theme: (settingData.configurations as Record<string, unknown>)?.theme as { creationColor: string; xpColor: string } || { creationColor: "#000", xpColor: "#000" },
                 libraries: libraries
             });
 

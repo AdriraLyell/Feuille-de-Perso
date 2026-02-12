@@ -11,11 +11,15 @@ Ces règles sont la source de vérité pour le comportement de l'agent dans ce w
 - **Chirurgie du Code** : Modifications minimales et précises. Ne jamais réécrire un fichier complet inutilement.
 - **Typage Strict** : Éviter `any` et `@ts-ignore`. Préférer les structures Zod et les types inférés.
 - **UX Premium** : Interfaces vivantes, micro-animations, feedback visuel immédiat.
+- **Logging** : Utiliser `src/utils/logger.ts` au lieu de `console.log` directement.
 
 ## 2. DOCUMENTATION DE RÉFÉRENCE
 *Consulter ces fichiers avant toute intervention majeure pour limiter l'usage des tokens :*
-- [L'Audit & Roadmap](file:///d:/Projet%20JdR/feuille-de-perso/docs/AUDIT_SUMMARY.md) : État des dettes techniques et tâches à venir.
+- [Audit & Roadmap](file:///d:/Projet%20JdR/feuille-de-perso/docs/AUDIT_SUMMARY.md) : État des dettes techniques et tâches à venir.
+- [Plan Issues](file:///d:/Projet%20JdR/feuille-de-perso/docs/PLAN_ISSUES_MOYENNES.md) : Plan détaillé de résolution des issues de typage et structure.
 - [Sécurité RLS](file:///d:/Projet%20JdR/feuille-de-perso/docs/RLS_POLICIES.md) : Politiques d'accès Supabase.
+- [Périmètre Fonctionnel](file:///d:/Projet%20JdR/feuille-de-perso/docs/functional_scope.md) : Vision, rôles et fonctionnalités clés.
+- [Schéma DB](file:///d:/Projet%20JdR/feuille-de-perso/docs/db_schema.md) : Tables Supabase et relations.
 - [Schémas Zod](file:///d:/Projet%20JdR/feuille-de-perso/src/schemas/characterSchema.ts) : Structure de données pivot.
 
 ## 3. PROTOCOLE DE VERSIONNING (OBLIGATOIRE)
@@ -24,12 +28,20 @@ Avant chaque fin de tâche (notify_user) :
 2. Mettre à jour `src/data/changelog.json` avec la version, date et type de changement.
 3. Vérifier l'intégrité via `npm run build`.
 
-## 4. GESTION DES TOKENS & DOCS
-- **Maintenance Proactive** : L'agent doit mettre à jour les documents de référence (`docs/AUDIT_SUMMARY.md`, `docs/RLS_POLICIES.md`) après chaque modification majeure ou résolution de problème.
-- **Concision** : Toujours rester synthétique dans les docs pour limiter l'usage des tokens de contexte.
-- **Source Unique** : Ce fichier (`regle.md`) est l'unique source de règles de l'agent. `.cursorrules` est obsolète.
+> Le script `npm run sync-version` synchronise automatiquement `src/constants.ts` depuis `package.json`.
 
-## 5. EMPLACEMENT DES FICHIERS
+## 4. GESTION DES TOKENS & DOCS
+- **Maintenance Proactive** : Mettre à jour les docs de référence (`docs/AUDIT_SUMMARY.md`, `docs/RLS_POLICIES.md`) après chaque modification majeure.
+- **Concision** : Toujours rester synthétique dans les docs pour limiter l'usage des tokens de contexte.
+- **Source Unique** : `.agent/rules/regle.md` est l'unique source de règles de l'agent.
+
+## 5. HYGIÈNE DU PROJET
+- **Racine propre** : Ne jamais laisser de fichiers temporaires (`*.log`, `test_output*`, debug HTML) à la racine. Utiliser le `.gitignore`.
+- **Pas de doublons de docs** : Un seul fichier par sujet (ex: un seul changelog = `src/data/changelog.json`).
+- **Constantes** : `src/constants/` pour les constantes métier (db, theme). `src/constants.ts` pour les constantes globales (version, repo).
+
+## 6. EMPLACEMENT DES FICHIERS
 - **Code** : `src/`
 - **Docs** : `docs/`
+- **Règles Agent** : `.agent/rules/`
 - **Brain** : `<appDataDir>/brain/<uuid>/` (Artifacts temporaires).

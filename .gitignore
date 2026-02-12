@@ -33,6 +33,13 @@ dist-ssr
 .env.test
 .env.production
 
+# Test & debug artifacts
+playwright-report/
+test-results/
+test_output*.txt
+tsc_errors.txt
+test-page.html
+
 # MCP configuration with sensitive tokens
 .mcp.json
 

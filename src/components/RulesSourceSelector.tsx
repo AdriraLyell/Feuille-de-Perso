@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GameSettingSummary, CampaignService } from '../services/CampaignService';
-import { Cloud, Wifi, WifiOff, Loader2, ArrowRight, RotateCcw, BookOpen, Scroll, Sparkles } from 'lucide-react';
+import { Cloud, Wifi, WifiOff, Loader2, ArrowRight, RotateCcw, BookOpen, Scroll, Sparkles, Clock } from 'lucide-react';
 import { RulesData } from '../types/rules';
 import { ErrorService } from '../services/ErrorService';
 import { MotionFade } from './ui/motion/MotionFade';
@@ -276,7 +276,5 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
         </div>
     );
 };
-
-export default RulesSourceSelector;
 
 export default RulesSourceSelector;

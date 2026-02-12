@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.45.5",
+        "date": "2026-02-12",
+        "type": "patch",
+        "changes": [
+            "🧹 Audit : Suppression de 12 fichiers de débris à la racine du projet (logs, tests, doublons)",
+            "🛠️ Build : Correction de 4 erreurs de compilation pré-existantes (imports manquants, exports dupliqués, accès typé)",
+            "📄 Docs : Mise à jour de regle.md, AUDIT_SUMMARY.md et .gitignore",
+            "🔄 Version : Résolution de la désynchronisation de version entre package.json et constants.ts"
+        ]
+    },
+    {
         "version": "2.45.4",
         "date": "2026-02-12",
         "type": "patch",
@@ -217,24 +228,6 @@
         "changes": [
             "Mise à jour de la documentation d'architecture (functional_scope.md, db_schema.md)",
             "Ajustements de l'Audit Summary (Phase 1)"
-        ]
-    },
-    {
-        "version": "2.40.1",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "Correction d'un crash dans le modal Changelog dû à des données non définies",
-            "Ajout de protections contre les erreurs de rendu dans ChangelogModal"
-        ]
-    },
-    {
-        "version": "2.40.0",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "Refactorisation du Reconciler : Extraction de skillsReconciler.ts pour une meilleure maintenabilité",
-            "Standardisation des variables CSS et nettoyage des styles orphelins"
         ]
     }
 ]

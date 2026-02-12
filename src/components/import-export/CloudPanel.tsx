@@ -14,6 +14,7 @@ import { detectConflicts, smartMerge, DataConflict } from '../../utils/importExp
 import CloudConflictResolver from './CloudConflictResolver';
 import { ErrorService } from '../../services/ErrorService';
 import ThematicModal from '../ui/ThematicModal';
+import ThematicButton from '../ui/ThematicButton';
 import { useNotification } from '../../context/NotificationContext';
 
 interface CloudPanelProps {

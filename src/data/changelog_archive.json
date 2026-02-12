@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.40.1",
+        "date": "2026-02-11",
+        "type": "patch",
+        "changes": [
+            "Correction d'un crash dans le modal Changelog dû à des données non définies",
+            "Ajout de protections contre les erreurs de rendu dans ChangelogModal"
+        ]
+    },
+    {
+        "version": "2.40.0",
+        "date": "2026-02-11",
+        "type": "minor",
+        "changes": [
+            "Refactorisation du Reconciler : Extraction de skillsReconciler.ts pour une meilleure maintenabilité",
+            "Standardisation des variables CSS et nettoyage des styles orphelins"
+        ]
+    },
+    {
         "version": "2.35.6",
         "date": "2026-02-10",
         "changes": [
@@ -1407,27 +1425,6 @@
             "UX: Nouveau bouton 'Reprendre ma session' pour charger instantanément la campagne associée au personnage local.",
             "Sauvegarde: Option de sauvegarde de secours (JSON) intégrée directement dans la modale de conflit.",
             "Core: Extraction de la logique d'exportation vers un utilitaire partagé."
-        ]
-    },
-    {
-        "version": "2.20.12",
-        "date": "2026-02-07",
-        "type": "refactor",
-        "changes": [
-            "Optimisation: Évitement de la re-compression des images déjà optimisées (prévention de la perte de qualité).",
-            "Core: Décompression à la volée uniquement lors de l'affichage (données stockées compressées partout).",
-            "Fix: Correction des imports et de la gestion de la mémoire à l'affichage des images."
-        ]
-    },
-    {
-        "version": "2.20.11",
-        "date": "2026-02-07",
-        "type": "feature",
-        "changes": [
-            "Export/Import: Intégration de la compression d'images (JPEG + GZIP) dans les fichiers .json.",
-            "Optimisation: Réduction de 70-85% de la taille des fichiers d'exportation.",
-            "Core: Centralisation de la logique de traitement d'images pour réutilisation.",
-            "Rétrocompatibilité: Les anciens fichiers JSON non compressés restent parfaitement importables."
         ]
     }
 ]
