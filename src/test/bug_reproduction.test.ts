@@ -17,15 +17,16 @@ describe('Bug Reproduction: Counter Sync Logic', () => {
 
         // Counter Key Lookup
         const counterKey = Object.keys(prev.counters).find(k => k === id) || id;
-        const current = prev.counters[counterKey]; // @ts-ignore
+        const currentRaw = prev.counters[counterKey];
+        const current = Array.isArray(currentRaw) ? currentRaw[0] : (currentRaw as DotEntry | undefined);
 
-        if (current && !Array.isArray(current)) {
-
+        if (current) {
             // BLOCKING LOGIC
             const def = rules?.definitions?.counters?.[id] || rules?.definitions?.counters?.[counterKey];
             if (!isCreationMode && def && (def.xpCost <= 0)) {
                 if (value > current.value) return prev; // BLOCKED
             }
+
 
             const newItem = { ...current };
             newItem.value = value;

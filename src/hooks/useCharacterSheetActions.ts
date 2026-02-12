@@ -219,7 +219,10 @@ export const useCharacterSheetActions = (
                 });
                 return { ...prev, counters: { ...prev.counters, custom: newCustom } };
             } else {
-                const counterKey = Object.keys(prev.counters).find(k => getCounter(prev, k)?.id === id) || id;
+                const counterKey = Object.keys(prev.counters).find(k => {
+                    const c = getCounter(prev, k);
+                    return !Array.isArray(c) && c?.id === id;
+                }) || id;
                 const current = getCounter(prev, counterKey);
                 if (!current || Array.isArray(current)) return prev;
 

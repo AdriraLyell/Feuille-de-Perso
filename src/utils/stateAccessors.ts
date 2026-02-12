@@ -27,8 +27,8 @@ export function setSkillCategory(
 export function getCounter(
     state: CharacterSheetData,
     key: string
-): any {
-    return (state.counters as Record<string, any>)[key];
+): DotEntry | DotEntry[] | undefined {
+    return (state.counters as Record<string, DotEntry | DotEntry[]>)[key];
 }
 
 /**
@@ -37,7 +37,7 @@ export function getCounter(
 export function setCounter(
     state: CharacterSheetData,
     key: string,
-    value: any
+    value: DotEntry | DotEntry[]
 ): void {
-    (state.counters as Record<string, any>)[key] = value;
+    (state.counters as Record<string, DotEntry | DotEntry[]>)[key] = value;
 }

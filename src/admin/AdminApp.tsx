@@ -159,7 +159,7 @@ const AdminApp: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 text-slate-800 font-sans pb-20">
+        <div className="min-h-screen bg-mystic-stone text-stone-200 font-sans pb-20 transition-colors duration-500">
             <AdminHeader
                 currentSettingName={currentSettingName}
                 hasUnsavedChanges={hasUnsavedChanges}
@@ -176,7 +176,7 @@ const AdminApp: React.FC = () => {
 
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
 
-            <nav className="bg-white border-b border-gray-200 mt-0 sticky top-16 z-40">
+            <nav className="bg-mystic-deep/90 border-b border-stone-800 mt-0 sticky top-[72px] z-40 backdrop-blur-md shadow-lg">
                 <div className="max-w-7xl mx-auto flex">
                     {([
                         { id: 'general', label: 'Général & Création' },
@@ -189,7 +189,7 @@ const AdminApp: React.FC = () => {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === tab.id ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+                            className={`flex-1 py-4 text-center font-bold uppercase tracking-widest text-xs border-b-2 transition-all ${activeTab === tab.id ? 'border-amber-gold text-amber-gold bg-amber-900/10' : 'border-transparent text-stone-500 hover:text-stone-300 hover:bg-stone-800'}`}
                         >
                             {tab.label}
                         </button>
@@ -199,8 +199,10 @@ const AdminApp: React.FC = () => {
 
             <main className={`mx-auto p-6 transition-all duration-300 ${activeTab === 'skills' ? 'max-w-[1600px]' : 'max-w-7xl'}`}>
                 {activeTab === 'general' && (
-                    <div className="bg-white p-8 rounded-lg shadow-sm border border-slate-200 animate-in fade-in slide-in-from-bottom-4">
-                        <h2 className="text-2xl font-bold mb-4 text-slate-900 border-b pb-2">Configuration Générale</h2>
+                    <div className="bg-mystic-surface p-8 rounded-sm shadow-glass border border-stone-700/50 animate-in fade-in slide-in-from-bottom-4">
+                        <h2 className="text-2xl font-serif font-bold mb-6 text-amber-gold border-b border-stone-700 pb-2 flex items-center gap-2">
+                            Configuration Générale
+                        </h2>
                         <AdminCreationEditor rules={rules} onUpdate={handleUpdateRules} />
                     </div>
                 )}
@@ -209,12 +211,12 @@ const AdminApp: React.FC = () => {
                 {activeTab === 'costs' && <AdminCostsEditor rules={rules} onUpdate={handleUpdateRules} />}
                 {activeTab === 'libraries' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4">
-                        <div className="flex gap-4 mb-4 bg-white p-2 rounded-lg shadow-sm border border-slate-200 w-fit mx-auto overflow-x-auto">
+                        <div className="flex gap-2 mb-6 bg-mystic-surface p-2 rounded-sm shadow-md border border-stone-700 w-fit mx-auto overflow-x-auto">
                             {['traits', 'skills', 'backgrounds', 'counters', 'specializations'].map((lt) => (
                                 <button
                                     key={lt}
                                     onClick={() => setActiveLibraryTab(lt as typeof activeLibraryTab)}
-                                    className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === lt ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                                    className={`px-6 py-2 rounded-sm font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap ${activeLibraryTab === lt ? 'bg-amber-gold text-stone-900 shadow-glow-gold' : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800'}`}
                                 >
                                     {lt.charAt(0).toUpperCase() + lt.slice(1)}
                                 </button>

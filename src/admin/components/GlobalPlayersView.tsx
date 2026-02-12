@@ -12,6 +12,7 @@ import CharacterReadOnlyView from './CharacterReadOnlyView';
 import { GameSettingSummary, CampaignService } from '../../services/CampaignService';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { logger } from '../../utils/logger';
+import { ErrorService } from '../../services/ErrorService';
 import { Loader2 } from 'lucide-react';
 
 const GlobalPlayersView: React.FC = () => {
@@ -32,12 +33,15 @@ const GlobalPlayersView: React.FC = () => {
         try {
             const [charData, campaignData] = await Promise.all([
                 CharacterSyncService.getAllCharacters(),
-                CampaignService.listPublicSettings() // To match setting_id with names
+                CampaignService.listPublicSettings()
             ]);
             setCharacters(charData);
             setCampaigns(campaignData);
         } catch (error) {
-            logger.error("GlobalPlayersView: Failed to load data", error);
+            ErrorService.handleError(error, {
+                context: 'GlobalPlayersView.loadData',
+                userMessage: "Échec du chargement de la base de données joueurs."
+            });
         } finally {
             setIsLoading(false);
         }
@@ -56,7 +60,10 @@ const GlobalPlayersView: React.FC = () => {
                 setSelectedCharacter(fullChar);
             }
         } catch (error) {
-            logger.error("GlobalPlayersView: Failed to fetch character details", error);
+            ErrorService.handleError(error, {
+                context: 'GlobalPlayersView.handleViewDetails',
+                userMessage: "Impossible d'afficher les détails du personnage."
+            });
         }
     };
 
@@ -72,7 +79,10 @@ const GlobalPlayersView: React.FC = () => {
                 setCharacters(prev => prev.filter(c => c.id !== characterToDelete));
             }
         } catch (error) {
-            logger.error("GlobalPlayersView: Failed to delete character", error);
+            ErrorService.handleError(error, {
+                context: 'GlobalPlayersView.confirmDelete',
+                userMessage: "Échec de la suppression."
+            });
         } finally {
             setCharacterToDelete(null);
         }

@@ -1,6 +1,12 @@
+
 import React, { useState } from 'react';
 import { supabase } from '../../services/supabase';
-import { ShieldCheck, Lock, Loader2, AlertCircle } from 'lucide-react';
+import { ShieldCheck, Lock, Loader2, AlertCircle, Sparkles, Scroll, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MotionFade } from '../../components/ui/motion/MotionFade';
+import { MotionCard } from '../../components/ui/motion/MotionCard';
+import ThematicButton from '../../components/ui/ThematicButton';
+import { APP_VERSION } from '../../constants';
 
 const LoginScreen: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -49,91 +55,140 @@ const LoginScreen: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#fdfbf7] flex items-center justify-center p-4">
-            <div className="bg-white max-w-md w-full rounded-2xl shadow-xl border border-[#bfae85]/30 overflow-hidden animate-in zoom-in duration-300">
+        <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-1000">
+            {/* Background Texture & Effects */}
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')] opacity-30 pointer-events-none" />
 
-                {/* Header */}
-                <div className="bg-[#2d241e] p-8 text-center">
-                    <div className="w-16 h-16 bg-amber-700 rounded-full flex items-center justify-center mx-auto mb-4 text-white shadow-lg border-4 border-[#3d322b]">
-                        <ShieldCheck size={32} />
-                    </div>
-                    <h1 className="text-2xl font-serif font-bold text-amber-50">Administration</h1>
-                    <p className="text-amber-200/60 text-sm mt-2">Veuillez vous identifier pour accéder au grimoire.</p>
-                </div>
+            {/* Mystic Glows (Amber & Crimson) */}
+            <motion.div
+                animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.1, 0.2, 0.1],
+                }}
+                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-amber-900/10 rounded-full blur-[100px] pointer-events-none"
+            />
+            <motion.div
+                animate={{
+                    scale: [1.2, 1, 1.2],
+                    opacity: [0.1, 0.15, 0.1],
+                }}
+                transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-crimson-blood/5 rounded-full blur-[100px] pointer-events-none"
+            />
 
-                {/* Form */}
-                <form onSubmit={handleLogin} className="p-8">
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-start gap-3">
-                            <AlertCircle size={18} className="mt-0.5 shrink-0" />
-                            <span>{error}</span>
-                        </div>
-                    )}
-
-                    {successMessage && (
-                        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm flex items-start gap-3">
-                            <ShieldCheck size={18} className="mt-0.5 shrink-0" />
-                            <span>{successMessage}</span>
-                        </div>
-                    )}
-
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label>
-                            <input
-                                type="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-amber-600 focus:ring-1 focus:ring-amber-600 outline-none transition-all font-sans"
-                                placeholder="maitre.du.jeu@gmail.com"
-                            />
+            <MotionFade delay={0.1} className="w-full max-w-lg z-10">
+                <MotionCard
+                    className="overflow-hidden border border-amber-900/30 bg-stone-900/40 backdrop-blur-md shadow-glass"
+                    hoverEffect="glow"
+                >
+                    {/* Header */}
+                    <div className="bg-stone-900/60 p-10 text-center border-b border-amber-900/20 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                            <Scroll size={100} className="text-stone-500 rotate-12" />
                         </div>
 
-                        <div>
-                            <div className="flex justify-between items-center mb-1">
-                                <label className="block text-xs font-bold text-gray-500 uppercase">Mot de passe</label>
-                                <button
-                                    type="button"
-                                    onClick={handleForgotPassword}
-                                    className="text-[10px] font-bold text-amber-700 hover:text-amber-900 uppercase tracking-wider"
-                                >
-                                    Oublié ?
-                                </button>
-                            </div>
-                            <div className="relative">
-                                <input
-                                    type="password"
-                                    required={!successMessage}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-4 py-3 pl-10 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-amber-600 focus:ring-1 focus:ring-amber-600 outline-none transition-all font-sans"
-                                    placeholder="••••••••"
-                                />
-                                <Lock size={18} className="absolute left-3 top-3.5 text-gray-400" />
-                            </div>
+                        <div className="w-20 h-20 bg-amber-900/20 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500 shadow-glow-gold border border-amber-500/30 relative">
+                            <ShieldCheck size={40} />
+                            <Sparkles className="absolute -top-1 -right-1 text-amber-400 animate-pulse" size={20} />
                         </div>
+
+                        <h1 className="text-3xl font-serif font-black text-amber-500 tracking-tighter uppercase mb-2">
+                            Bureau du Maître
+                        </h1>
+                        <p className="text-stone-500 text-[10px] font-bold uppercase tracking-[0.3em] mt-1 italic">
+                            Accès aux Chroniques • Registre des Élus
+                        </p>
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full mt-8 bg-[#2d241e] hover:bg-[#1e1814] text-white font-bold py-3 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                    >
-                        {isLoading ? (
-                            <>
-                                <Loader2 size={20} className="animate-spin" /> Action en cours...
-                            </>
-                        ) : (
-                            "Accéder au Dashboard"
+                    {/* Form */}
+                    <form onSubmit={handleLogin} className="p-10">
+                        {error && (
+                            <MotionFade key="error">
+                                <div className="mb-8 p-4 bg-crimson-blood/5 border border-crimson-blood/30 rounded-sm text-rose-400 text-sm flex items-start gap-4 shadow-sm animate-shake">
+                                    <AlertCircle size={20} className="mt-0.5 shrink-0 text-crimson-blood" />
+                                    <span className="font-serif italic font-medium">{error}</span>
+                                </div>
+                            </MotionFade>
                         )}
-                    </button>
 
-                    <p className="mt-6 text-center text-xs text-gray-400">
-                        Accès réservé. Toute tentative d'intrusion sera punie par un jet de désastre critique.
-                    </p>
-                </form>
-            </div>
+                        {successMessage && (
+                            <MotionFade key="success">
+                                <div className="mb-8 p-4 bg-emerald-950/20 border border-emerald-500/30 rounded-sm text-emerald-400 text-sm flex items-start gap-4 shadow-sm">
+                                    <ShieldCheck size={20} className="mt-0.5 shrink-0" />
+                                    <span className="font-serif italic font-medium">{successMessage}</span>
+                                </div>
+                            </MotionFade>
+                        )}
+
+                        <div className="space-y-8">
+                            <div className="relative group">
+                                <label className="absolute -top-2.5 left-3 bg-stone-950 px-2 text-[9px] font-bold text-amber-700 uppercase tracking-[0.2em] group-focus-within:text-amber-400 transition-colors z-20">
+                                    Sceau de l'Identité
+                                </label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full px-5 py-4 bg-stone-950/50 border border-stone-800 rounded-sm focus:border-amber-500/50 focus:bg-stone-950 text-stone-200 outline-none transition-all font-sans placeholder:text-stone-800 hover:border-stone-700 shadow-inner"
+                                    placeholder="maitre@chroniques.fr"
+                                />
+                            </div>
+
+                            <div className="relative group">
+                                <div className="flex justify-between items-center absolute -top-2.5 left-3 right-3 z-20 pointer-events-none">
+                                    <label className="bg-stone-950 px-2 text-[9px] font-bold text-amber-700 uppercase tracking-[0.2em] group-focus-within:text-amber-400 transition-colors">
+                                        Parole Sacrée
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={handleForgotPassword}
+                                        className="bg-stone-950 px-2 text-[9px] font-bold text-stone-600 hover:text-amber-500 uppercase tracking-widest transition-colors pointer-events-auto"
+                                    >
+                                        Secret égaré ?
+                                    </button>
+                                </div>
+                                <div className="relative">
+                                    <input
+                                        type="password"
+                                        required={!successMessage}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full px-5 py-4 pl-12 bg-stone-950/50 border border-stone-800 rounded-sm focus:border-amber-500/50 focus:bg-stone-950 text-stone-200 outline-none transition-all font-sans placeholder:text-stone-800 hover:border-stone-700 shadow-inner"
+                                        placeholder="••••••••"
+                                    />
+                                    <Lock size={18} className="absolute left-4 top-4.5 text-stone-700 group-focus-within:text-amber-700 transition-colors" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <ThematicButton
+                            type="submit"
+                            variant="primary"
+                            size="xl"
+                            isLoading={isLoading}
+                            className="w-full mt-12 !tracking-[0.25em]"
+                            rightIcon={!isLoading ? <ArrowRight size={20} /> : undefined}
+                        >
+                            FRANCHIR LE SEUIL
+                        </ThematicButton>
+
+                        <div className="mt-10 pt-8 border-t border-stone-800/30 text-center">
+                            <p className="text-[10px] text-stone-700 font-bold uppercase tracking-[0.15em] leading-relaxed max-w-[200px] mx-auto italic">
+                                "Nul secret ne survit au regard de celui qui sait."
+                            </p>
+                        </div>
+                    </form>
+                </MotionCard>
+            </MotionFade>
+
+            <MotionFade delay={0.6} className="mt-12 flex flex-col items-center gap-2">
+                <div className="h-px w-12 bg-stone-800 mb-2" />
+                <span className="text-stone-800 text-[9px] font-mono tracking-[0.4em] uppercase">
+                    System v{APP_VERSION} | Neural Encryption Active
+                </span>
+            </MotionFade>
         </div>
     );
 };

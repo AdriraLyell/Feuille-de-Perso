@@ -86,8 +86,8 @@ export interface DataConflict {
     type: 'skill' | 'trait' | 'specialization';
     key: string;
     name: string;
-    current: any;
-    incoming: any;
+    current: LibrarySkillEntry | LibraryEntry | LibrarySpecializationEntry;
+    incoming: LibrarySkillEntry | LibraryEntry | LibrarySpecializationEntry;
 }
 
 /**

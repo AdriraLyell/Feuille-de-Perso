@@ -2,8 +2,14 @@ import { useState, useCallback } from 'react';
 import { RulesData } from '../../types/rules';
 import { CampaignService } from '../../services/CampaignService';
 import { LibraryService } from '../../services/LibraryService';
-import { generateRulesJSContent } from '../utils/rulesGenerator';
+import { generateRulesJSONContent } from '../utils/rulesGenerator';
 import { usePersistence } from './usePersistence';
+
+declare global {
+    interface Window {
+        EXTERNAL_RULES?: RulesData;
+    }
+}
 
 export const useAdminRulesHandler = () => {
     const [rules, setRules] = useState<RulesData | null>(null);
@@ -27,7 +33,6 @@ export const useAdminRulesHandler = () => {
 
     const handleUpdateRules = useCallback((newRules: RulesData) => {
         setRules(newRules);
-        // @ts-ignore
         window.EXTERNAL_RULES = newRules;
     }, []);
 
@@ -63,12 +68,12 @@ export const useAdminRulesHandler = () => {
 
     const handleExport = useCallback(() => {
         if (!rules) return;
-        const ruleString = generateRulesJSContent(rules);
-        const blob = new Blob([ruleString], { type: 'text/javascript' });
+        const ruleString = generateRulesJSONContent(rules);
+        const blob = new Blob([ruleString], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'rules.js';
+        a.download = 'rules.json';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

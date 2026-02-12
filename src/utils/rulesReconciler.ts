@@ -1,5 +1,5 @@
 
-import { CharacterSheetData, DotEntry, AttributeEntry } from '../types';
+import { CharacterSheetData, DotEntry, AttributeEntry, TraitEntry } from '../types';
 import { RulesData } from '../types/rules';
 import { generateId } from './factories';
 import { normalizeString } from './stringUtils';
@@ -163,23 +163,24 @@ const reconcileCounters = (newState: CharacterSheetData, currentState: Character
 
     Object.keys(rules.definitions.counters).forEach(key => {
         const def = rules.definitions.counters[key];
-        const existing = currentState.counters[key];
+        const existingRaw = currentState.counters[key];
+        const existing = Array.isArray(existingRaw) ? existingRaw[0] : (existingRaw as DotEntry | undefined);
+
         const libCounter = rules.libraries?.counters?.find(c => normalizeString(c.name) === normalizeString(def.name) || c.id === key);
         const description = def.description || libCounter?.description || '';
 
         const defaultValue = def.defaultValue !== undefined ? def.defaultValue : (def.value || 3);
-        const xpCost = def.xpCost ?? 0;
         const max = def.max || 10;
 
-        const value = existing && (existing as any).value !== undefined ? (existing as any).value : defaultValue;
-        const creationValue = existing && (existing as any).creationValue !== undefined ? (existing as any).creationValue : defaultValue;
+        const value = existing?.value !== undefined ? existing.value : defaultValue;
+        const creationValue = existing?.creationValue !== undefined ? existing.creationValue : defaultValue;
 
         if (existing) {
             newCounters[key] = {
                 ...existing,
                 name: def.name,
                 max,
-                description: description || (existing as any).description || '',
+                description: description || existing.description || '',
                 value,
                 creationValue
             };
@@ -209,7 +210,7 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
     // Migrer les Avantages (avantages) et Désavantages (desavantages)
     // Le but est de lier les entrées existantes aux définitions de la bibliothèque via definitionId
 
-    const processTraitList = (list: any[], type: 'avantage' | 'desavantage') => {
+    const processTraitList = (list: TraitEntry[], type: 'avantage' | 'desavantage'): TraitEntry[] => {
         if (!list) return [];
         return list.map(existing => {
             // Si déjà lié, on garde (on pourrait update le nom ici si besoin, mais attention aux customs)
@@ -225,8 +226,6 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
                 return {
                     ...existing,
                     definitionId: libMatch.id,
-                    // On ne force pas le nom pour l'instant pour éviter de casser des customs proches
-                    // Mais on pourrait le faire si on veut uniformiser
                 };
             }
 
@@ -235,10 +234,10 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
     };
 
     if (newState.page2) {
-        newState.page2.avantages = processTraitList(currentState.page2.avantages, 'avantage');
-        newState.page2.desavantages = processTraitList(currentState.page2.desavantages, 'desavantage');
+        newState.page2.avantages = processTraitList(currentState.page2.avantages || [], 'avantage');
+        newState.page2.desavantages = processTraitList(currentState.page2.desavantages || [], 'desavantage');
     }
-};
+}
 
 // --- Main Function ---
 

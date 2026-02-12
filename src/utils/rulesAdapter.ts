@@ -198,16 +198,18 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
     // 8. Update Counters
     const ruleCounters = rules.definitions.counters;
     if (ruleCounters) {
-        const newCounters: any = { custom: [] };
+        const newCounters: CharacterSheetData['counters'] = {
+            custom: baseState.counters.custom || []
+        };
 
         Object.keys(ruleCounters).forEach(key => {
             const def = ruleCounters[key];
             // Use defaultValue for starting value, fallback to 3 if not set
-            const startValue = (def as any).defaultValue !== undefined ? (def as any).defaultValue : 3;
+            const startValue = def.defaultValue !== undefined ? def.defaultValue : (def.value || 3);
             newCounters[key] = {
                 id: def.id || key,
                 name: def.name,
-                description: (def as any).description || '',
+                description: def.description || '',
                 value: startValue,           // Use defaultValue, not max!
                 creationValue: startValue,   // Use defaultValue, not max!
                 max: def.max,                // Hard cap for UI
@@ -215,19 +217,16 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
             };
         });
 
-        // Preserve custom counters if possible? No, we apply rules strictly for system counters.
-        // But we might want to keep 'custom' array from user state if it exists?
-        // For now, let's reset to rules + empty custom.
-        newCounters.custom = baseState.counters.custom || [];
-
         newState.counters = newCounters;
     }
 
     // Force strict structure matching for potential mismatch in rankSlots or other deep objects
     if (rules.configurations.creation.rankSlots) {
-        // @ts-ignore
-        newState.creationConfig.rankSlots = rules.configurations.creation.rankSlots;
+        newState.creationConfig.rankSlots = {
+            ...rules.configurations.creation.rankSlots
+        };
     }
+
 
     return newState;
 };

@@ -8,7 +8,7 @@ import { Upload, FileBox, LayoutTemplate, BookOpen, GraduationCap, Award, User, 
 import { createTemplateFromData, detectConflicts, smartMerge, DataConflict } from '../../utils/importExportUtils';
 import { base64ToBlob, saveImage } from '../../imageDB';
 import ImportOptionsSection from './ImportOptionsSection';
-import ConflictResolver from './ConflictResolver';
+import CloudConflictResolver from './CloudConflictResolver';
 import ThematicButton from '../ui/ThematicButton';
 import ThematicModal from '../ui/ThematicModal';
 import { ImageCompressionService } from '../../services/ImageCompressionService';
@@ -289,7 +289,7 @@ const ImportPanel: React.FC<ImportPanelProps> = ({ data, variant, onImportSucces
 
     if (isResolvingConflicts) {
         return (
-            <ConflictResolver
+            <CloudConflictResolver
                 conflicts={conflicts}
                 resolutionMap={resolutionMap}
                 onResolutionChoice={handleResolutionChoice}

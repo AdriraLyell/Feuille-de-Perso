@@ -101,37 +101,42 @@ export const LibraryLoader = {
      * Get usage statistics from all settings except the current one
      */
     async loadGlobalUsage(currentSettingId: string): Promise<Record<string, number>> {
-        const tables = [
-            { table: TABLE_REL_SETTING_TRAITS, id: 'trait_id', cat: false },
-            { table: TABLE_REL_SETTING_SKILLS, id: 'skill_id', cat: true },
-            { table: TABLE_REL_SETTING_BACKGROUNDS, id: 'background_id', cat: true },
-            { table: TABLE_REL_SETTING_COUNTERS, id: 'counter_id', cat: true },
-            { table: TABLE_REL_SETTING_SPECIALIZATIONS, id: 'specialization_id', cat: false }
-        ];
+        try {
+            const tables = [
+                { table: TABLE_REL_SETTING_TRAITS, id: 'trait_id', cat: false },
+                { table: TABLE_REL_SETTING_SKILLS, id: 'skill_id', cat: true },
+                { table: TABLE_REL_SETTING_BACKGROUNDS, id: 'background_id', cat: true },
+                { table: TABLE_REL_SETTING_COUNTERS, id: 'counter_id', cat: true },
+                { table: TABLE_REL_SETTING_SPECIALIZATIONS, id: 'specialization_id', cat: false }
+            ];
 
-        const results = await Promise.all(tables.map(async t => {
-            let query = supabase.from(t.table).select(`${t.id}, setting_id`);
+            const results = await Promise.all(tables.map(async t => {
+                let query = supabase.from(t.table).select(`${t.id}, setting_id`);
 
-            // Filter out current setting
-            query = query.neq('setting_id', currentSettingId);
+                // Filter out current setting
+                query = query.neq('setting_id', currentSettingId);
 
-            // For tables with categories, only count "placed" items
-            if (t.cat) {
-                query = query.not('default_category', 'is', null);
-            }
+                // For tables with categories, only count "placed" items
+                if (t.cat) {
+                    query = query.not('default_category', 'is', null);
+                }
 
-            const { data } = await query;
-            return { idKey: t.id, data: data || [] };
-        }));
+                const { data } = await query;
+                return { idKey: t.id, data: data || [] };
+            }));
 
-        const usageMap: Record<string, number> = {};
-        results.forEach(res => {
-            res.data.forEach((row: Record<string, any>) => {
-                const id = row[res.idKey];
-                usageMap[id] = (usageMap[id] || 0) + 1;
+            const usageMap: Record<string, number> = {};
+            results.forEach(res => {
+                res.data.forEach((row: Record<string, any>) => {
+                    const id = row[res.idKey];
+                    usageMap[id] = (usageMap[id] || 0) + 1;
+                });
             });
-        });
 
-        return usageMap;
+            return usageMap;
+        } catch (error) {
+            ErrorService.handleError(error, { context: 'LibraryLoader.loadGlobalUsage', silent: true });
+            return {};
+        }
     }
 };

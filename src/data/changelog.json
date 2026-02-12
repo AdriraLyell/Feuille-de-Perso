@@ -1,5 +1,63 @@
 [
     {
+        "version": "2.45.4",
+        "date": "2026-02-12",
+        "type": "patch",
+        "changes": [
+            "✨ Landing Page Wow Effect : Refonte immersive de RulesSourceSelector avec le thème 'Mystic' Premium",
+            "🛡️ Secure Entry : Harmonisation du LoginScreen avec la même esthétique (lueurs, textures, boutons thématiques)",
+            "📱 Mobile UX : Implémentation d'un menu 'hamburger' animé dans la navigation diégétique",
+            "🎨 Micro-Interactions : Ajout d'animations Framer Motion sur les cartes de sélection et les boutons d'action",
+            "📏 Responsive : Optimisation de la typographie et des espacements pour tablettes et smartphones"
+        ]
+    },
+    {
+        "version": "2.45.3",
+        "date": "2026-02-12",
+        "type": "patch",
+        "changes": [
+            "🛡️ Sécurité & Fiabilité : Ajout de blocs try/catch/finally sur toutes les actions asynchrones de l'Admin",
+            "🧩 Type Safety : Suppression massive de types 'any' et de '@ts-ignore' dans le moteur de réconciliation",
+            "🧪 Tests : Correction de la suite de tests pour supporter le nouveau typage des compteurs",
+            "🧹 Code Clean : Suppression de console.logs et typage strict des accesseurs d'état"
+        ]
+    },
+    {
+        "version": "2.45.2",
+        "date": "2026-02-12",
+        "type": "patch",
+        "changes": [
+            "🛡️ Hotfix : Correction d'un crash critique 'process is not defined' sur l'écran de connexion",
+            "🏗️ Architecture : Transition finale vers le format JSON pour l'exportation et la publication des règles",
+            "🧹 Nettoyage : Suppression de l'injection obsolète de rules.js dans admin.html",
+            "🎨 UI/UX : Refonte de la modale de déploiement GitHub avec le thème Premium Dark Mystic",
+            "🛠️ Core : Mise à jour du RulesGenerator pour une sortie JSON pure"
+        ]
+    },
+    {
+        "version": "2.45.1",
+        "date": "2026-02-12",
+        "type": "patch",
+        "changes": [
+            "✨ Animations Admin : Intégration de framer-motion (MotionFade, MotionCard) sur l'ensemble des éditeurs admin",
+            "🎨 Premium Aesthetic : Application du thème sombre 'Mystic' avec effets de verre et de parchemin sur CharacterReadOnlyView",
+            "🎭 UX : Effets d'apparition séquencés (staggered) sur les boutons du header et les cartes de catégories",
+            "💎 Polish : Amélioration visuelle de l'éditeur de création, des coûts et des compteurs"
+        ]
+    },
+    {
+        "version": "2.45.0",
+        "date": "2026-02-12",
+        "type": "minor",
+        "changes": [
+            "🎨 Admin Thème : Refonte complète de l'interface d'administration (Thème Mystic & Victorien)",
+            "✨ UI/UX : Harmonisation des couleurs (Pierre/Ambre) sur les éditeurs de compétences et propriétés",
+            "🛠️ Composants : Mise à jour des cartes de catégories, de la sidebar et des panneaux de configuration",
+            "🌚 Thème sombre : Support natif du thème Mystic sur les modales de confirmation et d'édition",
+            "💎 Polish : Amélioration des transitions, des ombres et des effets de survol pour un rendu premium"
+        ]
+    },
+    {
         "version": "2.44.5",
         "date": "2026-02-12",
         "type": "minor",

@@ -1,3 +1,4 @@
+// COMPLEX COMPONENT: VERIFY RETURNS CAREFULLY
 import React from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibrarySkillEntry } from '../../../types';
@@ -133,32 +134,32 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
 
     return (
         <div
-            className={`w-80 shrink-0 sticky top-32 h-[calc(100vh-9rem)] bg-slate-100 border-l border-y border-gray-300 flex flex-col transition-colors rounded-l-md shadow-sm ${draggedItem?.type === 'admin_sheet_skill' ? 'bg-orange-50 border-orange-300' : ''}`}
+            className={`w-80 shrink-0 sticky top-32 h-[calc(100vh-9rem)] bg-stone-950/80 border-l border-y border-stone-800 flex flex-col transition-colors rounded-l-md shadow-glass ${draggedItem?.type === 'admin_sheet_skill' ? 'bg-amber-950/20 border-amber-500/30' : ''}`}
             onDragOver={handleDragOver}
             onDrop={handleDropOnLibrary}
         >
-            <div className="bg-slate-200 border-b border-gray-300 shadow-sm">
-                <div className="p-3 font-bold text-slate-700 flex items-center gap-2">
-                    <BookOpen size={18} />
+            <div className="bg-stone-900 border-b border-stone-800 shadow-sm">
+                <div className="p-3 font-bold text-stone-300 flex items-center gap-2 uppercase tracking-wider text-xs">
+                    <BookOpen size={16} className="text-amber-500" />
                     Réserve
                 </div>
                 {/* TABS */}
-                <div className="flex text-xs font-bold text-slate-600">
+                <div className="flex text-[10px] font-bold text-stone-500 uppercase tracking-wide">
                     <button
                         onClick={() => setActiveTab('skills')}
-                        className={`flex-1 py-2 text-center border-b-2 transition-colors ${activeTab === 'skills' ? 'border-blue-600 text-blue-700 bg-white' : 'border-transparent hover:bg-slate-300/50'}`}
+                        className={`flex-1 py-2 text-center border-b-2 transition-colors ${activeTab === 'skills' ? 'border-amber-500 text-amber-500 bg-stone-950' : 'border-transparent hover:bg-stone-800/50 hover:text-stone-300'}`}
                     >
                         Compétences
                     </button>
                     <button
                         onClick={() => setActiveTab('backgrounds')}
-                        className={`flex-1 py-2 text-center border-b-2 transition-colors ${activeTab === 'backgrounds' ? 'border-purple-600 text-purple-700 bg-white' : 'border-transparent hover:bg-slate-300/50'}`}
+                        className={`flex-1 py-2 text-center border-b-2 transition-colors ${activeTab === 'backgrounds' ? 'border-amber-500 text-amber-500 bg-stone-950' : 'border-transparent hover:bg-stone-800/50 hover:text-stone-300'}`}
                     >
                         Arr. Plans
                     </button>
                     <button
                         onClick={() => setActiveTab('counters')}
-                        className={`flex-1 py-2 text-center border-b-2 transition-colors ${activeTab === 'counters' ? 'border-red-600 text-red-700 bg-white' : 'border-transparent hover:bg-slate-300/50'}`}
+                        className={`flex-1 py-2 text-center border-b-2 transition-colors ${activeTab === 'counters' ? 'border-amber-500 text-amber-500 bg-stone-950' : 'border-transparent hover:bg-stone-800/50 hover:text-stone-300'}`}
                     >
                         Compteurs
                     </button>
@@ -166,13 +167,13 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
             </div>
 
             {draggedItem?.type === 'admin_sheet_skill' && activeTab === 'skills' && (
-                <div className="absolute inset-0 bg-orange-100/90 z-50 flex flex-col items-center justify-center border-4 border-dashed border-orange-400 m-2 rounded-xl pointer-events-none">
-                    <Archive size={48} className="text-orange-600 mb-2" />
-                    <span className="font-bold text-orange-800 text-lg">Archiver ici</span>
+                <div className="absolute inset-0 bg-stone-950/90 z-50 flex flex-col items-center justify-center border-4 border-dashed border-amber-500/50 m-2 rounded-sm pointer-events-none backdrop-blur-sm">
+                    <Archive size={48} className="text-amber-500 mb-2 drop-shadow-glow" />
+                    <span className="font-bold text-amber-500 text-lg font-serif tracking-widest uppercase">Archiver ici</span>
                 </div>
             )}
 
-            <div className="p-3 text-xs text-slate-500 border-b border-slate-200 bg-slate-50">
+            <div className="p-3 text-[10px] text-stone-500 border-b border-stone-800 bg-stone-950 italic font-medium">
                 {activeTab === 'skills' && "Glissez vers une catégorie."}
                 {activeTab === 'backgrounds' && "Glissez un Historique vers la fiche."}
                 {activeTab === 'counters' && "Glissez un Compteur vers la fiche."}
@@ -180,7 +181,7 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
 
             <div className="flex-grow overflow-y-auto p-3 space-y-2 custom-scrollbar">
                 {visibleLibrary.length === 0 ? (
-                    <div className="text-center text-slate-400 italic mt-10 px-4">
+                    <div className="text-center text-stone-600 italic mt-10 px-4 text-xs">
                         La réserve est vide.
                     </div>
                 ) : (
@@ -193,43 +194,43 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                         return (
                             <div
                                 key={item.id}
-                                className="bg-white border border-gray-300 rounded shadow-sm overflow-hidden"
+                                className="bg-stone-900 border border-stone-700/60 rounded-sm shadow-sm overflow-hidden hover:border-amber-500/30 transition-colors group/card"
                             >
                                 <div
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, 'admin_lib_skill', { name: item.name, data: item })}
-                                    className={`p-2 cursor-grab active:cursor-grabbing transition-all flex justify-between items-center group hover:bg-slate-50`}
+                                    className={`p-2 cursor-grab active:cursor-grabbing transition-all flex justify-between items-center group hover:bg-stone-800`}
                                 >
                                     <div className="flex items-center gap-2 overflow-hidden">
-                                        <GripVertical size={14} className="text-gray-300 shrink-0" />
+                                        <GripVertical size={14} className="text-stone-600 shrink-0 group-hover:text-stone-400 transition-colors" />
                                         <div className="flex flex-col min-w-0">
                                             <div className="flex items-center gap-1.5">
-                                                <span className={`font-bold text-sm truncate text-slate-700`}>
+                                                <span className={`font-bold text-xs truncate text-stone-300 group-hover:text-amber-500 transition-colors font-serif tracking-wide`}>
                                                     {item.name}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 {item.isVariable && (
-                                                    <div className="flex items-center gap-0.5 text-[10px] text-blue-600 bg-blue-50 px-1 rounded-sm border border-blue-100">
+                                                    <div className="flex items-center gap-0.5 text-[9px] text-amber-500 bg-amber-950/30 px-1 rounded-sm border border-amber-500/20">
                                                         <Layers size={10} />
-                                                        <span className="font-semibold" title="Variable">Var</span>
+                                                        <span className="font-bold tracking-tighter" title="Variable">VAR</span>
                                                     </div>
                                                 )}
                                                 {item.isActive === false && (
-                                                    <div className="text-[9px] text-red-500 font-bold px-1 rounded-sm border border-red-100 bg-red-50">Inactif</div>
+                                                    <div className="text-[9px] text-crimson-blood font-bold px-1 rounded-sm border border-crimson-blood/20 bg-crimson-blood/10">Inactif</div>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
-                                    <ArrowRight size={14} className="text-gray-300 opacity-0 group-hover:opacity-100 shrink-0 mx-1" />
+                                    <ArrowRight size={14} className="text-stone-600 opacity-0 group-hover:opacity-100 shrink-0 mx-1 transition-all group-hover:translate-x-1 group-hover:text-amber-500" />
                                 </div>
 
                                 {/* Local Category Picker */}
-                                <div className="px-2 pb-2 bg-slate-50/50 flex items-center justify-between border-t border-slate-100 pt-1">
+                                <div className="px-2 pb-2 bg-stone-950/30 flex items-center justify-between border-t border-stone-800 pt-1">
                                     {editingCategory === item.id ? (
                                         <select
                                             autoFocus
-                                            className="text-[10px] bg-white border border-slate-300 rounded px-1 py-0.5 w-full outline-none focus:border-blue-400"
+                                            className="text-[10px] bg-stone-950 border border-stone-700 rounded-sm px-1 py-0.5 w-full outline-none focus:border-amber-500 text-stone-300"
                                             value={item.defaultCategory || ''}
                                             onChange={(e) => {
                                                 const cat = e.target.value;
@@ -256,9 +257,9 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                                     ) : (
                                         <button
                                             onClick={() => setEditingCategory(item.id)}
-                                            className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-blue-600 font-medium truncate group/tag"
+                                            className="flex items-center gap-1 text-[10px] text-stone-500 hover:text-amber-500 font-medium truncate group/tag transition-colors w-full text-left"
                                         >
-                                            <Tag size={10} className="shrink-0 text-slate-400 group-hover/tag:text-blue-400" />
+                                            <Tag size={10} className="shrink-0 text-stone-600 group-hover/tag:text-amber-500 transition-colors" />
                                             <span className="truncate">
                                                 {item.defaultCategory ? (availableCategories.find(c => c.id === item.defaultCategory)?.label || item.defaultCategory) : "Définir catégorie..."}
                                             </span>

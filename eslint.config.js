@@ -12,7 +12,11 @@ export default tseslint.config(
                 tsconfigRootDir: import.meta.dirname,
             },
         },
+        plugins: {
+            'jsx-a11y': jsxA11y,
+        },
         rules: {
+            'no-unreachable': 'error',
             '@typescript-eslint/no-explicit-any': 'warn',
             '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
             'no-console': ['warn', { allow: ['warn', 'error'] }],

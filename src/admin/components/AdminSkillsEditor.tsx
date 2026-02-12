@@ -5,6 +5,7 @@ import { AlertCircle, FolderSync, CheckCircle2 } from 'lucide-react';
 import { disambiguateCategories } from '../../utils/categoryUtils';
 import AdminSkillLibrarySidebar from './libraries/AdminSkillLibrarySidebar';
 import SkillCategoryCard from './skills/SkillCategoryCard';
+import { MotionFade } from '../../components/ui/motion/MotionFade';
 
 interface AdminSkillsEditorProps {
     rules: RulesData;
@@ -234,48 +235,51 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
     return (
         <div className="flex relative items-start gap-4">
             <div className="flex-grow space-y-8">
-                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 flex justify-between items-start">
-                    <div className="flex items-start gap-3">
-                        <AlertCircle className="text-blue-500 mt-0.5" size={20} />
-                        <div>
-                            <h3 className="font-bold text-blue-900 text-sm">Gestion Dynamique</h3>
-                            <p className="text-xs text-blue-700 mt-1">
-                                Glissez-déposez pour réorganiser. Glissez vers la réserve (droite) pour archiver.
-                                <br />Les nouvelles compétences sont automatiquement ajoutées à la bibliothèque.
-                            </p>
+                <MotionFade delay={0.1}>
+                    <div className="bg-stone-900/40 border-l-4 border-amber-600 p-4 mb-6 flex justify-between items-start rounded-r-sm shadow-glass">
+                        <div className="flex items-start gap-4">
+                            <AlertCircle className="text-amber-500 mt-0.5" size={20} />
+                            <div>
+                                <h3 className="font-bold text-amber-500 text-sm uppercase tracking-wide">Gestion Dynamique</h3>
+                                <p className="text-xs text-stone-400 mt-1 font-medium leading-relaxed">
+                                    Glissez-déposez pour réorganiser. Glissez vers la réserve (droite) pour archiver.
+                                    <br />Les nouvelles compétences sont automatiquement ajoutées à la bibliothèque.
+                                </p>
+                            </div>
                         </div>
+                        <button
+                            onClick={handleSyncAll}
+                            className="text-xs bg-stone-900 border border-stone-700 text-stone-300 px-3 py-1.5 rounded-sm hover:bg-stone-800 hover:border-amber-500 hover:text-amber-500 transition-all font-bold flex items-center gap-2 shadow-sm uppercase tracking-wider"
+                            title="Ajouter toutes les compétences actuelles à la bibliothèque"
+                        >
+                            {syncSuccess ? <CheckCircle2 size={14} className="text-green-500" /> : <FolderSync size={14} />}
+                            {syncSuccess || "Synchroniser Bibliothèque"}
+                        </button>
                     </div>
-                    <button
-                        onClick={handleSyncAll}
-                        className="text-xs bg-white border border-blue-200 text-blue-700 px-3 py-1.5 rounded hover:bg-blue-100 transition-colors font-bold flex items-center gap-2 shadow-sm"
-                        title="Ajouter toutes les compétences actuelles à la bibliothèque"
-                    >
-                        {syncSuccess ? <CheckCircle2 size={14} className="text-green-600" /> : <FolderSync size={14} />}
-                        {syncSuccess || "Synchroniser Bibliothèque"}
-                    </button>
-                </div>
+                </MotionFade>
 
                 {/* Dynamic Columns Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {disambiguateCategories(skillCategories).map(cat => (
-                        <SkillCategoryCard
-                            key={cat.id}
-                            id={cat.id}
-                            label={cat.label}
-                            categoryConfig={skillCategories.find(c => c.id === cat.id)!}
-                            skills={skillsMap[cat.id] || []}
-                            isDraggingSidebarItem={draggedItem?.type === 'admin_lib_skill'}
-                            onUpdateLabel={updateLabel}
-                            onUpdateBehavior={updateBehavior}
-                            onUpdateCategory={(updates) => updateCategoryMetadata(cat.id, updates)}
-                            onUpdateSkill={updateSkillName}
-                            onAddSkill={addSkill}
-                            onRemoveSkill={removeSkill}
-                            onSkillBlur={handleSkillBlur}
-                            onDragStart={(e, idx, name) => handleDragStart(e, cat.id, idx, name)}
-                            onDrop={(e, idx) => handleDropOnColumn(e, cat.id, idx)}
-                            draggedItemInfo={draggedItem}
-                        />
+                    {disambiguateCategories(skillCategories).map((cat, index) => (
+                        <MotionFade key={cat.id} delay={0.1 + (index * 0.05)}>
+                            <SkillCategoryCard
+                                id={cat.id}
+                                label={cat.label}
+                                categoryConfig={skillCategories.find(c => c.id === cat.id)!}
+                                skills={skillsMap[cat.id] || []}
+                                isDraggingSidebarItem={draggedItem?.type === 'admin_lib_skill'}
+                                onUpdateLabel={updateLabel}
+                                onUpdateBehavior={updateBehavior}
+                                onUpdateCategory={(updates) => updateCategoryMetadata(cat.id, updates)}
+                                onUpdateSkill={updateSkillName}
+                                onAddSkill={addSkill}
+                                onRemoveSkill={removeSkill}
+                                onSkillBlur={handleSkillBlur}
+                                onDragStart={(e, idx, name) => handleDragStart(e, cat.id, idx, name)}
+                                onDrop={(e, idx) => handleDropOnColumn(e, cat.id, idx)}
+                                draggedItemInfo={draggedItem}
+                            />
+                        </MotionFade>
                     ))}
                 </div>
             </div>

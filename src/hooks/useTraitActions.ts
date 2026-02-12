@@ -161,9 +161,8 @@ export const useTraitActions = (
     const allSkills = useMemo(() => {
         if (!data || !data.skills) return [];
         const skills: { id: string, name: string }[] = [];
-        Object.keys(data.skills).forEach(key => {
-            // @ts-ignore
-            data.skills[key].forEach(s => {
+        Object.values(data.skills).forEach(skillList => {
+            skillList.forEach(s => {
                 if (s.name && s.name.trim() !== '') {
                     skills.push({ id: s.id, name: s.name });
                 }

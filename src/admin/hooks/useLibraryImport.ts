@@ -39,8 +39,15 @@ export const useLibraryImport = (character: SyncedCharacter, onSuccess?: () => v
     useEffect(() => {
         if (!targetSettingId) {
             const loadSettings = async () => {
-                const list = await CampaignService.listSettings();
-                setSettings(list || []);
+                try {
+                    const list = await CampaignService.listSettings();
+                    setSettings(list || []);
+                } catch (error) {
+                    ErrorService.handleError(error, {
+                        context: 'useLibraryImport.loadSettings',
+                        silent: true
+                    });
+                }
             };
             loadSettings();
         }

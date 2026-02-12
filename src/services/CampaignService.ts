@@ -16,8 +16,8 @@ interface DBGameSetting {
     name: string;
     version: string;
     last_updated: string;
-    configurations: any; // JSONB
-    definitions: any; // JSONB
+    configurations: RulesData['configurations']; // JSONB
+    definitions: RulesData['definitions']; // JSONB
     is_public: boolean;
     is_archived: boolean;
     description: string | null;
@@ -137,7 +137,7 @@ export const CampaignService = {
             // 2. Load Libraries
             const libraries = await LibraryService.loadLibraries(id);
 
-            const rulesRaw: any = migrateRulesToV2({
+            const rulesRaw = migrateRulesToV2({
                 version: settingData.version,
                 lastUpdated: new Date(settingData.last_updated).getTime(),
                 configurations: settingData.configurations,
@@ -172,7 +172,7 @@ export const CampaignService = {
             // 3. REBUILD definitions.skills layout from libraries if needed
             // Only rebuild if the current layout is empty or significantly different
             const currentLayoutKeys = Object.keys(rules.definitions.skills || {});
-            const hasExistingLayout = currentLayoutKeys.length > 0 && currentLayoutKeys.some(k => (rules.definitions.skills as any)[k]?.length > 0);
+            const hasExistingLayout = currentLayoutKeys.length > 0 && currentLayoutKeys.some(k => rules.definitions.skills?.[k] && (rules.definitions.skills[k] as string[]).length > 0);
 
             if (!hasExistingLayout && libraries.skills.length > 0) {
                 logger.log("[CampaignService] Rebuilding skill layout from library (empty layout detected)");
@@ -191,7 +191,7 @@ export const CampaignService = {
 
             // Ensure categories from libraries exist in skillCategories if migrateRules didn't find them
             // Backgrounds
-            const bgCatDef = rules.definitions.skillCategories?.find((c: any) => c.behavior === 'Arrière-plan');
+            const bgCatDef = rules.definitions.skillCategories?.find((c) => c.behavior === 'Arrière-plan');
             const bgCat = bgCatDef?.id || SKILL_COLUMNS.COL_8;
 
             if (!rules.definitions.skills[bgCat]) rules.definitions.skills[bgCat] = [];
@@ -256,7 +256,7 @@ export const CampaignService = {
     async saveSetting(id: string, rules: RulesData, name?: string): Promise<{ success: boolean; message?: string }> {
 
         // 1. Update Root
-        const rootUpdate: any = {
+        const rootUpdate: Partial<DBGameSetting> = {
             version: rules.version,
             last_updated: new Date().toISOString(),
             configurations: rules.configurations,

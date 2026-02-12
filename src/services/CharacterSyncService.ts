@@ -155,11 +155,7 @@ export const CharacterSyncService = {
         return await DatabaseService.checkAvailable('characters');
     },
 
-    /**
-     * Recursively process an object to compress/decompress image strings.
-     * @deprecated Use ImageCompressionService.processImages instead
-     */
     async processImages(obj: any, action: 'compress' | 'decompress'): Promise<any> {
-        return ImageCompressionService.processImages(obj, action);
+        return ImageCompressionService.processImages(obj as Record<string, any>, action);
     }
 };
