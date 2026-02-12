@@ -162,7 +162,7 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
                                             {setting.label}
                                         </h4>
                                         <div className="grid grid-cols-1 gap-2">
-                                            {(attrs as any[]).map((attr, idx) => {
+                                            {attrs.map((attr, idx) => {
                                                 const total = (parseInt(attr.val1) || 0) + (parseInt(attr.val2) || 0) + (parseInt(attr.val3) || 0);
                                                 return (
                                                     <div key={idx} className="bg-white px-3 py-1.5 rounded shadow-sm flex justify-between items-center text-sm border border-amber-100">
@@ -186,7 +186,7 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {Object.entries(data.skills || {})
                                 .filter(([category, skills]) => {
-                                    const active = (skills as any[]).filter(s => s.name && s.value > 0);
+                                    const active = skills.filter(s => s.name && s.value > 0);
                                     return active.length > 0 &&
                                         !category.toLowerCase().includes('background') &&
                                         !category.toLowerCase().includes('arrière-plan') &&
@@ -200,7 +200,7 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
                                             {getCategoryLabel(category)}
                                         </h4>
                                         <div className="space-y-1">
-                                            {(skills as any[]).filter(s => s.name && s.value > 0).map((skill, idx) => {
+                                            {skills.filter(s => s.name && s.value > 0).map((skill, idx) => {
                                                 const personalSpecs = data.specializations?.[skill.id] || [];
                                                 const imposedSpecs = data.imposedSpecializations?.[skill.id] || [];
 
@@ -237,7 +237,7 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
                     {/* Backgrounds */}
                     {Object.entries(data.skills || {})
                         .filter(([category]) => category.toLowerCase().includes('background') || category.toLowerCase().includes('arrière-plan') || category === 'Col_Comp_8')
-                        .flatMap(([_, skills]) => (skills as any[]).filter(s => s.name && s.value > 0)).length > 0 && (
+                        .flatMap(([_, skills]) => skills.filter(s => s.name && s.value > 0)).length > 0 && (
                             <section className="bg-orange-50 p-4 rounded-lg">
                                 <h3 className="text-lg font-bold text-orange-800 mb-3 flex items-center gap-2 border-b border-orange-200 pb-1">
                                     <Award size={18} /> Arrière-plans
@@ -245,7 +245,7 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                                     {Object.entries(data.skills || {})
                                         .filter(([category]) => category.toLowerCase().includes('background') || category.toLowerCase().includes('arrière-plan') || category === 'Col_Comp_8')
-                                        .flatMap(([_, skills]) => (skills as any[]).filter(s => s.name && s.value > 0))
+                                        .flatMap(([_, skills]) => skills.filter(s => s.name && s.value > 0))
                                         .sort((a, b) => a.name.localeCompare(b.name))
                                         .map((bg, idx) => {
                                             const personalSpecs = data.specializations?.[bg.id] || [];

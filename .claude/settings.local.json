@@ -9,5 +9,10 @@
     "playwright",
     "prettier",
     "npm"
-  ]
+  ],
+  "permissions": {
+    "allow": [
+      "Bash(npm test:*)"
+    ]
+  }
 }

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { GameSettingSummary, CampaignService } from '../../services/CampaignService';
 import { RulesData } from '../../types/rules';
-import { Plus, Loader2, FileCog, Trash2, Eye, EyeOff, Users, Copy, LogOut } from 'lucide-react';
+import { Plus, Loader2, FileCog, Trash2, Eye, EyeOff, Users, Copy, LogOut, BookOpen } from 'lucide-react';
 import { defaultRules } from '../../data/defaultRules'; // We might need a default template
 import { INITIAL_DATA, INITIAL_SKILLS } from '../../data/initialState';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
@@ -22,6 +22,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onView
     const [newName, setNewName] = useState('');
     const [settingToDelete, setSettingToDelete] = useState<string | null>(null);
     const [settingToDuplicate, setSettingToDuplicate] = useState<{ id: string, name: string } | null>(null);
+    const [showArchived, setShowArchived] = useState(false);
 
     useEffect(() => {
         loadSettings();
@@ -54,8 +55,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onView
         };
 
         Object.keys(INITIAL_SKILLS).forEach(key => {
-            // @ts-ignore
-            layoutDefinitions[key] = INITIAL_SKILLS[key].map((s: any) => s.name || ""); // "" preserves spacers
+            layoutDefinitions[key] = INITIAL_SKILLS[key].map((s) => s.name || ""); // "" preserves spacers
         });
 
         // Use a base template for new rules
@@ -113,6 +113,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onView
         }
     };
 
+    const handleToggleArchive = async (e: React.MouseEvent, id: string, currentStatus: boolean) => {
+        e.stopPropagation();
+        const success = await CampaignService.setArchived(id, !currentStatus);
+        if (success) {
+            loadSettings();
+        }
+    };
+
     const handleDuplicate = async (e: React.MouseEvent, id: string, oldName: string) => {
         e.stopPropagation();
         setSettingToDuplicate({ id, name: oldName });
@@ -141,13 +149,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onView
                     Tableau de Bord MJ
                 </h1>
 
-                <button
-                    onClick={onViewPlayers}
-                    className="flex items-center gap-2 bg-[#8b2e2e] hover:bg-[#a33939] text-white px-4 py-2 rounded-md font-bold transition-all shadow-md"
-                >
-                    <Users size={18} />
-                    Tous les Joueurs
-                </button>
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setShowArchived(!showArchived)}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-bold transition-all ${showArchived ? 'bg-amber-100 text-amber-800 ring-1 ring-amber-200' : 'text-slate-400 hover:text-slate-600'}`}
+                        title={showArchived ? "Masquer les archives" : "Afficher les archives"}
+                    >
+                        {showArchived ? <EyeOff size={16} /> : <Eye size={16} />}
+                        {showArchived ? "Archives visibles" : "Voir archives"}
+                    </button>
+
+                    <button
+                        onClick={onViewPlayers}
+                        className="flex items-center gap-2 bg-[#8b2e2e] hover:bg-[#a33939] text-white px-4 py-2 rounded-md font-bold transition-all shadow-md"
+                    >
+                        <Users size={18} />
+                        Tous les Joueurs
+                    </button>
+                </div>
 
                 <button
                     onClick={onLogout}
@@ -194,62 +213,72 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSelectSetting, onView
                                 Aucune campagne trouvée. Créez-en une pour commencer.
                             </div>
                         )}
-                        {settings.map(setting => (
-                            <div
-                                key={setting.id}
-                                onClick={() => handleSelect(setting.id)}
-                                className="bg-white group cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-300 rounded-xl border border-[#bfae85]/30 overflow-hidden relative"
-                            >
-                                <div className="h-2 bg-amber-700 w-full" />
-                                <div className="p-6">
-                                    <h3 className="font-serif font-bold text-xl text-[#4a3b32] mb-1 group-hover:text-amber-700 transition-colors pr-8">
-                                        {setting.name}
-                                    </h3>
+                        {settings
+                            .filter(s => showArchived || !s.is_archived)
+                            .map(setting => (
+                                <div
+                                    key={setting.id}
+                                    onClick={() => handleSelect(setting.id)}
+                                    className={`bg-white group cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-300 rounded-xl border border-[#bfae85]/30 overflow-hidden relative ${setting.is_archived ? 'opacity-60 grayscale-[0.5]' : ''}`}
+                                >
+                                    <div className={`h-2 w-full ${setting.is_archived ? 'bg-gray-400' : 'bg-amber-700'}`} />
+                                    <div className="p-6">
+                                        <h3 className="font-serif font-bold text-xl text-[#4a3b32] mb-1 group-hover:text-amber-700 transition-colors pr-24">
+                                            {setting.name}
+                                            {setting.is_archived && <span className="ml-2 text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded italic">Archivée</span>}
+                                        </h3>
 
-                                    {/* Absolute Actions Top Right */}
-                                    <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button
-                                            onClick={(e) => handleDuplicate(e, setting.id, setting.name)}
-                                            className="p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-                                            title="Dupliquer la campagne"
-                                        >
-                                            <Copy size={18} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); setSettingToDelete(setting.id); }}
-                                            className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                                            title="Supprimer la campagne"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
+                                        {/* Absolute Actions Top Right */}
+                                        <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={(e) => handleToggleArchive(e, setting.id, setting.is_archived)}
+                                                className={`p-1.5 rounded-full transition-colors ${setting.is_archived ? 'text-amber-600 hover:bg-amber-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}
+                                                title={setting.is_archived ? "Désarchiver" : "Archiver la campagne"}
+                                            >
+                                                <BookOpen size={18} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => handleDuplicate(e, setting.id, setting.name)}
+                                                className="p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                                                title="Dupliquer la campagne"
+                                            >
+                                                <Copy size={18} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); setSettingToDelete(setting.id); }}
+                                                className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                                                title="Supprimer la campagne"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
 
-                                    <div className="flex items-center gap-2 text-xs text-[#bfae85] font-bold uppercase tracking-wider mb-4">
-                                        <span className="bg-amber-50 px-2 py-1 rounded">v{setting.version}</span>
-                                        <span>•</span>
-                                        <span>{new Date(setting.last_updated).toLocaleString()}</span>
-                                    </div>
+                                        <div className="flex items-center gap-2 text-xs text-[#bfae85] font-bold uppercase tracking-wider mb-4">
+                                            <span className="bg-amber-50 px-2 py-1 rounded">v{setting.version}</span>
+                                            <span>•</span>
+                                            <span>{new Date(setting.last_updated).toLocaleString()}</span>
+                                        </div>
 
-                                    <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
-                                        <button
-                                            onClick={(e) => handleToggleVisibility(e, setting.id, setting.is_public)}
-                                            className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full font-bold transition-all ${setting.is_public
-                                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                                                }`}
-                                            title={setting.is_public ? "Cliquer pour rendre Privé" : "Cliquer pour rendre Public"}
-                                        >
-                                            {setting.is_public ? <Eye size={12} /> : <EyeOff size={12} />}
-                                            {setting.is_public ? 'PUBLIQUE' : 'PRIVÉE'}
-                                        </button>
+                                        <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
+                                            <button
+                                                onClick={(e) => handleToggleVisibility(e, setting.id, setting.is_public)}
+                                                className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full font-bold transition-all ${setting.is_public
+                                                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                                    }`}
+                                                title={setting.is_public ? "Cliquer pour rendre Privé" : "Cliquer pour rendre Public"}
+                                            >
+                                                {setting.is_public ? <Eye size={12} /> : <EyeOff size={12} />}
+                                                {setting.is_public ? 'PUBLIQUE' : 'PRIVÉE'}
+                                            </button>
 
-                                        <button className="text-amber-700 font-bold text-sm bg-amber-50 px-3 py-1 rounded group-hover:bg-amber-700 group-hover:text-white transition-colors">
-                                            Ouvrir
-                                        </button>
+                                            <button className="text-amber-700 font-bold text-sm bg-amber-50 px-3 py-1 rounded group-hover:bg-amber-700 group-hover:text-white transition-colors">
+                                                Ouvrir
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
                     </div>
                 )
             }

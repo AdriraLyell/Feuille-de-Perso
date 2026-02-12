@@ -16,11 +16,12 @@ import EditionSidebar from './sheet/EditionSidebar';
 // Hooks
 import { useCharacterData, useCharacterActions } from '../context/CharacterContext';
 import { useCharacterSheetActions } from '../hooks/useCharacterSheetActions';
-import { generateId } from '../utils/factories';
 import { useCharacterBonuses } from '../hooks/useCharacterBonuses';
 import { useCreationMode } from '../hooks/useCreationMode';
 import { useSheetLayout } from '../hooks/useSheetLayout';
 import { useRules } from '../context/RulesContext';
+import { useEditMode } from '../hooks/sheet/useEditMode';
+import { useVariableSkills } from '../hooks/sheet/useVariableSkills';
 
 import ThematicModal from './ui/ThematicModal';
 import VariantSelectionModal from './ui/VariantSelectionModal';
@@ -34,8 +35,14 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
     const data = useCharacterData();
     const { updateData: onChange, addLog: onAddLog } = useCharacterActions();
 
-    const [isEditMode, setIsEditMode] = useState(false);
-    const [showEditWarning, setShowEditWarning] = useState(false);
+    const {
+        isEditMode,
+        setIsEditMode,
+        showEditWarning,
+        setShowEditWarning,
+        handleToggleEditMode,
+        executeEditModeActivation
+    } = useEditMode();
 
     // Variable Skill State
     const [variantModalState, setVariantModalState] = useState<{
@@ -80,126 +87,10 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         updateCounter
     } = useCharacterSheetActions(data, onChange, onAddLog, rules);
 
-    // --- Variable Skill Logic ---
-    const handleDefineVariant = useCallback((category: string, id: string, name: string) => {
-        // Find existing entry to see if it already has a definitionId
-        const existingEntry = data.skills[category]?.find(s => s.id === id);
-        let definitionId = existingEntry?.definitionId;
-        let variants: string[] = [];
-
-        // Look up in library to find definitionId and suggested variants
-        const libSkill = rules?.libraries?.skills?.find(s =>
-            (definitionId && s.id === definitionId) ||
-            normalizeString(s.name) === normalizeString(name)
-        );
-
-        if (libSkill) {
-            definitionId = libSkill.id;
-            variants = libSkill.variants || [];
-        }
-
-        setVariantModalState({
-            isOpen: true,
-            category,
-            id,
-            skillName: name,
-            definitionId,
-            variants
-        });
-    }, [data.skills, rules?.libraries?.skills]);
-
-    const finalizeVariantDefinition = (variantName: string) => {
-        const { category, id, definitionId } = variantModalState;
-        if (!variantName.trim()) return;
-
-        onChange(prev => {
-            const list = prev.skills[category];
-            if (!list) return prev;
-
-            const index = list.findIndex(s => s.id === id);
-            if (index === -1) return prev;
-
-            const newList = [...list];
-
-            // 1. Update existing item (Define the variant)
-            newList[index] = {
-                ...newList[index],
-                variant: variantName.trim(),
-                definitionId: definitionId || newList[index].definitionId // Ensure definitionId is linked
-            };
-
-            // 2. Clone and Insert new empty variable skill below
-            const newItem: DotEntry = {
-                id: generateId(),
-                name: newList[index].name,
-                value: 0,
-                creationValue: 0,
-                max: 5,
-                variant: "", // Ready for next input
-                definitionId: definitionId // Propagate definitionId to the new empty slot
-            };
-
-            // Insert at index + 1
-            newList.splice(index + 1, 0, newItem);
-
-            onAddLog(`Définition variante : ${newList[index].name} : ${newList[index].variant}`, 'success', 'sheet');
-
-            const newState = {
-                ...prev,
-                skills: {
-                    ...prev.skills,
-                    [category]: newList
-                }
-            };
-
-            // 3. Suggestion Logic for Variants
-            if (definitionId && variantName.trim()) {
-                const libSkill = rules?.libraries?.skills?.find(s => s.id === definitionId);
-                const normalizedVariant = normalizeString(variantName);
-
-                // Only suggest if not in library variants (normalized check)
-                const isKnown = libSkill?.variants?.some(v => normalizeString(v) === normalizedVariant);
-
-                if (libSkill && !isKnown) {
-                    const alreadySuggested = prev.suggestions?.some(s =>
-                        s.type === 'variant' &&
-                        s.parentId === definitionId &&
-                        normalizeString(s.name) === normalizedVariant
-                    );
-
-                    if (!alreadySuggested) {
-                        const suggestion: SuggestionEntry = {
-                            id: generateId(),
-                            type: 'variant',
-                            name: variantName.trim(),
-                            category: category,
-                            parentId: definitionId,
-                            timestamp: Date.now()
-                        };
-                        newState.suggestions = [...(prev.suggestions || []), suggestion];
-                        onAddLog(`Suggestion de variante envoyée : ${variantName}`, 'info', 'sheet');
-                    }
-                }
-            }
-
-            return newState;
-        });
-
-        setVariantModalState(prev => ({ ...prev, isOpen: false }));
-    };
-
-    const handleToggleEditMode = useCallback(() => {
-        if (!isEditMode) {
-            setShowEditWarning(true);
-        } else {
-            setIsEditMode(false);
-        }
-    }, [isEditMode]);
-
-    const executeEditModeActivation = () => {
-        setIsEditMode(true);
-        setShowEditWarning(false);
-    };
+    const {
+        handleDefineVariant,
+        finalizeVariantDefinition
+    } = useVariableSkills(data, onChange, onAddLog, rules, setVariantModalState, variantModalState);
 
     const {
         attributeCategories,

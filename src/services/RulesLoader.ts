@@ -4,8 +4,11 @@ import { ErrorService } from './ErrorService';
 import { CampaignService } from './CampaignService';
 import { logger } from '../utils/logger';
 import { GithubRateLimiter } from '../utils/githubUtils';
+import { OfflineStorageService } from './OfflineStorageService';
 
 
+
+import { defaultRules } from '../data/defaultRules';
 
 // Helper to get query param (for cache busting)
 const getQueryParam = (name: string) => {
@@ -15,15 +18,6 @@ const getQueryParam = (name: string) => {
 
 // Rate limit handled by GithubRateLimiter utility
 
-// Helper to parse rules from JS text
-const parseRulesFromText = (text: string): RulesData | null => {
-    const jsonMatch = text.match(/window\.EXTERNAL_RULES\s*=\s*(\{[\s\S]*\});?/);
-    if (jsonMatch && jsonMatch[1]) {
-        return JSON.parse(jsonMatch[1]) as RulesData;
-    }
-    return null;
-};
-
 // Helper to get setting ID from URL
 const getSettingIdFromUrl = (): string | null => {
     return getQueryParam('s') || getQueryParam('setting');
@@ -31,31 +25,47 @@ const getSettingIdFromUrl = (): string | null => {
 
 export const loadRules = async (forceSettingId?: string): Promise<RulesData | null> => {
     try {
-        const isOnline = window.location.protocol.startsWith('http');
+        const isOffline = GithubRateLimiter.isOffline();
         const settingId = forceSettingId || getSettingIdFromUrl();
 
-        if (isOnline && settingId) {
+        // OFFLINE FIRST: If offline, we MUST use cache or legacy
+        if (isOffline) {
+            logger.log('[RulesLoader] Device is offline. Using cache strategies.');
+            const cached = settingId ? await OfflineStorageService.getRulesBySettingId(settingId) : await OfflineStorageService.getActiveRules();
+            if (cached) {
+                logger.log('[RulesLoader] Rules loaded from Offline cache.');
+                cached.source = 'cache';
+                return cached;
+            }
+            logger.warn('[RulesLoader] No cached rules found while offline. Using default backup.');
+            return defaultRules;
+        }
+
+        if (settingId) {
             // STRATEGY 0: Supabase (Online First)
             try {
                 logger.log('[RulesLoader] Attempting to fetch rules from Supabase for ID:', settingId);
                 const dbRules = await CampaignService.loadSetting(settingId);
                 if (dbRules) {
-                    logger.log('[RulesLoader] Rules loaded from Supabase:', dbRules.settingId);
-                    dbRules.source = 'database';
-                    window.EXTERNAL_RULES = dbRules;
+                    // Auto-cache
+                    await OfflineStorageService.saveRules(dbRules);
                     return dbRules;
                 }
-                logger.warn('[RulesLoader] Campaign not found or private in Supabase (ID: ' + settingId + '). Falling back to default rules.');
+                logger.warn('[RulesLoader] Campaign not found or private in Supabase (ID: ' + settingId + '). Falling back to cache if possible.');
             } catch (dbErr) {
-                logger.warn('[RulesLoader] Supabase load failed for ID: ' + settingId + ', falling back to default rules.', dbErr);
+                logger.warn('[RulesLoader] Supabase load failed for ID: ' + settingId + ', falling back back to cache.', dbErr);
+                // Try cache as fallback for specific campaign
+                const cached = await OfflineStorageService.getRulesBySettingId(settingId);
+                if (cached) return cached;
             }
         }
 
-        if (isOnline) {
+        // STRATEGY 1: GitHub API (Online)
+        if (!isOffline) {
             // STRATEGY 1: GitHub API (Instant Update)
             if (!GithubRateLimiter.isLimited()) {
                 try {
-                    const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/public/data/rules.js?ref=main`;
+                    const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/public/data/rules.json?ref=main`;
                     logger.log('[RulesLoader] Attempting to fetch rules via API:', apiUrl);
 
                     const apiResponse = await fetch(apiUrl, {
@@ -64,15 +74,16 @@ export const loadRules = async (forceSettingId?: string): Promise<RulesData | nu
                     });
 
                     if (apiResponse.ok) {
-                        const text = await apiResponse.text();
-                        const parsedRules = parseRulesFromText(text);
+                        const parsedRules = await apiResponse.json() as RulesData;
                         if (parsedRules) {
                             logger.log('[RulesLoader] Fresh rules loaded via API', parsedRules);
                             parsedRules.source = 'api';
-                            window.EXTERNAL_RULES = parsedRules;
                             return parsedRules;
                         }
-                        logger.warn('[RulesLoader] API Rate Limit hit during load. Falling back to Raw CDN.');
+                        logger.warn('[RulesLoader] API returned empty JSON. Falling back to Raw CDN.');
+                        GithubRateLimiter.setLimited();
+                    } else if (apiResponse.status === 403 || apiResponse.status === 429) {
+                        logger.warn('[RulesLoader] API Rate Limit hit. Falling back to Raw CDN.');
                         GithubRateLimiter.setLimited();
                     }
                 } catch (apiErr) {
@@ -92,16 +103,14 @@ export const loadRules = async (forceSettingId?: string): Promise<RulesData | nu
 
                 if (!response.ok) {
                     logger.warn('[RulesLoader] RAW fetch failed, falling back to relative path.');
-                    response = await fetch(`./data/rules.js?v=${timestamp}`, { cache: 'no-store' });
+                    response = await fetch(`./data/rules.json?v=${timestamp}`, { cache: 'no-store' });
                 }
 
                 if (response.ok) {
-                    const text = await response.text();
-                    const parsedRules = parseRulesFromText(text);
+                    const parsedRules = await response.json() as RulesData;
                     if (parsedRules) {
                         logger.log('[RulesLoader] Fresh rules loaded (Content Fetch)', parsedRules);
                         parsedRules.source = 'api';
-                        window.EXTERNAL_RULES = parsedRules;
                         return parsedRules;
                     }
                 }
@@ -110,16 +119,16 @@ export const loadRules = async (forceSettingId?: string): Promise<RulesData | nu
             }
         }
 
-        // 2. Fallback to Window Global (loaded via <script> tag)
-        if (!window.EXTERNAL_RULES) {
-            await new Promise(resolve => setTimeout(resolve, 50));
+        // LAST RESORT: Try general cache if everything else failed
+        const generalCache = await OfflineStorageService.getActiveRules();
+        if (generalCache) {
+            logger.log('[RulesLoader] Falling back to general active cache.');
+            return generalCache;
         }
 
-        if (window.EXTERNAL_RULES) {
-            logger.log('[RulesLoader] Rules loaded from Global (Script Tag):', window.EXTERNAL_RULES);
-            if (!window.EXTERNAL_RULES.source) window.EXTERNAL_RULES.source = 'legacy';
-            return window.EXTERNAL_RULES;
-        }
+        // ABSOLUTE LAST RESORT: Default Embedded Rules
+        logger.log('[RulesLoader] Using Default Embedded Rules.');
+        return defaultRules;
 
         logger.warn('[RulesLoader] No global rules found.');
         return null;
@@ -133,16 +142,9 @@ export const loadRules = async (forceSettingId?: string): Promise<RulesData | nu
 export const checkForUpdate = async (currentRules: RulesData | null): Promise<boolean> => {
     if (!currentRules) return false;
 
-    // Helper to parse rules from JS text
-    const parseRulesFromText = (text: string): RulesData | null => {
-        const jsonMatch = text.match(/window\.EXTERNAL_RULES\s*=\s*(\{[\s\S]*\});?/);
-        if (jsonMatch && jsonMatch[1]) {
-            return JSON.parse(jsonMatch[1]) as RulesData;
-        }
-        return null;
-    };
-
     try {
+        if (GithubRateLimiter.isOffline()) return false;
+
         // STRATEGY 0: Supabase (Online First)
         if (currentRules.source === 'database' && currentRules.settingId) {
             logger.log('[RulesLoader] Checking update via Supabase for ID:', currentRules.settingId);
@@ -158,7 +160,7 @@ export const checkForUpdate = async (currentRules: RulesData | null): Promise<bo
 
         // STRATEGY 1: GitHub API (Instant, No CDN Cache, but Rate Limited 60/h)
         if (!GithubRateLimiter.isLimited()) {
-            const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/public/data/rules.js?ref=main`;
+            const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/public/data/rules.json?ref=main`;
 
             logger.log('[RulesLoader] Checking update via API...');
             const apiResponse = await fetch(apiUrl, {
@@ -167,8 +169,7 @@ export const checkForUpdate = async (currentRules: RulesData | null): Promise<bo
             });
 
             if (apiResponse.ok) {
-                const text = await apiResponse.text();
-                const remoteRules = parseRulesFromText(text);
+                const remoteRules = await apiResponse.json() as RulesData;
 
                 if (remoteRules) {
                     // Compare Timestamps
@@ -196,8 +197,7 @@ export const checkForUpdate = async (currentRules: RulesData | null): Promise<bo
         const response = await fetch(rawUrlCacheBusted, { cache: 'no-store' });
 
         if (response.ok) {
-            const text = await response.text();
-            const remoteRules = parseRulesFromText(text);
+            const remoteRules = await response.json() as RulesData;
 
             if (remoteRules) {
                 // Compare Timestamps (Precise)

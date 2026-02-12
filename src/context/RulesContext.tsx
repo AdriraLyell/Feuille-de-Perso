@@ -3,7 +3,7 @@ import { RulesData } from '../types/rules';
 import { loadRules } from '../services/RulesLoader';
 import { migrateRulesToV2 } from '../utils/migrations';
 import { ErrorService } from '../services/ErrorService';
-import { get as getCache, set as setCache } from 'idb-keyval';
+import { OfflineStorageService } from '../services/OfflineStorageService';
 
 interface RulesContextType {
     rules: RulesData | null;
@@ -39,7 +39,7 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
         setError(null);
         try {
             // 1. Try to load from cache first for instant UI
-            const cached = await getCache('rpg-rules-cache');
+            const cached = await OfflineStorageService.getActiveRules();
             if (cached) {
                 console.log('[RulesContext] Loaded from cache');
                 setRules(migrateRulesToV2(cached));
@@ -62,13 +62,12 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
                 setIsOnlineMode(online);
 
                 // 3. Update cache
-                await setCache('rpg-rules-cache', data);
+                await OfflineStorageService.saveRules(data);
             }
             window.rulesStatus = { loaded: true, error: null, version: data?.version, online: !!(data?.settingId || data?.source === 'database') };
         } catch (err) {
             setError('Failed to load rules');
             ErrorService.handleError(err, { context: 'RulesContext.fetchRules' });
-            setIsOnlineMode(false);
             setIsOnlineMode(false);
             window.rulesStatus = { loaded: false, error: err instanceof Error ? err.toString() : String(err) };
         } finally {
@@ -89,9 +88,7 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
         setIsOnlineMode(online);
 
         // PERSISTENCE FIX: Save to cache so it survives refresh
-        setCache('rpg-rules-cache', newRules).catch(err =>
-            console.error('[RulesContext] Failed to update cache:', err)
-        );
+        OfflineStorageService.saveRules(newRules);
 
         // ROBUSTNESS: Persist the active setting ID
         if (newRules.settingId) {

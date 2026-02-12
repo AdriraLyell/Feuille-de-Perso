@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { GameSettingSummary } from '../services/CampaignService';
-import { PlayerService } from '../services/PlayerService';
+import { GameSettingSummary, CampaignService } from '../services/CampaignService';
 import { Cloud, Wifi, WifiOff, FileJson, Loader2, ArrowRight, RotateCcw } from 'lucide-react';
 import { RulesData } from '../types/rules';
 import { ErrorService } from '../services/ErrorService';
@@ -43,7 +42,7 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
     const handleOnlineClick = async () => {
         setIsLoading(true);
         try {
-            const settings = await PlayerService.listPublicSettings();
+            const settings = await CampaignService.listPublicSettings();
             setPublicSettings(settings);
             setMode('online_list');
         } catch (e) {
@@ -60,7 +59,7 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
         }
         setIsLoading(true);
         try {
-            const rules = await PlayerService.loadSetting(resumeInfo.settingId);
+            const rules = await CampaignService.loadSetting(resumeInfo.settingId);
             if (rules) {
                 onSelectSource('online', rules, resumeInfo.settingId, resumeInfo.campaign);
             } else {
@@ -77,7 +76,7 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
     const handleSettingClick = async (setting: GameSettingSummary) => {
         setIsLoading(true);
         try {
-            const rules = await PlayerService.loadSetting(setting.id);
+            const rules = await CampaignService.loadSetting(setting.id);
             if (rules) {
                 onSelectSource('online', rules, setting.id, setting.name);
             } else {

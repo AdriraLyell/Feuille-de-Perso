@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { Cloud, Download, AlertTriangle, Loader2, CheckCircle } from 'lucide-react';
 import { CharacterSyncService, SyncedCharacterSummary } from '../../services/CharacterSyncService';
 import { CharacterSheetData } from '../../types/character';
-import { PlayerService } from '../../services/PlayerService';
+import { CampaignService } from '../../services/CampaignService';
 
 interface CloudPanelProps {
     data: CharacterSheetData;
@@ -77,7 +77,7 @@ const CloudPanel: React.FC<CloudPanelProps> = ({ data, onLoadSuccess, onClose })
         }
 
         // Get campaign name for syncInfo
-        const campaigns = await PlayerService.listPublicSettings();
+        const campaigns = await CampaignService.listPublicSettings();
         const campaign = campaigns.find(c => c.id === char.setting_id);
 
         // Update syncInfo

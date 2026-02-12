@@ -126,10 +126,18 @@ const AdminApp: React.FC = () => {
             <div className="min-h-screen bg-gray-50 p-8">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex justify-between items-center mb-6">
-                        <button onClick={() => setViewMode('dashboard')} className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold transition-colors">
+                        <button
+                            onClick={() => setViewMode('dashboard')}
+                            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold transition-colors"
+                            aria-label="Retour au Tableau de Bord"
+                        >
                             <ArrowLeft size={20} /> Retour au Tableau de Bord
                         </button>
-                        <button onClick={logout} className="flex items-center gap-2 bg-[#5c4d41] hover:bg-[#8b2e2e] text-white px-4 py-2 rounded-md font-bold transition-all shadow-md group">
+                        <button
+                            onClick={logout}
+                            className="flex items-center gap-2 bg-[#5c4d41] hover:bg-[#8b2e2e] text-white px-4 py-2 rounded-md font-bold transition-all shadow-md group"
+                            aria-label="Se déconnecter"
+                        >
                             <LogOut size={18} className="group-hover:rotate-12 transition-transform" /> Déconnexion
                         </button>
                     </div>
@@ -163,24 +171,24 @@ const AdminApp: React.FC = () => {
                 onPublish={() => setShowDeployModal(true)}
                 onLogout={logout}
                 onShowChangelog={() => setShowChangelog(true)}
-                onCheckSchema={() => currentSettingId && (CampaignService as any).checkSchema?.(currentSettingId)}
+                onCheckSchema={() => currentSettingId && CampaignService.checkSchema?.(currentSettingId)}
             />
 
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
 
             <nav className="bg-white border-b border-gray-200 mt-0 sticky top-16 z-40">
                 <div className="max-w-7xl mx-auto flex">
-                    {[
+                    {([
                         { id: 'general', label: 'Général & Création' },
                         { id: 'attributes', label: 'Attributs' },
                         { id: 'skills', label: 'Compétences' },
                         { id: 'costs', label: 'Coûts & Limites' },
                         { id: 'libraries', label: <div className="flex items-center justify-center gap-2"><BookOpen size={16} /> Bibliothèques</div> },
                         { id: 'players', label: <div className="flex items-center justify-center gap-2"><Users size={16} /> Joueurs</div> }
-                    ].map(tab => (
+                    ] as const).map(tab => (
                         <button
                             key={tab.id}
-                            onClick={() => setActiveTab(tab.id as any)}
+                            onClick={() => setActiveTab(tab.id)}
                             className={`flex-1 py-4 text-center font-bold uppercase tracking-wider text-sm border-b-2 transition-colors ${activeTab === tab.id ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
                         >
                             {tab.label}
@@ -205,7 +213,7 @@ const AdminApp: React.FC = () => {
                             {['traits', 'skills', 'backgrounds', 'counters', 'specializations'].map((lt) => (
                                 <button
                                     key={lt}
-                                    onClick={() => setActiveLibraryTab(lt as any)}
+                                    onClick={() => setActiveLibraryTab(lt as typeof activeLibraryTab)}
                                     className={`px-4 py-2 rounded font-bold text-sm transition-colors whitespace-nowrap ${activeLibraryTab === lt ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
                                 >
                                     {lt.charAt(0).toUpperCase() + lt.slice(1)}

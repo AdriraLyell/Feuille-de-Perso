@@ -1,0 +1,159 @@
+
+Running 1 test using 1 worker
+
+[TEST]: Navigating to App (Online mode)...
+[BROWSER]: cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+[BROWSER]: [vite] connecting...
+[BROWSER]: [vite] connected.
+[BROWSER]: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[BROWSER]: [APP] [RulesLoader] Attempting to fetch rules via API: https://api.github.com/repos/AdriraLyell/Feuille-de-Perso/contents/public/data/rules.json?ref=main
+[TEST]: Mocking Online Rules Fetch: https://api.github.com/repos/AdriraLyell/Feuille-de-Perso/contents/public/data/rules.json?ref=main
+[BROWSER]: [APP] [RulesLoader] Attempting to fetch rules via API: https://api.github.com/repos/AdriraLyell/Feuille-de-Perso/contents/public/data/rules.json?ref=main
+[TEST]: Mocking Online Rules Fetch: https://api.github.com/repos/AdriraLyell/Feuille-de-Perso/contents/public/data/rules.json?ref=main
+[BROWSER]: [APP] [RulesLoader] Fresh rules loaded via API {version: E2E-TEST-OFFLINE-99, settingId: e2e-offline-setting, configurations: Object, definitions: Object, libraries: Object}
+[BROWSER]: [APP] [RulesLoader] Fresh rules loaded via API {version: E2E-TEST-OFFLINE-99, settingId: e2e-offline-setting, configurations: Object, definitions: Object, libraries: Object}
+[BROWSER]: [APP] [CharacterContext] Reconciling with rules vE2E-TEST-OFFLINE-99 (was vundefined). Skills before: 101
+[BROWSER]: [APP] [CharacterContext] Reconciliation complete. Skills after: 92
+[BROWSER]: [WARN] [CharacterContext] Skills count dropped from 101 to 92! Check rules for missing definitions.
+[BROWSER]: [APP] [CharacterContext] Reconciling with rules vE2E-TEST-OFFLINE-99 (was vundefined). Skills before: 101
+[BROWSER]: [APP] [CharacterContext] Reconciliation complete. Skills after: 92
+[BROWSER]: [WARN] [CharacterContext] Skills count dropped from 101 to 92! Check rules for missing definitions.
+[BROWSER]: [APP] [OfflineStorage] Rules e2e-offline-setting saved to cache.
+[BROWSER]: [APP] [OfflineStorage] Rules e2e-offline-setting saved to cache.
+[TEST]: Online Rules active and verified.
+[TEST]: Preparing Offline Reload...
+[TEST]: Reloading App...
+[TEST]: Blocking request while offline: https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap
+[TEST]: Blocking request while offline: https://cdn.tailwindcss.com/
+[BROWSER]: Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+[BROWSER]: Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+[BROWSER]: [vite] connecting...
+[BROWSER]: [vite] connected.
+[BROWSER]: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[BROWSER]: [Migration] Failed to apply migration step in v1 (index 2): TypeError: Cannot set properties of undefined (setting 'current')
+    at migrateCounters (http://localhost:5173/src/utils/migrations/migrateCounters.ts:14:37)
+    at http://localhost:5173/src/utils/migrations/index.ts:18:11
+    at Array.forEach (<anonymous>)
+    at migrateData (http://localhost:5173/src/utils/migrations/index.ts:16:13)
+    at http://localhost:5173/src/context/CharacterContext.tsx?t=1770850619135:77:26
+    at mountState (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:12053:28)
+    at Object.useState (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:12593:24)
+    at useState (http://localhost:5173/node_modules/.vite/deps/chunk-PMKBOVCG.js?v=86847f99:1066:29)
+    at CharacterProvider (http://localhost:5173/src/context/CharacterContext.tsx?t=1770850619135:72:27)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:11596:26)
+[BROWSER]: [Migration] Data migration completed with 1 failures. Schema version stayed at undefined
+[BROWSER]: %c[12:14:42 AM] [CharacterContext.Init] Error color: red; font-weight: bold;
+[BROWSER]: Original Error: ZodError: [
+  {
+    "expected": "object",
+    "code": "invalid_type",
+    "path": [
+      "counters",
+      "volonte"
+    ],
+    "message": "Invalid input: expected object, received undefined"
+  },
+  {
+    "expected": "object",
+    "code": "invalid_type",
+    "path": [
+      "counters",
+      "confiance"
+    ],
+    "message": "Invalid input: expected object, received undefined"
+  }
+]
+    at validateCharacterData (http://localhost:5173/src/schemas/characterSchema.ts:250:35)
+    at http://localhost:5173/src/context/CharacterContext.tsx?t=1770850619135:78:27
+    at mountState (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:12053:28)
+    at Object.useState (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:12593:24)
+    at useState (http://localhost:5173/node_modules/.vite/deps/chunk-PMKBOVCG.js?v=86847f99:1066:29)
+    at CharacterProvider (http://localhost:5173/src/context/CharacterContext.tsx?t=1770850619135:72:27)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:11596:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:14974:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:15962:22)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:19806:22)
+[BROWSER]: User Message: Erreur lors du chargement des donn├®es locales.
+[BROWSER]: console.groupEnd
+[BROWSER]: [Migration] Failed to apply migration step in v1 (index 2): TypeError: Cannot set properties of undefined (setting 'current')
+    at migrateCounters (http://localhost:5173/src/utils/migrations/migrateCounters.ts:14:37)
+    at http://localhost:5173/src/utils/migrations/index.ts:18:11
+    at Array.forEach (<anonymous>)
+    at migrateData (http://localhost:5173/src/utils/migrations/index.ts:16:13)
+    at http://localhost:5173/src/context/CharacterContext.tsx?t=1770850619135:86:18
+    at mountState (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:12053:28)
+    at Object.useState (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:12593:24)
+    at useState (http://localhost:5173/node_modules/.vite/deps/chunk-PMKBOVCG.js?v=86847f99:1066:29)
+    at CharacterProvider (http://localhost:5173/src/context/CharacterContext.tsx?t=1770850619135:72:27)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:11596:26)
+[BROWSER]: [Migration] Data migration completed with 1 failures. Schema version stayed at undefined
+[BROWSER]: [Migration] Failed to apply migration step in v1 (index 2): TypeError: Cannot set properties of undefined (setting 'current')
+    at migrateCounters (http://localhost:5173/src/utils/migrations/migrateCounters.ts:14:37)
+    at http://localhost:5173/src/utils/migrations/index.ts:18:11
+    at Array.forEach (<anonymous>)
+    at migrateData (http://localhost:5173/src/utils/migrations/index.ts:16:13)
+    at http://localhost:5173/src/context/CharacterContext.tsx?t=1770850619135:77:26
+    at mountState (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:12053:28)
+    at Object.useState (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:12593:24)
+    at useState (http://localhost:5173/node_modules/.vite/deps/chunk-PMKBOVCG.js?v=86847f99:1066:29)
+    at CharacterProvider (http://localhost:5173/src/context/CharacterContext.tsx?t=1770850619135:72:27)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:11596:26)
+[BROWSER]: [Migration] Data migration completed with 1 failures. Schema version stayed at undefined
+[BROWSER]: %c[12:14:42 AM] [CharacterContext.Init] Error color: red; font-weight: bold;
+[BROWSER]: Original Error: ZodError: [
+  {
+    "expected": "object",
+    "code": "invalid_type",
+    "path": [
+      "counters",
+      "volonte"
+    ],
+    "message": "Invalid input: expected object, received undefined"
+  },
+  {
+    "expected": "object",
+    "code": "invalid_type",
+    "path": [
+      "counters",
+      "confiance"
+    ],
+    "message": "Invalid input: expected object, received undefined"
+  }
+]
+    at validateCharacterData (http://localhost:5173/src/schemas/characterSchema.ts:250:35)
+    at http://localhost:5173/src/context/CharacterContext.tsx?t=1770850619135:78:27
+    at mountState (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:12053:28)
+    at Object.useState (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:12593:24)
+    at useState (http://localhost:5173/node_modules/.vite/deps/chunk-PMKBOVCG.js?v=86847f99:1066:29)
+    at CharacterProvider (http://localhost:5173/src/context/CharacterContext.tsx?t=1770850619135:72:27)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:11596:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:15024:27)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:15962:22)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:19806:22)
+[BROWSER]: User Message: Erreur lors du chargement des donn├®es locales.
+[BROWSER]: console.groupEnd
+[BROWSER]: [Migration] Failed to apply migration step in v1 (index 2): TypeError: Cannot set properties of undefined (setting 'current')
+    at migrateCounters (http://localhost:5173/src/utils/migrations/migrateCounters.ts:14:37)
+    at http://localhost:5173/src/utils/migrations/index.ts:18:11
+    at Array.forEach (<anonymous>)
+    at migrateData (http://localhost:5173/src/utils/migrations/index.ts:16:13)
+    at http://localhost:5173/src/context/CharacterContext.tsx?t=1770850619135:86:18
+    at mountState (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:12053:28)
+    at Object.useState (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:12593:24)
+    at useState (http://localhost:5173/node_modules/.vite/deps/chunk-PMKBOVCG.js?v=86847f99:1066:29)
+    at CharacterProvider (http://localhost:5173/src/context/CharacterContext.tsx?t=1770850619135:72:27)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-LPF6KSF2.js?v=86847f99:11596:26)
+[BROWSER]: [Migration] Data migration completed with 1 failures. Schema version stayed at undefined
+[BROWSER]: [RulesContext] Loaded from cache
+[BROWSER]: [APP] [RulesLoader] Device is offline. Using cache strategies.
+[BROWSER]: [RulesContext] Loaded from cache
+[BROWSER]: [APP] [RulesLoader] Device is offline. Using cache strategies.
+[BROWSER]: [APP] [RulesLoader] Rules loaded from Offline cache.
+[BROWSER]: [APP] [RulesLoader] Rules loaded from Offline cache.
+[BROWSER]: [APP] [OfflineStorage] Rules e2e-offline-setting saved to cache.
+[BROWSER]: [APP] [OfflineStorage] Rules e2e-offline-setting saved to cache.
+[TEST]: Offline Status: LOADED (vE2E-TEST-OFFLINE-99)
+[TEST]: Offline Persistence SUCCESS.
+  Ô£ô  1 [chromium] ÔÇ║ tests\offline-sync.spec.ts:5:5 ÔÇ║ Offline Sync Integration ÔÇ║ should persist rules and survive reload via cache (2.8s)
+
+  1 passed (3.7s)

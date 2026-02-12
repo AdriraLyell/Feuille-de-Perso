@@ -70,7 +70,11 @@ export interface RulesData {
     version: string;
     settingId?: string; // ID de la campagne source (si chargé depuis DB)
     settingName?: string; // Nom de la campagne source
-    source?: 'database' | 'file' | 'api' | 'legacy'; // Source des règles
+    description?: string; // Description de la campagne (MJ)
+    welcomeMessage?: string; // Message d'accueil pour les joueurs
+    showMetadataToPlayers?: boolean; // Toggle visibilité joueurs
+    isArchived?: boolean; // État d'archivage
+    source?: 'database' | 'file' | 'api' | 'legacy' | 'cache'; // Source des règles
     lastUpdated?: number;
     configurations: {
         global: {
@@ -105,6 +109,7 @@ export interface GameSettingSummary {
     version: string;
     last_updated: string;
     is_public: boolean;
+    is_archived: boolean;
 }
 
 export interface GameSetting {

@@ -24,5 +24,9 @@ export const GithubRateLimiter = {
         const limitUntil = Date.now() + API_LIMIT_DURATION;
         sessionStorage.setItem(API_LIMIT_KEY, limitUntil.toString());
         logger.warn(`GitHub API Rate Limit set until ${new Date(limitUntil).toLocaleTimeString()}`);
+    },
+
+    isOffline(): boolean {
+        return !window.navigator.onLine;
     }
 };

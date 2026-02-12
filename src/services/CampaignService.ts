@@ -19,6 +19,10 @@ interface DBGameSetting {
     configurations: any; // JSONB
     definitions: any; // JSONB
     is_public: boolean;
+    is_archived: boolean;
+    description: string | null;
+    welcome_message: string | null;
+    show_metadata_to_players: boolean;
 }
 
 export const CampaignService = {
@@ -28,9 +32,24 @@ export const CampaignService = {
      */
     async listSettings(): Promise<GameSettingSummary[] | null> {
         return await DatabaseService.fetchAll<GameSettingSummary>(TABLE_GAME_SETTINGS, {
-            select: 'id, name, version, last_updated, is_public',
+            select: 'id, name, version, last_updated, is_public, is_archived',
             order: { column: 'last_updated', ascending: false }
         }, 'CampaignService.listSettings');
+    },
+
+    /**
+     * List public settings available for players
+     */
+    async listPublicSettings(): Promise<GameSettingSummary[]> {
+        return await DatabaseService.fetchAll<GameSettingSummary>(
+            TABLE_GAME_SETTINGS,
+            {
+                select: 'id, name, version, last_updated, is_public',
+                eq: { is_public: true },
+                order: { column: 'last_updated', ascending: false }
+            },
+            'CampaignService.listPublicSettings'
+        ) || [];
     },
 
     /**
@@ -144,6 +163,10 @@ export const CampaignService = {
             // Inject setting metadata
             rules.settingId = id;
             rules.settingName = settingData.name;
+            rules.description = settingData.description || undefined;
+            rules.welcomeMessage = settingData.welcome_message || undefined;
+            rules.showMetadataToPlayers = settingData.show_metadata_to_players;
+            rules.isArchived = settingData.is_archived;
             rules.source = 'database';
 
             // 3. REBUILD definitions.skills layout from libraries if needed
@@ -237,7 +260,11 @@ export const CampaignService = {
             version: rules.version,
             last_updated: new Date().toISOString(),
             configurations: rules.configurations,
-            definitions: rules.definitions
+            definitions: rules.definitions,
+            description: rules.description || null,
+            welcome_message: rules.welcomeMessage || null,
+            show_metadata_to_players: !!rules.showMetadataToPlayers,
+            is_archived: !!rules.isArchived
         };
         if (name) rootUpdate.name = name;
 
@@ -288,6 +315,27 @@ export const CampaignService = {
      */
     async togglePublic(id: string, isPublic: boolean): Promise<boolean> {
         return await DatabaseService.update(TABLE_GAME_SETTINGS, id, { is_public: isPublic }, 'CampaignService.togglePublic');
+    },
+
+    /**
+     * Set archived status
+     */
+    async setArchived(id: string, isArchived: boolean): Promise<boolean> {
+        return await DatabaseService.update(TABLE_GAME_SETTINGS, id, { is_archived: isArchived }, 'CampaignService.setArchived');
+    },
+
+    /**
+     * Manual schema check for a setting
+     */
+    async checkSchema(id: string): Promise<boolean> {
+        try {
+            const rules = await CampaignService.loadSetting(id);
+            if (!rules) return false;
+            // loadSetting already performs Zod validation
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 
 }

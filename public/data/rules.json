@@ -1,4 +1,4 @@
-window.EXTERNAL_RULES = {
+{
     "version": "2.12.57",
     "theme": {
         "creationColor": "#2563eb",
@@ -1251,4 +1251,4 @@ window.EXTERNAL_RULES = {
         "specializations": []
     },
     "lastUpdated": 1770208884880
-};
+}

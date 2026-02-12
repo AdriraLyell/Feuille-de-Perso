@@ -68,7 +68,7 @@ export const useLibraryImport = (character: SyncedCharacter, onSuccess?: () => v
                         cost: t.value || '0',
                         description: t.variant || '',
                         tags: [],
-                        is_variable: !!t.variant,
+                        isVariable: !!t.variant,
                         effects: []
                     }));
 
@@ -82,14 +82,14 @@ export const useLibraryImport = (character: SyncedCharacter, onSuccess?: () => v
                         cost: t.value || '0',
                         description: t.variant || '',
                         tags: [],
-                        is_variable: !!t.variant,
+                        isVariable: !!t.variant,
                         effects: []
                     }));
 
                 const allTraits = [...advantages, ...disadvantages];
                 setTraitCandidates(allTraits.map(t => {
                     const existing = libraries.traits.find(et => normalizeString(et.name) === normalizeString(t.name));
-                    const v = !!(t as any).isVariable || !!(t as any).is_variable;
+                    const v = !!t.isVariable;
                     return { data: t, isDuplicate: !!existing, isSelected: !existing && !v, isVariable: v, existingId: existing?.id };
                 }));
 
@@ -106,7 +106,7 @@ export const useLibraryImport = (character: SyncedCharacter, onSuccess?: () => v
                         return;
                     }
 
-                    (list as any[]).filter(s => s.name && s.value > 0).forEach(s => {
+                    (list as { name: string, value: number, variant?: string }[]).filter(s => s.name && s.value > 0).forEach(s => {
                         rawSkills.push({
                             id: crypto.randomUUID(),
                             name: s.name,
@@ -126,7 +126,7 @@ export const useLibraryImport = (character: SyncedCharacter, onSuccess?: () => v
                 // 4. Scan Specializations
                 const allSpecs: LibrarySpecializationEntry[] = [];
                 Object.entries(data.specializations || {}).forEach(([skillId, specs]) => {
-                    const skillName = Object.values(data.skills || {}).flat().find((s: any) => (s as any).id === skillId)?.name || skillId;
+                    const skillName = Object.values(data.skills || {}).flat().find((s) => (s as { id: string, name: string }).id === skillId)?.name || skillId;
 
                     specs.forEach(specName => {
                         allSpecs.push({
@@ -147,14 +147,17 @@ export const useLibraryImport = (character: SyncedCharacter, onSuccess?: () => v
                 // 5. Scan Backgrounds
                 const rawBackgrounds = data.skills['Col_Comp_8'] || [];
                 const backgrounds: LibraryBackgroundEntry[] = rawBackgrounds
-                    .filter((b: any) => b.name && b.name.trim() !== '')
-                    .map((b: any) => ({
-                        id: crypto.randomUUID(),
-                        name: b.name,
-                        description: b.description || '',
-                        isVariable: !!b.variant,
-                        defaultCategory: 'arrieres_plans'
-                    }));
+                    .filter((b) => (b as { name: string }).name && (b as { name: string }).name.trim() !== '')
+                    .map((b) => {
+                        const bg = b as { name: string, description?: string, variant?: string };
+                        return {
+                            id: crypto.randomUUID(),
+                            name: bg.name,
+                            description: bg.description || '',
+                            isVariable: !!bg.variant,
+                            defaultCategory: 'arrieres_plans'
+                        };
+                    });
 
                 setBackgroundCandidates(backgrounds.map(b => {
                     const existing = libraries.backgrounds.find(eb => normalizeString(eb.name) === normalizeString(b.name));
@@ -165,7 +168,7 @@ export const useLibraryImport = (character: SyncedCharacter, onSuccess?: () => v
                 const allCounters: LibraryCounterEntry[] = [];
                 const processedCounterNames = new Set<string>();
 
-                const processCounter = (c: any) => {
+                const processCounter = (c: { name: string, description?: string, max?: number, current?: number }) => {
                     if (c.name && c.name.trim() !== '') {
                         const norm = normalizeString(c.name);
                         if (!processedCounterNames.has(norm)) {
@@ -211,23 +214,23 @@ export const useLibraryImport = (character: SyncedCharacter, onSuccess?: () => v
 
             // 1. Import Traits
             const traitsToImport = traitCandidates.filter(c => c.isSelected && !c.isDuplicate).map(c => c.data);
-            if (traitsToImport.length > 0) await LibraryService.importTraits(sid as any, traitsToImport, targetSettingId);
+            if (traitsToImport.length > 0) await LibraryService.importTraits(sid, traitsToImport, targetSettingId || undefined);
 
             // 2. Import Skills
             const skillsToImport = skillCandidates.filter(c => c.isSelected && !c.isDuplicate).map(c => c.data);
-            if (skillsToImport.length > 0) await LibraryService.importSkills(sid as any, skillsToImport, targetSettingId);
+            if (skillsToImport.length > 0) await LibraryService.importSkills(sid, skillsToImport, targetSettingId || undefined);
 
             // 3. Import Specializations
             const specsToImport = specCandidates.filter(c => c.isSelected && !c.isDuplicate).map(c => c.data);
-            if (specsToImport.length > 0) await LibraryService.importSpecializations(sid as any, specsToImport, targetSettingId);
+            if (specsToImport.length > 0) await LibraryService.importSpecializations(sid, specsToImport, targetSettingId || undefined);
 
             // 4. Import Backgrounds
             const bgsToImport = backgroundCandidates.filter(c => c.isSelected && !c.isDuplicate).map(c => c.data);
-            if (bgsToImport.length > 0) await LibraryService.importBackgrounds(sid as any, bgsToImport, targetSettingId);
+            if (bgsToImport.length > 0) await LibraryService.importBackgrounds(sid, bgsToImport, targetSettingId || undefined);
 
             // 5. Import Counters
             const ctrsToImport = counterCandidates.filter(c => c.isSelected && !c.isDuplicate).map(c => c.data);
-            if (ctrsToImport.length > 0) await LibraryService.importCounters(sid as any, ctrsToImport, targetSettingId);
+            if (ctrsToImport.length > 0) await LibraryService.importCounters(sid, ctrsToImport, targetSettingId || undefined);
 
             setIsSaving(false);
             if (onSuccess) onSuccess();

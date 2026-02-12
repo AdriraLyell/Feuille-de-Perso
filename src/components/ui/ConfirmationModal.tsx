@@ -60,6 +60,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                         <button
                             onClick={onClose}
                             className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold transition-colors uppercase text-xs tracking-wider"
+                            aria-label={cancelLabel}
                         >
                             {cancelLabel}
                         </button>
@@ -67,6 +68,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     <button
                         onClick={handleConfirm}
                         className={`px-6 py-2 text-white rounded-sm font-bold shadow-md flex items-center gap-2 transition-all uppercase leading-none tracking-wider text-xs ${getBtnColor()}`}
+                        aria-label={confirmLabel}
                     >
                         {confirmLabel}
                     </button>

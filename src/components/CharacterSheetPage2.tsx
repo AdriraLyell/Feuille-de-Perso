@@ -1,19 +1,19 @@
 
-import React, { useState, useEffect } from 'react';
-import { CharacterSheetData, ReputationEntry, TraitEntry, LibraryEntry } from '../types';
+import React from 'react';
+import { CharacterSheetData, TraitEntry } from '../types';
 import { BookOpen, X, Edit, Trash2, Check, CheckSquare } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import { useCharacter } from '../context/CharacterContext';
 
 import { useRules } from '../context/RulesContext';
-import { normalizeString } from '../utils/stringUtils';
 
 // Imports Refactorisés
-import { useNotification } from '../context/NotificationContext';
 import NotebookInput from './shared/NotebookInput';
 import CharacterImageWidget from './shared/CharacterImageWidget';
 import TraitRow from './sheet/page2/TraitRow';
 import { Page2SectionHeader } from './sheet/page2/Page2Components';
+import { useTraitEditor } from '../hooks/sheet/useTraitEditor';
+import { useReputationManager } from '../hooks/sheet/useReputationManager';
 
 interface Props {
     isLandscape?: boolean;
@@ -23,57 +23,30 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
     const { data, updateData: onChange, addLog: onAddLog } = useCharacter();
     const { rules } = useRules();
 
-    const [editingSlot, setEditingSlot] = useState<{ type: 'avantages' | 'desavantages', index: number } | null>(null);
-    const [showLibraryInEditor, setShowLibraryInEditor] = useState(false);
-    const [multiSelectTarget, setMultiSelectTarget] = useState<'avantages' | 'desavantages' | null>(null);
-    const [focusNewReputation, setFocusNewReputation] = useState<number | null>(null);
-    const [editorName, setEditorName] = useState('');
-    const [editorValue, setEditorValue] = useState('');
-    const [editorTag, setEditorTag] = useState('');
-    const [editorVariant, setEditorVariant] = useState('');
-    const [editorVariants, setEditorVariants] = useState<string[]>([]);
-    const [editorDescription, setEditorDescription] = useState('');
-    const [editorDefinitionId, setEditorDefinitionId] = useState<string | undefined>(undefined);
-    const [editorIsVariable, setEditorIsVariable] = useState(false);
+    const {
+        editingSlot, setEditingSlot,
+        showLibraryInEditor, setShowLibraryInEditor,
+        multiSelectTarget, setMultiSelectTarget,
+        editorName, setEditorName,
+        editorValue, setEditorValue,
+        editorTag, setEditorTag,
+        editorVariant, setEditorVariant,
+        editorVariants, setEditorVariants,
+        editorDescription, setEditorDescription,
+        editorIsVariable, setEditorIsVariable,
+        editorDefinitionId, setEditorDefinitionId,
+        openEditor,
+        closeEditor,
+        saveTraitFromEditor,
+        removeTrait,
+        handleMultiAdd,
+        clearEditor
+    } = useTraitEditor(data, rules, onChange, onAddLog);
 
-    useEffect(() => {
-        if (editingSlot) {
-            const item = data.page2[editingSlot.type][editingSlot.index];
-            setEditorName(item.name);
-            setEditorValue(item.value);
-            setEditorDescription(item.description || '');
-            setEditorTag(item.tag || '');
-            setEditorVariant(item.variant || '');
-
-            // Resolve Definition & Variants
-            let defId = item.definitionId;
-            let variants: string[] = [];
-
-            // Try to find by ID first, then Name
-            const libEntry = rules?.libraries?.traits?.find(t =>
-                (defId && t.id === defId) ||
-                normalizeString(t.name) === normalizeString(item.name)
-            );
-
-            if (libEntry) {
-                defId = libEntry.id;
-                variants = libEntry.variants || [];
-                setEditorIsVariable(libEntry.isVariable || false);
-            } else {
-                setEditorIsVariable(false);
-            }
-
-            setEditorDefinitionId(defId);
-            setEditorVariants(variants);
-        }
-    }, [editingSlot, data.page2, rules?.libraries?.traits]);
-
-    useEffect(() => {
-        if (focusNewReputation !== null) {
-            const element = document.getElementById(`rep-row-${focusNewReputation}-rep`);
-            if (element) { element.focus(); setFocusNewReputation(null); }
-        }
-    }, [focusNewReputation, data.page2.reputation]);
+    const {
+        updateReputationEntry,
+        handleReputationKeyDown
+    } = useReputationManager(data, onChange, onAddLog);
 
     const updateStringField = (field: keyof CharacterSheetData['page2'], value: string) => {
         onChange({ ...data, page2: { ...data.page2, [field]: value } });
@@ -82,82 +55,6 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
 
     const updateCharacterImageId = (id: string) => {
         onChange({ ...data, page2: { ...data.page2, characterImageId: id, characterImage: '' } });
-    };
-
-    const openEditor = (type: 'avantages' | 'desavantages', index: number) => {
-        setEditingSlot({ type, index });
-    };
-
-    const saveTraitFromEditor = () => {
-        if (!editingSlot) return;
-        const newList = [...data.page2[editingSlot.type]];
-        newList[editingSlot.index] = {
-            name: editorName,
-            value: editorValue,
-            description: editorDescription,
-            tag: editorTag,
-            variant: editorVariant,
-            definitionId: editorDefinitionId
-        };
-        onChange({ ...data, page2: { ...data.page2, [editingSlot.type]: newList } });
-        onAddLog(`Modification ${editingSlot.type === 'avantages' ? 'Avantage' : 'Désavantage'}`, 'info', 'sheet');
-        setEditingSlot(null);
-        setShowLibraryInEditor(false);
-    };
-
-    const removeTrait = (type: 'avantages' | 'desavantages', index: number) => {
-        onChange(prev => {
-            const list = [...prev.page2[type]];
-            list[index] = { name: '', value: '', variant: '', description: '', tag: '', definitionId: undefined }; // Clear all fields
-            onAddLog(`Suppression ${type === 'avantages' ? 'Avantage' : 'Désavantage'}`, 'info', 'sheet');
-            return {
-                ...prev,
-                page2: { ...prev.page2, [type]: list }
-            };
-        });
-    };
-
-    const handleMultiAdd = (instances: { entry: LibraryEntry; variant?: string }[]) => {
-        if (!multiSelectTarget) return;
-        const currentList = [...data.page2[multiSelectTarget]];
-        let addedCount = 0;
-        let listIndex = 0;
-        instances.forEach(instance => {
-            const entry = instance.entry;
-            while (listIndex < currentList.length && currentList[listIndex].name.trim() !== '') { listIndex++; }
-            if (listIndex < currentList.length) {
-                currentList[listIndex] = {
-                    name: entry.name,
-                    value: entry.cost,
-                    description: entry.description,
-                    tag: entry.tags?.[0] || '',
-                    variant: instance.variant || '',
-                    definitionId: entry.id // LINKING
-                };
-                addedCount++;
-            }
-        });
-        if (addedCount > 0) {
-            onChange({ ...data, page2: { ...data.page2, [multiSelectTarget]: currentList } });
-            onAddLog(`Ajout de ${addedCount} traits.`, 'success', 'sheet');
-        }
-        setMultiSelectTarget(null);
-    };
-
-    const updateReputationEntry = (index: number, key: keyof ReputationEntry, value: string) => {
-        const newList = [...data.page2.reputation];
-        newList[index] = { ...newList[index], [key]: value };
-        onChange({ ...data, page2: { ...data.page2, reputation: newList } });
-        onAddLog(`Modification Réputation`, 'info', 'sheet', `reputation_${index}_${String(key)}`);
-    };
-
-    const handleReputationKeyDown = (e: React.KeyboardEvent, index: number, field: 'reputation' | 'lieu' | 'valeur') => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            if (field === 'reputation') document.getElementById(`rep-row-${index}-lieu`)?.focus();
-            else if (field === 'lieu') document.getElementById(`rep-row-${index}-val`)?.focus();
-            else if (field === 'valeur' && index < data.page2.reputation.length - 1) document.getElementById(`rep-row-${index + 1}-rep`)?.focus();
-        }
     };
 
     const calculateTotal = (list: TraitEntry[]) => list.reduce((acc, item) => acc + (parseInt(item.value) || 0), 0);
@@ -325,7 +222,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description / Effets</label>
                                     <textarea className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-700 h-24 focus:border-blue-500 outline-none resize-none" value={editorDescription} onChange={(e) => setEditorDescription(e.target.value)} placeholder="Description détaillée du trait..." />
                                 </div>
-                                <div className="flex justify-end"><button onClick={() => { setEditorName(''); setEditorValue(''); setEditorDescription(''); setEditorTag(''); setEditorVariant(''); setEditorVariants([]); setEditorIsVariable(false); }} className="text-gray-500 text-xs hover:text-red-600 px-3 py-1.5 flex items-center gap-1 hover:bg-red-50 rounded"><Trash2 size={14} /> Vider</button></div>
+                                <div className="flex justify-end"><button onClick={clearEditor} className="text-gray-500 text-xs hover:text-red-600 px-3 py-1.5 flex items-center gap-1 hover:bg-red-50 rounded"><Trash2 size={14} /> Vider</button></div>
                             </div>
                             <div className={`flex flex-col min-h-0 border-t border-gray-200 transition-all duration-300 ${showLibraryInEditor ? 'flex-grow' : 'h-10'}`}>
                                 <div className="bg-blue-50 px-4 py-2 border-b border-blue-100 flex items-center justify-between text-blue-800 text-sm font-bold shrink-0">

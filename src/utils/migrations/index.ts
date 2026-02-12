@@ -176,6 +176,44 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
         }
     }
 
+    // 6. Ensure libraries structure
+    if (!rules.libraries) {
+        rules.libraries = {
+            traits: [],
+            skills: [],
+            specializations: [],
+            backgrounds: [],
+            counters: []
+        };
+    } else {
+        if (!rules.libraries.traits) rules.libraries.traits = [];
+        if (!rules.libraries.skills) rules.libraries.skills = [];
+        if (!rules.libraries.specializations) rules.libraries.specializations = [];
+        if (!rules.libraries.backgrounds) rules.libraries.backgrounds = [];
+        if (!rules.libraries.counters) rules.libraries.counters = [];
+    }
+
+    // Populate libraries.backgrounds from definitions.backgrounds if empty
+    if (rules.libraries.backgrounds.length === 0 && rules.definitions.backgrounds) {
+        rules.libraries.backgrounds = rules.definitions.backgrounds.map((bg: string) => ({
+            id: bg.toLowerCase().replace(/\s+/g, '_'),
+            name: bg,
+            description: "",
+            cost: 1
+        }));
+    }
+
+    // Populate libraries.counters from definitions.counters if empty
+    if (rules.libraries.counters.length === 0 && rules.definitions.counters) {
+        rules.libraries.counters = Object.values(rules.definitions.counters).map((counter: any) => ({
+            id: counter.id,
+            name: counter.name,
+            description: "",
+            defaultMax: counter.max,
+            xpCost: counter.xpCost
+        }));
+    }
+
     return rules as RulesData;
 };
 

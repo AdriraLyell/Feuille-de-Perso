@@ -1,21 +1,19 @@
 import React, { useState, useMemo } from 'react';
 import { CharacterSheetData, LibrarySkillEntry } from '../types';
-import { BookOpen, GraduationCap, Plus, Search, Trash2, Edit2, CheckCircle2, Download, Award, Layers, RefreshCw, Eye, EyeOff, Globe } from 'lucide-react';
+import { BookOpen, GraduationCap, Award } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import SpecializationLibraryView from './specialization-library/SpecializationLibraryView';
 import { useCharacter } from '../context/CharacterContext';
 import { useNotification } from '../context/NotificationContext';
-import { smartIncludes } from '../utils/stringUtils';
-import ThematicModal from './ui/ThematicModal';
 import { useRules } from '../context/RulesContext';
-import { mergeLibraries, MergedEntry } from '../utils/libraryMerger';
+import { MergedEntry } from '../utils/libraryMerger';
 import LibrarySkillForm from './library/LibrarySkillForm';
 import LibraryDeleteModal from './library/LibraryDeleteModal';
 import LibraryImportModal from './library/LibraryImportModal';
 import LibraryRenameModal from './library/LibraryRenameModal';
 import { disambiguateCategories } from '../utils/categoryUtils';
-import ConfirmationModal from './ui/ConfirmationModal';
 import SkillLibraryTab from './library/SkillLibraryTab';
+import { useSkillLibrary } from '../hooks/library/useSkillLibrary';
 
 interface LibraryViewProps {
     data?: CharacterSheetData; // Optional to support standalone use if needed, but we will pass it
@@ -34,31 +32,33 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
     const [activeTab, setActiveTab] = useState<'traits' | 'skills' | 'specializations'>('traits');
     const addLog = useNotification();
 
-    // -- Skill Library Logic --
-    const [skillSearch, setSkillSearch] = useState('');
-    const [hideKnownSkills, setHideKnownSkills] = useState(true); // Default: Hide known
-    const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
-    const [editingSkill, setEditingSkill] = useState<LibrarySkillEntry | null>(null);
-    const [skillError, setSkillError] = useState<string | null>(null);
-    const [showRenameConfirm, setShowRenameConfirm] = useState<{ oldName: string, newSkill: LibrarySkillEntry } | null>(null);
-
-    // Import Confirmation Modal State
-    const [showImportConfirm, setShowImportConfirm] = useState(false);
-
-    // Delete Confirmation Modal State
-    const [skillToDelete, setSkillToDelete] = useState<LibrarySkillEntry | null>(null);
-
     // OFFICIAL: Get Rules Context
     const { rules, updateRules } = useRules();
 
     // MERGE: Compute Hybrid Skill Library
-    const hybridSkills = useMemo(() => {
-        const local = data.skillLibrary || [];
-        const official = rules?.libraries?.skills || [];
+    const {
+        skillSearch, setSkillSearch,
+        hideKnownSkills, setHideKnownSkills,
+        isSkillModalOpen, setIsSkillModalOpen,
+        editingSkill, setEditingSkill,
+        skillError, setSkillError,
+        showRenameConfirm, setShowRenameConfirm,
+        showImportConfirm, setShowImportConfirm,
+        skillToDelete, setSkillToDelete,
+        hybridSkills,
+        usedSkillNames,
+        filteredSkills,
+        handleOpenNewSkill,
+        handleOpenEditSkill,
+        handleSaveSkill,
+        finalizeSaveSkill,
+        handleDeleteRequest,
+        executeDeleteSkill,
+        executeImportFromSheet
+    } = useSkillLibrary(data, rules, onUpdate, addLog);
 
-        // We use the same merger logic, works for {id, ...} objects
-        return mergeLibraries(local, official);
-    }, [data.skillLibrary, rules]);
+    // OFFICIAL: Use local state for visibility for now (could be moved to hook too if shared)
+    const [showOfficialUpdateConfirm, setShowOfficialUpdateConfirm] = useState(false);
 
     // Dynamic Categories Source of Truth
     const availableCategories = useMemo(() => {
@@ -78,153 +78,6 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
     const getCategoryLabel = (code: string) => {
         return availableCategories.find(c => c.code === code)?.label || code;
     };
-
-    const skillsList = hybridSkills; // Now we work with MergedEntry<LibrarySkillEntry>[]
-
-    // Determine which skills are currently on the sheet
-    const usedSkillNames = useMemo(() => {
-        const names = new Set<string>();
-        if (data.skills) {
-            Object.keys(data.skills).forEach(key => {
-                // @ts-ignore
-                const list = data.skills[key] || [];
-                list.forEach((s: any) => {
-                    if (s.name && s.name.trim() !== '') {
-                        names.add(s.name.trim().toLowerCase());
-                    }
-                });
-            });
-        }
-        return names;
-    }, [data.skills]);
-
-    const filteredSkills = skillsList.filter(m => {
-        // 1. Text Search
-        const matchesSearch = smartIncludes(m.entry.name, skillSearch) ||
-            smartIncludes(m.entry.description || '', skillSearch);
-
-        // 2. Hide Known Filter
-        const isKnown = usedSkillNames.has(m.entry.name.trim().toLowerCase());
-        const matchesFilter = hideKnownSkills ? !isKnown : true;
-
-        return matchesSearch && matchesFilter;
-    }).sort((a, b) => a.entry.name.localeCompare(b.entry.name));
-
-    const handleOpenNewSkill = () => {
-        setSkillError(null);
-        setEditingSkill({
-            id: Math.random().toString(36).substr(2, 9),
-            name: '',
-            description: ''
-        });
-        setIsSkillModalOpen(true);
-    };
-
-    const handleOpenEditSkill = (merged: MergedEntry<LibrarySkillEntry>) => {
-        setSkillError(null);
-        // Force keep official ID to allow creating copy
-        setEditingSkill({ ...merged.entry });
-        setIsSkillModalOpen(true);
-    };
-
-    const handleSaveSkill = (skillToSave: LibrarySkillEntry) => {
-        if (!skillToSave.name.trim()) {
-            setSkillError("Le nom de la compétence est requis.");
-            return;
-        }
-
-        const duplicate = hybridSkills.find(m =>
-            m.source === 'local' && // Check duplication only against LOCAL items
-            m.entry.id !== skillToSave.id &&
-            m.entry.name.trim().toLowerCase() === skillToSave.name.trim().toLowerCase()
-        );
-
-        if (duplicate) {
-            setSkillError("Une compétence portant ce nom existe déjà.");
-            return;
-        }
-
-        const existingMerged = skillsList.find(m => m.entry.id === skillToSave.id);
-        const existing = existingMerged ? existingMerged.entry : null;
-        const nameChanged = existing && existing.name.trim().toLowerCase() !== skillToSave.name.trim().toLowerCase();
-        const isUsed = existing && usedSkillNames.has(existing.name.trim().toLowerCase());
-
-        // If name changed and skill is used, ask for confirmation
-        if (nameChanged && isUsed) {
-            setShowRenameConfirm({ oldName: existing.name, newSkill: skillToSave });
-            setIsSkillModalOpen(false); // Close editor, open rename confirm
-            return;
-        }
-
-        const cleanedSkill = {
-            ...skillToSave,
-            variants: skillToSave.variants ? skillToSave.variants.map(v => v.trim()).filter(v => v !== '') : []
-        };
-
-        finalizeSaveSkill(cleanedSkill);
-    };
-
-    const finalizeSaveSkill = (skillToSave: LibrarySkillEntry, renameOnSheet: boolean = false) => {
-        const localList = data.skillLibrary || [];
-        const exists = localList.some(s => s.id === skillToSave.id);
-
-        let newLibrary;
-        if (exists) {
-            newLibrary = localList.map(s => s.id === skillToSave.id ? skillToSave : s);
-        } else {
-            // New or cloned from official
-            newLibrary = [...localList, skillToSave];
-        }
-
-        let newData = { ...data, skillLibrary: newLibrary };
-
-        // Handle global rename on sheet if requested
-        if (renameOnSheet && showRenameConfirm) {
-            const oldName = showRenameConfirm.oldName.trim().toLowerCase();
-            const newName = skillToSave.name.trim();
-
-            const updatedSkills = { ...data.skills };
-            Object.keys(updatedSkills).forEach(cat => {
-                // @ts-ignore
-                if (Array.isArray(updatedSkills[cat])) {
-                    // @ts-ignore
-                    updatedSkills[cat] = updatedSkills[cat].map(s =>
-                        (s.name && s.name.trim().toLowerCase() === oldName)
-                            ? { ...s, name: newName }
-                            : s
-                    );
-                }
-            });
-            newData.skills = updatedSkills;
-        }
-
-        onUpdate(newData);
-        addLog(`Compétence "${skillToSave.name}" enregistrée dans la réserve.`, 'success', 'settings');
-        setIsSkillModalOpen(false);
-        setEditingSkill(null);
-        setShowRenameConfirm(null);
-    };
-
-    const handleDeleteRequest = (merged: MergedEntry<LibrarySkillEntry>) => {
-        if (merged.source === 'official') {
-            // Cannot delete official.
-            // Silent or use a small info toast if we had access to addLog here (we do).
-            addLog("Impossible de supprimer une compétence officielle.", "info", "settings");
-            return;
-        }
-        setSkillToDelete(merged.entry);
-    };
-
-    const executeDeleteSkill = () => {
-        if (!skillToDelete) return;
-
-        const localList = data.skillLibrary || [];
-        onUpdate({ ...data, skillLibrary: localList.filter(s => s.id !== skillToDelete.id) });
-        addLog(`Compétence "${skillToDelete.name}" supprimée de la réserve.`, 'info', 'settings');
-        setSkillToDelete(null);
-    };
-
-    const [showOfficialUpdateConfirm, setShowOfficialUpdateConfirm] = useState(false);
 
     const handleOfficialUpdateClick = () => {
         setShowOfficialUpdateConfirm(true);
@@ -253,44 +106,6 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         } catch (e) {
             addLog("Échec de la mise à jour officielle : " + (e as Error).message, 'danger', 'settings');
         }
-    };
-
-    // Logic to import skills currently on the sheet into the library
-    const executeImportFromSheet = () => {
-        // Import into LOCAL
-        const currentLib = JSON.parse(JSON.stringify(data.skillLibrary || []));
-        const existingNames = new Set(currentLib.map((s: any) => s.name.trim().toLowerCase()));
-        let addedCount = 0;
-
-        Object.keys(data.skills).forEach(key => {
-            if (key === 'arrieres_plans') return; // Skip backgrounds
-
-            // @ts-ignore
-            const sheetSkills = data.skills[key] || [];
-            sheetSkills.forEach((skill: any) => {
-                const normalized = skill.name ? skill.name.trim() : "";
-                if (normalized && !existingNames.has(normalized.toLowerCase())) {
-                    currentLib.push({
-                        id: Math.random().toString(36).substr(2, 9),
-                        name: skill.name,
-                        description: "",
-                        defaultCategory: key // Store origin category as default
-                    });
-                    existingNames.add(normalized.toLowerCase());
-                    addedCount++;
-                }
-            });
-        });
-
-        if (addedCount > 0) {
-            // Sort alphabetically
-            currentLib.sort((a: any, b: any) => a.name.localeCompare(b.name));
-            onUpdate({ ...data, skillLibrary: currentLib });
-            addLog(`${addedCount} compétence(s) importée(s) depuis la fiche.`, 'success', 'settings');
-        } else {
-            addLog("Toutes les compétences de la fiche sont déjà dans la réserve.", 'info', 'settings');
-        }
-        setShowImportConfirm(false);
     };
 
     return (
@@ -341,7 +156,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
 
                 {activeTab === 'skills' && (
                     <SkillLibraryTab
-                        skillsList={skillsList}
+                        skillsList={hybridSkills}
                         filteredSkills={filteredSkills}
                         usedSkillNames={usedSkillNames}
                         skillSearch={skillSearch}

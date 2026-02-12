@@ -1,7 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { CharacterSheetData } from '../types';
-import { INITIAL_DATA } from '../data/initialState';
 import ThematicButton from './ui/ThematicButton';
 import ThematicModal from './ui/ThematicModal';
 import { useCharacter } from '../context/CharacterContext';
@@ -17,15 +16,15 @@ import LibrarySidebar from './settings/LibrarySidebar';
 import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
 import LibraryView from './LibraryView';
 import AdminSuggestions from './settings/AdminSuggestions'; // NEW
-import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Settings, Lock, UploadCloud, CheckCircle, Lightbulb } from 'lucide-react';
+import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Lock, UploadCloud, Lightbulb } from 'lucide-react';
 
 // Rules Integration
 import { useRules } from '../context/RulesContext';
-import { applyRulesToState } from '../utils/rulesAdapter';
 
 // Expert Mode
 import { useExpertMode } from '../hooks/useExpertMode';
 import ExpertModeWarningModal from './ui/ExpertModeWarningModal';
+import { useSettingsManager } from '../hooks/settings/useSettingsManager';
 
 // Version and App Info
 // Note: APP_VERSION might be global or imported, assuming it was used in previous context but not shown in imports?
@@ -69,68 +68,27 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
   const { data, updateData: onUpdate, addLog: onAddLog } = useCharacter();
   const { rules, isOnlineMode } = useRules();
   const { expertMode, enableExpertMode, disableExpertMode } = useExpertMode();
-  const [localData, setLocalData] = useState<CharacterSheetData>(data);
+
+  const {
+    localData,
+    activeTab,
+    setActiveTab,
+    isDirty,
+    showResetConfirm,
+    setShowResetConfirm,
+    showExpertWarning,
+    setShowExpertWarning,
+    handleSave,
+    handleLocalUpdate,
+    performReset,
+    toggleAutoSync
+  } = useSettingsManager(data, rules, isOnlineMode, expertMode, onUpdate, onAddLog, onDirtyChange);
 
   // Drag State (Shared between SkillsEditor and LibrarySidebar)
   const [draggedItem, setDraggedItem] = useState<DragItemType | null>(null);
 
-  // Modal States
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [showExpertWarning, setShowExpertWarning] = useState(false);
-
   // Tab visibility based on Online Mode and Expert Mode
   const showAdvancedTabs = !isOnlineMode || expertMode;
-
-  const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'specializations' | 'creation' | 'library' | 'cloud' | 'suggestions'>('library');
-  const [isDirty, setIsDirty] = useState(false);
-
-  // Helper to compare data excluding volatile/computed fields
-  const getComparableData = (d: CharacterSheetData) => {
-    const { appLogs, xpLogs, experience, ...rest } = d;
-    return rest;
-  };
-
-  const handleSave = () => {
-    onUpdate(localData);
-    onAddLog('Modifications de la structure sauvegardées', 'success', 'settings');
-  };
-
-  // Effect to detect unsaved changes
-  useEffect(() => {
-    const dirty = JSON.stringify(getComparableData(localData)) !== JSON.stringify(getComparableData(data));
-    setIsDirty(dirty);
-    if (onDirtyChange) {
-      onDirtyChange(dirty);
-    }
-  }, [localData, data, onDirtyChange]);
-
-  // Force Tab to Library if entering Online Mode without Expert Mode
-  useEffect(() => {
-    const advancedTabs = ['attributes', 'skills', 'specializations', 'creation'];
-    if (isOnlineMode && !expertMode && advancedTabs.includes(activeTab)) {
-      setActiveTab('library');
-    }
-  }, [isOnlineMode, expertMode, activeTab]);
-
-  const performReset = () => {
-    // FIX: Use applyRulesToState instead of raw INITIAL_DATA
-    const base = JSON.parse(JSON.stringify(INITIAL_DATA));
-    const newState = rules ? applyRulesToState(base, rules) : base;
-
-    setLocalData(newState);
-    onUpdate(newState); // Also update global context to match
-
-    setShowResetConfirm(false);
-
-    const logMsg = rules
-      ? `Réinitialisation complète (Règles chargées : v${rules.version})`
-      : "Réinitialisation complète des données (Règles par défaut)";
-    onAddLog(logMsg, 'danger', 'settings');
-  };
-
-  const handleLocalUpdate = (newData: CharacterSheetData) => {
-    setLocalData(newData);
-  };
 
   return (
     <div className={`w-full px-6 pb-20 mx-auto relative flex transition-all duration-300 ${!showAdvancedTabs ? 'max-w-[1100px]' : 'max-w-[1600px]'}`}>

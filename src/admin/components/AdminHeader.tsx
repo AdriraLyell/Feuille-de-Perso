@@ -33,7 +33,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
         <header className="bg-slate-900 text-white p-4 shadow-md sticky top-0 z-50">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                    <button onClick={onBack} className="text-slate-400 hover:text-white transition-colors" title="Retour au tableau de bord">
+                    <button onClick={onBack} className="text-slate-400 hover:text-white transition-colors" title="Retour au tableau de bord" aria-label="Retour au tableau de bord">
                         <ArrowLeft size={24} />
                     </button>
                     <Settings className="text-blue-400" />
@@ -102,6 +102,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                         onClick={onLogout}
                         className="bg-slate-800 p-2 rounded hover:bg-red-900 text-slate-400 hover:text-white transition-colors"
                         title="Se déconnecter"
+                        aria-label="Se déconnecter"
                     >
                         <LogOut size={20} />
                     </button>

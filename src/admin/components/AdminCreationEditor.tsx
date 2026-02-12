@@ -5,6 +5,7 @@ import CreationGeneralSettings from './creation/CreationGeneralSettings';
 import RankSlotsConfig from './creation/RankSlotsConfig';
 import CreationPointsPreview from './creation/CreationPointsPreview';
 import CardSystemConfig from './creation/CardSystemConfig';
+import CampaignMetadataSettings from './creation/CampaignMetadataSettings';
 
 interface AdminCreationEditorProps {
     rules: RulesData;
@@ -86,8 +87,22 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
         });
     };
 
+    const updateRootField = (field: string, value: any) => {
+        onUpdate({
+            ...rules,
+            [field]: value
+        });
+    };
+
     return (
         <div className="space-y-6">
+            <CampaignMetadataSettings
+                description={rules.description}
+                welcomeMessage={rules.welcomeMessage}
+                showMetadataToPlayers={!!rules.showMetadataToPlayers}
+                onUpdate={updateRootField}
+            />
+
             {/* Header / Config Générale */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-xl shadow-sm border border-slate-200 mt-6">
                 <div className="flex items-center gap-3">

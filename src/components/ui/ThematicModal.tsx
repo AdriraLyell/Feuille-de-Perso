@@ -26,21 +26,30 @@ const ThematicModal: React.FC<ThematicModalProps> = ({
 }) => {
     const [isVisible, setIsVisible] = useState(false);
 
+    const lastFocusedElement = React.useRef<HTMLElement | null>(null);
+
     useEffect(() => {
         if (isOpen) {
             setIsVisible(true);
+            lastFocusedElement.current = document.activeElement as HTMLElement;
             document.body.style.overflow = 'hidden';
+
+            const handleKeyDown = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') onClose();
+            };
+            window.addEventListener('keydown', handleKeyDown);
+            return () => window.removeEventListener('keydown', handleKeyDown);
         } else {
-            const timer = setTimeout(() => setIsVisible(false), 300); // Wait for animation
+            const timer = setTimeout(() => {
+                setIsVisible(false);
+                if (lastFocusedElement.current) {
+                    lastFocusedElement.current.focus();
+                }
+            }, 300);
             document.body.style.overflow = 'unset';
             return () => clearTimeout(timer);
         }
-
-        // Cleanup on unmount to ensure scroll is restored
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
-    }, [isOpen]);
+    }, [isOpen, onClose]);
 
     if (!isVisible && !isOpen) return null;
 
@@ -67,6 +76,9 @@ const ThematicModal: React.FC<ThematicModalProps> = ({
 
             {/* Modal Content */}
             <div
+                role="dialog"
+                aria-modal="true"
+                aria-label={typeof title === 'string' ? title : "Modale"}
                 className={`
                     relative w-full ${sizeClasses[size]} 
                     bg-[#fdfbf7] text-[#2c241b]
@@ -97,6 +109,7 @@ const ThematicModal: React.FC<ThematicModalProps> = ({
                     </div>
                     <button
                         onClick={onClose}
+                        aria-label="Fermer la modale"
                         className="
                             w-10 h-10 rounded-full flex items-center justify-center 
                             text-[#5c4d41] hover:text-[#8b2e2e] hover:bg-[#8b2e2e]/10 

@@ -104,8 +104,7 @@ const generateDefaultSkillLibrary = (): LibrarySkillEntry[] => {
 
   Object.keys(INITIAL_SKILLS).forEach(key => {
     if (key === 'Col_Comp_8') return; // Skip backgrounds in default library
-    // @ts-ignore
-    INITIAL_SKILLS[key].forEach((skill: any) => {
+    INITIAL_SKILLS[key].forEach((skill) => {
       if (skill.name && skill.name.trim() !== '') {
         const normalized = skill.name.trim().toLowerCase();
         if (!seenNames.has(normalized)) {

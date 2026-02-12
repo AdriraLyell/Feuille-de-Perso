@@ -9,8 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, Search, Eye, Trash2, Calendar, User, Shield, Info, AlertCircle } from 'lucide-react';
 import { CharacterSyncService, SyncedCharacterSummary, SyncedCharacter } from '../../services/CharacterSyncService';
 import CharacterReadOnlyView from './CharacterReadOnlyView';
-import { PlayerService } from '../../services/PlayerService';
-import { GameSettingSummary } from '../../services/CampaignService';
+import { GameSettingSummary, CampaignService } from '../../services/CampaignService';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { logger } from '../../utils/logger';
 import { Loader2 } from 'lucide-react';
@@ -33,7 +32,7 @@ const GlobalPlayersView: React.FC = () => {
         try {
             const [charData, campaignData] = await Promise.all([
                 CharacterSyncService.getAllCharacters(),
-                PlayerService.listPublicSettings() // To match setting_id with names
+                CampaignService.listPublicSettings() // To match setting_id with names
             ]);
             setCharacters(charData);
             setCampaigns(campaignData);

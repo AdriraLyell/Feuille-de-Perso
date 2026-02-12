@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { UploadCloud, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
 import ThematicModal from './ui/ThematicModal';
-import { PlayerService } from '../services/PlayerService';
 import { CharacterSyncService } from '../services/CharacterSyncService';
 import { CharacterSheetData } from '../types/character';
-import { GameSettingSummary } from '../services/CampaignService';
+import { GameSettingSummary, CampaignService } from '../services/CampaignService';
 import { useRules } from '../context/RulesContext';
 import { ErrorService } from '../services/ErrorService';
 
@@ -37,8 +36,8 @@ const SyncModal: React.FC<SyncModalProps> = ({
     useEffect(() => {
         if (isOpen) {
             // Priority 1: Current Rules (if online)
-            if (isOnlineMode && (rules as any)?.settingId) {
-                setSelectedCampaign((rules as any).settingId);
+            if (isOnlineMode && rules?.settingId) {
+                setSelectedCampaign(rules.settingId);
             }
             // Priority 2: Existing sync info (if not online or as fallback)
             else if (characterData.syncInfo) {
@@ -64,7 +63,7 @@ const SyncModal: React.FC<SyncModalProps> = ({
     const loadCampaigns = async () => {
         setIsLoadingCampaigns(true);
         try {
-            const publicSettings = await PlayerService.listPublicSettings();
+            const publicSettings = await CampaignService.listPublicSettings();
             setCampaigns(publicSettings);
             // Auto-select first campaign if none selected
             if (publicSettings.length > 0 && !selectedCampaign) {

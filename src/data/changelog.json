@@ -1,5 +1,110 @@
 [
     {
+        "version": "2.44.5",
+        "date": "2026-02-12",
+        "type": "minor",
+        "changes": [
+            "🧪 Test Automation : Mise en place d'une suite complète de tests E2E avec Playwright",
+            "📡 Robustesse Réseau : Validation des scénarios de repli (Offline, Rate Limit API, CDN Failure)",
+            "💾 Tests d'Intégration : Couverture des services CampaignService et OfflineStorageService",
+            "🛡️ Correction de Bug : Élimination des doublons dans l'affichage des campagnes cachées",
+            "🔧 RulesLoader : Gestion optimisée des erreurs 403/429 pour la résilience du chargement"
+        ]
+    },
+    {
+        "version": "2.44.4",
+        "date": "2026-02-12",
+        "type": "patch",
+        "changes": [
+            "🏗️ Architecture : Suppression définitive de l'injection script rules.js",
+            "🔧 Service : Bascule complète vers un chargement de règles JSON via API/CDN",
+            "🛡️ Résilience : Intégration de defaultRules.ts comme ultime fallback embarqué",
+            "🧹 Nettoyage : Suppression de PlayerService au profit de CampaignService unifié",
+            "💾 Migration : Amélioration de migrateRulesToV2 pour garantir l'intégrité des bibliothèques"
+        ]
+    },
+    {
+        "version": "2.44.3",
+        "date": "2026-02-11",
+        "type": "minor",
+        "changes": [
+            "💾 Hybrid Database : Implémentation du OfflineStorageService (IndexedDB)",
+            "📡 Résilience : Chargement 'Online First' avec repli automatique sur le cache local",
+            "🌐 Connectivity : Détection intelligente de l'état hors ligne (isOffline)",
+            "💾 Persistance : Les campagnes chargées depuis Supabase sont désormais auto-cachées localement",
+            "🛡️ Typage : Ajout de la source 'cache' au schéma RulesData"
+        ]
+    },
+    {
+        "version": "2.44.2",
+        "date": "2026-02-11",
+        "type": "patch",
+        "changes": [
+            "🛡️ Typage : Éradication finale des 'as any' dans AdminApp, SyncModal et CharacterReadOnly",
+            "♿ Accessibilité : Gestion du focus et support touche Echap dans les modales thématiques",
+            "🏷️ UX : Ajout de labels ARIA sur l'ensemble de la navigation diégétique",
+            "🧹 Code : Nettoyage des stubs ts-ignore dans les générateurs d'état initial",
+            "🔧 Service : Ajout de checkSchema dans CampaignService pour la validation manuelle"
+        ]
+    },
+    {
+        "version": "2.44.1",
+        "date": "2026-02-11",
+        "type": "minor",
+        "changes": [
+            "🚀 MJ Dashboard : Implémentation de l'archivage des campagnes",
+            "📝 Métadonnées : Ajout d'une description de campagne et d'un message d'accueil MJ",
+            "👁️ Visibilité : Contrôle MJ sur l'affichage des infos de campagne pour les joueurs",
+            "🛡️ Base de Données : Migration PostgreSQL pour supporter les nouvelles métadonnées",
+            "🧑‍🚀 Expérience Joueur : Modal d'information de campagne avec message de bienvenue automatique"
+        ]
+    },
+    {
+        "version": "2.44.0",
+        "date": "2026-02-12",
+        "type": "minor",
+        "changes": [
+            "🏗️ Architecture : Refonte majeure du MainLayout via les hooks useNavigationState, usePrintManager et useRulesSync",
+            "🏗️ Architecture : Refactorisation de SettingsView via le hook useSettingsManager",
+            "🏗️ Architecture : Refactorisation de CharacterSheetPage2 via useTraitEditor et useReputationManager",
+            "🏗️ Architecture : Refactorisation de LibraryView via useSkillLibrary",
+            "🧹 Code : Suppression de code dupliqué et amélioration de la séparation des préoccupations",
+            "🛡️ Stabilité : Correction des types TypeScript et amélioration de la robustesse de la synchro des règles"
+        ]
+    },
+    {
+        "version": "2.43.3",
+        "date": "2026-02-11",
+        "type": "patch",
+        "changes": [
+            "🏗️ Architecture : Extraction de la logique complexe de CharacterSheet.tsx vers useEditMode et useVariableSkills",
+            "🏗️ Architecture : Modularisation de LibraryView.tsx via le nouveau hook useSkillLibrary",
+            "🧹 Nettoyage : Réduction de la taille des composants principaux (~300 lignes extraites)",
+            "🚀 Performance : Optimisation des rendus via useMemo dans les nouveaux hooks"
+        ]
+    },
+    {
+        "version": "2.43.2",
+        "date": "2026-02-11",
+        "type": "patch",
+        "changes": [
+            "💎 Qualité : Suppression massive de 'as any' pour un typage TypeScript strict (~90 occurrences)",
+            "♿ Accessibilité : Installation de eslint-plugin-jsx-a11y et corrections sémantique (main, nav, aside)",
+            "🏷️ UX : Ajout de labels ARIA sur les boutons d'actions (Déconnexion, Suppression, Publication)",
+            "🛡️ Typage : Sécurisation du processus d'import de bibliothèque avec validation de types"
+        ]
+    },
+    {
+        "version": "2.43.1",
+        "date": "2026-02-11",
+        "type": "patch",
+        "changes": [
+            "🛡️ Sécurité : Mise à jour vers Vite 7 et correction des vulnérabilités (npm audit)",
+            "🧩 Fiabilité : Implémentation d'un Error Boundary global (fallback UI en français)",
+            "🚀 CI/CD : Renforcement du workflow de déploiement (Type Check, Lint, Tests unitaires obligatoires)"
+        ]
+    },
+    {
         "version": "2.43.0",
         "date": "2026-02-11",
         "type": "minor",
