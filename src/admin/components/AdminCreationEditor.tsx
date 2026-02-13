@@ -19,7 +19,7 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
     const config = rules.configurations.creation;
     const cardConfig = rules.configurations.cards;
 
-    const updateCreationConfig = (field: string, value: any) => {
+    const updateCreationConfig = (field: string, value: unknown) => {
         onUpdate({
             ...rules,
             configurations: {
@@ -48,7 +48,7 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
         });
     };
 
-    const updateCardConfig = (field: string, value: any) => {
+    const updateCardConfig = (field: string, value: unknown) => {
         onUpdate({
             ...rules,
             configurations: {
@@ -90,7 +90,7 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
         });
     };
 
-    const updateRootField = (field: string, value: any) => {
+    const updateRootField = (field: string, value: unknown) => {
         onUpdate({
             ...rules,
             [field]: value

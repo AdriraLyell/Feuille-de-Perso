@@ -13,7 +13,11 @@ interface AdminCountersEditorProps {
 const AdminCountersEditor: React.FC<AdminCountersEditorProps> = ({ rules, onUpdate }) => {
     const counters = rules.definitions.counters || {};
 
-    const handleUpdateCounter = (id: string, field: keyof RulesCounterDefinition, value: any) => {
+    const handleUpdateCounter = <K extends keyof RulesCounterDefinition>(
+        id: string,
+        field: K,
+        value: RulesCounterDefinition[K]
+    ) => {
         onUpdate({
             ...rules,
             definitions: {

@@ -1,233 +1,196 @@
 [
     {
-        "version": "2.45.5",
-        "date": "2026-02-12",
+        "version": "2.48.5",
+        "date": "2026-02-13",
         "type": "patch",
         "changes": [
-            "🧹 Audit : Suppression de 12 fichiers de débris à la racine du projet (logs, tests, doublons)",
-            "🛠️ Build : Correction de 4 erreurs de compilation pré-existantes (imports manquants, exports dupliqués, accès typé)",
-            "📄 Docs : Mise à jour de regle.md, AUDIT_SUMMARY.md et .gitignore",
-            "🔄 Version : Résolution de la désynchronisation de version entre package.json et constants.ts"
+            "🧠 UX : Migration vers la sélection native Tiptap (setTextSelection) pour un surlignage fiable et persistant des titres de chapitres"
         ]
     },
     {
-        "version": "2.45.4",
-        "date": "2026-02-12",
+        "version": "2.48.4",
+        "date": "2026-02-13",
         "type": "patch",
         "changes": [
-            "✨ Landing Page Wow Effect : Refonte immersive de RulesSourceSelector avec le thème 'Mystic' Premium",
-            "🛡️ Secure Entry : Harmonisation du LoginScreen avec la même esthétique (lueurs, textures, boutons thématiques)",
-            "📱 Mobile UX : Implémentation d'un menu 'hamburger' animé dans la navigation diégétique",
-            "🎨 Micro-Interactions : Ajout d'animations Framer Motion sur les cartes de sélection et les boutons d'action",
-            "📏 Responsive : Optimisation de la typographie et des espacements pour tablettes et smartphones"
+            "🎯 UX : Correction critique de la sélection locale des chapitres (ne saute plus au premier chapitre du livre)"
         ]
     },
     {
-        "version": "2.45.3",
-        "date": "2026-02-12",
+        "version": "2.48.3",
+        "date": "2026-02-13",
         "type": "patch",
         "changes": [
-            "🛡️ Sécurité & Fiabilité : Ajout de blocs try/catch/finally sur toutes les actions asynchrones de l'Admin",
-            "🧩 Type Safety : Suppression massive de types 'any' et de '@ts-ignore' dans le moteur de réconciliation",
-            "🧪 Tests : Correction de la suite de tests pour supporter le nouveau typage des compteurs",
-            "🧹 Code Clean : Suppression de console.logs et typage strict des accesseurs d'état"
+            "✍️ UX : Garantie de la sélection automatique du titre (surlignage) lors de la création d'un chapitre via un cycle de rendu stabilisé"
         ]
     },
     {
-        "version": "2.45.2",
-        "date": "2026-02-12",
+        "version": "2.48.2",
+        "date": "2026-02-13",
         "type": "patch",
         "changes": [
-            "🛡️ Hotfix : Correction d'un crash critique 'process is not defined' sur l'écran de connexion",
-            "🏗️ Architecture : Transition finale vers le format JSON pour l'exportation et la publication des règles",
-            "🧹 Nettoyage : Suppression de l'injection obsolète de rules.js dans admin.html",
-            "🎨 UI/UX : Refonte de la modale de déploiement GitHub avec le thème Premium Dark Mystic",
-            "🛠️ Core : Mise à jour du RulesGenerator pour une sortie JSON pure"
+            "✍️ UX : Correction de la sélection du titre lors de l'ajout d'un chapitre (désormais correctement surligné pour modification immédiate)"
         ]
     },
     {
-        "version": "2.45.1",
-        "date": "2026-02-12",
+        "version": "2.48.1",
+        "date": "2026-02-13",
         "type": "patch",
         "changes": [
-            "✨ Animations Admin : Intégration de framer-motion (MotionFade, MotionCard) sur l'ensemble des éditeurs admin",
-            "🎨 Premium Aesthetic : Application du thème sombre 'Mystic' avec effets de verre et de parchemin sur CharacterReadOnlyView",
-            "🎭 UX : Effets d'apparition séquencés (staggered) sur les boutons du header et les cartes de catégories",
-            "💎 Polish : Amélioration visuelle de l'éditeur de création, des coûts et des compteurs"
+            "📅 UX : L'icône calendrier ouvre désormais un sélecteur de date natif",
+            "✍️ UX : Auto-focus et sélection automatique du texte lors de la création d'un chapitre pour une saisie immédiate"
         ]
     },
     {
-        "version": "2.45.0",
+        "version": "2.48.0",
+        "date": "2026-02-13",
+        "type": "minor",
+        "changes": [
+            "📖 Journal : Implémentation de la création manuelle de Chapitres/Sessions",
+            "🛠️ Interface : Ajout d'une barre d'outils flottante persistante pour le formatage (Gras, Italique)",
+            "🔖 Structure : Les chapitres forcent désormais un saut de page (double-page) pour une organisation claire du récit",
+            "📅 Metadata : Intégration d'un champ Date intelligent au sein de chaque en-tête de chapitre",
+            "🖼️ Média : Accès rapide à l'insertion d'images via la barre d'outils"
+        ]
+    },
+    {
+        "version": "2.47.0",
+        "date": "2026-02-13",
+        "type": "minor",
+        "changes": [
+            "🎨 UI : Ajustement précis des marges (100px table, 50px toolbar) pour un rendu premium",
+            "🏛️ Structure : Calibration du tableau de groupe (PartyTable) sur les dimensions du grimoire (1484x1000px)",
+            "📜 Esthétique : Migration vers un thème unifié 'Parchemin ivoire' (#fbf4e9) pour tout le module campagne",
+            "🐞 Bugfix : Nettoyage automatique des pages vides lors de la suppression de texte",
+            "📖 Expérience : Navigation intelligente (masquage flèches aux limites) et affichage forcé par paires de pages (spreads)",
+            "🏗️ Robustesse : Correction du bug de décalage de 40px en fin de livre (ghost shift)"
+        ]
+    },
+    {
+        "version": "2.46.0",
+        "date": "2026-02-13",
+        "type": "major",
+        "changes": [
+            "📖 Journal : Implémentation du nouveau moteur 'Columnar' basé sur les colonnes CSS natives",
+            "🚀 Performance : Suppression de toute la logique de pagination lourde au profit d'un rendu navigateur ultra-fluide",
+            "🎨 UI : Nouveau design en double-page (spread) avec navigation ancrées et centrage dynamique",
+            "🖼️ Média : Gestion optimisée des images (évite les coupes entre colonnes) et intégration Tiptap Image",
+            "🧹 Clean Up : Suppression massive de code obsolète (BookLayout, FlipView, BookEditorContext, etc.)"
+        ]
+    },
+    {
+        "version": "2.45.22",
+        "date": "2026-02-13",
+        "type": "fix",
+        "changes": [
+            "📖 Pagination : Correction du décalage Chapitres/Pages entre les modes Édition et Lecture",
+            "🔧 Core : Robustesse de la détection de coupe (posAtDOM) pour supporter les overlays graphiques",
+            "🧹 Code Clean : Suppression du code de debug (window.editor)"
+        ]
+    },
+    {
+        "version": "2.45.21",
+        "date": "2026-02-13",
+        "type": "fix",
+        "changes": [
+            "📖 Livre : Correction de la pagination en mode Lecture. Les pages sont désormais calculées correctement même quand l'éditeur est masqué.",
+            "📏 Dimensions : Ajustement des hauteurs (Page: 1000px, Cadre: 1200px) pour un meilleur équilibre entre espace et pagination cohérente."
+        ]
+    },
+    {
+        "version": "2.45.20",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "📖 Livre : L'ombre de la pliure centrale est maintenant limitée à la hauteur réelle des pages du livre (et ne déborde plus sur l'en-tête)",
+            "🏗️ Refactoring : Déplacement de la décoration de pliure dans BookFlipView pour un alignement au pixel près"
+        ]
+    },
+    {
+        "version": "2.45.19",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "👥 Groupe : Suppression de l'ombre de pliure centrale dans l'onglet Groupe pour une meilleure lisibilité du tableau"
+        ]
+    },
+    {
+        "version": "2.45.18",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "📖 Livre : Agrandissement vertical du cadre (1200px -> 1400px) et de l'effet table",
+            "🎨 UI : Retrait de l'ombre de pliure centrale en mode Édition pour une vue plus 'plate' et moderne"
+        ]
+    },
+    {
+        "version": "2.45.17",
+        "date": "2026-02-13",
+        "type": "refactor",
+        "changes": [
+            "🏗️ Architecture : Refactorisation majeure de CampaignNotes (suppression de DigitalBookEditor)",
+            "⚡ Performance : Extraction de la logique de calcul des pages vers useBookPages",
+            "🎨 UI : Correction des cadres imbriqués et suppression des backgrounds redondants"
+        ]
+    },
+    {
+        "version": "2.45.16",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "📖 Livre : Ajout d'une page vierge à droite si le nombre de pages est impair pour respecter l'aspect 'livre ouvert'",
+            "🎨 UI : Masquage du numéro de page sur les pages vierges",
+            "📐 Layout : Alignement vertical (Top) parfait entre les modes Édition et Lecture (0px delta)"
+        ]
+    },
+    {
+        "version": "2.45.15",
         "date": "2026-02-12",
         "type": "minor",
         "changes": [
-            "🎨 Admin Thème : Refonte complète de l'interface d'administration (Thème Mystic & Victorien)",
-            "✨ UI/UX : Harmonisation des couleurs (Pierre/Ambre) sur les éditeurs de compétences et propriétés",
-            "🛠️ Composants : Mise à jour des cartes de catégories, de la sidebar et des panneaux de configuration",
-            "🌚 Thème sombre : Support natif du thème Mystic sur les modales de confirmation et d'édition",
-            "💎 Polish : Amélioration des transitions, des ombres et des effets de survol pour un rendu premium"
+            "📖 Livre numérique : Ajout d'une séparation visuelle entre les pages en mode édition",
+            "✨ UX : Intégration de 'tiptap-pagination-plus' pour gérer les sauts de page dynamiquement",
+            "📐 Layout : Ajustement des marges et du rendu pour correspondre au format papier"
         ]
     },
     {
-        "version": "2.44.5",
-        "date": "2026-02-12",
-        "type": "minor",
-        "changes": [
-            "🧪 Test Automation : Mise en place d'une suite complète de tests E2E avec Playwright",
-            "📡 Robustesse Réseau : Validation des scénarios de repli (Offline, Rate Limit API, CDN Failure)",
-            "💾 Tests d'Intégration : Couverture des services CampaignService et OfflineStorageService",
-            "🛡️ Correction de Bug : Élimination des doublons dans l'affichage des campagnes cachées",
-            "🔧 RulesLoader : Gestion optimisée des erreurs 403/429 pour la résilience du chargement"
-        ]
-    },
-    {
-        "version": "2.44.4",
+        "version": "2.45.14",
         "date": "2026-02-12",
         "type": "patch",
         "changes": [
-            "🏗️ Architecture : Suppression définitive de l'injection script rules.js",
-            "🔧 Service : Bascule complète vers un chargement de règles JSON via API/CDN",
-            "🛡️ Résilience : Intégration de defaultRules.ts comme ultime fallback embarqué",
-            "🧹 Nettoyage : Suppression de PlayerService au profit de CampaignService unifié",
-            "💾 Migration : Amélioration de migrateRulesToV2 pour garantir l'intégrité des bibliothèques"
+            "📖 Livre : Correction de la pagination pour éviter la disparition de la dernière ligne en bas de page",
+            "📏 Algorithme : Prise en compte précise des marges et fusion des blocks (margin-collapse) lors du calcul des pages",
+            "⚡ Performance : Optimisation de la découpe des longs paragraphes par recherche binaire"
         ]
     },
     {
-        "version": "2.44.3",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "💾 Hybrid Database : Implémentation du OfflineStorageService (IndexedDB)",
-            "📡 Résilience : Chargement 'Online First' avec repli automatique sur le cache local",
-            "🌐 Connectivity : Détection intelligente de l'état hors ligne (isOffline)",
-            "💾 Persistance : Les campagnes chargées depuis Supabase sont désormais auto-cachées localement",
-            "🛡️ Typage : Ajout de la source 'cache' au schéma RulesData"
-        ]
-    },
-    {
-        "version": "2.44.2",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "🛡️ Typage : Éradication finale des 'as any' dans AdminApp, SyncModal et CharacterReadOnly",
-            "♿ Accessibilité : Gestion du focus et support touche Echap dans les modales thématiques",
-            "🏷️ UX : Ajout de labels ARIA sur l'ensemble de la navigation diégétique",
-            "🧹 Code : Nettoyage des stubs ts-ignore dans les générateurs d'état initial",
-            "🔧 Service : Ajout de checkSchema dans CampaignService pour la validation manuelle"
-        ]
-    },
-    {
-        "version": "2.44.1",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "🚀 MJ Dashboard : Implémentation de l'archivage des campagnes",
-            "📝 Métadonnées : Ajout d'une description de campagne et d'un message d'accueil MJ",
-            "👁️ Visibilité : Contrôle MJ sur l'affichage des infos de campagne pour les joueurs",
-            "🛡️ Base de Données : Migration PostgreSQL pour supporter les nouvelles métadonnées",
-            "🧑‍🚀 Expérience Joueur : Modal d'information de campagne avec message de bienvenue automatique"
-        ]
-    },
-    {
-        "version": "2.44.0",
+        "version": "2.45.13",
         "date": "2026-02-12",
-        "type": "minor",
-        "changes": [
-            "🏗️ Architecture : Refonte majeure du MainLayout via les hooks useNavigationState, usePrintManager et useRulesSync",
-            "🏗️ Architecture : Refactorisation de SettingsView via le hook useSettingsManager",
-            "🏗️ Architecture : Refactorisation de CharacterSheetPage2 via useTraitEditor et useReputationManager",
-            "🏗️ Architecture : Refactorisation de LibraryView via useSkillLibrary",
-            "🧹 Code : Suppression de code dupliqué et amélioration de la séparation des préoccupations",
-            "🛡️ Stabilité : Correction des types TypeScript et amélioration de la robustesse de la synchro des règles"
-        ]
-    },
-    {
-        "version": "2.43.3",
-        "date": "2026-02-11",
         "type": "patch",
         "changes": [
-            "🏗️ Architecture : Extraction de la logique complexe de CharacterSheet.tsx vers useEditMode et useVariableSkills",
-            "🏗️ Architecture : Modularisation de LibraryView.tsx via le nouveau hook useSkillLibrary",
-            "🧹 Nettoyage : Réduction de la taille des composants principaux (~300 lignes extraites)",
-            "🚀 Performance : Optimisation des rendus via useMemo dans les nouveaux hooks"
+            "📖 Livre : Suppression totale des barres de défilement (ascenseurs) en mode lecture pour une immersion parfaite",
+            "🎨 UI : Ajustement des conteneurs parents pour éviter les débordements visuels et masquer les scrollbars sur toutes les résolutions",
+            "📏 Mise en page : Centrage amélioré du livre dans son écrin de bois"
         ]
     },
     {
-        "version": "2.43.2",
-        "date": "2026-02-11",
+        "version": "2.45.12",
+        "date": "2026-02-12",
         "type": "patch",
         "changes": [
-            "💎 Qualité : Suppression massive de 'as any' pour un typage TypeScript strict (~90 occurrences)",
-            "♿ Accessibilité : Installation de eslint-plugin-jsx-a11y et corrections sémantique (main, nav, aside)",
-            "🏷️ UX : Ajout de labels ARIA sur les boutons d'actions (Déconnexion, Suppression, Publication)",
-            "🛡️ Typage : Sécurisation du processus d'import de bibliothèque avec validation de types"
+            "📖 Livre : Préservation intégrale de la mise en forme (gras, italique, etc.) lors du découpage des paragraphes géants",
+            "🛠️ Algorithme : Utilisation de l'API Range du DOM pour un découpage HTML structurellement sûr",
+            "📏 Précision : Mesures de hauteur encore plus fidèles grâce au rendu des balises réelles lors du calcul du split"
         ]
     },
     {
-        "version": "2.43.1",
-        "date": "2026-02-11",
+        "version": "2.45.11",
+        "date": "2026-02-12",
         "type": "patch",
         "changes": [
-            "🛡️ Sécurité : Mise à jour vers Vite 7 et correction des vulnérabilités (npm audit)",
-            "🧩 Fiabilité : Implémentation d'un Error Boundary global (fallback UI en français)",
-            "🚀 CI/CD : Renforcement du workflow de déploiement (Type Check, Lint, Tests unitaires obligatoires)"
-        ]
-    },
-    {
-        "version": "2.43.0",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "🏗️ Refonte majeure architecturale : Extraction de plus de 1500 lignes de logique vers des hooks personnalisés",
-            "🧩 AdminApp : Extraction de useAdminAuth et useAdminRulesHandler (Optimisation de 60%)",
-            "📖 CampaignNotes : Refonte complète du journal avec useJournal et useJournalImages",
-            "🎨 TraitLibrary : Modularisation de la bibliothèque de traits et des sélections",
-            "🧙 LibraryImportWizard : Simplification de l'assistant d'importation via useLibraryImport",
-            "🛡️ Renforcement du typage TypeScript Strict sur l'ensemble des nouveaux modules"
-        ]
-    },
-    {
-        "version": "2.42.1",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "💄 Amélioration de l'accessibilité du bouton de déconnexion dans l'Admin",
-            "🏠 Ajout du bouton de déconnexion sur le Tableau de Bord",
-            "👥 Ajout du bouton de déconnexion sur la vue des Joueurs Globaux"
-        ]
-    },
-    {
-        "version": "2.42.0",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "🛡️ Hardening de la sécurité RLS (Supabase) : Transition vers les claims JWT pour plus de robustesse",
-            "🚀 Correction des erreurs 403 Forbidden dans l'administration des campagnes",
-            "🔧 Consolidation des politiques de bibliothèques (Skills, Traits, Backgrounds)",
-            "🆕 Support multi-campagne : Gestion automatisée de la propriété des personnages (created_by)"
-        ]
-    },
-    {
-        "version": "2.41.0",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "Audit Phase 2 : Amélioration de la Qualité et du Typage",
-            "Refonte de DatabaseService : Suppression des types 'any' au profit de Partial<T>",
-            "Nettoyage de rulesReconciler : Suppression des assertions 'as any' pour une réconciliation typée",
-            "Unification de la limitation du débit GitHub API dans RulesLoader et githubService",
-            "Centralisation des constantes UI (couleurs, espacement) dans src/constants/theme.ts",
-            "Ajout de tests unitaires pour RulesContext et CharacterContext (Stabilité et robustesse)",
-            "Correction des incohérences de schéma Zod pour la validation des configurations de campagne"
-        ]
-    },
-    {
-        "version": "2.40.2",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "Mise à jour de la documentation d'architecture (functional_scope.md, db_schema.md)",
-            "Ajustements de l'Audit Summary (Phase 1)"
+            "📖 Livre : Rétablissement de la vue double-page (cote-à-cote)",
+            "✨ UX : Suppression du flickering via la désactivation des coins interactifs (showPageCorners)",
+            "🎨 Style : Nettoyage des ombres CSS redondantes pour laisser le moteur FlipBook gérer le relief",
+            "🚀 Performance : Optimisation de l'auto-dimensionnement (autoSize: true)"
         ]
     }
 ]

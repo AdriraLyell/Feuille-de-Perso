@@ -1,6 +1,6 @@
 # Plan : Résolution des Issues Audit (Sections 4 & 5)
 
-> **Dernière mise à jour** : 2026-02-12 — Audit v2.45.4
+> **Dernière mise à jour** : 2026-02-12T12:20 — Audit v2.45.7
 
 ---
 
@@ -10,9 +10,9 @@
 
 | # | Issue | Statut | Détails |
 |---|-------|--------|---------|
-| 4.1 | 60+ console.log | **CORRIGÉ** | Logger conditionnel `src/utils/logger.ts`, ~20 appels directs restants |
-| 4.2 | 77+ `any` / 27 `@ts-ignore` | **NON CORRIGÉ** | 168 `any`, 55 `@ts-ignore` (a empiré avec le nouveau code admin) |
-| 4.3 | Fichiers trop gros | **PARTIEL** | CharacterSheet 788→478, LibraryView 528→409, mais rulesReconciler 492→546 |
+| 4.1 | 60+ console.log | **PARTIEL** | Logger conditionnel `src/utils/logger.ts`, **24 `console.*` directs restants** |
+| 4.2 | 77+ `any` / 27 `@ts-ignore` | **PARTIEL** | **26 `as any`, 35 `@ts-ignore`** (Phase A complétée, Phases B-E restantes) |
+| 4.3 | Fichiers trop gros | **PARTIEL** | Refactorisés: CreationHUD 537→168, CharacterSheet 788→478, LibraryView 528→409. **Nouveaux identifiés**: CharacterReadOnlyView (427L), SpecializationLibrary (462L), SkillsEditor (413L), ImportPanel (389L), AdminDashboard (359L), CreationConfigEditor (320L) |
 | 4.4 | Promises non gérées | **CORRIGÉ** | try/catch/finally sur GlobalPlayersView et autres |
 | 4.5 | Rate-limiting GitHub | **CORRIGÉ** | 50 appels/heure via sessionStorage |
 | 4.6 | Placeholder Supabase | **CORRIGÉ** | Throw immédiat si env vars manquantes |
@@ -31,30 +31,31 @@
 | 5.7 | Mot de passe / auto-logout | **CORRIGÉ** | Reset password + hook useIdleTimeout (30 min) |
 | 5.8 | Docs RLS | **CORRIGÉ** | `docs/RLS_POLICIES.md` complet |
 
-**Score global : 12/15 corrigés, 3 restants (4.2, 4.3, 5.1-CSS)**
+**Score global : 11/15 corrigés, 4 restants (4.1-partiel, 4.2, 4.3, 5.1-CSS)**
 
 ---
 
 ## Plan détaillé : Issue 4.2 — Éradication des `any` et `@ts-ignore`
 
-### État actuel
+### État actuel (2026-02-12)
 
-- **168 occurrences** de `: any` / `as any`
-- **55 occurrences** de `@ts-ignore`
+- **26 occurrences** de `as any` (hors tests/fixtures)
+- **35 occurrences** de `@ts-ignore` (hors tests/fixtures)
 - Types DB déjà créés dans `src/types/database.ts` mais **sous-utilisés**
+- Phase A complétée (`stateAccessors.ts` créé)
 
-### Catégorisation des occurrences
+### Catégorisation des occurrences (26 `as any` + 35 `@ts-ignore` actuels)
 
-| Catégorie | Count | Cause racine |
-|-----------|-------|--------------|
-| A. Accès dynamique aux propriétés (skills/counters) | ~20 | `@ts-ignore` pour accès `state.skills[key]` |
-| B. Mapping DB snake_case → camelCase | ~15 | `(row as any).field_name` dans LibraryMapper |
-| C. Handlers d'événements génériques | ~15 | `value: any` dans les éditeurs admin |
-| D. Fetch DB non typés | ~15 | `fetchAll<any>(...)` dans LibraryLoader/Importer |
-| E. Layout (colonnes/blocs) | ~10 | `as any[]` dans useSheetLayout, `as any` dans CharacterSheet |
-| F. JSONB Postgres brut | ~8 | `configurations: Record<string, any>` dans DBGameSetting |
-| G. Logger variadic | ~4 | `(...args: any[])` — **acceptable, ne pas toucher** |
-| H. Fixtures de test | ~45+ | `} as any` — **acceptable, ne pas toucher** |
+| Catégorie | Count | Cause racine | Statut |
+|-----------|-------|--------------|--------|
+| A. Accès dynamique aux propriétés (skills/counters) | ~3 | `@ts-ignore` pour accès `state.skills[key]` | **Phase A créée** (stateAccessors.ts) |
+| B. Mapping DB snake_case → camelCase | ~9 | `(row as any).field_name` dans LibraryMapper | **À faire** (Phase B) |
+| C. Handlers d'événements génériques | ~8 | `value: any` dans les éditeurs admin | **À faire** (Phase C) |
+| D. Fetch DB non typés | ~10 | `fetchAll<any>(...)` dans LibraryLoader/Importer | **À faire** (Phase D) |
+| E. Layout (colonnes/blocs) | ~8 | `as any[]` dans useSheetLayout, `as any` dans CharacterSheet | **À faire** (Phase E) |
+| F. JSONB Postgres brut | ~8 | `configurations: Record<string, any>` dans DBGameSetting | **Acceptable** (ne pas toucher) |
+| G. Logger variadic | ~4 | `(...args: any[])` | **Acceptable** (ne pas toucher) |
+| H. Migrations/utils legacy | ~11 | Migrations, importExport, ErrorService | **Acceptable** (legacy) |
 
 ### Phase A : Types d'accès dynamique aux skills/counters
 
@@ -223,15 +224,15 @@ Les champs `configurations: Record<string, any>` et `definitions: Record<string,
 
 | Catégorie | Avant | Après | Réduction |
 |-----------|-------|-------|-----------|
-| A. Accès dynamique | ~20 | 0 | -20 |
-| B. Mapping DB | ~15 | 0 | -15 |
-| C. Handlers admin | ~15 | 0 | -15 |
-| D. Fetch DB | ~15 | 0 | -15 |
-| E. Layout | ~10 | 0 | -10 |
+| A. Accès dynamique | ~3 | 0 | -3 |
+| B. Mapping DB | ~9 | 0 | -9 |
+| C. Handlers admin | ~8 | 0 | -8 |
+| D. Fetch DB | ~10 | 0 | -10 |
+| E. Layout | ~8 | 0 | -8 |
 | F. JSONB (ignoré) | ~8 | ~8 | 0 |
 | G. Logger (ignoré) | ~4 | ~4 | 0 |
-| H. Tests (ignoré) | ~45 | ~45 | 0 |
-| **Total** | **~168+55** | **~57** | **~-75%** |
+| H. Legacy (ignoré) | ~11 | ~11 | 0 |
+| **Total** | **61** | **~23** | **~-62%** |
 
 ---
 

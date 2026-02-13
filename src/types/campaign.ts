@@ -1,3 +1,9 @@
+import { JSONContent } from '@tiptap/core';
+
+export interface BookDocument {
+    content: JSONContent;
+    formatVersion: number;
+}
 
 export interface ImageConfig {
     width: number;

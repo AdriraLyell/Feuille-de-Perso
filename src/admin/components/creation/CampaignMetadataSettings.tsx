@@ -5,7 +5,7 @@ interface CampaignMetadataSettingsProps {
     description?: string;
     welcomeMessage?: string;
     showMetadataToPlayers: boolean;
-    onUpdate: (field: string, value: any) => void;
+    onUpdate: (field: string, value: unknown) => void;
 }
 
 const CampaignMetadataSettings: React.FC<CampaignMetadataSettingsProps> = ({

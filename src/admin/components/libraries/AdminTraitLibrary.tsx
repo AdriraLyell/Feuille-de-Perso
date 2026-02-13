@@ -259,7 +259,11 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
         setEditForm({ ...editForm, effects: [...(editForm.effects || []), newEffect] });
     };
 
-    const updateEffect = (id: string, field: keyof TraitEffect, value: any) => {
+    const updateEffect = <K extends keyof TraitEffect>(
+        id: string,
+        field: K,
+        value: TraitEffect[K]
+    ) => {
         if (!editForm) return;
         setEditForm({
             ...editForm,

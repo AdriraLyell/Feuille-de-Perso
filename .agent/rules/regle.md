@@ -11,6 +11,7 @@ Ces règles sont la source de vérité pour le comportement de l'agent dans ce w
 - **Chirurgie du Code** : Modifications minimales et précises. Ne jamais réécrire un fichier complet inutilement.
 - **Typage Strict** : Éviter `any` et `@ts-ignore`. Préférer les structures Zod et les types inférés.
 - **UX Premium** : Interfaces vivantes, micro-animations, feedback visuel immédiat.
+- **Outil de Navigation (Playwright)** : Utiliser le `browser_subagent` pour valider visuellement les changements complexes (ex: pagination, overflow, responsive) lorsque les logs ne suffisent pas.
 - **Logging** : Utiliser `src/utils/logger.ts` au lieu de `console.log` directement.
 
 ## 2. DOCUMENTATION DE RÉFÉRENCE
@@ -26,7 +27,9 @@ Ces règles sont la source de vérité pour le comportement de l'agent dans ce w
 Avant chaque fin de tâche (notify_user) :
 1. Incrémenter la version dans `package.json`.
 2. Mettre à jour `src/data/changelog.json` avec la version, date et type de changement.
-3. Vérifier l'intégrité via `npm run build`.
+3. Vérifier l'intégrité via `npm run build`, si cela n'a pas été fait pendant le code
+4. Mettre à jour les fichiers .md creer lors des phases de planifications (task.md, implementation plan, ou autres)
+
 
 > Le script `npm run sync-version` synchronise automatiquement `src/constants.ts` depuis `package.json`.
 

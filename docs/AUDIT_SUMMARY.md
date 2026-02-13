@@ -1,6 +1,6 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.45.4)
+# Audit - État des Lieux & Roadmap (Synthèse v2.48.0)
 
-Ce document résume l'état de l'application au 2026-02-12.
+> **Dernière mise à jour** : 2026-02-13T19:55 — Version 2.48.0
 
 ## 1. Phases Complétées
 
@@ -32,17 +32,41 @@ Ce document résume l'état de l'application au 2026-02-12.
 - [x] Design responsive mobile + navigation diégétique.
 - [x] Nettoyage racine : 12 fichiers de débris supprimés.
 
+### ✅ Phase 6 : Moteur Journal 'Columnar' (v2.47.0)
+- [x] **Moteur CSS Native Columns** : Remplacement de PaginationPlus par une approche ultra-performante basée sur les colonnes CSS.
+- [x] **Pagination Dynamique** : Reflow instantané et nettoyage automatique des pages vides.
+- [x] **Affichage Spreads** : Toujours par paires de pages pour respecter l'esthétique grimoire.
+- [x] **Navigation Intelligente** : Masquage contextuel des flèches et suppression du ghost shift.
+- [x] **Thème Parchemin** : Unification graphique (#fbf4e9) Journal + PartyTable.
+
 ## 2. Issues Restantes & Roadmap
 
+### 🔶 Issue 4.1 — `console.log` directs (PARTIELLE)
+- **24 occurrences** de `console.*` directs restantes (hors logger).
+- Logger conditionnel `src/utils/logger.ts` créé et majoritairement adopté.
+
 ### 🔶 Issue 4.2 — Typage `any`/`@ts-ignore` (OUVERTE)
-- ~50 `as any` + ~45 `@ts-ignore` en production.
-- Plan détaillé dans `docs/PLAN_ISSUES_MOYENNES.md` (Phases A-F).
+- **26 `as any`** + **35 `@ts-ignore`** en production (hors tests/fixtures).
+- Phase A complétée (`stateAccessors.ts` créé).
+- Phases B-E restantes : types DB, handlers admin, fetch typés, layout.
+- Plan détaillé dans `docs/PLAN_ISSUES_MOYENNES.md`.
 
 ### 🔶 Issue 4.3 — Fichiers volumineux (PARTIELLE)
-- `CreationHUD.tsx` (29KB), `CharacterSheetPage2.tsx` (26KB), `SettingsView.tsx` (18.8KB) encore trop gros.
+- Fichiers refactorisés : `CharacterSheet` (788→478), `CreationHUD` (537→168), `LibraryView` (528→409).
+- **Nouveaux fichiers à traiter** :
+  - `CharacterReadOnlyView.tsx` (427 lignes, 34.5 KB)
+  - `SpecializationLibrary.tsx` (462 lignes, 28.2 KB)
+  - `SkillsEditor.tsx` (413 lignes, 22.9 KB)
+  - `ImportPanel.tsx` (389 lignes, 22.2 KB)
+  - `AdminDashboard.tsx` (359 lignes, 21.5 KB)
+  - `CreationConfigEditor.tsx` (320 lignes, 21.3 KB)
+
+### 🔶 Issue 5.1 — Variables CSS (OUVERTE)
+- Couleurs et dimensions hardcodées dans `index.css`.
+- Bloc `:root` avec CSS custom properties non créé.
 
 ### 💡 Suggestions QoL
-- **Logs de Production** : Généraliser l'usage du `logger.ts` typé.
+- **Logs de Production** : Généraliser l'usage du `logger.ts` typé (24 `console.*` restants).
 - **Quota IndexedDB** : Améliorer le feedback visuel lors du dépassement de quota.
 - **Constantes** : Fusionner `src/constants.ts` dans `src/constants/app.ts` à terme.
 

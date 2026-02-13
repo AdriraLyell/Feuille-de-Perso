@@ -254,12 +254,14 @@ const MainLayout: React.FC = () => {
                                         </div>
                                     </nav>
 
-                                    <div className="w-full overflow-x-auto flex px-2 md:px-0 pb-8">
+
+
+                                    <div className={`w-full flex px-2 md:px-0 pb-8 ${sheetTab === 'notes' || sheetTab === 'prototype' ? 'overflow-hidden' : 'overflow-x-auto'}`}>
                                         <div className={`${sheetTab === 'p1' ? 'block' : 'hidden'} mx-auto`}><CharacterSheet isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'specs' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetSpecializations isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'p2' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetPage2 isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'xp' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetXP isLandscape={isLandscape} /></div>
-                                        <div className={`${sheetTab === 'notes' ? 'block' : 'hidden'} mx-auto`}><CampaignNotes isLandscape={isLandscape} /></div>
+                                        <div className={`${sheetTab === 'notes' ? 'block' : 'hidden'} mx-auto`}><CampaignNotes /></div>
                                     </div>
 
                                     {data.creationConfig?.active && (<CreationHUD />)}
@@ -278,7 +280,7 @@ const MainLayout: React.FC = () => {
                         {pagesToPrint.specs && (<div className="print-sheet-wrapper"><CharacterSheetSpecializations isLandscape={isLandscape} /></div>)}
                         {pagesToPrint.p2 && (<div className="print-sheet-wrapper"><CharacterSheetPage2 isLandscape={isLandscape} /></div>)}
                         {pagesToPrint.xp && (<div className="print-sheet-wrapper"><CharacterSheetXP isLandscape={isLandscape} /></div>)}
-                        {pagesToPrint.notes && (<div className="print-sheet-wrapper"><CampaignNotes isLandscape={isLandscape} /></div>)}
+                        {pagesToPrint.notes && (<div className="print-sheet-wrapper"><CampaignNotes /></div>)}
                     </div>
 
                     <Suspense fallback={null}>

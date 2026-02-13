@@ -23,7 +23,8 @@ import {
   CampaignNoteEntry,
   PartyMemberEntry,
   PartyColumn,
-  ImposedSpecialization
+  ImposedSpecialization,
+  BookDocument
 } from './campaign';
 
 export interface Page2Data {
@@ -91,6 +92,7 @@ export interface CharacterSheetData {
   xpLogs: XPEntry[];
   appLogs: LogEntry[];
   campaignNotes: CampaignNoteEntry[];
+  bookDocument?: BookDocument;
   partyNotes: {
     members: PartyMemberEntry[];
     columns: PartyColumn[];

@@ -1,6 +1,6 @@
 {
   "name": "rpg-sheet-manager",
-  "version": "2.45.5",
+  "version": "2.48.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,7 +15,9 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.1",
+    "@tiptap/extension-image": "^3.19.0",
     "@tiptap/extension-placeholder": "^3.19.0",
+    "@tiptap/extension-text-align": "^3.19.0",
     "@tiptap/extension-underline": "^3.19.0",
     "@tiptap/react": "^3.19.0",
     "@tiptap/starter-kit": "^3.19.0",
@@ -26,7 +28,9 @@
     "pako": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-pageflip": "^2.0.3",
     "tailwind-merge": "^3.4.0",
+    "tiptap-pagination-plus": "^3.0.5",
     "uuid": "^9.0.1",
     "zod": "^4.3.6"
   },
