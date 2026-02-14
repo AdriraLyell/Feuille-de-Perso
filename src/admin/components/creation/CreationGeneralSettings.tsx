@@ -23,9 +23,10 @@ const CreationGeneralSettings: React.FC<CreationGeneralSettingsProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
                 <div className="space-y-2 group">
-                    <label className="block text-[10px] font-black text-stone-500 mb-2 uppercase tracking-[0.25em] ml-1 group-hover:text-amber-500/50 transition-colors">Seuil Minimal d'Attribut</label>
+                    <label htmlFor="attribute-min" className="block text-[10px] font-black text-stone-500 mb-2 uppercase tracking-[0.25em] ml-1 group-hover:text-amber-500/50 transition-colors">Seuil Minimal d'Attribut</label>
                     <div className="relative">
                         <input
+                            id="attribute-min"
                             type="number"
                             value={config.attributeMin ?? -1}
                             onChange={(e) => onUpdateConfig('attributeMin', parseInt(e.target.value))}
@@ -37,9 +38,10 @@ const CreationGeneralSettings: React.FC<CreationGeneralSettingsProps> = ({
                     </div>
                 </div>
                 <div className="space-y-2 group">
-                    <label className="block text-[10px] font-black text-stone-500 mb-2 uppercase tracking-[0.25em] ml-1 group-hover:text-amber-500/50 transition-colors">Plafond Maximal d'Attribut</label>
+                    <label htmlFor="attribute-max" className="block text-[10px] font-black text-stone-500 mb-2 uppercase tracking-[0.25em] ml-1 group-hover:text-amber-500/50 transition-colors">Plafond Maximal d'Attribut</label>
                     <div className="relative">
                         <input
+                            id="attribute-max"
                             type="number"
                             value={config.attributeMax ?? 3}
                             onChange={(e) => onUpdateConfig('attributeMax', parseInt(e.target.value))}
@@ -54,7 +56,7 @@ const CreationGeneralSettings: React.FC<CreationGeneralSettingsProps> = ({
 
             <div className="space-y-8">
                 <div>
-                    <label className="block text-xs font-black text-stone-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <label htmlFor="creation-mode" className="block text-xs font-black text-stone-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                         <Layout size={14} className="text-amber-700" /> Philosophie de Création
                     </label>
                     <div className="grid grid-cols-2 bg-stone-950 p-1.5 rounded-sm gap-2 border border-stone-800">
@@ -81,7 +83,7 @@ const CreationGeneralSettings: React.FC<CreationGeneralSettingsProps> = ({
                 {config.mode === 'points' && (
                     <MotionFade className="space-y-6 pt-4 border-t border-stone-800/50">
                         <div>
-                            <label className="block text-xs font-black text-stone-400 mb-4 uppercase tracking-widest">Type de Répartition</label>
+                            <label htmlFor="card-system" className="block text-xs font-black text-stone-400 mb-4 uppercase tracking-widest">Type de Répartition</label>
                             <div className="grid grid-cols-2 bg-stone-950 p-1.5 rounded-sm gap-2 border border-stone-800 shadow-inner">
                                 <button
                                     onClick={() => onUpdateConfig('pointsDistributionMode', 'global')}
@@ -100,12 +102,13 @@ const CreationGeneralSettings: React.FC<CreationGeneralSettingsProps> = ({
 
                         {(!config.pointsDistributionMode || config.pointsDistributionMode === 'global') ? (
                             <MotionFade key="global-xp" className="bg-stone-950/50 p-6 rounded-sm border border-stone-800 shadow-inner group">
-                                <label className="block text-[10px] font-black text-stone-500 mb-3 uppercase tracking-[0.2em] group-hover:text-amber-500 transition-colors">Capital d'XP Initial</label>
+                                <label htmlFor="starting-xp" className="block text-[10px] font-black text-stone-500 mb-3 uppercase tracking-[0.2em] group-hover:text-amber-500 transition-colors">Capital d'XP Initial</label>
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 bg-amber-900/20 text-amber-500 rounded-sm">
                                         <CircleDot size={20} className="animate-pulse" />
                                     </div>
                                     <input
+                                        id="starting-xp"
                                         type="number"
                                         value={config.startingXP || 0}
                                         onChange={(e) => onUpdateConfig('startingXP', parseInt(e.target.value) || 0)}
@@ -139,8 +142,9 @@ const CreationGeneralSettings: React.FC<CreationGeneralSettingsProps> = ({
                 {config.mode === 'rangs' && (
                     <MotionFade className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-stone-800/50">
                         <div className="bg-stone-950/40 p-4 rounded-sm border border-stone-800 group hover:border-amber-900/20 transition-colors">
-                            <label className="block text-[10px] font-black text-stone-500 mb-2 uppercase tracking-widest group-hover:text-amber-500/50 transition-colors">Capital Attributs</label>
+                            <label htmlFor="attribute-points" className="block text-[10px] font-black text-stone-500 mb-2 uppercase tracking-widest group-hover:text-amber-500/50 transition-colors">Capital Attributs</label>
                             <input
+                                id="attribute-points"
                                 type="number"
                                 value={config.attributePoints || 0}
                                 onChange={(e) => onUpdateConfig('attributePoints', parseInt(e.target.value) || 0)}
@@ -148,8 +152,9 @@ const CreationGeneralSettings: React.FC<CreationGeneralSettingsProps> = ({
                             />
                         </div>
                         <div className="bg-stone-950/40 p-4 rounded-sm border border-stone-800 group hover:border-amber-900/20 transition-colors">
-                            <label className="block text-[10px] font-black text-stone-500 mb-2 uppercase tracking-widest group-hover:text-amber-500/50 transition-colors">Capital Arr. Plans</label>
+                            <label htmlFor="background-points" className="block text-[10px] font-black text-stone-500 mb-2 uppercase tracking-widest group-hover:text-amber-500/50 transition-colors">Capital Arr. Plans</label>
                             <input
+                                id="background-points"
                                 type="number"
                                 value={config.backgroundPoints || 0}
                                 onChange={(e) => onUpdateConfig('backgroundPoints', parseInt(e.target.value) || 0)}

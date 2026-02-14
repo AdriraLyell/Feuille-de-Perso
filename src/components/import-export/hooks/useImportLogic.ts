@@ -124,8 +124,8 @@ export function useImportLogic({ data, variant, onImportSuccess, onClose }: UseI
         const importedFile: any = pendingFile;
         // --- CONFLICT CHECK FOR MERGES ---
         if ((['skill_lib_merge', 'lib_merge', 'all_libs_merge'].includes(importAction)) && !isResolvingConflicts) {
-            let checkSkills = importAction.includes('skill') || importAction.includes('all');
-            let checkTraits = importAction.includes('lib_merge') || importAction.includes('all');
+            const checkSkills = importAction.includes('skill') || importAction.includes('all');
+            const checkTraits = importAction.includes('lib_merge') || importAction.includes('all');
 
             const currentSkills = checkSkills ? (data.skillLibrary || []) : [];
             const incomingSkills = checkSkills ? (importedFile.skillLibrary || []) : [];

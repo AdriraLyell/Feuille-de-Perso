@@ -25,7 +25,6 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
     const getSkillName = (skillId: string): string => {
         for (const cat of Object.keys(data.skills)) {
-            // @ts-ignore
             const skill = data.skills[cat].find((s: DotEntry) => s.id === skillId);
             if (skill) return skill.name;
         }
@@ -85,7 +84,6 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
     const findSkill = (skillId: string): DotEntry | null => {
         for (const cat of Object.keys(data.skills)) {
-            // @ts-ignore
             const skill = data.skills[cat].find((s: DotEntry) => s.id === skillId);
             if (skill) return skill;
         }
@@ -199,7 +197,6 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         if (key === 'arrieres_plans') return false;
         if (key === 'competences2') return false; // Exclude secondary skills from empty check
         // Check for dots OR imposed specs
-        // @ts-ignore
         return data.skills[key].some((s: DotEntry) => {
             const hasDots = s.value > 0;
             const hasVisibleImposed = (data.imposedSpecializations[s.id] || [])

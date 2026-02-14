@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Users, Search, Eye, Trash2, Calendar, User, Shield, Info, AlertCircle } from 'lucide-react';
+import { Users, Search, Eye, Trash2, Calendar, Shield, Info, AlertCircle } from 'lucide-react';
 import { CharacterSyncService, SyncedCharacterSummary, SyncedCharacter } from '../../services/CharacterSyncService';
 import CharacterReadOnlyView from './CharacterReadOnlyView';
 import { GameSettingSummary, CampaignService } from '../../services/CampaignService';
@@ -255,13 +255,5 @@ const GlobalPlayersView: React.FC = () => {
         </div>
     );
 };
-
-// Loader2 is already imported from lucide-react if available, otherwise defining a fallback
-// Correcting the duplicate/local definition if it clashes with lucide-react or replacing with themed one
-const CustomLoader: React.FC<{ className?: string, size?: number }> = ({ className, size = 24 }) => (
-    <div className={`animate-spin ${className}`} style={{ width: size, height: size }}>
-        <Users size={size} />
-    </div>
-);
 
 export default GlobalPlayersView;

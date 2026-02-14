@@ -180,13 +180,13 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                         <div className={`flex flex-col overflow-hidden min-h-0 ${showLibraryInEditor ? 'flex-grow' : ''}`}>
                             <div className="p-5 bg-gray-50 border-b border-gray-200 shrink-0">
                                 <div className="flex gap-4 items-start mb-4">
-                                    <div className="w-1/3 shrink-0"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom du Trait</label><input className="w-full border border-gray-300 rounded px-3 py-2 font-bold text-gray-900 focus:border-blue-500 outline-none" value={editorName} onChange={(e) => setEditorName(e.target.value)} autoFocus /></div>
+                                    <div className="w-1/3 shrink-0"><label htmlFor="trait-name" className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom du Trait</label><input id="trait-name" className="w-full border border-gray-300 rounded px-3 py-2 font-bold text-gray-900 focus:border-blue-500 outline-none" value={editorName} onChange={(e) => setEditorName(e.target.value)} /></div>
 
                                     {(editorIsVariable || editorVariant || editorVariants.length > 0) ? (
                                         <div className="flex-grow flex gap-4 items-end animate-in slide-in-from-top-1 duration-200">
                                             <div className="flex-grow">
-                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Complément (Variant)</label>
-                                                <input className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorVariant} onChange={(e) => setEditorVariant(e.target.value)} placeholder="Ex: Chats, Pollen..." />
+                                                <label htmlFor="trait-variant" className="block text-xs font-bold text-gray-500 uppercase mb-1">Complément (Variant)</label>
+                                                <input id="trait-variant" className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorVariant} onChange={(e) => setEditorVariant(e.target.value)} placeholder="Ex: Chats, Pollen..." />
                                                 {/* Suggested Variants */}
                                                 {editorVariants.length > 0 && (
                                                     <div className="flex flex-wrap gap-1.5 mt-2">
@@ -202,25 +202,25 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                                                     </div>
                                                 )}
                                             </div>
-                                            <div className="w-24 shrink-0"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tag</label><input className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorTag} onChange={(e) => setEditorTag(e.target.value)} placeholder="Ex: Mental..." /></div>
-                                            <div className="w-20 shrink-0"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Valeur</label><input className="w-full border border-gray-300 rounded px-3 py-2 font-mono text-center focus:border-blue-500 outline-none" value={editorValue} onChange={(e) => setEditorValue(e.target.value)} /></div>
+                                            <div className="w-24 shrink-0"><label htmlFor="trait-tag-1" className="block text-xs font-bold text-gray-500 uppercase mb-1">Tag</label><input id="trait-tag-1" className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorTag} onChange={(e) => setEditorTag(e.target.value)} placeholder="Ex: Mental..." /></div>
+                                            <div className="w-20 shrink-0"><label htmlFor="trait-value-1" className="block text-xs font-bold text-gray-500 uppercase mb-1">Valeur</label><input id="trait-value-1" className="w-full border border-gray-300 rounded px-3 py-2 font-mono text-center focus:border-blue-500 outline-none" value={editorValue} onChange={(e) => setEditorValue(e.target.value)} /></div>
                                         </div>
                                     ) : (
                                         <div className="flex-grow flex gap-4 items-end">
                                             <div className="flex-grow">
-                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Tag</label>
-                                                <input className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorTag} onChange={(e) => setEditorTag(e.target.value)} placeholder="Ex: Mental..." />
+                                                <label htmlFor="trait-tag-2" className="block text-xs font-bold text-gray-500 uppercase mb-1">Tag</label>
+                                                <input id="trait-tag-2" className="w-full border border-gray-300 rounded px-3 py-2 text-gray-700 focus:border-blue-500 outline-none" value={editorTag} onChange={(e) => setEditorTag(e.target.value)} placeholder="Ex: Mental..." />
                                             </div>
                                             <div className="w-40 shrink-0">
-                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Valeur</label>
-                                                <input className="w-full border border-gray-300 rounded px-3 py-2 font-mono text-center focus:border-blue-500 outline-none" value={editorValue} onChange={(e) => setEditorValue(e.target.value)} />
+                                                <label htmlFor="trait-value-2" className="block text-xs font-bold text-gray-500 uppercase mb-1">Valeur</label>
+                                                <input id="trait-value-2" className="w-full border border-gray-300 rounded px-3 py-2 font-mono text-center focus:border-blue-500 outline-none" value={editorValue} onChange={(e) => setEditorValue(e.target.value)} />
                                             </div>
                                         </div>
                                     )}
                                 </div>
                                 <div className="mb-2">
-                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description / Effets</label>
-                                    <textarea className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-700 h-24 focus:border-blue-500 outline-none resize-none" value={editorDescription} onChange={(e) => setEditorDescription(e.target.value)} placeholder="Description détaillée du trait..." />
+                                    <label htmlFor="trait-description" className="block text-xs font-bold text-gray-500 uppercase mb-1">Description / Effets</label>
+                                    <textarea id="trait-description" className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-700 h-24 focus:border-blue-500 outline-none resize-none" value={editorDescription} onChange={(e) => setEditorDescription(e.target.value)} placeholder="Description détaillée du trait..." />
                                 </div>
                                 <div className="flex justify-end"><button onClick={clearEditor} className="text-gray-500 text-xs hover:text-red-600 px-3 py-1.5 flex items-center gap-1 hover:bg-red-50 rounded"><Trash2 size={14} /> Vider</button></div>
                             </div>

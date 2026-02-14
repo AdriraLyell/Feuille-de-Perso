@@ -81,7 +81,7 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
 
             let attempts = 0;
             while (attempts < 8) {
-                const runDate = run ? new Date(run.created_at).getTime() : 0;
+                const runDate = run?.created_at ? new Date(run.created_at).getTime() : 0;
                 const now = Date.now();
                 if (!run || (now - runDate > 120000)) {
                     await new Promise(r => setTimeout(r, 3000));

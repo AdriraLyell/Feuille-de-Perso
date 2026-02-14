@@ -95,7 +95,7 @@ export const SkillCategoryEditor: React.FC<SkillCategoryEditorProps> = ({
                                 <div className="flex-grow flex items-center gap-1">
                                     <input
                                         type="text"
-                                        autoFocus={item.id === newlyAddedId}
+                                        ref={(el) => { if (el && item.id === newlyAddedId) el.focus(); }}
                                         value={item.name}
                                         readOnly={!!item.variant}
                                         title={item.variant ? "Le nom racine ne peut pas être modifié pour une compétence variable" : undefined}

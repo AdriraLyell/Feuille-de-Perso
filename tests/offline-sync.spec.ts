@@ -59,8 +59,8 @@ test.describe('Offline Sync Integration', () => {
         }, { timeout: 15000 }).toBe('E2E-TEST-OFFLINE-100');
         console.log('[TEST]: Online Rules verified.');
 
-        // Wait to ensure IndexedDB write finish
-        await page.waitForTimeout(2000);
+        // Wait for IndexedDB write to complete (reduced from 2000ms)
+        await page.waitForTimeout(500);
 
         // 2. Simulate Offline
         console.log('[TEST]: Simulating Offline state...');

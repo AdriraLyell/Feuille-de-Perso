@@ -41,7 +41,7 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ data, onUpdate, onAddLo
             // Add to Library
             // Check duplicate name first to be safe
             const existingInLib = (data.skillLibrary || []).find(l => l.name === removedItem.name);
-            let newLib = [...(data.skillLibrary || [])];
+            const newLib = [...(data.skillLibrary || [])];
 
             if (!existingInLib && removedItem.name.trim() !== '') {
                 const newLibEntry: LibrarySkillEntry = {
@@ -71,7 +71,6 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ data, onUpdate, onAddLo
     // Filter out skills that are already present on the sheet to avoid duplication clutter
     const currentSkillNames = new Set<string>();
     Object.keys(data.skills).forEach(cat => {
-        // @ts-ignore
         data.skills[cat].forEach(s => {
             if (s.name) currentSkillNames.add(s.name.trim().toLowerCase());
         });

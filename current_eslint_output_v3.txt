@@ -1,0 +1,897 @@
+
+D:\Projet JdR\feuille-de-perso\src\admin\AdminApp.tsx
+   9:8   warning  'AdminCountersEditor' is defined but never used       @typescript-eslint/no-unused-vars
+  10:8   warning  'AdminBackgroundsEditor' is defined but never used    @typescript-eslint/no-unused-vars
+  20:8   warning  'DeployToGithubModal' is defined but never used       @typescript-eslint/no-unused-vars
+  56:12  warning  'showDeployModal' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\AdminCostsEditor.tsx
+  4:10  warning  'RuleCalculationsService' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\AdminDashboard.tsx
+  5:19  warning  'Scroll' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\GlobalPlayersView.tsx
+  9:56  warning  'Info' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\import-wizard\CampaignSelector.tsx
+  25:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\import-wizard\ImportWizardModal.tsx
+   5:10   warning  'ArrowRight' is defined but never used              @typescript-eslint/no-unused-vars
+  18:12   warning  'activeStep' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  18:24   warning  'setActiveStep' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  47:122  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\import-wizard\WizardContent.tsx
+  12:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  13:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\import\CandidateLine.tsx
+  6:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\libraries\AdminBackgroundLibrary.tsx
+  5:117  warning  'X' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\libraries\AdminSkillLibrary.tsx
+    5:59  warning  'HelpCircle' is defined but never used                 @typescript-eslint/no-unused-vars
+  101:11  warning  'getCategoryLabel' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\libraries\AdminSkillLibrarySidebar.tsx
+  238:100  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\libraries\AdminSpecializationLibrary.tsx
+  95:39  warning  'name' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\readonly\ReadOnlyInventory.tsx
+  3:10  warning  'CharacterSheetData' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\admin\components\readonly\ReadOnlyPortrait.tsx
+  2:10  warning  'SyncedCharacter' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\admin\hooks\useAttributeEditor.ts
+   50:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   66:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   68:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\admin\hooks\useLibraryImport.ts
+   31:76  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   32:76  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   33:74  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   34:86  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   35:80  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   59:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   63:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   69:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:90  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   80:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   88:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   92:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   93:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   93:67  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  110:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  114:83  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  133:96  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  143:88  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  164:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\admin\hooks\useSkillEditorActions.ts
+  3:29  warning  'DotEntry' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\admin\utils\importDiffUtils.ts
+   3:10  warning  'LibraryEntry' is defined but never used                @typescript-eslint/no-unused-vars
+   3:24  warning  'LibrarySkillEntry' is defined but never used           @typescript-eslint/no-unused-vars
+   3:43  warning  'LibrarySpecializationEntry' is defined but never used  @typescript-eslint/no-unused-vars
+  35:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  35:33  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\admin\utils\rulesLoader.ts
+  47:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  51:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\admin\utils\templateImporter.ts
+    9:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  146:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  149:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\CampaignNotes.tsx
+  11:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  55:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\ChangelogModal.tsx
+  13:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\CharacterSheet.tsx
+   1:17  warning  'useCallback' is defined but never used       @typescript-eslint/no-unused-vars
+   2:10  warning  'DotEntry' is defined but never used          @typescript-eslint/no-unused-vars
+   2:20  warning  'SkillCategoryKey' is defined but never used  @typescript-eslint/no-unused-vars
+   2:38  warning  'SuggestionEntry' is defined but never used   @typescript-eslint/no-unused-vars
+   3:10  warning  'normalizeString' is defined but never used   @typescript-eslint/no-unused-vars
+   8:10  warning  'SkillBlock' is defined but never used        @typescript-eslint/no-unused-vars
+  29:10  warning  'Layers' is defined but never used            @typescript-eslint/no-unused-vars
+  29:18  warning  'Save' is defined but never used              @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\CharacterSheetPage2.tsx
+  37:9  warning  'editorDefinitionId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  39:9  warning  'closeEditor' is assigned a value but never used         @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\CharacterSheetSpecializations.tsx
+  240:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  247:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  248:77  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  249:91  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  250:81  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  251:91  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  252:67  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\CharacterSheetXP.tsx
+  90:44  warning  'index' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\CreationHUD.tsx
+  3:10  warning  'useNotification' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\ErrorBoundary.tsx
+  61:25  error  onMouseOver must be accompanied by onFocus for accessibility  jsx-a11y/mouse-events-have-key-events
+  62:25  error  onMouseOut must be accompanied by onBlur for accessibility    jsx-a11y/mouse-events-have-key-events
+
+D:\Projet JdR\feuille-de-perso\src\components\LibraryView.tsx
+   9:10  warning  'MergedEntry' is defined but never used                         @typescript-eslint/no-unused-vars
+  44:21  warning  'setSkillError' is assigned a value but never used              @typescript-eslint/no-unused-vars
+  61:12  warning  'showOfficialUpdateConfirm' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  86:11  warning  'executeOfficialUpdate' is assigned a value but never used      @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\RulesSourceSelector.tsx
+   2:17  warning  'useEffect' is defined but never used       @typescript-eslint/no-unused-vars
+  10:8   warning  'ThematicButton' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\SettingsView.tsx
+    3:10  warning  'CharacterSheetData' is defined but never used       @typescript-eslint/no-unused-vars
+    7:10  warning  'useNotification' is defined but never used          @typescript-eslint/no-unused-vars
+   20:75  warning  'X' is defined but never used                        @typescript-eslint/no-unused-vars
+   65:10  warning  Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+   85:5   warning  'toggleAutoSync' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  248:21  error    A form label must have accessible text               jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\SyncModal.tsx
+  255:21  error  A form label must have accessible text  jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\TraitLibrary.tsx
+  115:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\UpdateNotifier.tsx
+  27:12  warning  'isChecking' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\UserGuideModal.tsx
+  4:8   warning  'HelpCircle' is defined but never used   @typescript-eslint/no-unused-vars
+  4:20  warning  'User' is defined but never used         @typescript-eslint/no-unused-vars
+  4:46  warning  'Settings' is defined but never used     @typescript-eslint/no-unused-vars
+  4:56  warning  'Save' is defined but never used         @typescript-eslint/no-unused-vars
+  5:51  warning  'ImageIcon' is defined but never used    @typescript-eslint/no-unused-vars
+  6:71  warning  'Download' is defined but never used     @typescript-eslint/no-unused-vars
+  6:81  warning  'UploadCloud' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\campaign\NoteImageZone.tsx
+  17:56  warning  'uniqueId' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\campaign\PartyTable.tsx
+  199:33  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  203:33  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  217:37  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\campaign\book\BookImageView.tsx
+  152:57  warning  Unexpected any. Specify a different type                                                                                                                                                           @typescript-eslint/no-explicit-any
+  162:13  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  212:25  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  218:25  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  224:25  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  242:17  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  330:25  error    The autoFocus prop should not be used, as it can reduce usability and accessibility for users                                                                                                      jsx-a11y/no-autofocus
+  345:21  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  345:21  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\campaign\book\ChapterHeaderView.tsx
+  35:26  warning  'err' is defined but never used                                                                                                                                                                    @typescript-eslint/no-unused-vars
+  59:42  warning  Unexpected any. Specify a different type                                                                                                                                                           @typescript-eslint/no-explicit-any
+  88:21  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  88:21  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\campaign\book\ColumnarEditor.tsx
+    5:8   warning  'Image' is defined but never used                                                                                                                                                                  @typescript-eslint/no-unused-vars
+  275:56  warning  Unexpected any. Specify a different type                                                                                                                                                           @typescript-eslint/no-explicit-any
+  379:25  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\import-export\CloudConflictResolver.tsx
+    6:43  warning  'LibrarySpecializationEntry' is defined but never used                                                                                                                                             @typescript-eslint/no-unused-vars
+   65:31  warning  'currentAsSkill' is assigned a value but never used                                                                                                                                                @typescript-eslint/no-unused-vars
+   66:31  warning  'incomingAsSkill' is assigned a value but never used                                                                                                                                               @typescript-eslint/no-unused-vars
+   98:37  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+   98:37  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  149:37  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  149:37  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\import-export\CloudPanel.tsx
+  189:21  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\import-export\ExportPanel.tsx
+   32:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   60:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   77:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  178:29  error    A form label must have accessible text    jsx-a11y/label-has-associated-control
+  186:29  error    A form label must have accessible text    jsx-a11y/label-has-associated-control
+  194:29  error    A form label must have accessible text    jsx-a11y/label-has-associated-control
+  206:29  error    A form label must have accessible text    jsx-a11y/label-has-associated-control
+  215:33  error    A form label must have accessible text    jsx-a11y/label-has-associated-control
+  223:33  error    A form label must have accessible text    jsx-a11y/label-has-associated-control
+  231:33  error    A form label must have accessible text    jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\import-export\FileDropZone.tsx
+   6:26  warning  Unexpected any. Specify a different type                                                                                                                                                           @typescript-eslint/no-explicit-any
+  36:9   error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  36:9   error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\import-export\ImportOptionsSection.tsx
+    3:69  warning  'GraduationCap' is defined but never used  @typescript-eslint/no-unused-vars
+    3:84  warning  'BookOpen' is defined but never used       @typescript-eslint/no-unused-vars
+    3:94  warning  'Award' is defined but never used          @typescript-eslint/no-unused-vars
+   63:21  error    A form label must have accessible text     jsx-a11y/label-has-associated-control
+   70:21  error    A form label must have accessible text     jsx-a11y/label-has-associated-control
+   78:25  error    A form label must have accessible text     jsx-a11y/label-has-associated-control
+   97:21  error    A form label must have accessible text     jsx-a11y/label-has-associated-control
+  104:21  error    A form label must have accessible text     jsx-a11y/label-has-associated-control
+  122:21  error    A form label must have accessible text     jsx-a11y/label-has-associated-control
+  129:21  error    A form label must have accessible text     jsx-a11y/label-has-associated-control
+  147:21  error    A form label must have accessible text     jsx-a11y/label-has-associated-control
+  154:21  error    A form label must have accessible text     jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\import-export\hooks\useImportLogic.ts
+    1:20   warning  'useRef' is defined but never used        @typescript-eslint/no-unused-vars
+   44:43   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   64:35   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:29   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  169:83   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  171:98   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  173:125  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  189:57   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  193:96   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  199:67   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  203:111  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  209:85   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  213:138  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  219:83   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  220:98   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  221:125  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  226:100  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  229:115  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  232:142  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\layout\DiegeticNavigation.tsx
+    3:10   warning  'Book' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+    3:36   warning  'Layout' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
+    3:50   warning  'Upload' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
+    3:58   warning  'Feather' is defined but never used                                                                                  @typescript-eslint/no-unused-vars
+    3:67   warning  'LogOut' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
+    3:84   warning  'Monitor' is defined but never used                                                                                  @typescript-eslint/no-unused-vars
+    3:93   warning  'Smartphone' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+    3:138  warning  'ArrowRightLeft' is defined but never used                                                                           @typescript-eslint/no-unused-vars
+    3:154  warning  'BookOpen' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+    7:10   warning  'CharacterSheetData' is defined but never used                                                                       @typescript-eslint/no-unused-vars
+   97:26   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+   98:36   warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  102:48   warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\layout\MainLayout.tsx
+    3:10   warning  'useNotification' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+   10:10   warning  'loadRules' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+   11:10   warning  'RulesData' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+   14:10   warning  'INITIAL_DATA' is defined but never used                                                                             @typescript-eslint/no-unused-vars
+   44:10   warning  'Settings' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+   44:20   warning  'Printer' is defined but never used                                                                                  @typescript-eslint/no-unused-vars
+   44:29   warning  'FileText' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+   44:57   warning  'AlertTriangle' is defined but never used                                                                            @typescript-eslint/no-unused-vars
+   44:90   warning  'History' is defined but never used                                                                                  @typescript-eslint/no-unused-vars
+   44:117  warning  'Save' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+   44:129  warning  'LogOut' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
+   44:137  warning  'Menu' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+   44:143  warning  'Upload' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
+   55:9    warning  'showDiscardConfirm' is assigned a value but never used                                                              @typescript-eslint/no-unused-vars
+   55:29   warning  'setShowDiscardConfirm' is assigned a value but never used                                                           @typescript-eslint/no-unused-vars
+   56:9    warning  'isSettingsDirty' is assigned a value but never used                                                                 @typescript-eslint/no-unused-vars
+   58:9    warning  'confirmDiscard' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
+   76:12   warning  'lastSavedState' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
+  129:25   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  294:178  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\library\LibrarySkillForm.tsx
+   64:25  error  A form label must be associated with a control                                                 jsx-a11y/label-has-associated-control
+   69:29  error  The autoFocus prop should not be used, as it can reduce usability and accessibility for users  jsx-a11y/no-autofocus
+   73:25  error  A form label must be associated with a control                                                 jsx-a11y/label-has-associated-control
+   82:29  error  A form label must be associated with a control                                                 jsx-a11y/label-has-associated-control
+  121:29  error  A form label must be associated with a control                                                 jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\library\SkillLibraryTab.tsx
+  1:17  warning  'useState' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\settings\AdminSuggestions.tsx
+   5:39  warning  'LucideIcon' is defined but never used    @typescript-eslint/no-unused-vars
+  32:62  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\settings\AppearanceEditor.tsx
+   58:25  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+   79:25  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  104:29  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\settings\AttributesEditor.tsx
+   16:56  warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   38:28  warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   39:30  warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   41:47  warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  174:13  error    'newSecondary' is never reassigned. Use 'const' instead  prefer-const
+  312:21  error    A form label must be associated with a control           jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\settings\CreationConfigEditor.tsx
+    4:53  warning  'AlertCircle' is defined but never used                                                                              @typescript-eslint/no-unused-vars
+   16:57  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   40:53  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   81:29  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+   94:29  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  115:37  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  134:41  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  145:45  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  154:45  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  163:45  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  179:37  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  188:37  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  201:33  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  210:33  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  238:49  error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  306:25  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  320:25  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  330:25  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\settings\LibrarySidebar.tsx
+  10:110  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  11:28   warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  16:82   warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  44:17   error    'newLib' is never reassigned. Use 'const' instead                                                                    prefer-const
+  74:9    error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+D:\Projet JdR\feuille-de-perso\src\components\settings\SkillsEditor.tsx
+   13:110  warning  Unexpected any. Specify a different type                                                       @typescript-eslint/no-explicit-any
+   14:28   warning  Unexpected any. Specify a different type                                                       @typescript-eslint/no-explicit-any
+   95:29   error    A form label must be associated with a control                                                 jsx-a11y/label-has-associated-control
+  102:33   error    The autoFocus prop should not be used, as it can reduce usability and accessibility for users  jsx-a11y/no-autofocus
+
+D:\Projet JdR\feuille-de-perso\src\components\settings\SpecializationLibrarySidebar.tsx
+  12:92   warning  'onUpdate' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  12:102  warning  'onAddLog' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\settings\SpecializationsEditor.tsx
+    3:40  warning  'SkillCategoryKey' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+    4:24  warning  'Award' is defined but never used                                                                                    @typescript-eslint/no-unused-vars
+   15:10  warning  'newlyAddedSpec' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
+   20:7   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+   47:9   error    'newLibrary' is never reassigned. Use 'const' instead                                                                prefer-const
+  132:5   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+D:\Projet JdR\feuille-de-perso\src\components\settings\hooks\useSkillsEditorActions.ts
+  8:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  9:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\settings\skills\SkillCategoryEditor.tsx
+  10:18  warning  Unexpected any. Specify a different type                                                       @typescript-eslint/no-explicit-any
+  98:41  error    The autoFocus prop should not be used, as it can reduce usability and accessibility for users  jsx-a11y/no-autofocus
+
+D:\Projet JdR\feuille-de-perso\src\components\shared\CharacterImageWidget.tsx
+  112:13  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  112:13  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\sheet\CharacterSheetGrid.tsx
+  20:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\sheet\CountersSection.tsx
+   81:70  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   96:13  error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  122:25  error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+D:\Projet JdR\feuille-de-perso\src\components\sheet\CreationModeModal.tsx
+  89:54  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+D:\Projet JdR\feuille-de-perso\src\components\sheet\EditionSidebar.tsx
+  22:25  warning  '_updateData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\sheet\SheetHeader.tsx
+  22:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\sheet\SkillBlock.tsx
+    7:10  warning  'LucideIcon' is defined but never used                                                                                                                                                             @typescript-eslint/no-unused-vars
+   96:13  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+   96:13  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  171:39  warning  Unexpected any. Specify a different type                                                                                                                                                           @typescript-eslint/no-explicit-any
+  263:43  warning  'idx' is defined but never used. Allowed unused args must match /^_/u                                                                                                                              @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\sheet\page2\TraitRow.tsx
+  16:9   error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  16:9   error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  37:17  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  37:17  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\specialization-library\SpecializationLibraryDrawer.tsx
+  30:57  warning  Unexpected any. Specify a different type                                                                                                                                                           @typescript-eslint/no-explicit-any
+  75:25  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  75:25  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\specialization-library\SpecializationLibraryView.tsx
+    2:70  warning  'HelpCircle' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+    2:91  warning  'AlertTriangle' is defined but never used                                                                            @typescript-eslint/no-unused-vars
+  171:13  error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  179:58  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  219:33  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  219:41  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  384:33  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  393:33  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  439:33  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+  452:33  error    A form label must be associated with a control                                                                       jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\specialization-library\SpecializationOmnibar.tsx
+  3:10  warning  'Search' is defined but never used  @typescript-eslint/no-unused-vars
+  3:25  warning  'Plus' is defined but never used    @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\trait-library\TraitCard.tsx
+  36:9  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  36:9  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\trait-library\TraitEffectEditor.tsx
+   81:108  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  111:45   error    A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  127:45   error    A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  139:45   error    A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  155:45   error    A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\trait-library\TraitForm.tsx
+  104:25  error  A form label must be associated with a control                                                 jsx-a11y/label-has-associated-control
+  110:29  error  The autoFocus prop should not be used, as it can reduce usability and accessibility for users  jsx-a11y/no-autofocus
+  114:25  error  A form label must be associated with a control                                                 jsx-a11y/label-has-associated-control
+  126:21  error  A form label must be associated with a control                                                 jsx-a11y/label-has-associated-control
+  137:21  error  A form label must be associated with a control                                                 jsx-a11y/label-has-associated-control
+  177:25  error  A form label must be associated with a control                                                 jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\trait-library\TraitImportModal.tsx
+  116:33  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  116:33  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\trait-library\TraitVariantPicker.tsx
+  22:29  error  A form label must be associated with a control                                                 jsx-a11y/label-has-associated-control
+  37:25  error  A form label must be associated with a control                                                 jsx-a11y/label-has-associated-control
+  40:33  error  The autoFocus prop should not be used, as it can reduce usability and accessibility for users  jsx-a11y/no-autofocus
+
+D:\Projet JdR\feuille-de-perso\src\components\ui\CampaignConflictModal.tsx
+   2:43  warning  'FileJson' is defined but never used                                       @typescript-eslint/no-unused-vars
+   2:63  warning  'X' is defined but never used                                              @typescript-eslint/no-unused-vars
+  18:5   warning  'onClose' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\ui\CampaignInfoModal.tsx
+  23:13  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  23:13  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\ui\RulesStatus.tsx
+  4:21  warning  'CheckCircle' is defined but never used  @typescript-eslint/no-unused-vars
+  4:49  warning  'Clock' is defined but never used        @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\ui\ThematicModal.tsx
+  1:28  warning  'useState' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\ui\VariantSelectionModal.tsx
+    3:24  warning  'PlusCircle' is defined but never used                                                                                                                                                             @typescript-eslint/no-unused-vars
+   88:29  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+   88:29  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  119:25  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  119:25  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  132:29  error    A form label must be associated with a control                                                                                                                                                     jsx-a11y/label-has-associated-control
+
+D:\Projet JdR\feuille-de-perso\src\components\ui\motion\MotionFade.tsx
+  28:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  28:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\context\NotificationContext.tsx
+  1:8  warning  'React' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\extensions\bookImage.ts
+   1:33  warning  'nodeInputRule' is defined but never used  @typescript-eslint/no-unused-vars
+  95:55  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\extensions\chapterHeading.ts
+   3:10  warning  'TextSelection' is defined but never used                                   @typescript-eslint/no-unused-vars
+  42:33  warning  Unexpected any. Specify a different type                                    @typescript-eslint/no-explicit-any
+  49:41  warning  'tr' is defined but never used. Allowed unused args must match /^_/u        @typescript-eslint/no-unused-vars
+  49:45  warning  'dispatch' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  49:57  warning  Unexpected any. Specify a different type                                    @typescript-eslint/no-explicit-any
+  57:14  warning  Unexpected any. Specify a different type                                    @typescript-eslint/no-explicit-any
+  61:59  warning  Unexpected any. Specify a different type                                    @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\hooks\layout\useRulesSync.ts
+  5:10  warning  'ErrorService' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\hooks\library\useSkillLibrary.ts
+   33:34  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+   77:13  error    'newData' is never reassigned. Use 'const' instead  prefer-const
+   86:69  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  157:58  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  163:41  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  179:33  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  179:41  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\hooks\settings\useSettingsManager.ts
+  24:17  warning  'appLogs' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  24:26  warning  'xpLogs' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  24:34  warning  'experience' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\hooks\sheet\useTraitEditor.ts
+  1:31  warning  'useCallback' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\hooks\sheet\useVariableSkills.ts
+   13:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   14:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\hooks\useCharacterSheetActions.ts
+   17:24  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  107:17  error    'updatedSkills' is never reassigned. Use 'const' instead  prefer-const
+  168:88  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\hooks\useSheetLayout.ts
+  3:21  warning  'SkillBehavior' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\hooks\useTraitActions.ts
+   37:15  warning  'source' is assigned a value but never used            @typescript-eslint/no-unused-vars
+  114:13  error    'newLibrary' is never reassigned. Use 'const' instead  prefer-const
+  148:84  warning  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\hooks\useTraitLibrary.ts
+   1:19  warning  'useState' is defined but never used             @typescript-eslint/no-unused-vars
+   2:30  warning  'LibraryEntry' is defined but never used         @typescript-eslint/no-unused-vars
+   4:26  warning  'MergedEntry' is defined but never used          @typescript-eslint/no-unused-vars
+  33:13  error    'list' is never reassigned. Use 'const' instead  prefer-const
+
+D:\Projet JdR\feuille-de-perso\src\services\AttributeService.ts
+  37:77  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\services\CampaignIntegration.test.ts
+   32:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   77:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  155:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  156:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\services\CampaignService.ts
+    1:10  warning  'supabase' is defined but never used  @typescript-eslint/no-unused-vars
+  336:18  warning  'e' is defined but never used         @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\services\CharacterSyncService.ts
+   54:21  warning  'syncInfo' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  159:30  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  159:79  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\services\DatabaseService.ts
+   15:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   69:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  117:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  117:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  205:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\services\ErrorService.ts
+  41:75   warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  41:109  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  44:9    warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  46:26   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  50:9    warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+D:\Projet JdR\feuille-de-perso\src\services\ImageCompressionService.ts
+  237:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  237:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  244:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\services\ImageSyncResolver.ts
+   18:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   18:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   25:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   46:74  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   48:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   57:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   63:92  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:26  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+   96:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   96:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  117:74  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  130:84  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:26  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\services\RuleCalculationsService.ts
+    2:59  warning  'SkillCategoryKey' is defined but never used                            @typescript-eslint/no-unused-vars
+  254:38  warning  'list' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\services\RulesLoader.test.ts
+    1:48  warning  'afterEach' is defined but never used     @typescript-eslint/no-unused-vars
+  140:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\services\RulesLoader.ts
+  133:9  error  Unreachable code  no-unreachable
+
+D:\Projet JdR\feuille-de-perso\src\services\library\LibraryImporter.ts
+  3:10  warning  'ErrorService' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\services\library\LibraryLoader.ts
+  130:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\services\library\LibraryPersistence.ts
+    1:10  warning  'supabase' is defined but never used           @typescript-eslint/no-unused-vars
+    4:26  warning  'LibraryTraitEntry' is defined but never used  @typescript-eslint/no-unused-vars
+    5:31  warning  'LibraryTypeKey' is defined but never used     @typescript-eslint/no-unused-vars
+   15:54  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   25:29  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   26:27  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   28:34  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   33:33  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   41:36  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   67:33  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   85:54  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   89:32  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  119:57  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  121:59  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  122:33  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  140:40  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  141:45  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\test\RulesContext.test.tsx
+   3:35  warning  'act' is defined but never used           @typescript-eslint/no-unused-vars
+  59:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\test\background_migration.test.ts
+   40:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   85:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  158:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\test\bug_reproduction.test.ts
+   14:16  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   47:82  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   96:14  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  102:9   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  118:14  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  124:9   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+D:\Projet JdR\feuille-de-perso\src\test\counter_cost.test.ts
+  26:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\test\counter_e2e.test.ts
+  28:14  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  31:13  error    'character' is never reassigned. Use 'const' instead  prefer-const
+
+D:\Projet JdR\feuille-de-perso\src\test\fixtures\legacy-data.ts
+  238:5  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+D:\Projet JdR\feuille-de-perso\src\test\library\LibraryImporter.test.ts
+  20:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  50:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  51:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  69:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\test\mechanics.test.ts
+   43:9   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  113:18  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  140:18  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\test\migrations.test.ts
+    1:32  warning  'beforeEach' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+    3:10  warning  'INITIAL_DATA' is defined but never used                                                                             @typescript-eslint/no-unused-vars
+   33:13  error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+   42:13  error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+   87:65  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   88:41  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  110:13  error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  118:76  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  134:48  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  135:50  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  141:48  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  142:50  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  148:48  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  149:50  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  167:52  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  168:52  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  181:54  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  182:13  error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  191:54  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  199:54  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  207:54  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  274:59  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  288:71  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  325:49  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  326:13  error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  353:49  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  354:49  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  475:71  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  478:72  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\test\reconciler.test.ts
+  27:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  59:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\test\rules_reconciliation_duplication.test.ts
+  34:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\test\xp_cost_repro.test.ts
+   3:30  warning  'DotEntry' is defined but never used      @typescript-eslint/no-unused-vars
+  19:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\test\xp_counter_repro.test.ts
+  30:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  61:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\types\database.ts
+  85:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  86:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\types\global.d.ts
+  2:10  warning  'RulesData' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\utils\book\BookPageSplitter.ts
+  1:43  warning  'PAGE_CONTENT_WIDTH' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\utils\characterUtils.ts
+  20:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  50:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  51:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  77:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\factories.ts
+   4:76  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  13:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\importExportUtils.ts
+  11:139  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:40   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  50:28   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  51:27   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\libraryMerger.ts
+  2:10  warning  'LibraryEntry' is defined but never used       @typescript-eslint/no-unused-vars
+  2:24  warning  'LibrarySkillEntry' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\utils\logger.ts
+   9:20  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  11:13  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  18:21  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  27:22  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  34:21  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  36:13  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\index.ts
+  15:37  warning  Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+  25:9   error    'migrated' is never reassigned. Use 'const' instead  prefer-const
+  71:41  warning  Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\migrateAttributes.ts
+   34:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   42:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   63:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  102:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\migrateBookImages.ts
+   8:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   8:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\migrateCampaignNotes.ts
+   5:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\migrateCounters.ts
+   8:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  35:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\migrateDefaults.ts
+  11:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  70:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\migrateLibrary.ts
+  12:40  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  14:5   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  16:9   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  18:9   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  32:40  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  62:41  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  77:49  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\migrateNotebook.ts
+   7:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\migrateSkills.ts
+  34:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  68:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  94:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\migrateSpecializations.ts
+   7:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\migrateTerminology.ts
+  6:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\migrateTraits.ts
+  6:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\migrations\registry.ts
+   1:10  warning  'CharacterSheetData' is defined but never used  @typescript-eslint/no-unused-vars
+  16:33  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\utils\reconcilers\skillsReconciler.ts
+  189:17  error  'matchingExisting' is never reassigned. Use 'const' instead  prefer-const
+
+D:\Projet JdR\feuille-de-perso\src\utils\rulesReconciler.ts
+  6:10  warning  'getSkillCategory' is defined but never used  @typescript-eslint/no-unused-vars
+  6:28  warning  'getCounter' is defined but never used        @typescript-eslint/no-unused-vars
+  6:40  warning  'setCounter' is defined but never used        @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\tests\debug.spec.ts
+  2:23  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+D:\Projet JdR\feuille-de-perso\tests\journal-overflow.spec.ts
+  10:13  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  42:5   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+D:\Projet JdR\feuille-de-perso\tests\offline-sync.spec.ts
+  10:17  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  45:13  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  53:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  58:57  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  60:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  66:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  83:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  91:65  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  92:33  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  96:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+D:\Projet JdR\feuille-de-perso\tests\pagination.spec.ts
+  45:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  49:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  51:9  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+D:\Projet JdR\feuille-de-perso\tests\rules-stress.spec.ts
+   8:35  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  12:13  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  18:13  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  34:57  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  39:35  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  55:64  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  60:13  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  67:57  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  72:35  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  91:65  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  92:25  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+Ô£û 595 problems (138 errors, 457 warnings)
+  10 errors and 0 warnings potentially fixable with the `--fix` option.
+

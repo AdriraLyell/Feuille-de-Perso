@@ -87,9 +87,12 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
                     {/* Database Presets */}
                     {dbPresets.map(preset => (
-                        <button
+                        <div
                             key={preset.id}
                             onClick={() => onLoadRequested(preset)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onLoadRequested(preset); } }}
+                            role="button"
+                            tabIndex={0}
                             className="relative bg-stone-950/50 border border-stone-700/50 hover:border-amber-500/50 hover:bg-stone-900 rounded-sm p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[105px] shadow-sm hover:shadow-glow-gold"
                             title={`Charger le préréglage : ${preset.name}`}
                         >
@@ -104,7 +107,7 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                     <Pencil size={12} />
                                 </button>
                                 {preset.isOfficial ? (
-                                    <span title="Officiel" className="p-0.5">
+                                    <span title="Officiel" className="p-0.5" aria-hidden="true">
                                         <Shield size={12} className="text-amber-500/50 fill-amber-500/10" />
                                     </span>
                                 ) : (
@@ -162,14 +165,17 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                 </span>
                                 <Play size={10} className="text-stone-700 group-hover/card:text-amber-500 shrink-0 transition-colors" />
                             </div>
-                        </button>
+                        </div>
                     ))}
 
                     {/* Fallback to hardcoded if DB empty and not loading */}
                     {!isLoading && dbPresets.length === 0 && ATTRIBUTE_PRESETS.map((preset, idx) => (
-                        <button
+                        <div
                             key={`hc-${idx}`}
                             onClick={() => onLoadRequested(preset as AttributePreset)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onLoadRequested(preset as AttributePreset); } }}
+                            role="button"
+                            tabIndex={0}
                             className="relative bg-stone-950/50 border border-stone-700/50 hover:border-amber-500/50 hover:bg-stone-900 rounded-sm p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[105px] shadow-sm hover:shadow-glow-gold"
                             title={`Charger le préréglage : ${preset.name}`}
                         >
@@ -184,7 +190,7 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                     <Pencil size={12} />
                                 </button>
                                 {preset.isOfficial && (
-                                    <span title="Officiel" className="p-0.5">
+                                    <span title="Officiel" className="p-0.5" aria-hidden="true">
                                         <Shield size={12} className="text-amber-500/50 fill-amber-500/10" />
                                     </span>
                                 )}
@@ -230,7 +236,7 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                 </span>
                                 <Play size={10} className="text-stone-700 group-hover/card:text-amber-500 shrink-0 transition-colors" />
                             </div>
-                        </button>
+                        </div>
                     ))}
                 </div>
             </div>

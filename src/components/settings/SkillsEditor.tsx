@@ -99,7 +99,6 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                                 className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm text-lg"
                                 value={variantInput}
                                 onChange={(e) => setVariantInput(e.target.value)}
-                                autoFocus
                                 onKeyDown={(e) => e.key === 'Enter' && confirmVariableSkill()}
                             />
 

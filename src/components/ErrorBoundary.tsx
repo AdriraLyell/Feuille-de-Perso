@@ -60,6 +60,8 @@ class ErrorBoundary extends Component<Props, State> {
                         }}
                         onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'}
                         onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
+                        onFocus={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'}
+                        onBlur={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
                     >
                         Recharger l'application
                     </button>

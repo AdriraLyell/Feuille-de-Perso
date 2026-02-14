@@ -12,8 +12,7 @@ export const migrateGlobalSkills = async () => {
         return { success: false, message: "No initial skills items found." };
     }
 
-    let successCount = 0;
-    let errorCount = 0;
+
 
     // 1. Check if we already have global skills (safety check)
     const { count, error: countError } = await supabase

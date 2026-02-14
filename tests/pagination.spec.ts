@@ -1,54 +1,32 @@
 import { test, expect } from '@playwright/test';
 
 test('journal pagination should work with contentEditable', async ({ page }) => {
-    test.setTimeout(90000);
-    
-    await page.goto('http://localhost:5173');
+    await page.goto('/');
+
+    // Select Hors Ligne to enter the app (uses default character)
+    await page.click('text=Hors Ligne');
+
+    // Wait for app to load with default character
     await page.waitForTimeout(2000);
 
-    // Create character
-    const createBtn = page.locator('button').first();
-    await createBtn.click();
-    await page.waitForTimeout(1000);
+    // Navigate to Campaign Notes
+    await page.click('text=Notes de Campagne');
 
-    const nameInput = page.locator('input').first();
-    await nameInput.fill('TestChar');
-    await page.waitForTimeout(500);
+    // Wait for the editor to be mounted
+    const editor = page.locator('.ProseMirror').first();
+    await expect(editor).toBeVisible({ timeout: 20000 });
+    await editor.click();
 
-    const okBtn = page.locator('button').nth(2);
-    await okBtn.click();
-    await page.waitForTimeout(2000);
+    // Insert 100 lines instantly (instead of typing char by char)
+    const content = Array.from({ length: 100 }, (_, i) => `Line ${i + 1}`).join('\n');
+    await page.keyboard.insertText(content);
 
-    // Create first journal entry by clicking "Nouvelle Page"
-    const newPageBtn = page.locator('button').filter({ hasText: /Nouvelle|New/ }).first();
-    if (await newPageBtn.isVisible()) {
-        await newPageBtn.click();
-        await page.waitForTimeout(1500);
-    }
-
-    // Type content (45 lines to trigger pagination)
-    const editor = page.locator('[contenteditable]').first();
-    if (await editor.isVisible()) {
-        await editor.click();
-        
-        let content = '';
-        for (let i = 0; i < 45; i++) {
-            content += `Line ${i + 1}\n`;
-        }
-        
-        await editor.type(content);
-        await page.waitForTimeout(3000);
-
-        // Check if pagination happened
-        const pages = page.locator('.journal-page');
-        const count = await pages.count();
-        console.log(`Found ${count} journal pages after typing 45 lines`);
-
-        // The test passes if we have more than 1 page after typing
-        expect(count).toBeGreaterThan(1);
-        console.log('✅ Pagination works!');
-    } else {
-        console.log('❌ No editor found');
-        expect(false).toBe(true); // Force fail
-    }
+    // Wait for pagination to complete by polling
+    const pages = page.locator('.journal-page');
+    await expect.poll(async () => {
+        return await pages.count();
+    }, {
+        message: 'Expected more than 2 journal pages after inserting 100 lines',
+        timeout: 15000,
+    }).toBeGreaterThan(2);
 });

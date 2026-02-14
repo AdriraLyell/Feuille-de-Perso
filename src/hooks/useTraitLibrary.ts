@@ -30,7 +30,7 @@ export const useTraitLibrary = (
     }, [hybridList]);
 
     const processedList = useMemo(() => {
-        let list = hybridList.filter(m => {
+        const list = hybridList.filter(m => {
             const entry = m.entry;
             const entryTags = entry.tags || [];
             const matchesSearch = smartIncludes(entry.name, searchTerm) ||

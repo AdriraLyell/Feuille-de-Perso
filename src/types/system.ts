@@ -105,9 +105,7 @@ export interface LibrarySpecializationEntry {
   globalUsage?: number;
 }
 
-export interface LibraryBackgroundEntry extends LibrarySkillEntry {
-  // Same structure as Skill for now (id, name, desc, isVariable...)
-}
+export type LibraryBackgroundEntry = LibrarySkillEntry;
 
 export interface LibraryCounterEntry {
   id: string;

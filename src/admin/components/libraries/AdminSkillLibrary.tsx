@@ -420,12 +420,12 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="flex flex-col gap-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nom</label>
+                                    <label htmlFor="skill-name" className="block text-xs font-bold text-slate-500 uppercase mb-1">Nom</label>
                                     <input
+                                        id="skill-name"
                                         className="w-full border border-slate-300 rounded px-3 py-2 font-bold focus:border-blue-500 outline-none"
                                         value={editingSkill.name}
                                         onChange={(e) => setEditingSkill({ ...editingSkill, name: e.target.value })}
-                                        autoFocus
                                     />
                                 </div>
                                 <div className="bg-blue-50 border border-blue-200 rounded p-3 flex items-center gap-3">
@@ -443,8 +443,9 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                 </div>
                                 {editingSkill.isVariable && (
                                     <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Exemples de variantes (séparés par des virgules)</label>
+                                        <label htmlFor="skill-variants" className="block text-xs font-bold text-slate-500 uppercase mb-1">Exemples de variantes (séparés par des virgules)</label>
                                         <input
+                                            id="skill-variants"
                                             className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 outline-none"
                                             placeholder="Ex: Forge, Menuiserie, Peinture..."
                                             value={variantDraft}
@@ -454,8 +455,9 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                 )}
                             </div>
                             <div className="flex flex-col">
-                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Description</label>
+                                <label htmlFor="skill-description" className="block text-xs font-bold text-slate-500 uppercase mb-1">Description</label>
                                 <textarea
+                                    id="skill-description"
                                     className="w-full flex-grow border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 outline-none resize-none min-h-[120px]"
                                     value={editingSkill.description || ''}
                                     onChange={(e) => setEditingSkill({ ...editingSkill, description: e.target.value })}

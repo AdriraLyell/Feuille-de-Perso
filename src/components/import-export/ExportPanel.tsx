@@ -118,8 +118,6 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                 exportData = { specializationLibrary: data.specializationLibrary, appVersion: APP_VERSION };
                 filename = `${timestamp}_Biblio_Specialisations`;
                 break;
-                filename = `${timestamp}_Biblio_Complete`;
-                break;
         }
 
         // --- COMPRESS IMAGES IN EXPORT DATA ---

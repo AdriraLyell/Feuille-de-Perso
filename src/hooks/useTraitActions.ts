@@ -111,7 +111,7 @@ export const useTraitActions = (
 
     const handleImportTraits = useCallback((importedEntries: LibraryEntry[]) => {
         const local = (data && Array.isArray(data.library)) ? data.library : [];
-        let newLibrary = [...local];
+        const newLibrary = [...local];
 
         importedEntries.forEach(entry => {
             const index = newLibrary.findIndex(l => l.id === entry.id);

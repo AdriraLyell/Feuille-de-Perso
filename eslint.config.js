@@ -21,6 +21,14 @@ export default tseslint.config(
             '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
             'no-console': ['warn', { allow: ['warn', 'error'] }],
             ...jsxA11y.configs.recommended.rules,
+            'jsx-a11y/label-has-associated-control': ['warn', {
+                assert: 'either',
+                depth: 3,
+                controlComponents: ['input', 'select', 'textarea'],
+            }],
+            'jsx-a11y/no-static-element-interactions': 'warn',
+            'jsx-a11y/click-events-have-key-events': 'warn',
+            'jsx-a11y/no-autofocus': 'warn',
         },
     },
     {

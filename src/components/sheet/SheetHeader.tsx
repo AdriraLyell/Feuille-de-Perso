@@ -37,7 +37,7 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
         <>
             {/* Main Title */}
             <div className="py-3 border-b-2 border-stone-800 bg-white relative flex justify-center items-center">
-                <h1 className="text-4xl font-black text-center uppercase tracking-[0.2em] text-indigo-950 font-serif">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-center uppercase tracking-[0.1em] sm:tracking-[0.2em] text-indigo-950 font-serif px-4">
                     Seigneurs des Mystères
                 </h1>
                 {/* Action Buttons */}

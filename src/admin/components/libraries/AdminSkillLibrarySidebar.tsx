@@ -62,7 +62,7 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
 
             // 2. Add to Library (if not exists)
             const existingInLib = (rules.libraries.skills || []).find(l => l.name === skillName);
-            let newLib = [...(rules.libraries.skills || [])];
+            const newLib = [...(rules.libraries.skills || [])];
 
             if (!existingInLib && skillName.trim() !== '') {
                 const newLibEntry: LibrarySkillEntry = {
@@ -231,7 +231,6 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                                 <div className="px-2 pb-2 bg-stone-950/30 flex items-center justify-between border-t border-stone-800 pt-1">
                                     {editingCategory === item.id ? (
                                         <select
-                                            autoFocus
                                             className="text-[10px] bg-stone-950 border border-stone-700 rounded-sm px-1 py-0.5 w-full outline-none focus:border-amber-500 text-stone-300"
                                             value={item.defaultCategory || ''}
                                             onChange={(e) => {

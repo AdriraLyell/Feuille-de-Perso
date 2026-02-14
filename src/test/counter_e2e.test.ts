@@ -28,7 +28,7 @@ describe('Counter Cost E2E Simulation', () => {
         } as any;
 
         // 2. Reconcile initial data with these rules
-        let character = reconcileRulesWithState(INITIAL_DATA, rules);
+        const character = reconcileRulesWithState(INITIAL_DATA, rules);
 
         // 3. Set a value (simulate user clicking dots)
         // Find Volonté in skills

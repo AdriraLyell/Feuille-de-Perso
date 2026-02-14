@@ -1,6 +1,6 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.49.15)
+# Audit - État des Lieux & Roadmap (Synthèse v2.49.22)
 
-> **Dernière mise à jour** : 2026-02-14 — Version 2.49.15
+> **Dernière mise à jour** : 2026-02-14 — Version 2.49.22
 
 ## 1. Phases Complétées
 
@@ -16,6 +16,11 @@
 - [x] **Event Handlers Génériques** : Typage strict des mises à jour complexes (`keyof T`) dans les éditeurs Admin.
 - [x] **Constantes** : Réorganisation de `src/constants.ts` vers `src/constants/app.ts` pour une meilleure maintenance.
 - [x] **Accessibilité Admin** : Correction des erreurs d'accessibilité (labels, boutons) bloquant la CI dans `AttributePresetManager`, `LoginScreen`, `DuplicateSettingModal`.
+
+### ✅ Phase 13 : Stabilité E2E & CI (v2.49.22)
+- [x] **Workflows GitHub** : Optimisation turbo (cache, suppression des doublons, exécution sur build de production).
+- [x] **Tests E2E** : Migration des tests vers le nouveau Grimoire Digital (TiPTap + CSS Columns) et correction des sélecteurs de démarrage.
+- [x] **Performance CI** : Réduction du temps de run de ~3 minutes grâce au cache Playwright.
 
 ## 2. Issues Restantes & Roadmap
 

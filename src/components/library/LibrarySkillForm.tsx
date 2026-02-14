@@ -66,7 +66,6 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
                             className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm"
                             value={skill.name}
                             onChange={(e) => onSkillChange({ ...skill, name: e.target.value })}
-                            autoFocus
                         />
                     </div>
                     <div>

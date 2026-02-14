@@ -22,7 +22,7 @@ export const migrateData = (parsed: any): CharacterSheetData => {
     }
 
     // Deep copy to prevent mutating the original until success
-    let migrated = JSON.parse(JSON.stringify(parsed));
+    const migrated = JSON.parse(JSON.stringify(parsed));
     let migrationsApplied = 0;
     const failedSteps: { version: number, index: number, error: string }[] = [];
 

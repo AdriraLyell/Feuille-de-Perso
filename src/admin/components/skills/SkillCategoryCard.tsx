@@ -91,8 +91,9 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
                 </div>
 
                 <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-stone-500 uppercase tracking-wider">Description (Bulle d'info)</label>
+                    <label htmlFor={`category-desc-${id}`} className="text-[9px] font-bold text-stone-500 uppercase tracking-wider">Description (Bulle d'info)</label>
                     <textarea
+                        id={`category-desc-${id}`}
                         value={categoryConfig.description || ''}
                         onChange={(e) => onUpdateCategory({ description: e.target.value })}
                         className="w-full bg-stone-950 border border-stone-700 rounded-sm p-1.5 text-[10px] text-stone-300 outline-none resize-none h-12 shadow-inner focus:border-amber-500 transition-colors placeholder-stone-700"
