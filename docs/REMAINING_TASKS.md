@@ -1,26 +1,23 @@
-# État des lieux - Tâches restantes (v2.49.11)
+# Tâches Restantes — Finalisation Admin & Layout
 
-## 🎯 Priorités Immédiates
+Statut global : ✅ **Complété**
 
-### 1. Issue 4.2 — Fin du Typage Strict (Haut)
-Il reste deux phases majeures du plan `PLAN_ISSUES_MOYENNES.md` :
-- [ ] **Phase C** : Typer les handlers d'événements dans l'administration (environ 7 fichiers concernés : `AdminCountersEditor`, `AdminCreationEditor`, `AdminSkillsEditor`, `PartyTable`, `AdminTraitLibrary`).
-- [ ] **Phase E** : Typer le layout dynamique (`useSheetLayout.ts` et `CharacterSheet.tsx`). C'est une partie complexe car elle touche à la structure même de l'affichage des colonnes.
+## 🎯 Task list
 
-### 2. Issue 4.1 — Adoption du Logger (Moyen)
-- [x] Remplacer les **15 `console.log`** restants par l'usage de `src/utils/logger.ts`. (Terminé en v2.49.12)
-- [x] S'assurer que les erreurs critiques utilisent `ErrorService`. (Vérifié)
+- [x] **Issue 4.2 — Phase E : Typer le layout dynamique**
+  - [x] Typer `useSheetLayout.ts` (interfaces `SheetLayout`, `SheetColumn`, `SkillBlock`).
+  - [x] Typer le retour de `getDynamicColumns`.
+  - [x] Sécuriser le mapping des catégories de compétences (Landscape/Portrait).
+- [x] **Issue 4.3 — Hygiène des fichiers (Moyen) : Extraire les composants monolithiques**
+  - [x] Extraire le rendu de la grille dynamique de `CharacterSheet.tsx` vers `CharacterSheetGrid.tsx`.
+  - [x] Nettoyer `CharacterSheet.tsx` en utilisant le nouveau composant.
+- [x] **Issue 5.1 — Standardisation des variables CSS (Restant)**
+  - [x] Remplacer les couleurs "magiques" (white/black) par des variables CSS dans `index.css`.
+- [x] **Vérification & Nettoyage Final**
+  - [x] Confirmer la suppression de `tiptap-pagination-plus`.
+  - [x] Incrémenter la version (`2.49.14`).
+  - [x] Mettre à jour `src/data/changelog.json`.
+  - [x] Build final de vérification (`npm run build`).
 
-### 3. Issue 4.3 — Hygiène des fichiers (Moyen)
-- [x] Vérifier si `admin/components/AdventureLog.tsx` ou d'autres nouveaux fichiers dépassent les 400 lignes. (Vérifié : GlobalPlayersView=246, DeployModal=234, CharacterSheet=339, SettingsView=337).
-- [ ] Extraire les composants monolithiques si nécessaire.
-
-## 🛠️ Suggestions QoL (Quality of Life)
-- [ ] **Nettoyage package.json** : Retirer `tiptap-pagination-plus` qui n'est plus utilisé.
-- [x] **Quota IndexedDB** : Indicateur visuel et alertes sur le stockage navigateur (Intégré dans Settings > Cloud).
-- [x] **Fusion des constantes** : Regroupement dans `src/constants/app.ts` (Effectué).
-- [x] **Admin : Taille des données** : Affichage de l'occupation JSONB par personnage (Effectué).
-
-## 📈 Score Global
-- **13/15** Correctifs appliqués.
-- Les fondations (Cloud, Sync, Variables CSS, Types de base, Monitoring) sont solides.
+---
+Fin de sprint de typage et refactoring.

@@ -1,5 +1,19 @@
 [
     {
+        "version": "2.49.14",
+        "date": "2026-02-14",
+        "type": "refactor",
+        "content": "🏗️ Architecture & Typing Phase E : Finalisation du typage dynamique du layout, extraction du composant `CharacterSheetGrid` et nettoyage des dépendances obsolètes.",
+        "major": false
+    },
+    {
+        "version": "2.49.13",
+        "date": "2026-02-14",
+        "type": "refactor",
+        "content": "🛡️ Typage Phase C : Éradication des `any` restants dans l'admin, refactoring du reconciler de compétences et consolidation des variables CSS.",
+        "major": false
+    },
+    {
         "version": "2.49.12",
         "date": "2026-02-14",
         "type": "chore",
@@ -199,18 +213,6 @@
             "🖱️ Déplacement : Activation du Drag & Drop natif pour déplacer les images dans le flow du texte",
             "🧹 Nettoyage : Suppression du filtre Sépia (obsolète)",
             "🏗️ Stabilité : Correction des types d'images et nettoyage des imports"
-        ]
-    },
-    {
-        "version": "2.48.15",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🔳 Images : Ajout de poignées de redimensionnement multidirectionnelles",
-            "↔️ Axe Horizontal : Nouvelle barre latérale pour ajuster uniquement la largeur (avec magnétisme)",
-            "↕️ Axe Vertical : Nouvelle barre inférieure pour ajuster uniquement la hauteur",
-            "📐 Coin Diagonal : Conservation de la poignée de coin pour un redimensionnement libre",
-            "🖱️ Ergonomie : Curseurs contextuels indiquant l'axe de redimensionnement"
         ]
     }
 ]

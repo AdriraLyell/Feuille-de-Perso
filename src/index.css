@@ -30,6 +30,9 @@
   --color-focus-blue: rgba(59, 130, 246, 0.05);
   --color-glass-shadow: rgba(0, 0, 0, 0.1);
   --color-print-hr: #cccccc;
+  /* Utility Colors */
+  --color-white: #ffffff;
+  --color-black: #000000;
 
   /* Shadows */
   --shadow-sheet: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -128,7 +131,7 @@ body {
   }
 
   body {
-    background-color: white;
+    background-color: var(--color-white);
     margin: 0;
     padding: 0;
     -webkit-print-color-adjust: exact;
@@ -190,7 +193,7 @@ body {
     border: none !important;
     box-shadow: none !important;
     margin: 0 !important;
-    background-color: white !important;
+    background-color: var(--color-white) !important;
     /* Save Ink */
     zoom: var(--print-zoom-portrait);
     overflow: hidden;
@@ -202,11 +205,11 @@ body {
 
   /* Input styling for print */
   .sheet-input {
-    color: black !important;
+    color: var(--color-black) !important;
   }
 
   .text-ink {
-    color: black !important;
+    color: var(--color-black) !important;
   }
 
   input {

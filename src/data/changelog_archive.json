@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.48.15",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🔳 Images : Ajout de poignées de redimensionnement multidirectionnelles",
+            "↔️ Axe Horizontal : Nouvelle barre latérale pour ajuster uniquement la largeur (avec magnétisme)",
+            "↕️ Axe Vertical : Nouvelle barre inférieure pour ajuster uniquement la hauteur",
+            "📐 Coin Diagonal : Conservation de la poignée de coin pour un redimensionnement libre",
+            "🖱️ Ergonomie : Curseurs contextuels indiquant l'axe de redimensionnement"
+        ]
+    },
+    {
         "version": "2.48.14",
         "date": "2026-02-13",
         "type": "patch",
@@ -1393,28 +1405,6 @@
                 "type": "improved",
                 "text": "Standardisation de la génération d'ID via UUID pour une meilleure compatibilité avec Supabase.",
                 "category": "core"
-            }
-        ]
-    },
-    {
-        "version": "2.30.2",
-        "date": "2026-02-09",
-        "description": "Optimisation Admin v2.",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Rétablissement de la suppression pour les items de bibliothèque partagés (Repository).",
-                "category": "fix"
-            },
-            {
-                "type": "improved",
-                "text": "Refonte ergonomique de la modale d'édition des compétences (meilleur équilibre Nom/Description/Variante).",
-                "category": "ui"
-            },
-            {
-                "type": "removed",
-                "text": "Nettoyage des items dupliqués entre les bibliothèques de compétences, compteurs et historiques.",
-                "category": "cleanup"
             }
         ]
     }

@@ -1,7 +1,13 @@
-
 import { RulesData } from '../../types/rules';
 import { INITIAL_DATA } from '../../data/initialState';
 import { logger } from '../../utils/logger';
+import { DotEntry, AttributeEntry } from '../../types';
+
+declare global {
+    interface Window {
+        EXTERNAL_RULES?: RulesData;
+    }
+}
 
 /**
  * Generates a default RulesData object based on the Application's hardcoded Initial State.
@@ -11,7 +17,7 @@ export const generateDefaultRules = (): RulesData => {
     const data = INITIAL_DATA;
 
     // Helper to extract names
-    const extractNames = (list: any[]): string[] => {
+    const extractNames = (list: (DotEntry | AttributeEntry)[] | undefined): string[] => {
         if (!Array.isArray(list)) return [];
         return list.map(item => item.name || "");
     };
@@ -20,7 +26,6 @@ export const generateDefaultRules = (): RulesData => {
     const skillDefs: Record<string, string[]> = {};
     if (data.skills) {
         Object.keys(data.skills).forEach(key => {
-            // @ts-ignore
             skillDefs[key] = extractNames(data.skills[key]);
         });
     }
@@ -43,8 +48,7 @@ export const generateDefaultRules = (): RulesData => {
     if (data.counters) {
         Object.keys(data.counters).forEach(key => {
             if (key === 'custom') return;
-            // @ts-ignore
-            const c = data.counters[key];
+            const c = (data.counters as Record<string, any>)[key];
             if (c && !Array.isArray(c)) {
                 counterDefs[key] = {
                     id: key,
@@ -61,6 +65,8 @@ export const generateDefaultRules = (): RulesData => {
         : [];
 
     return {
+        settingId: "standard-rules",
+        settingName: "Règles Standard",
         version: "2.12.55",
         configurations: {
             creation: data.creationConfig,
@@ -121,9 +127,7 @@ export const generateDefaultRules = (): RulesData => {
 };
 
 export const loadRules = (): RulesData => {
-    // @ts-ignore
     if (window.EXTERNAL_RULES) {
-        // @ts-ignore
         return window.EXTERNAL_RULES;
     }
 

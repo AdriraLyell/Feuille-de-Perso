@@ -9,8 +9,8 @@ interface ConfigQuickSummaryProps {
     onUpdateVersion: (v: string) => void;
     config: RulesCreationConfig;
     xpCosts: RulesXPCosts;
-    updateCreationConfig: (field: keyof RulesCreationConfig, value: any) => void;
-    updateXPCost: (field: keyof RulesXPCosts, value: any) => void;
+    updateCreationConfig: <K extends keyof RulesCreationConfig>(field: K, value: RulesCreationConfig[K]) => void;
+    updateXPCost: <K extends keyof RulesXPCosts>(field: K, value: RulesXPCosts[K]) => void;
 }
 
 export const ConfigQuickSummary: React.FC<ConfigQuickSummaryProps> = ({
