@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 import { MotionCard } from '../../components/ui/motion/MotionCard';
 import ThematicButton from '../../components/ui/ThematicButton';
-import { APP_VERSION } from '../../constants';
+import { REPO_OWNER, REPO_NAME, APP_VERSION } from '../../constants/app';
 
 const LoginScreen: React.FC = () => {
     const [email, setEmail] = useState('');

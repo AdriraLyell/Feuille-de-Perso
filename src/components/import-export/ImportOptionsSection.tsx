@@ -2,7 +2,7 @@ import React from 'react';
 import {
     AlertTriangle, User, FileBox, LayoutTemplate, Merge, RefreshCw, GraduationCap, BookOpen, Award
 } from 'lucide-react';
-import { APP_VERSION } from '../../constants';
+import { APP_VERSION } from '../../constants/app';
 
 interface ImportOptionsSectionProps {
     analysis: {

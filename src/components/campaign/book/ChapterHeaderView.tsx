@@ -23,7 +23,7 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
             // TextSelection. This is much more robust than DOM selection.
             const timer = setTimeout(() => {
                 try {
-                    const pos = getPos();
+                    const pos = (getPos as () => number)();
                     // In ProseMirror, the text starts at getPos() + 1
                     const from = pos + 1;
                     const to = from + node.content.size;
@@ -58,7 +58,7 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
             if ('showPicker' in dateInputRef.current) {
                 (dateInputRef.current as any).showPicker();
             } else {
-                dateInputRef.current.click();
+                (dateInputRef.current as HTMLInputElement).click();
             }
         }
     };

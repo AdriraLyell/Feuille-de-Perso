@@ -1,5 +1,5 @@
 import { RulesData } from '../types/rules';
-import { RAW_RULES_URL, REPO_OWNER, REPO_NAME } from '../constants';
+import { RAW_RULES_URL, REPO_OWNER, REPO_NAME } from '../constants/app';
 import { ErrorService } from './ErrorService';
 import { CampaignService } from './CampaignService';
 import { logger } from '../utils/logger';

@@ -1,6 +1,9 @@
 import { JSONContent } from '@tiptap/core';
 
 export interface BookDocument {
+    id?: string;
+    createdAt?: string;
+    updatedAt?: string;
     content: JSONContent;
     formatVersion: number;
 }
@@ -26,6 +29,7 @@ export interface NoteImage {
     id: string; // Unique placement ID
     imageId: string; // IndexedDB Blob ID
     config: ImageConfig;
+    base64Data?: string; // For Export/Import transit
 }
 
 export interface CampaignNoteEntry {

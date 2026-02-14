@@ -1,3 +1,5 @@
+import { TraitEffect } from './primitives';
+
 /**
  * Database model for traits (avantages/défauts)
  */
@@ -11,7 +13,7 @@ export interface DBTrait {
     type?: string;           // 'avantage' | 'desavantage'
     tags?: string[];
     is_variable?: boolean;
-    effects?: any[];         // JSONB: List of effects
+    effects?: TraitEffect[];         // JSONB: List of effects
     created_at?: string;
     updated_at?: string;
 }

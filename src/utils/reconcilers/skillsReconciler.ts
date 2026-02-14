@@ -8,14 +8,18 @@ import { getSkillCategory } from '../stateAccessors';
  * Synchronizes skills and backgrounds with rule definitions.
  * Extracted from rulesReconciler.ts for better maintainability.
  */
-export const reconcileSkillsAndBackgrounds = (newState: CharacterSheetData, currentState: CharacterSheetData, rules: RulesData) => {
-    const ruleSkills = rules.definitions.skills;
-    if (!ruleSkills) return;
-
+/**
+ * Phase 1: Processing standard skill categories
+ */
+function processSkillCategories(
+    newState: CharacterSheetData,
+    currentState: CharacterSheetData,
+    rules: RulesData
+): Record<string, DotEntry[]> {
+    const ruleSkills = rules.definitions.skills || {};
     const newSkills: Record<string, DotEntry[]> = {};
     const processedNamesGlobal = new Set<string>();
 
-    // 1. Process Standard Categories
     Object.keys(ruleSkills).forEach(category => {
         const definedNames = ruleSkills[category] || [];
         const existingEntries: DotEntry[] = getSkillCategory(currentState, category);
@@ -152,9 +156,18 @@ export const reconcileSkillsAndBackgrounds = (newState: CharacterSheetData, curr
         }
     });
 
-    newState.skills = newSkills;
+    return newSkills;
+}
 
-    // 2. Backgrounds (Arriere-plans) Logic
+/**
+ * Phase 2: Backgrounds Logic & Deduping
+ */
+function processBackgrounds(
+    newState: CharacterSheetData,
+    currentState: CharacterSheetData,
+    rules: RulesData,
+    newSkills: Record<string, DotEntry[]>
+): void {
     const dynamicBgCat = rules.definitions.skillCategories?.find(c => c.behavior === 'Arrière-plan')?.id || 'Col_Comp_8';
     const definedInSkills = rules.definitions.skills?.[dynamicBgCat] || [];
     const definedInBackgrounds = rules.definitions.backgrounds || [];
@@ -219,20 +232,34 @@ export const reconcileSkillsAndBackgrounds = (newState: CharacterSheetData, curr
             return false;
         });
 
-        newState.skills[dynamicBgCat] = [...syncedBgs, ...remainingBgs];
+        newSkills[dynamicBgCat] = [...syncedBgs, ...remainingBgs];
 
         const allBgIds = new Set([...syncedBgs, ...remainingBgs].map(s => s.id));
 
-        Object.keys(newState.skills).forEach(catId => {
-            if (catId !== dynamicBgCat && Array.isArray(newState.skills[catId])) {
-                newState.skills[catId] = newState.skills[catId].filter((s: DotEntry) =>
+        Object.keys(newSkills).forEach(catId => {
+            if (catId !== dynamicBgCat && Array.isArray(newSkills[catId])) {
+                newSkills[catId] = newSkills[catId].filter((s: DotEntry) =>
                     !allBgIds.has(s.id)
                 );
             }
         });
 
-        if (dynamicBgCat !== 'arrieres_plans' && newState.skills['arrieres_plans']) {
-            newState.skills['arrieres_plans'] = [];
+        if (dynamicBgCat !== 'arrieres_plans' && newSkills['arrieres_plans']) {
+            newSkills['arrieres_plans'] = [];
         }
     }
+}
+
+/**
+ * Synchronizes skills and backgrounds with rule definitions.
+ * Extracted from rulesReconciler.ts for better maintainability.
+ */
+export const reconcileSkillsAndBackgrounds = (newState: CharacterSheetData, currentState: CharacterSheetData, rules: RulesData) => {
+    const ruleSkills = rules.definitions.skills;
+    if (!ruleSkills) return;
+
+    const newSkills = processSkillCategories(newState, currentState, rules);
+    processBackgrounds(newState, currentState, rules, newSkills);
+
+    newState.skills = newSkills;
 };

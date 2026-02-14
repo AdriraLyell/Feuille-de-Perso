@@ -4,6 +4,7 @@ import { loadRules } from '../services/RulesLoader';
 import { migrateRulesToV2 } from '../utils/migrations';
 import { ErrorService } from '../services/ErrorService';
 import { OfflineStorageService } from '../services/OfflineStorageService';
+import { logger } from '../utils/logger';
 
 interface RulesContextType {
     rules: RulesData | null;
@@ -41,7 +42,7 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
             // 1. Try to load from cache first for instant UI
             const cached = await OfflineStorageService.getActiveRules();
             if (cached) {
-                console.log('[RulesContext] Loaded from cache');
+                logger.log('[RulesContext] Loaded from cache');
                 setRules(migrateRulesToV2(cached));
                 setIsLoading(false);
             }
@@ -96,7 +97,7 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
         }
 
         setIsLoading(false); // Ensure loading is stopped
-        console.log('[RulesContext] Rules updated, online mode:', online);
+        logger.log('[RulesContext] Rules updated, online mode:', online);
     };
 
     return (

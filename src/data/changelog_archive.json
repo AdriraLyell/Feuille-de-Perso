@@ -1,5 +1,134 @@
 [
     {
+        "version": "2.48.15",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🔳 Images : Ajout de poignées de redimensionnement multidirectionnelles",
+            "↔️ Axe Horizontal : Nouvelle barre latérale pour ajuster uniquement la largeur (avec magnétisme)",
+            "↕️ Axe Vertical : Nouvelle barre inférieure pour ajuster uniquement la hauteur",
+            "📐 Coin Diagonal : Conservation de la poignée de coin pour un redimensionnement libre",
+            "🖱️ Ergonomie : Curseurs contextuels indiquant l'axe de redimensionnement"
+        ]
+    },
+    {
+        "version": "2.48.14",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🔳 Images : Remplacement des boutons S/M/L par un redimensionnement manuel fluide",
+            "🧲 Aimant Magnétique : Le redimensionnement s'accroche proprement aux tailles standards (25%, 33%, 50%, 75%, 100%)",
+            "📝 Habillage Texte : Le texte enroule désormais les images alignées à gauche ou à droite",
+            "🛡️ Limites Intelligentes : L'image s'auto-limite à 55% de largeur en mode habillage pour préserver la lisibilité"
+        ]
+    },
+    {
+        "version": "2.48.13",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "✨ Journal : Restauration du traçage visuel des images",
+            "🖱️ Mode Dessin : Cliquer sur le bouton Image permet désormais de tracer directement un rectangle sur la page pour définir la zone d'insertion",
+            "📏 Intelligence : La largeur et la hauteur de l'image sont automatiquement calculées d'après votre tracé",
+            "🎯 Précision : L'image est insérée à l'emplacement exact (paragraphe) où vous relâchez la souris"
+        ]
+    },
+    {
+        "version": "2.48.12",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🔳 Images : Restauration du concept de 'Zone Rectangulaire'",
+            "📏 Contrôle Height : Ajout de boutons +/- pour ajuster la hauteur de l'image indépendamment de sa largeur",
+            "🖼️ Mode Remplissage : Ajout d'un bouton pour basculer entre 'Ajuster' (Contain) et 'Remplir' (Cover - zoom pour remplir le cadre)",
+            "🔄 Flexibilité : Bouton 'Auto' pour revenir au ratio naturel de l'image"
+        ]
+    },
+    {
+        "version": "2.48.11",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🛠️ Fix Layout : Correction de la mise à jour dynamique de la zone de défilement lors du redimensionnement massif d'images",
+            "📏 Pagination : Ajout d'un système de synchronisation plus robuste pour détecter les nouvelles pages créées par le reflow CSS"
+        ]
+    },
+    {
+        "version": "2.48.10",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🛠️ Fix Image : Correction de la visibilité des contrôles sur les petites images (25%)",
+            "📏 Mise en page : La barre d'outils de l'image peut désormais déborder du cadre et passer à la ligne si nécessaire"
+        ]
+    },
+    {
+        "version": "2.48.9",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🎨 UI Image : Ajout de filtres visuels (Sépia, Noir & Blanc) pour coller à l'esthétique Grimoire",
+            "✏️ Légendes : Édition directe des légendes sous les images",
+            "🖼️ Design : Ajout d'un cadre 'photo' avec ombre portée pour dissocier l'image du parchemin"
+        ]
+    },
+    {
+        "version": "2.48.8",
+        "date": "2026-02-13",
+        "type": "minor",
+        "changes": [
+            "🖼️ Images : Phase 1 de l'optimisation du Grimoire",
+            "💾 Stockage : Migration du Base64 vers IndexedDB (gain de place massif dans les sauvegardes)",
+            "🔄 Auto-Migration : Script automatique convertissant les anciennes images lors du chargement ou de l'import",
+            "🛠️ Extension : Activation de l'extension BookImage avec gestion de l'alignement et de la taille"
+        ]
+    },
+    {
+        "version": "2.48.7",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🛡️ Schéma : Correction critique du Zod schema pour inclure bookDocument (évite la perte de données au rechargement)",
+            "🔧 Typage : Amélioration du typage dans ChapterHeaderView (suppression des 'any' Tiptap)",
+            "📋 Task List : Mise à jour du suivi de progression du Grimoire"
+        ]
+    },
+    {
+        "version": "2.48.6",
+        "date": "2026-02-13",
+        "type": "minor",
+        "changes": [
+            "📖 Sommaire : Implémentation du Sommaire dynamique (Table des Matières) automatique en début de livre",
+            "🚀 Navigation : Support de la navigation par clic depuis le sommaire vers les chapitres correspondants",
+            "🔄 Migration : Automatisation de la migration des anciennes notes de journal vers le nouveau format Grimoire (v2)",
+            "🧹 Clean Up : Suppression des anciens composants de journal obsolètes (NotebookTextarea, useJournal, etc.)"
+        ]
+    },
+    {
+        "version": "2.48.5",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🧠 UX : Migration vers la sélection native Tiptap (setTextSelection) pour un surlignage fiable et persistant des titres de chapitres"
+        ]
+    },
+    {
+        "version": "2.48.4",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🎯 UX : Correction critique de la sélection locale des chapitres (ne saute plus au premier chapitre du livre)"
+        ]
+    },
+    {
+        "version": "2.48.3",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "✍️ UX : Garantie de la sélection automatique du titre (surlignage) lors de la création d'un chapitre via un cycle de rendu stabilisé"
+        ]
+    },
+    {
         "version": "2.48.2",
         "date": "2026-02-13",
         "type": "patch",
@@ -1277,208 +1406,6 @@
                 "text": "Standardisation de la génération d'ID via UUID pour une meilleure compatibilité avec Supabase.",
                 "category": "core"
             }
-        ]
-    },
-    {
-        "version": "2.30.2",
-        "date": "2026-02-09",
-        "description": "Optimisation Admin v2.",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Rétablissement de la suppression pour les items de bibliothèque partagés (Repository).",
-                "category": "fix"
-            },
-            {
-                "type": "improved",
-                "text": "Refonte ergonomique de la modale d'édition des compétences (meilleur équilibre Nom/Description/Variante).",
-                "category": "ui"
-            },
-            {
-                "type": "removed",
-                "text": "Nettoyage des items dupliqués entre les bibliothèques de compétences, compteurs et historiques.",
-                "category": "cleanup"
-            }
-        ]
-    },
-    {
-        "version": "2.30.1",
-        "date": "2026-02-09",
-        "description": "Correctif de la Réserve (Admin).",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "La réserve de l'admin ne montre désormais que les compétences/historiques/compteurs explicitement sélectionnés pour la campagne.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.0",
-        "date": "2026-02-09",
-        "description": "Architecture 'Global Repository' & Gestion localisée des catégories.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Migration vers le modèle 'Global Repository' : tous les items de bibliothèque sont désormais partagés.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Gestion des catégories par défaut déplacée dans le contexte local de la campagne (Réserve).",
-                "category": "ui"
-            },
-            {
-                "type": "changed",
-                "text": "Refonte des services LibraryLoader et LibraryPersistence pour garantir l'intégrité des items globaux.",
-                "category": "core"
-            },
-            {
-                "type": "fixed",
-                "text": "Suppression des risques de perte de données lors de la synchronisation des bibliothèques.",
-                "category": "fix"
-            }
-        ]
-    },
-    {
-        "version": "2.29.3",
-        "date": "2026-02-09",
-        "description": "Audit & Online First : Supabase Integration",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Support du chargement direct des campagnes Supabase via URL (?s=id) dans l'app Joueur.",
-                "category": "core"
-            },
-            {
-                "type": "fixed",
-                "text": "Nettoyage complet du Type Safety (zéro @ts-ignore) dans les services de données.",
-                "category": "core"
-            },
-            {
-                "type": "changed",
-                "text": "Refactoring de RulesReconciler pour une meilleure modularité et tests automatisés.",
-                "category": "core"
-            }
-        ]
-    },
-    {
-        "version": "2.29.2",
-        "date": "2026-02-09",
-        "description": "Correction Audit : Export Offline",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Ajout du bouton 'Exporter' dans l'Admin pour générer le fichier rules.js (Fallback Offline).",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Mise à jour du rapport d'audit technique (v2.29.2).",
-                "category": "docs"
-            }
-        ]
-    },
-    {
-        "version": "2.29.1",
-        "date": "2026-02-09",
-        "description": "Premium UI Upgrade (Admin) & Corrections.",
-        "changes": [
-            {
-                "type": "improved",
-                "text": "Refonte complète des modales de confirmation (Suppression, Navigation, Duplication) avec le style Premium (Ambre/Parchemin).",
-                "category": "ui"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction d'un crash critique (ReferenceError) dans l'éditeur d'attributs suite à la refonte de l'état.",
-                "category": "fix"
-            },
-            {
-                "type": "removed",
-                "text": "Suppression définitive des alertes natives 'window.confirm' dans la section Admin.",
-                "category": "cleanup"
-            }
-        ]
-    },
-    {
-        "version": "2.29.0",
-        "date": "2026-02-09",
-        "description": "Optimisation API GitHub & Investigation Réconciliation",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Implémentation d'un délai d'attente (backoff) de 15 minutes pour les appels API GitHub en cas de limitation (403/429) afin d'éviter la pollution de la console.",
-                "category": "core"
-            },
-            {
-                "type": "fixed",
-                "text": "Confirmation que la baisse du nombre de compétences (à 128) lors du changement de campagne est un nettoyage normal des emplacements vides.",
-                "category": "reconciliation"
-            },
-            {
-                "type": "improved",
-                "text": "Le passage automatique au CDN Raw est désormais silencieux lorsque l'API est connue pour être en dépassement de quota.",
-                "category": "core"
-            }
-        ]
-    },
-    {
-        "version": "2.28.1",
-        "date": "2026-02-09",
-        "description": "Correctifs de navigation et de réconciliation.",
-        "changes": [
-            "Fix : Correction du menu 'Source' sauté au démarrage à cause du cache (ajout de de l'état isSourceSelected).",
-            "Fix : Correction des doublons de clés React (IDs dupliqués) dans les blocs de compétences quand les règles ont des noms identiques."
-        ]
-    },
-    {
-        "version": "2.28.0",
-        "date": "2026-02-09",
-        "description": "Phase 3 : Optimisations de performance majeures.",
-        "changes": [
-            "Réduction de l'inlining des assets (limite à 10Ko) pour accélérer le parsing HTML initial.",
-            "Implémentation du Lazy Loading pour les modules Admin et les modales secondaires via React.lazy et Suspense.",
-            "Mise en cache persistante des règles via IndexedDB (idb-keyval) pour un chargement instantané au rafraîchissement.",
-            "Amélioration de la structure de build avec des fallbacks de chargement (loaders)."
-        ]
-    },
-    {
-        "version": "2.27.2",
-        "date": "2026-02-09",
-        "description": "Ajustements visuels de la synchronisation.",
-        "changes": [
-            "Retrait des animations de pulsation sur l'indicateur d'auto-sync pour plus de discrétion."
-        ]
-    },
-    {
-        "version": "2.27.1",
-        "date": "2026-02-09",
-        "description": "Améliorations UX de la synchronisation automatique.",
-        "changes": [
-            "L'onglet 'Cloud' est désormais accessible en tout temps (hors réglages avancés).",
-            "Ajout d'un feedback visuel en temps réel sur le bouton de synchronisation (icône en rotation + texte 'Sync...').",
-            "Correction d'un problème de portée de variable dans le contexte de personnage."
-        ]
-    },
-    {
-        "version": "2.27.0",
-        "date": "2026-02-09",
-        "description": "Implémentation de la synchronisation automatique (Auto-Sync).",
-        "changes": [
-            "Ajout d'un toggle d'auto-sync dans la modale de synchronisation.",
-            "Nouvel onglet 'Cloud' dans les réglages de la fiche pour gérer l'auto-sync.",
-            "Mécanisme de sauvegarde automatique debounced (10s) pour éviter les surcharges.",
-            "Indicateurs visuels d'état de synchronisation dans la barre de navigation."
-        ]
-    },
-    {
-        "version": "2.26.1",
-        "date": "2026-02-09",
-        "changes": [
-            "Fix: Correction d'un bug 400 lors du chargement des personnages orphelins (ID 'orphan')",
-            "Refactor: Migration finale de PlayerService vers DatabaseService",
-            "Robustesse: Centralisation totale des appels Supabase dans la couche service"
         ]
     }
 ]

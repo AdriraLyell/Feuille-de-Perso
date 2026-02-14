@@ -4,7 +4,7 @@ import { useNotification } from '../../context/NotificationContext';
 import { useCharacter } from '../../context/CharacterContext';
 import { NotificationProvider } from '../../context/NotificationContext';
 import { CharacterSheetData } from '../../types';
-import { APP_VERSION } from '../../constants';
+import { APP_VERSION } from '../../constants/app';
 import { migrateData } from '../../utils/migrations';
 import { useRules } from '../../context/RulesContext';
 import { loadRules } from '../../services/RulesLoader';

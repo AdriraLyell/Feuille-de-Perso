@@ -4,12 +4,13 @@ import { RulesData } from '../../../types/rules';
 import { LibrarySkillEntry } from '../../../types';
 import { BookOpen, Archive, GripVertical, ArrowRight, Layers, Tag } from 'lucide-react';
 import { disambiguateCategories } from '../../../utils/categoryUtils';
+import { DragItem } from '../AdminSkillsEditor';
 
 interface AdminSkillLibrarySidebarProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
-    draggedItem: { type: 'admin_sheet_skill' | 'admin_lib_skill', category?: string, index?: number, name?: string, data?: any } | null;
-    setDraggedItem: (item: any) => void;
+    draggedItem: DragItem | null;
+    setDraggedItem: (item: DragItem | null) => void;
 }
 
 const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rules, onUpdate, draggedItem, setDraggedItem }) => {
@@ -20,10 +21,11 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
         return disambiguateCategories(rules.definitions.skillCategories || []);
     }, [rules.definitions.skillCategories]);
 
-    const handleDragStart = (e: React.DragEvent, type: 'admin_lib_skill', dataPayload: any) => {
-        setDraggedItem({ type, ...dataPayload });
+    const handleDragStart = (e: React.DragEvent, type: 'admin_lib_skill', dataPayload: Partial<DragItem>) => {
+        const item: DragItem = { type, ...dataPayload };
+        setDraggedItem(item);
         e.dataTransfer.effectAllowed = "move";
-        e.dataTransfer.setData("application/json", JSON.stringify({ type, ...dataPayload }));
+        e.dataTransfer.setData("application/json", JSON.stringify(item));
     };
 
     const handleDragOver = (e: React.DragEvent) => {

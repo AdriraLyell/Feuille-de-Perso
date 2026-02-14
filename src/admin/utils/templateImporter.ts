@@ -7,20 +7,19 @@ import { RulesData } from '../../types/rules';
  * and returns the CharacterSheetData if found.
  */
 const normalizeInput = (json: any): CharacterSheetData | null => {
+    if (!json || typeof json !== 'object') return null;
+
     // 1. Direct CharacterSheetData
     if (json.header && json.attributes && json.skills) {
         return json as CharacterSheetData;
     }
 
     // 2. Full Backup Wrapper (legacy or specific export)
-    // Sometimes exports are wrapped in { data: ... } or similar depending on version
-    if (json.data && json.data.header && json.data.attributes) {
+    if (json.data && typeof json.data === 'object' && json.data.header && json.data.attributes) {
         return json.data as CharacterSheetData;
     }
 
     // 3. "System" or "Template" export from ExportPanel
-    // They are essentially CharacterSheetData but might be missing some runtime fields
-    // Checks for essential config fields
     if (json.creationConfig && json.skills) {
         return json as CharacterSheetData;
     }
@@ -33,7 +32,7 @@ const normalizeInput = (json: any): CharacterSheetData | null => {
  * to update the Admin Rules.
  */
 export const extractRulesFromCharacter = (
-    inputJson: any,
+    inputJson: unknown,
     currentRules: RulesData
 ): { rules: RulesData; report: { success: string[]; warnings: string[] } } => {
     const sheet = normalizeInput(inputJson);
@@ -121,8 +120,7 @@ export const extractRulesFromCharacter = (
     if (sheet.skills) {
         const newSkills: Record<string, string[]> = {};
         Object.keys(sheet.skills).forEach(cat => {
-            // @ts-ignore
-            const list = sheet.skills[cat];
+            const list = (sheet.skills as Record<string, DotEntry[]>)[cat];
             if (Array.isArray(list)) {
                 newSkills[cat] = list
                     .map((s: DotEntry) => s.name ? s.name : "") // Keep name or empty string for spacer
@@ -134,9 +132,8 @@ export const extractRulesFromCharacter = (
     }
 
     // 6. Import Backgrounds (Arrières-Plans)
-    if (sheet.skills && sheet.skills.arrieres_plans) {
-        // @ts-ignore
-        const bgList = sheet.skills.arrieres_plans
+    if (sheet.skills && (sheet.skills as Record<string, DotEntry[]>).arrieres_plans) {
+        const bgList = (sheet.skills as Record<string, DotEntry[]>).arrieres_plans
             .filter((s: DotEntry) => s.name && s.name.trim() !== "")
             .map((s: DotEntry) => s.name);
 
@@ -149,8 +146,7 @@ export const extractRulesFromCharacter = (
         const rulesCounters: Record<string, any> = {};
         Object.keys(sheet.counters).forEach(key => {
             if (key === 'custom') return;
-            // @ts-ignore
-            const c = sheet.counters[key];
+            const c = (sheet.counters as Record<string, any>)[key];
             if (c && !Array.isArray(c)) {
                 rulesCounters[key] = {
                     id: key,

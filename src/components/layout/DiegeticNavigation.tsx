@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { Book, Settings, FileText, Layout, Save, Upload, Feather, LogOut, Printer, Monitor, Smartphone, History, HelpCircle, ScrollText, ArrowRightLeft, BookOpen, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X } from 'lucide-react';
+import { Book, Settings, FileText, Layout, Save, Upload, Feather, LogOut, Printer, Monitor, Smartphone, History, HelpCircle, ScrollText, ArrowRightLeft, BookOpen, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X, AlertTriangle } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';
+import { useStorageUsage } from '../../hooks/useStorageUsage';
 import { CharacterSheetData } from '../../types';
 import RulesStatus from '../ui/RulesStatus';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,13 +34,27 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 }) => {
     const { data, isSyncing } = useCharacter();
     const { rules } = useRules();
+    const { stats } = useStorageUsage();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
     const menuItems = [
         { label: 'Thème', icon: <Palette size={18} />, onClick: onOpenAppearance },
-        { label: 'Réglages', icon: <Settings size={18} />, onClick: () => { onModeChange('settings'); setIsMobileMenuOpen(false); }, active: currentMode === 'settings' },
+        {
+            label: 'Réglages',
+            icon: (
+                <div className="relative">
+                    <Settings size={18} />
+                    {(stats?.isCritical || stats?.isWarning) && (
+                        <div className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border border-gray-900 ${stats.isCritical ? 'bg-red-500 animate-pulse' : 'bg-amber-500'}`} />
+                    )}
+                </div>
+            ),
+            onClick: () => { onModeChange('settings'); setIsMobileMenuOpen(false); },
+            active: currentMode === 'settings',
+            isWarning: stats?.isCritical || stats?.isWarning
+        },
         { label: 'Import/Export', icon: <Download size={18} />, onClick: onOpenImportExport },
         { label: 'Synchro', icon: <UploadCloud size={18} />, onClick: onOpenSync, highlight: data.syncInfo?.isAutoSyncEnabled },
         { label: 'Imprimer', icon: <Printer size={18} />, onClick: onPrintRequest },
@@ -125,11 +140,26 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                             </button>
                             <button
                                 onClick={() => onModeChange('settings')}
-                                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-2 ${currentMode === 'settings'
+                                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all flex items-center gap-2 relative ${currentMode === 'settings'
                                     ? 'bg-blue-600 text-white shadow-sm'
                                     : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
                             >
-                                <Settings size={16} /> Réglages
+                                <div className="relative">
+                                    <Settings size={16} />
+                                    {(stats?.isCritical || stats?.isWarning) && (
+                                        <div className="absolute -top-1.5 -right-1.5 flex items-center justify-center">
+                                            {stats.isCritical && <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-red-400 opacity-75"></span>}
+                                            <span className={`relative inline-flex rounded-full h-2 w-2 border border-gray-900 ${stats.isCritical ? 'bg-red-500' : 'bg-amber-500'}`}></span>
+                                        </div>
+                                    )}
+                                </div>
+                                Réglages
+                                {stats?.isCritical && (
+                                    <AlertTriangle size={14} className="text-red-400 animate-pulse ml-0.5" />
+                                )}
+                                {stats?.isWarning && !stats?.isCritical && (
+                                    <AlertTriangle size={14} className="text-amber-400 ml-0.5" />
+                                )}
                             </button>
                         </div>
 

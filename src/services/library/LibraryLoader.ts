@@ -127,7 +127,7 @@ export const LibraryLoader = {
 
             const usageMap: Record<string, number> = {};
             results.forEach(res => {
-                res.data.forEach((row: Record<string, any>) => {
+                res.data.forEach((row: any) => {
                     const id = row[res.idKey];
                     usageMap[id] = (usageMap[id] || 0) + 1;
                 });

@@ -2,9 +2,10 @@ import { supabase } from '../../services/supabase';
 import { INITIAL_DATA } from '../../data/initialState';
 import { LibrarySkillEntry } from '../../types';
 import { ErrorService } from '../../services/ErrorService';
+import { logger } from '../../utils/logger';
 
 export const migrateGlobalSkills = async () => {
-    console.log("Starting Migration of Global Skills...");
+    logger.log("Starting Migration of Global Skills...");
     const skills = INITIAL_DATA.skillLibrary || [];
 
     if (skills.length === 0) {

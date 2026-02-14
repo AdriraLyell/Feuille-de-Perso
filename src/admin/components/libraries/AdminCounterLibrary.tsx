@@ -14,8 +14,7 @@ interface AdminCounterLibraryProps {
 }
 
 const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
-    // @ts-ignore
-    const list: LibraryCounterEntry[] = rules.libraries?.counters || [];
+    const list = rules.libraries.counters;
 
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,7 +29,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
 
     const placedNames = useMemo(() => {
         const names = new Set<string>();
-        const counterCat = rules.definitions.skillCategories?.find((c: any) => c.behavior === 'Compteur')?.id || 'Col_Comp_9';
+        const counterCat = rules.definitions.skillCategories?.find(c => c.behavior === 'Compteur')?.id || 'Col_Comp_9';
         const placed = rules.definitions.skills?.[counterCat] || [];
         placed.forEach(name => {
             if (name.trim()) names.add(name.trim().toLowerCase());
@@ -68,7 +67,6 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
         if (!showDeleteConfirm) return;
         onUpdate({
             ...rules,
-            // @ts-ignore
             libraries: { ...rules.libraries, counters: list.filter(c => c.id !== showDeleteConfirm) }
         });
         setShowDeleteConfirm(null);
@@ -97,7 +95,6 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
 
         onUpdate({
             ...rules,
-            // @ts-ignore
             libraries: { ...rules.libraries, counters: newList }
         });
         setIsModalOpen(false);
@@ -111,7 +108,6 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
         );
         onUpdate({
             ...rules,
-            // @ts-ignore
             libraries: { ...rules.libraries, counters: newList }
         });
     };
@@ -187,7 +183,6 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                                 checked={item.isActive !== false}
                                                 onChange={() => {
                                                     const newList = list.map(c => c.id === item.id ? { ...c, isActive: !c.isActive } : c);
-                                                    // @ts-ignore
                                                     onUpdate({ ...rules, libraries: { ...rules.libraries, counters: newList } });
                                                 }}
                                                 className="w-4 h-4 text-red-600 rounded cursor-pointer"

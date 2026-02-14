@@ -140,7 +140,7 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
         onAddLog("Membre ajouté au groupe", 'success');
     };
 
-    const updateMember = (memberId: string, field: 'name' | 'player' | 'data', value: any, key?: string) => {
+    const updateMember = (memberId: string, field: 'name' | 'player' | 'data', value: string, key?: string) => {
         const newMembers = members.map(m => {
             if (m.id !== memberId) return m;
             if (field === 'data' && key) {

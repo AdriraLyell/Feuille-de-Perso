@@ -5,7 +5,7 @@ import PartyTable from './campaign/PartyTable';
 import { ColumnarEditor } from './campaign/book/ColumnarEditor';
 
 const CampaignNotes: React.FC = () => {
-    const { data, updateData: onChange } = useCharacter();
+    const { data, updateData: onChange, addLog } = useCharacter();
     const [activeTab, setActiveTab] = useState<'journal' | 'party'>('journal');
 
     const handleUpdate = (content: any) => {
@@ -81,7 +81,7 @@ const CampaignNotes: React.FC = () => {
                             style={{ width: '1484px', minHeight: '1000px' }}
                         >
                             <div className="bg-[#fbf4e9] rounded-lg shadow-2xl overflow-hidden border border-stone-300/50 h-full min-h-[1000px]">
-                                <PartyTable data={data} onChange={onChange} />
+                                <PartyTable data={data} onChange={onChange} onAddLog={addLog} />
                             </div>
                         </div>
                     )}

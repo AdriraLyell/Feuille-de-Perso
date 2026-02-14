@@ -53,6 +53,13 @@ const GlobalPlayersView: React.FC = () => {
         return campaign ? campaign.name : <span className="text-stone-400 italic">Inconnue</span>;
     };
 
+    const formatSize = (bytes: number | undefined) => {
+        if (bytes === undefined) return '-';
+        if (bytes < 1024) return `${bytes} o`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} ko`;
+        return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
+    };
+
     const handleViewDetails = async (id: string) => {
         try {
             const fullChar = await CharacterSyncService.getCharacterById(id);
@@ -163,6 +170,7 @@ const GlobalPlayersView: React.FC = () => {
                                 <th className="px-6 py-4">Joueur</th>
                                 <th className="px-6 py-4">Campagne</th>
                                 <th className="px-6 py-4">Dernière Sync</th>
+                                <th className="px-6 py-4 text-center">Taille</th>
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -195,6 +203,11 @@ const GlobalPlayersView: React.FC = () => {
                                                 day: '2-digit', month: '2-digit', year: 'numeric',
                                                 hour: '2-digit', minute: '2-digit'
                                             })}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        <div className="text-stone-500 font-mono text-xs">
+                                            {formatSize(char.data_size)}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">

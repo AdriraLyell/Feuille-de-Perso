@@ -1,6 +1,6 @@
 import React from 'react';
 import { Settings, ArrowLeft, UploadCloud, Download, Upload, LogOut, AlertTriangle, Cloud } from 'lucide-react';
-import { APP_VERSION } from '../../constants';
+import { APP_VERSION } from '../../constants/app';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 
 interface AdminHeaderProps {

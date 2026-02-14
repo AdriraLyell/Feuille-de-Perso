@@ -42,6 +42,13 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
         }
     };
 
+    const formatSize = (bytes: number | undefined) => {
+        if (bytes === undefined) return '-';
+        if (bytes < 1024) return `${bytes} o`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} ko`;
+        return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
+    };
+
     const handleViewCharacter = async (id: string) => {
         setIsLoadingCharacter(true);
         try {
@@ -110,6 +117,9 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
                                 <th className="text-left px-6 py-4 font-bold text-amber-900 text-[10px] uppercase tracking-widest border-b border-stone-800">
                                     Dernier Passage
                                 </th>
+                                <th className="text-center px-6 py-4 font-bold text-amber-900 text-[10px] uppercase tracking-widest border-b border-stone-800">
+                                    Taille
+                                </th>
                                 <th className="text-right px-6 py-4 font-bold text-amber-900 text-[10px] uppercase tracking-widest border-b border-stone-800">
                                     Actions
                                 </th>
@@ -138,6 +148,11 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
                                         <div className="flex items-center gap-2 font-mono">
                                             <Clock size={14} className="text-stone-700" />
                                             {new Date(char.last_synced).toLocaleString('fr-FR')}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-5 text-stone-500 text-xs text-center">
+                                        <div className="font-mono text-[10px] text-stone-600">
+                                            {formatSize(char.data_size)}
                                         </div>
                                     </td>
                                     <td className="px-6 py-5 text-right">

@@ -10,7 +10,7 @@ const rootDir = path.resolve(__dirname, '..');
 const paths = {
     package: path.join(rootDir, 'package.json'),
     version: path.join(rootDir, 'public', 'version.json'),
-    constants: path.join(rootDir, 'src', 'constants.ts')
+    constants: path.join(rootDir, 'src', 'constants', 'app.ts')
 };
 
 // Lecture de la version dans package.json
@@ -27,12 +27,12 @@ if (fs.existsSync(paths.version)) {
     console.log('✅ public/version.json mis à jour.');
 }
 
-// 2. Mise à jour de src/constants.ts
+// 2. Mise à jour de src/constants/app.ts
 if (fs.existsSync(paths.constants)) {
     let content = fs.readFileSync(paths.constants, 'utf8');
     content = content.replace(/export const APP_VERSION = ['"][^'"]+['"];/, `export const APP_VERSION = '${currentVersion}';`);
     fs.writeFileSync(paths.constants, content);
-    console.log('✅ src/constants.ts mis à jour.');
+    console.log('✅ src/constants/app.ts mis à jour.');
 }
 
 // 3. Rotation automatique du changelog

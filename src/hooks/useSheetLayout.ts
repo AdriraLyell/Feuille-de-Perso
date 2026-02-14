@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { CharacterSheetData, DotEntry } from '../types';
-import { RulesData } from '../types/rules';
+import { RulesData, SkillBehavior } from '../types/rules';
 
 export interface SkillBlock {
     title: string;
@@ -23,6 +23,37 @@ export interface SheetLayout {
     counters: { title: string; id: string; description?: string }[];
 }
 
+type ColumnRow = 'top' | 'bottom';
+interface Mapping {
+    col: number;
+    row: ColumnRow;
+}
+
+const LANDSCAPE_MAP: Record<string, Mapping> = {
+    'Col_Comp_1': { col: 0, row: 'top' },
+    'Col_Comp_2': { col: 1, row: 'top' },
+    'Col_Comp_3': { col: 2, row: 'top' },
+    'Col_Comp_4': { col: 3, row: 'top' },
+    'Col_Comp_5': { col: 4, row: 'top' },
+    'Col_Comp_6': { col: 0, row: 'bottom' },
+    'Col_Comp_7': { col: 1, row: 'bottom' },
+    'Col_Comp_8': { col: 2, row: 'bottom' },
+    'Col_Comp_9': { col: 3, row: 'bottom' },
+    'Col_Comp_10': { col: 4, row: 'bottom' },
+};
+
+const PORTRAIT_MAP: Record<string, Mapping> = {
+    'Col_Comp_1': { col: 0, row: 'top' },
+    'Col_Comp_2': { col: 1, row: 'top' },
+    'Col_Comp_3': { col: 2, row: 'top' },
+    'Col_Comp_4': { col: 3, row: 'top' },
+    'Col_Comp_5': { col: 0, row: 'bottom' },
+    'Col_Comp_6': { col: 1, row: 'bottom' },
+    'Col_Comp_7': { col: 2, row: 'bottom' },
+    'Col_Comp_8': { col: 3, row: 'bottom' },
+    'Col_Comp_9': { col: 0, row: 'bottom' }, // Overflow
+};
+
 export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null) => {
 
     const attributeCategories = useMemo(() => data.attributeSettings || [
@@ -42,14 +73,16 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
 
     const getDynamicColumns = useCallback((isLandscape: boolean = false): SheetLayout => {
         const skillCats = rules?.definitions?.skillCategories || [];
-        if (skillCats.length === 0) return { columns: [], columnCount: isLandscape ? 5 : 4, backgrounds: [], counters: [] }; // Fallback empty structure
+        const fallback: SheetLayout = { columns: [], columnCount: isLandscape ? 5 : 4, backgrounds: [], counters: [] };
+
+        if (skillCats.length === 0) return fallback;
 
         // 1. Separate by behavior
-        const skills = skillCats.filter(c => c.behavior === 'Compétence' || c.behavior === 'Secondaire');
-        const backgrounds = skillCats.filter(c => c.behavior === 'Arrière-plan');
-        const counters = skillCats.filter(c => c.behavior === 'Compteur');
+        const skillsSet = skillCats.filter(c => c.behavior === 'Compétence' || c.behavior === 'Secondaire');
+        const backgroundsSet = skillCats.filter(c => c.behavior === 'Arrière-plan');
+        const countersSet = skillCats.filter(c => c.behavior === 'Compteur');
 
-        // 2. Base columns: 4 for portrait, 5 for landscape
+        // 2. Base columns
         const columnCount = isLandscape ? 5 : 4;
         const columns: SheetColumn[] = Array.from({ length: columnCount }, (_, id) => ({
             id,
@@ -58,67 +91,38 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
             get blocks() { return [...this.topBlocks, ...this.bottomBlocks]; }
         }));
 
-        // 3. Dynamic Mapping based on column count
-        const mapping: Record<string, { col: number, row: 'top' | 'bottom' }> = {};
+        const mapping = isLandscape ? LANDSCAPE_MAP : PORTRAIT_MAP;
 
-        if (isLandscape) {
-            // Mapping for 5 columns (1-5 Top / 6-10 Bottom)
-            const landscapeMap: Record<string, { col: number, row: 'top' | 'bottom' }> = {
-                'Col_Comp_1': { col: 0, row: 'top' },
-                'Col_Comp_2': { col: 1, row: 'top' },
-                'Col_Comp_3': { col: 2, row: 'top' },
-                'Col_Comp_4': { col: 3, row: 'top' },
-                'Col_Comp_5': { col: 4, row: 'top' },
-                'Col_Comp_6': { col: 0, row: 'bottom' },
-                'Col_Comp_7': { col: 1, row: 'bottom' },
-                'Col_Comp_8': { col: 2, row: 'bottom' },
-                'Col_Comp_9': { col: 3, row: 'bottom' },
-                'Col_Comp_10': { col: 4, row: 'bottom' },
-            };
-            Object.assign(mapping, landscapeMap);
-        } else {
-            // Mapping for 4 columns (1-4 Top / 5-8 Bottom)
-            const portraitMap: Record<string, { col: number, row: 'top' | 'bottom' }> = {
-                'Col_Comp_1': { col: 0, row: 'top' },
-                'Col_Comp_2': { col: 1, row: 'top' },
-                'Col_Comp_3': { col: 2, row: 'top' },
-                'Col_Comp_4': { col: 3, row: 'top' },
-                'Col_Comp_5': { col: 0, row: 'bottom' },
-                'Col_Comp_6': { col: 1, row: 'bottom' },
-                'Col_Comp_7': { col: 2, row: 'bottom' },
-                'Col_Comp_8': { col: 3, row: 'bottom' },
-                'Col_Comp_9': { col: 0, row: 'bottom' }, // Overflow
-            };
-            Object.assign(mapping, portraitMap);
-        }
-
-        skills.forEach(cat => {
+        skillsSet.forEach(cat => {
             const items = data.skills[cat.id] || [];
             const map = mapping[cat.id] || { col: 0, row: 'top' };
-            const block = {
+            const block: SkillBlock = {
                 title: cat.label,
                 items,
                 cat: cat.id,
                 description: cat.description
             };
 
-            if (map.row === 'top') {
-                columns[map.col].topBlocks.push(block);
-            } else {
-                columns[map.col].bottomBlocks.push(block);
+            // Safety check for col index
+            if (map.col < columns.length) {
+                if (map.row === 'top') {
+                    columns[map.col].topBlocks.push(block);
+                } else {
+                    columns[map.col].bottomBlocks.push(block);
+                }
             }
         });
 
         return {
             columns,
             columnCount,
-            backgrounds: backgrounds.map(cat => ({
+            backgrounds: backgroundsSet.map(cat => ({
                 title: cat.label,
                 items: data.skills[cat.id] || [],
                 cat: cat.id,
                 description: cat.description
             })),
-            counters: counters.map(cat => ({
+            counters: countersSet.map(cat => ({
                 title: cat.label,
                 id: cat.id,
                 description: cat.description

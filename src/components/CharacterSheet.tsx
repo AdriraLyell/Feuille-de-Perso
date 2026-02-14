@@ -12,6 +12,7 @@ import SheetHeader from './sheet/SheetHeader';
 import ExperienceSummary from './sheet/ExperienceSummary';
 import CreationModeModal from './sheet/CreationModeModal';
 import EditionSidebar from './sheet/EditionSidebar';
+import CharacterSheetGrid from './sheet/CharacterSheetGrid';
 
 // Hooks
 import { useCharacterData, useCharacterActions } from '../context/CharacterContext';
@@ -158,141 +159,31 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 <ExperienceSummary experience={data.experience} cardValue={cardValue} />
             </div>
 
-            {isLandscape ? (
-                /* --- Landscape Layout (6 Columns Dynamic) --- */
-                <div className="flex-grow grid grid-cols-6 border-b-2 border-stone-800">
-                    {columns.map((col, idx) => (
-                        <div key={idx} className="border-r border-stone-400 flex flex-col">
-                            {col.blocks.map((block) => (
-                                <div key={block.cat} className="flex-grow border-b border-stone-300 last:border-b-0">
-                                    <SkillBlock
-                                        title={block.title}
-                                        items={block.items}
-                                        cat={block.cat}
-                                        onUpdate={updateDot}
-                                        userSpecs={data.specializations}
-                                        imposedSpecs={data.imposedSpecializations}
-                                        theme={data.theme}
-                                        onDefineVariant={handleDefineVariant}
-                                        allowExtendedSkills={allowExtendedSkills}
-                                        description={block.description}
-                                        isEditing={isEditMode}
-                                        categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
-                                        onDrop={handleDropItem}
-                                        onRemove={handleRemoveItem}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-
-                    {/* Col 6: Dynamic Backgrounds & Combat & Counters */}
-                    <div className="flex flex-col h-full">
-                        {backgrounds.map((bg, bIdx) => (
-                            <div key={bg.cat} className="flex-none border-b border-stone-400">
-                                <SkillBlock
-                                    title={bg.title}
-                                    items={bg.items || []}
-                                    cat={bg.cat}
-                                    onUpdate={updateDot}
-                                    userSpecs={data.specializations}
-                                    imposedSpecs={data.imposedSpecializations}
-                                    theme={data.theme}
-                                    onDefineVariant={handleDefineVariant}
-                                    allowExtendedSkills={allowExtendedSkills}
-                                    description={bg.description}
-                                    isEditing={isEditMode}
-                                    categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === bg.cat)?.behavior}
-                                    onDrop={handleDropItem}
-                                    onRemove={handleRemoveItem}
-                                />
-                            </div>
-                        ))}
+            <CharacterSheetGrid
+                columns={columns}
+                backgrounds={backgrounds}
+                isLandscape={isLandscape}
+                isEditMode={isEditMode}
+                allowExtendedSkills={allowExtendedSkills}
+                theme={data.theme}
+                rules={rules}
+                specializations={data.specializations}
+                imposedSpecializations={data.imposedSpecializations}
+                onUpdateDot={updateDot}
+                onDefineVariant={handleDefineVariant}
+                onDropItem={handleDropItem}
+                onRemoveItem={handleRemoveItem}
+                renderExtraColumn={() => (
+                    <>
                         <div className="flex-none border-b border-stone-400 overflow-hidden">
                             <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
                         </div>
                         <div className="flex-grow overflow-hidden">
                             <CountersSection data={data} updateCounter={updateCounter} isLandscape={isLandscape} />
                         </div>
-                    </div>
-                </div>
-            ) : (
-                /* --- Portrait Layout (Standard Deterministic) --- */
-                <>
-                    <div className="grid grid-cols-4 border-b-2 border-stone-800 h-auto">
-                        {columns.map((col, idx) => (
-                            <div key={idx} className={idx < 3 ? "border-r border-stone-400" : ""}>
-                                {col.topBlocks.map((block) => (
-                                    <SkillBlock
-                                        key={block.cat}
-                                        title={block.title}
-                                        items={block.items}
-                                        cat={block.cat}
-                                        onUpdate={updateDot}
-                                        userSpecs={data.specializations}
-                                        imposedSpecs={data.imposedSpecializations}
-                                        theme={data.theme}
-                                        onDefineVariant={handleDefineVariant}
-                                        allowExtendedSkills={allowExtendedSkills}
-                                        description={block.description}
-                                        isEditing={isEditMode}
-                                        categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
-                                        onDrop={handleDropItem}
-                                        onRemove={handleRemoveItem}
-                                    />
-                                ))}
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="grid grid-cols-4 border-b-2 border-stone-800 flex-grow min-h-[200px]">
-                        {columns.map((col, idx) => (
-                            <div key={idx} className={idx < 3 ? "border-r border-stone-400" : ""}>
-                                {col.bottomBlocks.map((block) => (
-                                    <SkillBlock
-                                        key={block.cat}
-                                        title={block.title}
-                                        items={block.items}
-                                        cat={block.cat}
-                                        onUpdate={updateDot}
-                                        userSpecs={data.specializations}
-                                        imposedSpecs={data.imposedSpecializations}
-                                        theme={data.theme}
-                                        onDefineVariant={handleDefineVariant}
-                                        allowExtendedSkills={allowExtendedSkills}
-                                        description={block.description}
-                                        isEditing={isEditMode}
-                                        categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
-                                        onDrop={handleDropItem}
-                                        onRemove={handleRemoveItem}
-                                    />
-                                ))}
-                                {idx === 3 && (
-                                    /* backgrounds render in the last column of second row */
-                                    backgrounds.map((bg) => (
-                                        <SkillBlock
-                                            key={bg.cat}
-                                            title={bg.title}
-                                            items={bg.items || []}
-                                            cat={bg.cat}
-                                            onUpdate={updateDot}
-                                            userSpecs={data.specializations}
-                                            imposedSpecs={data.imposedSpecializations}
-                                            theme={data.theme}
-                                            onDefineVariant={handleDefineVariant}
-                                            allowExtendedSkills={allowExtendedSkills}
-                                            description={bg.description}
-                                            isEditing={isEditMode}
-                                            categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === bg.cat)?.behavior}
-                                            onDrop={handleDropItem}
-                                            onRemove={handleRemoveItem}
-                                        />
-                                    ))
-                                )}
-                            </div>
-                        ))}
-                    </div>
-
+                    </>
+                )}
+                renderBottomSection={() => (
                     <div className="grid grid-cols-2">
                         <div className="border-r-2 border-stone-800 flex flex-col">
                             <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
@@ -301,8 +192,8 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                             <CountersSection data={data} updateCounter={updateCounter} isLandscape={isLandscape} />
                         </div>
                     </div>
-                </>
-            )}
+                )}
+            />
 
             {showEditWarning && (
                 <ThematicModal

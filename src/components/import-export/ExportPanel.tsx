@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { CharacterSheetData } from '../../types';
 import { Download, User, Shield, LayoutTemplate, Layers, BookOpen, GraduationCap, Award } from 'lucide-react';
-import { APP_VERSION } from '../../constants';
+import { APP_VERSION } from '../../constants/app';
 import { createTemplateFromData } from '../../utils/importExportUtils';
 import { getImage, blobToBase64 } from '../../imageDB';
 import { useNotification } from '../../context/NotificationContext';

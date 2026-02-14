@@ -1,4 +1,4 @@
-import { APP_VERSION } from '../../constants';
+import { APP_VERSION } from '../../constants/app';
 import { RulesData } from '../../types/rules';
 
 /**

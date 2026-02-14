@@ -8,7 +8,7 @@ interface TraitEffectEditorProps {
     allSkills: { id: string, name: string }[];
     allAttributes: { id: string, name: string }[];
     onAdd: () => void;
-    onUpdate: (id: string, field: keyof TraitEffect, value: any) => void;
+    onUpdate: <K extends keyof TraitEffect>(id: string, field: K, value: TraitEffect[K]) => void;
     onRemove: (id: string) => void;
 }
 
@@ -78,7 +78,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                         <select
                                             className={`appearance-none bg-white border border-gray-300 font-bold text-xs text-gray-900 w-full focus:outline-none focus:ring-1 focus:ring-blue-300 cursor-pointer pr-4 py-1 pl-2 rounded shadow-sm`}
                                             value={effect.type}
-                                            onChange={(e) => onUpdate(effect.id, 'type', e.target.value)}
+                                            onChange={(e) => onUpdate(effect.id, 'type', e.target.value as any)}
                                         >
                                             <option value="attribute_bonus" className="text-gray-900 bg-white">Bonus Attribut</option>
                                             <option value="xp_bonus" className="text-gray-900 bg-white">Bonus XP</option>
