@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.2",
+        "date": "2026-02-14",
+        "type": "feat",
+        "changes": [
+            "Renforcement du typage strict des éditeurs Admin (Creation, Counters, Skills)",
+            "Correction des imports de types et signatures génériques dans les composants Admin",
+            "Suppression des types 'any' résiduels dans LibraryLoader et LibraryImporter",
+            "Validation du build complet sans erreurs de typage"
+        ]
+    },
+    {
         "version": "2.49.1",
         "date": "2026-02-14",
         "type": "patch",
@@ -1319,23 +1330,6 @@
                 "type": "fixed",
                 "text": "Correction de la gestion des catégories lors de l'édition pour respecter les types de blocs (Compétences vs Historiques).",
                 "category": "fix"
-            }
-        ]
-    },
-    {
-        "version": "2.32.4",
-        "date": "2026-02-10",
-        "description": "Filtre 'Masquer acquis' pour les Bibliothèques.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Ajout d'un filtre (œil) pour masquer les compétences et spécialisations déjà acquises dans la bibliothèque.",
-                "category": "feature"
-            },
-            {
-                "type": "modified",
-                "text": "Remplacement du badge 'OFF'/'OFFICIEL' par une icône Globe pour uniformiser l'interface.",
-                "category": "ui"
             }
         ]
     }
