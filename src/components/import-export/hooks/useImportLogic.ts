@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { CharacterSheetData } from '../../../types';
 import { useNotification } from '../../../context/NotificationContext';
 import { useCharacter } from '../../../context/CharacterContext';
-import { APP_VERSION } from '../../../constants';
+import { APP_VERSION } from '../../../constants/app';
 import { createTemplateFromData, detectConflicts, smartMerge, DataConflict } from '../../../utils/importExportUtils';
 import { base64ToBlob, saveImage } from '../../../imageDB';
 import { ErrorService } from '../../../services/ErrorService';

@@ -3,7 +3,7 @@ import { generateRulesJSONContent } from '../utils/rulesGenerator';
 import { publishFileToGitHub } from '../../services/githubService';
 import { RulesData } from '../../types/rules';
 import { Save, AlertTriangle, CheckCircle, Loader2, Github, X, Info } from 'lucide-react';
-import { APP_VERSION } from '../../constants';
+import { APP_VERSION } from '../../constants/app';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 import { MotionCard } from '../../components/ui/motion/MotionCard';
 

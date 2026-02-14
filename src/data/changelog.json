@@ -1,5 +1,58 @@
 [
     {
+        "version": "2.49.11",
+        "date": "2026-02-14",
+        "type": "fix",
+        "changes": [
+            "📊 Admin : Repositionnement de la colonne 'Taille' entre 'Dernière Sync' et 'Actions'",
+            "📂 Admin : Ajout de la colonne 'Taille' dans la vue par campagne (`CampaignCharactersView`)",
+            "🎨 UI : Alignement centré et style mono pour les indicateurs de taille"
+        ]
+    },
+    {
+        "version": "2.49.10",
+        "date": "2026-02-14",
+        "type": "feat",
+        "changes": [
+            "📊 Admin : Affichage de la taille des données (JSONB) pour chaque personnage dans la Master List",
+            "⚡ Performance : Optimisation via une vue SQL (`pg_column_size`) pour éviter de charger les données complètes lors du listing",
+            "📁 UI : Ajout d'une colonne 'Taille' avec formatage intelligent (o, ko, Mo)"
+        ]
+    },
+    {
+        "version": "2.49.9",
+        "date": "2026-02-14",
+        "type": "feat",
+        "changes": [
+            "📦 Stockage : Implémentation du `StorageMonitor` pour visualiser l'espace IndexedDB (Cloud / Réglages)",
+            "🔔 Alertes : Ajout d'indicateurs visuels globaux dans la barre de navigation (Orange >= 70%, Rouge >= 90%)",
+            "📱 Mobile : Intégration des alertes de stockage dans le menu mobile",
+            "🔄 UX : Rafraîchissement automatique des statistiques de stockage lors du focus de la page"
+        ]
+    },
+    {
+        "version": "2.49.8",
+        "date": "2026-02-14",
+        "type": "refactor",
+        "changes": [
+            "📂 Structure : Déplacement de `src/constants.ts` vers `src/constants/app.ts` pour une meilleure organisation",
+            "🔗 Imports : Mise à jour de tous les chemins d'importation des constantes globales à travers le projet",
+            "🛠️ Build : Mise à jour du script `sync-version` pour supporter la nouvelle structure de fichiers"
+        ]
+    },
+    {
+        "version": "2.49.7",
+        "date": "2026-02-14",
+        "type": "maintenance",
+        "changes": [
+            "🛡️ Typage Admin : Refonte complète de la sécurité des types pour la gestion des bibliothèques (Phase C & E)",
+            "🧹 Code Health : Éradication massive des `@ts-ignore` et `any` dans les composants d'administration critiques",
+            "🔧 Hooks Admin : Typage strict des handlers génériques pour la mise à jour des compteurs et de la configuration de création",
+            "🧩 Composants : Amélioration de la robustesse de `AdminTraitLibrary`, `AdminBackgroundLibrary` et `AdminCounterLibrary`",
+            "🛡️ DB Fetches : Sécurisation des appels `DatabaseService` dans les services de chargement et d'import (Phase D)"
+        ]
+    },
+    {
         "version": "2.49.6",
         "date": "2026-02-14",
         "type": "refactor",
@@ -162,56 +215,6 @@
             "🧲 Aimant Magnétique : Le redimensionnement s'accroche proprement aux tailles standards (25%, 33%, 50%, 75%, 100%)",
             "📝 Habillage Texte : Le texte enroule désormais les images alignées à gauche ou à droite",
             "🛡️ Limites Intelligentes : L'image s'auto-limite à 55% de largeur en mode habillage pour préserver la lisibilité"
-        ]
-    },
-    {
-        "version": "2.48.13",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "✨ Journal : Restauration du traçage visuel des images",
-            "🖱️ Mode Dessin : Cliquer sur le bouton Image permet désormais de tracer directement un rectangle sur la page pour définir la zone d'insertion",
-            "📏 Intelligence : La largeur et la hauteur de l'image sont automatiquement calculées d'après votre tracé",
-            "🎯 Précision : L'image est insérée à l'emplacement exact (paragraphe) où vous relâchez la souris"
-        ]
-    },
-    {
-        "version": "2.48.12",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🔳 Images : Restauration du concept de 'Zone Rectangulaire'",
-            "📏 Contrôle Height : Ajout de boutons +/- pour ajuster la hauteur de l'image indépendamment de sa largeur",
-            "🖼️ Mode Remplissage : Ajout d'un bouton pour basculer entre 'Ajuster' (Contain) et 'Remplir' (Cover - zoom pour remplir le cadre)",
-            "🔄 Flexibilité : Bouton 'Auto' pour revenir au ratio naturel de l'image"
-        ]
-    },
-    {
-        "version": "2.48.11",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🛠️ Fix Layout : Correction de la mise à jour dynamique de la zone de défilement lors du redimensionnement massif d'images",
-            "📏 Pagination : Ajout d'un système de synchronisation plus robuste pour détecter les nouvelles pages créées par le reflow CSS"
-        ]
-    },
-    {
-        "version": "2.48.10",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🛠️ Fix Image : Correction de la visibilité des contrôles sur les petites images (25%)",
-            "📏 Mise en page : La barre d'outils de l'image peut désormais déborder du cadre et passer à la ligne si nécessaire"
-        ]
-    },
-    {
-        "version": "2.48.9",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🎨 UI Image : Ajout de filtres visuels (Sépia, Noir & Blanc) pour coller à l'esthétique Grimoire",
-            "✏️ Légendes : Édition directe des légendes sous les images",
-            "🖼️ Design : Ajout d'un cadre 'photo' avec ombre portée pour dissocier l'image du parchemin"
         ]
     }
 ]

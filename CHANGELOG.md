@@ -1,5 +1,35 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.30.0] - 2026-02-09
+
+- [object Object]
+- [object Object]
+- [object Object]
+- [object Object]
+
+## [2.29.3] - 2026-02-09
+
+- [object Object]
+- [object Object]
+- [object Object]
+
+## [2.29.2] - 2026-02-09
+
+- [object Object]
+- [object Object]
+
+## [2.29.1] - 2026-02-09
+
+- [object Object]
+- [object Object]
+- [object Object]
+
+## [2.29.0] - 2026-02-09
+
+- [object Object]
+- [object Object]
+- [object Object]
+
 ## [2.28.1] - 2026-02-09
 
 - Fix : Correction du menu 'Source' sauté au démarrage à cause du cache (ajout de de l'état isSourceSelected).

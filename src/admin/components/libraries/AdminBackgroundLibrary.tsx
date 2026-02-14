@@ -15,8 +15,7 @@ interface AdminBackgroundLibraryProps {
 }
 
 const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
-    // @ts-ignore - types might need strict alignment, but runtime is safe if shape matches
-    const list: LibraryBackgroundEntry[] = rules.libraries?.backgrounds || [];
+    const list = rules.libraries.backgrounds;
 
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,7 +55,7 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
 
     const placedNames = useMemo(() => {
         const names = new Set<string>();
-        const bgCat = rules.definitions.skillCategories?.find((c: any) => c.behavior === 'Arrière-plan')?.id || 'Col_Comp_8';
+        const bgCat = rules.definitions.skillCategories?.find(c => c.behavior === 'Arrière-plan')?.id || 'Col_Comp_8';
         const placed = rules.definitions.skills?.[bgCat] || [];
         placed.forEach(name => {
             if (name.trim()) names.add(name.trim().toLowerCase());
@@ -91,7 +90,6 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
         if (!showDeleteConfirm) return;
         onUpdate({
             ...rules,
-            // @ts-ignore
             libraries: { ...rules.libraries, backgrounds: list.filter(b => b.id !== showDeleteConfirm) }
         });
         setShowDeleteConfirm(null);
@@ -113,7 +111,6 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
 
         onUpdate({
             ...rules,
-            // @ts-ignore
             libraries: { ...rules.libraries, backgrounds: newList }
         });
         setIsModalOpen(false);
@@ -127,7 +124,6 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
         );
         onUpdate({
             ...rules,
-            // @ts-ignore
             libraries: { ...rules.libraries, backgrounds: newList }
         });
     };
@@ -242,7 +238,6 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                                             checked={item.isActive !== false}
                                             onChange={() => {
                                                 const newList = list.map(b => b.id === item.id ? { ...b, isActive: !b.isActive } : b);
-                                                // @ts-ignore
                                                 onUpdate({ ...rules, libraries: { ...rules.libraries, backgrounds: newList } });
                                             }}
                                             className="w-4 h-4 text-purple-600 rounded cursor-pointer"

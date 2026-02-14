@@ -1,6 +1,7 @@
 import { CharacterSheetData } from '../../types';
 import { RulesData, SkillCategoryConfig, SkillBehavior, RulesCardConfig } from '../../types/rules';
 import { INITIAL_DATA } from '../../data/initialState';
+import { logger } from '../logger';
 
 // Import migration modules
 import { MIGRATIONS, CURRENT_SCHEMA_VERSION } from './registry';
@@ -33,7 +34,7 @@ export const migrateData = (parsed: any): CharacterSheetData => {
                 try {
                     step(migrated);
                 } catch (e) {
-                    console.error(`[Migration] Failed to apply migration step in v${v} (index ${i}):`, e);
+                    logger.error(`[Migration] Failed to apply migration step in v${v} (index ${i}):`, e);
                     failedSteps.push({
                         version: v,
                         index: i,
@@ -55,9 +56,9 @@ export const migrateData = (parsed: any): CharacterSheetData => {
 
     if (failedSteps.length > 0) {
         migrated._migrationFailures = failedSteps;
-        console.warn(`[Migration] Data migration completed with ${failedSteps.length} failures. Schema version stayed at ${migrated._schemaVersion}`);
+        logger.warn(`[Migration] Data migration completed with ${failedSteps.length} failures. Schema version stayed at ${migrated._schemaVersion}`);
     } else if (migrationsApplied > 0) {
-        console.log(`[Migration] Successfully migrated data from v${currentVersion} to v${CURRENT_SCHEMA_VERSION}`);
+        logger.log(`[Migration] Successfully migrated data from v${currentVersion} to v${CURRENT_SCHEMA_VERSION}`);
     }
 
     return migrated as CharacterSheetData;

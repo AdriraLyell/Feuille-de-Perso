@@ -8,7 +8,7 @@ import { ErrorService } from './ErrorService';
 import { migrateRulesToV2 } from '../utils/migrations';
 import { RulesDataSchema } from '../utils/validation/rulesSchema';
 import { TABLE_GAME_SETTINGS, TABLE_LIBRARIES_TRAITS, TABLE_LIBRARIES_SKILLS, TABLE_LIBRARIES_SPECIALIZATIONS, TABLE_LIBRARIES_BACKGROUNDS, TABLE_LIBRARIES_COUNTERS } from '../constants/db';
-import { SKILL_COLUMNS } from '../constants';
+import { SKILL_COLUMNS } from '../constants/app';
 
 // Interface de la base de données (table game_settings)
 interface DBGameSetting {

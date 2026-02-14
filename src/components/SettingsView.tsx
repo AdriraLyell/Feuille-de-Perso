@@ -11,6 +11,7 @@ import AttributesEditor from './settings/AttributesEditor';
 import SkillsEditor from './settings/SkillsEditor';
 import SpecializationsEditor from './settings/SpecializationsEditor';
 import CreationConfigEditor from './settings/CreationConfigEditor';
+import StorageMonitor from './settings/StorageMonitor';
 
 import LibrarySidebar from './settings/LibrarySidebar';
 import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
@@ -260,6 +261,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
                       <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-6 after:transition-all peer-checked:bg-indigo-600"></div>
                     </label>
                   </div>
+
+                  <StorageMonitor />
 
                   <div className="p-4 border border-[#bfae85]/30 rounded-sm bg-[#fdfbf7]">
                     <h4 className="text-xs font-bold text-[#8b2e2e] uppercase tracking-widest mb-3 border-b border-[#bfae85]/20 pb-2">Informations de Synchronisation</h4>

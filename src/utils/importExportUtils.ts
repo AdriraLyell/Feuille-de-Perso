@@ -1,5 +1,5 @@
 import { CharacterSheetData, LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, AttributeEntry, DotEntry, CombatEntry, ReputationEntry, TraitEntry } from '../types';
-import { APP_VERSION } from '../constants';
+import { APP_VERSION } from '../constants/app';
 import { getImage, blobToBase64 } from '../imageDB';
 import { ImageCompressionService } from '../services/ImageCompressionService';
 import { ErrorService } from '../services/ErrorService';

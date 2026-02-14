@@ -4,7 +4,7 @@ import { CharacterSheetData } from '../types';
 import { Download, Upload, Save, Cloud } from 'lucide-react';
 import { useCharacter } from '../context/CharacterContext';
 import ThematicModal from './ui/ThematicModal';
-import { APP_VERSION } from '../constants';
+import { APP_VERSION } from '../constants/app';
 import ExportPanel from './import-export/ExportPanel';
 import ImportPanel from './import-export/ImportPanel';
 import CloudPanel from './import-export/CloudPanel';

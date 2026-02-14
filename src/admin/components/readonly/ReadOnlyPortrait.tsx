@@ -1,5 +1,6 @@
 import React from 'react';
 import { SyncedCharacter } from '../../../services/CharacterSyncService';
+import { logger } from '../../../utils/logger';
 
 interface ReadOnlyPortraitProps {
     imageId?: string;
@@ -19,7 +20,7 @@ export const ReadOnlyPortrait: React.FC<ReadOnlyPortraitProps> = ({ imageId, leg
                         setImageUrl(URL.createObjectURL(blob));
                     }
                 } catch (e) {
-                    console.error("Failed to load portrait", e);
+                    logger.error("Failed to load portrait", e);
                 }
             } else if (legacyImage) {
                 setImageUrl(legacyImage);

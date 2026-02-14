@@ -28,6 +28,7 @@ export interface SyncedCharacterSummary {
     character_name: string;
     player_name: string;
     last_synced: string;
+    data_size?: number; // Real size in bytes from view_characters_summary
 }
 
 export interface SyncResult {
@@ -87,9 +88,9 @@ export const CharacterSyncService = {
      */
     async getCharactersByPlayerName(playerName: string): Promise<SyncedCharacterSummary[]> {
         return await DatabaseService.fetchAll<SyncedCharacterSummary>(
-            'characters',
+            'view_characters_summary',
             {
-                select: 'id, character_name, player_name, last_synced, setting_id',
+                select: 'id, character_name, player_name, last_synced, setting_id, data_size',
                 eq: { player_name: playerName.trim() },
                 order: { column: 'last_synced', ascending: false }
             },
@@ -102,9 +103,9 @@ export const CharacterSyncService = {
      */
     async getAllCharacters(): Promise<SyncedCharacterSummary[]> {
         return await DatabaseService.fetchAll<SyncedCharacterSummary>(
-            'characters',
+            'view_characters_summary',
             {
-                select: 'id, character_name, player_name, last_synced, setting_id',
+                select: 'id, character_name, player_name, last_synced, setting_id, data_size',
                 order: { column: 'last_synced', ascending: false }
             },
             'CharacterSyncService.getAllCharacters'
@@ -116,9 +117,9 @@ export const CharacterSyncService = {
      */
     async getCharactersBySettingId(settingId: string): Promise<SyncedCharacterSummary[]> {
         return await DatabaseService.fetchAll<SyncedCharacterSummary>(
-            'characters',
+            'view_characters_summary',
             {
-                select: 'id, setting_id, character_name, player_name, last_synced',
+                select: 'id, setting_id, character_name, player_name, last_synced, data_size',
                 eq: { setting_id: settingId },
                 order: { column: 'last_synced', ascending: false }
             },
