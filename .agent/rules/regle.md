@@ -12,6 +12,9 @@ Ces règles sont la source de vérité pour le comportement de l'agent dans ce w
 - **Typage Strict** : Éviter `any` et `@ts-ignore`. Préférer les structures Zod et les types inférés.
 - **UX Premium** : Interfaces vivantes, micro-animations, feedback visuel immédiat.
 - **Outil de Navigation (Playwright)** : Utiliser le `browser_subagent` pour valider visuellement les changements complexes (ex: pagination, overflow, responsive) lorsque les logs ne suffisent pas.
+- **GitHub CLI (gh)** : Utiliser `gh run view --log` pour déboguer les échecs de CI directement depuis le terminal.
+- **Supabase & DB Tools** : Utiliser le serveur MCP `supabase-mcp-server` pour les migrations (`apply_migration`), l'inspection (`execute_sql`) et les logs système.
+- **Type Safety & Linting** : Utiliser les serveurs MCP `typescript` (renommage de symboles, diagnostics) et `eslint` pour garantir la conformité avant chaque commit.
 - **Logging** : Utiliser `src/utils/logger.ts` au lieu de `console.log` directement.
 
 ## 2. DOCUMENTATION DE RÉFÉRENCE
