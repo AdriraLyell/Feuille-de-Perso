@@ -1,4 +1,5 @@
 import { saveImage, base64ToBlob } from '../../imageDB';
+import { logger } from '../../utils/logger';
 
 /**
  * Migration: Processes Tiptap JSON to move Base64 images to IndexedDB
@@ -28,7 +29,7 @@ export const migrateBookImages = async (content: any): Promise<any> => {
                     }
                 };
             } catch (err) {
-                console.error("Failed to migrate image during JSON processing", err);
+                logger.error("Failed to migrate image during JSON processing", err);
                 return node; // Fallback to original
             }
         }

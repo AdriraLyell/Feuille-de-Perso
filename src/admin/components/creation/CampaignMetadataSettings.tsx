@@ -1,11 +1,12 @@
 import React from 'react';
+import { RulesData } from '../../../types/rules';
 import { Info, MessageSquare, Eye, EyeOff } from 'lucide-react';
 
 interface CampaignMetadataSettingsProps {
     description?: string;
     welcomeMessage?: string;
     showMetadataToPlayers: boolean;
-    onUpdate: (field: string, value: unknown) => void;
+    onUpdate: <K extends keyof RulesData>(field: K, value: RulesData[K]) => void;
 }
 
 const CampaignMetadataSettings: React.FC<CampaignMetadataSettingsProps> = ({

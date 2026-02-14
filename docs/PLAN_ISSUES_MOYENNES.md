@@ -11,7 +11,7 @@
 | # | Issue | Statut | Détails |
 |---|-------|--------|---------|
 | 4.1 | 60+ console.log | **PARTIEL** | Logger conditionnel `src/utils/logger.ts`, **24 `console.*` directs restants** |
-| 4.2 | 77+ `any` / 27 `@ts-ignore` | **PARTIEL** | **40 `as any`, 39 `@ts-ignore`** en production (Phase A complétée, Phases B-E restantes). Hausse due à ImageSyncResolver (+8), composants book (+5), admin libraries (+10). |
+| 4.2 | 77+ `any` / 27 `@ts-ignore` | **PARTIEL** | **Approx. 30 `as any`, 35 `@ts-ignore`** (Phases A-D complétées, Phase E restante). |
 | 4.3 | Fichiers trop gros | **PARTIEL** | Refactorisés: CreationHUD 537→168, CharacterSheet 788→478, LibraryView 528→409. **Nouveaux identifiés**: CharacterReadOnlyView (427L), SpecializationLibrary (462L), SkillsEditor (413L), ImportPanel (389L), AdminDashboard (359L), CreationConfigEditor (320L) |
 | 4.4 | Promises non gérées | **CORRIGÉ** | try/catch/finally sur GlobalPlayersView et autres |
 | 4.5 | Rate-limiting GitHub | **CORRIGÉ** | 50 appels/heure via sessionStorage |
@@ -56,10 +56,10 @@
 | Catégorie | Count | Cause racine | Statut |
 |-----------|-------|--------------|--------|
 | A. Accès dynamique aux propriétés (skills/counters) | ~3 | `@ts-ignore` pour accès `state.skills[key]` | **Phase A créée** (stateAccessors.ts) |
-| B. Mapping DB snake_case → camelCase | ~9 | `(row as any).field_name` dans LibraryMapper | **À faire** (Phase B) |
-| C. Handlers d'événements génériques | ~8 | `value: any` dans les éditeurs admin | **À faire** (Phase C) |
-| D. Fetch DB non typés | ~10 | `fetchAll<any>(...)` dans LibraryLoader/Importer | **À faire** (Phase D) |
-| E. Layout (colonnes/blocs) | ~8 | `as any[]` dans useSheetLayout, `as any` dans CharacterSheet | **À faire** (Phase E) |
+| B. Mapping DB snake_case → camelCase | ~9 | `(row as any).field_name` dans LibraryMapper | **FAIT** |
+| C. Handlers d'événements génériques | ~8 | `value: any` dans les éditeurs admin | **FAIT** |
+| D. Fetch DB non typés | ~10 | `fetchAll<any>(...)` dans LibraryLoader/Importer | **FAIT** |
+| E. Layout (colonnes/blocs) | ~8 | `as any[]` dans useSheetLayout, `as any` dans CharacterSheet | **À faire** |
 | F. JSONB Postgres brut | ~8 | `configurations: Record<string, any>` dans DBGameSetting | **Acceptable** (ne pas toucher) |
 | G. Logger variadic | ~4 | `(...args: any[])` | **Acceptable** (ne pas toucher) |
 | H. Migrations/utils legacy | ~11 | Migrations, importExport, ErrorService | **Acceptable** (legacy) |

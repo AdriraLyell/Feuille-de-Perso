@@ -1,4 +1,4 @@
-import { CharacterSheetData, LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry } from '../types';
+import { CharacterSheetData, LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, AttributeEntry, DotEntry, CombatEntry, ReputationEntry, TraitEntry } from '../types';
 import { APP_VERSION } from '../constants';
 import { getImage, blobToBase64 } from '../imageDB';
 import { ImageCompressionService } from '../services/ImageCompressionService';
@@ -9,7 +9,7 @@ import { ErrorService } from '../services/ErrorService';
  * Extracted from ExportPanel for reuse in safety modals.
  */
 export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (msg: string, type: 'info' | 'success' | 'danger', scope?: any) => void) => {
-    const dataToProcess = JSON.parse(JSON.stringify(data));
+    const dataToProcess: CharacterSheetData = JSON.parse(JSON.stringify(data));
 
     // 1. Resolve Images from DB
     if (dataToProcess.page2?.characterImageId) {
@@ -34,20 +34,21 @@ export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (
                         try {
                             const blob = await getImage(img.imageId);
                             if (blob) {
-                                (img as any).base64Data = await blobToBase64(blob);
+                                img.base64Data = await blobToBase64(blob);
                             }
                         } catch (e) {
                             ErrorService.handleError(e, { context: 'ExportCharacter', userMessage: `Impossible d'exporter l'image de la note ${img.id}` });
                         }
-                        delete img.imageId;
+                        // Type assertion needed because imageId is required in runtime type but removed for export
+                        delete (img as any).imageId;
                     }
                 }
             }
         }
     }
 
-    if (!dataToProcess.appVersion) {
-        dataToProcess.appVersion = APP_VERSION;
+    if (!(dataToProcess as any).appVersion) {
+        (dataToProcess as any).appVersion = APP_VERSION;
     }
 
     // 2. Compression
@@ -109,7 +110,7 @@ export const createTemplateFromData = (source: CharacterSheetData): CharacterShe
     if (clean.attributes) {
         Object.keys(clean.attributes).forEach(cat => {
             if (Array.isArray(clean.attributes[cat])) {
-                clean.attributes[cat].forEach((attr: any) => {
+                clean.attributes[cat].forEach((attr: AttributeEntry) => {
                     attr.val1 = ""; attr.val2 = ""; attr.val3 = "";
                     attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
                 });
@@ -121,7 +122,7 @@ export const createTemplateFromData = (source: CharacterSheetData): CharacterShe
     Object.keys(clean.skills).forEach(cat => {
         const skillList = clean.skills[cat as keyof typeof clean.skills];
         if (Array.isArray(skillList)) {
-            skillList.forEach((skill: any) => {
+            skillList.forEach((skill: DotEntry) => {
                 skill.value = 0;
                 skill.creationValue = 0;
                 skill.current = 0;
@@ -130,19 +131,23 @@ export const createTemplateFromData = (source: CharacterSheetData): CharacterShe
     });
 
     // Reset Combat
-    clean.combat.weapons.forEach((w: any) => { w.weapon = ""; w.level = ""; w.init = ""; w.attack = ""; w.damage = ""; w.parry = ""; });
-    clean.combat.armor.forEach((a: any) => { a.type = ""; a.protection = ""; a.weight = ""; });
+    if (clean.combat && clean.combat.weapons) {
+        clean.combat.weapons.forEach((w: CombatEntry) => { w.weapon = ""; w.level = ""; w.init = ""; w.attack = ""; w.damage = ""; w.parry = ""; });
+    }
+    if (clean.combat && clean.combat.armor) {
+        clean.combat.armor.forEach((a: { type: string, protection: string, weight: string }) => { a.type = ""; a.protection = ""; a.weight = ""; });
+    }
     clean.combat.stats = { agility: '', dexterity: '', force: '', size: '' };
 
     // Reset Page 2 Details
     clean.page2.lieux_importants = "";
     clean.page2.contacts = "";
-    clean.page2.reputation.fill({ reputation: '', lieu: '', valeur: '' });
+    clean.page2.reputation.forEach((r: ReputationEntry) => { r.reputation = ''; r.lieu = ''; r.valeur = ''; });
     clean.page2.connaissances = "";
     clean.page2.valeurs_monetaires = "";
     clean.page2.armes_list = "";
-    clean.page2.avantages.fill({ name: '', value: '' });
-    clean.page2.desavantages.fill({ name: '', value: '' });
+    clean.page2.avantages.forEach((t: TraitEntry) => { t.name = ''; t.value = ''; });
+    clean.page2.desavantages.forEach((t: TraitEntry) => { t.name = ''; t.value = ''; });
     clean.page2.equipement = "";
     clean.page2.notes = "";
     clean.page2.characterImage = "";
@@ -152,9 +157,13 @@ export const createTemplateFromData = (source: CharacterSheetData): CharacterShe
     clean.specializations = {};
 
     // Counters
-    clean.counters.volonte.value = 3; clean.counters.volonte.current = 0;
-    clean.counters.confiance.value = 3; clean.counters.confiance.current = 0;
-    clean.counters.custom.forEach((c: any) => { c.value = 0; c.current = 0; });
+    if (clean.counters) {
+        if (clean.counters.volonte) { clean.counters.volonte.value = 3; clean.counters.volonte.current = 0; }
+        if (clean.counters.confiance) { clean.counters.confiance.value = 3; clean.counters.confiance.current = 0; }
+        if (clean.counters.custom) {
+            clean.counters.custom.forEach((c: DotEntry) => { c.value = 0; c.current = 0; });
+        }
+    }
 
     // Reset Specializations Library
     clean.specializationLibrary = [];

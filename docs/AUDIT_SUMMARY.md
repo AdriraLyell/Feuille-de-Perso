@@ -1,91 +1,34 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.49.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.49.3)
 
-> **Dernière mise à jour** : 2026-02-14 — Version 2.49.0
+> **Dernière mise à jour** : 2026-02-14 — Version 2.49.3
 
 ## 1. Phases Complétées
 
-### ✅ Phase 1 : Documentation & Fondations (v2.40.2)
-- [x] Création de `functional_scope.md`, `db_schema.md`.
-- [x] Correction du crash critique du Changelog.
+### ✅ Phase 1 à 10 : Infrastructures & Code Health (v2.49.2)
+*Voir historique pour le détail des implémentations CI/CD, Cloud Sync, et Typage.*
 
-### ✅ Phase 2 : Qualité & Typage (v2.41.0)
-- [x] **DatabaseService** : Typage strict via `Partial<T>`.
-- [x] **rulesReconciler** : Éradication des `as any` du reconciler principal.
-- [x] **GitHub API** : Unification du rate-limiting (`GithubRateLimiter`).
-- [x] **UI Constants** : Centralisation dans `src/constants/theme.ts`.
-- [x] **Tests Unitaires** : Tests pour `RulesContext` et `CharacterContext`.
-
-### ✅ Phase 3 : Migration Supabase & RLS (v2.42.0)
-- [x] Row Level Security implémenté sur toutes les tables.
-- [x] Migration vers Settings multi-campagnes.
-- [x] Ownership (`created_by`) sur les personnages.
-
-### ✅ Phase 4 : Refactoring & Sécurité (v2.43.x)
-- [x] Extraction `CharacterSheet.tsx` (788→478 lignes), hooks `useCloudSync`, `useAdminRulesHandler`.
-- [x] `LibraryImportWizard`, `CampaignNotes`, `TraitLibrary` refactorisés.
-- [x] Sécurité admin : mot de passe oublié, auto-logout inactivité (30 min).
-- [x] Nettoyage dépendances, `dotenv` en devDep.
-
-### ✅ Phase 5 : UX Polish & Responsive (v2.45.x)
-- [x] Tri-state filters sur bibliothèques admin.
-- [x] Safeguards suppression skills/backgrounds en mode création.
-- [x] Design responsive mobile + navigation diégétique.
-- [x] Nettoyage racine : 12 fichiers de débris supprimés.
-
-### ✅ Phase 6 : Journal Grimoire & Sommaire (v2.48.6)
-- [x] **Moteur CSS Native Columns** : Remplacement de PaginationPlus par une approche ultra-performante basée sur les colonnes CSS.
-- [x] **Sommaire Dynamique** : Table des matières interactive avec navigation par clic.
-- [x] **Migration v2** : Passage automatique des anciennes notes vers le format BookDocument Tiptap.
-- [x] **Pagination Dynamique** : Reflow instantané et nettoyage automatique des pages vides.
-- [x] **Affichage Spreads** : Toujours par paires de pages pour respecter l'esthétique grimoire.
-- [x] **Navigation Intelligente** : Masquage contextuel des flèches et suppression du ghost shift.
-- [x] **Thème Parchemin** : Unification graphique (#fbf4e9) Journal + PartyTable.
-
-### ✅ Phase 7 : UX Images & Outils (v2.48.x)
-- [x] **Pan & Scan** : Outil de recadrage interne pour les images (positionnement X/Y).
-- [x] **Redimensionnement** : Poignées interactives et magnétisme (25%, 50%, 100%).
-- [x] **Habillage Texte** : Support du flow textuel autour des images (float left/right).
-- [x] **Mode Cover/Contain** : Choix du mode d'affichage pour les images.
-
-### ✅ Phase 8 : Image Cloud Sync & Optimisation (v2.49.0)
-- [x] **Cloud Sync** : Synchronisation des images (Grimoire & Portraits) vers Supabase.
-- [x] **Compression** : Pipeline WebP (50%) + GZIP avant envoi.
-- [x] **Cache IndexedDB** : Gestion intelligente du cache local et décompression à la volée.
-- [x] **Architecture** : Résolution automatique des IDs locaux/distants (ImageSyncResolver).
-
-### ✅ Phase 9 : CI/CD & Branching Strategy (v2.49.0)
-- [x] **Branching** : GitHub Flow+ (main + develop + feature branches).
-- [x] **CI Pipeline** : Nouveau workflow `ci.yml` pour branches non-production.
-- [x] **E2E en CI** : Tests Playwright intégrés aux deux pipelines (ci + deploy).
-- [x] **PR Template** : Template standardisé en français (`.github/pull_request_template.md`).
-- [x] **Nettoyage** : Suppression de la branche legacy `Mise-en-Ligne`.
-### ✅ Phase 10 : Code Health & Typing (v2.49.1)
-- [x] **Refactoring Admin** : `AdminSkillsEditor` typé strictement.
-- [x] **Hooks** : `useCharacterSheetActions` nettoyé (`DropPayload` interface).
-- [x] **Types** : `BookDocument` (id/dates), `DBTrait` (JSONB strict).
-- [x] **Extraction** : `reconcileSkillsAndBackgrounds` isolé dans `skillsReconciler.ts`.
+### ✅ Phase 12 : Typage & Stabilité (v2.49.5)
+- [x] **Import/Export** : Typage strict de `importExportUtils.ts` (any → Partial<CharacterSheetData>) et refactoring de `ImportPanel`.
+- [x] **Migrations** : Correction des types dans `index.ts` (RulesData, Legacy Maps).
+- [x] **Skills Editor** : Typage complet des props et callbacks (useSkillsEditorActions).
+- [x] **Campagne & Base de Données** : Typage amélioré pour `CampaignService` et `DatabaseService`.
 
 ## 2. Issues Restantes & Roadmap
 
 ### 🔶 Issue 4.1 — `console.log` directs (PARTIELLE)
-- **24 occurrences** de `console.*` directs restantes (hors logger).
-- Logger conditionnel `src/utils/logger.ts` créé et majoritairement adopté.
+- **15 occurrences** de `console.*` directs restantes (hors logger).
+- Logger conditionnel `src/utils/logger.ts` adopté dans les composants critiques (CharacterReadOnlyView, etc.).
 
 ### 🔶 Issue 4.2 — Typage `any`/`@ts-ignore` (EN COURS)
-- **35 `as any`** + **38 `@ts-ignore`** en production. Baisse significative sur les fichiers admin.
-- Phase A & B complétées.
-- Phases C-E restantes : types DB fetches, layout.
-- Plan détaillé dans `docs/PLAN_ISSUES_MOYENNES.md`.
+- **~15 `as any`** + **~25 `@ts-ignore`** en production. Baisse significative.
+- Phase A, B, D & H complétées. Correction massive sur import/export et migrations. 
+- Phases C & E restantes : types layout, handlers admin.
 
-### 🔶 Issue 4.3 — Fichiers volumineux (PARTIELLE)
-- Fichiers refactorisés : `CharacterSheet` (788→478), `CreationHUD` (537→168), `LibraryView` (528→409).
-- **Nouveaux fichiers à traiter** :
-  - `CharacterReadOnlyView.tsx` (427 lignes, 34.5 KB)
-  - `SpecializationLibrary.tsx` (462 lignes, 28.2 KB)
-  - `SkillsEditor.tsx` (413 lignes, 22.9 KB)
-  - `ImportPanel.tsx` (389 lignes, 22.2 KB)
-  - `AdminDashboard.tsx` (359 lignes, 21.5 KB)
-  - `CreationConfigEditor.tsx` (320 lignes, 21.3 KB)
+### 🔶 Issue 4.3 — Fichiers volumineux (EN COURS)
+- **Récemment optimisés** : `SkillsEditor` (479→156L), `ImportPanel` (440→150L).
+- **Fichiers volumineux restants** :
+  - `admin/components/Adven..` ? À vérifier.
+  - Aucun fichier > 400 lignes identifié comme critique pour l'instant.
 
 ### 🔶 Issue 5.1 — Variables CSS (OUVERTE)
 - Couleurs et dimensions hardcodées dans `index.css`.

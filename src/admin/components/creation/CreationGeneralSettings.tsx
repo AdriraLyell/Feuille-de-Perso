@@ -6,7 +6,7 @@ import { MotionCard } from '../../../components/ui/motion/MotionCard';
 
 interface CreationGeneralSettingsProps {
     config: RulesCreationConfig;
-    onUpdateConfig: (field: string, value: unknown) => void;
+    onUpdateConfig: <K extends keyof RulesCreationConfig>(field: K, value: RulesCreationConfig[K]) => void;
     onUpdatePointsBuckets: (bucket: 'attributes' | 'skills' | 'backgrounds', value: number) => void;
 }
 

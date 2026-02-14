@@ -1,5 +1,50 @@
 [
     {
+        "version": "2.48.7",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🛡️ Schéma : Correction critique du Zod schema pour inclure bookDocument (évite la perte de données au rechargement)",
+            "🔧 Typage : Amélioration du typage dans ChapterHeaderView (suppression des 'any' Tiptap)",
+            "📋 Task List : Mise à jour du suivi de progression du Grimoire"
+        ]
+    },
+    {
+        "version": "2.48.6",
+        "date": "2026-02-13",
+        "type": "minor",
+        "changes": [
+            "📖 Sommaire : Implémentation du Sommaire dynamique (Table des Matières) automatique en début de livre",
+            "🚀 Navigation : Support de la navigation par clic depuis le sommaire vers les chapitres correspondants",
+            "🔄 Migration : Automatisation de la migration des anciennes notes de journal vers le nouveau format Grimoire (v2)",
+            "🧹 Clean Up : Suppression des anciens composants de journal obsolètes (NotebookTextarea, useJournal, etc.)"
+        ]
+    },
+    {
+        "version": "2.48.5",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🧠 UX : Migration vers la sélection native Tiptap (setTextSelection) pour un surlignage fiable et persistant des titres de chapitres"
+        ]
+    },
+    {
+        "version": "2.48.4",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🎯 UX : Correction critique de la sélection locale des chapitres (ne saute plus au premier chapitre du livre)"
+        ]
+    },
+    {
+        "version": "2.48.3",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "✍️ UX : Garantie de la sélection automatique du titre (surlignage) lors de la création d'un chapitre via un cycle de rendu stabilisé"
+        ]
+    },
+    {
         "version": "2.48.2",
         "date": "2026-02-13",
         "type": "patch",
@@ -1430,55 +1475,6 @@
         "changes": [
             "Fix : Correction du menu 'Source' sauté au démarrage à cause du cache (ajout de de l'état isSourceSelected).",
             "Fix : Correction des doublons de clés React (IDs dupliqués) dans les blocs de compétences quand les règles ont des noms identiques."
-        ]
-    },
-    {
-        "version": "2.28.0",
-        "date": "2026-02-09",
-        "description": "Phase 3 : Optimisations de performance majeures.",
-        "changes": [
-            "Réduction de l'inlining des assets (limite à 10Ko) pour accélérer le parsing HTML initial.",
-            "Implémentation du Lazy Loading pour les modules Admin et les modales secondaires via React.lazy et Suspense.",
-            "Mise en cache persistante des règles via IndexedDB (idb-keyval) pour un chargement instantané au rafraîchissement.",
-            "Amélioration de la structure de build avec des fallbacks de chargement (loaders)."
-        ]
-    },
-    {
-        "version": "2.27.2",
-        "date": "2026-02-09",
-        "description": "Ajustements visuels de la synchronisation.",
-        "changes": [
-            "Retrait des animations de pulsation sur l'indicateur d'auto-sync pour plus de discrétion."
-        ]
-    },
-    {
-        "version": "2.27.1",
-        "date": "2026-02-09",
-        "description": "Améliorations UX de la synchronisation automatique.",
-        "changes": [
-            "L'onglet 'Cloud' est désormais accessible en tout temps (hors réglages avancés).",
-            "Ajout d'un feedback visuel en temps réel sur le bouton de synchronisation (icône en rotation + texte 'Sync...').",
-            "Correction d'un problème de portée de variable dans le contexte de personnage."
-        ]
-    },
-    {
-        "version": "2.27.0",
-        "date": "2026-02-09",
-        "description": "Implémentation de la synchronisation automatique (Auto-Sync).",
-        "changes": [
-            "Ajout d'un toggle d'auto-sync dans la modale de synchronisation.",
-            "Nouvel onglet 'Cloud' dans les réglages de la fiche pour gérer l'auto-sync.",
-            "Mécanisme de sauvegarde automatique debounced (10s) pour éviter les surcharges.",
-            "Indicateurs visuels d'état de synchronisation dans la barre de navigation."
-        ]
-    },
-    {
-        "version": "2.26.1",
-        "date": "2026-02-09",
-        "changes": [
-            "Fix: Correction d'un bug 400 lors du chargement des personnages orphelins (ID 'orphan')",
-            "Refactor: Migration finale de PlayerService vers DatabaseService",
-            "Robustesse: Centralisation totale des appels Supabase dans la couche service"
         ]
     }
 ]

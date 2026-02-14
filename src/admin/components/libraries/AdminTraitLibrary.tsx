@@ -267,7 +267,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
         if (!editForm) return;
         setEditForm({
             ...editForm,
-            effects: (editForm.effects || []).map(e => e.id === id ? { ...e, [field]: value } : e)
+            effects: (editForm.effects || []).map(e => e.id === id ? { ...e, [field]: value } as TraitEffect : e)
         });
     };
 

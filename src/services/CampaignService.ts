@@ -202,7 +202,7 @@ export const CampaignService = {
             });
 
             // Counters
-            const counterCatDef = rules.definitions.skillCategories?.find((c: any) => c.behavior === 'Compteur');
+            const counterCatDef = rules.definitions.skillCategories?.find((c) => c.behavior === 'Compteur');
             const counterCat = counterCatDef?.id || SKILL_COLUMNS.COL_9;
             if (!rules.definitions.skills[counterCat]) rules.definitions.skills[counterCat] = [];
             libraries.counters.forEach(c => {

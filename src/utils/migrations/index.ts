@@ -1,5 +1,5 @@
 import { CharacterSheetData } from '../../types';
-import { RulesData, SkillCategoryConfig, SkillBehavior } from '../../types/rules';
+import { RulesData, SkillCategoryConfig, SkillBehavior, RulesCardConfig } from '../../types/rules';
 import { INITIAL_DATA } from '../../data/initialState';
 
 // Import migration modules
@@ -158,7 +158,12 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
             global: { maxAttributeScore: 5, maxSkillScore: 10, secondaryAttributes: false },
             creation: INITIAL_DATA.creationConfig,
             xpCosts: { attributeFactor: 6, skillFactor: 1, specializationFactor: 0 },
-            cards: INITIAL_DATA.creationConfig.cardConfig as any
+            cards: {
+                ...INITIAL_DATA.creationConfig.cardConfig,
+                ranks: [],
+                counts: [],
+                maxLabel: 'Max'
+            }
         };
     } else {
         // Ensure sub-sections exist
@@ -172,7 +177,16 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
             };
         }
         if (!rules.configurations.cards && rules.configurations.creation.cardConfig) {
-            rules.configurations.cards = rules.configurations.creation.cardConfig;
+            const legacyConfig = rules.configurations.creation.cardConfig as Partial<RulesCardConfig>;
+            rules.configurations.cards = {
+                active: legacyConfig.active ?? true,
+                baseStart: legacyConfig.baseStart ?? 2,
+                increment: legacyConfig.increment ?? 0.5,
+                bestSkillsCount: legacyConfig.bestSkillsCount ?? 6,
+                ranks: legacyConfig.ranks || [],
+                counts: legacyConfig.counts || [],
+                maxLabel: legacyConfig.maxLabel || ''
+            };
         }
     }
 
@@ -205,13 +219,16 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
 
     // Populate libraries.counters from definitions.counters if empty
     if (rules.libraries.counters.length === 0 && rules.definitions.counters) {
-        rules.libraries.counters = Object.values(rules.definitions.counters).map((counter: any) => ({
-            id: counter.id,
-            name: counter.name,
-            description: "",
-            defaultMax: counter.max,
-            xpCost: counter.xpCost
-        }));
+        rules.libraries.counters = Object.values(rules.definitions.counters).map((counter: unknown) => {
+            const c = counter as { id: string; name: string; max: number; xpCost: number };
+            return {
+                id: c.id,
+                name: c.name,
+                description: "",
+                defaultMax: c.max,
+                xpCost: c.xpCost
+            };
+        });
     }
 
     return rules as RulesData;

@@ -4,7 +4,7 @@ import { RulesCardConfig } from '../../../types/rules';
 
 interface CardSystemConfigProps {
     config: RulesCardConfig;
-    onUpdateCardConfig: (field: string, value: unknown) => void;
+    onUpdateCardConfig: <K extends keyof RulesCardConfig>(field: K, value: RulesCardConfig[K]) => void;
 }
 
 const CardSystemConfig: React.FC<CardSystemConfigProps> = ({ config, onUpdateCardConfig }) => {

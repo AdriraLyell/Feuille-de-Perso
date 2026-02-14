@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Plus, Award, Edit2, Trash2, HelpCircle, Save, X, AlertTriangle, Layers, UploadCloud, CheckCircle2, Circle, Lock, Globe } from 'lucide-react';
+import { Search, Plus, Award, Save, UploadCloud, CheckCircle2, Circle } from 'lucide-react';
 import { RulesData } from '../../../types/rules';
 import { LibrarySpecializationEntry } from '../../../types';
 import { smartIncludes } from '../../../utils/stringUtils';
@@ -7,6 +7,10 @@ import ThematicModal from '../../../components/ui/ThematicModal';
 import { useNotification } from '../../../context/NotificationContext';
 import { publishFileToGitHub } from '../../../services/githubService';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
+
+// Sub components
+import { SpecListItem } from './specialization/SpecListItem';
+import { SpecModalContent } from './specialization/SpecModalContent';
 
 interface AdminSpecializationLibraryProps {
     rules: RulesData;
@@ -27,12 +31,6 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
 
     const library = rules.libraries.specializations || [];
 
-    // Flatten all skills for mapping (Admin sees all skills in rules)
-    // But wait, rules.libraries.skills contains the official skills.
-    // We should also consider the structure of rules.skills (categories).
-    // Actually, in Admin, we mostly care about `rules.libraries.skills` (the official reserve) 
-    // AND the base skills defined in `rules.skills`.
-
     const allSkills = useMemo(() => {
         const skills: { id: string, name: string }[] = [];
 
@@ -41,8 +39,6 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
             Object.values(rules.definitions.skills).forEach(categorySkills => {
                 categorySkills.forEach(skillName => {
                     if (skillName && skillName.trim() !== '') {
-                        // For base skills in rules, we don't have IDs. 
-                        // We use the Name as the ID. The Player side must handle this loose coupling.
                         skills.push({ id: skillName, name: skillName });
                     }
                 });
@@ -61,14 +57,12 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         return skills.sort((a, b) => a.name.localeCompare(b.name));
     }, [rules.definitions, rules.libraries.skills]);
 
-    // Filtered skills for modal selection
     const filteredSkillsForModal = useMemo(() => {
         return allSkills.filter(s =>
             smartIncludes(s.name, skillSearch) || (editingEntry?.skillIds.includes(s.id))
         );
     }, [allSkills, skillSearch, editingEntry?.skillIds]);
 
-    // Compute derived list
     const filteredLibrary = useMemo(() => {
         return (rules.libraries.specializations || []).filter(s =>
             smartIncludes(s.name, searchTerm) ||
@@ -155,6 +149,12 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         addLog(`Spécialisation officielle "${editingEntry.name}" enregistrée.`, 'success', 'settings');
         setIsModalOpen(false);
         setEditingEntry(null);
+    };
+
+    const handleToggle = (id: string, currentlyActive: boolean) => {
+        const currentList = rules.libraries.specializations || [];
+        const newList = currentList.map(s => s.id === id ? { ...s, isActive: !currentlyActive } : s);
+        onUpdate({ ...rules, libraries: { ...rules.libraries, specializations: newList } });
     };
 
     const handleBulkSelect = (active: boolean) => {
@@ -280,80 +280,17 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                     <div className="text-center text-[#5c4d41]/60 py-10 italic">Aucun résultat.</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {filteredLibrary.map(entry => {
-                            const isGloballyUsed = globalUsage[entry.id] > 0;
-                            const isLocked = isGloballyUsed;
-
-                            return (
-                                <div key={entry.id} className={`bg-white border rounded p-2 transition-shadow group ${entry.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
-                                    <div className="flex items-center gap-2 mb-1.5">
-                                        {/* 1. Toggle */}
-                                        <div className="w-8 flex justify-center shrink-0">
-                                            <input
-                                                type="checkbox"
-                                                checked={entry.isActive !== false}
-                                                onChange={() => {
-                                                    const currentList = rules.libraries.specializations || [];
-                                                    const newList = currentList.map(s => s.id === entry.id ? { ...s, isActive: !s.isActive } : s);
-                                                    onUpdate({ ...rules, libraries: { ...rules.libraries, specializations: newList } });
-                                                }}
-                                                className="w-4 h-4 text-amber-600 rounded cursor-pointer"
-                                                title={entry.isActive !== false ? "Désactiver" : "Activer"}
-                                            />
-                                        </div>
-
-                                        {/* 2. Status Icons */}
-                                        <div className="w-16 flex items-center gap-1 shrink-0">
-                                            {entry.isGlobal && <div title="Item Global"><Globe size={14} className="text-indigo-500" /></div>}
-                                            {isLocked && (
-                                                <div className="text-amber-600" title="Utilisée dans d'autres campagnes">
-                                                    <Lock size={14} />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* 3. Content */}
-                                        <div className="flex-grow overflow-hidden pr-2">
-                                            <div className={`font-serif font-black uppercase text-xs tracking-wide truncate ${entry.isActive === false ? 'text-slate-500 line-through' : 'text-[#4a3b32]'}`} title={entry.name}>
-                                                {entry.name}
-                                            </div>
-                                        </div>
-
-                                        {/* 4. Actions */}
-                                        <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                                            <button onClick={() => handleOpenEdit(entry)} className="text-blue-500 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
-                                            <button
-                                                onClick={() => handleDelete(entry.id, entry.name)}
-                                                disabled={isLocked}
-                                                className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
-                                                title={isLocked ? "Suppression bloquée : utilisée" : "Supprimer définitivement"}
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="ml-10"> {/* Aligned with name content start */}
-                                        {entry.description && (
-                                            <p className="text-[10px] text-[#5c4d41] italic line-clamp-1 mb-1 opacity-80">{entry.description}</p>
-                                        )}
-                                        <div className="flex flex-wrap gap-1 mb-1">
-                                            {entry.skillIds.map(sid => {
-                                                const s = allSkills.find(sk => sk.id === sid);
-                                                return (
-                                                    <span key={sid} className="text-[8px] bg-stone-50 text-[#5c4d41]/60 px-1 py-0.5 rounded-sm border border-[#bfae85]/10">
-                                                        {s ? s.name : sid}
-                                                    </span>
-                                                );
-                                            })}
-                                        </div>
-                                        <div className="text-[9px] text-[#5c4d41]/50 border-t border-stone-100 pt-0.5">
-                                            Seuil : <span className="font-bold text-amber-700">{entry.defaultMinLevel}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                        {filteredLibrary.map(entry => (
+                            <SpecListItem
+                                key={entry.id}
+                                entry={entry}
+                                isLocked={globalUsage[entry.id] > 0}
+                                allSkills={allSkills}
+                                onEdit={handleOpenEdit}
+                                onDelete={handleDelete}
+                                onToggle={handleToggle}
+                            />
+                        ))}
                     </div>
                 )}
             </div>
@@ -375,95 +312,16 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                 }
             >
                 {editingEntry && (
-                    <div className="flex flex-col gap-4 py-2">
-                        <div>
-                            <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Nom</label>
-                            <input
-                                className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-black font-serif text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm"
-                                value={editingEntry.name}
-                                onChange={(e) => setEditingEntry({ ...editingEntry, name: e.target.value })}
-                                autoFocus
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Compétences associées</label>
-                            <div className="relative mb-2">
-                                <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-[#5c4d41]/60" />
-                                <input
-                                    className="w-full pl-7 pr-2 py-1 text-[11px] border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none bg-white/50"
-                                    placeholder="Filtrer les compétences..."
-                                    value={skillSearch}
-                                    onChange={(e) => setSkillSearch(e.target.value)}
-                                />
-                                {skillSearch && (
-                                    <button
-                                        onClick={() => setSkillSearch('')}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-[#5c4d41]/60 hover:text-gray-600"
-                                    >
-                                        <X size={12} />
-                                    </button>
-                                )}
-                            </div>
-                            <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-[#bfae85]/50 rounded-sm p-2 bg-white/30 custom-scrollbar">
-                                {filteredSkillsForModal.length === 0 ? (
-                                    <div className="col-span-2 text-center py-2 text-[10px] text-[#5c4d41]/60 italic">Aucun résultat.</div>
-                                ) : filteredSkillsForModal.map(skill => (
-                                    <label key={skill.id} className={`flex items-center gap-2 text-xs cursor-pointer hover:bg-stone-100/50 p-1 rounded transition-colors ${editingEntry.skillIds.includes(skill.id) ? 'bg-amber-100/30' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            checked={editingEntry.skillIds.includes(skill.id)}
-                                            onChange={(e) => {
-                                                const ids = e.target.checked
-                                                    ? [...editingEntry.skillIds, skill.id]
-                                                    : editingEntry.skillIds.filter(id => id !== skill.id);
-                                                setEditingEntry({ ...editingEntry, skillIds: ids });
-                                            }}
-                                            className="rounded border-[#bfae85]/50 text-amber-600 focus:ring-amber-500"
-                                        />
-                                        <span className={`truncate ${editingEntry.skillIds.includes(skill.id) ? 'font-bold text-amber-900' : 'text-[#4a3b32]'}`}>{skill.name}</span>
-                                    </label>
-                                ))}
-                            </div>
-                            {editingEntry.skillIds.length > 0 && (
-                                <div className="mt-1 text-[9px] text-[#5c4d41]/60 italic">
-                                    {editingEntry.skillIds.length} compétence(s) sélectionnée(s)
-                                </div>
-                            )}
-                        </div>
-
-                        <div>
-                            <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Seuil minimum par défaut</label>
-                            <input
-                                type="number"
-                                min="0"
-                                max="5"
-                                className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm bg-white/50 focus:border-amber-500 outline-none shadow-sm"
-                                value={editingEntry.defaultMinLevel}
-                                onChange={(e) => setEditingEntry({ ...editingEntry, defaultMinLevel: parseInt(e.target.value) || 0 })}
-                            />
-                            <p className="text-[10px] text-[#5c4d41]/60 mt-1 italic">Niveau de compétence requis pour débloquer cette spécialisation.</p>
-                        </div>
-
-                        <div>
-                            <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Description</label>
-                            <textarea
-                                className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm bg-white/50 min-h-[80px] focus:border-amber-500 outline-none resize-none shadow-sm italic text-[#4a3b32]"
-                                value={editingEntry.description || ''}
-                                onChange={(e) => setEditingEntry({ ...editingEntry, description: e.target.value })}
-                            />
-                        </div>
-
-                        {error && (
-                            <div className="bg-red-50 text-red-600 text-xs p-2 rounded border border-red-200 font-bold">
-                                {error}
-                            </div>
-                        )}
-                    </div>
+                    <SpecModalContent
+                        editingEntry={editingEntry}
+                        setEditingEntry={setEditingEntry}
+                        skillSearch={skillSearch}
+                        setSkillSearch={setSkillSearch}
+                        filteredSkillsForModal={filteredSkillsForModal}
+                        error={error}
+                    />
                 )}
             </ThematicModal>
-
-
 
             <ConfirmationModal
                 isOpen={showPublishConfirm}

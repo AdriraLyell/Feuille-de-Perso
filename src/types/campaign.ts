@@ -29,6 +29,7 @@ export interface NoteImage {
     id: string; // Unique placement ID
     imageId: string; // IndexedDB Blob ID
     config: ImageConfig;
+    base64Data?: string; // For Export/Import transit
 }
 
 export interface CampaignNoteEntry {

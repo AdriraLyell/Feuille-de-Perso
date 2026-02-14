@@ -1,0 +1,7 @@
+src/admin/components/AdminCreationEditor.tsx(121,21): error TS2322: Type '<K extends keyof RulesData>(field: K, value: RulesData[K]) => void' is not assignable to type '<K extends keyof RulesData>(field: K, value: RulesData) => void'.
+  Types of parameters 'field' and 'field' are incompatible.
+    Type 'K' is not assignable to type 'keyof RulesData'.
+      Type 'string | number | symbol' is not assignable to type 'keyof RulesData'.
+        Type 'string' is not assignable to type 'keyof RulesData'.
+src/admin/components/creation/CampaignMetadataSettings.tsx(8,32): error TS2304: Cannot find name 'RulesData'.
+src/admin/components/creation/CampaignMetadataSettings.tsx(8,60): error TS2304: Cannot find name 'RulesData'.

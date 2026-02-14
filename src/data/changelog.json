@@ -1,5 +1,54 @@
 [
     {
+        "version": "2.49.5",
+        "date": "2026-02-14",
+        "type": "maintenance",
+        "changes": [
+            "🧠 Refactoring Majeur : Optimisation complète de `SkillsEditor` et `ImportPanel` (réduction de 50% du code)",
+            "🏗️ Architecture : Création de hooks dédiés `useSkillsEditorActions` et `useImportLogic`",
+            "🧩 Composants : Extraction de `SkillCategoryEditor`, `FileDropZone`, `FileAnalysisHeader`, `MigrationSuccessModal`",
+            "🚀 Performance : Allègement significatif des composants critiques de la fiche joueur",
+            "🔧 Types : Éradication des `any` critiques dans les migrations et l'import/export (+50 corrections)",
+            "🛡️ Stabilité : Renforcement de la logique d'import de fichiers JSON avec typage strict"
+        ]
+    },
+    {
+        "version": "2.49.4",
+        "date": "2026-02-14",
+        "type": "refactor",
+        "changes": [
+            "🧠 Refactoring Admin : Extraction massive de la logique vers `useDashboardActions`, `useSkillEditorActions` et `useCreationEditorActions`",
+            "🧩 Modularité : Décomposition des composants `AdminDashboard`, `AdminSkillsEditor` et `AdminCreationEditor` en sous-composants réutilisables",
+            "📉 Dette Technique : Réduction drastique de la taille des fichiers Admin principaux (jusqu'à -60% de lignes)",
+            "🧹 Dépendances : Suppression de `tiptap-pagination-plus` (obsolète)",
+            "🔧 Types : Correction et alignement des types pour `useLibraryImport` et `CandidateLine`",
+            "🐛 Fix : Résolution du chemin d'import critique pour `useCampaignLabels` dans l'admin",
+            "✅ Build : Validation finale du build de production et de l'administration"
+        ]
+    },
+    {
+        "version": "2.49.3",
+        "date": "2026-02-14",
+        "type": "refactor",
+        "changes": [
+            "🧠 Refactoring : Extraction massive des sections de `CharacterReadOnlyView.tsx` en 10 sous-composants modulaires",
+            "📚 Admin : Décomposition de `AdminSpecializationLibrary.tsx` pour une meilleure maintenance",
+            "🚀 Performance : Réduction de la taille des fichiers composants et isolation des responsabilités UI",
+            "🎨 UI : Conservation de l'esthétique premium tout en simplifiant la structure du code"
+        ]
+    },
+    {
+        "version": "2.49.2",
+        "date": "2026-02-14",
+        "type": "feat",
+        "changes": [
+            "Renforcement du typage strict des éditeurs Admin (Creation, Counters, Skills)",
+            "Correction des imports de types et signatures génériques dans les composants Admin",
+            "Suppression des types 'any' résiduels dans LibraryLoader et LibraryImporter",
+            "Validation du build complet sans erreurs de typage"
+        ]
+    },
+    {
         "version": "2.49.1",
         "date": "2026-02-14",
         "type": "patch",
@@ -163,51 +212,6 @@
             "💾 Stockage : Migration du Base64 vers IndexedDB (gain de place massif dans les sauvegardes)",
             "🔄 Auto-Migration : Script automatique convertissant les anciennes images lors du chargement ou de l'import",
             "🛠️ Extension : Activation de l'extension BookImage avec gestion de l'alignement et de la taille"
-        ]
-    },
-    {
-        "version": "2.48.7",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🛡️ Schéma : Correction critique du Zod schema pour inclure bookDocument (évite la perte de données au rechargement)",
-            "🔧 Typage : Amélioration du typage dans ChapterHeaderView (suppression des 'any' Tiptap)",
-            "📋 Task List : Mise à jour du suivi de progression du Grimoire"
-        ]
-    },
-    {
-        "version": "2.48.6",
-        "date": "2026-02-13",
-        "type": "minor",
-        "changes": [
-            "📖 Sommaire : Implémentation du Sommaire dynamique (Table des Matières) automatique en début de livre",
-            "🚀 Navigation : Support de la navigation par clic depuis le sommaire vers les chapitres correspondants",
-            "🔄 Migration : Automatisation de la migration des anciennes notes de journal vers le nouveau format Grimoire (v2)",
-            "🧹 Clean Up : Suppression des anciens composants de journal obsolètes (NotebookTextarea, useJournal, etc.)"
-        ]
-    },
-    {
-        "version": "2.48.5",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🧠 UX : Migration vers la sélection native Tiptap (setTextSelection) pour un surlignage fiable et persistant des titres de chapitres"
-        ]
-    },
-    {
-        "version": "2.48.4",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🎯 UX : Correction critique de la sélection locale des chapitres (ne saute plus au premier chapitre du livre)"
-        ]
-    },
-    {
-        "version": "2.48.3",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "✍️ UX : Garantie de la sélection automatique du titre (surlignage) lors de la création d'un chapitre via un cycle de rendu stabilisé"
         ]
     }
 ]

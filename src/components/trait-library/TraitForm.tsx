@@ -19,7 +19,7 @@ interface TraitFormProps {
     addTag: () => void;
     removeTag: (tag: string) => void;
     addEffect: () => void;
-    updateEffect: (id: string, field: keyof TraitEffect, value: any) => void;
+    updateEffect: <K extends keyof TraitEffect>(id: string, field: K, value: TraitEffect[K]) => void;
     removeEffect: (id: string) => void;
 }
 

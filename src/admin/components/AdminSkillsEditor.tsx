@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { RulesData, SkillCategoryConfig, SkillBehavior } from '../../types/rules';
+import { RulesData, SkillCategoryConfig } from '../../types/rules';
 import { LibrarySkillEntry, DotEntry } from '../../types';
-import { AlertCircle, FolderSync, CheckCircle2 } from 'lucide-react';
 import { disambiguateCategories } from '../../utils/categoryUtils';
 import AdminSkillLibrarySidebar from './libraries/AdminSkillLibrarySidebar';
 import SkillCategoryCard from './skills/SkillCategoryCard';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
+import { useSkillEditorActions } from '../hooks/useSkillEditorActions';
+import { SkillEditorHeader } from './skills/SkillEditorHeader';
 
 interface AdminSkillsEditorProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
 }
 
-type DragItem = {
+export type DragItem = {
     type: 'admin_sheet_skill' | 'admin_lib_skill';
     category?: string;
     index?: number;
@@ -25,154 +26,19 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
     const skillsMap = definitions.skills || {};
     const skillCategories = definitions.skillCategories || [];
     const [draggedItem, setDraggedItem] = useState<DragItem | null>(null);
-    const [syncSuccess, setSyncSuccess] = useState<string | null>(null);
 
-    // -- Library Sync Logic --
-    const ensureSkillInLibrary = (skillName: string, category: string, currentRules: RulesData): RulesData | null => {
-        if (!skillName || skillName.trim() === "" || skillName === "Nouvelle Compétence") return null;
-
-        const lib = currentRules.libraries?.skills || [];
-        const exists = lib.some(s => s.name.trim().toLowerCase() === skillName.trim().toLowerCase());
-
-        if (!exists) {
-            const newEntry: LibrarySkillEntry = {
-                id: crypto.randomUUID(),
-                name: skillName.trim(),
-                description: "",
-                defaultCategory: category,
-                isVariable: false
-            };
-            const newLib = [...lib, newEntry].sort((a, b) => a.name.localeCompare(b.name));
-
-            return {
-                ...currentRules,
-                libraries: {
-                    ...currentRules.libraries,
-                    skills: newLib
-                }
-            };
-        }
-        return null;
-    };
-
-    const handleSkillBlur = (category: string, skillName: string) => {
-        const updatedRules = ensureSkillInLibrary(skillName, category, rules);
-        if (updatedRules) {
-            onUpdate(updatedRules);
-        }
-    };
-
-    const handleSyncAll = () => {
-        let currentRules = { ...rules };
-        let addedCount = 0;
-
-        skillCategories.forEach(cat => {
-            const skills = skillsMap[cat.id] || [];
-            skills.forEach(skillName => {
-                const updated = ensureSkillInLibrary(skillName, cat.id, currentRules);
-                if (updated) {
-                    currentRules = updated;
-                    addedCount++;
-                }
-            });
-        });
-
-        if (addedCount > 0) {
-            onUpdate(currentRules);
-            setSyncSuccess(`${addedCount} compétence(s) ajoutée(s) à la bibliothèque.`);
-            setTimeout(() => setSyncSuccess(null), 3000);
-        } else {
-            setSyncSuccess("Bibliothèque déjà à jour.");
-            setTimeout(() => setSyncSuccess(null), 3000);
-        }
-    };
-
-    const updateSkillList = (category: string, newList: string[]) => {
-        onUpdate({
-            ...rules,
-            definitions: {
-                ...rules.definitions,
-                skills: {
-                    ...rules.definitions.skills,
-                    [category]: newList
-                }
-            }
-        });
-    };
-
-    const updateLabel = (category: string, newLabel: string) => {
-        onUpdate({
-            ...rules,
-            definitions: {
-                ...rules.definitions,
-                skillCategories: skillCategories.map(cat =>
-                    cat.id === category ? { ...cat, label: newLabel } : cat
-                )
-            }
-        });
-    };
-
-    const updateCategoryMetadata = (category: string, updates: Partial<SkillCategoryConfig>) => {
-        onUpdate({
-            ...rules,
-            definitions: {
-                ...rules.definitions,
-                skillCategories: skillCategories.map(cat =>
-                    cat.id === category ? { ...cat, ...updates } : cat
-                )
-            }
-        });
-    };
-
-    const updateBehavior = (category: string, behavior: SkillBehavior) => {
-        // Déterminer les coûts par défaut selon le behavior
-        let factor = 1;
-        let type: 'linear' | 'triangular' = 'triangular';
-
-        if (behavior === 'Secondaire') {
-            factor = 0.5;
-            type = 'triangular';
-        } else if (behavior === 'Arrière-plan' || behavior === 'Compteur') {
-            factor = 1;
-            type = 'linear';
-        }
-
-        onUpdate({
-            ...rules,
-            definitions: {
-                ...rules.definitions,
-                skillCategories: skillCategories.map(cat =>
-                    cat.id === category
-                        ? {
-                            ...cat,
-                            behavior,
-                            costConfig: { factor, type } // Mise à jour automatique des coûts
-                        }
-                        : cat
-                )
-            }
-        });
-    };
-
-
-    const addSkill = (category: string, isSpacer = false) => {
-        const currentList = skillsMap[category] || [];
-        updateSkillList(category, [...currentList, isSpacer ? "" : "Nouvelle Compétence"]);
-    };
-
-    const removeSkill = (category: string, index: number) => {
-        const currentList = skillsMap[category] || [];
-        const newList = [...currentList];
-        newList.splice(index, 1);
-        updateSkillList(category, newList);
-    };
-
-    const updateSkillName = (category: string, index: number, newName: string) => {
-        const currentList = skillsMap[category] || [];
-        const newList = [...currentList];
-        newList[index] = newName;
-        updateSkillList(category, newList);
-    };
+    const {
+        syncSuccess,
+        handleSyncAll,
+        updateLabel,
+        updateBehavior,
+        updateCategoryMetadata,
+        updateSkillName,
+        addSkill,
+        removeSkill,
+        handleSkillBlur,
+        updateSkillList
+    } = useSkillEditorActions(rules, onUpdate);
 
     // -- DnD Handlers --
     const handleDragStart = (e: React.DragEvent, category: string, index: number, name: string) => {
@@ -241,28 +107,10 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
     return (
         <div className="flex relative items-start gap-4">
             <div className="flex-grow space-y-8">
-                <MotionFade delay={0.1}>
-                    <div className="bg-stone-900/40 border-l-4 border-amber-600 p-4 mb-6 flex justify-between items-start rounded-r-sm shadow-glass">
-                        <div className="flex items-start gap-4">
-                            <AlertCircle className="text-amber-500 mt-0.5" size={20} />
-                            <div>
-                                <h3 className="font-bold text-amber-500 text-sm uppercase tracking-wide">Gestion Dynamique</h3>
-                                <p className="text-xs text-stone-400 mt-1 font-medium leading-relaxed">
-                                    Glissez-déposez pour réorganiser. Glissez vers la réserve (droite) pour archiver.
-                                    <br />Les nouvelles compétences sont automatiquement ajoutées à la bibliothèque.
-                                </p>
-                            </div>
-                        </div>
-                        <button
-                            onClick={handleSyncAll}
-                            className="text-xs bg-stone-900 border border-stone-700 text-stone-300 px-3 py-1.5 rounded-sm hover:bg-stone-800 hover:border-amber-500 hover:text-amber-500 transition-all font-bold flex items-center gap-2 shadow-sm uppercase tracking-wider"
-                            title="Ajouter toutes les compétences actuelles à la bibliothèque"
-                        >
-                            {syncSuccess ? <CheckCircle2 size={14} className="text-green-500" /> : <FolderSync size={14} />}
-                            {syncSuccess || "Synchroniser Bibliothèque"}
-                        </button>
-                    </div>
-                </MotionFade>
+                <SkillEditorHeader
+                    handleSyncAll={handleSyncAll}
+                    syncSuccess={syncSuccess}
+                />
 
                 {/* Dynamic Columns Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

@@ -1,5 +1,35 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.28.0] - 2026-02-09
+
+- Réduction de l'inlining des assets (limite à 10Ko) pour accélérer le parsing HTML initial.
+- Implémentation du Lazy Loading pour les modules Admin et les modales secondaires via React.lazy et Suspense.
+- Mise en cache persistante des règles via IndexedDB (idb-keyval) pour un chargement instantané au rafraîchissement.
+- Amélioration de la structure de build avec des fallbacks de chargement (loaders).
+
+## [2.27.2] - 2026-02-09
+
+- Retrait des animations de pulsation sur l'indicateur d'auto-sync pour plus de discrétion.
+
+## [2.27.1] - 2026-02-09
+
+- L'onglet 'Cloud' est désormais accessible en tout temps (hors réglages avancés).
+- Ajout d'un feedback visuel en temps réel sur le bouton de synchronisation (icône en rotation + texte 'Sync...').
+- Correction d'un problème de portée de variable dans le contexte de personnage.
+
+## [2.27.0] - 2026-02-09
+
+- Ajout d'un toggle d'auto-sync dans la modale de synchronisation.
+- Nouvel onglet 'Cloud' dans les réglages de la fiche pour gérer l'auto-sync.
+- Mécanisme de sauvegarde automatique debounced (10s) pour éviter les surcharges.
+- Indicateurs visuels d'état de synchronisation dans la barre de navigation.
+
+## [2.26.1] - 2026-02-09
+
+- Fix: Correction d'un bug 400 lors du chargement des personnages orphelins (ID 'orphan')
+- Refactor: Migration finale de PlayerService vers DatabaseService
+- Robustesse: Centralisation totale des appels Supabase dans la couche service
+
 ## [2.26.0] - 2026-02-09
 
 - Refactoring technique majeur : Centralisation des appels base de données (DatabaseService).
