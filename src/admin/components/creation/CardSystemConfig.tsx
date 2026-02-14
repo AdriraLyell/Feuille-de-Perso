@@ -29,9 +29,10 @@ const CardSystemConfig: React.FC<CardSystemConfigProps> = ({ config, onUpdateCar
 
             <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 transition-opacity ${config?.active ? 'opacity-100' : 'opacity-40 pointer-events-none grayscale'}`}>
                 <div>
-                    <label className="block text-[10px] font-bold text-stone-500 mb-1 uppercase tracking-tighter">Compétences retenues</label>
+                    <label htmlFor="best-skills-count" className="block text-[10px] font-bold text-stone-500 mb-1 uppercase tracking-tighter">Compétences retenues</label>
                     <div className="flex items-center gap-2">
                         <input
+                            id="best-skills-count"
                             type="number"
                             value={config?.bestSkillsCount ?? 6}
                             onChange={(e) => onUpdateCardConfig('bestSkillsCount', parseInt(e.target.value))}
@@ -43,8 +44,9 @@ const CardSystemConfig: React.FC<CardSystemConfigProps> = ({ config, onUpdateCar
                     </div>
                 </div>
                 <div>
-                    <label className="block text-xs font-bold text-stone-500 mb-1 uppercase">Incrément par Palier</label>
+                    <label htmlFor="card-increment" className="block text-xs font-bold text-stone-500 mb-1 uppercase">Incrément par Palier</label>
                     <input
+                        id="card-increment"
                         type="number"
                         step="0.1"
                         value={config?.increment ?? 0.5}
@@ -53,8 +55,9 @@ const CardSystemConfig: React.FC<CardSystemConfigProps> = ({ config, onUpdateCar
                     />
                 </div>
                 <div>
-                    <label className="block text-xs font-bold text-stone-500 mb-1 uppercase">Seuil de Base (Valet)</label>
+                    <label htmlFor="card-base-start" className="block text-xs font-bold text-stone-500 mb-1 uppercase">Seuil de Base (Valet)</label>
                     <input
+                        id="card-base-start"
                         type="number"
                         step="0.1"
                         value={config?.baseStart ?? 2}

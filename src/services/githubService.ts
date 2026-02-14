@@ -14,6 +14,15 @@ export interface PublishResult {
     message?: string;
 }
 
+export interface WorkflowRun {
+    id: number;
+    status: string;
+    conclusion: string | null;
+    html_url?: string;
+    created_at?: string;
+    updated_at?: string;
+}
+
 // Rate limit handled by GithubRateLimiter utility
 
 /**
@@ -105,7 +114,7 @@ export async function publishFileToGitHub(
  */
 export async function getLatestWorkflowRun(
     config: GitHubConnectConfig
-): Promise<any | null> {
+): Promise<WorkflowRun | null> {
     if (GithubRateLimiter.isLimited()) return null;
     // List runs for the branch, event=push is likely what we want, but just latest is safer
     const apiUrl = `https://api.github.com/repos/${config.owner}/${config.repo}/actions/runs?branch=${config.branch}&per_page=1`;

@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Loader2, CheckCircle, XCircle, Github } from 'lucide-react';
-import { getLatestWorkflowRun } from '../../services/githubService';
+import { getLatestWorkflowRun, GitHubConnectConfig, WorkflowRun } from '../../services/githubService';
 
 const POLL_INTERVAL = 5000; // 5 seconds as requested
 
 const DeploymentMonitor: React.FC = () => {
     const [, setLastRunId] = useState<number | null>(null);
-    const [currentRun, setCurrentRun] = useState<any | null>(null);
+    const [currentRun, setCurrentRun] = useState<WorkflowRun | null>(null);
     const [isVisible, setIsVisible] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error' | 'info', message: string } | null>(null);
 
@@ -22,7 +22,7 @@ const DeploymentMonitor: React.FC = () => {
         // Initial fetch to set the baseline (don't notify for old runs)
         const init = async () => {
             if (!credsRef.current.token) return;
-            const run = await getLatestWorkflowRun(credsRef.current as any);
+            const run = await getLatestWorkflowRun(credsRef.current as GitHubConnectConfig);
             if (run) {
                 setLastRunId(run.id);
             }
@@ -51,8 +51,7 @@ const DeploymentMonitor: React.FC = () => {
                 return prev;
             });
 
-            // Update current run status if it's the one we are tracking (or just the latest)
-            setCurrentRun((prev: any) => {
+            setCurrentRun((prev: WorkflowRun | null) => {
                 if (prev && prev.id === run.id) {
                     // Detect Status Change
                     if (prev.status !== run.status || prev.conclusion !== run.conclusion) {

@@ -186,7 +186,7 @@ function processBackgrounds(
             const isVariable = libBg?.isVariable === true;
             const description = libBg?.description || "";
 
-            let matchingExisting = allExistingSkills.filter(e =>
+            const matchingExisting = allExistingSkills.filter(e =>
             (
                 (definitionId && e.definitionId === definitionId) ||
                 (!e.definitionId && normalizeString(e.name) === normalizeString(name))

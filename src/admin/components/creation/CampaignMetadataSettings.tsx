@@ -46,10 +46,11 @@ const CampaignMetadataSettings: React.FC<CampaignMetadataSettingsProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Description MJ */}
                 <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-[10px] font-bold text-stone-500 uppercase tracking-widest ml-1">
+                    <label htmlFor="campaign-description" className="flex items-center gap-2 text-[10px] font-bold text-stone-500 uppercase tracking-widest ml-1">
                         <Info size={12} /> Description de la Campagne
                     </label>
                     <textarea
+                        id="campaign-description"
                         value={description}
                         onChange={(e) => onUpdate('description', e.target.value)}
                         placeholder="Ex: Campagne médiévale-fantastique dans le monde d'Adrira..."
@@ -59,10 +60,11 @@ const CampaignMetadataSettings: React.FC<CampaignMetadataSettingsProps> = ({
 
                 {/* Message d'accueil */}
                 <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-[10px] font-bold text-stone-500 uppercase tracking-widest ml-1">
+                    <label htmlFor="welcome-message" className="flex items-center gap-2 text-[10px] font-bold text-stone-500 uppercase tracking-widest ml-1">
                         <MessageSquare size={12} /> Message d'accueil Joueurs
                     </label>
                     <textarea
+                        id="welcome-message"
                         value={welcomeMessage}
                         onChange={(e) => onUpdate('welcomeMessage', e.target.value)}
                         placeholder="Ex: Bienvenue aventuriers ! N'oubliez pas de consulter le guide des règles..."
