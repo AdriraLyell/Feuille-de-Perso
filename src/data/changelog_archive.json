@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.1",
+        "date": "2026-02-14",
+        "type": "patch",
+        "changes": [
+            "🛡️ Typage Strict : Amélioration de la sécurité des types dans l'éditeur de compétences Admin",
+            "🧹 Refactoring : Extraction de la logique de réconciliation des compétences et historiques vers `skillsReconciler.ts`",
+            "🔧 Hooks : Renforcement du typage pour `useCharacterSheetActions` et suppression des `any` résiduels",
+            "🐛 Fix : Correction des types pour `BookDocument` et `ChapterHeading`"
+        ]
+    },
+    {
         "version": "2.49.0",
         "date": "2026-02-14",
         "type": "minor",
@@ -1325,28 +1336,6 @@
                 "type": "modified",
                 "text": "Remplacement du badge 'OFF'/'OFFICIEL' par une icône Globe pour uniformiser l'interface.",
                 "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.3",
-        "date": "2026-02-10",
-        "description": "Correction des doublons dans la Bibliothèque (Joueur & Admin).",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Élimination des compétences et traits dupliqués dans la bibliothèque du joueur (fusion insensible à la casse).",
-                "category": "core"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction de l'assistant d'import Admin : exclusion des Historiques dans l'onglet Compétences et dédoublonnage des Compteurs.",
-                "category": "fix"
-            },
-            {
-                "type": "improved",
-                "text": "Renforcement de la sécurité backend : vérification anti-doublon lors de l'import de bibliothèque.",
-                "category": "core"
             }
         ]
     }

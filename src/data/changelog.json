@@ -1,5 +1,12 @@
 [
     {
+        "version": "2.49.21",
+        "date": "2026-02-14",
+        "type": "chore",
+        "content": "⚡ Turbo CI : Fusion des jobs pour éviter les installations redondantes, ajout du cache pour les navigateurs Playwright (gain de ~3-5 min) et exécution des tests E2E sur le build de production.",
+        "major": false
+    },
+    {
         "version": "2.49.20",
         "date": "2026-02-14",
         "type": "chore",
@@ -183,17 +190,6 @@
             "Correction des imports de types et signatures génériques dans les composants Admin",
             "Suppression des types 'any' résiduels dans LibraryLoader et LibraryImporter",
             "Validation du build complet sans erreurs de typage"
-        ]
-    },
-    {
-        "version": "2.49.1",
-        "date": "2026-02-14",
-        "type": "patch",
-        "changes": [
-            "🛡️ Typage Strict : Amélioration de la sécurité des types dans l'éditeur de compétences Admin",
-            "🧹 Refactoring : Extraction de la logique de réconciliation des compétences et historiques vers `skillsReconciler.ts`",
-            "🔧 Hooks : Renforcement du typage pour `useCharacterSheetActions` et suppression des `any` résiduels",
-            "🐛 Fix : Correction des types pour `BookDocument` et `ChapterHeading`"
         ]
     }
 ]
