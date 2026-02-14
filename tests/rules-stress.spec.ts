@@ -53,7 +53,8 @@ test.describe('Rules Loading Stress Tests', () => {
 
         await page.goto('/');
         await expect.poll(() => page.evaluate(() => (window as any).rulesStatus?.version)).toBe('STRESS-CACHE');
-        await page.waitForTimeout(2000);
+        // Wait for IndexedDB write to complete (reduced from 2000ms)
+        await page.waitForTimeout(500);
 
         // 2. Failure load
         await page.route('**/*rules.json*', async route => {

@@ -1,44 +1,28 @@
 import { test, expect } from '@playwright/test';
 
 test('journal overflow should split precisely', async ({ page }) => {
-    // Increase timeout for slow dev server
-    test.setTimeout(90000);
-
-    // Capture console logs
-    page.on('console', msg => {
-        if (msg.text().includes('Overflow Check')) {
-            console.log('--- BROWSER LOG ---', msg.text());
-        }
-    });
-
     await page.goto('/');
 
-    // 1. Select Hors Ligne to enter the app
+    // Select Hors Ligne to enter the app
     await page.click('text=Hors Ligne');
 
-    // 2. Click on the Campaign Notes tab
+    // Click on the Campaign Notes tab
     await page.click('text=Notes de Campagne');
 
-    // Wait for the journal to load (wait for the editor to be mounted)
-    await page.waitForSelector('.ProseMirror', { timeout: 20000 });
-
+    // Wait for the editor to be mounted
     const editor = page.locator('.ProseMirror').first();
+    await expect(editor).toBeVisible({ timeout: 20000 });
     await editor.click();
 
-    // Type content (45 lines to be sure)
-    let content = '';
-    for (let i = 0; i < 100; i++) {
-        content += `Line ${i + 1}\n`;
-    }
+    // Insert 100 lines of content instantly (instead of typing char by char)
+    const content = Array.from({ length: 100 }, (_, i) => `Line ${i + 1}`).join('\n');
+    await page.keyboard.insertText(content);
 
-    await page.keyboard.type(content);
-
-    // Wait for pagination
-    await page.waitForTimeout(10000);
-
-    const pages = page.locator('.journal-page');
-    const count = await pages.count();
-    console.log(`Detected ${count} pages.`);
-
-    expect(count).toBeGreaterThan(2);
+    // Wait for pagination to complete by polling for journal pages
+    await expect.poll(async () => {
+        return await page.locator('.journal-page').count();
+    }, {
+        message: 'Expected more than 2 journal pages after inserting 100 lines',
+        timeout: 15000,
+    }).toBeGreaterThan(2);
 });
