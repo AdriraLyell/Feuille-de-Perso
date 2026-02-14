@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.28.1] - 2026-02-09
+
+- Fix : Correction du menu 'Source' sauté au démarrage à cause du cache (ajout de de l'état isSourceSelected).
+- Fix : Correction des doublons de clés React (IDs dupliqués) dans les blocs de compétences quand les règles ont des noms identiques.
+
 ## [2.28.0] - 2026-02-09
 
 - Réduction de l'inlining des assets (limite à 10Ko) pour accélérer le parsing HTML initial.

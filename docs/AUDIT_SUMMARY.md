@@ -19,6 +19,8 @@
 - **15 occurrences** de `console.*` directs restantes (hors logger).
 - Logger conditionnel `src/utils/logger.ts` adopté dans les composants critiques (CharacterReadOnlyView, etc.).
 
+**Score global : 12/15 corrigés, 3 restants (4.1-partiel, 4.2, 4.3)**
+
 ### 🔶 Issue 4.2 — Typage `any`/`@ts-ignore` (EN COURS)
 - **~15 `as any`** + **~25 `@ts-ignore`** en production. Baisse significative.
 - Phase A, B, D & H complétées. Correction massive sur import/export et migrations. 
@@ -30,9 +32,9 @@
   - `admin/components/Adven..` ? À vérifier.
   - Aucun fichier > 400 lignes identifié comme critique pour l'instant.
 
-### 🔶 Issue 5.1 — Variables CSS (OUVERTE)
-- Couleurs et dimensions hardcodées dans `index.css`.
-- Bloc `:root` avec CSS custom properties non créé.
+### ✅ Issue 5.1 — Variables CSS (CORRIGÉE)
+- Bloc `:root` consolidé dans `src/index.css` avec 14 variables de couleur et 6 de dimension.
+- Élimination des "valeurs magiques" (rgba, hex) au profit des variables CSS.
 
 ### 💡 Suggestions QoL
 - **Logs de Production** : Généraliser l'usage du `logger.ts` typé (24 `console.*` restants).

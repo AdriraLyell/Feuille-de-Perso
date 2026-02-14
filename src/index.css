@@ -3,18 +3,39 @@
 @tailwind utilities;
 
 :root {
+  /* Colors */
   --color-app-bg: #52525b;
+  /* Zinc 600 */
   --color-ink: #1e3a8a;
+  /* Blue 900 */
   --color-placeholder: #64748b;
+  /* Slate 500 */
   --color-paper: #fdfbf7;
+  /* Ivory Paper */
   --color-sheet-border: #44403c;
+  /* Stone 700 */
   --color-text-primary: #1c1917;
+  /* Stone 900 */
+
   --color-border-main: #292524;
   /* Stone 800 */
-  --color-border-light: #d6d3d1;
-  /* Stone 300 */
   --color-border-medium: #a8a29e;
   /* Stone 400 */
+  --color-border-light: #d6d3d1;
+  /* Stone 300 */
+
+  --color-gold: #bfae85;
+  /* Sand/Gold */
+  --color-amber-glow: rgba(245, 158, 11, 0.5);
+  --color-focus-blue: rgba(59, 130, 246, 0.05);
+  --color-glass-shadow: rgba(0, 0, 0, 0.1);
+  --color-print-hr: #cccccc;
+
+  /* Shadows */
+  --shadow-sheet: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --shadow-glass: 0 4px 30px var(--color-glass-shadow);
+
+  /* Dimensions & Zooms */
   --sheet-width-portrait: 1100px;
   --sheet-height-portrait: 1560px;
   --sheet-width-landscape: 1560px;
@@ -42,7 +63,7 @@ body {
 }
 
 .sheet-input:focus {
-  background-color: rgba(59, 130, 246, 0.05);
+  background-color: var(--color-focus-blue);
 }
 
 .sheet-input::placeholder {
@@ -69,7 +90,7 @@ body {
   margin: 0 auto;
   border: 1px solid var(--color-sheet-border);
   /* Stone 700 */
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-sheet);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -189,7 +210,7 @@ body {
   }
 
   input {
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--color-print-hr);
     background: transparent !important;
   }
 
@@ -220,11 +241,11 @@ body {
 }
 
 .drop-shadow-glow {
-  filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
+  filter: drop-shadow(0 0 10px var(--color-amber-glow));
 }
 
 .shadow-glass {
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-glass);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }

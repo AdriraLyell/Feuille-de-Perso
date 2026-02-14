@@ -22,7 +22,7 @@
 
 | # | Issue | Statut | Détails |
 |---|-------|--------|---------|
-| 5.1 | Valeurs magiques | **PARTIEL** | `constants/db.ts` + `constants.ts` créés, mais couleurs CSS non extraites |
+| 5.1 | Valeurs magiques | **CORRIGÉ** | Bloc `:root` consolidé dans `index.css` (14 couleurs, 6 dimensions) |
 | 5.2 | Duplication bibliothèques | **CORRIGÉ** | Pas de vraie duplication (rôles distincts) |
 | 5.3 | dotenv en prod | **CORRIGÉ** | Déplacé en devDependencies |
 | 5.4 | Sync multi-onglets | **CORRIGÉ** | `storage` event listener dans useExpertMode |
