@@ -1,4 +1,4 @@
-# État des lieux - Tâches restantes (v2.49.6)
+# État des lieux - Tâches restantes (v2.49.11)
 
 ## 🎯 Priorités Immédiates
 
@@ -17,9 +17,10 @@ Il reste deux phases majeures du plan `PLAN_ISSUES_MOYENNES.md` :
 
 ## 🛠️ Suggestions QoL (Quality of Life)
 - [ ] **Nettoyage package.json** : Retirer `tiptap-pagination-plus` qui n'est plus utilisé.
-- [ ] **Quota IndexedDB** : Ajouter une notification visuelle si le stockage navigateur est plein (important pour les images).
-- [ ] **Fusion des constantes** : Regrouper `src/constants.ts` et `src/constants/app.ts`.
+- [x] **Quota IndexedDB** : Indicateur visuel et alertes sur le stockage navigateur (Intégré dans Settings > Cloud).
+- [x] **Fusion des constantes** : Regroupement dans `src/constants/app.ts` (Effectué).
+- [x] **Admin : Taille des données** : Affichage de l'occupation JSONB par personnage (Effectué).
 
 ## 📈 Score Global
-- **12/15** Correctifs appliqués.
-- Les fondations (Cloud, Sync, Variables CSS, Types de base) sont solides.
+- **13/15** Correctifs appliqués.
+- Les fondations (Cloud, Sync, Variables CSS, Types de base, Monitoring) sont solides.
