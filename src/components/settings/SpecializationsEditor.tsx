@@ -17,7 +17,6 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
   const getSkillContext = (skillId: string) => {
     if (!data.skills) return { name: "Inconnu" };
     for (const cat of Object.keys(data.skills)) {
-      // @ts-ignore
       const list = data.skills[cat];
       if (Array.isArray(list)) {
         const found = list.find(s => s.id === skillId);
@@ -44,7 +43,7 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
   const syncSpecializationWithLibrary = (skillId: string, name: string, minLevel: number) => {
     if (name.trim() === '') return;
 
-    let newLibrary = [...(data.specializationLibrary || [])];
+    const newLibrary = [...(data.specializationLibrary || [])];
     const normName = name.trim().toLowerCase();
     const existingIdx = newLibrary.findIndex(l => l.name.trim().toLowerCase() === normName);
 
@@ -129,7 +128,6 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
   };
 
   const renderSpecializationEditor = (title: string, category: string) => {
-    // @ts-ignore
     const list: DotEntry[] = data.skills[category] || [];
 
     return (

@@ -107,7 +107,6 @@ const TraitForm: React.FC<TraitFormProps> = ({
                             value={editForm.name}
                             onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                             placeholder="Ex: Chance, Ennemi..."
-                            autoFocus
                         />
                     </div>
                     <div className="col-span-1">

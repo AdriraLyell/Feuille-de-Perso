@@ -99,7 +99,7 @@ describe('Bug Reproduction: Counter Sync Logic', () => {
         const newState = updateCounterLogic(initialState, 'volonte', 5, true, mockRules);
 
         // Counter creationValue should remain 3
-        // @ts-ignore
+        // @ts-expect-error -- legacy code
         expect(newState.counters['volonte'].creationValue).toBe(3);
 
         // Skill creationValue SHOULD now be 3 (FIXED)
@@ -121,7 +121,7 @@ describe('Bug Reproduction: Counter Sync Logic', () => {
         const newState = updateCounterLogic(initialState, 'sante', 8, false, mockRules);
 
         // Should remain 7
-        // @ts-ignore
+        // @ts-expect-error -- legacy code
         expect(newState.counters['sante'].value).toBe(7);
     });
 });

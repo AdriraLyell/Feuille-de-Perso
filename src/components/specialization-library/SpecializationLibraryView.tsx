@@ -168,7 +168,6 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
             updateRules(updatedRules);
             addLog(`Bibliothèque officielle mise à jour (${newSpecs.length} spécialisations).`, 'success', 'settings');
         } catch (e) {
-            // @ts-ignore
             addLog("Échec de la mise à jour officielle : " + (e as Error).message, 'danger', 'settings');
         }
     };

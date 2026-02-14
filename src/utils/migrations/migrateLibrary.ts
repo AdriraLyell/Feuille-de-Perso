@@ -11,11 +11,8 @@ import { LibrarySkillEntry } from '../../types';
  */
 export const migrateLibrary = (parsed: any): void => {
     // Fix key casing typo
-    // @ts-ignore
     if (parsed.skilllibrary && !parsed.skillLibrary) {
-        // @ts-ignore
         parsed.skillLibrary = parsed.skilllibrary;
-        // @ts-ignore
         delete parsed.skilllibrary;
     }
 

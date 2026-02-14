@@ -235,7 +235,6 @@ export const LEGACY_V1_SINGLE_IMAGE_NOTE = {
  * V1 Legacy: Typo in skillLibrary key (skilllibrary instead of skillLibrary)
  */
 export const LEGACY_V1_TYPO_SKILLLIBRARY = {
-    // @ts-ignore - intentional typo to test migration
     skilllibrary: [
         { id: 's1', name: 'Acrobatie', defaultCategory: 'talents', description: '' }
     ],

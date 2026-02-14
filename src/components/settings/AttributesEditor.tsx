@@ -171,7 +171,7 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
 
     const toggleSecondaryAttributes = () => {
         const isActive = !data.secondaryAttributesActive;
-        let newSecondary = { ...data.secondaryAttributes };
+        const newSecondary = { ...data.secondaryAttributes };
 
         if (isActive) {
             data.attributeSettings.forEach(cat => {

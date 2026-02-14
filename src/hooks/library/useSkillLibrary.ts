@@ -77,7 +77,7 @@ export const useSkillLibrary = (
             newLibrary = [...localList, skillToSave];
         }
 
-        let newData = { ...data, skillLibrary: newLibrary };
+        const newData = { ...data, skillLibrary: newLibrary };
 
         if (renameOnSheet && showRenameConfirm) {
             const oldName = showRenameConfirm.oldName.trim().toLowerCase();

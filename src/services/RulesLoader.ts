@@ -130,9 +130,6 @@ export const loadRules = async (forceSettingId?: string): Promise<RulesData | nu
         logger.log('[RulesLoader] Using Default Embedded Rules.');
         return defaultRules;
 
-        logger.warn('[RulesLoader] No global rules found.');
-        return null;
-
     } catch (error) {
         ErrorService.handleError(error, { context: 'RulesLoader', userMessage: "Erreur critique lors du chargement des règles." });
         return null;

@@ -37,7 +37,6 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, 
                         <label className="block text-[10px] font-bold text-stone-500 uppercase mb-2">Saisie Libre</label>
                         <div className="flex gap-2">
                             <input
-                                autoFocus
                                 id="variant-custom-input"
                                 placeholder="Ex: Chats, Pollen..."
                                 className="flex-grow border border-stone-200 rounded px-3 py-1.5 text-sm focus:border-amber-500 outline-none"

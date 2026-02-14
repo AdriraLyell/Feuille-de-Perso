@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.30.5] - 2026-02-09
+
+- [object Object]
+- [object Object]
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.30.4] - 2026-02-09
 
 - [object Object]

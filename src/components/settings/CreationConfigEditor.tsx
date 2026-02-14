@@ -235,7 +235,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                         <div className="flex items-center gap-2">
                                             <input
                                                 type="number"
-                                                // @ts-ignore
+                                                // @ts-expect-error -- legacy code
                                                 value={config.rankSlots[rank] || 0}
                                                 onChange={(e) => updateRankSlot(rank, parseInt(e.target.value) || 0)}
                                                 className="w-20 border border-gray-300 rounded px-2 py-1 text-center font-mono focus:border-blue-500 outline-none"

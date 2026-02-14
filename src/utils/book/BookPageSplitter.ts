@@ -67,7 +67,7 @@ export function splitIntoPages(html: string, pageHeight: number = PAGE_CONTENT_H
     // Step 2: Distribute into pages
     const pages: string[] = [];
     let currentPageBlocks: string[] = [];
-    let blockQueue: Block[] = [...blocks];
+    const blockQueue: Block[] = [...blocks];
 
     while (blockQueue.length > 0) {
         const block = blockQueue.shift()!;
@@ -193,11 +193,12 @@ function splitParagraph(
         const nodes: { node: Text; start: number; end: number }[] = [];
         let offset = 0;
         const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-        let node;
-        while (node = walker.nextNode() as Text) {
+        let node: Text | null = walker.nextNode() as Text | null;
+        while (node) {
             const len = node.textContent?.length || 0;
             nodes.push({ node, start: offset, end: offset + len });
             offset += len;
+            node = walker.nextNode() as Text | null;
         }
         return nodes;
     }

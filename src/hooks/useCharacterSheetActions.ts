@@ -104,7 +104,7 @@ export const useCharacterSheetActions = (
             };
 
         onChange(prev => {
-            let updatedSkills = { ...prev.skills };
+            const updatedSkills = { ...prev.skills };
             if (type === 'sheet_item') {
                 Object.keys(updatedSkills).forEach(cat => {
                     updatedSkills[cat] = (updatedSkills[cat] || []).filter(s => s.id !== newEntry.id);

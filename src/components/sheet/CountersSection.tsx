@@ -93,7 +93,7 @@ export const CountersSection = React.memo<CountersSectionProps>(({ data, updateC
             // 1. Exact Key Match
             if (key === idOrName) return true;
             // 2. Name Match (current data)
-            // @ts-ignore
+            // @ts-expect-error -- counters[key] may be DotEntry[]
             if (data.counters[key]?.name === idOrName) return true;
             // 3. System Definition Name Match
             const sysDef = rules?.definitions?.counters?.[key];
@@ -119,7 +119,6 @@ export const CountersSection = React.memo<CountersSectionProps>(({ data, updateC
                 <div className={`grid gap-1 ${isLandscape ? 'grid-cols-1' : 'grid-cols-2'}`}>
                     {/* Dynamic System Counters (Sorted) */}
                     {orderedKeys.map(key => {
-                        // @ts-ignore
                         const counter = data.counters[key];
                         if (Array.isArray(counter)) return null;
                         return renderCounterItem(counter, false);

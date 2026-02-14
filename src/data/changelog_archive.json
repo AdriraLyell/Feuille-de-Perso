@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.48.18",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🎨 Esthétique : Suppression du fond gris derrière les images (fond transparent)",
+            "🖼️ Design : Renforcement du cadre blanc (5px) pour un effet 'Polaroid/Photo'",
+            "🌗 Ombres : Amélioration des ombres portées pour une meilleure intégration sur le papier"
+        ]
+    },
+    {
         "version": "2.48.17",
         "date": "2026-02-13",
         "type": "patch",
@@ -1373,23 +1383,6 @@
             {
                 "type": "improved",
                 "text": "Mise à jour de toutes les bibliothèques (Compétences, Historiques, Compteurs, Traits, Spécialisations).",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.5",
-        "date": "2026-02-09",
-        "description": "Généralisation des actions en masse (Admin).",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Extension des actions 'Tout activer / Tout désactiver' aux bibliothèques d'Historiques, Compteurs, Spécialisations et Traits.",
-                "category": "ui"
-            },
-            {
-                "type": "improved",
-                "text": "Cohérence visuelle et fonctionnelle des actions en masse sur l'ensemble de la section Admin.",
                 "category": "ui"
             }
         ]

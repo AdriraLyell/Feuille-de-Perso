@@ -30,7 +30,7 @@ describe('Data Migrations - migrateData', () => {
 
             expect(result.page2.avantages).toBeDefined();
             expect(result.page2.avantages[0].name).toBe('Courage');
-            // @ts-ignore - testing that old key is removed
+            // @ts-expect-error -- testing that old key is removed
             expect(result.page2.vertus).toBeUndefined();
         });
 
@@ -39,7 +39,7 @@ describe('Data Migrations - migrateData', () => {
 
             expect(result.page2.desavantages).toBeDefined();
             expect(result.page2.desavantages[0].name).toBe('Impulsif');
-            // @ts-ignore - testing that old key is removed
+            // @ts-expect-error -- testing that old key is removed
             expect(result.page2.defauts).toBeUndefined();
         });
     });
@@ -107,7 +107,6 @@ describe('Data Migrations - migrateData', () => {
             expect(result.attributes.pave_attributs_1).toBeDefined();
             expect(result.attributes.pave_attributs_2).toBeDefined();
             expect(result.attributes.pave_attributs_3).toBeDefined();
-            // @ts-ignore - testing that old keys are removed
             expect(result.attributes.physique).toBeUndefined();
         });
 
@@ -179,7 +178,6 @@ describe('Data Migrations - migrateData', () => {
             expect(result.skills.Col_Comp_1).toBeDefined();
             // Check that 'Acrobatie' from fixture is in the merged array
             expect(result.skills.Col_Comp_1.some((s: any) => s.name === 'Acrobatie')).toBe(true);
-            // @ts-ignore
             expect(result.skills.talents).toBeUndefined();
         });
 
@@ -323,7 +321,7 @@ describe('Data Migrations - migrateData', () => {
 
             expect(result.skillLibrary).toBeDefined();
             expect(result.skillLibrary.some((s: any) => s.name === 'Acrobatie')).toBe(true);
-            // @ts-ignore
+            // @ts-expect-error -- testing that typo key is removed
             expect(result.skilllibrary).toBeUndefined();
         });
     });

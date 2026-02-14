@@ -40,7 +40,6 @@ describe('Mechanics Utils', () => {
         data.counters.volonte = { id: 'v1', name: 'Volonté', value: 3, creationValue: 0, max: 10 };
 
         // Mock rules with a specific cost for 'volonte' (e.g. 10 instead of default 5)
-        // @ts-ignore
         const mockRules: RulesData = {
             definitions: {
                 counters: {

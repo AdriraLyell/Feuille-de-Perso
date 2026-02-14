@@ -327,7 +327,6 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, s
                         defaultValue={node.attrs.caption}
                         placeholder="Légende de l'image..."
                         className="w-full text-center text-xs font-serif italic border-b border-stone-300 focus:border-stone-500 outline-none bg-transparent px-2 py-1"
-                        autoFocus
                         onBlur={(e) => {
                             updateAttributes({ caption: e.target.value });
                             setIsEditingCaption(false);

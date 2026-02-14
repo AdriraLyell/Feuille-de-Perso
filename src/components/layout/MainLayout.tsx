@@ -126,7 +126,6 @@ const MainLayout: React.FC = () => {
                 if (freshRules) {
                     updateRules({
                         ...freshRules,
-                        // @ts-ignore
                         settingId: migrated.syncInfo.settingId,
                         settingName: migrated.syncInfo.settingName
                     });

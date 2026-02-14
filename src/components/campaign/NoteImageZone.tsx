@@ -174,7 +174,7 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
 
         // When switching to absolute, sync X/Y from current visual state if possible
         // Ideally we would calculate position, but for now we rely on existing X/Y or marginTop
-        let updates: Partial<ImageConfig> = { mode: newMode };
+        const updates: Partial<ImageConfig> = { mode: newMode };
 
         if (newMode === 'absolute') {
             // Initialize X/Y if they are 0 (first switch)
