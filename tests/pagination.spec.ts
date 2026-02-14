@@ -33,7 +33,7 @@ test('journal pagination should work with contentEditable', async ({ page }) => 
         await editor.click();
 
         let content = '';
-        for (let i = 0; i < 45; i++) {
+        for (let i = 0; i < 100; i++) {
             content += `Line ${i + 1}\n`;
         }
 

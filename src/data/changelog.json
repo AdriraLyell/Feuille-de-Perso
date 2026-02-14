@@ -1,5 +1,19 @@
 [
     {
+        "version": "2.49.23",
+        "date": "2026-02-14",
+        "type": "fix",
+        "content": "🛡️ E2E Pagination : Augmentation de la charge de texte (100 lignes) pour garantir le déclenchement des seuils de pagination dans les tests automatisés.",
+        "major": false
+    },
+    {
+        "version": "2.49.22",
+        "date": "2026-02-14",
+        "type": "fix",
+        "content": "🛡️ E2E Stability : Résolution des erreurs de connexion (ports) et gestion de l'écran de sélection des règles dans le CI. Migration des tests vers le nouveau Grimoire Numérique (TiPTap).",
+        "major": false
+    },
+    {
         "version": "2.49.21",
         "date": "2026-02-14",
         "type": "chore",
@@ -179,17 +193,6 @@
             "📚 Admin : Décomposition de `AdminSpecializationLibrary.tsx` pour une meilleure maintenance",
             "🚀 Performance : Réduction de la taille des fichiers composants et isolation des responsabilités UI",
             "🎨 UI : Conservation de l'esthétique premium tout en simplifiant la structure du code"
-        ]
-    },
-    {
-        "version": "2.49.2",
-        "date": "2026-02-14",
-        "type": "feat",
-        "changes": [
-            "Renforcement du typage strict des éditeurs Admin (Creation, Counters, Skills)",
-            "Correction des imports de types et signatures génériques dans les composants Admin",
-            "Suppression des types 'any' résiduels dans LibraryLoader et LibraryImporter",
-            "Validation du build complet sans erreurs de typage"
         ]
     }
 ]

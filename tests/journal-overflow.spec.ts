@@ -27,11 +27,10 @@ test('journal overflow should split precisely', async ({ page }) => {
 
     // Type content (45 lines to be sure)
     let content = '';
-    for (let i = 0; i < 45; i++) {
+    for (let i = 0; i < 100; i++) {
         content += `Line ${i + 1}\n`;
     }
 
-    await editor.fill('');
     await page.keyboard.type(content);
 
     // Wait for pagination
