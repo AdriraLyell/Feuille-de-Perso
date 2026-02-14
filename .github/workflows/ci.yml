@@ -10,7 +10,7 @@ on:
       - 'hotfix/**'
       - 'docs/**'
   pull_request:
-    branches: [develop, main]
+    branches: [main] # Trigger on PRs to main, but skip PRs to develop to avoid duplication when pushing to develop
   workflow_dispatch:
 
 jobs:

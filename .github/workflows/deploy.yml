@@ -40,6 +40,9 @@ jobs:
 
       - name: Unit Tests
         run: npx vitest run
+        env:
+          VITE_SUPABASE_URL: "https://mock.supabase.co"
+          VITE_SUPABASE_ANON_KEY: "mock-key-for-testing"
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
