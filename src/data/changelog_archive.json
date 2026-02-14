@@ -1,5 +1,26 @@
 [
     {
+        "version": "2.49.0",
+        "date": "2026-02-14",
+        "type": "minor",
+        "changes": [
+            "☁️ Cloud Sync : Activation de la synchronisation des images (Grimoire & Portraits) vers le cloud",
+            "🗜️ Compression : Implémentation du pipeline WebP (qualité 50%) + GZIP pour minimiser le poids sur Supabase",
+            "🔄 Synchronisation : Les images vous suivent désormais sur tous vos appareils via le Cloud",
+            "👀 Admin : Les MJ peuvent désormais voir les illustrations des joueurs dans la vue Administrateur",
+            "🛡️ Architecture : Conversion automatique IDs locaux <-> Données compressées lors des cycles de Sync"
+        ]
+    },
+    {
+        "version": "2.48.21",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🛠️ Fix Resizing : Correction des poignées de redimensionnement qui étaient masquées par le cadre blanc",
+            "📏 Précision : Décalage des poignées vers l'extérieur et augmentation de leur priorité visuelle (z-index)"
+        ]
+    },
+    {
         "version": "2.48.20",
         "date": "2026-02-13",
         "type": "patch",
@@ -1326,30 +1347,6 @@
                 "type": "improved",
                 "text": "Renforcement de la sécurité backend : vérification anti-doublon lors de l'import de bibliothèque.",
                 "category": "core"
-            }
-        ]
-    },
-    {
-        "version": "2.32.2",
-        "date": "2026-02-10",
-        "description": "Ajustement layout : Noms sur une ligne, icônes déportées.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Retour au nom sur une seule ligne avec icônes de statut déplacées sur la ligne de description (Skills/Backgrounds).",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.1",
-        "date": "2026-02-10",
-        "description": "Amélioration layout : Noms multi-lignes.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Support des noms sur deux lignes pour les cartes Compétences et Arrières-plans dans l'admin.",
-                "category": "ui"
             }
         ]
     }
