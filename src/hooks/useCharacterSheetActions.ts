@@ -6,6 +6,19 @@ import { RulesData } from '../types/rules';
 import { CharacterSheetData } from '../types/character';
 import { getSkillCategory, getCounter, setCounter } from '../utils/stateAccessors';
 
+interface DropPayload {
+    type: string;
+    data: {
+        id?: string;
+        name: string;
+        description?: string;
+        isVariable?: boolean;
+        categoryType?: string;
+        [key: string]: any;
+    };
+    categoryType?: string;
+}
+
 export const useCharacterSheetActions = (
     data: CharacterSheetData,
     onChange: (update: (prev: CharacterSheetData) => CharacterSheetData) => void,
@@ -64,7 +77,7 @@ export const useCharacterSheetActions = (
         });
     }, [onChange, onAddLog, rules]);
 
-    const handleDropItem = useCallback((category: string, payload: any, targetIndex?: number) => {
+    const handleDropItem = useCallback((category: string, payload: DropPayload, targetIndex?: number) => {
         const { type, data: itemData, categoryType } = payload;
         const catDef = rules?.definitions?.skillCategories?.find(c => c.id === category);
         const behavior = catDef?.behavior || 'Compétence';
@@ -79,7 +92,7 @@ export const useCharacterSheetActions = (
         }
 
         const newEntry: DotEntry = type === 'sheet_item'
-            ? itemData
+            ? (itemData as DotEntry)
             : {
                 id: generateId(),
                 name: itemData.name,
@@ -87,7 +100,6 @@ export const useCharacterSheetActions = (
                 creationValue: 0,
                 max: 5,
                 description: itemData.description,
-                isVariable: itemData.isVariable,
                 definitionId: itemData.id
             };
 
@@ -153,7 +165,7 @@ export const useCharacterSheetActions = (
             const numValue = parseInt(value) || 0;
             const isCreationMode = prev.creationConfig && prev.creationConfig.active;
 
-            const updateInList = (list: any[]) => {
+            const updateInList = <T extends { id: string; name?: string;[key: string]: any }>(list: T[]) => {
                 const idx = list.findIndex(item => item.id === id);
                 if (idx === -1) return null;
                 const newList = [...list];
@@ -226,7 +238,7 @@ export const useCharacterSheetActions = (
                 const current = getCounter(prev, counterKey);
                 if (!current || Array.isArray(current)) return prev;
 
-                const sysDef = (rules?.definitions?.counters as any)?.[id] || (rules?.definitions?.counters as any)?.[counterKey];
+                const sysDef = rules?.definitions?.counters?.[id] || (rules?.definitions?.counters && rules.definitions.counters[counterKey]);
                 const displayName = current.name || sysDef?.name || id;
                 const libDef = rules?.libraries?.counters?.find(c => c.id === id || normalizeString(c.name) === normalizeString(displayName));
 

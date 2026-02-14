@@ -53,17 +53,28 @@
 - [x] **Cache IndexedDB** : Gestion intelligente du cache local et décompression à la volée.
 - [x] **Architecture** : Résolution automatique des IDs locaux/distants (ImageSyncResolver).
 
+### ✅ Phase 9 : CI/CD & Branching Strategy (v2.49.0)
+- [x] **Branching** : GitHub Flow+ (main + develop + feature branches).
+- [x] **CI Pipeline** : Nouveau workflow `ci.yml` pour branches non-production.
+- [x] **E2E en CI** : Tests Playwright intégrés aux deux pipelines (ci + deploy).
+- [x] **PR Template** : Template standardisé en français (`.github/pull_request_template.md`).
+- [x] **Nettoyage** : Suppression de la branche legacy `Mise-en-Ligne`.
+### ✅ Phase 10 : Code Health & Typing (v2.49.1)
+- [x] **Refactoring Admin** : `AdminSkillsEditor` typé strictement.
+- [x] **Hooks** : `useCharacterSheetActions` nettoyé (`DropPayload` interface).
+- [x] **Types** : `BookDocument` (id/dates), `DBTrait` (JSONB strict).
+- [x] **Extraction** : `reconcileSkillsAndBackgrounds` isolé dans `skillsReconciler.ts`.
+
 ## 2. Issues Restantes & Roadmap
 
 ### 🔶 Issue 4.1 — `console.log` directs (PARTIELLE)
 - **24 occurrences** de `console.*` directs restantes (hors logger).
 - Logger conditionnel `src/utils/logger.ts` créé et majoritairement adopté.
 
-### 🔶 Issue 4.2 — Typage `any`/`@ts-ignore` (OUVERTE)
-- **40 `as any`** + **39 `@ts-ignore`** en production (hors tests/fixtures). Audit 2026-02-14.
-- Augmentation due aux nouveaux fichiers : `ImageSyncResolver.ts` (+8), composants book (+5), admin libraries (+10).
-- Phase A complétée (`stateAccessors.ts` créé).
-- Phases B-E restantes : types DB, handlers admin, fetch typés, layout.
+### 🔶 Issue 4.2 — Typage `any`/`@ts-ignore` (EN COURS)
+- **35 `as any`** + **38 `@ts-ignore`** en production. Baisse significative sur les fichiers admin.
+- Phase A & B complétées.
+- Phases C-E restantes : types DB fetches, layout.
 - Plan détaillé dans `docs/PLAN_ISSUES_MOYENNES.md`.
 
 ### 🔶 Issue 4.3 — Fichiers volumineux (PARTIELLE)

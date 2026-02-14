@@ -39,14 +39,14 @@ export const ChapterHeading = Node.create({
         return {
             setChapter:
                 () =>
-                    ({ chain }) => {
+                    ({ chain }: any) => {
                         return chain()
                             .insertContent({
                                 type: this.name,
                                 attrs: { date: new Date().toISOString().split('T')[0] },
                                 content: [{ type: 'text', text: 'Nouveau Chapitre' }],
                             })
-                            .command(({ tr, dispatch }) => {
+                            .command(({ tr, dispatch }: any) => {
                                 // Logic removed here: the React component handles selection on mount
                                 // for better stability with NodeViews.
                                 return true;
@@ -54,7 +54,7 @@ export const ChapterHeading = Node.create({
                             .focus()
                             .run();
                     },
-        };
+        } as any;
     },
 
     addNodeView() {

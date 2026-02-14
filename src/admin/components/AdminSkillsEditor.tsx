@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { RulesData } from '../../types/rules';
-import { LibrarySkillEntry } from '../../types';
+import { RulesData, SkillCategoryConfig, SkillBehavior } from '../../types/rules';
+import { LibrarySkillEntry, DotEntry } from '../../types';
 import { AlertCircle, FolderSync, CheckCircle2 } from 'lucide-react';
 import { disambiguateCategories } from '../../utils/categoryUtils';
 import AdminSkillLibrarySidebar from './libraries/AdminSkillLibrarySidebar';
@@ -12,7 +12,13 @@ interface AdminSkillsEditorProps {
     onUpdate: (newRules: RulesData) => void;
 }
 
-type DragItem = { type: 'admin_sheet_skill' | 'admin_lib_skill', category?: string, index?: number, name?: string, data?: any };
+type DragItem = {
+    type: 'admin_sheet_skill' | 'admin_lib_skill';
+    category?: string;
+    index?: number;
+    name?: string;
+    data?: LibrarySkillEntry | DotEntry;
+};
 
 const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }) => {
     const definitions = rules.definitions;
@@ -106,7 +112,7 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
         });
     };
 
-    const updateCategoryMetadata = (category: string, updates: Partial<any>) => {
+    const updateCategoryMetadata = (category: string, updates: Partial<SkillCategoryConfig>) => {
         onUpdate({
             ...rules,
             definitions: {
@@ -118,7 +124,7 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
         });
     };
 
-    const updateBehavior = (category: string, behavior: any) => {
+    const updateBehavior = (category: string, behavior: SkillBehavior) => {
         // Déterminer les coûts par défaut selon le behavior
         let factor = 1;
         let type: 'linear' | 'triangular' = 'triangular';
@@ -212,7 +218,7 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
 
         // 2. Mobile Library Drop
         else if (draggedItem.type === 'admin_lib_skill') {
-            const skillName = draggedItem.name || draggedItem.data.name;
+            const skillName = draggedItem.name || draggedItem.data?.name || 'Inconnu';
             const currentList = [...(skillsMap[targetCategory] || [])];
 
             if (currentList.includes(skillName)) {
@@ -270,7 +276,7 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
                                 isDraggingSidebarItem={draggedItem?.type === 'admin_lib_skill'}
                                 onUpdateLabel={updateLabel}
                                 onUpdateBehavior={updateBehavior}
-                                onUpdateCategory={(updates) => updateCategoryMetadata(cat.id, updates)}
+                                onUpdateCategory={(updates: Partial<SkillCategoryConfig>) => updateCategoryMetadata(cat.id, updates)}
                                 onUpdateSkill={updateSkillName}
                                 onAddSkill={addSkill}
                                 onRemoveSkill={removeSkill}
@@ -287,7 +293,7 @@ const AdminSkillsEditor: React.FC<AdminSkillsEditorProps> = ({ rules, onUpdate }
             <AdminSkillLibrarySidebar
                 rules={rules}
                 onUpdate={onUpdate}
-                draggedItem={draggedItem as any}
+                draggedItem={draggedItem}
                 setDraggedItem={setDraggedItem}
             />
         </div>

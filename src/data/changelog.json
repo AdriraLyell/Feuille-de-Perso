@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.1",
+        "date": "2026-02-14",
+        "type": "patch",
+        "changes": [
+            "🛡️ Typage Strict : Amélioration de la sécurité des types dans l'éditeur de compétences Admin",
+            "🧹 Refactoring : Extraction de la logique de réconciliation des compétences et historiques vers `skillsReconciler.ts`",
+            "🔧 Hooks : Renforcement du typage pour `useCharacterSheetActions` et suppression des `any` résiduels",
+            "🐛 Fix : Correction des types pour `BookDocument` et `ChapterHeading`"
+        ]
+    },
+    {
         "version": "2.49.0",
         "date": "2026-02-14",
         "type": "minor",

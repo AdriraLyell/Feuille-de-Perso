@@ -30,8 +30,9 @@ Ces règles sont la source de vérité pour le comportement de l'agent dans ce w
 Avant chaque fin de tâche (notify_user) :
 1. Incrémenter la version dans `package.json`.
 2. Mettre à jour `src/data/changelog.json` avec la version, date et type de changement.
-3. Vérifier l'intégrité via `npm run build`, si cela n'a pas été fait pendant le code
-4. Mettre à jour les fichiers .md creer lors des phases de planifications (task.md, implementation plan, ou autres)
+3. Vérifier l'intégrité via `npm run build`, si cela n'a pas été fait pendant le code.
+4. Mettre à jour les fichiers .md créés lors des phases de planifications (task.md, implementation plan, ou autres).
+5. Commiter sur `develop`, puis créer une PR `develop → main` pour déployer.
 
 
 > Le script `npm run sync-version` synchronise automatiquement `src/constants.ts` depuis `package.json`.
@@ -51,3 +52,28 @@ Avant chaque fin de tâche (notify_user) :
 - **Docs** : `docs/`
 - **Règles Agent** : `.agent/rules/`
 - **Brain** : `<appDataDir>/brain/<uuid>/` (Artifacts temporaires).
+
+## 7. WORKFLOW GIT (GitHub Flow+)
+
+### Branches
+- **`main`** : Production (déploie sur GitHub Pages). Protégée : PR obligatoire + status checks.
+- **`develop`** : Intégration. Push direct autorisé. CI sans déploiement.
+- **`feat/*`, `fix/*`, `chore/*`, `docs/*`** : Branches de travail éphémères depuis `develop`.
+- **`hotfix/*`** : Corrections urgentes depuis `main` (bypass develop).
+
+### Nommage des branches
+`type/description-courte` en lowercase avec tirets. Ex: `feat/book-page-animations`, `fix/xp-counter-overflow`.
+
+### Stratégie de merge
+- `feat/*` → `develop` : **Squash merge** (1 commit propre par feature).
+- `develop` → `main` : **Merge commit** (traçabilité, le merge commit marque le déploiement).
+- `hotfix/*` → `main` : **Squash merge**, puis cherry-pick vers `develop`.
+
+### Commits
+Format : `type(scope): résumé impératif court` (max ~72 chars).
+- Types : `feat`, `fix`, `chore`, `ci`, `docs`, `refactor`, `test`, `perf`
+- Scopes : `admin`, `book`, `character`, `sync`, `ui`, `rules`
+
+### CI/CD
+- `.github/workflows/ci.yml` : Branches non-production (type check, lint, tests unitaires, E2E Playwright, build).
+- `.github/workflows/deploy.yml` : Production `main` (idem + déploiement GitHub Pages).

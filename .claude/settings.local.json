@@ -5,7 +5,19 @@
       "mcp__sequential-thinking__sequentialthinking",
       "Bash(dir:*)",
       "Bash(findstr:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(git -C \"d:\\\\Projet JdR\\\\feuille-de-perso\" branch -a)",
+      "Bash(git -C \"d:\\\\Projet JdR\\\\feuille-de-perso\" log --oneline -20)",
+      "Bash(git -C \"d:\\\\Projet JdR\\\\feuille-de-perso\" remote -v)",
+      "Bash(git -C \"d:\\\\Projet JdR\\\\feuille-de-perso\" log --oneline --all --graph -20)",
+      "Bash(git -C \"d:\\\\Projet JdR\\\\feuille-de-perso\" branch -a -vv)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "Bash(where:*)",
+      "mcp__github__create_pull_request",
+      "mcp__github__get_pull_request_status",
+      "mcp__github__merge_pull_request",
+      "Bash(git pull:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
