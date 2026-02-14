@@ -180,7 +180,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                         <div className={`flex flex-col overflow-hidden min-h-0 ${showLibraryInEditor ? 'flex-grow' : ''}`}>
                             <div className="p-5 bg-gray-50 border-b border-gray-200 shrink-0">
                                 <div className="flex gap-4 items-start mb-4">
-                                    <div className="w-1/3 shrink-0"><label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom du Trait</label><input className="w-full border border-gray-300 rounded px-3 py-2 font-bold text-gray-900 focus:border-blue-500 outline-none" value={editorName} onChange={(e) => setEditorName(e.target.value)} autoFocus /></div>
+                                    <div className="w-1/3 shrink-0"><label htmlFor="trait-name" className="block text-xs font-bold text-gray-500 uppercase mb-1">Nom du Trait</label><input id="trait-name" className="w-full border border-gray-300 rounded px-3 py-2 font-bold text-gray-900 focus:border-blue-500 outline-none" value={editorName} onChange={(e) => setEditorName(e.target.value)} autoFocus /></div>
 
                                     {(editorIsVariable || editorVariant || editorVariants.length > 0) ? (
                                         <div className="flex-grow flex gap-4 items-end animate-in slide-in-from-top-1 duration-200">

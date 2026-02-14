@@ -22,17 +22,17 @@ export const SpecModalContent: React.FC<SpecModalContentProps> = ({
     return (
         <div className="flex flex-col gap-4 py-2">
             <div>
-                <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Nom</label>
+                <label htmlFor="spec-name" className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Nom</label>
                 <input
+                    id="spec-name"
                     className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-black font-serif text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm"
                     value={editingEntry.name}
                     onChange={(e) => setEditingEntry({ ...editingEntry, name: e.target.value })}
-                    autoFocus
                 />
             </div>
 
             <div>
-                <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Compétences associées</label>
+                <label htmlFor="spec-skills" className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Compétences associées</label>
                 <div className="relative mb-2">
                     <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-[#5c4d41]/60" />
                     <input
@@ -78,8 +78,9 @@ export const SpecModalContent: React.FC<SpecModalContentProps> = ({
             </div>
 
             <div>
-                <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Seuil minimum par défaut</label>
+                <label htmlFor="spec-min-level" className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Seuil minimum par défaut</label>
                 <input
+                    id="spec-min-level"
                     type="number"
                     min="0"
                     max="5"
@@ -91,8 +92,9 @@ export const SpecModalContent: React.FC<SpecModalContentProps> = ({
             </div>
 
             <div>
-                <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Description</label>
+                <label htmlFor="spec-description" className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Description</label>
                 <textarea
+                    id="spec-description"
                     className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm bg-white/50 min-h-[80px] focus:border-amber-500 outline-none resize-none shadow-sm italic text-[#4a3b32]"
                     value={editingEntry.description || ''}
                     onChange={(e) => setEditingEntry({ ...editingEntry, description: e.target.value })}

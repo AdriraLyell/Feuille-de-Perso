@@ -206,7 +206,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
 
     // Filter & Sort Logic
     const processedList = useMemo(() => {
-        let list = library.filter(entry => {
+        const list = library.filter(entry => {
             const entryTags = entry.tags || [];
             const matchesSearch = smartIncludes(entry.name, searchTerm) ||
                 smartIncludes(entry.description, searchTerm) ||
