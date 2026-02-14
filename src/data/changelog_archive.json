@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.48.17",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🎯 Centrage : Les images centrées respectent désormais leur largeur personnalisée (plus besoin de forcer 100%)",
+            "📏 Correction Auto : Résolution du bug de hauteur infinie et de rendu vide pour les images verticales en mode Auto",
+            "💎 Stabilité : Amélioration de la robustesse CSS pour prévenir les dépendances circulaires de hauteur"
+        ]
+    },
+    {
         "version": "2.48.16",
         "date": "2026-02-13",
         "type": "patch",
@@ -1380,23 +1390,6 @@
             {
                 "type": "improved",
                 "text": "Cohérence visuelle et fonctionnelle des actions en masse sur l'ensemble de la section Admin.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.4",
-        "date": "2026-02-09",
-        "description": "Amélioration ergonomie Bibliothèque (Admin).",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Ajout d'actions en masse (Tout activer / Tout désactiver) dans la réserve de compétences.",
-                "category": "ui"
-            },
-            {
-                "type": "improved",
-                "text": "Les actions en masse respectent le filtre de recherche actif.",
                 "category": "ui"
             }
         ]

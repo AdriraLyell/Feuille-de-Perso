@@ -4,12 +4,8 @@ import { getLatestWorkflowRun } from '../../services/githubService';
 
 const POLL_INTERVAL = 5000; // 5 seconds as requested
 
-interface DeploymentMonitorProps {
-    open: boolean; // Managed by parent or self? Let's make it self-managed mostly.
-}
-
 const DeploymentMonitor: React.FC = () => {
-    const [lastRunId, setLastRunId] = useState<number | null>(null);
+    const [, setLastRunId] = useState<number | null>(null);
     const [currentRun, setCurrentRun] = useState<any | null>(null);
     const [isVisible, setIsVisible] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error' | 'info', message: string } | null>(null);
@@ -83,7 +79,7 @@ const DeploymentMonitor: React.FC = () => {
         return () => clearInterval(interval);
     }, []);
 
-    const playSound = (type: 'start' | 'success' | 'error') => {
+    const playSound = (_type: 'start' | 'success' | 'error') => {
         // Optional: Add simple beep or notification sound if desired
     };
 

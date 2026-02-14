@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Shield, Zap, Play, Info, Save, Loader2, Pencil } from 'lucide-react';
+import { Trash2, Shield, Zap, Play, Info, Save, Loader2, Pencil } from 'lucide-react';
 import { ATTRIBUTE_PRESETS } from '../../../data/defaults/attributes';
 import { AttributePreset } from '../../../types/system';
 import ThematicModal from '../../../components/ui/ThematicModal';
@@ -7,7 +7,7 @@ import ThematicModal from '../../../components/ui/ThematicModal';
 interface AttributePresetManagerProps {
     dbPresets: AttributePreset[];
     isLoading: boolean;
-    onLoadRequested: (preset: any) => void;
+    onLoadRequested: (preset: AttributePreset) => void;
     onSaveRequested: (name: string, desc: string) => void;
     onUpdateRequested: (id: string, name: string, desc: string) => void;
     onDeleteRequested: (id: string) => void;
@@ -87,10 +87,11 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
                     {/* Database Presets */}
                     {dbPresets.map(preset => (
-                        <div
+                        <button
                             key={preset.id}
                             onClick={() => onLoadRequested(preset)}
                             className="relative bg-stone-950/50 border border-stone-700/50 hover:border-amber-500/50 hover:bg-stone-900 rounded-sm p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[105px] shadow-sm hover:shadow-glow-gold"
+                            title={`Charger le préréglage : ${preset.name}`}
                         >
                             {/* Actions positioned absolutely to be invariant */}
                             <div className="absolute top-2.5 right-2 flex items-center gap-1 z-10">
@@ -98,6 +99,7 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                     onClick={(e) => { e.stopPropagation(); openEditModal(preset); }}
                                     className="opacity-0 group-hover/card:opacity-100 text-stone-500 hover:text-amber-500 transition-opacity p-0.5"
                                     title="Modifier les informations"
+                                    aria-label="Modifier les informations"
                                 >
                                     <Pencil size={12} />
                                 </button>
@@ -110,6 +112,7 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                         onClick={(e) => { e.stopPropagation(); onDeleteRequested(preset.id); }}
                                         className="opacity-0 group-hover/card:opacity-100 text-stone-500 hover:text-crimson-blood transition-opacity p-0.5"
                                         title="Supprimer"
+                                        aria-label="Supprimer le préréglage"
                                     >
                                         <Trash2 size={12} />
                                     </button>
@@ -123,7 +126,7 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                     </span>
                                     <div className="shrink-0 pt-0.5 pr-12">
                                         <div className="flex gap-0.5 items-center">
-                                            {preset.structure.map((pave: any, i: number) => {
+                                            {preset.structure.map((pave, i: number) => {
                                                 const isSecondary = (preset.hasSecondary);
                                                 return (
                                                     <div
@@ -131,7 +134,7 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                                         className={`flex flex-col gap-0.5 p-0.5 rounded-[1px] border ${isSecondary ? 'bg-stone-800/50 border-stone-700' : 'bg-stone-900 border-stone-800'}`}
                                                     >
                                                         <div className="flex flex-col gap-0.5">
-                                                            {pave.attrs.slice(0, 4).map((_: any, j: number) => (
+                                                            {pave.attrs.slice(0, 4).map((_: unknown, j: number) => (
                                                                 <div key={j} className="w-0.5 h-0.5 rounded-full bg-stone-500" />
                                                             ))}
                                                         </div>
@@ -159,22 +162,24 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                 </span>
                                 <Play size={10} className="text-stone-700 group-hover/card:text-amber-500 shrink-0 transition-colors" />
                             </div>
-                        </div>
+                        </button>
                     ))}
 
                     {/* Fallback to hardcoded if DB empty and not loading */}
                     {!isLoading && dbPresets.length === 0 && ATTRIBUTE_PRESETS.map((preset, idx) => (
-                        <div
+                        <button
                             key={`hc-${idx}`}
-                            onClick={() => onLoadRequested(preset)}
+                            onClick={() => onLoadRequested(preset as AttributePreset)}
                             className="relative bg-stone-950/50 border border-stone-700/50 hover:border-amber-500/50 hover:bg-stone-900 rounded-sm p-3 text-left transition-all group/card cursor-pointer flex flex-col justify-between min-h-[105px] shadow-sm hover:shadow-glow-gold"
+                            title={`Charger le préréglage : ${preset.name}`}
                         >
                             {/* Actions positioned absolutely to be invariant */}
                             <div className="absolute top-2.5 right-2 flex items-center gap-1 z-10">
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); openEditModal(preset as any); }}
+                                    onClick={(e) => { e.stopPropagation(); openEditModal(preset as AttributePreset); }}
                                     className="opacity-0 group-hover/card:opacity-100 text-stone-500 hover:text-amber-500 transition-opacity p-0.5"
                                     title="Modifier"
+                                    aria-label="Modifier le préréglage"
                                 >
                                     <Pencil size={12} />
                                 </button>
@@ -192,12 +197,12 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                     </span>
                                     <div className="shrink-0 pt-0.5 pr-12">
                                         <div className="flex gap-0.5 items-center">
-                                            {preset.structure.map((pave: any, i: number) => {
+                                            {preset.structure.map((pave, i: number) => {
                                                 const isSec = preset.hasSecondary;
                                                 return (
                                                     <div key={i} className={`flex flex-col gap-0.5 p-0.5 rounded-[1px] border ${isSec ? 'bg-stone-800/50 border-stone-700' : 'bg-stone-900 border-stone-800'}`}>
                                                         <div className="flex flex-col gap-0.5">
-                                                            {(pave.attrs || []).slice(0, 3).map((_: any, j: number) => (
+                                                            {(pave.attrs || []).slice(0, 3).map((_: unknown, j: number) => (
                                                                 <div key={j} className="w-0.5 h-0.5 rounded-full bg-stone-500" />
                                                             ))}
                                                         </div>
@@ -225,7 +230,7 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                 </span>
                                 <Play size={10} className="text-stone-700 group-hover/card:text-amber-500 shrink-0 transition-colors" />
                             </div>
-                        </div>
+                        </button>
                     ))}
                 </div>
             </div>
@@ -259,11 +264,11 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                         </p>
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-[10px] uppercase font-bold text-stone-500 mb-1 tracking-wider">
+                                <label htmlFor="preset-name" className="block text-[10px] uppercase font-bold text-stone-500 mb-1 tracking-wider">
                                     Nom du préréglage {isOfficial && "(Officiel - Non modifiable)"}
                                 </label>
                                 <input
-                                    autoFocus={!isOfficial}
+                                    id="preset-name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="Ex: Système 3-Pavés-6-Attributs"
@@ -277,9 +282,9 @@ const AttributePresetManager: React.FC<AttributePresetManagerProps> = ({
                                 )}
                             </div>
                             <div>
-                                <label className="block text-[10px] uppercase font-bold text-stone-500 mb-1 tracking-wider">Description</label>
+                                <label htmlFor="preset-description" className="block text-[10px] uppercase font-bold text-stone-500 mb-1 tracking-wider">Description</label>
                                 <textarea
-                                    autoFocus={isOfficial}
+                                    id="preset-description"
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     placeholder="Décrivez l'usage de ce préréglage..."
