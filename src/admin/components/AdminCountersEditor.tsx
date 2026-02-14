@@ -94,8 +94,9 @@ const AdminCountersEditor: React.FC<AdminCountersEditorProps> = ({ rules, onUpda
 
                             <div className="space-y-3">
                                 <div>
-                                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Nom</label>
+                                    <label htmlFor={`counter-name-${counter.id}`} className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Nom</label>
                                     <input
+                                        id={`counter-name-${counter.id}`}
                                         type="text"
                                         value={counter.name}
                                         onChange={(e) => handleUpdateCounter(counter.id, 'name', e.target.value)}
@@ -104,8 +105,9 @@ const AdminCountersEditor: React.FC<AdminCountersEditorProps> = ({ rules, onUpda
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Description</label>
+                                    <label htmlFor={`counter-desc-${counter.id}`} className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Description</label>
                                     <textarea
+                                        id={`counter-desc-${counter.id}`}
                                         value={counter.description || ''}
                                         onChange={(e) => handleUpdateCounter(counter.id, 'description', e.target.value)}
                                         className="w-full bg-stone-950 border border-stone-700 rounded-sm px-2 py-1 text-xs min-h-[50px] resize-none text-stone-400 outline-none focus:border-amber-500 transition-colors placeholder-stone-700"
@@ -114,8 +116,9 @@ const AdminCountersEditor: React.FC<AdminCountersEditorProps> = ({ rules, onUpda
                                 </div>
                                 <div className="grid grid-cols-3 gap-2">
                                     <div>
-                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Max</label>
+                                        <label htmlFor={`counter-max-${counter.id}`} className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Max</label>
                                         <input
+                                            id={`counter-max-${counter.id}`}
                                             type="number"
                                             value={counter.max}
                                             onChange={(e) => handleUpdateCounter(counter.id, 'max', parseInt(e.target.value))}
@@ -123,8 +126,9 @@ const AdminCountersEditor: React.FC<AdminCountersEditorProps> = ({ rules, onUpda
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Départ</label>
+                                        <label htmlFor={`counter-start-${counter.id}`} className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Départ</label>
                                         <input
+                                            id={`counter-start-${counter.id}`}
                                             type="number"
                                             value={counter.defaultValue || counter.value || 0}
                                             onChange={(e) => handleUpdateCounter(counter.id, 'defaultValue', parseInt(e.target.value))}
@@ -132,8 +136,9 @@ const AdminCountersEditor: React.FC<AdminCountersEditorProps> = ({ rules, onUpda
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Coût XP</label>
+                                        <label htmlFor={`counter-xp-${counter.id}`} className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Coût XP</label>
                                         <input
+                                            id={`counter-xp-${counter.id}`}
                                             type="number"
                                             value={counter.xpCost}
                                             onChange={(e) => handleUpdateCounter(counter.id, 'xpCost', parseInt(e.target.value))}

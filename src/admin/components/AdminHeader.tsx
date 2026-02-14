@@ -57,12 +57,14 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                             </MotionFade>
                         ) : (
                             <MotionFade key="synced" duration={0.3}>
-                                <div
-                                    className="flex items-center gap-2 text-green-700/50 cursor-pointer hover:text-green-500 transition-colors"
+                                <button
+                                    className="flex items-center gap-2 text-green-700/50 cursor-pointer hover:text-green-500 transition-colors bg-transparent border-none p-0"
                                     onClick={onCheckSchema}
+                                    title="Vérifier la validité du schéma"
+                                    aria-label="Vérifier la validité du schéma"
                                 >
                                     <Cloud size={20} />
-                                </div>
+                                </button>
                             </MotionFade>
                         )}
                     </div>

@@ -204,15 +204,5 @@
             "📏 Correction Auto : Résolution du bug de hauteur infinie et de rendu vide pour les images verticales en mode Auto",
             "💎 Stabilité : Amélioration de la robustesse CSS pour prévenir les dépendances circulaires de hauteur"
         ]
-    },
-    {
-        "version": "2.48.16",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🖱️ Déplacement : Activation du Drag & Drop natif pour déplacer les images dans le flow du texte",
-            "🧹 Nettoyage : Suppression du filtre Sépia (obsolète)",
-            "🏗️ Stabilité : Correction des types d'images et nettoyage des imports"
-        ]
     }
 ]

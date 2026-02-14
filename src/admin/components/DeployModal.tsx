@@ -18,8 +18,8 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
     const [token, setToken] = useState<string>(localStorage.getItem('GITHUB_TOKEN') || '');
     const [repoOwner, setRepoOwner] = useState<string>(localStorage.getItem('GITHUB_OWNER') || 'AdriraLyell');
     const [repoName, setRepoName] = useState<string>(localStorage.getItem('GITHUB_REPO') || 'Feuille-de-Perso');
-    const [filePath, setFilePath] = useState<string>('public/data/rules.json');
-    const [branch, setBranch] = useState<string>('main');
+    const filePath = 'public/data/rules.json';
+    const branch = 'main';
 
     const [status, setStatus] = useState<'idle' | 'loading' | 'building' | 'success' | 'error'>('idle');
     const [message, setMessage] = useState<string>('');
@@ -117,6 +117,7 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
                 setMessage('Le fichier est à jour, mais le déploiement Pages a rencontré une anomalie.');
             }
         } catch (err) {
+            console.error('Erreur de déploiement:', err);
             setStatus('error');
             setMessage('Une erreur arcanique a interrompu le processus.');
         }
@@ -154,8 +155,9 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest">Maître du Dépôt</label>
+                                <label htmlFor="repoOwner" className="text-[10px] font-black text-stone-500 uppercase tracking-widest">Maître du Dépôt</label>
                                 <input
+                                    id="repoOwner"
                                     value={repoOwner}
                                     onChange={(e) => setRepoOwner(e.target.value)}
                                     className="w-full bg-stone-950 border border-stone-800 rounded-sm px-3 py-2 text-stone-300 focus:border-amber-500/50 outline-none text-xs transition-all"
@@ -163,8 +165,9 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest">Archives (Dépôt)</label>
+                                <label htmlFor="repoName" className="text-[10px] font-black text-stone-500 uppercase tracking-widest">Archives (Dépôt)</label>
                                 <input
+                                    id="repoName"
                                     value={repoName}
                                     onChange={(e) => setRepoName(e.target.value)}
                                     className="w-full bg-stone-950 border border-stone-800 rounded-sm px-3 py-2 text-stone-300 focus:border-amber-500/50 outline-none text-xs transition-all"
@@ -174,9 +177,10 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest">Sceau d'Accès (GitHub Token)</label>
+                            <label htmlFor="githubToken" className="text-[10px] font-black text-stone-500 uppercase tracking-widest">Sceau d'Accès (GitHub Token)</label>
                             <div className="relative">
                                 <input
+                                    id="githubToken"
                                     type="password"
                                     value={token}
                                     onChange={(e) => setToken(e.target.value)}

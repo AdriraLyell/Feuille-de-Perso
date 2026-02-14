@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.48.16",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🖱️ Déplacement : Activation du Drag & Drop natif pour déplacer les images dans le flow du texte",
+            "🧹 Nettoyage : Suppression du filtre Sépia (obsolète)",
+            "🏗️ Stabilité : Correction des types d'images et nettoyage des imports"
+        ]
+    },
+    {
         "version": "2.48.15",
         "date": "2026-02-13",
         "type": "patch",
@@ -1388,23 +1398,6 @@
                 "type": "improved",
                 "text": "Les actions en masse respectent le filtre de recherche actif.",
                 "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.3",
-        "date": "2026-02-09",
-        "description": "Sécurisation de la persistance (Admin).",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Correction d'une faille de synchronisation provoquant la perte de données lors de l'ajout de nouveaux items ou de l'activation massive.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Standardisation de la génération d'ID via UUID pour une meilleure compatibilité avec Supabase.",
-                "category": "core"
             }
         ]
     }
