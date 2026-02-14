@@ -4,7 +4,10 @@ test('journal pagination should work with contentEditable', async ({ page }) => 
     test.setTimeout(90000);
 
     await page.goto('/');
-    await page.waitForTimeout(2000);
+
+    // Select Hors Ligne to enter the app
+    await page.click('text=Hors Ligne');
+    await page.waitForTimeout(1000);
 
     // Create character
     const createBtn = page.locator('button').first();

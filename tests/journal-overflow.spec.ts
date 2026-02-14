@@ -13,8 +13,8 @@ test('journal overflow should split precisely', async ({ page }) => {
 
     await page.goto('/');
 
-    // 1. Select Mode Hors Ligne
-    await page.click('text=Mode Hors Ligne');
+    // 1. Select Hors Ligne to enter the app
+    await page.click('text=Hors Ligne');
 
     // 2. Click on the Campaign Notes tab
     await page.click('text=Notes de Campagne');
