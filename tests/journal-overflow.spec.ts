@@ -11,7 +11,7 @@ test('journal overflow should split precisely', async ({ page }) => {
         }
     });
 
-    await page.goto('http://localhost:5173/');
+    await page.goto('/');
 
     // 1. Select Mode Hors Ligne
     await page.click('text=Mode Hors Ligne');

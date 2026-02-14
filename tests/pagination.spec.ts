@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 
 test('journal pagination should work with contentEditable', async ({ page }) => {
     test.setTimeout(90000);
-    
-    await page.goto('http://localhost:5173');
+
+    await page.goto('/');
     await page.waitForTimeout(2000);
 
     // Create character
@@ -30,12 +30,12 @@ test('journal pagination should work with contentEditable', async ({ page }) => 
     const editor = page.locator('[contenteditable]').first();
     if (await editor.isVisible()) {
         await editor.click();
-        
+
         let content = '';
         for (let i = 0; i < 45; i++) {
             content += `Line ${i + 1}\n`;
         }
-        
+
         await editor.type(content);
         await page.waitForTimeout(3000);
 
