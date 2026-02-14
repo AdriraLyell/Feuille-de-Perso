@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
 import { supabase } from '../../services/supabase';
-import { ShieldCheck, Lock, Loader2, AlertCircle, Sparkles, Scroll, ArrowRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ShieldCheck, Lock, AlertCircle, Sparkles, Scroll, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 import { MotionCard } from '../../components/ui/motion/MotionCard';
 import ThematicButton from '../../components/ui/ThematicButton';
-import { REPO_OWNER, REPO_NAME, APP_VERSION } from '../../constants/app';
+import { APP_VERSION } from '../../constants/app';
 
 const LoginScreen: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -123,10 +123,11 @@ const LoginScreen: React.FC = () => {
 
                         <div className="space-y-8">
                             <div className="relative group">
-                                <label className="absolute -top-2.5 left-3 bg-stone-950 px-2 text-[9px] font-bold text-amber-700 uppercase tracking-[0.2em] group-focus-within:text-amber-400 transition-colors z-20">
+                                <label htmlFor="email" className="absolute -top-2.5 left-3 bg-stone-950 px-2 text-[9px] font-bold text-amber-700 uppercase tracking-[0.2em] group-focus-within:text-amber-400 transition-colors z-20">
                                     Sceau de l'Identité
                                 </label>
                                 <input
+                                    id="email"
                                     type="email"
                                     required
                                     value={email}
@@ -138,7 +139,7 @@ const LoginScreen: React.FC = () => {
 
                             <div className="relative group">
                                 <div className="flex justify-between items-center absolute -top-2.5 left-3 right-3 z-20 pointer-events-none">
-                                    <label className="bg-stone-950 px-2 text-[9px] font-bold text-amber-700 uppercase tracking-[0.2em] group-focus-within:text-amber-400 transition-colors">
+                                    <label htmlFor="password" className="bg-stone-950 px-2 text-[9px] font-bold text-amber-700 uppercase tracking-[0.2em] group-focus-within:text-amber-400 transition-colors">
                                         Parole Sacrée
                                     </label>
                                     <button
@@ -151,6 +152,7 @@ const LoginScreen: React.FC = () => {
                                 </div>
                                 <div className="relative">
                                     <input
+                                        id="password"
                                         type="password"
                                         required={!successMessage}
                                         value={password}

@@ -1,5 +1,12 @@
 [
     {
+        "version": "2.49.15",
+        "date": "2026-02-14",
+        "type": "fix",
+        "content": "🛡️ Admin accessibility & build fix : Résolution des erreurs d'accessibilité (labels, boutons) et de typage bloquant le déploiement CI.",
+        "major": false
+    },
+    {
         "version": "2.49.14",
         "date": "2026-02-14",
         "type": "refactor",
@@ -193,16 +200,6 @@
             "🎨 Esthétique : Suppression du fond gris derrière les images (fond transparent)",
             "🖼️ Design : Renforcement du cadre blanc (5px) pour un effet 'Polaroid/Photo'",
             "🌗 Ombres : Amélioration des ombres portées pour une meilleure intégration sur le papier"
-        ]
-    },
-    {
-        "version": "2.48.17",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🎯 Centrage : Les images centrées respectent désormais leur largeur personnalisée (plus besoin de forcer 100%)",
-            "📏 Correction Auto : Résolution du bug de hauteur infinie et de rendu vide pour les images verticales en mode Auto",
-            "💎 Stabilité : Amélioration de la robustesse CSS pour prévenir les dépendances circulaires de hauteur"
         ]
     }
 ]

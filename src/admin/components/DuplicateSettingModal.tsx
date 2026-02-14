@@ -68,11 +68,11 @@ const DuplicateSettingModal: React.FC<DuplicateSettingModalProps> = ({
                 </div>
 
                 <div>
-                    <label className="block text-xs font-bold text-stone-500 uppercase mb-1 tracking-widest px-1">
+                    <label htmlFor="new-campaign-name" className="block text-xs font-bold text-stone-500 uppercase mb-1 tracking-widest px-1">
                         Nom de la nouvelle campagne
                     </label>
                     <input
-                        autoFocus
+                        id="new-campaign-name"
                         type="text"
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
