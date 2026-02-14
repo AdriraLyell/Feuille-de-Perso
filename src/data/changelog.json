@@ -1,5 +1,12 @@
 [
     {
+        "version": "2.49.19",
+        "date": "2026-02-14",
+        "type": "chore",
+        "content": "🚀 CI : Optimisation du workflow GitHub Actions. Les tests E2E Playwright sont désormais restreints aux Pull Requests et à la branche main pour accélérer les push sur develop. Correction des variables d'environnement manquantes pour Vitest.",
+        "major": false
+    },
+    {
         "version": "2.49.18",
         "date": "2026-02-14",
         "type": "feat",
@@ -192,15 +199,6 @@
             "🔄 Synchronisation : Les images vous suivent désormais sur tous vos appareils via le Cloud",
             "👀 Admin : Les MJ peuvent désormais voir les illustrations des joueurs dans la vue Administrateur",
             "🛡️ Architecture : Conversion automatique IDs locaux <-> Données compressées lors des cycles de Sync"
-        ]
-    },
-    {
-        "version": "2.48.21",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🛠️ Fix Resizing : Correction des poignées de redimensionnement qui étaient masquées par le cadre blanc",
-            "📏 Précision : Décalage des poignées vers l'extérieur et augmentation de leur priorité visuelle (z-index)"
         ]
     }
 ]
