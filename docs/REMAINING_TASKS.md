@@ -8,11 +8,11 @@ Il reste deux phases majeures du plan `PLAN_ISSUES_MOYENNES.md` :
 - [ ] **Phase E** : Typer le layout dynamique (`useSheetLayout.ts` et `CharacterSheet.tsx`). C'est une partie complexe car elle touche à la structure même de l'affichage des colonnes.
 
 ### 2. Issue 4.1 — Adoption du Logger (Moyen)
-- [ ] Remplacer les **15 `console.log`** restants par l'usage de `src/utils/logger.ts`.
-- [ ] S'assurer que les erreurs critiques utilisent `ErrorService`.
+- [x] Remplacer les **15 `console.log`** restants par l'usage de `src/utils/logger.ts`. (Terminé en v2.49.12)
+- [x] S'assurer que les erreurs critiques utilisent `ErrorService`. (Vérifié)
 
 ### 3. Issue 4.3 — Hygiène des fichiers (Moyen)
-- [ ] Vérifier si `admin/components/AdventureLog.tsx` ou d'autres nouveaux fichiers dépassent les 400 lignes.
+- [x] Vérifier si `admin/components/AdventureLog.tsx` ou d'autres nouveaux fichiers dépassent les 400 lignes. (Vérifié : GlobalPlayersView=246, DeployModal=234, CharacterSheet=339, SettingsView=337).
 - [ ] Extraire les composants monolithiques si nécessaire.
 
 ## 🛠️ Suggestions QoL (Quality of Life)

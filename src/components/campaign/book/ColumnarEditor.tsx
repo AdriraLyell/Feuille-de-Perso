@@ -10,6 +10,7 @@ import { BookImage } from '../../../extensions/bookImage';
 import { saveImage } from '../../../imageDB';
 import { BookTableOfContents } from './BookTableOfContents';
 import { useBookTableOfContents } from './useBookTableOfContents';
+import { logger } from '../../../utils/logger';
 
 interface ColumnarEditorProps {
     initialContent?: JSONContent | string;
@@ -205,7 +206,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                         }).run();
                     }
                 } catch (err) {
-                    console.error("Failed to save image", err);
+                    logger.error("Failed to save image", err);
                 }
             }
             setIsDrawingMode(false);

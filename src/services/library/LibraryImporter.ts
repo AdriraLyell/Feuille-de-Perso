@@ -3,12 +3,13 @@ import { LibraryEntry as LibraryTraitEntry, LibrarySkillEntry, LibrarySpecializa
 import { ErrorService } from '../ErrorService';
 
 import { normalizeString } from '../../utils/stringUtils';
+import { logger } from '../../utils/logger';
 
 const ensureUUID = (id: string | undefined): string => {
     if (!id) return crypto.randomUUID();
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (uuidRegex.test(id)) return id;
-    console.warn(`[LibraryImporter] Legacy ID detected (${id}), replacing with UUID`);
+    logger.warn(`[LibraryImporter] Legacy ID detected (${id}), replacing with UUID`);
     return crypto.randomUUID();
 };
 

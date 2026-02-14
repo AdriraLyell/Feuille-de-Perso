@@ -1,6 +1,7 @@
 
 import { RulesData } from '../../types/rules';
 import { INITIAL_DATA } from '../../data/initialState';
+import { logger } from '../../utils/logger';
 
 /**
  * Generates a default RulesData object based on the Application's hardcoded Initial State.
@@ -126,6 +127,6 @@ export const loadRules = (): RulesData => {
         return window.EXTERNAL_RULES;
     }
 
-    console.warn("rules.js not found. Loading fallback rules from Initial State.");
+    logger.warn("rules.js not found. Loading fallback rules from Initial State.");
     return generateDefaultRules();
 };

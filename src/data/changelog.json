@@ -1,5 +1,12 @@
 [
     {
+        "version": "2.49.12",
+        "date": "2026-02-14",
+        "type": "chore",
+        "content": "🧹 Nettoyage des logs : Remplacement systématique des console.log/warn/error par le logger applicatif et suppression des logs de debug.",
+        "major": false
+    },
+    {
         "version": "2.49.11",
         "date": "2026-02-14",
         "type": "fix",
@@ -204,17 +211,6 @@
             "↕️ Axe Vertical : Nouvelle barre inférieure pour ajuster uniquement la hauteur",
             "📐 Coin Diagonal : Conservation de la poignée de coin pour un redimensionnement libre",
             "🖱️ Ergonomie : Curseurs contextuels indiquant l'axe de redimensionnement"
-        ]
-    },
-    {
-        "version": "2.48.14",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🔳 Images : Remplacement des boutons S/M/L par un redimensionnement manuel fluide",
-            "🧲 Aimant Magnétique : Le redimensionnement s'accroche proprement aux tailles standards (25%, 33%, 50%, 75%, 100%)",
-            "📝 Habillage Texte : Le texte enroule désormais les images alignées à gauche ou à droite",
-            "🛡️ Limites Intelligentes : L'image s'auto-limite à 55% de largeur en mode habillage pour préserver la lisibilité"
         ]
     }
 ]

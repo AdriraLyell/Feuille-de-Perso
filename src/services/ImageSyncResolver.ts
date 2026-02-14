@@ -1,6 +1,7 @@
 
 import { getImage, saveImage, blobToBase64, base64ToBlob } from '../imageDB';
-import { ImageCompressionService, GZIP_MARKER } from './ImageCompressionService';
+import { GZIP_MARKER, ImageCompressionService } from './ImageCompressionService';
+import { logger } from '../utils/logger';
 
 /**
  * ImageSyncResolver
@@ -37,7 +38,7 @@ export const ImageSyncResolver = {
                         processed[key] = value;
                     }
                 } catch (e) {
-                    console.error("[ImageSyncResolver] Failed to resolve portrait image:", e);
+                    logger.error("[ImageSyncResolver] Failed to resolve portrait image:", e);
                     processed[key] = value;
                 }
             }
@@ -65,7 +66,7 @@ export const ImageSyncResolver = {
                         }
                     }
                 } catch (e) {
-                    console.error("[ImageSyncResolver] Failed to resolve book image:", e);
+                    logger.error("[ImageSyncResolver] Failed to resolve book image:", e);
                 }
                 processed[key] = value;
             }
@@ -108,7 +109,7 @@ export const ImageSyncResolver = {
                     const newId = await saveImage(blob);
                     processed[key] = newId;
                 } catch (e) {
-                    console.error("[ImageSyncResolver] Failed to inject portrait image:", e);
+                    logger.error("[ImageSyncResolver] Failed to inject portrait image:", e);
                     processed[key] = '';
                 }
             }
@@ -130,7 +131,7 @@ export const ImageSyncResolver = {
                     }
                     return processed;
                 } catch (e) {
-                    console.error("[ImageSyncResolver] Failed to inject book image:", e);
+                    logger.error("[ImageSyncResolver] Failed to inject book image:", e);
                 }
                 processed[key] = value;
             }

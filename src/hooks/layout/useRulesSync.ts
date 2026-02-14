@@ -4,6 +4,7 @@ import { RulesData } from '../../types/rules';
 import { CampaignService } from '../../services/CampaignService';
 import { ErrorService } from '../../services/ErrorService';
 import { loadRules } from '../../services/RulesLoader';
+import { logger } from '../../utils/logger';
 import { INITIAL_DATA } from '../../data/initialState';
 
 export const useRulesSync = (
@@ -51,7 +52,7 @@ export const useRulesSync = (
         if (!syncInfo?.settingId || !rules || isSourceSelected === false) return;
 
         if (rules?.settingId !== syncInfo.settingId) {
-            console.log(`[useRulesSync] Rules Mismatch Detected. Restoring ${syncInfo.settingId}...`);
+            logger.log(`[useRulesSync] Rules Mismatch Detected. Restoring ${syncInfo.settingId}...`);
             CampaignService.loadSetting(syncInfo.settingId).then(restoredRules => {
                 if (restoredRules) {
                     updateRules({
@@ -61,7 +62,7 @@ export const useRulesSync = (
                     });
                     addLog(`Règles de la campagne "${syncInfo.settingName}" restaurées.`, 'info', 'settings');
                 }
-            }).catch(err => console.error("[useRulesSync] Failed to restore rules", err));
+            }).catch(err => logger.error("[useRulesSync] Failed to restore rules", err));
         }
     }, [data.syncInfo, rules?.settingId, isSourceSelected, updateRules, addLog]);
 

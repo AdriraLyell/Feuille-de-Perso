@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.48.14",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🔳 Images : Remplacement des boutons S/M/L par un redimensionnement manuel fluide",
+            "🧲 Aimant Magnétique : Le redimensionnement s'accroche proprement aux tailles standards (25%, 33%, 50%, 75%, 100%)",
+            "📝 Habillage Texte : Le texte enroule désormais les images alignées à gauche ou à droite",
+            "🛡️ Limites Intelligentes : L'image s'auto-limite à 55% de largeur en mode habillage pour préserver la lisibilité"
+        ]
+    },
+    {
         "version": "2.48.13",
         "date": "2026-02-13",
         "type": "patch",
@@ -1404,18 +1415,6 @@
                 "type": "removed",
                 "text": "Nettoyage des items dupliqués entre les bibliothèques de compétences, compteurs et historiques.",
                 "category": "cleanup"
-            }
-        ]
-    },
-    {
-        "version": "2.30.1",
-        "date": "2026-02-09",
-        "description": "Correctif de la Réserve (Admin).",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "La réserve de l'admin ne montre désormais que les compétences/historiques/compteurs explicitement sélectionnés pour la campagne.",
-                "category": "ui"
             }
         ]
     }

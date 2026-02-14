@@ -231,9 +231,6 @@ export const RuleCalculationsService = {
                     // Coût XP effectif
                     const xpCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 0);
 
-                    if (counter.name.toLowerCase().includes('test')) {
-                        /* console.log(`[XP Debug] - Final xpCost: ${xpCost}`); */
-                    }
 
                     if (xpCost > 0) {
                         // Compteur Custom = Toujours facteur 1.0 (sauf si un jour on les lie aux catégories, mais c'est le cas désactivé plus haut)
@@ -245,7 +242,6 @@ export const RuleCalculationsService = {
                         const creationValue = Math.max(counter.creationValue || 0, modelDefault);
 
                         const cost = this.getXPCost(counter.value, creationValue, xpCost, false);
-                        if (counter.name.toLowerCase().includes('test')) { /* console.log(`[XP Debug] - Calculated Cost: ${cost} (val=${counter.value}, base=${creationValue})`); */ }
 
                         totalSpent += cost;
                     }

@@ -3,6 +3,7 @@ import { NodeViewWrapper } from '@tiptap/react';
 import { BookImageAttributes } from '../../../extensions/bookImage';
 import { Image as ImageIcon, Loader, Type, Maximize2, Minimize2, ChevronUp, ChevronDown, Crop } from 'lucide-react';
 import { getImage } from '../../../imageDB';
+import { logger } from '../../../utils/logger';
 
 interface BookImageViewProps {
     node: {
@@ -42,7 +43,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, s
                     setImageSrc(url);
                 }
             } catch (e) {
-                console.error("Failed to load image", e);
+                logger.error("Failed to load image", e);
             } finally {
                 if (active) setLoading(false);
             }

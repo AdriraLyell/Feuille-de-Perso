@@ -5,6 +5,7 @@ import { SectionHeader } from './Shared';
 import { Info } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
+import { logger } from '../../utils/logger';
 
 const DotRow: React.FC<{
     entry: DotEntry;
@@ -210,7 +211,7 @@ export const SkillBlock = React.memo<{
             const payload = JSON.parse(e.dataTransfer.getData('application/json'));
             onDrop?.(cat, payload, finalDropIndex);
         } catch (err) {
-            console.error('Failed to parse drop payload', err);
+            logger.error('Failed to parse drop payload', err);
         }
     };
 

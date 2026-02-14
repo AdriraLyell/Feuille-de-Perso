@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { APP_VERSION, REMOTE_MANIFEST_URL } from '../constants/app';
 import { Sparkles, RefreshCw, Download, X } from 'lucide-react';
+import { logger } from '../utils/logger';
 
 interface VersionManifest {
     version: string;
@@ -40,7 +41,7 @@ const UpdateNotifier: React.FC = () => {
                     }
                 }
             } catch (error) {
-                console.warn("Impossible de vérifier la mise à jour", error);
+                logger.warn("Impossible de vérifier la mise à jour", error);
             } finally {
                 setIsChecking(false);
             }

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { checkStorageQuota } from '../imageDB';
+import { logger } from '../utils/logger';
 
 export interface StorageStats {
     usage: number;
@@ -27,7 +28,7 @@ export const useStorageUsage = () => {
                 isWarning: percent >= 70
             });
         } catch (error) {
-            console.error('Failed to fetch storage stats:', error);
+            logger.error('Failed to fetch storage stats:', error);
         } finally {
             setLoading(false);
         }
