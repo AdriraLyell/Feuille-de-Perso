@@ -1,11 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react';
+import { Editor, NodeViewProps } from '@tiptap/core';
 import { Calendar } from 'lucide-react';
 
-interface ChapterHeaderViewProps {
-    node: any;
-    editor: any;
-    getPos: () => number;
+interface ChapterHeaderViewProps extends Omit<NodeViewProps, 'node' | 'editor'> {
+    node: NodeViewProps['node'] & { attrs: { date: string } };
+    editor: Editor;
     updateAttributes: (attrs: Partial<{ date: string }>) => void;
 }
 

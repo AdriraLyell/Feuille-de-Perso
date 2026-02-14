@@ -5,9 +5,13 @@ import BookImageView from '../components/campaign/book/BookImageView';
 export interface BookImageAttributes {
     imageId: string; // Reference to IndexedDB
     width: number | string;
-    height: number | string;
+    height?: number | string;
     align: 'left' | 'right' | 'center';
     caption?: string;
+    filter?: 'none' | 'grayscale';
+    fit?: 'cover' | 'contain' | 'fill';
+    posX?: number;
+    posY?: number;
 }
 
 declare module '@tiptap/core' {
@@ -43,6 +47,18 @@ export const BookImage = Node.create({
             },
             caption: {
                 default: '',
+            },
+            filter: {
+                default: 'none',
+            },
+            fit: {
+                default: 'contain',
+            },
+            posX: {
+                default: 50,
+            },
+            posY: {
+                default: 50,
             },
         };
     },

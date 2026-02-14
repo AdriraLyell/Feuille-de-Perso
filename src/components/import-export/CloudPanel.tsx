@@ -8,6 +8,7 @@
 import React, { useState } from 'react';
 import { Cloud, Download, AlertTriangle, Loader2, CheckCircle } from 'lucide-react';
 import { CharacterSyncService, SyncedCharacterSummary } from '../../services/CharacterSyncService';
+import { ImageSyncResolver } from '../../services/ImageSyncResolver';
 import { CharacterSheetData } from '../../types/character';
 import { CampaignService } from '../../services/CampaignService';
 import { detectConflicts, smartMerge, DataConflict } from '../../utils/importExportUtils';
@@ -90,6 +91,9 @@ const CloudPanel: React.FC<CloudPanelProps> = ({ data, onLoadSuccess, onClose })
                 setSelectedCharId(null);
                 return;
             }
+
+            // Step 1: Restore images from cloud format to local IndexedDB
+            fullCharacter.data = await ImageSyncResolver.injectImagesAfterSync(fullCharacter.data);
 
             // Detect Conflicts if local data exists
             if (data.header?.name && data.header.name.trim() !== '' && !isResolvingConflicts) {

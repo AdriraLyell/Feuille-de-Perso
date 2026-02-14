@@ -12,7 +12,7 @@ Ce document résume les politiques de sécurité appliquées à la base de donn�
 -   **SELECT** : Autorisé si `is_public = true` OU si l'utilisateur est admin.
 -   **INSERT/UPDATE/DELETE** : Réservé aux administrateurs.
 
-### 2. Bibliothèques (`libraries_traits`, `libraries_skills`, etc.)
+### 2. Bibliothèques (`libraries_traits`, `libraries_skills`, etc.) et Variantes (`*_variants`)
 -   **SELECT** : Autorisé pour tous les utilisateurs authentifiés.
 -   **INSERT/UPDATE/DELETE** : Réservé aux administrateurs.
 

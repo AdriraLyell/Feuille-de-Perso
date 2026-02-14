@@ -1,6 +1,6 @@
 # Plan : Résolution des Issues Audit (Sections 4 & 5)
 
-> **Dernière mise à jour** : 2026-02-12T12:20 — Audit v2.45.7
+> **Dernière mise à jour** : 2026-02-14 — Audit v2.49.0
 
 ---
 
@@ -11,7 +11,7 @@
 | # | Issue | Statut | Détails |
 |---|-------|--------|---------|
 | 4.1 | 60+ console.log | **PARTIEL** | Logger conditionnel `src/utils/logger.ts`, **24 `console.*` directs restants** |
-| 4.2 | 77+ `any` / 27 `@ts-ignore` | **PARTIEL** | **26 `as any`, 35 `@ts-ignore`** (Phase A complétée, Phases B-E restantes) |
+| 4.2 | 77+ `any` / 27 `@ts-ignore` | **PARTIEL** | **40 `as any`, 39 `@ts-ignore`** en production (Phase A complétée, Phases B-E restantes). Hausse due à ImageSyncResolver (+8), composants book (+5), admin libraries (+10). |
 | 4.3 | Fichiers trop gros | **PARTIEL** | Refactorisés: CreationHUD 537→168, CharacterSheet 788→478, LibraryView 528→409. **Nouveaux identifiés**: CharacterReadOnlyView (427L), SpecializationLibrary (462L), SkillsEditor (413L), ImportPanel (389L), AdminDashboard (359L), CreationConfigEditor (320L) |
 | 4.4 | Promises non gérées | **CORRIGÉ** | try/catch/finally sur GlobalPlayersView et autres |
 | 4.5 | Rate-limiting GitHub | **CORRIGÉ** | 50 appels/heure via sessionStorage |
@@ -37,14 +37,21 @@
 
 ## Plan détaillé : Issue 4.2 — Éradication des `any` et `@ts-ignore`
 
-### État actuel (2026-02-12)
+### État actuel (2026-02-14)
 
-- **26 occurrences** de `as any` (hors tests/fixtures)
-- **35 occurrences** de `@ts-ignore` (hors tests/fixtures)
-- Types DB déjà créés dans `src/types/database.ts` mais **sous-utilisés**
-- Phase A complétée (`stateAccessors.ts` créé)
+- **40 occurrences** de `as any` en production (hors tests/fixtures). +14 vs audit précédent.
+- **39 occurrences** de `@ts-ignore` en production (hors tests/fixtures). +4 vs audit précédent.
+- En tests : 37 `as any` + 8 `@ts-ignore` (acceptables).
+- Types DB déjà créés dans `src/types/database.ts` mais **sous-utilisés**.
+- Phase A complétée (`stateAccessors.ts` créé).
 
-### Catégorisation des occurrences (26 `as any` + 35 `@ts-ignore` actuels)
+**Principales sources nouvelles (v2.49.0)** :
+- `ImageSyncResolver.ts` : 8 `as any` (traversée JSON récursive)
+- `AdminBackgroundLibrary.tsx` : 5 `@ts-ignore`
+- `AdminCounterLibrary.tsx` : 5 `@ts-ignore`
+- Extensions book (chapterHeading, bookImage, ColumnarEditor, BookImageView, ChapterHeaderView) : 5 `as any`
+
+### Catégorisation des occurrences (40 `as any` + 39 `@ts-ignore` actuels)
 
 | Catégorie | Count | Cause racine | Statut |
 |-----------|-------|--------------|--------|
@@ -141,7 +148,7 @@ Après enrichissement, remplacer dans `src/services/library/LibraryMapper.ts` :
 | `AdminCreationEditor.tsx` | 18, 47 | `value: any` | `value: string \| number \| boolean` |
 | `AdminSkillsEditor.tsx` | 108 | `Partial<any>` | `Partial<SkillCategoryDefinition>` |
 | `AdminSkillsEditor.tsx` | 120 | `behavior: any` | `behavior: string` |
-| `JournalPage.tsx` | 13 | `value: any` | `value: CampaignNoteEntry[typeof field]` |
+| ~~`JournalPage.tsx`~~ | — | ~~supprimé~~ | Fichier supprimé (v2.49.0 — remplacé par ColumnarEditor) |
 | `PartyTable.tsx` | 143 | `value: any` | `value: string \| Record<string, string>` |
 | `AdminTraitLibrary.tsx` | 262 | `value: any` | `value: TraitEffect[typeof field]` |
 
@@ -226,13 +233,16 @@ Les champs `configurations: Record<string, any>` et `definitions: Record<string,
 |-----------|-------|-------|-----------|
 | A. Accès dynamique | ~3 | 0 | -3 |
 | B. Mapping DB | ~9 | 0 | -9 |
-| C. Handlers admin | ~8 | 0 | -8 |
+| C. Handlers admin | ~7 | 0 | -7 |
 | D. Fetch DB | ~10 | 0 | -10 |
 | E. Layout | ~8 | 0 | -8 |
 | F. JSONB (ignoré) | ~8 | ~8 | 0 |
 | G. Logger (ignoré) | ~4 | ~4 | 0 |
-| H. Legacy (ignoré) | ~11 | ~11 | 0 |
-| **Total** | **61** | **~23** | **~-62%** |
+| H. Legacy/utils (ignoré) | ~11 | ~11 | 0 |
+| I. Nouvelles (ImageSyncResolver, book, admin libs) | ~19 | ~19 | 0 |
+| **Total** | **79** | **~42** | **~-47%** |
+
+> **Note** : La catégorie I regroupe les nouveaux `as any`/`@ts-ignore` introduits en v2.49.0. Leur traitement est hors scope de ce plan mais identifié pour un futur sprint.
 
 ---
 

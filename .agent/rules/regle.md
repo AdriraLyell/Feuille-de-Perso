@@ -16,12 +16,15 @@ Ces règles sont la source de vérité pour le comportement de l'agent dans ce w
 
 ## 2. DOCUMENTATION DE RÉFÉRENCE
 *Consulter ces fichiers avant toute intervention majeure pour limiter l'usage des tokens :*
-- [Audit & Roadmap](file:///d:/Projet%20JdR/feuille-de-perso/docs/AUDIT_SUMMARY.md) : État des dettes techniques et tâches à venir.
-- [Plan Issues](file:///d:/Projet%20JdR/feuille-de-perso/docs/PLAN_ISSUES_MOYENNES.md) : Plan détaillé de résolution des issues de typage et structure.
-- [Sécurité RLS](file:///d:/Projet%20JdR/feuille-de-perso/docs/RLS_POLICIES.md) : Politiques d'accès Supabase.
-- [Périmètre Fonctionnel](file:///d:/Projet%20JdR/feuille-de-perso/docs/functional_scope.md) : Vision, rôles et fonctionnalités clés.
-- [Schéma DB](file:///d:/Projet%20JdR/feuille-de-perso/docs/db_schema.md) : Tables Supabase et relations.
-- [Schémas Zod](file:///d:/Projet%20JdR/feuille-de-perso/src/schemas/characterSchema.ts) : Structure de données pivot.
+- [Audit & Roadmap](docs/AUDIT_SUMMARY.md) : État des dettes techniques et tâches à venir.
+- [Plan Issues](docs/PLAN_ISSUES_MOYENNES.md) : Plan détaillé de résolution des issues de typage et structure.
+- [Livre Numérique](docs/PLAN_LIVRE_NUMERIQUE.md) : Architecture et statut de l'éditeur de livre (Tiptap + CSS Columns).
+- [Mécaniques Chapitres](docs/MECHANICS_CHAPTERS.md) : Fonctionnement technique des chapitres du grimoire.
+- [Sécurité RLS](docs/RLS_POLICIES.md) : Politiques d'accès Supabase.
+- [Périmètre Fonctionnel](docs/functional_scope.md) : Vision, rôles et fonctionnalités clés.
+- [Schéma DB](docs/db_schema.md) : Tables Supabase et relations.
+- [Schémas Zod](src/schemas/characterSchema.ts) : Structure de données pivot.
+- **Archives** : `docs/archive/` contient les documents résolus ou supercédés (historique).
 
 ## 3. PROTOCOLE DE VERSIONNING (OBLIGATOIRE)
 Avant chaque fin de tâche (notify_user) :

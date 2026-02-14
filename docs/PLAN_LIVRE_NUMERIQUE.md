@@ -1,295 +1,174 @@
-> **Date** : 2026-02-13 | **Statut** : COMPLETED (v2.47.0) | **Difficulte** : 5/10
+# Éditeur de Livre Numérique — Statut Implémentation
+
+> **Date** : 2026-02-14 | **Statut** : IMPLÉMENTÉ (v2.49.0) | **Difficulté** : 5/10
 
 ---
 
 ## Contexte
 
-Le journal a été entièrement réécrit en mode "Livre numérique" via un moteur d'édition moderne (Tiptap) couplé à une pagination CSS native (`column-width`). 
+Le journal de campagne a été entièrement réécrit en mode "Livre numérique" via un moteur d'édition Tiptap couplé à une pagination CSS native (`column-width`).
 
-**Choix technologique final** : Après évaluation de `tiptap-pagination-plus`, nous avons opté pour une approche **Columnar CSS Native** car elle offre un reflow instantané sans les boucles de calcul infinies des extensions DOM-heavy.
+**Choix technologique final** : Après évaluation de `tiptap-pagination-plus` (boucles de recalcul infinies, incompatibilité NodeView React), nous avons opté pour une approche **CSS Columns Native** offrant un reflow instantané géré nativement par le navigateur.
+
+> Historique de l'évaluation pagination : voir `docs/archive/AUDIT_PAGINATION.md`
 
 ---
 
 ## Architecture Globale
 
-### Approche : Document Tiptap unique + `tiptap-pagination-plus` + Affichage livre
+### Approche : Document Tiptap unique + CSS Columns Native
 
 - **Un seul document ProseMirror** contient tout le contenu (chapitres, texte, images) dans un flux continu
-- **`tiptap-pagination-plus`** calcule automatiquement les coupures de page par mesure DOM
-- **Un adaptateur custom** ajoute les regles metier (chapitres, sommaire, orphelines, images)
-- **L'affichage livre** utilise scroll programmatique + navigation par paires de pages
+- **CSS `column-width` + `column-gap`** gère la pagination automatiquement (navigateur natif)
+- **Extensions custom** : `chapterHeading.ts` et `bookImage.ts` avec NodeViews React
+- **L'affichage livre** utilise scroll programmatique + navigation par paires de pages (spreads)
 
-### Schema du Document Tiptap
+### Schéma du Document Tiptap
 
 ```
 doc
-  +-- chapterHeading     (node custom - frontiere de chapitre, date + titre)
+  +-- chapterHeading     (node custom - frontière de chapitre, date + titre)
   +-- paragraph           (standard)
   +-- heading             (h2, h3 - sous-titres)
   +-- bulletList / orderedList (standard)
   +-- blockquote          (standard)
-  +-- bookImage           (node custom atom - image IndexedDB)
+  +-- bookImage           (node custom atom - image IndexedDB avec resize/pan)
   +-- horizontalRule      (standard)
-  +-- ...
 ```
 
 ---
 
-## Fichiers a Creer
+## Inventaire des Fichiers
 
 ### Extensions Tiptap (`src/extensions/`)
 
-| Fichier | Role |
-|---------|------|
-| `chapterHeading.ts` | Node block custom : id, date, showHeader, isBookmarked. Contenu inline (titre editable). Force un saut de page avant. NodeView React avec date picker et toggle bookmark. |
-| `bookImage.ts` | Node atom block : imageId, placementId, width, height, align (left/right/center), fit (cover/contain/fill). NodeView React avec chargement async IndexedDB, resize, controles d'alignement/suppression. |
+| Fichier | Rôle | Statut |
+|---------|------|--------|
+| `chapterHeading.ts` | Node block custom : date, level. Contenu inline (titre éditable). Force saut de page via CSS `break-before: page`. NodeView React. | ✅ DONE |
+| `bookImage.ts` | Node atom block : imageId (IndexedDB), width, height, align, caption, filter, fit, posX, posY. NodeView React avec chargement async, resize, pan & scan. Draggable. | ✅ DONE |
 
 ### Composants (`src/components/campaign/book/`)
 
-| Fichier | Role |
-|---------|------|
-| `DigitalBookEditor.tsx` | Orchestrateur principal. Cree l'instance Tiptap avec `tiptap-pagination-plus`, gere persistence debounced vers CharacterSheetData. |
-| `BookEditorContext.tsx` | Context React fournissant : `editor`, `paginationResult`, `currentSpreadIndex`, `tocEntries`, navigation. |
-| `BookSpreadView.tsx` | Layout livre : container `overflow: hidden` montrant 2 pages, scroll programmatique par paires, fleches de navigation. Superpose le cadre visuel (spine, ombres, texture papier, numeros de page). |
-| `BookToolbar.tsx` | Barre d'outils Tiptap : gras, italique, souligne, listes, titres h2/h3, alignement, insertion chapitre, insertion image, signet. |
-| `BookTableOfContents.tsx` | Page sommaire auto-generee depuis les `chapterHeading` nodes. Affiche titre, date et numero de page. Cliquable pour naviguer. |
-| `ChapterHeaderView.tsx` | NodeView React du `chapterHeading` : bordure decorative, selecteur de date, texte de titre, toggle signet. |
-| `BookImageView.tsx` | NodeView React du `bookImage` : chargement IndexedDB, decompression GZIP, handles de resize, controles align/fit/delete. |
+| Fichier | Rôle | Statut |
+|---------|------|--------|
+| `ColumnarEditor.tsx` | Éditeur principal. Instance Tiptap avec CSS Columns, toolbar intégrée (gras, italique, listes, titres, alignement, insertion chapitre/image), persistence debounced vers CharacterSheetData. | ✅ DONE |
+| `BookImageView.tsx` | NodeView React du `bookImage` : chargement IndexedDB, décompression GZIP, handles de resize, contrôles align/fit/filter/delete, pan & scan (posX/posY). | ✅ DONE |
+| `ChapterHeaderView.tsx` | NodeView React du `chapterHeading` : bordure décorative, sélecteur de date, titre éditable. | ✅ DONE |
+| `BookTableOfContents.tsx` | Sommaire auto-généré depuis les noeuds `chapterHeading`. Affiche titre et date. Cliquable pour naviguer. | ✅ DONE |
+| `useBookTableOfContents.ts` | Hook scannant le document Tiptap pour collecter les `chapterHeading` et générer les entrées du sommaire. | ✅ DONE |
 
-### Services et Hooks
+### Utilitaires
 
-| Fichier | Role |
-|---------|------|
-| `src/services/BookPaginationAdapter.ts` | Surcouche sur `tiptap-pagination-plus`. Ajoute : sauts de chapitre forces, controle orphelines/veuves, images non coupees, generation du sommaire. Retourne `PageBreakInfo[]` et `TOCEntry[]`. |
-| `src/hooks/useBookEditor.ts` | Setup Tiptap : extensions, configuration, persistence debounced vers CharacterSheetData. |
-| `src/hooks/useBookPagination.ts` | Lie l'editeur au moteur de pagination : recalcul debounced (200ms) a chaque `onUpdate`, expose le resultat via context. |
+| Fichier | Rôle | Statut |
+|---------|------|--------|
+| `src/utils/book/BookPageSplitter.ts` | Découpe HTML en pages pour rendu. | ✅ DONE |
 
 ### Migration
 
-| Fichier | Role |
-|---------|------|
-| `src/utils/migrations/migrateBookDocument.ts` | Convertit `campaignNotes[]` (HTML) en document ProseMirror JSON via `generateJSON()` de Tiptap. Regroupe les pages non-continuation en chapitres. Convertit les images en nodes `bookImage`. |
+| Fichier | Rôle | Statut |
+|---------|------|--------|
+| `src/utils/migrations/migrateCampaignNotes.ts` | Convertit `campaignNotes[]` (ancien format HTML) en `bookDocument` (Tiptap JSON). Regroupe les pages en chapitres. | ✅ DONE |
+| `src/utils/migrations/migrateBookImages.ts` | Migration runtime : convertit les images base64 inline en références IndexedDB. | ✅ DONE |
+
+### Fichiers Modifiés
+
+| Fichier | Modification | Statut |
+|---------|-------------|--------|
+| `src/components/CampaignNotes.tsx` | Onglet Journal utilise `ColumnarEditor`. Onglet Groupe conservé. | ✅ DONE |
+| `src/schemas/characterSchema.ts` | Ajout `BookDocumentSchema` et champ `bookDocument` dans CharacterSheetData. | ✅ DONE |
+| `src/utils/migrations/registry.ts` | Version 2 avec `migrateCampaignNotes` et `migrateBookImages`. | ✅ DONE |
+
+### Fichiers Supprimés (ancien système journal)
+
+| Fichier | Raison |
+|---------|--------|
+| `JournalPage.tsx` | Remplacé par ColumnarEditor |
+| `NotebookTextarea.tsx` | Remplacé par Tiptap |
+| `RichTextToolbar.tsx` | Toolbar intégrée dans ColumnarEditor |
+| `TableOfContents.tsx` | Remplacé par BookTableOfContents |
+| `useJournal.ts` | Logique intégrée dans ColumnarEditor |
 
 ---
 
-## Fichiers a Modifier
+## Moteur de Pagination — CSS Columns Native
 
-| Fichier | Modification |
-|---------|-------------|
-| `src/components/CampaignNotes.tsx` | Remplacer le contenu de l'onglet Journal par `<DigitalBookEditor />`. Conserver l'onglet Groupe tel quel. Conserver le shell visuel (barre d'onglets, cadre du livre, ombres). |
-| `src/types/campaign.ts` | Ajouter `BookDocument { content: JSONContent; formatVersion: number; }` |
-| `src/types/character.ts` | Ajouter `bookDocument?: BookDocument` dans `CharacterSheetData` |
-| `src/utils/migrations/registry.ts` | Ajouter version 2 avec `migrateBookDocument`. `CURRENT_SCHEMA_VERSION = 2` |
-| `src/components/campaign/constants.ts` | Ajouter constantes : `PAGE_CONTENT_WIDTH = 722`, `PAGE_CONTENT_HEIGHT = 980`, `CHAPTER_HEADER_HEIGHT = 62` |
+### Fonctionnement
 
----
+- `ColumnarEditor.tsx` utilise `column-width` et `column-gap` sur le conteneur Tiptap
+- Le contenu s'écoule naturellement entre les colonnes (= pages)
+- Les chapitres forcent un saut via `break-before: page` CSS sur `.chapter-header-wrapper`
+- La navigation par paires (spreads) est gérée par scroll programmatique
 
-## Moteur de Pagination - Architecture
+### Avantages vs PaginationPlus
 
-**Dimensions** : contenu utile = 722 x 980px (page 772x1092 - padding 25x56).
+- Pas de boucle de recalcul (reflow instantané par le navigateur)
+- Compatible avec tous les NodeViews React (pas de conflit DOM)
+- Pas de dépendance externe pour la pagination
+- Performance native sans debounce nécessaire
 
-### Couche 1 : `tiptap-pagination-plus` (page breaks automatiques)
+### Dimensions
 
-Configuration de base :
-```typescript
-PaginationPlus.configure({
-  pageHeight: 980,
-  pageWidth: 722,
-  pageGap: 0,        // pas de gap visuel (on gere l'affichage nous-memes)
-  marginTop: 0,
-  marginBottom: 0,
-  marginLeft: 0,
-  marginRight: 0,
-})
-```
-
-La bibliotheque gere automatiquement :
-- Le calcul des positions de page breaks par mesure DOM
-- Le recalcul a chaque modification du document
-- L'insertion de separateurs visuels (que nous remplacerons par notre propre rendu)
-
-### Couche 2 : `BookPaginationAdapter.ts` (logique metier custom)
-
-Surcouche sur les page breaks de `tiptap-pagination-plus` :
-1. **Sauts de chapitre forces** : avant chaque noeud `chapterHeading`, forcer un saut de page
-2. **Controle orphelines/veuves** : si <2 lignes sur une page, repousser le paragraphe entier
-3. **Images non coupees** : si une image chevauche une frontiere de page, la pousser a la page suivante
-4. **Generation du sommaire** : traverser le document ProseMirror, collecter les `chapterHeading` avec leurs numeros de page calcules
-5. **Headers de chapitre** : soustraire 62px de la hauteur utile sur les pages avec en-tete
-
-### Performance
-- Debounce 200ms sur `onUpdate`
-- Rendu virtualise : 3 spreads max (precedent, courant, suivant)
-- Lazy loading des images distantes du viewport courant
-
----
-
-## Dependances a Installer
-
-```bash
-npm install @tiptap/extension-text-align tiptap-pagination-plus
-```
-
-1. **`@tiptap/extension-text-align`** (~5KB gzipped) : alignement de texte (gauche, centre, droite, justifie).
-
-2. **`tiptap-pagination-plus`** (MIT, compatible Tiptap v3) : **Bibliotheque cle pour le moteur de pagination.** Cette extension gere le calcul automatique des page breaks par mesure de hauteur du contenu DOM. Elle supporte :
-   - Dimensions en pixels (`pageHeight`, `pageWidth`) - compatible avec nos 722x980
-   - Headers/footers personnalisables par page avec HTML
-   - Gap et marges configurables
-   - Tables qui se coupent entre pages
-
-> **Alternatives evaluees et ecartees :**
-> - `tiptap-extension-pagination` (hugs7) : approche structurelle (noeuds Page) - plus rigide pour le reflow
-> - `@tiptap-pro/extension-pages` : extension officielle Tiptap mais **payante**
-> - `prosemirror-pagination` : ancien (93 stars), derniere mise a jour lointaine
-
----
-
-## Migration des Donnees
-
-**Strategie** : schema version 1 -> 2
-
-1. Si `bookDocument` existe deja : ne rien faire
-2. Si `campaignNotes[]` est vide : ne rien faire
-3. Pour chaque `CampaignNoteEntry` :
-   - Si `isContinuation === false` : creer un noeud `chapterHeading` avec `id`, `date`, `title`, `isBookmarked`
-   - Convertir `content` (HTML string) en noeuds ProseMirror via `generateJSON(html, extensions)`
-   - Convertir chaque `images[]` en noeud `bookImage`
-4. Assembler en `{ type: 'doc', content: [...] }`
-5. Stocker dans `bookDocument: { content, formatVersion: 1 }`
-
-L'ancien `campaignNotes[]` **n'est pas supprime** (rollback possible).
+- Page : fond parchemin (#fdfbf7), texture papier
+- Affichage spread : 2 pages côte à côte, spine central avec ombres
 
 ---
 
 ## Gestion des Images
 
-- **Stockage** : inchange (IndexedDB via `imageDB.ts` + compression GZIP via `ImageCompressionService.ts`)
-- **Dans le document** : noeud `bookImage` atom avec `imageId` referencant IndexedDB
+- **Stockage** : IndexedDB via `imageDB.ts` (local) + compression WebP+GZIP pour sync cloud
+- **Dans le document** : noeud `bookImage` atom avec `imageId` référençant IndexedDB
 - **Alignement** :
-  - `center` : bloc pleine largeur, hauteur ajoutee directement au budget de page
-  - `left`/`right` : CSS `float` + `shape-outside`, le texte s'ecoule autour
-- **Contrainte** : si le bas d'une image depasse la limite de page, l'image entiere passe a la page suivante (pas de coupure d'image)
-- **Upload** : toolbar "Inserer Image" -> compression -> IndexedDB -> insertion noeud `bookImage` au curseur
+  - `center` : bloc pleine largeur
+  - `left`/`right` : CSS `float`, le texte s'écoule autour (habillage)
+- **Contrôles** : resize (poignées magnétiques 25/50/100%), pan & scan (posX/posY), filtre (grayscale), fit (cover/contain/fill)
+- **Sync cloud** : `ImageSyncResolver.ts` résout les IDs locaux ↔ données compressées lors de la synchronisation
 
 ---
 
-## Affichage Double Page
+## Dépendances
 
-### Approche : Scroll continu + Navigation par paires (Google Docs style)
+```bash
+npm install @tiptap/extension-text-align
+```
 
-`tiptap-pagination-plus` rend l'editeur comme un document continu vertical avec des separateurs (gaps) entre chaque page. **Pas de viewport clippe** : l'editeur fonctionne naturellement avec curseur et selection standards.
-
-**Layout** :
-1. L'editeur Tiptap est rendu dans un container scrollable vertical avec `tiptap-pagination-plus` configure pour nos dimensions (722x980px)
-2. Chaque page est une section du flux vertical : fond blanc (#fdfbf7), padding 25/56px, texture papier
-3. Les gaps entre pages simulent l'espace du livre (spine + marge)
-4. Le container parent a `overflow: hidden` et montre exactement **2 pages de haut** cote a cote
-
-**Mise en page livre** :
-- Le container est style en CSS Grid ou Flex pour afficher **2 colonnes** (gauche + droite)
-- `tiptap-pagination-plus` rend les pages verticalement ; notre CSS les reorganise visuellement en paires horizontales
-- Alternativement : 2 instances de rendu (gauche = pages impaires, droite = pages paires) partageant le meme document Tiptap via scroll offset
-
-**Navigation** :
-- Fleches gauche/droite naviguent entre les spreads (paires de pages)
-- Scroll programmatique vers `spreadIndex * (pageHeight + gap)`
-- Clavier : Ctrl+Left / Ctrl+Right
-- L'edition est directe : cliquer sur n'importe quelle page visible et taper
-- Le curseur fonctionne naturellement - pas de gestion speciale necessaire
-
-**Sommaire** : page 0 (toujours a gauche sur le premier spread), rendu comme composant React separe
-
-**Cadre livre** : superpose en CSS (spine avec ombres, bordures, numeros de page en `position: absolute`)
+> **Note** : `tiptap-pagination-plus` est encore dans `package.json` mais n'est plus importé. À retirer lors d'un nettoyage futur.
 
 ---
 
-## Sequence d'Implementation
+## Statut des Phases
 
-### Phase 1 : Fondation (jours 1-2) ✅
-- [x] Installer `@tiptap/extension-text-align` et `tiptap-pagination-plus`
-- [x] Creer les extensions `chapterHeading` et `bookImage` (squelettes)
-- [x] Creer `useBookEditor.ts` avec setup Tiptap basique + `tiptap-pagination-plus`
-- [x] Creer `DigitalBookEditor.tsx` rendant un editeur continu pagine basique
-- [x] Brancher dans `CampaignNotes.tsx` (onglet journal)
+| Phase | Description | Statut |
+|-------|-------------|--------|
+| 1 — Fondation | Extensions Tiptap + setup éditeur | ✅ DONE |
+| 2 — Pagination | CSS Columns natif (PaginationPlus abandonné) | ✅ DONE |
+| 3 — Rendu Livre | ColumnarEditor + styles CSS (spreads, parchemin) | ✅ DONE |
+| 4 — Images & Chapitres | BookImageView + ChapterHeaderView + resize/pan | ✅ DONE |
+| 5 — Migration | migrateCampaignNotes + migrateBookImages | ✅ DONE |
+| 6 — Tests | Tests manuels OK. Tests E2E dédiés à écrire. | 🚧 PARTIEL |
 
-### Phase 2 : Moteur de Pagination (Partiel / Désactivé temporairement) ⚠️
-- [x] Creer `BookPaginationAdapter.ts` par-dessus `tiptap-pagination-plus`
-- [x] Ajouter les sauts de chapitre forces (Intégré dans ChapterHeading)
-- [x] Ajouter le controle orphelines/veuves (Via CSS global)
-- [x] Creer `useBookPagination.ts` (Intégré dans `useBookEditor`)
-- [ ] Generer le sommaire automatique depuis les page breaks calcules (Suspendu pour stabilité)
-- [ ] Tests unitaires de l'adaptateur
-- **Note** : `PaginationPlus` a été désactivé temporairement car il causait des boucles de rendu et d'édition. Fallback vers un document continu unique.
+### Reste à faire
 
-### Phase 3 : Rendu Livre (jours 6-8) 🚧
-- [ ] Creer `BookEditorContext.tsx`
-- [x] Creer `BookToolbar.tsx` - Ajout boutons insertion Chapitre et Image
-- [x] Styles CSS (`BookStyles.css`) - Support mode page unique et double page (CSS Columns)
-- [ ] Animation de tourne-page (`PageTurnAnimation.tsx`)
-
-### Phase 4 : Images & Chapitres (jours 9-11) 🚧
-- [x] Extension `bookImage.ts` (taille, alignement, legende, stockage IDB)
-- [x] Composant `BookImageView.tsx` (Rendu image depuis IDB, handles partiels)
-- [x] Extension `chapterHeading.ts` (design, date, signet)
-- [x] Composant `ChapterHeaderView.tsx` (Input date, Bookmark toggle)
-- [x] Integration Toolbar (Boutons Chapitre/Image fonctionnels)
-- [ ] En-tete de page optionnel (date + chapitre sur les pages concernees)
-
-### Phase 5 : Migration & Integration (jours 12-14)
-- Creer `migrateBookDocument.ts`
-- Mettre a jour `registry.ts` (version 2)
-- Tester la migration avec des donnees reelles
-- Mettre a jour types (`campaign.ts`, `character.ts`)
-- Verifier que l'onglet Groupe fonctionne toujours
-
-### Phase 6 : Tests & Robustesse (jours 15-17)
-- Tests E2E du flux complet
-- Cas limites : document vide, 1 page, 50+ pages
-- Performance avec beaucoup d'images
-- Export/import avec le nouveau format
+- [ ] Tests E2E du flux complet (édition, navigation, images)
+- [ ] Cas limites : document vide, 1 page, 50+ pages avec images
+- [ ] En-tête de page optionnel (date + chapitre sur les pages concernées)
+- [ ] Retirer `tiptap-pagination-plus` de package.json
 
 ---
 
-## Evaluation de Faisabilite
+## Vérification
 
-| Composant | Difficulte | Risque |
-|-----------|-----------|--------|
-| Setup Tiptap + pagination-plus | Facile | Faible - packages deja installes / npm install |
-| Extension ChapterHeading | Moyen | Faible - pattern standard NodeView |
-| Extension BookImage | Moyen | Moyen - chargement async IndexedDB |
-| Moteur de pagination | Moyen | Moyen - `tiptap-pagination-plus` + adaptateur custom |
-| Affichage livre double-page | Moyen | Moyen - scroll continu + navigation par paires, pas de clipping |
-| Layout livre (cadre visuel) | Facile | Faible - reutilise le design existant |
-| Sommaire auto | Facile | Faible - traversee du document |
-| Toolbar | Facile | Faible - API Tiptap standard |
-| Migration donnees | Moyen | Moyen - HTML legacy inconsistant |
-
-**Verdict global : FAISABLE, difficulte 5/10.** L'utilisation de `tiptap-pagination-plus` pour la pagination ET l'approche "scroll continu avec navigation par paires" (au lieu du viewport clippe) reduisent considerablement les risques. Plus aucun composant n'est a risque "Eleve".
-
-**Strategie de mitigation** : Si l'approche single-editor s'avere trop instable, un fallback est possible vers un editeur Tiptap par page (version amelioree du systeme actuel, mais avec Tiptap au lieu de contenteditable). On perdrait le reflow cross-page automatique mais on gagnerait quand meme toutes les autres ameliorations.
+1. **Édition** : Taper du texte, vérifier le reflow entre colonnes/pages
+2. **Chapitres** : Insérer un chapitre, vérifier qu'il apparaît dans le sommaire
+3. **Images** : Insérer une image alignée, vérifier l'habillage texte et le resize
+4. **Navigation** : Naviguer par flèches entre spreads
+5. **Migration** : Charger un personnage avec d'anciennes notes, vérifier la conversion
+6. **Sync cloud** : Synchroniser un personnage avec images, vérifier compression/décompression
+7. **Onglet Groupe** : Vérifier que le `PartyTable` fonctionne toujours
 
 ---
 
-## Verification
+## Références
 
-1. **Edition** : Taper du texte sur une page, verifier que le reflow repousse le contenu sur les pages suivantes
-2. **Chapitres** : Inserer un chapitre, verifier qu'il apparait dans le sommaire avec le bon numero de page
-3. **Images** : Inserer une image alignee a droite, verifier que le texte s'ecoule autour sans chevauchement
-4. **Navigation** : Naviguer par fleches entre les spreads, cliquer sur une page pour l'editer directement
-5. **En-tete** : Activer l'en-tete de chapitre avec date et titre, verifier la coherence sur les pages du chapitre
-6. **Migration** : Charger un personnage existant avec des notes de campagne, verifier que le contenu et les images sont preserves
-7. **Onglet Groupe** : Verifier que le `PartyTable` fonctionne toujours identiquement
-8. **Tests** : `npm run test` - tous les tests existants passent + nouveaux tests pour `BookPaginationAdapter`
-
----
-
-## References
-
-- [tiptap-pagination-plus](https://github.com/RomikMakavana/tiptap-pagination-plus) - Bibliotheque de pagination Tiptap (MIT)
-- [tiptap-extension-pagination](https://github.com/hugs7/tiptap-extension-pagination) - Alternative structurelle (ecartee)
-- [Tiptap Discussion #5960](https://github.com/ueberdosis/tiptap/discussions/5960) - Community Pagination
-- [Building a Print-Perfect Editor (Jan 2026)](https://medium.com/@sanyammunot03/building-a-print-perfect-document-editor-with-tiptap-next-js-0bcbaafa28c7)
-- [Badon Writer](https://discuss.prosemirror.net/t/a-new-text-editor-with-pagination/6667) - Editeur pagine ProseMirror (CSS float technique)
-- [itzbharathh/TipTap-Editor](https://github.com/itzbharathh/TipTap-Editor) - Editeur pagine CSS-based
-- [Paged.js](https://github.com/pagedjs/pagedjs) - Polyfill CSS Paged Media
+- Détails techniques des chapitres : `docs/MECHANICS_CHAPTERS.md`
+- Historique pagination : `docs/archive/AUDIT_PAGINATION.md`
+- Plan original (théorique) : `docs/archive/plan_editeur_livre.md`

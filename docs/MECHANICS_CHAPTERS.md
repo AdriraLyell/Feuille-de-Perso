@@ -62,23 +62,24 @@ Le CSS force le navigateur (ou le moteur d'impression) à considérer le chapitr
 
 ---
 
-## 4. Moteur de Pagination (Mode Lecture)
+## 4. Moteur de Pagination (CSS Columns)
 
-En "Mode Lecture" (`BookFlipView`), le document unique est découpé en pages virtuelles.
+La pagination est gérée nativement par le CSS via `ColumnarEditor.tsx`.
 
-### Logique de Découpage
-- **Fichier** : `src/hooks/useBookPages.ts`
-- **Détection** : Le moteur scanne le DOM pour trouver :
-    1. Les sauts de page automatiques (`.rm-pagination-gap`) générés par `tiptap-pagination-plus`.
-    2. Les en-têtes de chapitres (`.chapter-header-wrapper`).
+### Mécanisme
+- **Fichier** : `src/components/campaign/book/ColumnarEditor.tsx`
+- **Méthode** : CSS `column-width` + `column-gap` créent des colonnes = pages
+- **Chapitres** : Le CSS `break-before: page` sur `.chapter-header-wrapper` force un saut de colonne automatique
 
-### Algorithme (Mis à jour v2.45.22)
-Le moteur utilise `view.posAtDOM(element, 0)` pour localiser précisément le début du chapitre dans le document Tiptap.
-- Si un chapitre est détecté, une coupure est faite **juste devant** lui.
-- Cela garantit que le chapitre commence toujours en haut d'une nouvelle page dans le livre virtuel.
+### Sommaire Dynamique
+- **Fichier** : `src/components/campaign/book/useBookTableOfContents.ts`
+- Le hook scanne le document Tiptap pour collecter les noeuds `chapterHeading`
+- Génère les entrées du sommaire (titre, date) affichées par `BookTableOfContents.tsx`
+- Navigation par clic vers le chapitre correspondant
 
-### Robustesse
-Cette méthode fonctionne même si l'éditeur est masqué ou recouvert (overlay), garantissant une synchronisation parfaite entre le "Mode Édition" (continu) et le "Mode Lecture" ( paginé).
+### Navigation
+- Affichage par paires de pages (spreads) avec scroll programmatique
+- Flèches gauche/droite pour naviguer entre les spreads
 
 ---
 
@@ -86,4 +87,4 @@ Cette méthode fonctionne même si l'éditeur est masqué ou recouvert (overlay)
 
 1. **Pour créer un chapitre** : Utiliser la commande `editor.chain().setChapterHeading().run()`.
 2. **Pour modifier le style** : Éditer `ChapterHeaderView.tsx` (structure) ou `BookStyles.css` (layout).
-3. **Pour la pagination** : Ne rien faire de spécifique, le moteur détecte automatiquement la classe CSS `.chapter-header-wrapper`.
+3. **Pour la pagination** : Gérée nativement par CSS Columns dans `ColumnarEditor.tsx`. Le CSS `break-before: page` sur `.chapter-header-wrapper` force les sauts de colonne.

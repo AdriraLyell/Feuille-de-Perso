@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useEditor, EditorContent, JSONContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -6,6 +6,10 @@ import Image from '@tiptap/extension-image';
 import TextAlign from '@tiptap/extension-text-align';
 import { PAGE_WIDTH, PAGE_HEIGHT } from '../constants';
 import { ChapterHeading } from '../../../extensions/chapterHeading';
+import { BookImage } from '../../../extensions/bookImage';
+import { saveImage } from '../../../imageDB';
+import { BookTableOfContents } from './BookTableOfContents';
+import { useBookTableOfContents } from './useBookTableOfContents';
 
 interface ColumnarEditorProps {
     initialContent?: JSONContent | string;
@@ -19,6 +23,9 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     readOnly = false
 }) => {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const [isDrawingMode, setIsDrawingMode] = useState(false);
+    const [drawStart, setDrawStart] = useState<{ x: number, y: number } | null>(null);
+    const [drawRect, setDrawRect] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
 
     const editor = useEditor({
         extensions: [
@@ -27,7 +34,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                     levels: [1, 2, 3],
                 },
             }),
-            Image,
+            BookImage,
             ChapterHeading,
             TextAlign.configure({
                 types: ['heading', 'paragraph', 'chapterHeading'],
@@ -53,6 +60,8 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     const [pageCount, setPageCount] = React.useState(1);
     const [scrollPos, setScrollPos] = React.useState(0);
 
+    const { entries } = useBookTableOfContents(editor, contentRef);
+
     // Sync content if initialContent changes (e.g. switching chapters)
     useEffect(() => {
         if (editor && initialContent) {
@@ -71,13 +80,24 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     useEffect(() => {
         const checkScroll = () => {
             if (!contentRef.current || !containerRef.current) return;
-            const scrollWidth = contentRef.current.scrollWidth;
-            const stride = PAGE_WIDTH + 40;
-            const pages = Math.max(1, Math.ceil(scrollWidth / stride));
-            if (pages !== pageCount) {
-                setPageCount(pages);
-            }
-            setScrollPos(containerRef.current.scrollLeft);
+
+            // We use a small timeout to allow CSS Column reflow to complete
+            // especially after image size changes or Tiptap node view renders.
+            requestAnimationFrame(() => {
+                if (!contentRef.current || !containerRef.current) return;
+
+                const scrollWidth = contentRef.current.scrollWidth;
+                const stride = PAGE_WIDTH + 40;
+
+                // We add 1 for the Table of Contents page
+                const contentPages = Math.max(1, Math.ceil(scrollWidth / stride));
+                const totalPages = contentPages + 1;
+
+                if (totalPages !== pageCount) {
+                    setPageCount(totalPages);
+                }
+                setScrollPos(containerRef.current.scrollLeft);
+            });
         };
 
         const handleScroll = () => {
@@ -87,9 +107,16 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         };
 
         checkScroll();
+
+        // Add a ResizeObserver that specifically monitors the content container.
+        // Since CSS columns with width: fit-content should resize their box, 
+        // ResizeObserver on contentRef.current is usually correct.
         const observer = new ResizeObserver(checkScroll);
         if (contentRef.current) {
             observer.observe(contentRef.current);
+            // Also observe the first child (ProseMirror) just in case
+            const firstChild = contentRef.current.firstElementChild;
+            if (firstChild) observer.observe(firstChild);
         }
 
         const container = containerRef.current;
@@ -99,6 +126,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
 
         if (editor) {
             editor.on('update', checkScroll);
+            // selectionUpdate can also trigger layout shifts sometimes
             editor.on('selectionUpdate', checkScroll);
         }
 
@@ -113,6 +141,79 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
             }
         };
     }, [editor, pageCount]);
+
+    const handleDrawingMouseDown = (e: React.MouseEvent) => {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        const x = e.clientX - rect.left + (containerRef.current?.scrollLeft || 0);
+        const y = e.clientY - rect.top;
+        setDrawStart({ x, y });
+        setDrawRect({ x, y, w: 0, h: 0 });
+    };
+
+    const handleDrawingMouseMove = (e: React.MouseEvent) => {
+        if (!drawStart || !containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left + (containerRef.current.scrollLeft || 0);
+        const y = e.clientY - rect.top;
+
+        setDrawRect({
+            x: Math.min(x, drawStart.x),
+            y: Math.min(y, drawStart.y),
+            w: Math.abs(x - drawStart.x),
+            h: Math.abs(y - drawStart.y)
+        });
+    };
+
+    const handleDrawingMouseUp = (e: React.MouseEvent) => {
+        if (!drawRect || drawRect.w < 10 || drawRect.h < 10) {
+            setDrawStart(null);
+            setDrawRect(null);
+            setIsDrawingMode(false);
+            return;
+        }
+
+        const finalRect = { ...drawRect };
+        // Get the position in the editor based on mouse coordinates
+        const pos = editor?.view.posAtCoords({ left: e.clientX, top: e.clientY });
+
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async (ce) => {
+            const file = (ce.target as HTMLInputElement).files?.[0];
+            if (file) {
+                try {
+                    const imageId = await saveImage(file);
+                    // Standardize width to 25/50/75/100 based on drawing
+                    const ratio = finalRect.w / PAGE_WIDTH;
+                    let widthVal: string;
+                    if (ratio < 0.35) widthVal = '25%';
+                    else if (ratio < 0.65) widthVal = '50%';
+                    else if (ratio < 0.85) widthVal = '75%';
+                    else widthVal = '100%';
+
+                    if (editor) {
+                        const chain = editor.chain().focus();
+                        if (pos) chain.setTextSelection(pos.pos);
+                        chain.setBookImage({
+                            imageId,
+                            width: widthVal,
+                            height: `${finalRect.h}px`,
+                            fit: 'cover',
+                            align: 'center'
+                        }).run();
+                    }
+                } catch (err) {
+                    console.error("Failed to save image", err);
+                }
+            }
+            setIsDrawingMode(false);
+            setDrawStart(null);
+            setDrawRect(null);
+        };
+        input.click();
+    };
 
 
     if (!editor) {
@@ -131,6 +232,19 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         if (containerRef.current) {
             const stride = (PAGE_WIDTH + 40) * 2;
             containerRef.current.scrollBy({ left: stride, behavior: 'smooth' });
+        }
+    };
+
+    const navigateToPage = (pageNumber: number) => {
+        if (containerRef.current) {
+            const stride = PAGE_WIDTH + 40;
+            // pageNumber 1 is TOC, pageNumber 2 is first content page, etc.
+            // We scroll to the spread start.
+            const spreadIndex = Math.floor((pageNumber - 1) / 2);
+            containerRef.current.scrollTo({
+                left: spreadIndex * stride * 2,
+                behavior: 'smooth'
+            });
         }
     };
 
@@ -166,25 +280,9 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                 </button>
 
                 <button
-                    onClick={() => {
-                        const input = document.createElement('input');
-                        input.type = 'file';
-                        input.accept = 'image/*';
-                        input.onchange = (e) => {
-                            const file = (e.target as HTMLInputElement).files?.[0];
-                            if (file) {
-                                const reader = new FileReader();
-                                reader.onload = (e) => {
-                                    const result = e.target?.result as string;
-                                    editor.chain().focus().setImage({ src: result }).run();
-                                };
-                                reader.readAsDataURL(file);
-                            }
-                        };
-                        input.click();
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 rounded bg-stone-800 text-stone-300 hover:bg-stone-700 transition-colors border border-stone-600 font-serif font-bold text-xs uppercase"
-                    title="Insérer Image"
+                    onClick={() => setIsDrawingMode(true)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded transition-colors border font-serif font-bold text-xs uppercase ${isDrawingMode ? 'bg-amber-600 text-white border-amber-500' : 'bg-stone-800 text-stone-300 hover:bg-stone-700 border-stone-600'}`}
+                    title="Insérer Image (Tracer une zone)"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                     Image
@@ -229,6 +327,8 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                         margin: '0 auto',
                     }}
                 >
+                    {/* Spacer to force scrollable area */}
+                    <div style={{ width: `${(Math.ceil(pageCount / 2) * 2) * (PAGE_WIDTH + 40)}px`, height: '1px' }} />
                     {/* Visual Background/Decoration Track: Individual Page Cards */}
                     {(() => {
                         const visualPageCount = Math.ceil(pageCount / 2) * 2;
@@ -261,13 +361,58 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                         );
                     })()}
 
+                    {/* Table of Contents Page Overlay (Page 1) */}
+                    <div
+                        className="absolute top-0 left-0 z-20 pointer-events-auto"
+                        style={{
+                            width: `${PAGE_WIDTH}px`,
+                            height: `${PAGE_HEIGHT}px`,
+                            paddingTop: '60px'
+                        }}
+                    >
+                        <BookTableOfContents entries={entries} onNavigate={navigateToPage} />
+                    </div>
+
+                    {/* Drawing Overlay */}
+                    {isDrawingMode && (
+                        <div
+                            className="absolute top-0 left-0 z-[100] cursor-crosshair bg-white/10 backdrop-blur-[1px]"
+                            style={{ width: `${(Math.ceil(pageCount / 2) * 2) * (PAGE_WIDTH + 40)}px`, height: '100%' }}
+                            onMouseDown={handleDrawingMouseDown}
+                            onMouseMove={handleDrawingMouseMove}
+                            onMouseUp={handleDrawingMouseUp}
+                        >
+                            <div className="sticky left-1/2 -translate-x-1/2 top-4 w-fit bg-amber-600 text-white px-4 py-2 rounded-full shadow-2xl text-sm font-serif font-bold animate-in slide-in-from-top-4 duration-300 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18M3 12h18" /></svg>
+                                Tracez la zone de l'image sur le livre
+                            </div>
+                            {drawRect && (
+                                <div
+                                    className="absolute border-2 border-dashed border-amber-500 bg-amber-500/10 pointer-events-none"
+                                    style={{
+                                        left: `${drawRect.x}px`,
+                                        top: `${drawRect.y}px`,
+                                        width: `${drawRect.w}px`,
+                                        height: `${drawRect.h}px`
+                                    }}
+                                />
+                            )}
+                            <button
+                                className="sticky left-[90%] top-4 bg-stone-800 text-white px-3 py-1.5 rounded-lg shadow-lg text-[10px] font-bold uppercase transition-all hover:bg-red-700"
+                                onClick={(e) => { e.stopPropagation(); setIsDrawingMode(false); setDrawStart(null); setDrawRect(null); }}
+                            >
+                                Annuler [ESC]
+                            </button>
+                        </div>
+                    )}
+
                     <div
                         ref={contentRef}
                         className="text-stone-900 box-border relative z-10 no-scrollbar max-w-none"
                         style={{
                             position: 'absolute',
                             top: '60px',
-                            left: '0',
+                            left: `${PAGE_WIDTH + 40}px`, // Shift content to Page 2
                             height: `${PAGE_HEIGHT - 60 - 50}px`,
                             columnWidth: `${PAGE_WIDTH}px`,
                             columnGap: '40px',
@@ -328,7 +473,6 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                         img, .book-image-view {
                             break-inside: avoid;
                             max-width: 100%;
-                            display: block;
                         }
                     `}</style>
 

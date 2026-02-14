@@ -7,6 +7,7 @@ import { defaultRules } from '../../data/defaultRules';
 import LibraryImportWizard from './LibraryImportWizard';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 import { MotionCard } from '../../components/ui/motion/MotionCard';
+import { ImageSyncResolver } from '../../services/ImageSyncResolver';
 
 interface CharacterReadOnlyViewProps {
     character: SyncedCharacter;
@@ -15,9 +16,20 @@ interface CharacterReadOnlyViewProps {
 }
 
 const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character, onClose, onRefreshRules }) => {
-    const data = character.data as CharacterSheetData;
+    const [processedData, setProcessedData] = useState<CharacterSheetData | null>(null);
     const [categoryLabels, setCategoryLabels] = useState<Record<string, string>>({});
     const [isImportWizardOpen, setIsImportWizardOpen] = useState(false);
+
+    // Virtual reference to the data (either raw or processed)
+    const data = processedData || (character.data as CharacterSheetData);
+
+    useEffect(() => {
+        const inject = async () => {
+            const injected = await ImageSyncResolver.injectImagesAfterSync(character.data);
+            setProcessedData(injected);
+        };
+        inject();
+    }, [character]);
 
     useEffect(() => {
         const loadLabels = async () => {

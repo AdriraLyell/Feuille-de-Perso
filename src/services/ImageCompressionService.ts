@@ -20,14 +20,14 @@ export const GZIP_MARKER = 'GZIP:';
 const IMAGE_COMPRESSION_CONFIG = {
     // Standard compression for avatars/thumbnails
     STANDARD: {
-        quality: 0.8,
+        quality: 0.5,
         maxWidth: 1200,
         format: 'webp' as const
     },
 
     // Full resolution for documents/detailed images
     FULL: {
-        quality: 0.85,
+        quality: 0.5,
         maxWidth: 1920,
         format: 'webp' as const
     }

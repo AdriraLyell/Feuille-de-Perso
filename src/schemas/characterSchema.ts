@@ -168,6 +168,14 @@ export const LogEntrySchema = z.object({
 
 // --- Campaign ---
 
+export const BookDocumentSchema = z.object({
+    id: z.string().optional(),
+    content: z.any(), // Tiptap JSONContent is too complex for strict Zod validation
+    formatVersion: z.number(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional()
+});
+
 export const ImageConfigSchema = z.object({
     width: z.number(),
     height: z.number(),
@@ -268,6 +276,7 @@ export const CharacterSheetDataSchema = z.object({
     xpLogs: z.array(XPEntrySchema),
     appLogs: z.array(LogEntrySchema),
     campaignNotes: z.array(CampaignNoteEntrySchema),
+    bookDocument: BookDocumentSchema.optional(),
     partyNotes: z.object({
         members: z.array(PartyMemberEntrySchema),
         columns: z.array(PartyColumnSchema),
@@ -277,7 +286,8 @@ export const CharacterSheetDataSchema = z.object({
         }).optional()
     }),
     appVersion: z.string().optional(),
-    syncInfo: SyncInfoSchema.optional()
+    syncInfo: SyncInfoSchema.optional(),
+    _schemaVersion: z.number().optional()
 });
 
 export type ValidatedCharacterData = z.infer<typeof CharacterSheetDataSchema>;

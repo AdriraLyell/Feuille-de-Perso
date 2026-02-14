@@ -9,6 +9,7 @@ import { applyRulesToState } from '../utils/rulesAdapter';
 import { reconcileRulesWithState } from '../utils/rulesReconciler';
 import { ErrorService } from '../services/ErrorService';
 import { CharacterSyncService } from '../services/CharacterSyncService';
+import { migrateBookImages } from '../utils/migrations/migrateBookImages';
 import { logger } from '../utils/logger';
 
 
@@ -183,6 +184,36 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
     useEffect(() => {
         localStorage.setItem('rpg-sheet-data', JSON.stringify(data));
     }, [data]);
+
+    // 4. Image Migration Effect (Base64 -> IndexedDB)
+    // Runs when bookDocument changes (e.g. after load or import)
+    useEffect(() => {
+        if (!data.bookDocument?.content) return;
+
+        const processImages = async () => {
+            try {
+                const currentContent = data.bookDocument!.content;
+                const migratedContent = await migrateBookImages(currentContent);
+
+                // Compare to skip update if nothing changed
+                if (JSON.stringify(migratedContent) !== JSON.stringify(currentContent)) {
+                    logger.log("[CharacterContext] Book images migrated to IndexedDB.");
+                    setData(prev => ({
+                        ...prev,
+                        bookDocument: {
+                            ...prev.bookDocument!,
+                            content: migratedContent,
+                            updatedAt: new Date().toISOString()
+                        }
+                    }));
+                }
+            } catch (err) {
+                logger.error("[CharacterContext] Image migration failed:", err);
+            }
+        };
+
+        processImages();
+    }, [data.bookDocument?.id]);
 
     // 2a. Auto-Sync Effect (Cloud)
     // Runs when data changes, with a 10s debounce, if auto-sync is enabled.

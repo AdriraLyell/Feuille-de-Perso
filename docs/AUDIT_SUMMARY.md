@@ -1,6 +1,6 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.48.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.49.0)
 
-> **Dernière mise à jour** : 2026-02-13T19:55 — Version 2.48.0
+> **Dernière mise à jour** : 2026-02-14 — Version 2.49.0
 
 ## 1. Phases Complétées
 
@@ -32,12 +32,26 @@
 - [x] Design responsive mobile + navigation diégétique.
 - [x] Nettoyage racine : 12 fichiers de débris supprimés.
 
-### ✅ Phase 6 : Moteur Journal 'Columnar' (v2.47.0)
+### ✅ Phase 6 : Journal Grimoire & Sommaire (v2.48.6)
 - [x] **Moteur CSS Native Columns** : Remplacement de PaginationPlus par une approche ultra-performante basée sur les colonnes CSS.
+- [x] **Sommaire Dynamique** : Table des matières interactive avec navigation par clic.
+- [x] **Migration v2** : Passage automatique des anciennes notes vers le format BookDocument Tiptap.
 - [x] **Pagination Dynamique** : Reflow instantané et nettoyage automatique des pages vides.
 - [x] **Affichage Spreads** : Toujours par paires de pages pour respecter l'esthétique grimoire.
 - [x] **Navigation Intelligente** : Masquage contextuel des flèches et suppression du ghost shift.
 - [x] **Thème Parchemin** : Unification graphique (#fbf4e9) Journal + PartyTable.
+
+### ✅ Phase 7 : UX Images & Outils (v2.48.x)
+- [x] **Pan & Scan** : Outil de recadrage interne pour les images (positionnement X/Y).
+- [x] **Redimensionnement** : Poignées interactives et magnétisme (25%, 50%, 100%).
+- [x] **Habillage Texte** : Support du flow textuel autour des images (float left/right).
+- [x] **Mode Cover/Contain** : Choix du mode d'affichage pour les images.
+
+### ✅ Phase 8 : Image Cloud Sync & Optimisation (v2.49.0)
+- [x] **Cloud Sync** : Synchronisation des images (Grimoire & Portraits) vers Supabase.
+- [x] **Compression** : Pipeline WebP (50%) + GZIP avant envoi.
+- [x] **Cache IndexedDB** : Gestion intelligente du cache local et décompression à la volée.
+- [x] **Architecture** : Résolution automatique des IDs locaux/distants (ImageSyncResolver).
 
 ## 2. Issues Restantes & Roadmap
 
@@ -46,7 +60,8 @@
 - Logger conditionnel `src/utils/logger.ts` créé et majoritairement adopté.
 
 ### 🔶 Issue 4.2 — Typage `any`/`@ts-ignore` (OUVERTE)
-- **26 `as any`** + **35 `@ts-ignore`** en production (hors tests/fixtures).
+- **40 `as any`** + **39 `@ts-ignore`** en production (hors tests/fixtures). Audit 2026-02-14.
+- Augmentation due aux nouveaux fichiers : `ImageSyncResolver.ts` (+8), composants book (+5), admin libraries (+10).
 - Phase A complétée (`stateAccessors.ts` créé).
 - Phases B-E restantes : types DB, handlers admin, fetch typés, layout.
 - Plan détaillé dans `docs/PLAN_ISSUES_MOYENNES.md`.
@@ -69,6 +84,15 @@
 - **Logs de Production** : Généraliser l'usage du `logger.ts` typé (24 `console.*` restants).
 - **Quota IndexedDB** : Améliorer le feedback visuel lors du dépassement de quota.
 - **Constantes** : Fusionner `src/constants.ts` dans `src/constants/app.ts` à terme.
+- **Dépendance inutile** : `tiptap-pagination-plus` est toujours dans `package.json` mais n'est plus importé dans le code. À retirer.
+
+## 3. Documents Archivés (v2.49.0)
+
+| Document | Raison | Date |
+|----------|--------|------|
+| `AUDIT_CAMPAIGN_NOTES.md` | Résolu — Architecture "poupées russes" supprimée, ancien journal remplacé par ColumnarEditor | 2026-02-14 |
+| `AUDIT_PAGINATION.md` | Résolu — Moteur CSS Columns natif en production, PaginationPlus abandonné | 2026-02-14 |
+| `plan_editeur_livre.md` | Supercédé par `PLAN_LIVRE_NUMERIQUE.md` | 2026-02-14 |
 
 ---
-*Référence historique : `docs/archive/`*
+*Référence historique complète : `docs/archive/`*

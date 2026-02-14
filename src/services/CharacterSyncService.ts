@@ -8,7 +8,7 @@
 import { DatabaseService } from './DatabaseService';
 import { CharacterSheetData } from '../types/character';
 
-import { ImageCompressionService } from './ImageCompressionService';
+import { ImageSyncResolver } from './ImageSyncResolver';
 import { ErrorService } from './ErrorService';
 
 // Types for sync operations
@@ -52,8 +52,8 @@ export const CharacterSyncService = {
             // Remove syncInfo from the data being stored to avoid circular reference
             const { syncInfo, ...cleanData } = data;
 
-            // Step 1: Compress images in data
-            const dataToStore = await this.processImages(cleanData, 'compress');
+            // Step 1: Resolve and compress images for portable sync
+            const dataToStore = await ImageSyncResolver.resolveImagesForSync(cleanData);
 
             const result = await DatabaseService.upsert<{ id: string }>(
                 'characters',
@@ -156,6 +156,8 @@ export const CharacterSyncService = {
     },
 
     async processImages(obj: any, action: 'compress' | 'decompress'): Promise<any> {
-        return ImageCompressionService.processImages(obj as Record<string, any>, action);
+        return action === 'compress'
+            ? ImageSyncResolver.resolveImagesForSync(obj)
+            : ImageSyncResolver.injectImagesAfterSync(obj);
     }
 };
