@@ -19,10 +19,10 @@ import CharacterSheet from '../CharacterSheet';
 import CharacterSheetPage2 from '../CharacterSheetPage2';
 import CharacterSheetSpecializations from '../CharacterSheetSpecializations';
 import CharacterSheetXP from '../CharacterSheetXP';
-import CampaignNotes from '../CampaignNotes';
 
 // Lazy Loaded Components
 const SettingsView = lazy(() => import('../SettingsView'));
+const CampaignNotes = lazy(() => import('../CampaignNotes'));
 const ImportExportModal = lazy(() => import('../ImportExportModal'));
 const PrintSelectionModal = lazy(() => import('../PrintSelectionModal'));
 const ChangelogModal = lazy(() => import('../ChangelogModal'));
@@ -260,7 +260,9 @@ const MainLayout: React.FC = () => {
                                         <div className={`${sheetTab === 'specs' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetSpecializations isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'p2' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetPage2 isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'xp' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetXP isLandscape={isLandscape} /></div>
-                                        <div className={`${sheetTab === 'notes' ? 'block' : 'hidden'} mx-auto`}><CampaignNotes /></div>
+                                        {sheetTab === 'notes' && (
+                                            <div className="mx-auto block"><CampaignNotes /></div>
+                                        )}
                                     </div>
 
                                     {data.creationConfig?.active && (<CreationHUD />)}

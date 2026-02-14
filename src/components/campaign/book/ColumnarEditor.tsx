@@ -11,6 +11,7 @@ import { saveImage } from '../../../imageDB';
 import { BookTableOfContents } from './BookTableOfContents';
 import { useBookTableOfContents } from './useBookTableOfContents';
 import { logger } from '../../../utils/logger';
+import { useMemo } from 'react';
 
 interface ColumnarEditorProps {
     initialContent?: JSONContent | string;
@@ -28,7 +29,10 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     const [drawStart, setDrawStart] = useState<{ x: number, y: number } | null>(null);
     const [drawRect, setDrawRect] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
 
-    const editor = useEditor({
+    const onUpdateRef = useRef(onUpdate);
+    onUpdateRef.current = onUpdate;
+
+    const editorOptions = useMemo(() => ({
         extensions: [
             StarterKit.configure({
                 heading: {
@@ -44,17 +48,35 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                 placeholder: 'Écrivez votre récit ici...',
             }),
         ],
-        content: initialContent,
         editable: !readOnly,
-        onUpdate: ({ editor }) => {
-            if (onUpdate) {
+        immediatelyRender: false,
+        onUpdate: ({ editor }: { editor: any }) => {
+            if (onUpdateRef.current) {
                 if (timeoutRef.current) clearTimeout(timeoutRef.current);
                 timeoutRef.current = setTimeout(() => {
-                    onUpdate(editor.getJSON());
+                    onUpdateRef.current?.(editor.getJSON());
                 }, 1000);
             }
         },
-    });
+    }), [readOnly]); // initialContent is only used once, readOnly is dynamic
+
+    const editor = useEditor(editorOptions);
+
+    // Initial Content Injection (Safe from flushSync)
+    useEffect(() => {
+        if (editor && initialContent && !editor.isDestroyed) {
+            // Only set if we have content and it's not already there (to be safe)
+            // Using a microtask delay just to be 100% sure we are out of the render cycle
+            // although useEffect corresponds to the commit phase.
+            queueMicrotask(() => {
+                // Prevent resetting if content was somehow restored or if we are in a hot reload
+                if (editor.isEmpty) {
+                    editor.commands.setContent(initialContent, { emitUpdate: false });
+                }
+            });
+        }
+    }, [editor]); // Run once when editor is created
+
 
     const containerRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -110,7 +132,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         checkScroll();
 
         // Add a ResizeObserver that specifically monitors the content container.
-        // Since CSS columns with width: fit-content should resize their box, 
+        // Since CSS columns with width: fit-content should resize their box,
         // ResizeObserver on contentRef.current is usually correct.
         const observer = new ResizeObserver(checkScroll);
         if (contentRef.current) {
@@ -126,19 +148,46 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         }
 
         if (editor) {
-            editor.on('update', checkScroll);
-            // selectionUpdate can also trigger layout shifts sometimes
-            editor.on('selectionUpdate', checkScroll);
+            // Defer editor event handlers to avoid calling setState synchronously
+            // during Tiptap's internal flushSync cycle.
+            let updateRafId: number | null = null;
+            let selectionRafId: number | null = null;
+
+            const deferredUpdate = () => {
+                if (updateRafId !== null) cancelAnimationFrame(updateRafId);
+                updateRafId = requestAnimationFrame(() => {
+                    updateRafId = null;
+                    checkScroll();
+                });
+            };
+
+            const deferredSelection = () => {
+                if (selectionRafId !== null) cancelAnimationFrame(selectionRafId);
+                selectionRafId = requestAnimationFrame(() => {
+                    selectionRafId = null;
+                    checkScroll();
+                });
+            };
+
+            editor.on('update', deferredUpdate);
+            editor.on('selectionUpdate', deferredSelection);
+
+            return () => {
+                observer.disconnect();
+                if (container) {
+                    container.removeEventListener('scroll', handleScroll);
+                }
+                editor.off('update', deferredUpdate);
+                editor.off('selectionUpdate', deferredSelection);
+                if (updateRafId !== null) cancelAnimationFrame(updateRafId);
+                if (selectionRafId !== null) cancelAnimationFrame(selectionRafId);
+            };
         }
 
         return () => {
             observer.disconnect();
             if (container) {
                 container.removeEventListener('scroll', handleScroll);
-            }
-            if (editor) {
-                editor.off('update', checkScroll);
-                editor.off('selectionUpdate', checkScroll);
             }
         };
     }, [editor, pageCount]);
@@ -217,8 +266,25 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     };
 
 
-    if (!editor) {
-        return null;
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => {
+        // Double-tick mount to be absolutely safe with React 18 batching
+        const frame = requestAnimationFrame(() => {
+            const timer = setTimeout(() => setIsMounted(true), 50);
+            return () => clearTimeout(timer);
+        });
+        return () => cancelAnimationFrame(frame);
+    }, []);
+
+    if (!editor || !isMounted) {
+        return (
+            <div className="mx-auto w-[1484px] h-[1000px] flex items-center justify-center bg-[#fbf4e9] rounded-lg shadow-2xl border border-stone-300/50">
+                <div className="flex flex-col items-center gap-4 text-stone-400 font-serif italic">
+                    <div className="w-8 h-8 border-2 border-stone-300 border-t-amber-600 rounded-full animate-spin" />
+                    Lecture du grimoire...
+                </div>
+            </div>
+        );
     }
 
     const scrollPrev = () => {

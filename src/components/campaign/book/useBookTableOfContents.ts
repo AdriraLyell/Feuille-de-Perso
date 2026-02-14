@@ -46,8 +46,18 @@ export function useBookTableOfContents(
     useEffect(() => {
         if (!editor) return;
 
-        // Update when editor content changes
-        editor.on('update', updateTOC);
+        // Defer the TOC update when triggered by editor events to avoid
+        // calling setState synchronously during Tiptap's internal flushSync cycle.
+        let rafId: number | null = null;
+        const deferredUpdateTOC = () => {
+            if (rafId !== null) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(() => {
+                rafId = null;
+                updateTOC();
+            });
+        };
+
+        editor.on('update', deferredUpdateTOC);
 
         // Initial delayed update to allow DOM to settle
         const timeout = setTimeout(updateTOC, 500);
@@ -62,7 +72,8 @@ export function useBookTableOfContents(
         }
 
         return () => {
-            editor.off('update', updateTOC);
+            editor.off('update', deferredUpdateTOC);
+            if (rafId !== null) cancelAnimationFrame(rafId);
             clearTimeout(timeout);
             observer.disconnect();
         };

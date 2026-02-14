@@ -1,5 +1,25 @@
 [
     {
+        "version": "2.48.20",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "🛠️ Fix Toolbar : Correction d'un bug qui empêchait de quitter le mode 'Recadrage' à cause de l'interception des clics par le conteneur d'image",
+            "🖱️ UX : La barre d'outils est désormais isolée des interactions de glissement de l'image"
+        ]
+    },
+    {
+        "version": "2.48.19",
+        "date": "2026-02-13",
+        "type": "patch",
+        "changes": [
+            "📸 Pan & Scan : Nouveau mode de recadrage interne pour les images en mode 'Remplir' (Cover)",
+            "🖱️ Interaction : Cliquez sur l'icône de cadrage et faites glisser l'image à l'intérieur de son cadre pour choisir la meilleure zone",
+            "💾 Sauvegarde : La position du cadrage (posX/posY) est désormais conservée par image",
+            "✨ UI : Ajout d'indices visuels lors du mode recadrage"
+        ]
+    },
+    {
         "version": "2.48.18",
         "date": "2026-02-13",
         "type": "patch",
@@ -1329,60 +1349,6 @@
             {
                 "type": "modified",
                 "text": "Support des noms sur deux lignes pour les cartes Compétences et Arrières-plans dans l'admin.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.0",
-        "date": "2026-02-10",
-        "description": "Harmonisation UI des bibliothèques Administrateur.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Refonte visuelle premium des onglets Compétences, Origines, Compteurs, Spécialisations et Traits.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Colonnes interactives à largeur fixe pour une navigation plus fluide.",
-                "category": "ui"
-            },
-            {
-                "type": "modified",
-                "text": "Remplacement des badges textuels par des icônes intuitives (Global, Lock, Variantes).",
-                "category": "ui"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction de types TypeScript sur les icônes Lucide pour assurer l'intégrité du build.",
-                "category": "fix"
-            }
-        ]
-    },
-    {
-        "version": "2.31.0",
-        "date": "2026-02-09",
-        "description": "Sécurisation de l'intégrité des données : Verrouillage des items.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Indicateurs visuels (cadenas) pour les items de bibliothèque en cours d'utilisation.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Blocage de la suppression des items 'placés' dans la configuration ou actifs dans d'autres campagnes.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Suivi global de l'utilisation des items à travers toutes les campagnes via Supabase.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Mise à jour de toutes les bibliothèques (Compétences, Historiques, Compteurs, Traits, Spécialisations).",
                 "category": "ui"
             }
         ]
