@@ -254,12 +254,12 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                 >
                     <div className="flex flex-col gap-4 py-2">
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nom</label>
+                            <label htmlFor="counter-name" className="block text-xs font-bold text-slate-500 uppercase mb-1">Nom</label>
                             <input
+                                id="counter-name"
                                 className="w-full border border-slate-300 rounded px-3 py-2 font-bold focus:border-red-500 outline-none"
                                 value={editingItem.name}
                                 onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                                autoFocus
                             />
                         </div>
 

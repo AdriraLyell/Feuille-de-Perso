@@ -56,7 +56,7 @@ const CreationGeneralSettings: React.FC<CreationGeneralSettingsProps> = ({
 
             <div className="space-y-8">
                 <div>
-                    <label className="block text-xs font-black text-stone-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <label htmlFor="creation-mode" className="block text-xs font-black text-stone-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                         <Layout size={14} className="text-amber-700" /> Philosophie de Création
                     </label>
                     <div className="grid grid-cols-2 bg-stone-950 p-1.5 rounded-sm gap-2 border border-stone-800">
@@ -83,7 +83,7 @@ const CreationGeneralSettings: React.FC<CreationGeneralSettingsProps> = ({
                 {config.mode === 'points' && (
                     <MotionFade className="space-y-6 pt-4 border-t border-stone-800/50">
                         <div>
-                            <label className="block text-xs font-black text-stone-400 mb-4 uppercase tracking-widest">Type de Répartition</label>
+                            <label htmlFor="card-system" className="block text-xs font-black text-stone-400 mb-4 uppercase tracking-widest">Type de Répartition</label>
                             <div className="grid grid-cols-2 bg-stone-950 p-1.5 rounded-sm gap-2 border border-stone-800 shadow-inner">
                                 <button
                                     onClick={() => onUpdateConfig('pointsDistributionMode', 'global')}
@@ -142,8 +142,9 @@ const CreationGeneralSettings: React.FC<CreationGeneralSettingsProps> = ({
                 {config.mode === 'rangs' && (
                     <MotionFade className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-stone-800/50">
                         <div className="bg-stone-950/40 p-4 rounded-sm border border-stone-800 group hover:border-amber-900/20 transition-colors">
-                            <label className="block text-[10px] font-black text-stone-500 mb-2 uppercase tracking-widest group-hover:text-amber-500/50 transition-colors">Capital Attributs</label>
+                            <label htmlFor="attribute-points" className="block text-[10px] font-black text-stone-500 mb-2 uppercase tracking-widest group-hover:text-amber-500/50 transition-colors">Capital Attributs</label>
                             <input
+                                id="attribute-points"
                                 type="number"
                                 value={config.attributePoints || 0}
                                 onChange={(e) => onUpdateConfig('attributePoints', parseInt(e.target.value) || 0)}
@@ -151,8 +152,9 @@ const CreationGeneralSettings: React.FC<CreationGeneralSettingsProps> = ({
                             />
                         </div>
                         <div className="bg-stone-950/40 p-4 rounded-sm border border-stone-800 group hover:border-amber-900/20 transition-colors">
-                            <label className="block text-[10px] font-black text-stone-500 mb-2 uppercase tracking-widest group-hover:text-amber-500/50 transition-colors">Capital Arr. Plans</label>
+                            <label htmlFor="background-points" className="block text-[10px] font-black text-stone-500 mb-2 uppercase tracking-widest group-hover:text-amber-500/50 transition-colors">Capital Arr. Plans</label>
                             <input
+                                id="background-points"
                                 type="number"
                                 value={config.backgroundPoints || 0}
                                 onChange={(e) => onUpdateConfig('backgroundPoints', parseInt(e.target.value) || 0)}

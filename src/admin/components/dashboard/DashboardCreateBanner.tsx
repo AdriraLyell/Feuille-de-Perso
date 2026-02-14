@@ -23,8 +23,9 @@ export const DashboardCreateBanner: React.FC<DashboardCreateBannerProps> = ({
                 </div>
 
                 <div className="flex-grow z-10">
-                    <label className="block text-xs font-bold text-amber-700 uppercase mb-2 tracking-widest">Nouvelle Chronique</label>
+                    <label htmlFor="new-campaign-name" className="block text-xs font-bold text-amber-700 uppercase mb-2 tracking-widest">Nouvelle Chronique</label>
                     <input
+                        id="new-campaign-name"
                         type="text"
                         value={newName}
                         onChange={e => setNewName(e.target.value)}

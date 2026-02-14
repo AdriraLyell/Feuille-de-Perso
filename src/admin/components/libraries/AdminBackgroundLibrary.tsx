@@ -299,17 +299,18 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                 >
                     <div className="flex flex-col gap-5 py-2">
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nom</label>
+                            <label htmlFor="bg-name" className="block text-xs font-bold text-slate-500 uppercase mb-1">Nom</label>
                             <input
+                                id="bg-name"
                                 className="w-full border border-slate-300 rounded px-3 py-2 font-bold focus:border-purple-500 outline-none"
                                 value={editingItem.name}
                                 onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                                autoFocus
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Description</label>
+                            <label htmlFor="bg-description" className="block text-xs font-bold text-slate-500 uppercase mb-1">Description</label>
                             <textarea
+                                id="bg-description"
                                 className="w-full border border-slate-300 rounded px-3 py-2 text-sm min-h-[100px] focus:border-purple-500 outline-none resize-none"
                                 value={editingItem.description || ''}
                                 onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
@@ -330,8 +331,9 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                         </div>
                         {editingItem.isVariable && (
                             <div className="animate-in fade-in slide-in-from-top-2 duration-200 -mt-3">
-                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Variantes suggérées (Réserve)</label>
+                                <label htmlFor="bg-variants" className="block text-xs font-bold text-slate-500 uppercase mb-1">Variantes suggérées (Réserve)</label>
                                 <input
+                                    id="bg-variants"
                                     className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-purple-500 outline-none font-bold placeholder:italic placeholder:font-normal"
                                     value={(editingItem.variants || []).join(', ')}
                                     onChange={(e) => setEditingItem({ ...editingItem, variants: e.target.value.split(',').map(v => v.trim()).filter(v => v !== '') })}
