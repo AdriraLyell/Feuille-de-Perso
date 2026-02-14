@@ -22,15 +22,13 @@ test('journal pagination should work with contentEditable', async ({ page }) => 
     await okBtn.click();
     await page.waitForTimeout(2000);
 
-    // Create first journal entry by clicking "Nouvelle Page"
-    const newPageBtn = page.locator('button').filter({ hasText: /Nouvelle|New/ }).first();
-    if (await newPageBtn.isVisible()) {
-        await newPageBtn.click();
-        await page.waitForTimeout(1500);
-    }
+    // Navigate to Campaign Notes
+    await page.click('text=Notes de Campagne');
 
-    // Type content (45 lines to trigger pagination)
-    const editor = page.locator('[contenteditable]').first();
+    // Wait for the journal to load (wait for the editor to be mounted)
+    await page.waitForSelector('.ProseMirror', { timeout: 20000 });
+
+    const editor = page.locator('.ProseMirror').first();
     if (await editor.isVisible()) {
         await editor.click();
 
@@ -39,16 +37,16 @@ test('journal pagination should work with contentEditable', async ({ page }) => 
             content += `Line ${i + 1}\n`;
         }
 
-        await editor.type(content);
-        await page.waitForTimeout(3000);
+        await page.keyboard.type(content);
+        await page.waitForTimeout(5000);
 
-        // Check if pagination happened
+        // Check if pagination happened (looking for journal-page class added to background cards)
         const pages = page.locator('.journal-page');
         const count = await pages.count();
         console.log(`Found ${count} journal pages after typing 45 lines`);
 
-        // The test passes if we have more than 1 page after typing
-        expect(count).toBeGreaterThan(1);
+        // We add 1 for the Table of Contents page, so expecting more than 2 total pages
+        expect(count).toBeGreaterThan(2);
         console.log('✅ Pagination works!');
     } else {
         console.log('❌ No editor found');

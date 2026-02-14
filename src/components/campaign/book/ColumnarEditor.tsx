@@ -404,7 +404,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                                 {Array.from({ length: visualPageCount }).map((_, i) => (
                                     <div
                                         key={i}
-                                        className="bg-[#fbf4e9] shadow-xl rounded-sm"
+                                        className="bg-[#fbf4e9] shadow-xl rounded-sm journal-page"
                                         style={{
                                             width: `${PAGE_WIDTH}px`,
                                             height: `${PAGE_HEIGHT}px`,

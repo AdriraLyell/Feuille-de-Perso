@@ -19,10 +19,10 @@ test('journal overflow should split precisely', async ({ page }) => {
     // 2. Click on the Campaign Notes tab
     await page.click('text=Notes de Campagne');
 
-    // Wait for the journal to load
-    await page.waitForSelector('.journal-page', { timeout: 20000 });
+    // Wait for the journal to load (wait for the editor to be mounted)
+    await page.waitForSelector('.ProseMirror', { timeout: 20000 });
 
-    const editor = page.locator('[contenteditable]').first();
+    const editor = page.locator('.ProseMirror').first();
     await editor.click();
 
     // Type content (45 lines to be sure)
@@ -41,5 +41,5 @@ test('journal overflow should split precisely', async ({ page }) => {
     const count = await pages.count();
     console.log(`Detected ${count} pages.`);
 
-    expect(count).toBeGreaterThan(1);
+    expect(count).toBeGreaterThan(2);
 });
