@@ -67,7 +67,7 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
     };
 
     return (
-        <MotionCard className="p-8 border-stone-700/50" hoverEffect="glow">
+        <MotionCard className="p-8 border-stone-700/50 h-[calc(100vh-120px)] flex flex-col" hoverEffect="glow">
             <div className="flex justify-between items-center mb-8 border-b border-stone-800 pb-4">
                 <div>
                     <h2 className="text-2xl font-serif font-black text-amber-500 flex items-center gap-3 uppercase tracking-widest">
@@ -104,7 +104,7 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
                     </div>
                 </MotionFade>
             ) : (
-                <div className="overflow-y-auto rounded-sm border border-stone-800 bg-stone-900/40 max-h-[600px] custom-scrollbar">
+                <div className="flex-grow overflow-y-auto rounded-sm border border-stone-800 bg-stone-900/40 custom-scrollbar">
                     <table className="w-full">
                         <thead className="bg-stone-950/50">
                             <tr>

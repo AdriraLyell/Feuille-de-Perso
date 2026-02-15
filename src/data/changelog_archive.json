@@ -1,5 +1,12 @@
 [
     {
+        "version": "2.49.22",
+        "date": "2026-02-14",
+        "type": "fix",
+        "content": "🛡️ E2E Stability : Résolution des erreurs de connexion (ports) et gestion de l'écran de sélection des règles dans le CI. Migration des tests vers le nouveau Grimoire Numérique (TiPTap).",
+        "major": false
+    },
+    {
         "version": "2.49.21",
         "date": "2026-02-14",
         "type": "chore",
@@ -1109,33 +1116,6 @@
                 "type": "modified",
                 "text": "Support des noms sur deux lignes pour les cartes Compétences et Arrières-plans dans l'admin.",
                 "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.0",
-        "date": "2026-02-10",
-        "description": "Harmonisation UI des bibliothèques Administrateur.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Refonte visuelle premium des onglets Compétences, Origines, Compteurs, Spécialisations et Traits.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Colonnes interactives à largeur fixe pour une navigation plus fluide.",
-                "category": "ui"
-            },
-            {
-                "type": "modified",
-                "text": "Remplacement des badges textuels par des icônes intuitives (Global, Lock, Variantes).",
-                "category": "ui"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction de types TypeScript sur les icônes Lucide pour assurer l'intégrité du build.",
-                "category": "fix"
             }
         ]
     }

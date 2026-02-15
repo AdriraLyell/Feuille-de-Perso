@@ -193,7 +193,7 @@ const AdminApp: React.FC = () => {
                 </div>
             </nav>
 
-            <main className={`mx-auto p-6 transition-all duration-300 ${activeTab === 'skills' ? 'max-w-[1600px]' : 'max-w-7xl'}`}>
+            <main className={`mx-auto p-6 transition-all duration-300 ${activeTab === 'skills' || activeTab === 'players' ? 'max-w-[1600px]' : 'max-w-7xl'}`}>
                 {activeTab === 'general' && (
                     <div className="bg-mystic-surface p-8 rounded-sm shadow-glass border border-stone-700/50 animate-in fade-in slide-in-from-bottom-4">
                         <h2 className="text-2xl font-serif font-bold mb-6 text-amber-gold border-b border-stone-700 pb-2 flex items-center gap-2">

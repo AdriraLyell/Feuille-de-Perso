@@ -92,7 +92,7 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({ character
             <ReadOnlyHeader character={character} onClose={onClose} onImport={handleImport} />
 
             <div className="flex-grow overflow-y-auto custom-scrollbar p-8">
-                <div className="max-w-6xl mx-auto space-y-12 pb-20">
+                <div className="max-w-7xl mx-auto space-y-12 pb-20">
                     {/* Top Section: Portrait + Identity */}
                     <div className="flex flex-col md:flex-row gap-8 items-start">
                         <ReadOnlyPortrait

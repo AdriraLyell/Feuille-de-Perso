@@ -106,7 +106,7 @@ const GlobalPlayersView: React.FC = () => {
     });
 
     return (
-        <div className="space-y-6">
+        <div className="flex flex-col h-[calc(100vh-140px)] space-y-4">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                 <div>
                     <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
@@ -162,7 +162,7 @@ const GlobalPlayersView: React.FC = () => {
                     <p className="text-sm">Essayez d'ajuster vos filtres ou de réinitialiser la recherche.</p>
                 </div>
             ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-y-auto flex-grow custom-scrollbar">
                     <table className="w-full text-left">
                         <thead>
                             <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-bold uppercase tracking-wider">
