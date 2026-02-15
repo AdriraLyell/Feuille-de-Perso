@@ -250,7 +250,8 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
                             ...prev,
                             syncInfo: {
                                 ...prev.syncInfo,
-                                lastSynced: Date.now()
+                                lastSynced: Date.now(),
+                                lastSyncedHash: result.hash
                             }
                         };
                     }

@@ -107,7 +107,9 @@ export interface CharacterSheetData {
     settingId?: string;   // Campaign ID
     settingName?: string; // Campaign name (cached for display)
     lastSynced?: number;  // Timestamp of last sync
+    lastSyncedHash?: string; // Digital signature of the data at last sync
     isAutoSyncEnabled?: boolean; // New: Automatic cloud save
+    mjMessage?: string;   // Note left by the MJ when signaling an update
   };
   _rulesVersion?: string; // Version des règles appliquées (pour optimisation de la réconciliation)
   _schemaVersion?: number; // Version du schéma de données (pour migrations séquentielles)

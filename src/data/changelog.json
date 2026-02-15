@@ -1,5 +1,36 @@
 [
     {
+        "version": "2.49.48",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🛡️ Synchronisation : Implémentation du '3-Way Hash Check' (Dirty Check) pour éviter d'écraser des modifications locales par mégarde",
+            "💬 Admin : Possibilité pour le MJ d'envoyer un message personnalisé lors d'un signal de mise à jour",
+            "🔔 UX : Affichage des notes du MJ et alerte de 'Version plus récente disponible' dans la modale de synchronisation du joueur",
+            "⚙️ Service : Optimisation du CharacterSyncService pour gérer les messages et les signatures numériques (hashes)"
+        ]
+    },
+    {
+        "version": "2.49.47",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🏛️ Admin : Allègement du Registre des Destins (retrait des colonnes Col 4 et Col 8)",
+            "⚡ Performance : Restauration de la vue SQL simplifiée pour les résumés de personnages"
+        ]
+    },
+    {
+        "version": "2.49.46",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🏛️ Admin : Intégration avancée de la Master List avec le thème 'Mystic' (texture cuir, glassmorphism)",
+            "📊 Data : Ajout des colonnes de compétences prioritaires (Savoirs et Arrière-plans) directement dans le registre",
+            "⚡ Performance : Optimisation de la vue SQL pour extraire les compétences sans charger toute la fiche",
+            "🔍 UX : Amélioration de la recherche et des filtres orphelins avec retour visuel thématique"
+        ]
+    },
+    {
         "version": "2.49.45",
         "date": "2026-02-15",
         "type": "feat",
@@ -168,46 +199,6 @@
         "changes": [
             "🏛️ UI : Renommage de la sidebar 'Structure' en 'Chapitres' pour plus de clarté",
             "🐛 Fix : Correction du troncage des info-bulles (tooltips) dans la barre latérale en les déplaçant vers la gauche"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.28",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🖌️ Édition : Ajout d'une palette de surlignage 'Aquarelle' (5 couleurs immersives)",
-            "🧹 Outils : Implémentation d'une gomme (Eraser) pour effacer instantanément toute la mise en forme du texte",
-            "✨ UX : Activation du mode multicolore pour le surlignage Tiptap",
-            "🛡️ Typage : Optimisation de la configuration des extensions du livre"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.27",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🏛️ UI : Réorganisation du journal de campagne avec une nouvelle barre latérale de structure",
-            "📔 Structure : Déplacement des boutons 'Chapitre' vers la sidebar latérale pour un espace de travail plus propre",
-            "🎨 Design : Amélioration de la barre d'outils supérieure et maintien du bouton Image dans le menu texte",
-            "🖋️ Édition : Rétablissement de l'affichage des numéros de listes avec style ambré thématique",
-            "🎨 Palette : Ajout d'une sélection d'encres (Noir, Bleu, Sang, Vert, Or, Violet) dans l'éditeur",
-            "🛠️ Maintenance : Migration sécurisée des imports Tiptap TextStyle vers des exports nommés"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.26",
-        "date": "2026-02-15",
-        "type": "maintenance",
-        "changes": [
-            "🏗️ Refactoring : Extraction des extensions Tiptap de `ColumnarEditor.tsx` vers `/extensions/bookExtensions.ts`",
-            "🏗️ Refactoring : Extraction de la logique métier de `AdminSkillLibrary.tsx` vers le hook `useAdminSkillLibrary.ts`",
-            "🛡️ Typage : Amélioration de la sécurité des types dans `ImageSyncResolver.ts` (supression restrictive de `any`)",
-            "🛡️ Typage : Typage strict des extensions Tiptap `ChapterHeading` et `BookImage`",
-            "🧹 Nettoyage : Remplacement des derniers `console.error` par `logger.error` dans le module de déploiement",
-            "📈 Maintenance : Allègement des fichiers composants volumineux pour une meilleure maintenabilité"
         ],
         "major": false
     }

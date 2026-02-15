@@ -1,5 +1,45 @@
 [
     {
+        "version": "2.49.28",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🖌️ Édition : Ajout d'une palette de surlignage 'Aquarelle' (5 couleurs immersives)",
+            "🧹 Outils : Implémentation d'une gomme (Eraser) pour effacer instantanément toute la mise en forme du texte",
+            "✨ UX : Activation du mode multicolore pour le surlignage Tiptap",
+            "🛡️ Typage : Optimisation de la configuration des extensions du livre"
+        ],
+        "major": false
+    },
+    {
+        "version": "2.49.27",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🏛️ UI : Réorganisation du journal de campagne avec une nouvelle barre latérale de structure",
+            "📔 Structure : Déplacement des boutons 'Chapitre' vers la sidebar latérale pour un espace de travail plus propre",
+            "🎨 Design : Amélioration de la barre d'outils supérieure et maintien du bouton Image dans le menu texte",
+            "🖋️ Édition : Rétablissement de l'affichage des numéros de listes avec style ambré thématique",
+            "🎨 Palette : Ajout d'une sélection d'encres (Noir, Bleu, Sang, Vert, Or, Violet) dans l'éditeur",
+            "🛠️ Maintenance : Migration sécurisée des imports Tiptap TextStyle vers des exports nommés"
+        ],
+        "major": false
+    },
+    {
+        "version": "2.49.26",
+        "date": "2026-02-15",
+        "type": "maintenance",
+        "changes": [
+            "🏗️ Refactoring : Extraction des extensions Tiptap de `ColumnarEditor.tsx` vers `/extensions/bookExtensions.ts`",
+            "🏗️ Refactoring : Extraction de la logique métier de `AdminSkillLibrary.tsx` vers le hook `useAdminSkillLibrary.ts`",
+            "🛡️ Typage : Amélioration de la sécurité des types dans `ImageSyncResolver.ts` (supression restrictive de `any`)",
+            "🛡️ Typage : Typage strict des extensions Tiptap `ChapterHeading` et `BookImage`",
+            "🧹 Nettoyage : Remplacement des derniers `console.error` par `logger.error` dans le module de déploiement",
+            "📈 Maintenance : Allègement des fichiers composants volumineux pour une meilleure maintenabilité"
+        ],
+        "major": false
+    },
+    {
         "version": "2.49.25",
         "date": "2026-02-15",
         "type": "feat",
@@ -1041,77 +1081,6 @@
                 "type": "added",
                 "text": "Possibilité de déplacer les espaceurs déjà présents sur la fiche.",
                 "category": "feature"
-            }
-        ]
-    },
-    {
-        "version": "2.32.5",
-        "date": "2026-02-10",
-        "description": "Implémentation du Mode Édition Directe.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Nouveau Mode Édition Directe permettant d'ajouter, supprimer et déplacer des éléments directement sur la feuille.",
-                "category": "feature"
-            },
-            {
-                "type": "added",
-                "text": "Barre latérale d'édition avec recherche dans les bibliothèques de compétences et d'historiques.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Possibilité de créer des éléments personnalisés (suggestions automatiques pour le MJ).",
-                "category": "feature"
-            },
-            {
-                "type": "added",
-                "text": "Support du Drag & Drop pour réorganiser les compétences ou ajouter des espaceurs vides.",
-                "category": "ui"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction de la gestion des catégories lors de l'édition pour respecter les types de blocs (Compétences vs Historiques).",
-                "category": "fix"
-            }
-        ]
-    },
-    {
-        "version": "2.32.4",
-        "date": "2026-02-10",
-        "description": "Filtre 'Masquer acquis' pour les Bibliothèques.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Ajout d'un filtre (œil) pour masquer les compétences et spécialisations déjà acquises dans la bibliothèque.",
-                "category": "feature"
-            },
-            {
-                "type": "modified",
-                "text": "Remplacement du badge 'OFF'/'OFFICIEL' par une icône Globe pour uniformiser l'interface.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.3",
-        "date": "2026-02-10",
-        "description": "Correction des doublons dans la Bibliothèque (Joueur & Admin).",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Élimination des compétences et traits dupliqués dans la bibliothèque du joueur (fusion insensible à la casse).",
-                "category": "core"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction de l'assistant d'import Admin : exclusion des Historiques dans l'onglet Compétences et dédoublonnage des Compteurs.",
-                "category": "fix"
-            },
-            {
-                "type": "improved",
-                "text": "Renforcement de la sécurité backend : vérification anti-doublon lors de l'import de bibliothèque.",
-                "category": "core"
             }
         ]
     }

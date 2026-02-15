@@ -1,14 +1,15 @@
 import React from 'react';
-import { X, User, Clock, Download, Scroll } from 'lucide-react';
+import { X, User, Clock, Download, Scroll, RefreshCw } from 'lucide-react';
 import { SyncedCharacter } from '../../../services/CharacterSyncService';
 
 interface ReadOnlyHeaderProps {
     character: SyncedCharacter;
     onClose: () => void;
     onImport: () => void;
+    onForceUpdate?: () => void;
 }
 
-export const ReadOnlyHeader: React.FC<ReadOnlyHeaderProps> = ({ character, onClose, onImport }) => {
+export const ReadOnlyHeader: React.FC<ReadOnlyHeaderProps> = ({ character, onClose, onImport, onForceUpdate }) => {
     return (
         <div className="bg-stone-950/80 border-b border-stone-800 p-6 flex justify-between items-center z-10">
             {/* Header Decoration */}
@@ -32,6 +33,16 @@ export const ReadOnlyHeader: React.FC<ReadOnlyHeaderProps> = ({ character, onClo
                 </div>
             </div>
             <div className="flex items-center gap-3">
+                {onForceUpdate && (
+                    <button
+                        onClick={onForceUpdate}
+                        className="flex items-center gap-2 px-4 py-2 bg-stone-900 hover:bg-stone-800 text-amber-500 border border-amber-900/30 rounded-sm text-xs font-black transition-all shadow-lg active:scale-95 uppercase tracking-widest"
+                        title="Signaler un changement MJ au joueur (Force Load)"
+                    >
+                        <RefreshCw size={16} className="stroke-[3]" />
+                        Pousser MJ
+                    </button>
+                )}
                 <button
                     onClick={onImport}
                     className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-stone-950 rounded-sm text-xs font-black transition-all shadow-lg hover:shadow-amber-500/10 active:scale-95 uppercase tracking-widest"

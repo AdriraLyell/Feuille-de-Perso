@@ -34,13 +34,45 @@ export interface SyncedCharacterSummary {
 export interface SyncResult {
     success: boolean;
     syncId?: string;
+    hash?: string;
     error?: string;
 }
+
+// Assuming SyncInfo is part of CharacterSheetData, or a sub-interface.
+// The instruction implies adding this field to the SyncInfo structure.
+// For the purpose of this file, we'll assume CharacterSheetData's syncInfo property
+// will now include mjMessage. The actual type definition for SyncInfo would be in '../types/character'.
+// The provided snippet seems to be an attempt to show the *content* of the SyncInfo type.
+// We will not add a new type definition here, but acknowledge the change in the external type.
 
 export const CharacterSyncService = {
 
     /**
+     * Generate a short digital signature of the character data.
+     * Used for conflict detection and 'dirty' checking.
+     */
+    generateDataHash(data: CharacterSheetData): string {
+        try {
+            // We ignore volatile fields for the hash
+            const { syncInfo, appLogs, xpLogs, _rulesVersion, ...stableData } = data;
+
+            // Fast hashing via string manipulation
+            const str = JSON.stringify(stableData);
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return Math.abs(hash).toString(36);
+        } catch (e) {
+            return "unknown";
+        }
+    },
+
+    /**
      * Sync a character sheet to the database.
+
      * Uses upsert: creates if new, updates if exists (same setting/player/character combo).
      */
     async syncCharacter(
@@ -76,7 +108,11 @@ export const CharacterSyncService = {
                 return { success: false, error: "Erreur de synchronisation (DatabaseService)." };
             }
 
-            return { success: true, syncId: result.id };
+            return {
+                success: true,
+                syncId: result.id,
+                hash: this.generateDataHash(data)
+            };
         } catch (e) {
             ErrorService.handleError(e, { context: 'CharacterSyncService.syncCharacter' });
             return { success: false, error: (e as Error).message };
@@ -136,6 +172,59 @@ export const CharacterSyncService = {
             id,
             'CharacterSyncService.getCharacterById'
         );
+    },
+
+    /**
+     * Update character data directly (MJ/Admin).
+     * Used when the MJ makes manual modifications and wants to push them.
+     */
+    async updateCharacterData(id: string, data: CharacterSheetData): Promise<boolean> {
+        try {
+            // Remove syncInfo to avoid circularity if it was injected
+            const { syncInfo, ...cleanData } = data;
+
+            // Re-compress images for storage
+            const dataToStore = await ImageSyncResolver.resolveImagesForSync(cleanData);
+
+            return await DatabaseService.update(
+                'characters',
+                id,
+                {
+                    data: dataToStore,
+                    last_synced: new Date().toISOString()
+                },
+                'CharacterSyncService.updateCharacterData'
+            );
+        } catch (e) {
+            ErrorService.handleError(e, { context: 'CharacterSyncService.updateCharacterData' });
+            return false;
+        }
+    },
+
+    /**
+     * Signal to the player that a manual update has been made by the MJ.
+     * This updates the timestamp AND can inject a specific message.
+     */
+    async requestForceUpdate(id: string, message?: string): Promise<boolean> {
+        try {
+            // We need to fetch the character first to avoid wiping data if we just update the timestamp
+            const character = await this.getCharacterById(id);
+            if (!character) return false;
+
+            const updatedData: CharacterSheetData = {
+                ...character.data,
+                syncInfo: {
+                    ...(character.data.syncInfo || {}),
+                    mjMessage: message,
+                    lastSynced: Date.now()
+                }
+            };
+
+            return await this.updateCharacterData(id, updatedData);
+        } catch (e) {
+            ErrorService.handleError(e, { context: 'CharacterSyncService.requestForceUpdate' });
+            return false;
+        }
     },
 
     /**

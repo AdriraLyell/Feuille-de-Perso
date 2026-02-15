@@ -14,6 +14,7 @@ import { CampaignService } from '../../services/CampaignService';
 import { detectConflicts, smartMerge, DataConflict } from '../../utils/importExportUtils';
 import CloudConflictResolver from './CloudConflictResolver';
 import { ErrorService } from '../../services/ErrorService';
+import { logger } from '../../utils/logger';
 import ThematicModal from '../ui/ThematicModal';
 import ThematicButton from '../ui/ThematicButton';
 import { useNotification } from '../../context/NotificationContext';
@@ -95,9 +96,31 @@ const CloudPanel: React.FC<CloudPanelProps> = ({ data, onLoadSuccess, onClose })
             // Step 1: Restore images from cloud format to local IndexedDB
             fullCharacter.data = await ImageSyncResolver.injectImagesAfterSync(fullCharacter.data) as CharacterSheetData;
 
-            // Detect Conflicts if local data exists
+            const incomingData = fullCharacter.data;
+
+            // Step 2: 3-Way Check (Dirty Check)
+            const isLocalLinked = data.syncInfo?.syncId === char.id;
+            const currentHash = CharacterSyncService.generateDataHash(data);
+            const lastSyncedHash = data.syncInfo?.lastSyncedHash;
+            const isLocalDirty = isLocalLinked && lastSyncedHash && currentHash !== lastSyncedHash;
+
+            if (isLocalDirty && !isResolvingConflicts) {
+                logger.info("Local character is dirty, forcing conflict resolver", { currentHash, lastSyncedHash });
+                setConflicts([{
+                    type: 'skill', // Fake conflict to trigger resolver
+                    key: 'force_conflict_root',
+                    name: 'Données Personnelles',
+                    current: { name: 'Version Locale (Modifiée)', description: 'Vos changements non synchronisés' } as any,
+                    incoming: { name: 'Version Cloud', description: 'Version du Gardien / Dernier backup' } as any
+                }]);
+                setPendingData(incomingData);
+                setIsResolvingConflicts(true);
+                setLoadStatus('idle');
+                return;
+            }
+
+            // Step 3: Standard Library Conflict Detection
             if (data.header?.name && data.header.name.trim() !== '' && !isResolvingConflicts) {
-                const incomingData = fullCharacter.data;
                 const detected = detectConflicts(
                     data.skillLibrary || [], incomingData.skillLibrary || [],
                     data.library || [], incomingData.library || [],
@@ -122,12 +145,14 @@ const CloudPanel: React.FC<CloudPanelProps> = ({ data, onLoadSuccess, onClose })
 
             // Update syncInfo
             const loadedData: CharacterSheetData = {
-                ...fullCharacter.data,
+                ...incomingData,
                 syncInfo: {
                     syncId: fullCharacter.id,
                     settingId: fullCharacter.setting_id || 'orphan',
                     settingName: campaign?.name || (fullCharacter.setting_id ? 'Campagne Inconnue' : 'Indépendant (Archives)'),
-                    lastSynced: new Date(fullCharacter.last_synced).getTime()
+                    lastSynced: new Date(fullCharacter.last_synced).getTime(),
+                    lastSyncedHash: CharacterSyncService.generateDataHash(incomingData),
+                    mjMessage: incomingData.syncInfo?.mjMessage // Carry over any MJ message
                 }
             };
 
