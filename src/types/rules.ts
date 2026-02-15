@@ -102,6 +102,7 @@ export interface RulesData {
         backgrounds: LibraryBackgroundEntry[]; // Unified Backgrounds
         counters: LibraryCounterEntry[]; // Unified Counters
         specializations: LibrarySpecializationEntry[];
+        mysticAbilities: LibrarySkillEntry[];
     };
 }
 export interface GameSettingSummary {

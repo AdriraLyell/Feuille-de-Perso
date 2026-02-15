@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.56",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🔮 Admin : Ajout de la bibliothèque des 'Habilités Mystiques'",
+            "📚 Data : Configuration par défaut (Arts Martiaux, Magies, Psy, etc.)",
+            "🛠️ Admin : Interface de gestion complète (CRUD) pour les habilités mystiques",
+            "🔄 Migration : Initialisation automatique de la bibliothèque pour les campagnes existantes"
+        ]
+    },
+    {
         "version": "2.49.55",
         "date": "2026-02-15",
         "type": "feat",

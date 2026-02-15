@@ -15,6 +15,7 @@ import AdminSkillLibrary from './components/libraries/AdminSkillLibrary';
 import AdminSpecializationLibrary from './components/libraries/AdminSpecializationLibrary';
 import AdminBackgroundLibrary from './components/libraries/AdminBackgroundLibrary';
 import AdminCounterLibrary from './components/libraries/AdminCounterLibrary';
+import AdminMysticLibrary from './components/libraries/AdminMysticLibrary';
 import AdminDashboard from './components/AdminDashboard';
 import CampaignCharactersView from './components/CampaignCharactersView';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
@@ -48,7 +49,7 @@ const AdminApp: React.FC = () => {
 
     const [viewMode, setViewMode] = useState<'dashboard' | 'editor' | 'players'>('dashboard');
     const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'costs' | 'libraries' | 'players'>('general');
-    const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters'>('traits');
+    const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters' | 'mystic'>('traits');
 
     const [showImportResult, setShowImportResult] = useState(false);
     const [importReport, setImportReport] = useState<{ success: string[], warnings: string[] } | null>(null);
@@ -218,6 +219,7 @@ const AdminApp: React.FC = () => {
                                 { id: 'skills', label: 'Compétences' },
                                 { id: 'backgrounds', label: 'Arrière-Plans' },
                                 { id: 'counters', label: 'Compteurs' },
+                                { id: 'mystic', label: 'Habilités Myst.' },
                                 { id: 'specializations', label: 'Spécialisations' }
                             ] as const).map((lt) => (
                                 <button
@@ -233,6 +235,7 @@ const AdminApp: React.FC = () => {
                         {activeLibraryTab === 'skills' && <AdminSkillLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
                         {activeLibraryTab === 'backgrounds' && <AdminBackgroundLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
                         {activeLibraryTab === 'counters' && <AdminCounterLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
+                        {activeLibraryTab === 'mystic' && <AdminMysticLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
                         {activeLibraryTab === 'specializations' && <AdminSpecializationLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
                     </div>
                 )}
