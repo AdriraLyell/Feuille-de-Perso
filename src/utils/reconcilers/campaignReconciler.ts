@@ -89,5 +89,10 @@ export const reconcileRulesWithLibraries = (rules: RulesData, libraries: RulesDa
         });
     }
 
+    // 5. Ensure mysticAbilities are present
+    if (libraries.mysticAbilities) {
+        rules.libraries.mysticAbilities = libraries.mysticAbilities;
+    }
+
     return rules;
-};
+}

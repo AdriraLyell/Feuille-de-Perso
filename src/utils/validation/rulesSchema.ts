@@ -156,6 +156,7 @@ export const RulesDataSchema = z.object({
         backgrounds: z.array(LibraryBackgroundEntrySchema),
         counters: z.array(LibraryCounterEntrySchema),
         specializations: z.array(LibrarySpecializationEntrySchema),
+        mysticAbilities: z.array(LibrarySkillEntrySchema).optional().default([]),
     }),
 });
 
