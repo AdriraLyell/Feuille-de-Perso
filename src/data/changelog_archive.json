@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.32",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Extraction de la logique de ColumnarEditor dans des hooks spécialisés (Navigation, Dessin)",
+            "🛡️ Typage : Élimination des types 'any' résiduels dans les factories et le grimoire",
+            "🧹 Ménage : Suppression de la dépendance inutilisée 'tiptap-pagination-plus' et nettoyage des imports Admin"
+        ]
+    },
+    {
         "version": "2.49.31",
         "date": "2026-02-15",
         "type": "fix",
@@ -1019,33 +1029,6 @@
             {
                 "type": "feature",
                 "text": "Sécurisation du Mode Édition : interdiction de supprimer une compétence ayant des points investis (le déplacement reste autorisé).",
-                "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.33.0",
-        "date": "2026-02-10",
-        "description": "Refonte intégrale du Guide Utilisateur Joueur.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Nouveau guide utilisateur structuré par thématiques (Modes, Usage, Création/Édition, Outils).",
-                "category": "docs"
-            },
-            {
-                "type": "added",
-                "text": "Documentation détaillée des trois modes de fonctionnement : En Ligne (Cloud), JSON (Fichiers) et Hors Ligne.",
-                "category": "docs"
-            },
-            {
-                "type": "added",
-                "text": "Guide pas-à-pas pour le Mode Création (répartition des points) et le Mode Édition Directe (structure).",
-                "category": "docs"
-            },
-            {
-                "type": "improved",
-                "text": "Nettoyage du guide : suppression des sections MJ redondantes dans l'app joueur pour plus de clarté.",
                 "category": "ux"
             }
         ]
