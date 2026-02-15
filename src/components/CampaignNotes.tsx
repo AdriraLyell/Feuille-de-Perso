@@ -32,7 +32,7 @@ const CampaignNotes: React.FC = () => {
     };
 
     return (
-        <div className="w-full bg-[#121212] overflow-x-auto relative no-scrollbar">
+        <div className="w-full bg-[#121212] relative">
             <style>{`
                 .hide-scrollbar::-webkit-scrollbar { display: none; }
                 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -78,9 +78,9 @@ const CampaignNotes: React.FC = () => {
                     ) : (
                         <div
                             className="mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500"
-                            style={{ width: '1484px', minHeight: '1000px' }}
+                            style={{ width: '1484px', height: '1000px' }}
                         >
-                            <div className="bg-[#fbf4e9] rounded-lg shadow-2xl overflow-hidden border border-stone-300/50 h-full min-h-[1000px]">
+                            <div className="bg-[#fbf4e9] rounded-lg shadow-2xl overflow-hidden border border-stone-300/50 h-full">
                                 <PartyTable data={data} onChange={onChange} onAddLog={addLog} />
                             </div>
                         </div>

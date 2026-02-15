@@ -4,6 +4,7 @@ import { publishFileToGitHub } from '../../services/githubService';
 import { RulesData } from '../../types/rules';
 import { Save, AlertTriangle, CheckCircle, Loader2, Github, X, Info } from 'lucide-react';
 import { APP_VERSION } from '../../constants/app';
+import { logger } from '../../utils/logger';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 import { MotionCard } from '../../components/ui/motion/MotionCard';
 
@@ -117,7 +118,7 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
                 setMessage('Le fichier est à jour, mais le déploiement Pages a rencontré une anomalie.');
             }
         } catch (err) {
-            console.error('Erreur de déploiement:', err);
+            logger.error('Erreur de déploiement:', err);
             setStatus('error');
             setMessage('Une erreur arcanique a interrompu le processus.');
         }

@@ -15,15 +15,17 @@ export const ImageSyncResolver = {
      * Finds all imageId references in the data and replaces them with compressed WebP+GZIP strings.
      * This makes the character data "portable" for cloud sync.
      */
-    async resolveImagesForSync(data: any): Promise<any> {
+    async resolveImagesForSync(data: unknown): Promise<unknown> {
         if (!data || typeof data !== 'object' || data === null) return data;
 
         if (Array.isArray(data)) {
             return Promise.all(data.map(item => this.resolveImagesForSync(item)));
         }
 
-        const processed: any = {};
-        for (const [key, value] of Object.entries(data)) {
+        const obj = data as Record<string, unknown>;
+        const processed: Record<string, unknown> = {};
+
+        for (const [key, value] of Object.entries(obj)) {
             // Case 1: Portrait Image ID
             if (key === 'characterImageId' && typeof value === 'string' && value.startsWith('img_')) {
                 try {
@@ -33,7 +35,7 @@ export const ImageSyncResolver = {
                         const result = await ImageCompressionService.compressFull(base64);
                         processed[key] = result.compressed;
                         // Clear legacy carrier image if it exists in the same object
-                        if (data.characterImage !== undefined) processed.characterImage = '';
+                        if (obj.characterImage !== undefined) processed.characterImage = '';
                     } else {
                         processed[key] = value;
                     }
@@ -43,9 +45,10 @@ export const ImageSyncResolver = {
                 }
             }
             // Case 2: Grimoire Image Node (Tiptap bookImage)
-            else if (key === 'type' && value === 'bookImage' && (data as any).attrs?.imageId) {
+            else if (key === 'type' && value === 'bookImage' && (obj.attrs as Record<string, any> | undefined)?.imageId) {
                 try {
-                    const imageId = (data as any).attrs.imageId;
+                    const attrs = obj.attrs as Record<string, any>;
+                    const imageId = attrs.imageId;
                     if (typeof imageId === 'string' && imageId.startsWith('img_')) {
                         const blob = await getImage(imageId);
                         if (blob) {
@@ -54,13 +57,13 @@ export const ImageSyncResolver = {
 
                             processed.type = 'bookImage';
                             processed.attrs = {
-                                ...(data as any).attrs,
+                                ...attrs,
                                 imageId: result.compressed // Replace ID with compressed data for sync
                             };
 
                             // Copy any other node properties (content, marks, etc)
-                            for (const k of Object.keys(data)) {
-                                if (k !== 'type' && k !== 'attrs') processed[k] = (data as any)[k];
+                            for (const k of Object.keys(obj)) {
+                                if (k !== 'type' && k !== 'attrs') processed[k] = obj[k];
                             }
                             return processed;
                         }
@@ -93,15 +96,17 @@ export const ImageSyncResolver = {
      * Finds all compressed image strings (GZIP:...) in the data, saves them to IndexedDB,
      * and replaces them with local imageIds.
      */
-    async injectImagesAfterSync(data: any): Promise<any> {
+    async injectImagesAfterSync(data: unknown): Promise<unknown> {
         if (!data || typeof data !== 'object' || data === null) return data;
 
         if (Array.isArray(data)) {
             return Promise.all(data.map(item => this.injectImagesAfterSync(item)));
         }
 
-        const processed: any = {};
-        for (const [key, value] of Object.entries(data)) {
+        const obj = data as Record<string, unknown>;
+        const processed: Record<string, unknown> = {};
+
+        for (const [key, value] of Object.entries(obj)) {
             // Case 1: Portrait (compressed string in characterImageId field)
             if (key === 'characterImageId' && typeof value === 'string' && value.startsWith(GZIP_MARKER)) {
                 try {
@@ -114,20 +119,21 @@ export const ImageSyncResolver = {
                 }
             }
             // Case 2: Grimoire Image Node (compressed string in imageId attr)
-            else if (key === 'type' && value === 'bookImage' && (data as any)?.attrs?.imageId?.startsWith?.(GZIP_MARKER)) {
+            else if (key === 'type' && value === 'bookImage' && (obj.attrs as Record<string, any> | undefined)?.imageId?.startsWith?.(GZIP_MARKER)) {
                 try {
-                    const compressed = (data as any).attrs.imageId;
+                    const attrs = obj.attrs as Record<string, any>;
+                    const compressed = attrs.imageId;
                     const blob = await base64ToBlob(compressed);
                     const newId = await saveImage(blob);
 
                     processed.type = 'bookImage';
                     processed.attrs = {
-                        ...(data as any).attrs,
+                        ...attrs,
                         imageId: newId // Replace compressed data with local ID
                     };
 
-                    for (const k of Object.keys(data)) {
-                        if (k !== 'type' && k !== 'attrs') processed[k] = (data as any)[k];
+                    for (const k of Object.keys(obj)) {
+                        if (k !== 'type' && k !== 'attrs') processed[k] = obj[k];
                     }
                     return processed;
                 } catch (e) {

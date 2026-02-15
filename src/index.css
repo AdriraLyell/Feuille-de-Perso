@@ -48,6 +48,10 @@
 }
 
 /* Global Styles (Migrated from HTML for consistency) */
+html, body {
+  overflow-y: auto;
+}
+
 body {
   background-color: var(--color-app-bg);
   /* Darker background outside sheet for contrast */
