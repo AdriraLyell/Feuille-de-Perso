@@ -1,7 +1,8 @@
+import { DotEntry, AttributeEntry, CombatEntry } from '../types/primitives';
 
 export const generateId = () => crypto.randomUUID();
 
-export const createDotEntry = (name: string, value = 0, variant?: string): any => ({
+export const createDotEntry = (name: string, value = 0, variant?: string): DotEntry => ({
   id: generateId(),
   name,
   value,
@@ -10,7 +11,7 @@ export const createDotEntry = (name: string, value = 0, variant?: string): any =
   variant
 });
 
-export const createAttributeEntry = (name: string): any => ({
+export const createAttributeEntry = (name: string): AttributeEntry => ({
   id: generateId(),
   name,
   val1: "0",
@@ -21,7 +22,7 @@ export const createAttributeEntry = (name: string): any => ({
   creationVal3: 0,
 });
 
-export const createCombatEntry = (): any => ({
+export const createCombatEntry = (): CombatEntry => ({
   id: generateId(),
   weapon: '',
   level: '',

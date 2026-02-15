@@ -1,7 +1,6 @@
 import React from 'react';
 import { RulesData } from '../../types/rules';
 import { Coins, Zap, BarChart3, TrendingUp, Info } from 'lucide-react';
-import { RuleCalculationsService } from '../../services/RuleCalculationsService';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 import { MotionCard } from '../../components/ui/motion/MotionCard';
 

@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { calculateDiff, mergeRules, ImportOptions } from '../../utils/importDiffUtils';
-import { ArrowRight, Check, X, AlertTriangle, Settings, BookOpen, Database, Layers, CheckCircle2 } from 'lucide-react';
+import { Check, X, AlertTriangle, Settings, BookOpen, Database, Layers, CheckCircle2 } from 'lucide-react';
 
 interface ImportWizardModalProps {
     isOpen: boolean;
@@ -15,7 +15,7 @@ interface ImportWizardModalProps {
 const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, onConfirm, currentRules, candidateRules }) => {
     if (!isOpen) return null;
 
-    const [activeStep, setActiveStep] = useState<1 | 2>(1);
+
 
     // Default Options
     const [options, setOptions] = useState<ImportOptions>({

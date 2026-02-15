@@ -6,12 +6,12 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Users, Search, Eye, Trash2, Calendar, Shield, Info, AlertCircle } from 'lucide-react';
+import { Users, Search, Eye, Trash2, Calendar, Shield, AlertCircle } from 'lucide-react';
 import { CharacterSyncService, SyncedCharacterSummary, SyncedCharacter } from '../../services/CharacterSyncService';
 import CharacterReadOnlyView from './CharacterReadOnlyView';
 import { GameSettingSummary, CampaignService } from '../../services/CampaignService';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
-import { logger } from '../../utils/logger';
+
 import { ErrorService } from '../../services/ErrorService';
 import { Loader2 } from 'lucide-react';
 

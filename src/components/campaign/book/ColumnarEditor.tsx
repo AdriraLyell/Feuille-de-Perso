@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useEditor, EditorContent, JSONContent } from '@tiptap/react';
 import { getBookExtensions } from './extensions/bookExtensions';
 import { PAGE_WIDTH, PAGE_HEIGHT } from '../constants';
-import { saveImage } from '../../../imageDB';
 import { BookTableOfContents } from './BookTableOfContents';
 import { useBookTableOfContents } from './useBookTableOfContents';
-import { logger } from '../../../utils/logger';
+import { useColumnarNavigation } from './hooks/useColumnarNavigation';
+import { useColumnarDrawing } from './hooks/useColumnarDrawing';
+import { Editor } from '@tiptap/react';
 
 const INK_COLORS = [
     { name: 'Noir Corbeau', color: '#1c1917' },
@@ -35,13 +36,14 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     onUpdate,
     readOnly = false
 }) => {
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [isDrawingMode, setIsDrawingMode] = useState(false);
     const [showColorPalette, setShowColorPalette] = useState(false);
     const [showHighlightPalette, setShowHighlightPalette] = useState(false);
-    const [drawStart, setDrawStart] = useState<{ x: number, y: number } | null>(null);
-    const [drawRect, setDrawRect] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
 
+    const containerRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
+
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const onUpdateRef = useRef(onUpdate);
     onUpdateRef.current = onUpdate;
 
@@ -49,7 +51,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         extensions: getBookExtensions(),
         editable: !readOnly,
         immediatelyRender: false,
-        onUpdate: ({ editor }: { editor: any }) => {
+        onUpdate: ({ editor }: { editor: Editor }) => {
             if (onUpdateRef.current) {
                 if (timeoutRef.current) clearTimeout(timeoutRef.current);
                 timeoutRef.current = setTimeout(() => {
@@ -61,34 +63,46 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
 
     const editor = useEditor(editorOptions);
 
-    // Initial Content Injection (Safe from flushSync)
+    const {
+        pageCount,
+        scrollPos,
+        scrollPrev,
+        scrollNext,
+        navigateToPage
+    } = useColumnarNavigation({
+        editor,
+        containerRef,
+        contentRef
+    });
+
+    const {
+        drawRect,
+        handleDrawingMouseDown,
+        handleDrawingMouseMove,
+        handleDrawingMouseUp,
+        cancelDrawing
+    } = useColumnarDrawing({
+        editor,
+        containerRef,
+        setIsDrawingMode
+    });
+
+    const { entries } = useBookTableOfContents(editor, contentRef);
+
+    // Initial Content Injection
     useEffect(() => {
         if (editor && initialContent && !editor.isDestroyed) {
-            // Only set if we have content and it's not already there (to be safe)
-            // Using a microtask delay just to be 100% sure we are out of the render cycle
-            // although useEffect corresponds to the commit phase.
             queueMicrotask(() => {
-                // Prevent resetting if content was somehow restored or if we are in a hot reload
                 if (editor.isEmpty) {
                     editor.commands.setContent(initialContent, { emitUpdate: false });
                 }
             });
         }
-    }, [editor]); // Run once when editor is created
+    }, [editor]);
 
-
-    const containerRef = useRef<HTMLDivElement>(null);
-    const contentRef = useRef<HTMLDivElement>(null);
-    const [pageCount, setPageCount] = React.useState(1);
-    const [scrollPos, setScrollPos] = React.useState(0);
-
-    const { entries } = useBookTableOfContents(editor, contentRef);
-
-    // Sync content if initialContent changes (e.g. switching chapters)
+    // Sync content if initialContent changes
     useEffect(() => {
         if (editor && initialContent) {
-            // Only update if the content is different and editor is not focused/dirty
-            // to avoid cursor jumping during active typing (debounce handles saving)
             const currentJson = JSON.stringify(editor.getJSON());
             const nextJson = typeof initialContent === 'string' ? initialContent : JSON.stringify(initialContent);
 
@@ -98,176 +112,8 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         }
     }, [initialContent, editor]);
 
-    // Calculate how many pages we have based on scrollWidth
-    useEffect(() => {
-        const checkScroll = () => {
-            if (!contentRef.current || !containerRef.current) return;
-
-            // We use a small timeout to allow CSS Column reflow to complete
-            // especially after image size changes or Tiptap node view renders.
-            requestAnimationFrame(() => {
-                if (!contentRef.current || !containerRef.current) return;
-
-                const scrollWidth = contentRef.current.scrollWidth;
-                const stride = PAGE_WIDTH + 40;
-
-                // We add 1 for the Table of Contents page
-                const contentPages = Math.max(1, Math.ceil(scrollWidth / stride));
-                const totalPages = contentPages + 1;
-
-                if (totalPages !== pageCount) {
-                    setPageCount(totalPages);
-                }
-                setScrollPos(containerRef.current.scrollLeft);
-            });
-        };
-
-        const handleScroll = () => {
-            if (containerRef.current) {
-                setScrollPos(containerRef.current.scrollLeft);
-            }
-        };
-
-        checkScroll();
-
-        // Add a ResizeObserver that specifically monitors the content container.
-        // Since CSS columns with width: fit-content should resize their box,
-        // ResizeObserver on contentRef.current is usually correct.
-        const observer = new ResizeObserver(checkScroll);
-        if (contentRef.current) {
-            observer.observe(contentRef.current);
-            // Also observe the first child (ProseMirror) just in case
-            const firstChild = contentRef.current.firstElementChild;
-            if (firstChild) observer.observe(firstChild);
-        }
-
-        const container = containerRef.current;
-        if (container) {
-            container.addEventListener('scroll', handleScroll);
-        }
-
-        if (editor) {
-            // Defer editor event handlers to avoid calling setState synchronously
-            // during Tiptap's internal flushSync cycle.
-            let updateRafId: number | null = null;
-            let selectionRafId: number | null = null;
-
-            const deferredUpdate = () => {
-                if (updateRafId !== null) cancelAnimationFrame(updateRafId);
-                updateRafId = requestAnimationFrame(() => {
-                    updateRafId = null;
-                    checkScroll();
-                });
-            };
-
-            const deferredSelection = () => {
-                if (selectionRafId !== null) cancelAnimationFrame(selectionRafId);
-                selectionRafId = requestAnimationFrame(() => {
-                    selectionRafId = null;
-                    checkScroll();
-                });
-            };
-
-            editor.on('update', deferredUpdate);
-            editor.on('selectionUpdate', deferredSelection);
-
-            return () => {
-                observer.disconnect();
-                if (container) {
-                    container.removeEventListener('scroll', handleScroll);
-                }
-                editor.off('update', deferredUpdate);
-                editor.off('selectionUpdate', deferredSelection);
-                if (updateRafId !== null) cancelAnimationFrame(updateRafId);
-                if (selectionRafId !== null) cancelAnimationFrame(selectionRafId);
-            };
-        }
-
-        return () => {
-            observer.disconnect();
-            if (container) {
-                container.removeEventListener('scroll', handleScroll);
-            }
-        };
-    }, [editor, pageCount]);
-
-    const handleDrawingMouseDown = (e: React.MouseEvent) => {
-        const rect = containerRef.current?.getBoundingClientRect();
-        if (!rect) return;
-        const x = e.clientX - rect.left + (containerRef.current?.scrollLeft || 0);
-        const y = e.clientY - rect.top;
-        setDrawStart({ x, y });
-        setDrawRect({ x, y, w: 0, h: 0 });
-    };
-
-    const handleDrawingMouseMove = (e: React.MouseEvent) => {
-        if (!drawStart || !containerRef.current) return;
-        const rect = containerRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left + (containerRef.current.scrollLeft || 0);
-        const y = e.clientY - rect.top;
-
-        setDrawRect({
-            x: Math.min(x, drawStart.x),
-            y: Math.min(y, drawStart.y),
-            w: Math.abs(x - drawStart.x),
-            h: Math.abs(y - drawStart.y)
-        });
-    };
-
-    const handleDrawingMouseUp = (e: React.MouseEvent) => {
-        if (!drawRect || drawRect.w < 10 || drawRect.h < 10) {
-            setDrawStart(null);
-            setDrawRect(null);
-            setIsDrawingMode(false);
-            return;
-        }
-
-        const finalRect = { ...drawRect };
-        // Get the position in the editor based on mouse coordinates
-        const pos = editor?.view.posAtCoords({ left: e.clientX, top: e.clientY });
-
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = async (ce) => {
-            const file = (ce.target as HTMLInputElement).files?.[0];
-            if (file) {
-                try {
-                    const imageId = await saveImage(file);
-                    // Standardize width to 25/50/75/100 based on drawing
-                    const ratio = finalRect.w / PAGE_WIDTH;
-                    let widthVal: string;
-                    if (ratio < 0.35) widthVal = '25%';
-                    else if (ratio < 0.65) widthVal = '50%';
-                    else if (ratio < 0.85) widthVal = '75%';
-                    else widthVal = '100%';
-
-                    if (editor) {
-                        const chain = editor.chain().focus();
-                        if (pos) chain.setTextSelection(pos.pos);
-                        chain.setBookImage({
-                            imageId,
-                            width: widthVal,
-                            height: `${finalRect.h}px`,
-                            fit: 'cover',
-                            align: 'center'
-                        }).run();
-                    }
-                } catch (err) {
-                    logger.error("Failed to save image", err);
-                }
-            }
-            setIsDrawingMode(false);
-            setDrawStart(null);
-            setDrawRect(null);
-        };
-        input.click();
-    };
-
-
     const [isMounted, setIsMounted] = useState(false);
     useEffect(() => {
-        // Double-tick mount to be absolutely safe with React 18 batching
         const frame = requestAnimationFrame(() => {
             const timer = setTimeout(() => setIsMounted(true), 50);
             return () => clearTimeout(timer);
@@ -275,44 +121,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         return () => cancelAnimationFrame(frame);
     }, []);
 
-    if (!editor || !isMounted) {
-        return (
-            <div className="mx-auto w-[1484px] h-[1000px] flex items-center justify-center bg-[#fbf4e9] rounded-lg shadow-2xl border border-stone-300/50">
-                <div className="flex flex-col items-center gap-4 text-stone-400 font-serif italic">
-                    <div className="w-8 h-8 border-2 border-stone-300 border-t-amber-600 rounded-full animate-spin" />
-                    Lecture du grimoire...
-                </div>
-            </div>
-        );
-    }
-
-    const scrollPrev = () => {
-        if (containerRef.current) {
-            // Precise stride for 2 pages spread
-            const stride = (PAGE_WIDTH + 40) * 2;
-            containerRef.current.scrollBy({ left: -stride, behavior: 'smooth' });
-        }
-    };
-
-    const scrollNext = () => {
-        if (containerRef.current) {
-            const stride = (PAGE_WIDTH + 40) * 2;
-            containerRef.current.scrollBy({ left: stride, behavior: 'smooth' });
-        }
-    };
-
-    const navigateToPage = (pageNumber: number) => {
-        if (containerRef.current) {
-            const stride = PAGE_WIDTH + 40;
-            // pageNumber 1 is TOC, pageNumber 2 is first content page, etc.
-            // We scroll to the spread start.
-            const spreadIndex = Math.floor((pageNumber - 1) / 2);
-            containerRef.current.scrollTo({
-                left: spreadIndex * stride * 2,
-                behavior: 'smooth'
-            });
-        }
-    };
+    if (!editor) return null;
 
     return (
         <div className="w-full animate-in fade-in duration-700 flex flex-col items-center justify-start relative overflow-visible gap-4">
@@ -654,7 +463,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                             )}
                             <button
                                 className="sticky left-[90%] top-4 bg-stone-800 text-white px-3 py-1.5 rounded-lg shadow-lg text-[10px] font-bold uppercase transition-all hover:bg-red-700"
-                                onClick={(e) => { e.stopPropagation(); setIsDrawingMode(false); setDrawStart(null); setDrawRect(null); }}
+                                onClick={(e) => { e.stopPropagation(); cancelDrawing(); }}
                             >
                                 Annuler [ESC]
                             </button>

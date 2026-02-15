@@ -30,6 +30,37 @@
 
 **Score global : 14/15 corrigés, 1 restant (4.1-partiel/4.3)**
 
+### Phase 14 : Nettoyage & Refactoring (Audit v2.49.32) - [RÉSOLU]
+- **Type Safety** : Remplacement de `any` par des types stricts dans `factories.ts` et `ColumnarEditor.tsx`.
+- **Dette Technique** : Suppression de `tiptap-pagination-plus`.
+- **Refactoring** : Extraction de 300+ lignes de `ColumnarEditor.tsx` dans `useColumnarNavigation.ts` et `useColumnarDrawing.ts`.
+- **Hygène** : Suppression des imports et variables inutilisés dans les composants Admin.
+- **Résultat** : Build OK, types stricts, structure plus maintenable.
+
+### Phase 15 : Refactoring AdminTraitLibrary (Audit v2.49.33) - [RÉSOLU]
+- **Refactoring** : Extraction de la logique métier (250+ lignes) de `AdminTraitLibrary.tsx` vers `useAdminTraitLibrary.ts`.
+- **Résultat** : Réduction drastique de la taille du fichier (517 -> 240 lignes), séparation claire des préoccupations (UI vs Logique).
+
+### Phase 16 : Modularisation de useAttributeEditor (Audit v2.49.34) - [RÉSOLU]
+- **Refactoring** : Éclatement d'un hook mastodonte (380+ lignes) en trois hooks spécialisés.
+- **Hooks créés** : `useAttributeStructure.ts` (manipulation structurelle) et `useAttributePresets.ts` (gestion DB des presets).
+- **Résultat** : Code plus lisible, typé et plus facilement testable. Réduction de la dette technique sur le segment "Attributs".
+
+### Phase 17 : Refactoring CampaignService (Audit v2.49.35) - [RÉSOLU]
+- **Refactoring** : Extraction de la logique de réconciliation complexe (synchronisation règles/bibliothèques) vers `campaignReconciler.ts`.
+- **Résultat** : `CampaignService.ts` est désormais plus léger et se concentre sur les appels DB. La logique métier est isolée et testable.
+
+### Phase 18 : Fix Regression ColumnarEditor (Audit v2.49.36) - [RÉSOLU]
+- **Bug Fix** : Ajout d'une garde `if (!editor)` pour éviter les `TypeError` au premier rendu.
+- **Résultat** : Stabilité restaurée sur l'éditeur de livre du grimoire.
+
+### Phase 19 : Refactoring RuleCalculationsService (Audit v2.49.37) - [RÉSOLU]
+- **Refactoring** : Extraction des blocs de calcul d'XP et de Tarot vers `xpCalculator.ts` et `cardCalculator.ts`.
+- **Résultat** : `RuleCalculationsService.ts` réduit à une simple façade (~30 lignes). Logique métier isolée et testable.
+
+---
+*Dernière mise à jour : 15 Février 2026 - v2.49.37*
+
 ### ✅ Issue 4.2 — Typage `any`/`@ts-ignore` (CORRIGÉE)
 - **Typage strict** généralisé sur la fiche joueur et l'administration.
 - Phases A à E complétées. Plus de `@ts-ignore` bloquants ou de `any` injustifiés en production.

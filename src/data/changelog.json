@@ -1,5 +1,63 @@
 [
     {
+        "version": "2.49.37",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Modularisation de RuleCalculationsService.ts",
+            "📏 Code Health : Extraction des calculs d'XP (xpCalculator.ts) et de Tarot (cardCalculator.ts)",
+            "🏗️ Architecture : Simplification du service central vers un pattern Façade"
+        ]
+    },
+    {
+        "version": "2.49.36",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🐛 Fix : Correction d'un plantage dans le ColumnarEditor",
+            "🛡️ Stabilité : Ajout d'une garde contre les accès nuls lors de l'initialisation de l'éditeur Tiptap"
+        ]
+    },
+    {
+        "version": "2.49.35",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Simplification de CampaignService.ts",
+            "📏 Code Health : Extraction de la logique de réconciliation des règles dans campaignReconciler.ts",
+            "🏗️ Architecture : Amélioration de la séparation des préoccupations entre les services de base de données et la logique métier"
+        ]
+    },
+    {
+        "version": "2.49.34",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Éclatement du hook useAttributeEditor en modules spécialisés",
+            "📏 Code Health : Extraction de useAttributeStructure (gestion des catégories) et useAttributePresets (gestion des préréglages)",
+            "🏗️ Architecture : Amélioration de la modularité et réduction de la dette technique sur l'administration des attributs"
+        ]
+    },
+    {
+        "version": "2.49.33",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Extraction de la logique de AdminTraitLibrary dans le hook useAdminTraitLibrary",
+            "📏 Code Health : Réduction de la taille de AdminTraitLibrary.tsx (517 -> 240 lignes)"
+        ]
+    },
+    {
+        "version": "2.49.32",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Extraction de la logique de ColumnarEditor dans des hooks spécialisés (Navigation, Dessin)",
+            "🛡️ Typage : Élimination des types 'any' résiduels dans les factories et le grimoire",
+            "🧹 Ménage : Suppression de la dépendance inutilisée 'tiptap-pagination-plus' et nettoyage des imports Admin"
+        ]
+    },
+    {
         "version": "2.49.31",
         "date": "2026-02-15",
         "type": "fix",
@@ -142,50 +200,5 @@
             "🧹 Code Health : Nettoyage des imports statiques lourds au profit du chargement à la demande"
         ],
         "major": false
-    },
-    {
-        "version": "2.49.16",
-        "date": "2026-02-14",
-        "type": "chore",
-        "content": "🧹 Linting & CI : Résolution de 154 erreurs ESLint bloquantes, configuration pragmatique des règles d'accessibilité (warn) et nettoyage du code mort (@ts-expect-error inutiles).",
-        "major": false
-    },
-    {
-        "version": "2.49.15",
-        "date": "2026-02-14",
-        "type": "fix",
-        "content": "🛡️ Admin accessibility & build fix : Résolution des erreurs d'accessibilité (labels, boutons) et de typage bloquant le déploiement CI.",
-        "major": false
-    },
-    {
-        "version": "2.49.14",
-        "date": "2026-02-14",
-        "type": "refactor",
-        "content": "🏗️ Architecture & Typing Phase E : Finalisation du typage dynamique du layout, extraction du composant `CharacterSheetGrid` et nettoyage des dépendances obsolètes.",
-        "major": false
-    },
-    {
-        "version": "2.49.13",
-        "date": "2026-02-14",
-        "type": "refactor",
-        "content": "🛡️ Typage Phase C : Éradication des `any` restants dans l'admin, refactoring du reconciler de compétences et consolidation des variables CSS.",
-        "major": false
-    },
-    {
-        "version": "2.49.12",
-        "date": "2026-02-14",
-        "type": "chore",
-        "content": "🧹 Nettoyage des logs : Remplacement systématique des console.log/warn/error par le logger applicatif et suppression des logs de debug.",
-        "major": false
-    },
-    {
-        "version": "2.49.11",
-        "date": "2026-02-14",
-        "type": "fix",
-        "changes": [
-            "📊 Admin : Repositionnement de la colonne 'Taille' entre 'Dernière Sync' et 'Actions'",
-            "📂 Admin : Ajout de la colonne 'Taille' dans la vue par campagne (`CampaignCharactersView`)",
-            "🎨 UI : Alignement centré et style mono pour les indicateurs de taille"
-        ]
     }
 ]

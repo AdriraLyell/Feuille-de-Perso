@@ -8,7 +8,7 @@ import { ErrorService } from './ErrorService';
 import { migrateRulesToV2 } from '../utils/migrations';
 import { RulesDataSchema } from '../utils/validation/rulesSchema';
 import { TABLE_GAME_SETTINGS, TABLE_LIBRARIES_TRAITS, TABLE_LIBRARIES_SKILLS, TABLE_LIBRARIES_SPECIALIZATIONS, TABLE_LIBRARIES_BACKGROUNDS, TABLE_LIBRARIES_COUNTERS } from '../constants/db';
-import { SKILL_COLUMNS } from '../constants/app';
+import { reconcileRulesWithLibraries } from '../utils/reconcilers/campaignReconciler';
 
 // Interface de la base de données (table game_settings)
 interface DBGameSetting {
@@ -169,80 +169,8 @@ export const CampaignService = {
             rules.isArchived = settingData.is_archived;
             rules.source = 'database';
 
-            // 3. REBUILD definitions.skills layout from libraries if needed
-            // Only rebuild if the current layout is empty or significantly different
-            const currentLayoutKeys = Object.keys(rules.definitions.skills || {});
-            const hasExistingLayout = currentLayoutKeys.length > 0 && currentLayoutKeys.some(k => rules.definitions.skills?.[k] && (rules.definitions.skills[k] as string[]).length > 0);
-
-            if (!hasExistingLayout && libraries.skills.length > 0) {
-                logger.log("[CampaignService] Rebuilding skill layout from library (empty layout detected)");
-                if (!rules.definitions.skills) rules.definitions.skills = {};
-
-                libraries.skills.forEach(s => {
-                    if (s.isActive !== false) {
-                        const cat = s.defaultCategory || SKILL_COLUMNS.COL_2;
-                        if (!rules.definitions.skills[cat]) rules.definitions.skills[cat] = [];
-                        if (!rules.definitions.skills[cat].includes(s.name)) {
-                            rules.definitions.skills[cat].push(s.name);
-                        }
-                    }
-                });
-            }
-
-            // Ensure categories from libraries exist in skillCategories if migrateRules didn't find them
-            // Backgrounds
-            const bgCatDef = rules.definitions.skillCategories?.find((c) => c.behavior === 'Arrière-plan');
-            const bgCat = bgCatDef?.id || SKILL_COLUMNS.COL_8;
-
-            if (!rules.definitions.skills[bgCat]) rules.definitions.skills[bgCat] = [];
-            libraries.backgrounds.forEach(b => {
-                if (b.isActive !== false && !rules.definitions.skills[bgCat].includes(b.name)) {
-                    rules.definitions.skills[bgCat].push(b.name);
-                }
-            });
-
-            // Counters
-            const counterCatDef = rules.definitions.skillCategories?.find((c) => c.behavior === 'Compteur');
-            const counterCat = counterCatDef?.id || SKILL_COLUMNS.COL_9;
-            if (!rules.definitions.skills[counterCat]) rules.definitions.skills[counterCat] = [];
-            libraries.counters.forEach(c => {
-                if (c.isActive !== false && !rules.definitions.skills[counterCat].includes(c.name)) {
-                    rules.definitions.skills[counterCat].push(c.name);
-                }
-            });
-
-            // Sync definitions.counters map (for specific counter definitions like max/xpCost)
-            if (libraries.counters && libraries.counters.length > 0) {
-                const activeCounters = libraries.counters.filter(c => c.isActive !== false);
-
-                if (!rules.definitions.counters) {
-                    rules.definitions.counters = {};
-                }
-
-                activeCounters.forEach(libCounter => {
-                    // Determine stable key: ID preferred for global, slug for local
-                    const key = libCounter.id || libCounter.name
-                        .normalize('NFD')
-                        .replace(/[\u0300-\u036f]/g, '')
-                        .toLowerCase()
-                        .replace(/[^a-z0-9]/g, '_')
-                        .replace(/_+/g, '_')
-                        .replace(/^_|_$/g, '');
-
-                    // Always synchronize definition with library data to prevent stale values (from legacy JSON)
-                    rules.definitions.counters[key] = {
-                        id: libCounter.id,
-                        name: libCounter.name,
-                        description: libCounter.description || rules.definitions.counters[key]?.description || '',
-                        max: libCounter.maxValue ?? rules.definitions.counters[key]?.max ?? 10,
-                        value: libCounter.defaultValue ?? rules.definitions.counters[key]?.value,
-                        defaultValue: libCounter.defaultValue ?? rules.definitions.counters[key]?.defaultValue,
-                        xpCost: libCounter.xpCost ?? rules.definitions.counters[key]?.xpCost ?? 0
-                    };
-                });
-            }
-
-            return rules;
+            // 3. Reconcile with libraries
+            return reconcileRulesWithLibraries(rules, libraries);
         } catch (e) {
             ErrorService.handleError(e, { context: 'CampaignService.loadSetting', userMessage: "Erreur critique lors du chargement de la campagne." });
             return null;

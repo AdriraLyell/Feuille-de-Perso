@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibrarySkillEntry } from '../../../types';
-import { Search, Plus, GraduationCap, Save, AlertOctagon, HelpCircle, X, Layers, Edit2, Trash2, UploadCloud, CheckCircle2, Circle, Lock, Globe, Filter } from 'lucide-react';
+import { Search, Plus, GraduationCap, Save, AlertOctagon, X, Layers, Edit2, Trash2, UploadCloud, CheckCircle2, Circle, Lock, Globe, Filter } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import TriStateChip from '../../../components/ui/TriStateChip';
 import { useAdminSkillLibrary } from '../../../hooks/admin/useAdminSkillLibrary';

@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryBackgroundEntry } from '../../../types/system'; // Ensure this type is exported from where it was defined (src/types/system.ts)
-import { Search, Plus, Users, Save, AlertOctagon, Edit2, Trash2, Layers, CheckCircle2, Circle, Lock, Globe, Filter, X } from 'lucide-react';
+import { Search, Plus, Users, Save, AlertOctagon, Edit2, Trash2, Layers, CheckCircle2, Circle, Lock, Globe, Filter } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import TriStateChip from '../../../components/ui/TriStateChip';
 import { smartIncludes } from '../../../utils/stringUtils';

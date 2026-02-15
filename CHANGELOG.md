@@ -1,5 +1,41 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.30.1] - 2026-02-09
+
+- [object Object]
+
+## [2.30.0] - 2026-02-09
+
+- [object Object]
+- [object Object]
+- [object Object]
+- [object Object]
+
+## [2.29.3] - 2026-02-09
+
+- [object Object]
+- [object Object]
+- [object Object]
+
+## [2.34.3] - 2026-02-10
+
+- Restauration du champ Variantes dans la réserve de l'Administration.
+- Correction du bug de suppression/espaces ('sticky text') dans les saisies de variantes (Admin & Librairies).
+- Support de l'édition des descriptions et icônes de catégories dans l'Admin pour éviter la perte de données.
+- Mappage complet des métadonnées (bulles d'info) pour les Arrière-plans et Compteurs.
+
+## [2.34.2] - 2026-02-10
+
+- Correction des bulles d'info (descriptions) sur les pavés de compétences de la fiche perso.
+- Amélioration de la saisie des variantes dans l'administration (gestion fluide des virgules et espaces).
+- Restauration des icônes de catégorie sur la fiche perso.
+
+## [2.34.1] - 2026-02-10
+
+- [object Object]
+- [object Object]
+- [object Object]
+
 ## [2.34.0] - 2026-02-10
 
 - [object Object]

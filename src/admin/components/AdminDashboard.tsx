@@ -2,7 +2,7 @@
 import React from 'react';
 import { CampaignService } from '../../services/CampaignService';
 import { RulesData } from '../../types/rules';
-import { Loader2, Scroll } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import DuplicateSettingModal from './DuplicateSettingModal';
 import { MotionFade } from '../../components/ui/motion/MotionFade';

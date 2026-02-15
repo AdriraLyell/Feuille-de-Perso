@@ -1,5 +1,50 @@
 [
     {
+        "version": "2.49.16",
+        "date": "2026-02-14",
+        "type": "chore",
+        "content": "🧹 Linting & CI : Résolution de 154 erreurs ESLint bloquantes, configuration pragmatique des règles d'accessibilité (warn) et nettoyage du code mort (@ts-expect-error inutiles).",
+        "major": false
+    },
+    {
+        "version": "2.49.15",
+        "date": "2026-02-14",
+        "type": "fix",
+        "content": "🛡️ Admin accessibility & build fix : Résolution des erreurs d'accessibilité (labels, boutons) et de typage bloquant le déploiement CI.",
+        "major": false
+    },
+    {
+        "version": "2.49.14",
+        "date": "2026-02-14",
+        "type": "refactor",
+        "content": "🏗️ Architecture & Typing Phase E : Finalisation du typage dynamique du layout, extraction du composant `CharacterSheetGrid` et nettoyage des dépendances obsolètes.",
+        "major": false
+    },
+    {
+        "version": "2.49.13",
+        "date": "2026-02-14",
+        "type": "refactor",
+        "content": "🛡️ Typage Phase C : Éradication des `any` restants dans l'admin, refactoring du reconciler de compétences et consolidation des variables CSS.",
+        "major": false
+    },
+    {
+        "version": "2.49.12",
+        "date": "2026-02-14",
+        "type": "chore",
+        "content": "🧹 Nettoyage des logs : Remplacement systématique des console.log/warn/error par le logger applicatif et suppression des logs de debug.",
+        "major": false
+    },
+    {
+        "version": "2.49.11",
+        "date": "2026-02-14",
+        "type": "fix",
+        "changes": [
+            "📊 Admin : Repositionnement de la colonne 'Taille' entre 'Dernière Sync' et 'Actions'",
+            "📂 Admin : Ajout de la colonne 'Taille' dans la vue par campagne (`CampaignCharactersView`)",
+            "🎨 UI : Alignement centré et style mono pour les indicateurs de taille"
+        ]
+    },
+    {
         "version": "2.49.10",
         "date": "2026-02-14",
         "type": "feat",
@@ -1146,108 +1191,6 @@
                 "type": "removed",
                 "text": "Nettoyage des items dupliqués entre les bibliothèques de compétences, compteurs et historiques.",
                 "category": "cleanup"
-            }
-        ]
-    },
-    {
-        "version": "2.30.1",
-        "date": "2026-02-09",
-        "description": "Correctif de la Réserve (Admin).",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "La réserve de l'admin ne montre désormais que les compétences/historiques/compteurs explicitement sélectionnés pour la campagne.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.0",
-        "date": "2026-02-09",
-        "description": "Architecture 'Global Repository' & Gestion localisée des catégories.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Migration vers le modèle 'Global Repository' : tous les items de bibliothèque sont désormais partagés.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Gestion des catégories par défaut déplacée dans le contexte local de la campagne (Réserve).",
-                "category": "ui"
-            },
-            {
-                "type": "changed",
-                "text": "Refonte des services LibraryLoader et LibraryPersistence pour garantir l'intégrité des items globaux.",
-                "category": "core"
-            },
-            {
-                "type": "fixed",
-                "text": "Suppression des risques de perte de données lors de la synchronisation des bibliothèques.",
-                "category": "fix"
-            }
-        ]
-    },
-    {
-        "version": "2.29.3",
-        "date": "2026-02-09",
-        "description": "Audit & Online First : Supabase Integration",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Support du chargement direct des campagnes Supabase via URL (?s=id) dans l'app Joueur.",
-                "category": "core"
-            },
-            {
-                "type": "fixed",
-                "text": "Nettoyage complet du Type Safety (zéro @ts-ignore) dans les services de données.",
-                "category": "core"
-            },
-            {
-                "type": "changed",
-                "text": "Refactoring de RulesReconciler pour une meilleure modularité et tests automatisés.",
-                "category": "core"
-            }
-        ]
-    },
-    {
-        "version": "2.34.3",
-        "date": "2026-02-10",
-        "changes": [
-            "Restauration du champ Variantes dans la réserve de l'Administration.",
-            "Correction du bug de suppression/espaces ('sticky text') dans les saisies de variantes (Admin & Librairies).",
-            "Support de l'édition des descriptions et icônes de catégories dans l'Admin pour éviter la perte de données.",
-            "Mappage complet des métadonnées (bulles d'info) pour les Arrière-plans et Compteurs."
-        ]
-    },
-    {
-        "version": "2.34.2",
-        "date": "2026-02-10",
-        "changes": [
-            "Correction des bulles d'info (descriptions) sur les pavés de compétences de la fiche perso.",
-            "Amélioration de la saisie des variantes dans l'administration (gestion fluide des virgules et espaces).",
-            "Restauration des icônes de catégorie sur la fiche perso."
-        ]
-    },
-    {
-        "version": "2.34.1",
-        "date": "2026-02-10",
-        "description": "Correctifs : Gestion des Variantes et Spacers.",
-        "changes": [
-            {
-                "type": "fix",
-                "text": "Correction du bug des 'spacers' (lignes vides) dans les compétences.",
-                "category": "system"
-            },
-            {
-                "type": "fix",
-                "text": "Correction de la saisie des variantes (virgules) dans l'admin.",
-                "category": "admin"
-            },
-            {
-                "type": "ui",
-                "text": "Ajout d'une icône pour identifier les traits à variantes.",
-                "category": "ui"
             }
         ]
     }

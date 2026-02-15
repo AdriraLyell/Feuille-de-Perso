@@ -6,8 +6,6 @@ import AdminCreationEditor from './components/AdminCreationEditor';
 import AdminAttributesEditor from './components/AdminAttributesEditor';
 import AdminSkillsEditor from './components/AdminSkillsEditor';
 import AdminCostsEditor from './components/AdminCostsEditor';
-import AdminCountersEditor from './components/AdminCountersEditor';
-import AdminBackgroundsEditor from './components/AdminBackgroundsEditor';
 import ImportResultModal from './components/ImportResultModal';
 import ChangelogModal from '../components/ChangelogModal';
 import DeploymentMonitor from './components/DeploymentMonitor';
@@ -17,7 +15,6 @@ import AdminSkillLibrary from './components/libraries/AdminSkillLibrary';
 import AdminSpecializationLibrary from './components/libraries/AdminSpecializationLibrary';
 import AdminBackgroundLibrary from './components/libraries/AdminBackgroundLibrary';
 import AdminCounterLibrary from './components/libraries/AdminCounterLibrary';
-import DeployToGithubModal from './components/DeployModal';
 import AdminDashboard from './components/AdminDashboard';
 import CampaignCharactersView from './components/CampaignCharactersView';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
@@ -53,7 +50,6 @@ const AdminApp: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'costs' | 'libraries' | 'players'>('general');
     const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters'>('traits');
 
-    const [showDeployModal, setShowDeployModal] = useState(false);
     const [showImportResult, setShowImportResult] = useState(false);
     const [importReport, setImportReport] = useState<{ success: string[], warnings: string[] } | null>(null);
     const [showChangelog, setShowChangelog] = useState(false);
@@ -168,7 +164,7 @@ const AdminApp: React.FC = () => {
                 onSave={handleSaveToCloud}
                 onImport={() => fileInputRef.current?.click()}
                 onExport={handleExport}
-                onPublish={() => setShowDeployModal(true)}
+                onPublish={() => { }} // TODO: Connect to publish logic if needed, or remove param if unused in AdminHeader
                 onLogout={logout}
                 onShowChangelog={() => setShowChangelog(true)}
                 onCheckSchema={() => currentSettingId && CampaignService.checkSchema?.(currentSettingId)}
