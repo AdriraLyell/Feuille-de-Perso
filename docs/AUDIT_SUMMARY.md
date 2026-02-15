@@ -59,7 +59,13 @@
 - **Résultat** : `RuleCalculationsService.ts` réduit à une simple façade (~30 lignes). Logique métier isolée et testable.
 
 ---
-*Dernière mise à jour : 15 Février 2026 - v2.49.37*
+*Dernière mise à jour : 15 Février 2026 - v2.49.40*
+
+### ✅ Phase 20 : Correction des Tooltips Portals (Audit v2.49.40) - [RÉSOLU]
+- **Correction UI** : Résolution du tronquage des tooltips provoqué par `overflow: hidden` et `overflow-y: auto`.
+- **Composant** : Création de `PortalTooltip.tsx` utilisant `ReactDOM.createPortal`.
+- **Migration** : Mise à jour de `TraitCard.tsx`, `AdminSkillLibrary.tsx` et `AdminBackgroundLibrary.tsx` pour utiliser le système de portail.
+- **Résultat** : Tooltips toujours visibles, positionnés intelligemment (flip top/bottom) et centrés horizontalement.
 
 ### ✅ Issue 4.2 — Typage `any`/`@ts-ignore` (CORRIGÉE)
 - **Typage strict** généralisé sur la fiche joueur et l'administration.
