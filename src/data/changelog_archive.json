@@ -1,5 +1,12 @@
 [
     {
+        "version": "2.49.21",
+        "date": "2026-02-14",
+        "type": "chore",
+        "content": "⚡ Turbo CI : Fusion des jobs pour éviter les installations redondantes, ajout du cache pour les navigateurs Playwright (gain de ~3-5 min) et exécution des tests E2E sur le build de production.",
+        "major": false
+    },
+    {
         "version": "2.49.20",
         "date": "2026-02-14",
         "type": "chore",
@@ -1129,33 +1136,6 @@
                 "type": "fixed",
                 "text": "Correction de types TypeScript sur les icônes Lucide pour assurer l'intégrité du build.",
                 "category": "fix"
-            }
-        ]
-    },
-    {
-        "version": "2.31.0",
-        "date": "2026-02-09",
-        "description": "Sécurisation de l'intégrité des données : Verrouillage des items.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Indicateurs visuels (cadenas) pour les items de bibliothèque en cours d'utilisation.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Blocage de la suppression des items 'placés' dans la configuration ou actifs dans d'autres campagnes.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Suivi global de l'utilisation des items à travers toutes les campagnes via Supabase.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Mise à jour de toutes les bibliothèques (Compétences, Historiques, Compteurs, Traits, Spécialisations).",
-                "category": "ui"
             }
         ]
     }

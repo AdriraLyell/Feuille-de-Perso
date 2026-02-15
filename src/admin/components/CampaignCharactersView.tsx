@@ -104,7 +104,7 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
                     </div>
                 </MotionFade>
             ) : (
-                <div className="overflow-hidden rounded-sm border border-stone-800 bg-stone-900/40">
+                <div className="overflow-y-auto rounded-sm border border-stone-800 bg-stone-900/40 max-h-[600px] custom-scrollbar">
                     <table className="w-full">
                         <thead className="bg-stone-950/50">
                             <tr>

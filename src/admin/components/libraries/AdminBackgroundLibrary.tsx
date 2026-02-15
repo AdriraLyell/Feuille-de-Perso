@@ -213,7 +213,7 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-180px)] flex flex-col">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-120px)] flex flex-col">
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">

@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.42",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "📏 Admin : Augmentation de la hauteur verticale des vues de listes (Bibliothèques & Personnages)",
+            "🖥️ UX : Utilisation optimisée de l'espace vertical pour une meilleure visibilité des données",
+            "📜 Sync : Ajout d'une barre de défilement sur la liste des personnages de campagne"
+        ]
+    },
+    {
         "version": "2.49.41",
         "date": "2026-02-15",
         "type": "feat",
@@ -193,13 +203,6 @@
         "date": "2026-02-14",
         "type": "fix",
         "content": "🛡️ E2E Stability : Résolution des erreurs de connexion (ports) et gestion de l'écran de sélection des règles dans le CI. Migration des tests vers le nouveau Grimoire Numérique (TiPTap).",
-        "major": false
-    },
-    {
-        "version": "2.49.21",
-        "date": "2026-02-14",
-        "type": "chore",
-        "content": "⚡ Turbo CI : Fusion des jobs pour éviter les installations redondantes, ajout du cache pour les navigateurs Playwright (gain de ~3-5 min) et exécution des tests E2E sur le build de production.",
         "major": false
     }
 ]
