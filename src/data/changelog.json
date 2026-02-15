@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.49.49",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🐛 Fix : Correction d'une erreur de référence sur ThematicModal dans la Master List des joueurs",
+            "🛡️ Stabilité : Vérification des imports manquants suite à la mise à jour des signaux MJ"
+        ]
+    },
+    {
         "version": "2.49.48",
         "date": "2026-02-15",
         "type": "feat",
@@ -189,16 +198,6 @@
             "📱 Responsive : Activation du défilement horizontal sur les petits écrans (suppression de 'no-scrollbar')",
             "📐 Layout : Ajustement des contraintes de largeur minimale pour éviter le troncage du grimoire",
             "📔 Chapitres : Finalisation du renommage de la sidebar et de l'alignement des info-bulles"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.29",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🏛️ UI : Renommage de la sidebar 'Structure' en 'Chapitres' pour plus de clarté",
-            "🐛 Fix : Correction du troncage des info-bulles (tooltips) dans la barre latérale en les déplaçant vers la gauche"
         ],
         "major": false
     }

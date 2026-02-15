@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.29",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🏛️ UI : Renommage de la sidebar 'Structure' en 'Chapitres' pour plus de clarté",
+            "🐛 Fix : Correction du troncage des info-bulles (tooltips) dans la barre latérale en les déplaçant vers la gauche"
+        ],
+        "major": false
+    },
+    {
         "version": "2.49.28",
         "date": "2026-02-15",
         "type": "feat",
@@ -1054,33 +1064,6 @@
                 "type": "added",
                 "text": "Avertissement et explications pédagogiques avant d'activer le mode édition.",
                 "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.32.6",
-        "date": "2026-02-10",
-        "description": "Améliorations UX du Mode Édition Directe.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Repositionnement des boutons d'actions (Édition sous Création) pour une meilleure visibilité.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Indicateurs visuels de placement lors du Drag & Drop (ligne d'insertion).",
-                "category": "ui"
-            },
-            {
-                "type": "modified",
-                "text": "Amélioration de la logique de réorganisation : insertion précise à l'index visé.",
-                "category": "feature"
-            },
-            {
-                "type": "added",
-                "text": "Possibilité de déplacer les espaceurs déjà présents sur la fiche.",
-                "category": "feature"
             }
         ]
     }

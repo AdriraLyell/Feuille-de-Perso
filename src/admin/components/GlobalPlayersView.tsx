@@ -13,6 +13,7 @@ import { GameSettingSummary, CampaignService } from '../../services/CampaignServ
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 import { MotionCard } from '../../components/ui/motion/MotionCard';
+import ThematicModal from '../../components/ui/ThematicModal';
 
 import { ErrorService } from '../../services/ErrorService';
 
