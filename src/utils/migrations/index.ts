@@ -206,6 +206,10 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
         if (!rules.libraries.specializations) rules.libraries.specializations = [];
         if (!rules.libraries.backgrounds) rules.libraries.backgrounds = [];
         if (!rules.libraries.counters) rules.libraries.counters = [];
+        if (!rules.libraries.mysticAbilities || rules.libraries.mysticAbilities.length === 0) {
+            const defaults = (INITIAL_DATA as any).mysticAbilities || [];
+            rules.libraries.mysticAbilities = defaults.map((d: any) => ({ ...d }));
+        }
     }
 
     // Populate libraries.backgrounds from definitions.backgrounds if empty
