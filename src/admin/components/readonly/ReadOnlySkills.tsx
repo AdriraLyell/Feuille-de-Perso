@@ -19,11 +19,11 @@ export const ReadOnlySkills: React.FC<ReadOnlySkillsProps> = ({
     const activeSkillCategories = Object.entries(skills)
         .filter(([category, categorySkills]) => {
             const active = categorySkills.filter(s => s.name && s.value > 0);
+            const catId = category.toUpperCase();
             return active.length > 0 &&
-                !category.toLowerCase().includes('background') &&
-                !category.toLowerCase().includes('arrière-plan') &&
-                category !== 'Col_Comp_8' &&
-                category !== 'Col_Comp_9';
+                !catId.includes('BACKGROUND') &&
+                !catId.includes('ARRIÈRE-PLAN') &&
+                catId !== 'COL_COMP_9';
         })
         .sort(([a], [b]) => a.localeCompare(b));
 

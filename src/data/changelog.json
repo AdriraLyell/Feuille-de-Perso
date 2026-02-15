@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.44",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🎨 Admin : Application du thème 'Mystic' à la Master List des Voyageurs",
+            "🖋️ UI : Refonte visuelle des registres globaux (couleurs ambre/pierre et typographie serif)",
+            "📜 Fiche : Restauration des colonnes de compétences manquantes (Col_Comp_4 et Col_Comp_8)",
+            "🛡️ Fix : Robustesse accrue sur les filtres de catégories de compétences (insensibilité à la casse)"
+        ]
+    },
+    {
         "version": "2.49.43",
         "date": "2026-02-15",
         "type": "feat",
@@ -200,13 +211,6 @@
             "📏 Grimoire : Ligne de séparation décorative (Horizontal Rule) avec icône ◈",
             "🛠️ UI : Barre d'outils réorganisée en groupes logiques et icônes affinées"
         ],
-        "major": false
-    },
-    {
-        "version": "2.49.23",
-        "date": "2026-02-14",
-        "type": "fix",
-        "content": "🛡️ E2E Pagination : Augmentation de la charge de texte (100 lignes) pour garantir le déclenchement des seuils de pagination dans les tests automatisés.",
         "major": false
     }
 ]

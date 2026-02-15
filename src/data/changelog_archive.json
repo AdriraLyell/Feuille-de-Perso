@@ -1,5 +1,12 @@
 [
     {
+        "version": "2.49.23",
+        "date": "2026-02-14",
+        "type": "fix",
+        "content": "🛡️ E2E Pagination : Augmentation de la charge de texte (100 lignes) pour garantir le déclenchement des seuils de pagination dans les tests automatisés.",
+        "major": false
+    },
+    {
         "version": "2.49.22",
         "date": "2026-02-14",
         "type": "fix",
@@ -1103,18 +1110,6 @@
             {
                 "type": "modified",
                 "text": "Retour au nom sur une seule ligne avec icônes de statut déplacées sur la ligne de description (Skills/Backgrounds).",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.1",
-        "date": "2026-02-10",
-        "description": "Amélioration layout : Noms multi-lignes.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Support des noms sur deux lignes pour les cartes Compétences et Arrières-plans dans l'admin.",
                 "category": "ui"
             }
         ]

@@ -15,11 +15,12 @@ export const ReadOnlyBackgrounds: React.FC<ReadOnlyBackgroundsProps> = ({
     imposedSpecializations = {}
 }) => {
     const backgrounds = Object.entries(skills)
-        .filter(([category]) =>
-            category.toLowerCase().includes('background') ||
-            category.toLowerCase().includes('arrière-plan') ||
-            category === 'Col_Comp_8'
-        )
+        .filter(([category]) => {
+            const catId = category.toUpperCase();
+            return catId.includes('BACKGROUND') ||
+                catId.includes('ARRIÈRE-PLAN') ||
+                catId === 'COL_COMP_8';
+        })
         .flatMap(([_, categorySkills]) => categorySkills.filter(s => s.name && s.value > 0))
         .sort((a, b) => a.name.localeCompare(b.name));
 
