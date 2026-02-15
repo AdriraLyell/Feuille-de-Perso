@@ -30,7 +30,7 @@ export interface RulesXPCosts {
     attributeFactor: number;
     skillFactor: number;
     specializationFactor: number;
-    traitCost: number;
+    traitCost?: number;
 }
 
 export interface RulesCardConfig {

@@ -17,7 +17,7 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
         attributeFactor: rules.configurations.xpCosts.attributeFactor,
         skillFactor: rules.configurations.xpCosts.skillFactor,
         specializationFactor: rules.configurations.xpCosts.specializationFactor,
-        traitCost: rules.configurations.xpCosts.traitCost
+        traitCost: rules.configurations.xpCosts.traitCost ?? 5
     };
 
     // 2. Apply Creation Config
