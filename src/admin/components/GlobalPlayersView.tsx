@@ -6,14 +6,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Users, Search, Eye, Trash2, Calendar, Shield, AlertCircle, Loader2, User, Clock, RefreshCw } from 'lucide-react';
+import { Users, Search, Eye, Trash2, Calendar, Shield, AlertCircle, Loader2, User, Clock } from 'lucide-react';
 import { CharacterSyncService, SyncedCharacterSummary, SyncedCharacter } from '../../services/CharacterSyncService';
 import CharacterReadOnlyView from './CharacterReadOnlyView';
 import { GameSettingSummary, CampaignService } from '../../services/CampaignService';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 import { MotionCard } from '../../components/ui/motion/MotionCard';
-import ThematicModal from '../../components/ui/ThematicModal';
 
 import { ErrorService } from '../../services/ErrorService';
 
@@ -25,9 +24,6 @@ const GlobalPlayersView: React.FC = () => {
     const [selectedCharacter, setSelectedCharacter] = useState<SyncedCharacter | null>(null);
     const [filterOrphans, setFilterOrphans] = useState(false);
     const [characterToDelete, setCharacterToDelete] = useState<string | null>(null);
-    const [characterToUpdate, setCharacterToUpdate] = useState<SyncedCharacterSummary | null>(null);
-    const [updateMessage, setUpdateMessage] = useState('');
-    const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
         loadData();
@@ -97,36 +93,6 @@ const GlobalPlayersView: React.FC = () => {
             });
         } finally {
             setCharacterToDelete(null);
-        }
-    };
-
-    const handleSignalUpdate = (char: SyncedCharacterSummary) => {
-        setCharacterToUpdate(char);
-        setUpdateMessage('');
-    };
-
-    const confirmSignalUpdate = async () => {
-        if (!characterToUpdate) return;
-        setIsUpdating(true);
-        try {
-            const success = await CharacterSyncService.requestForceUpdate(characterToUpdate.id, updateMessage);
-            if (success) {
-                // Update local list timestamp to reflect the push
-                setCharacters(prev => prev.map(c =>
-                    c.id === characterToUpdate.id
-                        ? { ...c, last_synced: new Date().toISOString() }
-                        : c
-                ));
-            }
-        } catch (error) {
-            ErrorService.handleError(error, {
-                context: 'GlobalPlayersView.confirmSignalUpdate',
-                userMessage: "Échec de l'envoi du signal."
-            });
-        } finally {
-            setIsUpdating(false);
-            setCharacterToUpdate(null);
-            setUpdateMessage('');
         }
     };
 
@@ -275,13 +241,6 @@ const GlobalPlayersView: React.FC = () => {
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2">
                                             <button
-                                                onClick={() => handleSignalUpdate(char)}
-                                                className="p-1.5 text-stone-800 hover:text-amber-500 hover:bg-amber-950/20 rounded-sm transition-all"
-                                                title="Signaler une mise à jour MJ"
-                                            >
-                                                <RefreshCw size={16} />
-                                            </button>
-                                            <button
                                                 onClick={() => handleViewDetails(char.id)}
                                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-950/20 hover:bg-amber-800 text-amber-600/80 hover:text-stone-900 rounded-sm font-black text-[10px] transition-all border border-amber-900/20 hover:border-amber-600 shadow-sm active:scale-95 uppercase tracking-widest"
                                             >
@@ -322,49 +281,6 @@ const GlobalPlayersView: React.FC = () => {
                 type="danger"
                 scheme="mystic"
             />
-
-            <ThematicModal
-                isOpen={!!characterToUpdate}
-                onClose={() => setCharacterToUpdate(null)}
-                title="Pousser une Mise à Jour MJ"
-                scheme="mystic"
-                icon={<RefreshCw size={24} />}
-                footer={
-                    <div className="flex gap-3 w-full justify-end">
-                        <button
-                            onClick={() => setCharacterToUpdate(null)}
-                            className="px-4 py-2 text-stone-500 hover:text-stone-300 hover:bg-stone-800 rounded-sm font-bold transition-all uppercase text-xs tracking-wider"
-                        >
-                            Abjurer
-                        </button>
-                        <button
-                            onClick={confirmSignalUpdate}
-                            disabled={isUpdating}
-                            className="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-stone-950 rounded-sm font-bold transition-all shadow-lg active:scale-95 uppercase tracking-wider text-xs disabled:opacity-50"
-                        >
-                            {isUpdating ? "Incantation..." : "Envoyer le Signal"}
-                        </button>
-                    </div>
-                }
-            >
-                <div className="space-y-4">
-                    <p className="text-stone-400 text-xs italic leading-relaxed">
-                        Le lien avec <strong>{characterToUpdate?.character_name}</strong> sera marqué comme "mis à jour" par le Gardien des Archives. Le joueur recevra ce message lors de sa prochaine connexion.
-                    </p>
-
-                    <div>
-                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-amber-900/80 mb-2">
-                            Message du Gardien (Optionnel)
-                        </label>
-                        <textarea
-                            value={updateMessage}
-                            onChange={(e) => setUpdateMessage(e.target.value)}
-                            placeholder="Ex: J'ai ajouté tes récompenses de quête..."
-                            className="w-full h-32 bg-stone-900/50 border border-stone-800 rounded-sm p-3 text-sm text-stone-200 focus:border-amber-900/50 outline-none resize-none transition-all placeholder:text-stone-700"
-                        />
-                    </div>
-                </div>
-            </ThematicModal>
         </MotionCard>
     );
 };

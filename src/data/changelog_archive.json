@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.30",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "📱 Responsive : Activation du défilement horizontal sur les petits écrans (suppression de 'no-scrollbar')",
+            "📐 Layout : Ajustement des contraintes de largeur minimale pour éviter le troncage du grimoire",
+            "📔 Chapitres : Finalisation du renommage de la sidebar et de l'alignement des info-bulles"
+        ],
+        "major": false
+    },
+    {
         "version": "2.49.29",
         "date": "2026-02-15",
         "type": "fix",
@@ -1047,23 +1058,6 @@
                 "type": "modified",
                 "text": "Nettoyage UI : Suppression du bouton de validation redondant dans le Header pour centraliser sur le bandeau.",
                 "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.7",
-        "date": "2026-02-10",
-        "description": "Sécurité et clarté du Mode Édition.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Nouveau bandeau d'état 'Mode Édition' avec bouton de validation rapide.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Avertissement et explications pédagogiques avant d'activer le mode édition.",
-                "category": "ux"
             }
         ]
     }

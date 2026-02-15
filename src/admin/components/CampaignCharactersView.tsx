@@ -178,6 +178,7 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
                     character={selectedCharacter}
                     onClose={() => setSelectedCharacter(null)}
                     onRefreshRules={onRefreshRules}
+                    allowForceUpdate={true}
                 />
             )}
         </MotionCard>
