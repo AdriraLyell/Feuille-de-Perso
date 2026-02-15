@@ -1,4 +1,5 @@
-import { Node, mergeAttributes, nodeInputRule } from '@tiptap/core';
+import { Node, mergeAttributes } from '@tiptap/core';
+import type { RawCommands } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import BookImageView from '../components/campaign/book/BookImageView';
 
@@ -85,11 +86,8 @@ export const BookImage = Node.create({
                             attrs: attributes,
                         });
                     },
-        };
+        } as RawCommands;
     },
-
-    // Optional: Input rule to convert markdown image syntax if needed
-    // addInputRules() { ... }
 
     addNodeView() {
         return ReactNodeViewRenderer(BookImageView as any);

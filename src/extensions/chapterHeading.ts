@@ -1,7 +1,17 @@
 import { Node, mergeAttributes } from '@tiptap/core';
+import type { CommandProps, RawCommands } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { TextSelection } from 'prosemirror-state';
 import ChapterHeaderView from '../components/campaign/book/ChapterHeaderView';
+
+declare module '@tiptap/core' {
+    interface Commands<ReturnType> {
+        chapterHeading: {
+            setChapter: () => ReturnType;
+            appendChapter: () => ReturnType;
+        };
+    }
+}
 
 export const ChapterHeading = Node.create({
     name: 'chapterHeading',
@@ -39,22 +49,53 @@ export const ChapterHeading = Node.create({
         return {
             setChapter:
                 () =>
-                    ({ chain }: any) => {
+                    ({ chain, state }: CommandProps) => {
+                        const { selection } = state;
+                        const { empty } = selection;
+
+                        if (empty) {
+                            // If cursor is in the middle of a paragraph, split it first!
+                            return chain()
+                                .splitBlock()
+                                .insertContent({
+                                    type: this.name,
+                                    attrs: { date: new Date().toISOString().split('T')[0] },
+                                    content: [{ type: 'text', text: 'Nouveau Chapitre' }],
+                                })
+                                .focus()
+                                .run();
+                        }
+
+                        // If text is selected, convert it to a chapter
                         return chain()
                             .insertContent({
                                 type: this.name,
                                 attrs: { date: new Date().toISOString().split('T')[0] },
-                                content: [{ type: 'text', text: 'Nouveau Chapitre' }],
-                            })
-                            .command(({ tr, dispatch }: any) => {
-                                // Logic removed here: the React component handles selection on mount
-                                // for better stability with NodeViews.
-                                return true;
                             })
                             .focus()
                             .run();
                     },
-        } as any;
+
+            appendChapter:
+                () =>
+                    ({ chain, state }: CommandProps) => {
+                        const endPos = state.doc.content.size;
+                        return chain()
+                            .focus() // Focus first to ensure editor is active
+                            .insertContentAt(endPos, [
+                                {
+                                    type: this.name,
+                                    attrs: { date: new Date().toISOString().split('T')[0] },
+                                    content: [{ type: 'text', text: 'Nouveau Chapitre' }],
+                                },
+                                {
+                                    type: 'paragraph',
+                                }
+                            ])
+                            .focus(endPos + 1) // Hard focus on the new node
+                            .run();
+                    },
+        } as RawCommands;
     },
 
     addNodeView() {

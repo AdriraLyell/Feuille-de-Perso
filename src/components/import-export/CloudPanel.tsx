@@ -93,7 +93,7 @@ const CloudPanel: React.FC<CloudPanelProps> = ({ data, onLoadSuccess, onClose })
             }
 
             // Step 1: Restore images from cloud format to local IndexedDB
-            fullCharacter.data = await ImageSyncResolver.injectImagesAfterSync(fullCharacter.data);
+            fullCharacter.data = await ImageSyncResolver.injectImagesAfterSync(fullCharacter.data) as CharacterSheetData;
 
             // Detect Conflicts if local data exists
             if (data.header?.name && data.header.name.trim() !== '' && !isResolvingConflicts) {

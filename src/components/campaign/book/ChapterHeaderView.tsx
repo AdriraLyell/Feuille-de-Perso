@@ -19,15 +19,15 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
             node.content.firstChild?.text === 'Nouveau Chapitre';
 
         if (isDefault && typeof getPos === 'function') {
-            // We use the editor instance provided by Tiptap to set a native 
-            // TextSelection. This is much more robust than DOM selection.
-            const timer = setTimeout(() => {
+            const selectText = () => {
+                if (editor.isDestroyed) return;
+
                 try {
                     const pos = (getPos as () => number)();
-                    // In ProseMirror, the text starts at getPos() + 1
                     const from = pos + 1;
                     const to = from + node.content.size;
 
+                    // Execute focus and selection in a single transaction for atomicity
                     editor.chain()
                         .focus()
                         .setTextSelection({ from, to })
@@ -35,7 +35,13 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
                 } catch (err) {
                     // Silently fail if pos is invalid during a concurrent update
                 }
-            }, 60);
+            };
+
+            // Double security: small timeout + requestAnimationFrame to ensure DOM is ready
+            const timer = setTimeout(() => {
+                requestAnimationFrame(selectText);
+            }, 100);
+
             return () => clearTimeout(timer);
         }
     }, []); // Run only once on mount

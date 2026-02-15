@@ -1,5 +1,97 @@
 [
     {
+        "version": "2.49.10",
+        "date": "2026-02-14",
+        "type": "feat",
+        "changes": [
+            "📊 Admin : Affichage de la taille des données (JSONB) pour chaque personnage dans la Master List",
+            "⚡ Performance : Optimisation via une vue SQL (`pg_column_size`) pour éviter de charger les données complètes lors du listing",
+            "📁 UI : Ajout d'une colonne 'Taille' avec formatage intelligent (o, ko, Mo)"
+        ]
+    },
+    {
+        "version": "2.49.9",
+        "date": "2026-02-14",
+        "type": "feat",
+        "changes": [
+            "📦 Stockage : Implémentation du `StorageMonitor` pour visualiser l'espace IndexedDB (Cloud / Réglages)",
+            "🔔 Alertes : Ajout d'indicateurs visuels globaux dans la barre de navigation (Orange >= 70%, Rouge >= 90%)",
+            "📱 Mobile : Intégration des alertes de stockage dans le menu mobile",
+            "🔄 UX : Rafraîchissement automatique des statistiques de stockage lors du focus de la page"
+        ]
+    },
+    {
+        "version": "2.49.8",
+        "date": "2026-02-14",
+        "type": "refactor",
+        "changes": [
+            "📂 Structure : Déplacement de `src/constants.ts` vers `src/constants/app.ts` pour une meilleure organisation",
+            "🔗 Imports : Mise à jour de tous les chemins d'importation des constantes globales à travers le projet",
+            "🛠️ Build : Mise à jour du script `sync-version` pour supporter la nouvelle structure de fichiers"
+        ]
+    },
+    {
+        "version": "2.49.7",
+        "date": "2026-02-14",
+        "type": "maintenance",
+        "changes": [
+            "🛡️ Typage Admin : Refonte complète de la sécurité des types pour la gestion des bibliothèques (Phase C & E)",
+            "🧹 Code Health : Éradication massive des `@ts-ignore` et `any` dans les composants d'administration critiques",
+            "🔧 Hooks Admin : Typage strict des handlers génériques pour la mise à jour des compteurs et de la configuration de création",
+            "🧩 Composants : Amélioration de la robustesse de `AdminTraitLibrary`, `AdminBackgroundLibrary` et `AdminCounterLibrary`",
+            "🛡️ DB Fetches : Sécurisation des appels `DatabaseService` dans les services de chargement et d'import (Phase D)"
+        ]
+    },
+    {
+        "version": "2.49.6",
+        "date": "2026-02-14",
+        "type": "refactor",
+        "changes": [
+            "🎨 Design System : Extraction des constantes magiques vers des variables CSS (--color-paper, --shadow-sheet, etc.)",
+            "🧹 Nettoyage : Standardisation du fichier index.css et suppression des redondances de couleurs hexadécimales",
+            "📏 Géométrie : Centralisation des dimensions de la fiche (Portrait/Paysage) et des facteurs de zoom d'impression",
+            "🛡️ Stabilité : Validation du build de production avec le nouveau système de variables"
+        ]
+    },
+    {
+        "version": "2.49.5",
+        "date": "2026-02-14",
+        "type": "maintenance",
+        "changes": [
+            "🧠 Refactoring Majeur : Optimisation complète de `SkillsEditor` et `ImportPanel` (réduction de 50% du code)",
+            "🏗️ Architecture : Création de hooks dédiés `useSkillsEditorActions` et `useImportLogic`",
+            "🧩 Composants : Extraction de `SkillCategoryEditor`, `FileDropZone`, `FileAnalysisHeader`, `MigrationSuccessModal`",
+            "🚀 Performance : Allègement significatif des composants critiques de la fiche joueur",
+            "🔧 Types : Éradication des `any` critiques dans les migrations et l'import/export (+50 corrections)",
+            "🛡️ Stabilité : Renforcement de la logique d'import de fichiers JSON avec typage strict"
+        ]
+    },
+    {
+        "version": "2.49.4",
+        "date": "2026-02-14",
+        "type": "refactor",
+        "changes": [
+            "🧠 Refactoring Admin : Extraction massive de la logique vers `useDashboardActions`, `useSkillEditorActions` et `useCreationEditorActions`",
+            "🧩 Modularité : Décomposition des composants `AdminDashboard`, `AdminSkillsEditor` et `AdminCreationEditor` en sous-composants réutilisables",
+            "📉 Dette Technique : Réduction drastique de la taille des fichiers Admin principaux (jusqu'à -60% de lignes)",
+            "🧹 Dépendances : Suppression de `tiptap-pagination-plus` (obsolète)",
+            "🔧 Types : Correction et alignement des types pour `useLibraryImport` et `CandidateLine`",
+            "🐛 Fix : Résolution du chemin d'import critique pour `useCampaignLabels` dans l'admin",
+            "✅ Build : Validation finale du build de production et de l'administration"
+        ]
+    },
+    {
+        "version": "2.49.3",
+        "date": "2026-02-14",
+        "type": "refactor",
+        "changes": [
+            "🧠 Refactoring : Extraction massive des sections de `CharacterReadOnlyView.tsx` en 10 sous-composants modulaires",
+            "📚 Admin : Décomposition de `AdminSpecializationLibrary.tsx` pour une meilleure maintenance",
+            "🚀 Performance : Réduction de la taille des fichiers composants et isolation des responsabilités UI",
+            "🎨 UI : Conservation de l'esthétique premium tout en simplifiant la structure du code"
+        ]
+    },
+    {
         "version": "2.49.2",
         "date": "2026-02-14",
         "type": "feat",
@@ -1156,180 +1248,6 @@
                 "type": "ui",
                 "text": "Ajout d'une icône pour identifier les traits à variantes.",
                 "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.34.0",
-        "date": "2026-02-10",
-        "description": "Système de Variantes dynamiques et Suggestions Joueurs/MJ.",
-        "changes": [
-            {
-                "type": "feature",
-                "text": "Nouvelle interface de sélection de variantes pour les Compétences (ex: Artisanat : Forge).",
-                "category": "feature"
-            },
-            {
-                "type": "feature",
-                "text": "Système de Suggestions : les variantes créées par les joueurs sont proposées au MJ pour validation.",
-                "category": "admin"
-            },
-            {
-                "type": "added",
-                "text": "Onglet 'Suggestions' dans les réglages (Mode Expert) pour valider/rejeter les contributions des joueurs.",
-                "category": "admin"
-            },
-            {
-                "type": "modified",
-                "text": "Refonte de l'édition des compétences sur la fiche pour supporter nativement les définitions variables.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.33.2",
-        "date": "2026-02-10",
-        "changes": [
-            {
-                "type": "feature",
-                "text": "Verrouillage des scores en Mode Édition : désactivation de la modification des bulles pendant la réorganisation pour éviter les erreurs de saisie.",
-                "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.33.1",
-        "date": "2026-02-10",
-        "changes": [
-            {
-                "type": "feature",
-                "text": "Sécurisation du Mode Édition : interdiction de supprimer une compétence ayant des points investis (le déplacement reste autorisé).",
-                "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.33.0",
-        "date": "2026-02-10",
-        "description": "Refonte intégrale du Guide Utilisateur Joueur.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Nouveau guide utilisateur structuré par thématiques (Modes, Usage, Création/Édition, Outils).",
-                "category": "docs"
-            },
-            {
-                "type": "added",
-                "text": "Documentation détaillée des trois modes de fonctionnement : En Ligne (Cloud), JSON (Fichiers) et Hors Ligne.",
-                "category": "docs"
-            },
-            {
-                "type": "added",
-                "text": "Guide pas-à-pas pour le Mode Création (répartition des points) et le Mode Édition Directe (structure).",
-                "category": "docs"
-            },
-            {
-                "type": "improved",
-                "text": "Nettoyage du guide : suppression des sections MJ redondantes dans l'app joueur pour plus de clarté.",
-                "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.32.8",
-        "date": "2026-02-10",
-        "description": "Synchronisation Admin et amélioration de la remontée d'infos.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Notifications au MJ pour TOUT ajout (Compétences & Arrière-plans, y compris bibliothèque officielle).",
-                "category": "admin"
-            },
-            {
-                "type": "added",
-                "text": "Nouvelle section 'Suggestions' dans la vue Admin pour visualiser les éléments même à 0 points.",
-                "category": "admin"
-            },
-            {
-                "type": "modified",
-                "text": "Nettoyage UI : Suppression du bouton de validation redondant dans le Header pour centraliser sur le bandeau.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.7",
-        "date": "2026-02-10",
-        "description": "Sécurité et clarté du Mode Édition.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Nouveau bandeau d'état 'Mode Édition' avec bouton de validation rapide.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Avertissement et explications pédagogiques avant d'activer le mode édition.",
-                "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.32.6",
-        "date": "2026-02-10",
-        "description": "Améliorations UX du Mode Édition Directe.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Repositionnement des boutons d'actions (Édition sous Création) pour une meilleure visibilité.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Indicateurs visuels de placement lors du Drag & Drop (ligne d'insertion).",
-                "category": "ui"
-            },
-            {
-                "type": "modified",
-                "text": "Amélioration de la logique de réorganisation : insertion précise à l'index visé.",
-                "category": "feature"
-            },
-            {
-                "type": "added",
-                "text": "Possibilité de déplacer les espaceurs déjà présents sur la fiche.",
-                "category": "feature"
-            }
-        ]
-    },
-    {
-        "version": "2.32.5",
-        "date": "2026-02-10",
-        "description": "Implémentation du Mode Édition Directe.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Nouveau Mode Édition Directe permettant d'ajouter, supprimer et déplacer des éléments directement sur la feuille.",
-                "category": "feature"
-            },
-            {
-                "type": "added",
-                "text": "Barre latérale d'édition avec recherche dans les bibliothèques de compétences et d'historiques.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Possibilité de créer des éléments personnalisés (suggestions automatiques pour le MJ).",
-                "category": "feature"
-            },
-            {
-                "type": "added",
-                "text": "Support du Drag & Drop pour réorganiser les compétences ou ajouter des espaceurs vides.",
-                "category": "ui"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction de la gestion des catégories lors de l'édition pour respecter les types de blocs (Compétences vs Historiques).",
-                "category": "fix"
             }
         ]
     }

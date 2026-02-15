@@ -255,7 +255,7 @@ const MainLayout: React.FC = () => {
 
 
 
-                                    <div className={`w-full flex px-2 md:px-0 pb-8 ${sheetTab === 'notes' || sheetTab === 'prototype' ? 'overflow-hidden' : 'overflow-x-auto'}`}>
+                                    <div className={`w-full flex px-2 md:px-0 pb-8 ${sheetTab === 'notes' ? 'overflow-visible' : sheetTab === 'prototype' ? 'overflow-hidden' : 'overflow-x-auto'}`}>
                                         <div className={`${sheetTab === 'p1' ? 'block' : 'hidden'} mx-auto`}><CharacterSheet isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'specs' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetSpecializations isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'p2' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetPage2 isLandscape={isLandscape} /></div>
