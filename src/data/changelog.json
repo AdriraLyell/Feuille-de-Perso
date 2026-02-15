@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.38",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "✨ UX : Ajout d'infobulles dynamiques listant les variantes au survol de l'icône dans la bibliothèque",
+            "📚 Bibliothèques : Implémentation pour les Traits, Compétences et Arrière-plans",
+            "🛡️ Stabilité : Gestion du repli (fallback) vers le titre classique si aucune variante n'est définie"
+        ]
+    },
+    {
         "version": "2.49.37",
         "date": "2026-02-15",
         "type": "refactor",
@@ -186,18 +196,6 @@
             "🖼️ Grimoire : Mode 'Tracer une zone' pour insérer et dimensionner des images directement dans le livre",
             "🧭 Navigation : Correction de l'accès aux Notes de Campagne et ajustement des onglets",
             "👋 Campagne : Ajout d'une modale d'information de campagne (Welcome Message) pour les joueurs"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.17",
-        "date": "2026-02-14",
-        "type": "fix",
-        "changes": [
-            "🚀 Performance : Lazy-loading du Grimoire numérique pour accélérer le chargement initial de la fiche personnage",
-            "🛡️ Stabilité : Résolution du warning 'flushSync' de React 18 lors de l'initialisation de TiPTap",
-            "📱 Responsive : Ajustement du titre principal de la fiche pour éviter les débordements sur petits écrans",
-            "🧹 Code Health : Nettoyage des imports statiques lourds au profit du chargement à la demande"
         ],
         "major": false
     }

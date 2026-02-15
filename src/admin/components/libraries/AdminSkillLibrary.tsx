@@ -161,6 +161,8 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                             const isPlaced = placedSkillNames.has(skill.name.trim().toLowerCase());
                             const isGloballyUsed = !!globalUsage[skill.id];
                             const isLocked = isPlaced || isGloballyUsed;
+                            const hasVariants = skill.variants && skill.variants.length > 0;
+                            const [showVariantsTooltip, setShowVariantsTooltip] = useState(false);
 
                             return (
                                 <div key={skill.id} className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${skill.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
@@ -182,7 +184,33 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                         </div>
                                         <div className="flex items-center gap-1.5 mt-0.5">
                                             {skill.isGlobal && <div title="Global Reservoir"><Globe size={11} className="text-indigo-400 shrink-0" /></div>}
-                                            {skill.isVariable && <div title="Compétence à variantes"><Layers size={11} className="text-blue-400 shrink-0" /></div>}
+                                            {skill.isVariable && (
+                                                <div
+                                                    className="relative"
+                                                    onMouseEnter={() => setShowVariantsTooltip(true)}
+                                                    onMouseLeave={() => setShowVariantsTooltip(false)}
+                                                    title={!hasVariants ? "Compétence à variantes" : undefined}
+                                                >
+                                                    <Layers
+                                                        size={11}
+                                                        className="text-blue-400 shrink-0"
+                                                    />
+
+                                                    {showVariantsTooltip && hasVariants && (
+                                                        <div className="absolute z-[100] left-0 bottom-full mb-2 w-max max-w-[200px] bg-slate-800 text-white text-[10px] p-2 rounded shadow-xl animate-in fade-in zoom-in duration-150 pointer-events-none">
+                                                            <div className="font-bold border-b border-slate-600 mb-1 pb-1 text-slate-300">
+                                                                Variantes (Réserve)
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {skill.variants?.map((v, i) => (
+                                                                    <span key={i} className="bg-slate-700 px-1 rounded-sm border border-slate-600">{v}</span>
+                                                                ))}
+                                                            </div>
+                                                            <div className="absolute left-2 top-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-slate-800"></div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                             {isLocked && <div className="text-amber-500 shrink-0" title={isPlaced ? "Utilisée dans cette campagne" : "Utilisée dans d'autres campagnes"}><Lock size={11} /></div>}
                                             {skill.description && (
                                                 <div className="text-[10px] text-slate-500 italic truncate" title={skill.description}>
