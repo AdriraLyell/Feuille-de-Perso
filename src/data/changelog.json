@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.49.39",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🐛 Fix : Correction d'une violation des règles des Hooks React (useState dans un .map)",
+            "🏗️ Refactoring : Extraction des items de bibliothèque en sous-composants pour stabiliser le rendu"
+        ]
+    },
+    {
         "version": "2.49.38",
         "date": "2026-02-15",
         "type": "feat",

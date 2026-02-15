@@ -14,6 +14,89 @@ interface AdminBackgroundLibraryProps {
     globalUsage?: Record<string, number>;
 }
 
+const BackgroundLibraryItem: React.FC<{
+    item: LibraryBackgroundEntry;
+    isPlaced: boolean;
+    isLocked: boolean;
+    onToggleActive: (id: string, current: boolean) => void;
+    handleOpenEdit: (item: LibraryBackgroundEntry) => void;
+    handleDelete: (id: string) => void;
+}> = ({ item, isPlaced, isLocked, onToggleActive, handleOpenEdit, handleDelete }) => {
+    const hasVariants = item.variants && item.variants.length > 0;
+    const [showVariantsTooltip, setShowVariantsTooltip] = useState(false);
+
+    return (
+        <div className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${item.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
+            {/* 1. Toggle */}
+            <div className="w-8 flex justify-center shrink-0">
+                <input
+                    type="checkbox"
+                    checked={item.isActive !== false}
+                    onChange={() => onToggleActive(item.id, item.isActive !== false)}
+                    className="w-4 h-4 text-purple-600 rounded cursor-pointer"
+                    title={item.isActive !== false ? "Désactiver" : "Activer"}
+                />
+            </div>
+
+            {/* 2. Content */}
+            <div className="flex-grow overflow-hidden pr-2">
+                <div className={`font-bold truncate text-sm ${item.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={item.name}>
+                    {item.name}
+                </div>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                    {item.isGlobal && <div title="Global Reservoir"><Globe size={11} className="text-indigo-400 shrink-0" /></div>}
+                    {item.isVariable && (
+                        <div
+                            className="relative"
+                            onMouseEnter={() => setShowVariantsTooltip(true)}
+                            onMouseLeave={() => setShowVariantsTooltip(false)}
+                            title={!hasVariants ? "Variable" : undefined}
+                        >
+                            <Layers
+                                size={11}
+                                className="text-purple-400 shrink-0"
+                            />
+
+                            {showVariantsTooltip && hasVariants && (
+                                <div className="absolute z-[100] left-0 bottom-full mb-2 w-max max-w-[200px] bg-slate-800 text-white text-[10px] p-2 rounded shadow-xl animate-in fade-in zoom-in duration-150 pointer-events-none">
+                                    <div className="font-bold border-b border-slate-600 mb-1 pb-1 text-slate-300">
+                                        Variantes (Réserve)
+                                    </div>
+                                    <div className="flex flex-wrap gap-1">
+                                        {item.variants?.map((v, i) => (
+                                            <span key={i} className="bg-slate-700 px-1 rounded-sm border border-slate-600">{v}</span>
+                                        ))}
+                                    </div>
+                                    <div className="absolute left-2 top-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-slate-800"></div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {isLocked && <div className="text-amber-500 shrink-0" title={isPlaced ? "Utilisé dans cette campagne" : "Utilisé dans d'autres campagnes"}><Lock size={11} /></div>}
+                    {item.description && (
+                        <div className="text-[10px] text-slate-500 italic truncate" title={item.description}>
+                            {item.description}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* 4. Actions */}
+            <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                <button onClick={() => handleOpenEdit(item)} className="text-blue-600 hover:bg-blue-50 p-1 rounded" title="Modifier"><Edit2 size={14} /></button>
+                <button
+                    onClick={() => handleDelete(item.id)}
+                    disabled={isLocked}
+                    className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
+                    title={isLocked ? "Suppression bloquée : utilisé" : "Supprimer définitivement"}
+                >
+                    <Trash2 size={14} />
+                </button>
+            </div>
+        </div>
+    );
+};
+
 const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
     const list = rules.libraries.backgrounds;
 
@@ -228,81 +311,20 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                             const isPlaced = placedNames.has(item.name.trim().toLowerCase());
                             const isGloballyUsed = !!globalUsage[item.id];
                             const isLocked = isPlaced || isGloballyUsed;
-                            const hasVariants = item.variants && item.variants.length > 0;
-                            const [showVariantsTooltip, setShowVariantsTooltip] = useState(false);
 
                             return (
-                                <div key={item.id} className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${item.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
-                                    {/* 1. Toggle */}
-                                    <div className="w-8 flex justify-center shrink-0">
-                                        <input
-                                            type="checkbox"
-                                            checked={item.isActive !== false}
-                                            onChange={() => {
-                                                const newList = list.map(b => b.id === item.id ? { ...b, isActive: !b.isActive } : b);
-                                                onUpdate({ ...rules, libraries: { ...rules.libraries, backgrounds: newList } });
-                                            }}
-                                            className="w-4 h-4 text-purple-600 rounded cursor-pointer"
-                                            title={item.isActive !== false ? "Désactiver" : "Activer"}
-                                        />
-                                    </div>
-
-                                    {/* 2. Content */}
-                                    <div className="flex-grow overflow-hidden pr-2">
-                                        <div className={`font-bold truncate text-sm ${item.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={item.name}>
-                                            {item.name}
-                                        </div>
-                                        <div className="flex items-center gap-1.5 mt-0.5">
-                                            {item.isGlobal && <div title="Global Reservoir"><Globe size={11} className="text-indigo-400 shrink-0" /></div>}
-                                            {item.isVariable && (
-                                                <div
-                                                    className="relative"
-                                                    onMouseEnter={() => setShowVariantsTooltip(true)}
-                                                    onMouseLeave={() => setShowVariantsTooltip(false)}
-                                                    title={!hasVariants ? "Variable" : undefined}
-                                                >
-                                                    <Layers
-                                                        size={11}
-                                                        className="text-purple-400 shrink-0"
-                                                    />
-
-                                                    {showVariantsTooltip && hasVariants && (
-                                                        <div className="absolute z-[100] left-0 bottom-full mb-2 w-max max-w-[200px] bg-slate-800 text-white text-[10px] p-2 rounded shadow-xl animate-in fade-in zoom-in duration-150 pointer-events-none">
-                                                            <div className="font-bold border-b border-slate-600 mb-1 pb-1 text-slate-300">
-                                                                Variantes (Réserve)
-                                                            </div>
-                                                            <div className="flex flex-wrap gap-1">
-                                                                {item.variants?.map((v, i) => (
-                                                                    <span key={i} className="bg-slate-700 px-1 rounded-sm border border-slate-600">{v}</span>
-                                                                ))}
-                                                            </div>
-                                                            <div className="absolute left-2 top-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-slate-800"></div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                            {isLocked && <div className="text-amber-500 shrink-0" title={isPlaced ? "Utilisé dans cette campagne" : "Utilisé dans d'autres campagnes"}><Lock size={11} /></div>}
-                                            {item.description && (
-                                                <div className="text-[10px] text-slate-500 italic truncate" title={item.description}>
-                                                    {item.description}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* 4. Actions */}
-                                    <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                                        <button onClick={() => handleOpenEdit(item)} className="text-blue-600 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
-                                        <button
-                                            onClick={() => handleDelete(item.id)}
-                                            disabled={isLocked}
-                                            className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
-                                            title={isLocked ? "Suppression bloquée : utilisé" : "Supprimer définitivement"}
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
-                                    </div>
-                                </div>
+                                <BackgroundLibraryItem
+                                    key={item.id}
+                                    item={item}
+                                    isPlaced={isPlaced}
+                                    isLocked={isLocked}
+                                    onToggleActive={(id, current) => {
+                                        const newList = list.map(b => b.id === id ? { ...b, isActive: !current } : b);
+                                        onUpdate({ ...rules, libraries: { ...rules.libraries, backgrounds: newList } });
+                                    }}
+                                    handleOpenEdit={handleOpenEdit}
+                                    handleDelete={handleDelete}
+                                />
                             );
                         })}
                     </div>
