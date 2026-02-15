@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.41",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🏛️ Admin : Harmonisation de la terminologie des Traits",
+            "🖋️ UI : Renommage de 'Éclats de Fortune' en 'Avantages' et 'Fardeaux de l'Ombre' en 'Désavantages' dans la vue ReadOnly",
+            "🛠️ Admin : Mise à jour des descriptifs de la bibliothèque de traits pour utiliser 'Désavantages' au lieu de 'Défauts'"
+        ]
+    },
+    {
         "version": "2.49.40",
         "date": "2026-02-15",
         "type": "fix",
@@ -190,13 +200,6 @@
         "date": "2026-02-14",
         "type": "chore",
         "content": "⚡ Turbo CI : Fusion des jobs pour éviter les installations redondantes, ajout du cache pour les navigateurs Playwright (gain de ~3-5 min) et exécution des tests E2E sur le build de production.",
-        "major": false
-    },
-    {
-        "version": "2.49.20",
-        "date": "2026-02-14",
-        "type": "chore",
-        "content": "🚀 CI/CD : Suppression des runs en doublon sur la branche develop et synchronisation de deploy.yml avec les derniers correctifs de tests unitaires.",
         "major": false
     }
 ]

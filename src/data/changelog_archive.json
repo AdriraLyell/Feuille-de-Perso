@@ -1,5 +1,12 @@
 [
     {
+        "version": "2.49.20",
+        "date": "2026-02-14",
+        "type": "chore",
+        "content": "🚀 CI/CD : Suppression des runs en doublon sur la branche develop et synchronisation de deploy.yml avec les derniers correctifs de tests unitaires.",
+        "major": false
+    },
+    {
         "version": "2.49.19",
         "date": "2026-02-14",
         "type": "chore",
@@ -1148,23 +1155,6 @@
             {
                 "type": "improved",
                 "text": "Mise à jour de toutes les bibliothèques (Compétences, Historiques, Compteurs, Traits, Spécialisations).",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.5",
-        "date": "2026-02-09",
-        "description": "Généralisation des actions en masse (Admin).",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Extension des actions 'Tout activer / Tout désactiver' aux bibliothèques d'Historiques, Compteurs, Spécialisations et Traits.",
-                "category": "ui"
-            },
-            {
-                "type": "improved",
-                "text": "Cohérence visuelle et fonctionnelle des actions en masse sur l'ensemble de la section Admin.",
                 "category": "ui"
             }
         ]

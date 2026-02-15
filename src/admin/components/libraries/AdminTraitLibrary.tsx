@@ -64,7 +64,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
                     <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                         <BookOpen className="text-blue-600" /> Bibliothèque de Traits Officiels
                     </h2>
-                    <p className="text-slate-500 text-sm">Gérez ici les Avantages et Défauts qui seront proposés aux joueurs.</p>
+                    <p className="text-slate-500 text-sm">Gérez ici les Avantages et Désavantages qui seront proposés aux joueurs.</p>
                 </div>
                 <div className="flex gap-2">
                     <button
