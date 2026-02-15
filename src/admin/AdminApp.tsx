@@ -119,22 +119,27 @@ const AdminApp: React.FC = () => {
 
     if (viewMode === 'players') {
         return (
-            <div className="min-h-screen bg-gray-50 p-8">
-                <div className="max-w-7xl mx-auto">
-                    <div className="flex justify-between items-center mb-6">
+            <div className="min-h-screen bg-stone-950 p-8 relative overflow-hidden">
+                {/* Background Texture Effect */}
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')] opacity-20 pointer-events-none" />
+
+                <div className="max-w-[1600px] mx-auto relative z-10">
+                    <div className="flex justify-between items-center mb-8">
                         <button
                             onClick={() => setViewMode('dashboard')}
-                            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold transition-colors"
+                            className="flex items-center gap-2 text-stone-400 hover:text-amber-500 font-serif italic text-lg transition-all group"
                             aria-label="Retour au Tableau de Bord"
                         >
-                            <ArrowLeft size={20} /> Retour au Tableau de Bord
+                            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                            <span>Retour au Tableau de Bord</span>
                         </button>
                         <button
                             onClick={logout}
-                            className="flex items-center gap-2 bg-[#5c4d41] hover:bg-[#8b2e2e] text-white px-4 py-2 rounded-md font-bold transition-all shadow-md group"
+                            className="flex items-center gap-2 bg-stone-900 hover:bg-rose-950/40 text-stone-400 hover:text-rose-500 px-6 py-2 rounded-sm font-black uppercase tracking-widest text-xs transition-all border border-stone-800 hover:border-rose-900/30 shadow-lg group"
                             aria-label="Se déconnecter"
                         >
-                            <LogOut size={18} className="group-hover:rotate-12 transition-transform" /> Déconnexion
+                            <LogOut size={16} className="group-hover:rotate-12 transition-transform" />
+                            Déconnexion
                         </button>
                     </div>
                     <GlobalPlayersView />

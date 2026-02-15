@@ -1,5 +1,18 @@
 [
     {
+        "version": "2.49.25",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "✒️ Grimoire : Nouvelles fonctions d'édition (Souligné, Barré, Listes à puces/numéros)",
+            "📜 Grimoire : Style 'Citation' (Blockquote) immersif avec bordures et guillemets stylisés",
+            "🖋️ Grimoire : Surlignage type 'Encre Ambre' pour marquer les passages clés",
+            "📏 Grimoire : Ligne de séparation décorative (Horizontal Rule) avec icône ◈",
+            "🛠️ UI : Barre d'outils réorganisée en groupes logiques et icônes affinées"
+        ],
+        "major": false
+    },
+    {
         "version": "2.49.23",
         "date": "2026-02-14",
         "type": "fix",
@@ -1099,18 +1112,6 @@
                 "type": "improved",
                 "text": "Renforcement de la sécurité backend : vérification anti-doublon lors de l'import de bibliothèque.",
                 "category": "core"
-            }
-        ]
-    },
-    {
-        "version": "2.32.2",
-        "date": "2026-02-10",
-        "description": "Ajustement layout : Noms sur une ligne, icônes déportées.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Retour au nom sur une seule ligne avec icônes de statut déplacées sur la ligne de description (Skills/Backgrounds).",
-                "category": "ui"
             }
         ]
     }
