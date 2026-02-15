@@ -121,129 +121,130 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({
         );
     }
 
-    <div className="fixed inset-0 z-50 flex flex-col bg-stone-900 overflow-hidden shadow-2xl">
-        <ReadOnlyHeader
-            character={character}
-            onClose={onClose}
-            onImport={handleImport}
-            onForceUpdate={allowForceUpdate ? handleForceMJUpdate : undefined}
-        />
+    return (
+        <div className="fixed inset-0 z-50 flex flex-col bg-stone-900 overflow-hidden shadow-2xl">
+            <ReadOnlyHeader
+                character={character}
+                onClose={onClose}
+                onImport={handleImport}
+                onForceUpdate={allowForceUpdate ? handleForceMJUpdate : undefined}
+            />
 
-        <div className="flex-grow overflow-y-auto custom-scrollbar p-8">
-            <div className="max-w-7xl mx-auto space-y-12 pb-20">
-                {/* Top Section: Portrait + Identity */}
-                <div className="flex flex-col md:flex-row gap-8 items-start">
-                    <ReadOnlyPortrait
-                        imageId={processedData.page2?.characterImageId}
-                        legacyImage={processedData.page2?.characterImage}
+            <div className="flex-grow overflow-y-auto custom-scrollbar p-8">
+                <div className="max-w-7xl mx-auto space-y-12 pb-20">
+                    {/* Top Section: Portrait + Identity */}
+                    <div className="flex flex-col md:flex-row gap-8 items-start">
+                        <ReadOnlyPortrait
+                            imageId={processedData.page2?.characterImageId}
+                            legacyImage={processedData.page2?.characterImage}
+                        />
+                        <div className="flex-grow space-y-8 w-full">
+                            <ReadOnlyIdentity header={processedData.header} />
+                            <ReadOnlySuggestions suggestions={processedData.suggestions} getCategoryLabel={getCategoryLabel} />
+                        </div>
+                    </div>
+
+                    <ReadOnlyAttributes
+                        attributeSettings={processedData.attributeSettings}
+                        attributes={processedData.attributes}
                     />
-                    <div className="flex-grow space-y-8 w-full">
-                        <ReadOnlyIdentity header={processedData.header} />
-                        <ReadOnlySuggestions suggestions={processedData.suggestions} getCategoryLabel={getCategoryLabel} />
+
+                    <ReadOnlySkills
+                        skills={processedData.skills}
+                        specializations={processedData.specializations}
+                        imposedSpecializations={processedData.imposedSpecializations}
+                        getCategoryLabel={getCategoryLabel}
+                    />
+
+                    <ReadOnlyBackgrounds
+                        skills={processedData.skills}
+                        specializations={processedData.specializations}
+                        imposedSpecializations={processedData.imposedSpecializations}
+                    />
+
+                    <ReadOnlyTraits
+                        avantages={processedData.page2?.avantages}
+                        desavantages={processedData.page2?.desavantages}
+                    />
+
+                    <ReadOnlyExperience
+                        experience={processedData.experience}
+                    />
+
+                    <ReadOnlyInventory
+                        inventory={processedData.page2?.equipement}
+                    />
+
+                    <div className="text-center pt-8 border-t border-stone-800 opacity-20">
+                        <p className="text-[9px] font-bold text-stone-500 uppercase tracking-[0.5em]">
+                            Archives Scellées — Fin de la Chronique
+                        </p>
                     </div>
                 </div>
+            </div>
 
-                <ReadOnlyAttributes
-                    attributeSettings={processedData.attributeSettings}
-                    attributes={processedData.attributes}
+            {isWizardOpen && candidateRules && currentRules && character.setting_id && (
+                <ImportWizardModal
+                    isOpen={isWizardOpen}
+                    onClose={() => setIsWizardOpen(false)}
+                    currentRules={currentRules}
+                    candidateRules={candidateRules}
+                    onConfirm={async (merged: RulesData) => {
+                        try {
+                            await CampaignService.saveSetting(character.setting_id!, merged);
+                            addLog("Bibliothèque de campagne mise à jour avec succès !", "success");
+                            setIsWizardOpen(false);
+                            onRefreshRules?.();
+                        } catch (err) {
+                            addLog("Échec de la mise à jour : " + (err as Error).message, "danger");
+                        }
+                    }}
                 />
+            )}
 
-                <ReadOnlySkills
-                    skills={processedData.skills}
-                    specializations={processedData.specializations}
-                    imposedSpecializations={processedData.imposedSpecializations}
-                    getCategoryLabel={getCategoryLabel}
-                />
-
-                <ReadOnlyBackgrounds
-                    skills={processedData.skills}
-                    specializations={processedData.specializations}
-                    imposedSpecializations={processedData.imposedSpecializations}
-                />
-
-                <ReadOnlyTraits
-                    avantages={processedData.page2?.avantages}
-                    desavantages={processedData.page2?.desavantages}
-                />
-
-                <ReadOnlyExperience
-                    experience={processedData.experience}
-                />
-
-                <ReadOnlyInventory
-                    inventory={processedData.page2?.equipement}
-                />
-
-                <div className="text-center pt-8 border-t border-stone-800 opacity-20">
-                    <p className="text-[9px] font-bold text-stone-500 uppercase tracking-[0.5em]">
-                        Archives Scellées — Fin de la Chronique
+            <ThematicModal
+                isOpen={isUpdateModalOpen}
+                onClose={() => setIsUpdateModalOpen(false)}
+                title="Pousser Mise à Jour MJ"
+                scheme="mystic"
+                icon={<RefreshCw size={24} />}
+                footer={
+                    <div className="flex gap-3 w-full justify-end">
+                        <button
+                            onClick={() => setIsUpdateModalOpen(false)}
+                            className="px-4 py-2 text-stone-500 hover:text-stone-300 hover:bg-stone-800 rounded-sm font-bold transition-all uppercase text-xs tracking-wider"
+                        >
+                            Abjurer
+                        </button>
+                        <button
+                            onClick={confirmForceMJUpdate}
+                            disabled={isUpdating}
+                            className="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-stone-950 rounded-sm font-bold transition-all shadow-lg active:scale-95 uppercase tracking-wider text-xs disabled:opacity-50"
+                        >
+                            {isUpdating ? "Incantation..." : "Envoyer le Signal"}
+                        </button>
+                    </div>
+                }
+            >
+                <div className="space-y-4">
+                    <p className="text-stone-400 text-xs italic leading-relaxed">
+                        Le voyageur <strong>{character.character_name}</strong> recevra votre message et une invitation à synchroniser ses archives lors de sa prochaine connexion.
                     </p>
+
+                    <div>
+                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-amber-900/80 mb-2">
+                            Message du Gardien (Optionnel)
+                        </label>
+                        <textarea
+                            value={updateMessage}
+                            onChange={(e) => setUpdateMessage(e.target.value)}
+                            placeholder="Ex: J'ai rectifié tes points de santé..."
+                            className="w-full h-32 bg-stone-900/50 border border-stone-800 rounded-sm p-3 text-sm text-stone-200 focus:border-amber-900/50 outline-none resize-none transition-all placeholder:text-stone-700"
+                        />
+                    </div>
                 </div>
-            </div>
+            </ThematicModal>
         </div>
-
-        {isWizardOpen && candidateRules && currentRules && character.setting_id && (
-            <ImportWizardModal
-                isOpen={isWizardOpen}
-                onClose={() => setIsWizardOpen(false)}
-                currentRules={currentRules}
-                candidateRules={candidateRules}
-                onConfirm={async (merged) => {
-                    try {
-                        await CampaignService.saveSetting(character.setting_id!, merged);
-                        addLog("Bibliothèque de campagne mise à jour avec succès !", "success");
-                        setIsWizardOpen(false);
-                        onRefreshRules?.();
-                    } catch (err) {
-                        addLog("Échec de la mise à jour : " + (err as Error).message, "danger");
-                    }
-                }}
-            />
-        )}
-
-        <ThematicModal
-            isOpen={isUpdateModalOpen}
-            onClose={() => setIsUpdateModalOpen(false)}
-            title="Pousser Mise à Jour MJ"
-            scheme="mystic"
-            icon={<RefreshCw size={24} />}
-            footer={
-                <div className="flex gap-3 w-full justify-end">
-                    <button
-                        onClick={() => setIsUpdateModalOpen(false)}
-                        className="px-4 py-2 text-stone-500 hover:text-stone-300 hover:bg-stone-800 rounded-sm font-bold transition-all uppercase text-xs tracking-wider"
-                    >
-                        Abjurer
-                    </button>
-                    <button
-                        onClick={confirmForceMJUpdate}
-                        disabled={isUpdating}
-                        className="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-stone-950 rounded-sm font-bold transition-all shadow-lg active:scale-95 uppercase tracking-wider text-xs disabled:opacity-50"
-                    >
-                        {isUpdating ? "Incantation..." : "Envoyer le Signal"}
-                    </button>
-                </div>
-            }
-        >
-            <div className="space-y-4">
-                <p className="text-stone-400 text-xs italic leading-relaxed">
-                    Le voyageur <strong>{character.character_name}</strong> recevra votre message et une invitation à synchroniser ses archives lors de sa prochaine connexion.
-                </p>
-
-                <div>
-                    <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-amber-900/80 mb-2">
-                        Message du Gardien (Optionnel)
-                    </label>
-                    <textarea
-                        value={updateMessage}
-                        onChange={(e) => setUpdateMessage(e.target.value)}
-                        placeholder="Ex: J'ai rectifié tes points de santé..."
-                        className="w-full h-32 bg-stone-900/50 border border-stone-800 rounded-sm p-3 text-sm text-stone-200 focus:border-amber-900/50 outline-none resize-none transition-all placeholder:text-stone-700"
-                    />
-                </div>
-            </div>
-        </ThematicModal>
-    </div>
     );
 };
 

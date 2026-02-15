@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.31",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "📔 Journal : Suppression de la barre de défilement verticale parasite sur Windows via overflow-y: auto",
+            "👥 Groupe : Restauration des dimensions fixes du tableau de groupe (1484x1000px) pour préserver l'alignement avec le grimoire",
+            "📐 Layout : Optimisation de la gestion de l'overflow pour déléguer les barres de défilement globales au navigateur"
+        ],
+        "major": false
+    },
+    {
         "version": "2.49.30",
         "date": "2026-02-15",
         "type": "fix",
@@ -1036,28 +1047,6 @@
                 "type": "improved",
                 "text": "Nettoyage du guide : suppression des sections MJ redondantes dans l'app joueur pour plus de clarté.",
                 "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.32.8",
-        "date": "2026-02-10",
-        "description": "Synchronisation Admin et amélioration de la remontée d'infos.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Notifications au MJ pour TOUT ajout (Compétences & Arrière-plans, y compris bibliothèque officielle).",
-                "category": "admin"
-            },
-            {
-                "type": "added",
-                "text": "Nouvelle section 'Suggestions' dans la vue Admin pour visualiser les éléments même à 0 points.",
-                "category": "admin"
-            },
-            {
-                "type": "modified",
-                "text": "Nettoyage UI : Suppression du bouton de validation redondant dans le Header pour centraliser sur le bandeau.",
-                "category": "ui"
             }
         ]
     }

@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Users, Search, Eye, Trash2, Calendar, Shield, AlertCircle, Loader2, User, Clock } from 'lucide-react';
+import { Users, Search, Eye, Trash2, Calendar, Shield, AlertCircle, Loader2, User, Clock, RefreshCw } from 'lucide-react';
 import { CharacterSyncService, SyncedCharacterSummary, SyncedCharacter } from '../../services/CharacterSyncService';
 import CharacterReadOnlyView from './CharacterReadOnlyView';
 import { GameSettingSummary, CampaignService } from '../../services/CampaignService';

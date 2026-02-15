@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.51",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🐛 Fix : Correction d'une erreur de syntaxe blockante (return manquant) dans CharacterReadOnlyView",
+            "🛡️ Stabilité : Restauration de l'import RefreshCw manquant dans GlobalPlayersView",
+            "🏷️ Typage : Ajout du type RulesData manquant sur le paramètre merged de CharacterReadOnlyView"
+        ]
+    },
+    {
         "version": "2.49.50",
         "date": "2026-02-15",
         "type": "feat",
@@ -188,16 +198,5 @@
             "🛡️ Typage : Élimination des types 'any' résiduels dans les factories et le grimoire",
             "🧹 Ménage : Suppression de la dépendance inutilisée 'tiptap-pagination-plus' et nettoyage des imports Admin"
         ]
-    },
-    {
-        "version": "2.49.31",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "📔 Journal : Suppression de la barre de défilement verticale parasite sur Windows via overflow-y: auto",
-            "👥 Groupe : Restauration des dimensions fixes du tableau de groupe (1484x1000px) pour préserver l'alignement avec le grimoire",
-            "📐 Layout : Optimisation de la gestion de l'overflow pour déléguer les barres de défilement globales au navigateur"
-        ],
-        "major": false
     }
 ]
