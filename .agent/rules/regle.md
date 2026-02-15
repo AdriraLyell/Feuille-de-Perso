@@ -35,7 +35,7 @@ Avant chaque fin de tâche (notify_user) :
 2. Mettre à jour `src/data/changelog.json` avec la version, date et type de changement.
 3. Vérifier l'intégrité via `npm run build`, si cela n'a pas été fait pendant le code.
 4. Mettre à jour les fichiers .md créés lors des phases de planifications (task.md, implementation plan, ou autres).
-5. Commiter sur `develop`, puis créer une PR `develop → main` pour déployer.
+5. Commiter sur `develop`. Ne jamais pousser sur `main` (ou créer de PR vers `main`) sans demande explicite de l'utilisateur.
 
 
 > Le script `npm run sync-version` synchronise automatiquement `src/constants.ts` depuis `package.json`.
@@ -59,7 +59,7 @@ Avant chaque fin de tâche (notify_user) :
 ## 7. WORKFLOW GIT (GitHub Flow+)
 
 ### Branches
-- **`main`** : Production (déploie sur GitHub Pages). Protégée : PR obligatoire + status checks.
+- **`main`** : Production. **Interdit de push ou PR sans demande explicite.**
 - **`develop`** : Intégration. Push direct autorisé. CI sans déploiement.
 - **`feat/*`, `fix/*`, `chore/*`, `docs/*`** : Branches de travail éphémères depuis `develop`.
 - **`hotfix/*`** : Corrections urgentes depuis `main` (bypass develop).
