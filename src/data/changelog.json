@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.40",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "✨ UI : Correction du tronquage des tooltips via React Portals",
+            "🧩 UX : Ajout du composant PortalTooltip pour les variantes (Traits, Compétences, Historiques)",
+            "🏗️ Refactoring : Migration des listes de variantes vers le système de portail pour éviter le clipping overflow"
+        ]
+    },
+    {
         "version": "2.49.39",
         "date": "2026-02-15",
         "type": "fix",
@@ -187,25 +197,6 @@
         "date": "2026-02-14",
         "type": "chore",
         "content": "🚀 CI/CD : Suppression des runs en doublon sur la branche develop et synchronisation de deploy.yml avec les derniers correctifs de tests unitaires.",
-        "major": false
-    },
-    {
-        "version": "2.49.19",
-        "date": "2026-02-14",
-        "type": "chore",
-        "content": "🚀 CI : Optimisation du workflow GitHub Actions. Les tests E2E Playwright sont désormais restreints aux Pull Requests et à la branche main pour accélérer les push sur develop. Correction des variables d'environnement manquantes pour Vitest.",
-        "major": false
-    },
-    {
-        "version": "2.49.18",
-        "date": "2026-02-14",
-        "type": "feat",
-        "changes": [
-            "📖 Grimoire : Table des Matières dynamique et interactive (TOC)",
-            "🖼️ Grimoire : Mode 'Tracer une zone' pour insérer et dimensionner des images directement dans le livre",
-            "🧭 Navigation : Correction de l'accès aux Notes de Campagne et ajustement des onglets",
-            "👋 Campagne : Ajout d'une modale d'information de campagne (Welcome Message) pour les joueurs"
-        ],
         "major": false
     }
 ]

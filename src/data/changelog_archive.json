@@ -1,5 +1,24 @@
 [
     {
+        "version": "2.49.19",
+        "date": "2026-02-14",
+        "type": "chore",
+        "content": "🚀 CI : Optimisation du workflow GitHub Actions. Les tests E2E Playwright sont désormais restreints aux Pull Requests et à la branche main pour accélérer les push sur develop. Correction des variables d'environnement manquantes pour Vitest.",
+        "major": false
+    },
+    {
+        "version": "2.49.18",
+        "date": "2026-02-14",
+        "type": "feat",
+        "changes": [
+            "📖 Grimoire : Table des Matières dynamique et interactive (TOC)",
+            "🖼️ Grimoire : Mode 'Tracer une zone' pour insérer et dimensionner des images directement dans le livre",
+            "🧭 Navigation : Correction de l'accès aux Notes de Campagne et ajustement des onglets",
+            "👋 Campagne : Ajout d'une modale d'information de campagne (Welcome Message) pour les joueurs"
+        ],
+        "major": false
+    },
+    {
         "version": "2.49.17",
         "date": "2026-02-14",
         "type": "fix",
@@ -1147,40 +1166,6 @@
                 "type": "improved",
                 "text": "Cohérence visuelle et fonctionnelle des actions en masse sur l'ensemble de la section Admin.",
                 "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.4",
-        "date": "2026-02-09",
-        "description": "Amélioration ergonomie Bibliothèque (Admin).",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Ajout d'actions en masse (Tout activer / Tout désactiver) dans la réserve de compétences.",
-                "category": "ui"
-            },
-            {
-                "type": "improved",
-                "text": "Les actions en masse respectent le filtre de recherche actif.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.3",
-        "date": "2026-02-09",
-        "description": "Sécurisation de la persistance (Admin).",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Correction d'une faille de synchronisation provoquant la perte de données lors de l'ajout de nouveaux items ou de l'activation massive.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Standardisation de la génération d'ID via UUID pour une meilleure compatibilité avec Supabase.",
-                "category": "core"
             }
         ]
     }
