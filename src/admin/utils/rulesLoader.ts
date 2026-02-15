@@ -74,7 +74,8 @@ export const generateDefaultRules = (): RulesData => {
             xpCosts: {
                 attributeFactor: 6,
                 skillFactor: 1,
-                specializationFactor: 0
+                specializationFactor: 0,
+                traitCost: 5
             },
             cards: {
                 ...data.creationConfig.cardConfig,

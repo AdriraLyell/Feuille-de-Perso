@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Activity, Coins, Zap } from 'lucide-react';
+import { Settings, Activity, Coins, Zap, Sparkles } from 'lucide-react';
 import { MotionFade } from '../../../components/ui/motion/MotionFade';
 import { MotionCard } from '../../../components/ui/motion/MotionCard';
 import { RulesCreationConfig, RulesXPCosts } from '../../../types/rules';
@@ -58,7 +58,7 @@ export const ConfigQuickSummary: React.FC<ConfigQuickSummaryProps> = ({
             </MotionFade>
 
             {/* Quick Toggle Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <MotionFade delay={0.2}>
                     <MotionCard className="p-6 h-full flex flex-col justify-between border border-stone-800/50 group" hoverEffect="glow">
                         <div className="flex items-start justify-between mb-4">
@@ -118,6 +118,29 @@ export const ConfigQuickSummary: React.FC<ConfigQuickSummaryProps> = ({
                                 type="number"
                                 value={xpCosts.attributeFactor ?? 6}
                                 onChange={(e) => updateXPCost('attributeFactor', parseInt(e.target.value) || 0)}
+                                className="w-full bg-transparent border-none text-right font-mono font-black text-amber-500 focus:outline-none text-lg"
+                            />
+                            <span className="text-[10px] font-black text-stone-600 uppercase tracking-tighter shrink-0 pr-2 border-l border-stone-800 pl-3">Points XP</span>
+                        </div>
+                    </MotionCard>
+                </MotionFade>
+
+                <MotionFade delay={0.35}>
+                    <MotionCard className="p-6 h-full flex flex-col justify-between border border-stone-800/50 group" hoverEffect="glow">
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="p-3 bg-emerald-900/10 text-emerald-500 rounded-sm border border-emerald-900/20 group-hover:scale-110 transition-transform">
+                                <Sparkles size={24} />
+                            </div>
+                            <div className="flex-grow">
+                                <h4 className="text-sm font-black text-stone-200 uppercase tracking-widest">Coût Traits</h4>
+                                <p className="text-[10px] text-stone-500 font-bold italic">Prix par point</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 bg-stone-950/40 p-2 rounded-sm border border-stone-800">
+                            <input
+                                type="number"
+                                value={xpCosts.traitCost ?? 5}
+                                onChange={(e) => updateXPCost('traitCost', parseInt(e.target.value) || 0)}
                                 className="w-full bg-transparent border-none text-right font-mono font-black text-amber-500 focus:outline-none text-lg"
                             />
                             <span className="text-[10px] font-black text-stone-600 uppercase tracking-tighter shrink-0 pr-2 border-l border-stone-800 pl-3">Points XP</span>

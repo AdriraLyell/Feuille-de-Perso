@@ -73,6 +73,9 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
     // C. Attributs (Coût Linéaire)
     totalSpent += calculateAttributeXP(data, getAttributeBonus);
 
+    // D. Traits (Avantages/Désavantages si coûtés en XP)
+    totalSpent += calculateTraitXP(data, rules);
+
     // 3. Calcul du bilan final
     const gainFromLogs = (data.xpLogs || []).reduce((sum, entry) => sum + (entry.amount || 0), 0);
     const totalGain = gainFromLogs + traitXPBonus;
@@ -279,4 +282,20 @@ function calculateAttributeXP(
         }
     });
     return attrSpent;
+}
+
+/**
+ * Calcule l'XP dépensée dans les traits (Avantages / Désavantages)
+ */
+function calculateTraitXP(data: CharacterSheetData, rules: RulesData | undefined): number {
+    const traitCostFactor = rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
+
+    // Pour l'instant, les traits n'ont pas de creationValue.
+    // Cette fonction pourra être affinée si le système permet l'achat de traits après création.
+    // Si creationConfig.active est vrai, on est encore en création, le budget est géré par useCreationBudget.
+
+    if (data.creationConfig?.active) return 0;
+
+    // TODO: Si on ajoute creationValue aux traits, on pourra calculer l'XP dépensée ici après la création.
+    return 0;
 }

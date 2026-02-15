@@ -90,6 +90,7 @@ export const RulesXPCostsSchema = z.object({
     attributeFactor: z.number(),
     skillFactor: z.number(),
     specializationFactor: z.number(),
+    traitCost: z.number(),
 });
 
 export const RulesCardConfigSchema = z.object({

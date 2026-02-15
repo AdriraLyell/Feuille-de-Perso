@@ -80,6 +80,7 @@ export interface CharacterSheetData {
     attributeFactor: number;
     skillFactor: number;
     specializationFactor: number;
+    traitCost: number;
   };
   page2: Page2Data;
   // Key is skill ID, Value is array of specialization strings (Player defined based on dots)

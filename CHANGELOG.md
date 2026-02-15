@@ -1,5 +1,9 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.35.7] - 2026-02-10
+
+- Refactoring technique du Journal : Centralisation des constantes de dimensions et de mise en page.
+
 ## [2.33.2] - 2026-02-10
 
 - [object Object]

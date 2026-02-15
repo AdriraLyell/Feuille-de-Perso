@@ -33,7 +33,8 @@ const reconcileConfigurations = (newState: CharacterSheetData, rules: RulesData)
         newState.xpCosts = {
             attributeFactor: rules.configurations.xpCosts.attributeFactor || 6,
             skillFactor: rules.configurations.xpCosts.skillFactor || 1,
-            specializationFactor: rules.configurations.xpCosts.specializationFactor || 0
+            specializationFactor: rules.configurations.xpCosts.specializationFactor || 0,
+            traitCost: rules.configurations.xpCosts.traitCost || 5
         };
     }
 

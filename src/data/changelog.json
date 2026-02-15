@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.55",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "⚙️ Admin : Ajout d'un paramètre de configuration mondiale pour le coût en XP des traits",
+            "📊 Budget : Intégration du coût des traits dans le calcul du budget de création (Mode Points)",
+            "⚖️ XP : Préparation du moteur de calcul d'XP pour supporter les traits achetés après création",
+            "🛡️ Typage : Mise à jour du schéma de données et des réconciliateurs pour inclure le traitCost"
+        ]
+    },
+    {
         "version": "2.49.54",
         "date": "2026-02-15",
         "type": "feat",
@@ -186,16 +197,6 @@
         "changes": [
             "🐛 Fix : Correction d'un plantage dans le ColumnarEditor",
             "🛡️ Stabilité : Ajout d'une garde contre les accès nuls lors de l'initialisation de l'éditeur Tiptap"
-        ]
-    },
-    {
-        "version": "2.49.35",
-        "date": "2026-02-15",
-        "type": "refactor",
-        "changes": [
-            "🛠️ Refactoring : Simplification de CampaignService.ts",
-            "📏 Code Health : Extraction de la logique de réconciliation des règles dans campaignReconciler.ts",
-            "🏗️ Architecture : Amélioration de la séparation des préoccupations entre les services de base de données et la logique métier"
         ]
     }
 ]

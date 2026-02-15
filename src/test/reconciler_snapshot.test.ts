@@ -38,7 +38,7 @@ describe('RulesReconciler Snapshot', () => {
                     attributeMax: 5,
                     backgroundPoints: 5
                 },
-                xpCosts: { attributeFactor: 5, skillFactor: 2, specializationFactor: 1 },
+                xpCosts: { attributeFactor: 5, skillFactor: 2, specializationFactor: 1, traitCost: 5 },
                 cards: { active: false, baseStart: 0, increment: 0, bestSkillsCount: 0, ranks: [], counts: [], maxLabel: '' }
             },
             definitions: {

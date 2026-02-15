@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.35",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Simplification de CampaignService.ts",
+            "📏 Code Health : Extraction de la logique de réconciliation des règles dans campaignReconciler.ts",
+            "🏗️ Architecture : Amélioration de la séparation des préoccupations entre les services de base de données et la logique métier"
+        ]
+    },
+    {
         "version": "2.49.34",
         "date": "2026-02-15",
         "type": "refactor",
@@ -1021,13 +1031,6 @@
                 "text": "Filtres 'Smart Chips' pour les bibliothèques Admin (Compétences, Traits, Historiques).",
                 "category": "ui"
             }
-        ]
-    },
-    {
-        "version": "2.35.7",
-        "date": "2026-02-10",
-        "changes": [
-            "Refactoring technique du Journal : Centralisation des constantes de dimensions et de mise en page."
         ]
     }
 ]
