@@ -110,7 +110,7 @@ export const ConfigQuickSummary: React.FC<ConfigQuickSummaryProps> = ({
                             </div>
                             <div className="flex-grow">
                                 <h4 className="text-sm font-black text-stone-200 uppercase tracking-widest">Coût Attributs</h4>
-                                <p className="text-[10px] text-stone-500 font-bold italic">Prix par échelon</p>
+                                <p className="text-[10px] text-stone-500 font-bold italic">Prix par rang</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 bg-stone-950/40 p-2 rounded-sm border border-stone-800">

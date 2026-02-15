@@ -1,5 +1,24 @@
 [
     {
+        "version": "2.49.34",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Éclatement du hook useAttributeEditor en modules spécialisés",
+            "📏 Code Health : Extraction de useAttributeStructure (gestion des catégories) et useAttributePresets (gestion des préréglages)",
+            "🏗️ Architecture : Amélioration de la modularité et réduction de la dette technique sur l'administration des attributs"
+        ]
+    },
+    {
+        "version": "2.49.33",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Extraction de la logique de AdminTraitLibrary dans le hook useAdminTraitLibrary",
+            "📏 Code Health : Réduction de la taille de AdminTraitLibrary.tsx (517 -> 240 lignes)"
+        ]
+    },
+    {
         "version": "2.49.32",
         "date": "2026-02-15",
         "type": "refactor",
@@ -1009,28 +1028,6 @@
         "date": "2026-02-10",
         "changes": [
             "Refactoring technique du Journal : Centralisation des constantes de dimensions et de mise en page."
-        ]
-    },
-    {
-        "version": "2.33.2",
-        "date": "2026-02-10",
-        "changes": [
-            {
-                "type": "feature",
-                "text": "Verrouillage des scores en Mode Édition : désactivation de la modification des bulles pendant la réorganisation pour éviter les erreurs de saisie.",
-                "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.33.1",
-        "date": "2026-02-10",
-        "changes": [
-            {
-                "type": "feature",
-                "text": "Sécurisation du Mode Édition : interdiction de supprimer une compétence ayant des points investis (le déplacement reste autorisé).",
-                "category": "ux"
-            }
         ]
     }
 ]

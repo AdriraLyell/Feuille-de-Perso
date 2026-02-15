@@ -213,13 +213,19 @@ const AdminApp: React.FC = () => {
                 {activeTab === 'libraries' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4">
                         <div className="flex gap-2 mb-6 bg-mystic-surface p-2 rounded-sm shadow-md border border-stone-700 w-fit mx-auto overflow-x-auto">
-                            {['traits', 'skills', 'backgrounds', 'counters', 'specializations'].map((lt) => (
+                            {([
+                                { id: 'traits', label: 'Traits' },
+                                { id: 'skills', label: 'Compétences' },
+                                { id: 'backgrounds', label: 'Arrière-Plans' },
+                                { id: 'counters', label: 'Compteurs' },
+                                { id: 'specializations', label: 'Spécialisations' }
+                            ] as const).map((lt) => (
                                 <button
-                                    key={lt}
-                                    onClick={() => setActiveLibraryTab(lt as typeof activeLibraryTab)}
-                                    className={`px-6 py-2 rounded-sm font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap ${activeLibraryTab === lt ? 'bg-amber-gold text-stone-900 shadow-glow-gold' : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800'}`}
+                                    key={lt.id}
+                                    onClick={() => setActiveLibraryTab(lt.id as typeof activeLibraryTab)}
+                                    className={`px-6 py-2 rounded-sm font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap ${activeLibraryTab === lt.id ? 'bg-amber-gold text-stone-900 shadow-glow-gold' : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800'}`}
                                 >
-                                    {lt.charAt(0).toUpperCase() + lt.slice(1)}
+                                    {lt.label}
                                 </button>
                             ))}
                         </div>
