@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.51",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🐛 Fix : Correction d'une erreur de syntaxe blockante (return manquant) dans CharacterReadOnlyView",
+            "🛡️ Stabilité : Restauration de l'import RefreshCw manquant dans GlobalPlayersView",
+            "🏷️ Typage : Ajout du type RulesData manquant sur le paramètre merged de CharacterReadOnlyView"
+        ]
+    },
+    {
         "version": "2.49.50",
         "date": "2026-02-15",
         "type": "feat",
@@ -1007,18 +1017,6 @@
             "🛡️ Résilience : Intégration de defaultRules.ts comme ultime fallback embarqué",
             "🧹 Nettoyage : Suppression de PlayerService au profit de CampaignService unifié",
             "💾 Migration : Amélioration de migrateRulesToV2 pour garantir l'intégrité des bibliothèques"
-        ]
-    },
-    {
-        "version": "2.44.3",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "💾 Hybrid Database : Implémentation du OfflineStorageService (IndexedDB)",
-            "📡 Résilience : Chargement 'Online First' avec repli automatique sur le cache local",
-            "🌐 Connectivity : Détection intelligente de l'état hors ligne (isOffline)",
-            "💾 Persistance : Les campagnes chargées depuis Supabase sont désormais auto-cachées localement",
-            "🛡️ Typage : Ajout de la source 'cache' au schéma RulesData"
         ]
     }
 ]

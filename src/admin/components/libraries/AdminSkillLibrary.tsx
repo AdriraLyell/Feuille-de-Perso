@@ -327,7 +327,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                 </div>
 
                                 {/* Mystic Link SECTION */}
-                                <div className={`bg-amber-50 border border-amber-200 rounded p-3 flex flex-col gap-2 transition-all ${!!editingSkill.mysticAbilityId ? 'ring-1 ring-amber-400' : ''}`}>
+                                <div className={`bg-amber-50 border border-amber-200 rounded p-3 flex flex-col gap-2 transition-all ${editingSkill.mysticAbilityId ? 'ring-1 ring-amber-400' : ''}`}>
                                     <div className="flex items-center gap-3">
                                         <input
                                             type="checkbox"

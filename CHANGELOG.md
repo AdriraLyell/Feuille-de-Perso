@@ -1,5 +1,13 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.44.3] - 2026-02-11 [MINOR]
+
+- 💾 Hybrid Database : Implémentation du OfflineStorageService (IndexedDB)
+- 📡 Résilience : Chargement 'Online First' avec repli automatique sur le cache local
+- 🌐 Connectivity : Détection intelligente de l'état hors ligne (isOffline)
+- 💾 Persistance : Les campagnes chargées depuis Supabase sont désormais auto-cachées localement
+- 🛡️ Typage : Ajout de la source 'cache' au schéma RulesData
+
 ## [2.44.2] - 2026-02-11 [PATCH]
 
 - 🛡️ Typage : Éradication finale des 'as any' dans AdminApp, SyncModal et CharacterReadOnly

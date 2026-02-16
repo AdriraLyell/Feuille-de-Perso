@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.71",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🛡️ CI : Correction des erreurs de typage TypeScript bloquant le workflow (RecreationService)",
+            "🧩 UI : Fix du typage missing onUpdate dans le composant AttributeBlock",
+            "🧹 Lint : Suppression d'un double cast booléen redondant dans AdminSkillLibrary"
+        ]
+    },
+    {
         "version": "2.49.70",
         "date": "2026-02-16",
         "type": "fix",
@@ -181,16 +191,6 @@
         "changes": [
             "📝 Documentation : Création du guide complet sur la gestion des conflits et la synchronisation sécurisée (SYNC_CONFLICT_MANAGEMENT.md)",
             "🏗️ Architecture : Synthèse des scénarios de réconciliation (Ajout/Suppression MJ, Dirty Checking)"
-        ]
-    },
-    {
-        "version": "2.49.51",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🐛 Fix : Correction d'une erreur de syntaxe blockante (return manquant) dans CharacterReadOnlyView",
-            "🛡️ Stabilité : Restauration de l'import RefreshCw manquant dans GlobalPlayersView",
-            "🏷️ Typage : Ajout du type RulesData manquant sur le paramètre merged de CharacterReadOnlyView"
         ]
     }
 ]

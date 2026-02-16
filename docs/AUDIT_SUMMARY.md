@@ -59,7 +59,13 @@
 - **Résultat** : `RuleCalculationsService.ts` réduit à une simple façade (~30 lignes). Logique métier isolée et testable.
 
 ---
-*Dernière mise à jour : 16 Février 2026 - v2.49.68*
+*Dernière mise à jour : 16 Février 2026 - v2.49.71*
+
+### ✅ Phase 22 : Santé CI & Typage Strict (Audit v2.49.71) - [RÉSOLU]
+- **CI/CD** : Restauration de l'intégrité du workflow GitHub suite à des erreurs de typage sur les nouvelles fonctionnalités.
+- **Typage** : Correction des types optionnels dans `RecreationService.ts` et `AttributeBlock.tsx`.
+- **Linting** : Élimination des erreurs `no-extra-boolean-cast` bloquant le build automatique.
+- **Résultat** : Workflow CI repassé au vert (Type Check & Lint OK).
 
 ### ✅ Phase 21 : Recréation de Personnage (Audit v2.49.68) - [RÉSOLU]
 - **Logique métier** : Création de `RecreationService.ts` pour liquider la progression en XP (remboursement auto).

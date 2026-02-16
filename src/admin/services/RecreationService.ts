@@ -92,13 +92,13 @@ export const RecreationService = {
             startingXP: creationRule.startingXP,
             pointsDistributionMode: creationRule.pointsDistributionMode,
             pointsBuckets: creationRule.pointsBuckets,
-            attributePoints: creationRule.attributePoints,
-            attributeCost: creationRule.attributeCost,
+            attributePoints: creationRule.attributePoints ?? 0,
+            attributeCost: creationRule.attributeCost ?? 6,
             attributeMin: creationRule.attributeMin,
             attributeMax: creationRule.attributeMax,
-            backgroundPoints: creationRule.backgroundPoints,
+            backgroundPoints: creationRule.backgroundPoints ?? 0,
             rankSlots: creationRule.rankSlots,
-            backgroundCost: creationRule.backgroundCost
+            backgroundCost: creationRule.backgroundCost ?? 2
         };
 
         // On s'assure que les specialisations sont vidées car invalidées par le reset compétences

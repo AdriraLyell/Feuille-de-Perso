@@ -101,6 +101,7 @@ export const AttributeBlock = React.memo<{
     title: string;
     items: AttributeEntry[];
     cat: string;
+    onUpdate: (category: string, id: string, field: 'val1' | 'val2' | 'val3', value: string) => void;
     bonuses: Record<string, BonusInfo>;
     secondaryItems?: AttributeEntry[];
     isCreationMode?: boolean;
