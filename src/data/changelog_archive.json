@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.48",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🛡️ Synchronisation : Implémentation du '3-Way Hash Check' (Dirty Check) pour éviter d'écraser des modifications locales par mégarde",
+            "💬 Admin : Possibilité pour le MJ d'envoyer un message personnalisé lors d'un signal de mise à jour",
+            "🔔 UX : Affichage des notes du MJ et alerte de 'Version plus récente disponible' dans la modale de synchronisation du joueur",
+            "⚙️ Service : Optimisation du CharacterSyncService pour gérer les messages et les signatures numériques (hashes)"
+        ]
+    },
+    {
         "version": "2.49.47",
         "date": "2026-02-15",
         "type": "feat",
@@ -1013,19 +1024,6 @@
             "👁️ Visibilité : Contrôle MJ sur l'affichage des infos de campagne pour les joueurs",
             "🛡️ Base de Données : Migration PostgreSQL pour supporter les nouvelles métadonnées",
             "🧑‍🚀 Expérience Joueur : Modal d'information de campagne avec message de bienvenue automatique"
-        ]
-    },
-    {
-        "version": "2.44.0",
-        "date": "2026-02-12",
-        "type": "minor",
-        "changes": [
-            "🏗️ Architecture : Refonte majeure du MainLayout via les hooks useNavigationState, usePrintManager et useRulesSync",
-            "🏗️ Architecture : Refactorisation de SettingsView via le hook useSettingsManager",
-            "🏗️ Architecture : Refactorisation de CharacterSheetPage2 via useTraitEditor et useReputationManager",
-            "🏗️ Architecture : Refactorisation de LibraryView via useSkillLibrary",
-            "🧹 Code : Suppression de code dupliqué et amélioration de la séparation des préoccupations",
-            "🛡️ Stabilité : Correction des types TypeScript et amélioration de la robustesse de la synchro des règles"
         ]
     }
 ]

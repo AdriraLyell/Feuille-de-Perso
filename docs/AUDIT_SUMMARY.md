@@ -59,7 +59,15 @@
 - **Résultat** : `RuleCalculationsService.ts` réduit à une simple façade (~30 lignes). Logique métier isolée et testable.
 
 ---
-*Dernière mise à jour : 15 Février 2026 - v2.49.40*
+*Dernière mise à jour : 16 Février 2026 - v2.49.68*
+
+### ✅ Phase 21 : Recréation de Personnage (Audit v2.49.68) - [RÉSOLU]
+- **Logique métier** : Création de `RecreationService.ts` pour liquider la progression en XP (remboursement auto).
+- **Administration** : Intégration de l'action \"Recréer\" dans `GlobalPlayersView.tsx` avec signal de mise à jour forcé.
+- **UI/UX** : Création de `RecreationModal.tsx` avec bilan financier (XP) et avertissements thématiques.
+- **Accessibilité** : Mise à jour de `ConfirmationModal.tsx` pour supporter des messages riches (ReactNode).
+- **Résultat** : Les MJs peuvent désormais autoriser un \"Respec\" complet tout en préservant l'investissement en temps (XP) du joueur.
+
 
 ### ✅ Phase 20 : Correction des Tooltips Portals (Audit v2.49.40) - [RÉSOLU]
 - **Correction UI** : Résolution du tronquage des tooltips provoqué par `overflow: hidden` et `overflow-y: auto`.

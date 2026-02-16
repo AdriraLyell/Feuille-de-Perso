@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.68",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🔄 Recréation : Implémentation du système de 'Respec' pour les personnages (Admin)",
+            "💰 XP : Remboursement automatique de l'XP de progression (attributs, compétences, compteurs) lors d'une recréation",
+            "🛡️ Mode Création : Réactivation du mode création avec injection du remboursement et redistribution auto",
+            "🎨 UI : Nouvelle modale de confirmation 'Recréation Éthérée' avec bilan des gains d'XP et avertissements"
+        ]
+    },
+    {
         "version": "2.49.67",
         "date": "2026-02-16",
         "type": "feat",
@@ -179,17 +190,6 @@
         "changes": [
             "🐛 Fix : Correction d'une erreur de référence sur ThematicModal dans la Master List des joueurs",
             "🛡️ Stabilité : Vérification des imports manquants suite à la mise à jour des signaux MJ"
-        ]
-    },
-    {
-        "version": "2.49.48",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🛡️ Synchronisation : Implémentation du '3-Way Hash Check' (Dirty Check) pour éviter d'écraser des modifications locales par mégarde",
-            "💬 Admin : Possibilité pour le MJ d'envoyer un message personnalisé lors d'un signal de mise à jour",
-            "🔔 UX : Affichage des notes du MJ et alerte de 'Version plus récente disponible' dans la modale de synchronisation du joueur",
-            "⚙️ Service : Optimisation du CharacterSyncService pour gérer les messages et les signatures numériques (hashes)"
         ]
     }
 ]

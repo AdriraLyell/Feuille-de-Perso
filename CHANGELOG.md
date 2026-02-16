@@ -1,5 +1,14 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.44.0] - 2026-02-12 [MINOR]
+
+- 🏗️ Architecture : Refonte majeure du MainLayout via les hooks useNavigationState, usePrintManager et useRulesSync
+- 🏗️ Architecture : Refactorisation de SettingsView via le hook useSettingsManager
+- 🏗️ Architecture : Refactorisation de CharacterSheetPage2 via useTraitEditor et useReputationManager
+- 🏗️ Architecture : Refactorisation de LibraryView via useSkillLibrary
+- 🧹 Code : Suppression de code dupliqué et amélioration de la séparation des préoccupations
+- 🛡️ Stabilité : Correction des types TypeScript et amélioration de la robustesse de la synchro des règles
+
 ## [2.43.3] - 2026-02-11 [PATCH]
 
 - 🏗️ Architecture : Extraction de la logique complexe de CharacterSheet.tsx vers useEditMode et useVariableSkills
