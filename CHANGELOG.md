@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.45.3] - 2026-02-12 [PATCH]
+
+- 🛡️ Sécurité & Fiabilité : Ajout de blocs try/catch/finally sur toutes les actions asynchrones de l'Admin
+- 🧩 Type Safety : Suppression massive de types 'any' et de '@ts-ignore' dans le moteur de réconciliation
+- 🧪 Tests : Correction de la suite de tests pour supporter le nouveau typage des compteurs
+- 🧹 Code Clean : Suppression de console.logs et typage strict des accesseurs d'état
+
 ## [2.45.2] - 2026-02-12 [PATCH]
 
 - 🛡️ Hotfix : Correction d'un crash critique 'process is not defined' sur l'écran de connexion

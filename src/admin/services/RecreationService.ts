@@ -1,5 +1,6 @@
 import { CharacterSheetData, RulesData } from '../../types';
 import { recreateCharacterStats } from '../../utils/characterUtils';
+import { normalizeString } from '../../utils/stringUtils';
 import { generateId } from '../../utils/factories';
 
 /**
@@ -39,6 +40,12 @@ export const RecreationService = {
 
             // On crée une nouvelle liste basée strictement sur les règles
             const newSkillList = ruleNames.map(ruleName => {
+                // Déterminer si la compétence est variable (ex: "Artisanat : ...")
+                const libSkill = currentRules.libraries?.skills?.find(s => normalizeString(s.name) === normalizeString(ruleName));
+                const isVariable = libSkill?.isVariable === true;
+                // Si variable => variant: "" (attente input utilisateur), sinon undefined (pas de variant)
+                const targetVariant = isVariable ? "" : undefined;
+
                 // Tenter de trouver une compétence existante correspondante pour garder l'ID (logs, etc.)
                 const match = existingSkills.find(s =>
                     s.name === ruleName && !consumedIds.has(s.id)
@@ -46,23 +53,23 @@ export const RecreationService = {
 
                 if (match) {
                     consumedIds.add(match.id);
-                    // On garde l'ID mais on reset TOUT le reste pour être sûr
+                    // On garde l'ID mais on reset le reste
                     return {
                         ...match,
                         value: 0,
                         creationValue: 0,
-                        variant: undefined, // FORCE RESET du variant
+                        variant: targetVariant, // Reset correct selon la définition
                         current: 0
                     };
                 } else {
-                    // Création d'une entrée vierge si non trouvée
+                    // Création d'une entrée vierge
                     return {
                         id: generateId(),
                         name: ruleName,
                         value: 0,
                         creationValue: 0,
-                        max: 0, // Sera recalculé par le reconciler si besoin
-                        variant: undefined
+                        max: 0,
+                        variant: targetVariant
                     };
                 }
             });
