@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.46",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🏛️ Admin : Intégration avancée de la Master List avec le thème 'Mystic' (texture cuir, glassmorphism)",
+            "📊 Data : Ajout des colonnes de compétences prioritaires (Savoirs et Arrière-plans) directement dans le registre",
+            "⚡ Performance : Optimisation de la vue SQL pour extraire les compétences sans charger toute la fiche",
+            "🔍 UX : Amélioration de la recherche et des filtres orphelins avec retour visuel thématique"
+        ]
+    },
+    {
         "version": "2.49.45",
         "date": "2026-02-15",
         "type": "feat",
@@ -1017,17 +1028,6 @@
             "🏗️ Architecture : Modularisation de LibraryView.tsx via le nouveau hook useSkillLibrary",
             "🧹 Nettoyage : Réduction de la taille des composants principaux (~300 lignes extraites)",
             "🚀 Performance : Optimisation des rendus via useMemo dans les nouveaux hooks"
-        ]
-    },
-    {
-        "version": "2.43.2",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "💎 Qualité : Suppression massive de 'as any' pour un typage TypeScript strict (~90 occurrences)",
-            "♿ Accessibilité : Installation de eslint-plugin-jsx-a11y et corrections sémantique (main, nav, aside)",
-            "🏷️ UX : Ajout de labels ARIA sur les boutons d'actions (Déconnexion, Suppression, Publication)",
-            "🛡️ Typage : Sécurisation du processus d'import de bibliothèque avec validation de types"
         ]
     }
 ]

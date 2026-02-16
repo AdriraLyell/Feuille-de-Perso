@@ -177,9 +177,13 @@ export const ImageCompressionService = {
             const decompressed = pako.ungzip(bytes);
 
             // Convert back to base64
-            return btoa(
+            const base64 = btoa(
                 String.fromCharCode.apply(null, Array.from(decompressed))
             );
+
+            // Ensure we return a valid Data URI for images. 
+            // Since this is ImageCompressionService, we mostly deal with WebP.
+            return base64.startsWith('data:') ? base64 : `data:image/webp;base64,${base64}`;
         } catch (e) {
             ErrorService.handleError(e, { context: 'ImageCompressionService.decompressBase64', silent: true });
             return compressed; // Return original on error

@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.49.66",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🩹 Image : Correction du préfixe Data URI manquant lors de la décompression (fix 431 Request Header Too Large)",
+            "🛡️ Stabilité : Détection automatique des schémas d'images corrompus dans les registres admin"
+        ]
+    },
+    {
         "version": "2.49.65",
         "date": "2026-02-16",
         "type": "fix",
@@ -180,17 +189,6 @@
         "changes": [
             "🏛️ Admin : Allègement du Registre des Destins (retrait des colonnes Col 4 et Col 8)",
             "⚡ Performance : Restauration de la vue SQL simplifiée pour les résumés de personnages"
-        ]
-    },
-    {
-        "version": "2.49.46",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🏛️ Admin : Intégration avancée de la Master List avec le thème 'Mystic' (texture cuir, glassmorphism)",
-            "📊 Data : Ajout des colonnes de compétences prioritaires (Savoirs et Arrière-plans) directement dans le registre",
-            "⚡ Performance : Optimisation de la vue SQL pour extraire les compétences sans charger toute la fiche",
-            "🔍 UX : Amélioration de la recherche et des filtres orphelins avec retour visuel thématique"
         ]
     }
 ]

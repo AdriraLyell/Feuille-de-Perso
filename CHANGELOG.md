@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.43.2] - 2026-02-11 [PATCH]
+
+- 💎 Qualité : Suppression massive de 'as any' pour un typage TypeScript strict (~90 occurrences)
+- ♿ Accessibilité : Installation de eslint-plugin-jsx-a11y et corrections sémantique (main, nav, aside)
+- 🏷️ UX : Ajout de labels ARIA sur les boutons d'actions (Déconnexion, Suppression, Publication)
+- 🛡️ Typage : Sécurisation du processus d'import de bibliothèque avec validation de types
+
 ## [2.43.1] - 2026-02-11 [PATCH]
 
 - 🛡️ Sécurité : Mise à jour vers Vite 7 et correction des vulnérabilités (npm audit)
