@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.73",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🛡️ Sécurité : Suppression de l'attribution automatique de propriété dans DatabaseService pour éviter le verrouillage des fiches legacy",
+            "👤 Personnage : Déverrouillage des fiches d'Ayame et Louise (reset created_by à NULL) pour restaurer l'accès public",
+            "🔓 RLS : Mise à jour des politiques Supabase pour autoriser la lecture anonyme des fiches sans propriétaire"
+        ]
+    },
+    {
         "version": "2.49.72",
         "date": "2026-02-16",
         "type": "docs",
@@ -183,15 +193,6 @@
             "📝 Terminologie : Remplacement de 'Échelon' par 'Rang' dans tout le système d'administration",
             "🎨 UI : Retrait de la mention 'Niveau du Talent' dans la configuration des rangs",
             "🖋️ UI : Remplacement de 'Slots' par 'Rangs Disponibles' pour une meilleure clarté sémantique"
-        ]
-    },
-    {
-        "version": "2.49.53",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🌐 Admin : Traduction en français des onglets de bibliothèques (Skills, Backgrounds, Counters, Specializations)",
-            "🏗️ Refactoring : Amélioration de la structure des onglets de bibliothèques dans AdminApp.tsx"
         ]
     }
 ]

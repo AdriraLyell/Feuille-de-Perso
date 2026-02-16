@@ -1,5 +1,13 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.44.5] - 2026-02-12 [MINOR]
+
+- 🧪 Test Automation : Mise en place d'une suite complète de tests E2E avec Playwright
+- 📡 Robustesse Réseau : Validation des scénarios de repli (Offline, Rate Limit API, CDN Failure)
+- 💾 Tests d'Intégration : Couverture des services CampaignService et OfflineStorageService
+- 🛡️ Correction de Bug : Élimination des doublons dans l'affichage des campagnes cachées
+- 🔧 RulesLoader : Gestion optimisée des erreurs 403/429 pour la résilience du chargement
+
 ## [2.44.4] - 2026-02-12 [PATCH]
 
 - 🏗️ Architecture : Suppression définitive de l'injection script rules.js
