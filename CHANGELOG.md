@@ -1,5 +1,13 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.44.2] - 2026-02-11 [PATCH]
+
+- 🛡️ Typage : Éradication finale des 'as any' dans AdminApp, SyncModal et CharacterReadOnly
+- ♿ Accessibilité : Gestion du focus et support touche Echap dans les modales thématiques
+- 🏷️ UX : Ajout de labels ARIA sur l'ensemble de la navigation diégétique
+- 🧹 Code : Nettoyage des stubs ts-ignore dans les générateurs d'état initial
+- 🔧 Service : Ajout de checkSchema dans CampaignService pour la validation manuelle
+
 ## [2.44.1] - 2026-02-11 [MINOR]
 
 - 🚀 MJ Dashboard : Implémentation de l'archivage des campagnes

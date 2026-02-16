@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.50",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🏛️ Admin : Restriction du signal de mise à jour MJ aux personnages liés à une campagne uniquement",
+            "🧹 Clean : Retrait du bouton de mise à jour de la Master List globale pour éviter les actions hors contexte",
+            "🛠️ Architecture : Ajout de la prop 'allowForceUpdate' au composant CharacterReadOnlyView pour un contrôle granulaire"
+        ]
+    },
+    {
         "version": "2.49.49",
         "date": "2026-02-15",
         "type": "fix",
@@ -1009,18 +1019,6 @@
             "🌐 Connectivity : Détection intelligente de l'état hors ligne (isOffline)",
             "💾 Persistance : Les campagnes chargées depuis Supabase sont désormais auto-cachées localement",
             "🛡️ Typage : Ajout de la source 'cache' au schéma RulesData"
-        ]
-    },
-    {
-        "version": "2.44.2",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "🛡️ Typage : Éradication finale des 'as any' dans AdminApp, SyncModal et CharacterReadOnly",
-            "♿ Accessibilité : Gestion du focus et support touche Echap dans les modales thématiques",
-            "🏷️ UX : Ajout de labels ARIA sur l'ensemble de la navigation diégétique",
-            "🧹 Code : Nettoyage des stubs ts-ignore dans les générateurs d'état initial",
-            "🔧 Service : Ajout de checkSchema dans CampaignService pour la validation manuelle"
         ]
     }
 ]
