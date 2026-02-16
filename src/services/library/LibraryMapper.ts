@@ -1,5 +1,5 @@
 import { LibraryBackgroundEntry, LibraryCounterEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryEntry as LibraryTraitEntry } from '../../types/system';
-import { DBTrait, DBSkill, DBSpecialization, DBBackground, DBCounter } from '../../types/database';
+import { DBTrait, DBSkill, DBSpecialization, DBBackground, DBCounter, DBMysticAbility } from '../../types/database';
 
 
 const legacySkillMap: Record<string, string> = {
@@ -37,7 +37,17 @@ export const LibraryMapper = {
         isVariable: s.is_variable || false,
         variants: variants,
         isGlobal: s.setting_id === null,
-        isActive: activeIds.has(s.id) || s.setting_id === sid
+        isActive: activeIds.has(s.id) || s.setting_id === sid,
+        mysticAbilityId: s.mystic_ability_id // Added this line
+    }),
+
+    mapMysticAbility: (m: DBMysticAbility, activeIds: Set<string>, sid: string): LibrarySkillEntry => ({
+        id: m.id,
+        name: m.name,
+        description: m.description || '',
+        isVariable: m.is_variable || false,
+        isGlobal: m.setting_id === null,
+        isActive: activeIds.has(m.id) || m.setting_id === sid
     }),
 
     mapSpec: (s: DBSpecialization, activeIds: Set<string>, sid: string): LibrarySpecializationEntry => ({

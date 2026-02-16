@@ -11,6 +11,10 @@ import CharacterReadOnlyView from './CharacterReadOnlyView';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 import { MotionCard } from '../../components/ui/motion/MotionCard';
 import { ErrorService } from '../../services/ErrorService';
+import { RotateCcw } from 'lucide-react';
+import RecreationModal from './RecreationModal';
+import { RecreationService } from '../services/RecreationService';
+import { CampaignService } from '../../services/CampaignService';
 
 interface CampaignCharactersViewProps {
     settingId: string;
@@ -22,6 +26,8 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
     const [isLoading, setIsLoading] = useState(true);
     const [selectedCharacter, setSelectedCharacter] = useState<SyncedCharacter | null>(null);
     const [isLoadingCharacter, setIsLoadingCharacter] = useState(false);
+    const [characterToRecreate, setCharacterToRecreate] = useState<SyncedCharacter | null>(null);
+    const [isRecreating, setIsRecreating] = useState(false);
 
     useEffect(() => {
         loadCharacters();
@@ -66,8 +72,54 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
         }
     };
 
+    const handleRecreateRequest = async (id: string) => {
+        try {
+            const fullChar = await CharacterSyncService.getCharacterById(id);
+            if (fullChar) {
+                setCharacterToRecreate(fullChar);
+            }
+        } catch (error) {
+            ErrorService.handleError(error, {
+                context: 'CampaignCharactersView.handleRecreateRequest',
+                userMessage: "Impossible de préparer la recréation."
+            });
+        }
+    };
+
+    const confirmRecreate = async (refundAmount: number) => {
+        if (!characterToRecreate) return;
+        setIsRecreating(true);
+        try {
+            // 1. Charger les règles actuelles de la campagne
+            const currentRules = await CampaignService.loadSetting(settingId);
+            if (!currentRules) throw new Error("Impossible de charger les règles de la campagne.");
+
+            // 2. Transformer les données
+            const newData = RecreationService.performRecreation(characterToRecreate.data, refundAmount, currentRules);
+
+            // 3. Persister dans Supabase
+            const success = await CharacterSyncService.updateCharacterData(characterToRecreate.id, newData);
+
+            if (success) {
+                // Notifier le joueur via un message forcé
+                await CharacterSyncService.requestForceUpdate(characterToRecreate.id, "Votre personnage a été réinitialisé par le MJ pour une recréation.");
+
+                // Rafraîchir la liste locale
+                await loadCharacters();
+            }
+        } catch (error) {
+            ErrorService.handleError(error, {
+                context: 'CampaignCharactersView.confirmRecreate',
+                userMessage: "Échec de la recréation."
+            });
+        } finally {
+            setIsRecreating(false);
+            setCharacterToRecreate(null);
+        }
+    };
+
     return (
-        <MotionCard className="p-8 border-stone-700/50" hoverEffect="glow">
+        <MotionCard className="p-8 border-stone-700/50 h-[calc(100vh-120px)] flex flex-col" hoverEffect="glow">
             <div className="flex justify-between items-center mb-8 border-b border-stone-800 pb-4">
                 <div>
                     <h2 className="text-2xl font-serif font-black text-amber-500 flex items-center gap-3 uppercase tracking-widest">
@@ -104,7 +156,7 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
                     </div>
                 </MotionFade>
             ) : (
-                <div className="overflow-hidden rounded-sm border border-stone-800 bg-stone-900/40">
+                <div className="flex-grow overflow-y-auto rounded-sm border border-stone-800 bg-stone-900/40 custom-scrollbar">
                     <table className="w-full">
                         <thead className="bg-stone-950/50">
                             <tr>
@@ -164,6 +216,15 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
                                             <Eye size={16} />
                                             <span className="uppercase tracking-widest">Voir</span>
                                         </button>
+                                        <button
+                                            onClick={() => handleRecreateRequest(char.id)}
+                                            disabled={isRecreating || isLoadingCharacter}
+                                            className="inline-flex items-center gap-2 px-3 py-2 bg-stone-900/60 hover:bg-amber-600/20 text-stone-500 hover:text-amber-500 rounded-sm font-bold text-xs transition-all border border-stone-800 hover:border-amber-900/30 shadow-sm active:scale-95 uppercase tracking-widest disabled:opacity-50"
+                                            title="Lancer une recréation (Respec)"
+                                        >
+                                            <RotateCcw size={14} className={isRecreating && characterToRecreate?.id === char.id ? 'animate-spin' : ''} />
+                                            Recréer
+                                        </button>
                                     </td>
                                 </MotionFade>
                             ))}
@@ -178,6 +239,17 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
                     character={selectedCharacter}
                     onClose={() => setSelectedCharacter(null)}
                     onRefreshRules={onRefreshRules}
+                    allowForceUpdate={true}
+                />
+            )}
+
+            {/* Recreation Modal */}
+            {characterToRecreate && (
+                <RecreationModal
+                    isOpen={!!characterToRecreate}
+                    onClose={() => setCharacterToRecreate(null)}
+                    onConfirm={confirmRecreate}
+                    character={characterToRecreate.data}
                 />
             )}
         </MotionCard>

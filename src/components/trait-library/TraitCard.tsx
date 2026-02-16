@@ -1,7 +1,7 @@
-
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { LibraryEntry } from '../../types';
 import { Zap, Edit2, Trash2, Plus, CheckSquare, Square, Lock, Globe, Layers } from 'lucide-react';
+import { PortalTooltip } from '../ui/PortalTooltip';
 
 interface TraitCardProps {
     entry: LibraryEntry;
@@ -17,6 +17,40 @@ interface TraitCardProps {
     isActive?: boolean;
 }
 
+const TraitCardItemVariants: React.FC<{ entry: LibraryEntry; hasVariants: boolean }> = ({ entry, hasVariants }) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+    const anchorRef = useRef<HTMLDivElement>(null);
+
+    return (
+        <div
+            ref={anchorRef}
+            className="relative"
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+            title={!hasVariants ? "Trait à variantes" : undefined}
+        >
+            <Layers
+                size={14}
+                className="text-blue-500"
+            />
+
+            {hasVariants && (
+                <PortalTooltip
+                    anchorRef={anchorRef}
+                    isOpen={showTooltip}
+                    title="Variantes suggérées"
+                >
+                    <div className="flex flex-wrap gap-1">
+                        {entry.variants?.map((v, i) => (
+                            <span key={i} className="bg-slate-700 px-1 rounded-sm border border-slate-600">{v}</span>
+                        ))}
+                    </div>
+                </PortalTooltip>
+            )}
+        </div>
+    );
+};
+
 const TraitCard: React.FC<TraitCardProps> = ({
     entry,
     isEditable,
@@ -31,6 +65,8 @@ const TraitCard: React.FC<TraitCardProps> = ({
     isActive = true
 }) => {
     if (!entry) return null;
+
+    const hasVariants = entry.variants && entry.variants.length > 0;
 
     return (
         <div
@@ -56,7 +92,7 @@ const TraitCard: React.FC<TraitCardProps> = ({
 
             {/* 2. Status Icons (Fixed width) */}
             <div className="w-16 flex items-center gap-1 shrink-0">
-                {entry.isVariable && <div title="Trait à variantes"><Layers size={14} className="text-blue-500" /></div>}
+                {entry.isVariable && <TraitCardItemVariants entry={entry} hasVariants={!!hasVariants} />}
                 {source === 'official' && <div title="Trait Officiel"><Globe size={14} className="text-indigo-500" /></div>}
                 {entry.effects && entry.effects.length > 0 && <div title="Effets mécaniques"><Zap size={14} className="text-amber-500 fill-amber-500" /></div>}
                 {isLocked && <div title="Trait utilisé"><Lock size={14} className="text-amber-600" /></div>}

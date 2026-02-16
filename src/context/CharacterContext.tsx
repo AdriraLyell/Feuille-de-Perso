@@ -170,7 +170,11 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
             const validated = validateCharacterData(migrated);
 
             // Reconcile with current rules if available to ensure MJ definitions are applied
-            const finalData = rules ? reconcileRulesWithState(validated, rules) : validated;
+            const sanitizedData = {
+                ...validated,
+                mysticAbilities: validated.mysticAbilities || []
+            };
+            const finalData = rules ? reconcileRulesWithState(sanitizedData, rules) : sanitizedData;
 
             setData(finalData);
             addLog("Données importées avec succès", 'success', 'settings');
@@ -250,7 +254,8 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
                             ...prev,
                             syncInfo: {
                                 ...prev.syncInfo,
-                                lastSynced: Date.now()
+                                lastSynced: Date.now(),
+                                lastSyncedHash: result.hash
                             }
                         };
                     }

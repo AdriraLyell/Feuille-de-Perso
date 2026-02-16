@@ -34,6 +34,7 @@ export const LibrarySkillEntrySchema = z.object({
     variants: z.array(z.string()).nullable().optional(),
     isGlobal: z.boolean().nullable().optional(),
     isActive: z.boolean().nullable().optional(),
+    mysticAbilityId: z.string().nullable().optional(),
 });
 
 export const LibrarySpecializationEntrySchema = z.object({
@@ -90,6 +91,7 @@ export const RulesXPCostsSchema = z.object({
     attributeFactor: z.number(),
     skillFactor: z.number(),
     specializationFactor: z.number(),
+    traitCost: z.number().optional().default(5),
 });
 
 export const RulesCardConfigSchema = z.object({
@@ -155,6 +157,7 @@ export const RulesDataSchema = z.object({
         backgrounds: z.array(LibraryBackgroundEntrySchema),
         counters: z.array(LibraryCounterEntrySchema),
         specializations: z.array(LibrarySpecializationEntrySchema),
+        mysticAbilities: z.array(LibrarySkillEntrySchema).optional().default([]),
     }),
 });
 

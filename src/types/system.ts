@@ -90,6 +90,7 @@ export interface LibrarySkillEntry {
   isActive?: boolean; // True if selected for this campaign
   isLocked?: boolean;
   globalUsage?: number;
+  mysticAbilityId?: string; // Links this skill to a specific mystic ability
 }
 
 // Nouveau : Entrée pour le catalogue des spécialisations

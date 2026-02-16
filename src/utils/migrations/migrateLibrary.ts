@@ -78,4 +78,10 @@ export const migrateLibrary = (parsed: any): void => {
             effects: Array.isArray(l.effects) ? l.effects : []
         }));
     }
+
+    // Initialize mysticAbilities library
+    if (!parsed.mysticAbilities) {
+        const initialMystic: LibrarySkillEntry[] = (INITIAL_DATA as any).mysticAbilities || [];
+        parsed.mysticAbilities = initialMystic.map(m => ({ ...m }));
+    }
 };

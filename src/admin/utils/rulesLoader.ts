@@ -74,7 +74,8 @@ export const generateDefaultRules = (): RulesData => {
             xpCosts: {
                 attributeFactor: 6,
                 skillFactor: 1,
-                specializationFactor: 0
+                specializationFactor: 0,
+                traitCost: 5
             },
             cards: {
                 ...data.creationConfig.cardConfig,
@@ -121,7 +122,8 @@ export const generateDefaultRules = (): RulesData => {
             skills: data.skillLibrary || [],
             specializations: data.specializationLibrary || [],
             backgrounds: [],
-            counters: []
+            counters: [],
+            mysticAbilities: (data as any).mysticAbilities || []
         }
     };
 };

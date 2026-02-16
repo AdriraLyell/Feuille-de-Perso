@@ -151,7 +151,7 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
     // Library Merge Logic
     if (options.sections.libraries) {
         // Ensure library buckets exist
-        if (!result.libraries) result.libraries = { traits: [], skills: [], specializations: [], backgrounds: [], counters: [] };
+        if (!result.libraries) result.libraries = { traits: [], skills: [], specializations: [], backgrounds: [], counters: [], mysticAbilities: [] };
 
         const mergeLibList = <T extends { id: string }>(curr: T[], cand: T[]) => {
             const map = new Map(curr.map(i => [i.id, i]));

@@ -1,5 +1,349 @@
 [
     {
+        "version": "2.49.51",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🐛 Fix : Correction d'une erreur de syntaxe blockante (return manquant) dans CharacterReadOnlyView",
+            "🛡️ Stabilité : Restauration de l'import RefreshCw manquant dans GlobalPlayersView",
+            "🏷️ Typage : Ajout du type RulesData manquant sur le paramètre merged de CharacterReadOnlyView"
+        ]
+    },
+    {
+        "version": "2.49.50",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🏛️ Admin : Restriction du signal de mise à jour MJ aux personnages liés à une campagne uniquement",
+            "🧹 Clean : Retrait du bouton de mise à jour de la Master List globale pour éviter les actions hors contexte",
+            "🛠️ Architecture : Ajout de la prop 'allowForceUpdate' au composant CharacterReadOnlyView pour un contrôle granulaire"
+        ]
+    },
+    {
+        "version": "2.49.49",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🐛 Fix : Correction d'une erreur de référence sur ThematicModal dans la Master List des joueurs",
+            "🛡️ Stabilité : Vérification des imports manquants suite à la mise à jour des signaux MJ"
+        ]
+    },
+    {
+        "version": "2.49.48",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🛡️ Synchronisation : Implémentation du '3-Way Hash Check' (Dirty Check) pour éviter d'écraser des modifications locales par mégarde",
+            "💬 Admin : Possibilité pour le MJ d'envoyer un message personnalisé lors d'un signal de mise à jour",
+            "🔔 UX : Affichage des notes du MJ et alerte de 'Version plus récente disponible' dans la modale de synchronisation du joueur",
+            "⚙️ Service : Optimisation du CharacterSyncService pour gérer les messages et les signatures numériques (hashes)"
+        ]
+    },
+    {
+        "version": "2.49.47",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🏛️ Admin : Allègement du Registre des Destins (retrait des colonnes Col 4 et Col 8)",
+            "⚡ Performance : Restauration de la vue SQL simplifiée pour les résumés de personnages"
+        ]
+    },
+    {
+        "version": "2.49.46",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🏛️ Admin : Intégration avancée de la Master List avec le thème 'Mystic' (texture cuir, glassmorphism)",
+            "📊 Data : Ajout des colonnes de compétences prioritaires (Savoirs et Arrière-plans) directement dans le registre",
+            "⚡ Performance : Optimisation de la vue SQL pour extraire les compétences sans charger toute la fiche",
+            "🔍 UX : Amélioration de la recherche et des filtres orphelins avec retour visuel thématique"
+        ]
+    },
+    {
+        "version": "2.49.45",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🎨 Admin : Alignement parfait de la Master List avec le thème 'Mystic' (MotionCard et structure de table)",
+            "🌑 UI : Correction du fond de page en vue globale (remplacement du gris par le noir pierre pierre)",
+            "🖋️ Typographie : Utilisation de polices Serif et gestion fine de l'espacement pour les registres",
+            "✨ UX : Intégration de MotionFade sur les lignes de tableaux pour une apparition fluide"
+        ]
+    },
+    {
+        "version": "2.49.44",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🎨 Admin : Application du thème 'Mystic' à la Master List des Voyageurs",
+            "🖋️ UI : Refonte visuelle des registres globaux (couleurs ambre/pierre et typographie serif)",
+            "📜 Fiche : Restauration des colonnes de compétences manquantes (Col_Comp_4 et Col_Comp_8)",
+            "🛡️ Fix : Robustesse accrue sur les filtres de catégories de compétences (insensibilité à la casse)"
+        ]
+    },
+    {
+        "version": "2.49.43",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🖥️ Admin : Expansion verticale massive de l'onglet Joueurs",
+            "📏 UI : Alignement des hauteurs de listes de personnages sur le système des bibliothèques (calc(100vh - 120px))",
+            "🔍 UX : Élargissement de la vue détaillée des personnages (max-w-7xl) pour une meilleure vision d'ensemble",
+            "📊 Global : La Master List des joueurs occupe désormais tout l'espace vertical disponible"
+        ]
+    },
+    {
+        "version": "2.49.42",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "📏 Admin : Augmentation de la hauteur verticale des vues de listes (Bibliothèques & Personnages)",
+            "🖥️ UX : Utilisation optimisée de l'espace vertical pour une meilleure visibilité des données",
+            "📜 Sync : Ajout d'une barre de défilement sur la liste des personnages de campagne"
+        ]
+    },
+    {
+        "version": "2.49.41",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🏛️ Admin : Harmonisation de la terminologie des Traits",
+            "🖋️ UI : Renommage de 'Éclats de Fortune' en 'Avantages' et 'Fardeaux de l'Ombre' en 'Désavantages' dans la vue ReadOnly",
+            "🛠️ Admin : Mise à jour des descriptifs de la bibliothèque de traits pour utiliser 'Désavantages' au lieu de 'Défauts'"
+        ]
+    },
+    {
+        "version": "2.49.40",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "✨ UI : Correction du tronquage des tooltips via React Portals",
+            "🧩 UX : Ajout du composant PortalTooltip pour les variantes (Traits, Compétences, Historiques)",
+            "🏗️ Refactoring : Migration des listes de variantes vers le système de portail pour éviter le clipping overflow"
+        ]
+    },
+    {
+        "version": "2.49.39",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🐛 Fix : Correction d'une violation des règles des Hooks React (useState dans un .map)",
+            "🏗️ Refactoring : Extraction des items de bibliothèque en sous-composants pour stabiliser le rendu"
+        ]
+    },
+    {
+        "version": "2.49.38",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "✨ UX : Ajout d'infobulles dynamiques listant les variantes au survol de l'icône dans la bibliothèque",
+            "📚 Bibliothèques : Implémentation pour les Traits, Compétences et Arrière-plans",
+            "🛡️ Stabilité : Gestion du repli (fallback) vers le titre classique si aucune variante n'est définie"
+        ]
+    },
+    {
+        "version": "2.49.37",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Modularisation de RuleCalculationsService.ts",
+            "📏 Code Health : Extraction des calculs d'XP (xpCalculator.ts) et de Tarot (cardCalculator.ts)",
+            "🏗️ Architecture : Simplification du service central vers un pattern Façade"
+        ]
+    },
+    {
+        "version": "2.49.36",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🐛 Fix : Correction d'un plantage dans le ColumnarEditor",
+            "🛡️ Stabilité : Ajout d'une garde contre les accès nuls lors de l'initialisation de l'éditeur Tiptap"
+        ]
+    },
+    {
+        "version": "2.49.35",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Simplification de CampaignService.ts",
+            "📏 Code Health : Extraction de la logique de réconciliation des règles dans campaignReconciler.ts",
+            "🏗️ Architecture : Amélioration de la séparation des préoccupations entre les services de base de données et la logique métier"
+        ]
+    },
+    {
+        "version": "2.49.34",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Éclatement du hook useAttributeEditor en modules spécialisés",
+            "📏 Code Health : Extraction de useAttributeStructure (gestion des catégories) et useAttributePresets (gestion des préréglages)",
+            "🏗️ Architecture : Amélioration de la modularité et réduction de la dette technique sur l'administration des attributs"
+        ]
+    },
+    {
+        "version": "2.49.33",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Extraction de la logique de AdminTraitLibrary dans le hook useAdminTraitLibrary",
+            "📏 Code Health : Réduction de la taille de AdminTraitLibrary.tsx (517 -> 240 lignes)"
+        ]
+    },
+    {
+        "version": "2.49.32",
+        "date": "2026-02-15",
+        "type": "refactor",
+        "changes": [
+            "🛠️ Refactoring : Extraction de la logique de ColumnarEditor dans des hooks spécialisés (Navigation, Dessin)",
+            "🛡️ Typage : Élimination des types 'any' résiduels dans les factories et le grimoire",
+            "🧹 Ménage : Suppression de la dépendance inutilisée 'tiptap-pagination-plus' et nettoyage des imports Admin"
+        ]
+    },
+    {
+        "version": "2.49.31",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "📔 Journal : Suppression de la barre de défilement verticale parasite sur Windows via overflow-y: auto",
+            "👥 Groupe : Restauration des dimensions fixes du tableau de groupe (1484x1000px) pour préserver l'alignement avec le grimoire",
+            "📐 Layout : Optimisation de la gestion de l'overflow pour déléguer les barres de défilement globales au navigateur"
+        ],
+        "major": false
+    },
+    {
+        "version": "2.49.30",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "📱 Responsive : Activation du défilement horizontal sur les petits écrans (suppression de 'no-scrollbar')",
+            "📐 Layout : Ajustement des contraintes de largeur minimale pour éviter le troncage du grimoire",
+            "📔 Chapitres : Finalisation du renommage de la sidebar et de l'alignement des info-bulles"
+        ],
+        "major": false
+    },
+    {
+        "version": "2.49.29",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🏛️ UI : Renommage de la sidebar 'Structure' en 'Chapitres' pour plus de clarté",
+            "🐛 Fix : Correction du troncage des info-bulles (tooltips) dans la barre latérale en les déplaçant vers la gauche"
+        ],
+        "major": false
+    },
+    {
+        "version": "2.49.28",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🖌️ Édition : Ajout d'une palette de surlignage 'Aquarelle' (5 couleurs immersives)",
+            "🧹 Outils : Implémentation d'une gomme (Eraser) pour effacer instantanément toute la mise en forme du texte",
+            "✨ UX : Activation du mode multicolore pour le surlignage Tiptap",
+            "🛡️ Typage : Optimisation de la configuration des extensions du livre"
+        ],
+        "major": false
+    },
+    {
+        "version": "2.49.27",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🏛️ UI : Réorganisation du journal de campagne avec une nouvelle barre latérale de structure",
+            "📔 Structure : Déplacement des boutons 'Chapitre' vers la sidebar latérale pour un espace de travail plus propre",
+            "🎨 Design : Amélioration de la barre d'outils supérieure et maintien du bouton Image dans le menu texte",
+            "🖋️ Édition : Rétablissement de l'affichage des numéros de listes avec style ambré thématique",
+            "🎨 Palette : Ajout d'une sélection d'encres (Noir, Bleu, Sang, Vert, Or, Violet) dans l'éditeur",
+            "🛠️ Maintenance : Migration sécurisée des imports Tiptap TextStyle vers des exports nommés"
+        ],
+        "major": false
+    },
+    {
+        "version": "2.49.26",
+        "date": "2026-02-15",
+        "type": "maintenance",
+        "changes": [
+            "🏗️ Refactoring : Extraction des extensions Tiptap de `ColumnarEditor.tsx` vers `/extensions/bookExtensions.ts`",
+            "🏗️ Refactoring : Extraction de la logique métier de `AdminSkillLibrary.tsx` vers le hook `useAdminSkillLibrary.ts`",
+            "🛡️ Typage : Amélioration de la sécurité des types dans `ImageSyncResolver.ts` (supression restrictive de `any`)",
+            "🛡️ Typage : Typage strict des extensions Tiptap `ChapterHeading` et `BookImage`",
+            "🧹 Nettoyage : Remplacement des derniers `console.error` par `logger.error` dans le module de déploiement",
+            "📈 Maintenance : Allègement des fichiers composants volumineux pour une meilleure maintenabilité"
+        ],
+        "major": false
+    },
+    {
+        "version": "2.49.25",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "✒️ Grimoire : Nouvelles fonctions d'édition (Souligné, Barré, Listes à puces/numéros)",
+            "📜 Grimoire : Style 'Citation' (Blockquote) immersif avec bordures et guillemets stylisés",
+            "🖋️ Grimoire : Surlignage type 'Encre Ambre' pour marquer les passages clés",
+            "📏 Grimoire : Ligne de séparation décorative (Horizontal Rule) avec icône ◈",
+            "🛠️ UI : Barre d'outils réorganisée en groupes logiques et icônes affinées"
+        ],
+        "major": false
+    },
+    {
+        "version": "2.49.23",
+        "date": "2026-02-14",
+        "type": "fix",
+        "content": "🛡️ E2E Pagination : Augmentation de la charge de texte (100 lignes) pour garantir le déclenchement des seuils de pagination dans les tests automatisés.",
+        "major": false
+    },
+    {
+        "version": "2.49.22",
+        "date": "2026-02-14",
+        "type": "fix",
+        "content": "🛡️ E2E Stability : Résolution des erreurs de connexion (ports) et gestion de l'écran de sélection des règles dans le CI. Migration des tests vers le nouveau Grimoire Numérique (TiPTap).",
+        "major": false
+    },
+    {
+        "version": "2.49.21",
+        "date": "2026-02-14",
+        "type": "chore",
+        "content": "⚡ Turbo CI : Fusion des jobs pour éviter les installations redondantes, ajout du cache pour les navigateurs Playwright (gain de ~3-5 min) et exécution des tests E2E sur le build de production.",
+        "major": false
+    },
+    {
+        "version": "2.49.20",
+        "date": "2026-02-14",
+        "type": "chore",
+        "content": "🚀 CI/CD : Suppression des runs en doublon sur la branche develop et synchronisation de deploy.yml avec les derniers correctifs de tests unitaires.",
+        "major": false
+    },
+    {
+        "version": "2.49.19",
+        "date": "2026-02-14",
+        "type": "chore",
+        "content": "🚀 CI : Optimisation du workflow GitHub Actions. Les tests E2E Playwright sont désormais restreints aux Pull Requests et à la branche main pour accélérer les push sur develop. Correction des variables d'environnement manquantes pour Vitest.",
+        "major": false
+    },
+    {
+        "version": "2.49.18",
+        "date": "2026-02-14",
+        "type": "feat",
+        "changes": [
+            "📖 Grimoire : Table des Matières dynamique et interactive (TOC)",
+            "🖼️ Grimoire : Mode 'Tracer une zone' pour insérer et dimensionner des images directement dans le livre",
+            "🧭 Navigation : Correction de l'accès aux Notes de Campagne et ajustement des onglets",
+            "👋 Campagne : Ajout d'une modale d'information de campagne (Welcome Message) pour les joueurs"
+        ],
+        "major": false
+    },
+    {
+        "version": "2.49.17",
+        "date": "2026-02-14",
+        "type": "fix",
+        "changes": [
+            "🚀 Performance : Lazy-loading du Grimoire numérique pour accélérer le chargement initial de la fiche personnage",
+            "🛡️ Stabilité : Résolution du warning 'flushSync' de React 18 lors de l'initialisation de TiPTap",
+            "📱 Responsive : Ajustement du titre principal de la fiche pour éviter les débordements sur petits écrans",
+            "🧹 Code Health : Nettoyage des imports statiques lourds au profit du chargement à la demande"
+        ],
+        "major": false
+    },
+    {
         "version": "2.49.16",
         "date": "2026-02-14",
         "type": "chore",
@@ -673,525 +1017,6 @@
             "🛡️ Résilience : Intégration de defaultRules.ts comme ultime fallback embarqué",
             "🧹 Nettoyage : Suppression de PlayerService au profit de CampaignService unifié",
             "💾 Migration : Amélioration de migrateRulesToV2 pour garantir l'intégrité des bibliothèques"
-        ]
-    },
-    {
-        "version": "2.44.3",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "💾 Hybrid Database : Implémentation du OfflineStorageService (IndexedDB)",
-            "📡 Résilience : Chargement 'Online First' avec repli automatique sur le cache local",
-            "🌐 Connectivity : Détection intelligente de l'état hors ligne (isOffline)",
-            "💾 Persistance : Les campagnes chargées depuis Supabase sont désormais auto-cachées localement",
-            "🛡️ Typage : Ajout de la source 'cache' au schéma RulesData"
-        ]
-    },
-    {
-        "version": "2.44.2",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "🛡️ Typage : Éradication finale des 'as any' dans AdminApp, SyncModal et CharacterReadOnly",
-            "♿ Accessibilité : Gestion du focus et support touche Echap dans les modales thématiques",
-            "🏷️ UX : Ajout de labels ARIA sur l'ensemble de la navigation diégétique",
-            "🧹 Code : Nettoyage des stubs ts-ignore dans les générateurs d'état initial",
-            "🔧 Service : Ajout de checkSchema dans CampaignService pour la validation manuelle"
-        ]
-    },
-    {
-        "version": "2.44.1",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "🚀 MJ Dashboard : Implémentation de l'archivage des campagnes",
-            "📝 Métadonnées : Ajout d'une description de campagne et d'un message d'accueil MJ",
-            "👁️ Visibilité : Contrôle MJ sur l'affichage des infos de campagne pour les joueurs",
-            "🛡️ Base de Données : Migration PostgreSQL pour supporter les nouvelles métadonnées",
-            "🧑‍🚀 Expérience Joueur : Modal d'information de campagne avec message de bienvenue automatique"
-        ]
-    },
-    {
-        "version": "2.44.0",
-        "date": "2026-02-12",
-        "type": "minor",
-        "changes": [
-            "🏗️ Architecture : Refonte majeure du MainLayout via les hooks useNavigationState, usePrintManager et useRulesSync",
-            "🏗️ Architecture : Refactorisation de SettingsView via le hook useSettingsManager",
-            "🏗️ Architecture : Refactorisation de CharacterSheetPage2 via useTraitEditor et useReputationManager",
-            "🏗️ Architecture : Refactorisation de LibraryView via useSkillLibrary",
-            "🧹 Code : Suppression de code dupliqué et amélioration de la séparation des préoccupations",
-            "🛡️ Stabilité : Correction des types TypeScript et amélioration de la robustesse de la synchro des règles"
-        ]
-    },
-    {
-        "version": "2.43.3",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "🏗️ Architecture : Extraction de la logique complexe de CharacterSheet.tsx vers useEditMode et useVariableSkills",
-            "🏗️ Architecture : Modularisation de LibraryView.tsx via le nouveau hook useSkillLibrary",
-            "🧹 Nettoyage : Réduction de la taille des composants principaux (~300 lignes extraites)",
-            "🚀 Performance : Optimisation des rendus via useMemo dans les nouveaux hooks"
-        ]
-    },
-    {
-        "version": "2.43.2",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "💎 Qualité : Suppression massive de 'as any' pour un typage TypeScript strict (~90 occurrences)",
-            "♿ Accessibilité : Installation de eslint-plugin-jsx-a11y et corrections sémantique (main, nav, aside)",
-            "🏷️ UX : Ajout de labels ARIA sur les boutons d'actions (Déconnexion, Suppression, Publication)",
-            "🛡️ Typage : Sécurisation du processus d'import de bibliothèque avec validation de types"
-        ]
-    },
-    {
-        "version": "2.43.1",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "🛡️ Sécurité : Mise à jour vers Vite 7 et correction des vulnérabilités (npm audit)",
-            "🧩 Fiabilité : Implémentation d'un Error Boundary global (fallback UI en français)",
-            "🚀 CI/CD : Renforcement du workflow de déploiement (Type Check, Lint, Tests unitaires obligatoires)"
-        ]
-    },
-    {
-        "version": "2.43.0",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "🏗️ Refonte majeure architecturale : Extraction de plus de 1500 lignes de logique vers des hooks personnalisés",
-            "🧩 AdminApp : Extraction de useAdminAuth et useAdminRulesHandler (Optimisation de 60%)",
-            "📖 CampaignNotes : Refonte complète du journal avec useJournal et useJournalImages",
-            "🎨 TraitLibrary : Modularisation de la bibliothèque de traits et des sélections",
-            "🧙 LibraryImportWizard : Simplification de l'assistant d'importation via useLibraryImport",
-            "🛡️ Renforcement du typage TypeScript Strict sur l'ensemble des nouveaux modules"
-        ]
-    },
-    {
-        "version": "2.42.1",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "💄 Amélioration de l'accessibilité du bouton de déconnexion dans l'Admin",
-            "🏠 Ajout du bouton de déconnexion sur le Tableau de Bord",
-            "👥 Ajout du bouton de déconnexion sur la vue des Joueurs Globaux"
-        ]
-    },
-    {
-        "version": "2.42.0",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "🛡️ Hardening de la sécurité RLS (Supabase) : Transition vers les claims JWT pour plus de robustesse",
-            "🚀 Correction des erreurs 403 Forbidden dans l'administration des campagnes",
-            "🔧 Consolidation des politiques de bibliothèques (Skills, Traits, Backgrounds)",
-            "🆕 Support multi-campagne : Gestion automatisée de la propriété des personnages (created_by)"
-        ]
-    },
-    {
-        "version": "2.41.0",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "Audit Phase 2 : Amélioration de la Qualité et du Typage",
-            "Refonte de DatabaseService : Suppression des types 'any' au profit de Partial<T>",
-            "Nettoyage de rulesReconciler : Suppression des assertions 'as any' pour une réconciliation typée",
-            "Unification de la limitation du débit GitHub API dans RulesLoader et githubService",
-            "Centralisation des constantes UI (couleurs, espacement) dans src/constants/theme.ts",
-            "Ajout de tests unitaires pour RulesContext et CharacterContext (Stabilité et robustesse)",
-            "Correction des incohérences de schéma Zod pour la validation des configurations de campagne"
-        ]
-    },
-    {
-        "version": "2.40.2",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "Mise à jour de la documentation d'architecture (functional_scope.md, db_schema.md)",
-            "Ajustements de l'Audit Summary (Phase 1)"
-        ]
-    },
-    {
-        "version": "2.40.1",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "Correction d'un crash dans le modal Changelog dû à des données non définies",
-            "Ajout de protections contre les erreurs de rendu dans ChangelogModal"
-        ]
-    },
-    {
-        "version": "2.40.0",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "Refactorisation du Reconciler : Extraction de skillsReconciler.ts pour une meilleure maintenabilité",
-            "Standardisation des variables CSS et nettoyage des styles orphelins"
-        ]
-    },
-    {
-        "version": "2.35.6",
-        "date": "2026-02-10",
-        "changes": [
-            "Refactoring majeur du Journal : Extraction du composant JournalPage.",
-            "Optimisation du code de CampaignNotes (~150 lignes retirées)."
-        ]
-    },
-    {
-        "version": "2.34.16",
-        "date": "2026-02-10",
-        "changes": [
-            {
-                "type": "feature",
-                "text": "Filtres 'Smart Chips' pour les bibliothèques Admin (Compétences, Traits, Historiques).",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.35.7",
-        "date": "2026-02-10",
-        "changes": [
-            "Refactoring technique du Journal : Centralisation des constantes de dimensions et de mise en page."
-        ]
-    },
-    {
-        "version": "2.33.2",
-        "date": "2026-02-10",
-        "changes": [
-            {
-                "type": "feature",
-                "text": "Verrouillage des scores en Mode Édition : désactivation de la modification des bulles pendant la réorganisation pour éviter les erreurs de saisie.",
-                "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.33.1",
-        "date": "2026-02-10",
-        "changes": [
-            {
-                "type": "feature",
-                "text": "Sécurisation du Mode Édition : interdiction de supprimer une compétence ayant des points investis (le déplacement reste autorisé).",
-                "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.33.0",
-        "date": "2026-02-10",
-        "description": "Refonte intégrale du Guide Utilisateur Joueur.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Nouveau guide utilisateur structuré par thématiques (Modes, Usage, Création/Édition, Outils).",
-                "category": "docs"
-            },
-            {
-                "type": "added",
-                "text": "Documentation détaillée des trois modes de fonctionnement : En Ligne (Cloud), JSON (Fichiers) et Hors Ligne.",
-                "category": "docs"
-            },
-            {
-                "type": "added",
-                "text": "Guide pas-à-pas pour le Mode Création (répartition des points) et le Mode Édition Directe (structure).",
-                "category": "docs"
-            },
-            {
-                "type": "improved",
-                "text": "Nettoyage du guide : suppression des sections MJ redondantes dans l'app joueur pour plus de clarté.",
-                "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.32.8",
-        "date": "2026-02-10",
-        "description": "Synchronisation Admin et amélioration de la remontée d'infos.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Notifications au MJ pour TOUT ajout (Compétences & Arrière-plans, y compris bibliothèque officielle).",
-                "category": "admin"
-            },
-            {
-                "type": "added",
-                "text": "Nouvelle section 'Suggestions' dans la vue Admin pour visualiser les éléments même à 0 points.",
-                "category": "admin"
-            },
-            {
-                "type": "modified",
-                "text": "Nettoyage UI : Suppression du bouton de validation redondant dans le Header pour centraliser sur le bandeau.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.7",
-        "date": "2026-02-10",
-        "description": "Sécurité et clarté du Mode Édition.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Nouveau bandeau d'état 'Mode Édition' avec bouton de validation rapide.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Avertissement et explications pédagogiques avant d'activer le mode édition.",
-                "category": "ux"
-            }
-        ]
-    },
-    {
-        "version": "2.32.6",
-        "date": "2026-02-10",
-        "description": "Améliorations UX du Mode Édition Directe.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Repositionnement des boutons d'actions (Édition sous Création) pour une meilleure visibilité.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Indicateurs visuels de placement lors du Drag & Drop (ligne d'insertion).",
-                "category": "ui"
-            },
-            {
-                "type": "modified",
-                "text": "Amélioration de la logique de réorganisation : insertion précise à l'index visé.",
-                "category": "feature"
-            },
-            {
-                "type": "added",
-                "text": "Possibilité de déplacer les espaceurs déjà présents sur la fiche.",
-                "category": "feature"
-            }
-        ]
-    },
-    {
-        "version": "2.32.5",
-        "date": "2026-02-10",
-        "description": "Implémentation du Mode Édition Directe.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Nouveau Mode Édition Directe permettant d'ajouter, supprimer et déplacer des éléments directement sur la feuille.",
-                "category": "feature"
-            },
-            {
-                "type": "added",
-                "text": "Barre latérale d'édition avec recherche dans les bibliothèques de compétences et d'historiques.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Possibilité de créer des éléments personnalisés (suggestions automatiques pour le MJ).",
-                "category": "feature"
-            },
-            {
-                "type": "added",
-                "text": "Support du Drag & Drop pour réorganiser les compétences ou ajouter des espaceurs vides.",
-                "category": "ui"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction de la gestion des catégories lors de l'édition pour respecter les types de blocs (Compétences vs Historiques).",
-                "category": "fix"
-            }
-        ]
-    },
-    {
-        "version": "2.32.4",
-        "date": "2026-02-10",
-        "description": "Filtre 'Masquer acquis' pour les Bibliothèques.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Ajout d'un filtre (œil) pour masquer les compétences et spécialisations déjà acquises dans la bibliothèque.",
-                "category": "feature"
-            },
-            {
-                "type": "modified",
-                "text": "Remplacement du badge 'OFF'/'OFFICIEL' par une icône Globe pour uniformiser l'interface.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.3",
-        "date": "2026-02-10",
-        "description": "Correction des doublons dans la Bibliothèque (Joueur & Admin).",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Élimination des compétences et traits dupliqués dans la bibliothèque du joueur (fusion insensible à la casse).",
-                "category": "core"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction de l'assistant d'import Admin : exclusion des Historiques dans l'onglet Compétences et dédoublonnage des Compteurs.",
-                "category": "fix"
-            },
-            {
-                "type": "improved",
-                "text": "Renforcement de la sécurité backend : vérification anti-doublon lors de l'import de bibliothèque.",
-                "category": "core"
-            }
-        ]
-    },
-    {
-        "version": "2.32.2",
-        "date": "2026-02-10",
-        "description": "Ajustement layout : Noms sur une ligne, icônes déportées.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Retour au nom sur une seule ligne avec icônes de statut déplacées sur la ligne de description (Skills/Backgrounds).",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.1",
-        "date": "2026-02-10",
-        "description": "Amélioration layout : Noms multi-lignes.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Support des noms sur deux lignes pour les cartes Compétences et Arrières-plans dans l'admin.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.32.0",
-        "date": "2026-02-10",
-        "description": "Harmonisation UI des bibliothèques Administrateur.",
-        "changes": [
-            {
-                "type": "modified",
-                "text": "Refonte visuelle premium des onglets Compétences, Origines, Compteurs, Spécialisations et Traits.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Colonnes interactives à largeur fixe pour une navigation plus fluide.",
-                "category": "ui"
-            },
-            {
-                "type": "modified",
-                "text": "Remplacement des badges textuels par des icônes intuitives (Global, Lock, Variantes).",
-                "category": "ui"
-            },
-            {
-                "type": "fixed",
-                "text": "Correction de types TypeScript sur les icônes Lucide pour assurer l'intégrité du build.",
-                "category": "fix"
-            }
-        ]
-    },
-    {
-        "version": "2.31.0",
-        "date": "2026-02-09",
-        "description": "Sécurisation de l'intégrité des données : Verrouillage des items.",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Indicateurs visuels (cadenas) pour les items de bibliothèque en cours d'utilisation.",
-                "category": "ui"
-            },
-            {
-                "type": "added",
-                "text": "Blocage de la suppression des items 'placés' dans la configuration ou actifs dans d'autres campagnes.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Suivi global de l'utilisation des items à travers toutes les campagnes via Supabase.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Mise à jour de toutes les bibliothèques (Compétences, Historiques, Compteurs, Traits, Spécialisations).",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.5",
-        "date": "2026-02-09",
-        "description": "Généralisation des actions en masse (Admin).",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Extension des actions 'Tout activer / Tout désactiver' aux bibliothèques d'Historiques, Compteurs, Spécialisations et Traits.",
-                "category": "ui"
-            },
-            {
-                "type": "improved",
-                "text": "Cohérence visuelle et fonctionnelle des actions en masse sur l'ensemble de la section Admin.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.4",
-        "date": "2026-02-09",
-        "description": "Amélioration ergonomie Bibliothèque (Admin).",
-        "changes": [
-            {
-                "type": "added",
-                "text": "Ajout d'actions en masse (Tout activer / Tout désactiver) dans la réserve de compétences.",
-                "category": "ui"
-            },
-            {
-                "type": "improved",
-                "text": "Les actions en masse respectent le filtre de recherche actif.",
-                "category": "ui"
-            }
-        ]
-    },
-    {
-        "version": "2.30.3",
-        "date": "2026-02-09",
-        "description": "Sécurisation de la persistance (Admin).",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Correction d'une faille de synchronisation provoquant la perte de données lors de l'ajout de nouveaux items ou de l'activation massive.",
-                "category": "core"
-            },
-            {
-                "type": "improved",
-                "text": "Standardisation de la génération d'ID via UUID pour une meilleure compatibilité avec Supabase.",
-                "category": "core"
-            }
-        ]
-    },
-    {
-        "version": "2.30.2",
-        "date": "2026-02-09",
-        "description": "Optimisation Admin v2.",
-        "changes": [
-            {
-                "type": "fixed",
-                "text": "Rétablissement de la suppression pour les items de bibliothèque partagés (Repository).",
-                "category": "fix"
-            },
-            {
-                "type": "improved",
-                "text": "Refonte ergonomique de la modale d'édition des compétences (meilleur équilibre Nom/Description/Variante).",
-                "category": "ui"
-            },
-            {
-                "type": "removed",
-                "text": "Nettoyage des items dupliqués entre les bibliothèques de compétences, compteurs et historiques.",
-                "category": "cleanup"
-            }
         ]
     }
 ]

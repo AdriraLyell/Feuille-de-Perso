@@ -21,7 +21,10 @@ Ce document résume les politiques de sécurité appliquées à la base de donn�
 -   **INSERT/UPDATE/DELETE** : Réservé aux administrateurs.
 
 ### 4. `characters`
--   **SELECT** : Autorisé pour le créateur du personnage (basé sur `created_by` si implémenté) ou l'administrateur.
+-   **SELECT** : Autorisé pour :
+    1.  Le créateur du personnage (basé sur `created_by`).
+    2.  L'administrateur.
+    3.  **Tous** (anonymes inclus) si `created_by` est NULL (permet le chargement des fiches "legacy" ou créées sans compte).
 -   **INSERT/UPDATE/DELETE** : Autorisé pour le créateur ou l'administrateur.
 
 ## Authentification & Rôles

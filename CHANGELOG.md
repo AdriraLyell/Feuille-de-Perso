@@ -1,5 +1,215 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.44.3] - 2026-02-11 [MINOR]
+
+- 💾 Hybrid Database : Implémentation du OfflineStorageService (IndexedDB)
+- 📡 Résilience : Chargement 'Online First' avec repli automatique sur le cache local
+- 🌐 Connectivity : Détection intelligente de l'état hors ligne (isOffline)
+- 💾 Persistance : Les campagnes chargées depuis Supabase sont désormais auto-cachées localement
+- 🛡️ Typage : Ajout de la source 'cache' au schéma RulesData
+
+## [2.44.2] - 2026-02-11 [PATCH]
+
+- 🛡️ Typage : Éradication finale des 'as any' dans AdminApp, SyncModal et CharacterReadOnly
+- ♿ Accessibilité : Gestion du focus et support touche Echap dans les modales thématiques
+- 🏷️ UX : Ajout de labels ARIA sur l'ensemble de la navigation diégétique
+- 🧹 Code : Nettoyage des stubs ts-ignore dans les générateurs d'état initial
+- 🔧 Service : Ajout de checkSchema dans CampaignService pour la validation manuelle
+
+## [2.44.1] - 2026-02-11 [MINOR]
+
+- 🚀 MJ Dashboard : Implémentation de l'archivage des campagnes
+- 📝 Métadonnées : Ajout d'une description de campagne et d'un message d'accueil MJ
+- 👁️ Visibilité : Contrôle MJ sur l'affichage des infos de campagne pour les joueurs
+- 🛡️ Base de Données : Migration PostgreSQL pour supporter les nouvelles métadonnées
+- 🧑‍🚀 Expérience Joueur : Modal d'information de campagne avec message de bienvenue automatique
+
+## [2.44.0] - 2026-02-12 [MINOR]
+
+- 🏗️ Architecture : Refonte majeure du MainLayout via les hooks useNavigationState, usePrintManager et useRulesSync
+- 🏗️ Architecture : Refactorisation de SettingsView via le hook useSettingsManager
+- 🏗️ Architecture : Refactorisation de CharacterSheetPage2 via useTraitEditor et useReputationManager
+- 🏗️ Architecture : Refactorisation de LibraryView via useSkillLibrary
+- 🧹 Code : Suppression de code dupliqué et amélioration de la séparation des préoccupations
+- 🛡️ Stabilité : Correction des types TypeScript et amélioration de la robustesse de la synchro des règles
+
+## [2.43.3] - 2026-02-11 [PATCH]
+
+- 🏗️ Architecture : Extraction de la logique complexe de CharacterSheet.tsx vers useEditMode et useVariableSkills
+- 🏗️ Architecture : Modularisation de LibraryView.tsx via le nouveau hook useSkillLibrary
+- 🧹 Nettoyage : Réduction de la taille des composants principaux (~300 lignes extraites)
+- 🚀 Performance : Optimisation des rendus via useMemo dans les nouveaux hooks
+
+## [2.43.2] - 2026-02-11 [PATCH]
+
+- 💎 Qualité : Suppression massive de 'as any' pour un typage TypeScript strict (~90 occurrences)
+- ♿ Accessibilité : Installation de eslint-plugin-jsx-a11y et corrections sémantique (main, nav, aside)
+- 🏷️ UX : Ajout de labels ARIA sur les boutons d'actions (Déconnexion, Suppression, Publication)
+- 🛡️ Typage : Sécurisation du processus d'import de bibliothèque avec validation de types
+
+## [2.43.1] - 2026-02-11 [PATCH]
+
+- 🛡️ Sécurité : Mise à jour vers Vite 7 et correction des vulnérabilités (npm audit)
+- 🧩 Fiabilité : Implémentation d'un Error Boundary global (fallback UI en français)
+- 🚀 CI/CD : Renforcement du workflow de déploiement (Type Check, Lint, Tests unitaires obligatoires)
+
+## [2.43.0] - 2026-02-11 [MINOR]
+
+- 🏗️ Refonte majeure architecturale : Extraction de plus de 1500 lignes de logique vers des hooks personnalisés
+- 🧩 AdminApp : Extraction de useAdminAuth et useAdminRulesHandler (Optimisation de 60%)
+- 📖 CampaignNotes : Refonte complète du journal avec useJournal et useJournalImages
+- 🎨 TraitLibrary : Modularisation de la bibliothèque de traits et des sélections
+- 🧙 LibraryImportWizard : Simplification de l'assistant d'importation via useLibraryImport
+- 🛡️ Renforcement du typage TypeScript Strict sur l'ensemble des nouveaux modules
+
+## [2.42.1] - 2026-02-11 [PATCH]
+
+- 💄 Amélioration de l'accessibilité du bouton de déconnexion dans l'Admin
+- 🏠 Ajout du bouton de déconnexion sur le Tableau de Bord
+- 👥 Ajout du bouton de déconnexion sur la vue des Joueurs Globaux
+
+## [2.42.0] - 2026-02-11 [MINOR]
+
+- 🛡️ Hardening de la sécurité RLS (Supabase) : Transition vers les claims JWT pour plus de robustesse
+- 🚀 Correction des erreurs 403 Forbidden dans l'administration des campagnes
+- 🔧 Consolidation des politiques de bibliothèques (Skills, Traits, Backgrounds)
+- 🆕 Support multi-campagne : Gestion automatisée de la propriété des personnages (created_by)
+
+## [2.41.0] - 2026-02-11 [MINOR]
+
+- Audit Phase 2 : Amélioration de la Qualité et du Typage
+- Refonte de DatabaseService : Suppression des types 'any' au profit de Partial<T>
+- Nettoyage de rulesReconciler : Suppression des assertions 'as any' pour une réconciliation typée
+- Unification de la limitation du débit GitHub API dans RulesLoader et githubService
+- Centralisation des constantes UI (couleurs, espacement) dans src/constants/theme.ts
+- Ajout de tests unitaires pour RulesContext et CharacterContext (Stabilité et robustesse)
+- Correction des incohérences de schéma Zod pour la validation des configurations de campagne
+
+## [2.40.2] - 2026-02-11 [PATCH]
+
+- Mise à jour de la documentation d'architecture (functional_scope.md, db_schema.md)
+- Ajustements de l'Audit Summary (Phase 1)
+
+## [2.40.1] - 2026-02-11 [PATCH]
+
+- Correction d'un crash dans le modal Changelog dû à des données non définies
+- Ajout de protections contre les erreurs de rendu dans ChangelogModal
+
+## [2.40.0] - 2026-02-11 [MINOR]
+
+- Refactorisation du Reconciler : Extraction de skillsReconciler.ts pour une meilleure maintenabilité
+- Standardisation des variables CSS et nettoyage des styles orphelins
+
+## [2.35.6] - 2026-02-10
+
+- Refactoring majeur du Journal : Extraction du composant JournalPage.
+- Optimisation du code de CampaignNotes (~150 lignes retirées).
+
+## [2.34.16] - 2026-02-10
+
+- [object Object]
+
+## [2.35.7] - 2026-02-10
+
+- Refactoring technique du Journal : Centralisation des constantes de dimensions et de mise en page.
+
+## [2.33.2] - 2026-02-10
+
+- [object Object]
+
+## [2.33.1] - 2026-02-10
+
+- [object Object]
+
+## [2.33.0] - 2026-02-10
+
+- [object Object]
+- [object Object]
+- [object Object]
+- [object Object]
+
+## [2.32.8] - 2026-02-10
+
+- [object Object]
+- [object Object]
+- [object Object]
+
+## [2.32.7] - 2026-02-10
+
+- [object Object]
+- [object Object]
+
+## [2.32.6] - 2026-02-10
+
+- [object Object]
+- [object Object]
+- [object Object]
+- [object Object]
+
+## [2.32.5] - 2026-02-10
+
+- [object Object]
+- [object Object]
+- [object Object]
+- [object Object]
+- [object Object]
+
+## [2.32.4] - 2026-02-10
+
+- [object Object]
+- [object Object]
+
+## [2.32.3] - 2026-02-10
+
+- [object Object]
+- [object Object]
+- [object Object]
+
+## [2.32.2] - 2026-02-10
+
+- [object Object]
+
+## [2.32.1] - 2026-02-10
+
+- [object Object]
+
+## [2.32.0] - 2026-02-10
+
+- [object Object]
+- [object Object]
+- [object Object]
+- [object Object]
+
+## [2.31.0] - 2026-02-09
+
+- [object Object]
+- [object Object]
+- [object Object]
+- [object Object]
+
+## [2.30.5] - 2026-02-09
+
+- [object Object]
+- [object Object]
+
+## [2.30.4] - 2026-02-09
+
+- [object Object]
+- [object Object]
+
+## [2.30.3] - 2026-02-09
+
+- [object Object]
+- [object Object]
+
+## [2.30.2] - 2026-02-09
+
+- [object Object]
+- [object Object]
+- [object Object]
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.30.1] - 2026-02-09
 
 - [object Object]

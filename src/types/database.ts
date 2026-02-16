@@ -29,6 +29,17 @@ export interface DBSkill {
     defaultCategory?: string; // Default placement
     is_variable?: boolean;
     default_min_level?: number;
+    mystic_ability_id?: string;
+    created_at?: string;
+    updated_at?: string;
+}
+
+export interface DBMysticAbility {
+    id: string;
+    setting_id: string | null;
+    name: string;
+    description?: string;
+    is_variable?: boolean;
     created_at?: string;
     updated_at?: string;
 }
@@ -134,6 +145,12 @@ export interface RelSettingCounter {
 export interface RelSettingSpecialization {
     setting_id: string;
     specialization_id: string;
+    is_active: boolean;
+}
+
+export interface RelSettingMysticAbility {
+    setting_id: string;
+    mystic_ability_id: string;
     is_active: boolean;
 }
 

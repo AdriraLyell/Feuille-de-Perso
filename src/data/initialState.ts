@@ -8,6 +8,14 @@ export const DEFAULT_THEME = {
   dotSymbol: 'circle'
 };
 
+export const DEFAULT_MYSTIC_ABILITIES = [
+  'Arts Martiaux',
+  'Magies Mineures',
+  'Magies',
+  'Talents Exceptionnels',
+  'Psy'
+];
+
 // Define initial skills first to use them for Library generation
 // [!IMPORTANT]
 // CE FICHIER CONTIENT DES DONNÉES DE REPLI (FALLBACK).
@@ -248,6 +256,13 @@ export const INITIAL_DATA: CharacterSheetData = {
   library: [],
   skillLibrary: generateDefaultSkillLibrary(), // Pre-filled by default
   specializationLibrary: [], // Vide par défaut
+  mysticAbilities: DEFAULT_MYSTIC_ABILITIES.map(name => ({
+    id: generateId(),
+    name,
+    description: "",
+    isActive: true,
+    isGlobal: true
+  })),
   xpLogs: [],
   appLogs: [],
   campaignNotes: [],

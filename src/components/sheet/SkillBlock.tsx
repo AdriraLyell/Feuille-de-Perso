@@ -104,11 +104,15 @@ const DotRow: React.FC<{
                 onClick={handleClick}
                 title={entry.description || (entry.variant ? `${entry.name} : ${entry.variant}` : entry.name)}
             >
-                {entry.name}
-                {entry.variant !== undefined && (
-                    <span className={`${isUndefinedVariable ? 'italic opacity-60' : 'text-stone-500 font-normal'}`}>
-                        {' : '}{entry.variant || '...'}
-                    </span>
+                {entry.variant !== undefined ? (
+                    <>
+                        <span className="text-amber-600 font-bold">{entry.name}{' : '}</span>
+                        <span className={`${isUndefinedVariable ? 'italic opacity-60' : 'text-stone-500 font-normal'}`}>
+                            {entry.variant || '...'}
+                        </span>
+                    </>
+                ) : (
+                    entry.name
                 )}
                 {hasSpecs && !isUndefinedVariable && <span className="text-[9px] align-top ml-0.5 text-blue-400">*</span>}
             </span>

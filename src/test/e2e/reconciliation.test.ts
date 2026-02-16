@@ -17,7 +17,7 @@ describe('RulesReconciler E2E', () => {
                 attributeMax: 3,
                 rankSlots: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
             },
-            xpCosts: { attributeFactor: 1, skillFactor: 1, specializationFactor: 1 },
+            xpCosts: { attributeFactor: 1, skillFactor: 1, specializationFactor: 1, traitCost: 1 },
             cards: {
                 ...INITIAL_DATA.creationConfig.cardConfig,
                 ranks: ["D", "C", "B", "A", "S"],
@@ -39,7 +39,8 @@ describe('RulesReconciler E2E', () => {
             skills: [],
             backgrounds: [],
             counters: [],
-            specializations: []
+            specializations: [],
+            mysticAbilities: []
         }
     };
 

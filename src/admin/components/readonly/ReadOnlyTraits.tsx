@@ -20,7 +20,7 @@ export const ReadOnlyTraits: React.FC<ReadOnlyTraitsProps> = ({ avantages = [], 
                 <MotionFade delay={0.35}>
                     <section className="bg-stone-900/40 border-l-4 border-emerald-900/50 p-6 rounded-sm shadow-glass">
                         <h3 className="text-sm font-bold text-emerald-600 mb-6 flex items-center gap-2 uppercase tracking-[0.2em] border-b border-stone-800 pb-2">
-                            <Zap size={16} /> Éclats de Fortune
+                            <Zap size={16} /> Avantages
                         </h3>
                         <div className="space-y-3">
                             {avantages
@@ -44,7 +44,7 @@ export const ReadOnlyTraits: React.FC<ReadOnlyTraitsProps> = ({ avantages = [], 
                 <MotionFade delay={0.35}>
                     <section className="bg-stone-900/40 border-l-4 border-red-900/50 p-6 rounded-sm shadow-glass">
                         <h3 className="text-sm font-bold text-red-600 mb-6 flex items-center gap-2 uppercase tracking-[0.2em] border-b border-stone-800 pb-2">
-                            <Zap size={16} className="rotate-180" /> Fardeaux de l'Ombre
+                            <Zap size={16} className="rotate-180" /> Désavantages
                         </h3>
                         <div className="space-y-3">
                             {desavantages

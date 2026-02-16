@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
+import { UploadCloud, AlertTriangle, CheckCircle, RefreshCw, MessageSquare } from 'lucide-react';
 import ThematicModal from './ui/ThematicModal';
 import { CharacterSyncService } from '../services/CharacterSyncService';
 import { CharacterSheetData } from '../types/character';
@@ -31,6 +31,7 @@ const SyncModal: React.FC<SyncModalProps> = ({
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(false);
     const [isAutoSync, setIsAutoSync] = useState(false);
+    const [cloudVersion, setCloudVersion] = useState<{ lastSynced: number, mjMessage?: string } | null>(null);
 
     // Pre-fill from existing syncInfo or header
     useEffect(() => {
@@ -48,10 +49,30 @@ const SyncModal: React.FC<SyncModalProps> = ({
             setPlayerName(characterData.header?.player || '');
             setCharacterName(characterData.header?.name || '');
             setIsAutoSync(characterData.syncInfo?.isAutoSyncEnabled || false);
-            setStatus('idle');
             setErrorMessage('');
+
+            // Check if a newer version exists on cloud
+            if (characterData.syncInfo?.syncId) {
+                checkCloudVersion(characterData.syncInfo.syncId);
+            }
+        } else {
+            setCloudVersion(null);
         }
     }, [isOpen, characterData, isOnlineMode, rules]);
+
+    const checkCloudVersion = async (syncId: string) => {
+        try {
+            const char = await CharacterSyncService.getCharacterById(syncId);
+            if (char) {
+                setCloudVersion({
+                    lastSynced: new Date(char.last_synced).getTime(),
+                    mjMessage: char.data.syncInfo?.mjMessage
+                });
+            }
+        } catch (e) {
+            console.error("Failed to check cloud version", e);
+        }
+    };
 
     // Load public campaigns
     useEffect(() => {
@@ -102,6 +123,7 @@ const SyncModal: React.FC<SyncModalProps> = ({
                 settingId: selectedCampaign,
                 settingName: campaignData?.name || 'Campagne',
                 lastSynced: Date.now(),
+                lastSyncedHash: result.hash,
                 isAutoSyncEnabled: isAutoSync
             });
 
@@ -161,6 +183,29 @@ const SyncModal: React.FC<SyncModalProps> = ({
             }
         >
             <div className="space-y-5">
+                {/* Cloud Update Status Indicator */}
+                {cloudVersion && characterData.syncInfo && cloudVersion.lastSynced > (characterData.syncInfo.lastSynced || 0) && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
+                        <div className="flex items-center gap-2 text-amber-800 font-bold text-sm mb-1">
+                            <AlertTriangle size={18} className="text-amber-600" />
+                            Mise à jour disponible sur le Cloud
+                        </div>
+                        <p className="text-xs text-amber-700 leading-relaxed mb-2">
+                            Le Gardien ou un autre dispositif a synchronisé une version plus récente ({new Date(cloudVersion.lastSynced).toLocaleString()}).
+                            Il est recommandé de <strong>charger</strong> cette version via le panneau Cloud avant d'envoyer vos modifications.
+                        </p>
+
+                        {cloudVersion.mjMessage && (
+                            <div className="bg-white/60 border border-amber-900/10 p-2 rounded-sm mt-2">
+                                <div className="text-[10px] font-black uppercase text-amber-900/40 flex items-center gap-1 mb-1">
+                                    <MessageSquare size={10} /> Note du Gardien
+                                </div>
+                                <p className="text-[12px] italic text-stone-700">{cloudVersion.mjMessage}</p>
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {/* Info Banner */}
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-800">
                     <p>

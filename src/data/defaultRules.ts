@@ -29,7 +29,8 @@ export const defaultRules: RulesData = {
         xpCosts: {
             attributeFactor: 6,
             skillFactor: 1,
-            specializationFactor: 0
+            specializationFactor: 0,
+            traitCost: 5
         },
         cards: {
             active: false,
@@ -91,6 +92,7 @@ export const defaultRules: RulesData = {
         skills: [],
         specializations: [],
         backgrounds: [],
-        counters: []
+        counters: [],
+        mysticAbilities: []
     }
 };

@@ -25,6 +25,7 @@ export const useAdminSkillLibrary = (rules: RulesData, onUpdate: (newRules: Rule
     const [sourceFilter, setSourceFilter] = useState<boolean | null>(null);
     const [typeFilter, setTypeFilter] = useState<boolean | null>(null);
     const [usageFilter, setUsageFilter] = useState<boolean | null>(null);
+    const [mysticFilter, setMysticFilter] = useState<boolean | null>(null);
 
     const [showPublishConfirm, setShowPublishConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
@@ -69,10 +70,15 @@ export const useAdminSkillLibrary = (rules: RulesData, onUpdate: (newRules: Rule
                     if (usageFilter !== isPlaced) return false;
                 }
 
+                if (mysticFilter !== null) {
+                    const isMystic = !!s.mysticAbilityId;
+                    if (mysticFilter !== isMystic) return false;
+                }
+
                 return true;
             })
             .sort((a, b) => a.name.localeCompare(b.name));
-    }, [list, searchTerm, activeFilter, sourceFilter, typeFilter, usageFilter, placedSkillNames]);
+    }, [list, searchTerm, activeFilter, sourceFilter, typeFilter, usageFilter, mysticFilter, placedSkillNames]);
 
     const availableCategories = useMemo(() => {
         let rawCategories = [...CATEGORY_HELP];
@@ -223,6 +229,7 @@ export const useAdminSkillLibrary = (rules: RulesData, onUpdate: (newRules: Rule
         sourceFilter, setSourceFilter,
         typeFilter, setTypeFilter,
         usageFilter, setUsageFilter,
+        mysticFilter, setMysticFilter,
         showPublishConfirm, setShowPublishConfirm,
         showDeleteConfirm, setShowDeleteConfirm,
         publishResult, setPublishResult,

@@ -54,6 +54,9 @@ export const LibraryPersistence = {
                         payload.effects = item.effects || [];
                     } else if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds') {
                         payload.is_variable = item.isVariable;
+                        if (typeCfg.key === 'skills') payload.mystic_ability_id = item.mysticAbilityId;
+                    } else if (typeCfg.key === 'mysticAbilities') {
+                        payload.is_variable = item.isVariable;
                     } else if (typeCfg.key === 'counters') {
                         payload.max_value = item.maxValue;
                         payload.default_value = item.defaultValue;
@@ -100,6 +103,9 @@ export const LibraryPersistence = {
                     payload.is_variable = item.isVariable;
                     payload.effects = item.effects;
                 } else if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds') {
+                    payload.is_variable = item.isVariable;
+                    if (typeCfg.key === 'skills') payload.mystic_ability_id = item.mysticAbilityId || null;
+                } else if (typeCfg.key === 'mysticAbilities') {
                     payload.is_variable = item.isVariable;
                 } else if (typeCfg.key === 'counters') {
                     payload.max_value = item.maxValue;

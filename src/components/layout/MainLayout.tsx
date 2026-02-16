@@ -12,6 +12,8 @@ import { RulesData } from '../../types/rules';
 import { CampaignService } from '../../services/CampaignService';
 import { ErrorService } from '../../services/ErrorService';
 import { INITIAL_DATA } from '../../data/initialState';
+import { logger } from '../../utils/logger';
+import { useCloudSyncCheck } from '../../hooks/useCloudSyncCheck';
 
 // Static Components
 import DiegeticNavigation from './DiegeticNavigation';
@@ -44,7 +46,7 @@ import { useRulesSync } from '../../hooks/layout/useRulesSync';
 import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, TrendingUp, History, Clock, X, Trash2, Save, Book, LogOut, Menu, Upload } from 'lucide-react';
 
 const MainLayout: React.FC = () => {
-    const { data, updateData: setData, addLog, importData } = useCharacter();
+    const { data, updateData: setData, addLog, importData, isSyncing } = useCharacter();
     const { rules, updateRules } = useRules();
 
     // Custom Hooks
@@ -71,6 +73,8 @@ const MainLayout: React.FC = () => {
         handleSourceSelect,
         handleConfirmReset
     } = useRulesSync(data, rules, setData, updateRules, addLog);
+
+    const { hasUpdate, mjMessage } = useCloudSyncCheck(data);
 
     // Other UI States
     const [lastSavedState, setLastSavedState] = useState<string>("");
@@ -100,13 +104,13 @@ const MainLayout: React.FC = () => {
 
     // Logging helpers
     const clearCurrentLogs = () => {
-        setData(prev => ({
+        setData((prev: CharacterSheetData) => ({
             ...prev,
-            appLogs: prev.appLogs.filter(log => log.category !== historyTab)
+            appLogs: prev.appLogs.filter((log: any) => log.category !== historyTab)
         }));
     };
 
-    const filteredLogs = (data.appLogs || []).filter(log => {
+    const filteredLogs = (data.appLogs || []).filter((log: any) => {
         if (log.category === 'both') return true;
         return log.category === historyTab;
     });
@@ -119,18 +123,22 @@ const MainLayout: React.FC = () => {
         importData(newData);
         const migrated = migrateData(newData);
 
-        if (migrated.syncInfo?.settingId) {
+        const syncInfo = migrated.syncInfo; // Extract syncInfo for clarity
+
+        if (syncInfo?.settingId) {
             const currentSettingId = rules?.settingId;
             try {
-                const freshRules = await CampaignService.loadSetting(migrated.syncInfo.settingId);
-                if (freshRules) {
+                const freshRules = await CampaignService.loadSetting(syncInfo.settingId);
+                if (freshRules && syncInfo) {
                     updateRules({
                         ...freshRules,
-                        settingId: migrated.syncInfo.settingId,
-                        settingName: migrated.syncInfo.settingName
+                        settingId: syncInfo.settingId,
+                        settingName: syncInfo.settingName
                     });
-                    if (migrated.syncInfo.settingId !== currentSettingId) {
-                        addLog(`Règles de la campagne "${migrated.syncInfo.settingName}" chargées.`, 'success', 'settings');
+
+                    // Added narrowing check for TypeScript
+                    if (syncInfo.settingId !== currentSettingId) {
+                        addLog(`Règles de la campagne "${syncInfo.settingName}" chargées.`, 'success', 'settings');
                     }
                 }
             } catch (e) {
@@ -142,6 +150,16 @@ const MainLayout: React.FC = () => {
         setIsSettingsDirty(false);
         setLastSavedState(JSON.stringify(newData));
     };
+
+    useEffect(() => {
+        if (hasUpdate) {
+            addLog("Mise à jour disponible sur le Cloud (Note du MJ possible). Cliquez sur 'Sync' pour voir.", "success");
+            // Debug log to console if in dev
+            if (import.meta.env.DEV) {
+                logger.log("[Sync] Update detected:", { hasUpdate, mjMessage });
+            }
+        }
+    }, [hasUpdate, mjMessage, addLog]);
 
     const handleConfirmBackup = async () => {
         await exportCharacterAsJSON(data, addLog);
@@ -198,7 +216,11 @@ const MainLayout: React.FC = () => {
                     onShowChangelog={() => setShowChangelog(true)}
                     onOpenAppearance={() => setShowAppearance(true)}
                     onOpenSync={() => setShowSync(true)}
-                    syncStatus={data.syncInfo ? 'synced' : 'none'}
+                    syncStatus={
+                        isSyncing ? 'pending' :
+                            hasUpdate ? 'update-available' :
+                                data.syncInfo ? 'synced' : 'none'
+                    }
                     appVersion={APP_VERSION}
                     onShowCampaignInfo={() => setShowCampaignInfo(true)}
                 />
@@ -306,8 +328,8 @@ const MainLayout: React.FC = () => {
                             isOpen={showSync}
                             onClose={() => setShowSync(false)}
                             characterData={data}
-                            onSyncComplete={(syncInfo) => {
-                                setData(prev => ({ ...prev, syncInfo }));
+                            onSyncComplete={(syncInfo: any) => {
+                                setData((prev: CharacterSheetData) => ({ ...prev, syncInfo }));
                                 addLog(`Fiche synchronisée avec ${syncInfo?.settingName}`, 'success', 'sheet');
                             }}
                         />

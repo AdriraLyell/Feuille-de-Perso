@@ -15,6 +15,7 @@ import AdminSkillLibrary from './components/libraries/AdminSkillLibrary';
 import AdminSpecializationLibrary from './components/libraries/AdminSpecializationLibrary';
 import AdminBackgroundLibrary from './components/libraries/AdminBackgroundLibrary';
 import AdminCounterLibrary from './components/libraries/AdminCounterLibrary';
+import AdminMysticLibrary from './components/libraries/AdminMysticLibrary';
 import AdminDashboard from './components/AdminDashboard';
 import CampaignCharactersView from './components/CampaignCharactersView';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
@@ -48,7 +49,7 @@ const AdminApp: React.FC = () => {
 
     const [viewMode, setViewMode] = useState<'dashboard' | 'editor' | 'players'>('dashboard');
     const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'costs' | 'libraries' | 'players'>('general');
-    const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters'>('traits');
+    const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters' | 'mystic'>('traits');
 
     const [showImportResult, setShowImportResult] = useState(false);
     const [importReport, setImportReport] = useState<{ success: string[], warnings: string[] } | null>(null);
@@ -119,22 +120,27 @@ const AdminApp: React.FC = () => {
 
     if (viewMode === 'players') {
         return (
-            <div className="min-h-screen bg-gray-50 p-8">
-                <div className="max-w-7xl mx-auto">
-                    <div className="flex justify-between items-center mb-6">
+            <div className="min-h-screen bg-stone-950 p-8 relative overflow-hidden">
+                {/* Background Texture Effect */}
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')] opacity-20 pointer-events-none" />
+
+                <div className="max-w-[1600px] mx-auto relative z-10">
+                    <div className="flex justify-between items-center mb-8">
                         <button
                             onClick={() => setViewMode('dashboard')}
-                            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold transition-colors"
+                            className="flex items-center gap-2 text-stone-400 hover:text-amber-500 font-serif italic text-lg transition-all group"
                             aria-label="Retour au Tableau de Bord"
                         >
-                            <ArrowLeft size={20} /> Retour au Tableau de Bord
+                            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                            <span>Retour au Tableau de Bord</span>
                         </button>
                         <button
                             onClick={logout}
-                            className="flex items-center gap-2 bg-[#5c4d41] hover:bg-[#8b2e2e] text-white px-4 py-2 rounded-md font-bold transition-all shadow-md group"
+                            className="flex items-center gap-2 bg-stone-900 hover:bg-rose-950/40 text-stone-400 hover:text-rose-500 px-6 py-2 rounded-sm font-black uppercase tracking-widest text-xs transition-all border border-stone-800 hover:border-rose-900/30 shadow-lg group"
                             aria-label="Se déconnecter"
                         >
-                            <LogOut size={18} className="group-hover:rotate-12 transition-transform" /> Déconnexion
+                            <LogOut size={16} className="group-hover:rotate-12 transition-transform" />
+                            Déconnexion
                         </button>
                     </div>
                     <GlobalPlayersView />
@@ -193,7 +199,7 @@ const AdminApp: React.FC = () => {
                 </div>
             </nav>
 
-            <main className={`mx-auto p-6 transition-all duration-300 ${activeTab === 'skills' ? 'max-w-[1600px]' : 'max-w-7xl'}`}>
+            <main className={`mx-auto p-6 transition-all duration-300 ${activeTab === 'skills' || activeTab === 'players' ? 'max-w-[1600px]' : 'max-w-7xl'}`}>
                 {activeTab === 'general' && (
                     <div className="bg-mystic-surface p-8 rounded-sm shadow-glass border border-stone-700/50 animate-in fade-in slide-in-from-bottom-4">
                         <h2 className="text-2xl font-serif font-bold mb-6 text-amber-gold border-b border-stone-700 pb-2 flex items-center gap-2">
@@ -208,13 +214,20 @@ const AdminApp: React.FC = () => {
                 {activeTab === 'libraries' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4">
                         <div className="flex gap-2 mb-6 bg-mystic-surface p-2 rounded-sm shadow-md border border-stone-700 w-fit mx-auto overflow-x-auto">
-                            {['traits', 'skills', 'backgrounds', 'counters', 'specializations'].map((lt) => (
+                            {([
+                                { id: 'traits', label: 'Traits' },
+                                { id: 'skills', label: 'Compétences' },
+                                { id: 'backgrounds', label: 'Arrière-Plans' },
+                                { id: 'counters', label: 'Compteurs' },
+                                { id: 'mystic', label: 'Habilités Myst.' },
+                                { id: 'specializations', label: 'Spécialisations' }
+                            ] as const).map((lt) => (
                                 <button
-                                    key={lt}
-                                    onClick={() => setActiveLibraryTab(lt as typeof activeLibraryTab)}
-                                    className={`px-6 py-2 rounded-sm font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap ${activeLibraryTab === lt ? 'bg-amber-gold text-stone-900 shadow-glow-gold' : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800'}`}
+                                    key={lt.id}
+                                    onClick={() => setActiveLibraryTab(lt.id as typeof activeLibraryTab)}
+                                    className={`px-6 py-2 rounded-sm font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap ${activeLibraryTab === lt.id ? 'bg-amber-gold text-stone-900 shadow-glow-gold' : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800'}`}
                                 >
-                                    {lt.charAt(0).toUpperCase() + lt.slice(1)}
+                                    {lt.label}
                                 </button>
                             ))}
                         </div>
@@ -222,6 +235,7 @@ const AdminApp: React.FC = () => {
                         {activeLibraryTab === 'skills' && <AdminSkillLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
                         {activeLibraryTab === 'backgrounds' && <AdminBackgroundLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
                         {activeLibraryTab === 'counters' && <AdminCounterLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
+                        {activeLibraryTab === 'mystic' && <AdminMysticLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
                         {activeLibraryTab === 'specializations' && <AdminSpecializationLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
                     </div>
                 )}

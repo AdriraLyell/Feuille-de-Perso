@@ -30,6 +30,7 @@ export interface RulesXPCosts {
     attributeFactor: number;
     skillFactor: number;
     specializationFactor: number;
+    traitCost?: number;
 }
 
 export interface RulesCardConfig {
@@ -101,6 +102,7 @@ export interface RulesData {
         backgrounds: LibraryBackgroundEntry[]; // Unified Backgrounds
         counters: LibraryCounterEntry[]; // Unified Counters
         specializations: LibrarySpecializationEntry[];
+        mysticAbilities: LibrarySkillEntry[];
     };
 }
 export interface GameSettingSummary {

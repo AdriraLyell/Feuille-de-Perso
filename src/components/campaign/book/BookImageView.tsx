@@ -190,6 +190,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, s
                         style={{
                             objectFit: node.attrs.fit || 'contain',
                             objectPosition: `${node.attrs.posX ?? 50}% ${node.attrs.posY ?? 50}%`,
+                            maxHeight: '800px',
                             filter: node.attrs.filter === 'grayscale'
                                 ? 'grayscale(100%) contrast(1.1)'
                                 : 'none',

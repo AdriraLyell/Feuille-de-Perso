@@ -1,204 +1,196 @@
 [
     {
-        "version": "2.49.37",
-        "date": "2026-02-15",
-        "type": "refactor",
+        "version": "2.49.71",
+        "date": "2026-02-16",
+        "type": "fix",
         "changes": [
-            "🛠️ Refactoring : Modularisation de RuleCalculationsService.ts",
-            "📏 Code Health : Extraction des calculs d'XP (xpCalculator.ts) et de Tarot (cardCalculator.ts)",
-            "🏗️ Architecture : Simplification du service central vers un pattern Façade"
+            "🛡️ CI : Correction des erreurs de typage TypeScript bloquant le workflow (RecreationService)",
+            "🧩 UI : Fix du typage missing onUpdate dans le composant AttributeBlock",
+            "🧹 Lint : Suppression d'un double cast booléen redondant dans AdminSkillLibrary"
         ]
     },
     {
-        "version": "2.49.36",
+        "version": "2.49.70",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "📖 Journal : Fix de la conversion des dimensions d'images lors de la migration (px vers %)",
+            "🖼️ UI : Ajout d'une limite de hauteur maximale (800px) pour les images du Grimoire",
+            "📏 Migration : Correction du ratio d'aspect forcé à 'auto' pour les images importées"
+        ]
+    },
+    {
+        "version": "2.49.69",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "📂 Admin : Déplacement de la fonctionnalité de recréation vers les paramètres spécifiques de chaque campagne (Fiches des Destins)",
+            "🧩 Imports : Correction d'une erreur de référence sur l'icône RotateCcw",
+            "⏳ UX : Ajout d'états de chargement et verrouillage pendant le processus de recréation"
+        ]
+    },
+    {
+        "version": "2.49.68",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🔄 Recréation : Implémentation du système de 'Respec' pour les personnages (Admin)",
+            "💰 XP : Remboursement automatique de l'XP de progression (attributs, compétences, compteurs) lors d'une recréation",
+            "🛡️ Mode Création : Réactivation du mode création avec injection du remboursement et redistribution auto",
+            "🎨 UI : Nouvelle modale de confirmation 'Recréation Éthérée' avec bilan des gains d'XP et avertissements"
+        ]
+    },
+    {
+        "version": "2.49.67",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🛡️ Attributs : Verrouillage de la valeur de création (val1) une fois le mode création validé",
+            "📈 XP : Implémentation de l'achat d'attributs via la colonne val2 avec calcul auto de l'XP dépensée",
+            "🎨 UI : Feedback visuel (opacité, curseur) sur les champs d'attributs verrouillés"
+        ]
+    },
+    {
+        "version": "2.49.66",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🩹 Image : Correction du préfixe Data URI manquant lors de la décompression (fix 431 Request Header Too Large)",
+            "🛡️ Stabilité : Détection automatique des schémas d'images corrompus dans les registres admin"
+        ]
+    },
+    {
+        "version": "2.49.65",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🐛 Admin : Correction critique du chargement des portraits compressés (GZIP) dans la vue Admin",
+            "🖼️ UI : Amélioration de la gestion des erreurs d'image (fallback silhouette)"
+        ]
+    },
+    {
+        "version": "2.49.64",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🖼️ Admin : Correction du bug d'affichage des portraits manquants d'Ayame (Seigneurs des Mystères)",
+            "🛡️ UI : Ajout d'un placeholder 'Silhouette' explicite en cas d'erreur de chargement d'image",
+            "🐛 Fix : Gestion robuste des IDs d'images morts dans la vue Admin"
+        ]
+    },
+    {
+        "version": "2.49.63",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🛡️ Schema : Correction de la structure `mysticAbilities` dans le validateur Zod (LibrarySkillEntry vs DotEntry).",
+            "🚀 Import : Résolution du bug empêchant l'import de fiches contenant des capacités mystiques."
+        ]
+    },
+    {
+        "version": "2.49.62",
         "date": "2026-02-15",
         "type": "fix",
         "changes": [
-            "🐛 Fix : Correction d'un plantage dans le ColumnarEditor",
-            "🛡️ Stabilité : Ajout d'une garde contre les accès nuls lors de l'initialisation de l'éditeur Tiptap"
+            "🩹 Personnage : Restauration manuelle des attributs d'Ayame (3,1,3,3...) dans le Cloud",
+            "🛡️ Schema : Correction de la validation Zod (mysticAbilities) pour éviter les resets de fiche",
+            "🔍 Sync : Information MJ ajoutée pour guider la joueuse lors de la prochaine synchro"
         ]
     },
     {
-        "version": "2.49.35",
-        "date": "2026-02-15",
-        "type": "refactor",
-        "changes": [
-            "🛠️ Refactoring : Simplification de CampaignService.ts",
-            "📏 Code Health : Extraction de la logique de réconciliation des règles dans campaignReconciler.ts",
-            "🏗️ Architecture : Amélioration de la séparation des préoccupations entre les services de base de données et la logique métier"
-        ]
-    },
-    {
-        "version": "2.49.34",
-        "date": "2026-02-15",
-        "type": "refactor",
-        "changes": [
-            "🛠️ Refactoring : Éclatement du hook useAttributeEditor en modules spécialisés",
-            "📏 Code Health : Extraction de useAttributeStructure (gestion des catégories) et useAttributePresets (gestion des préréglages)",
-            "🏗️ Architecture : Amélioration de la modularité et réduction de la dette technique sur l'administration des attributs"
-        ]
-    },
-    {
-        "version": "2.49.33",
-        "date": "2026-02-15",
-        "type": "refactor",
-        "changes": [
-            "🛠️ Refactoring : Extraction de la logique de AdminTraitLibrary dans le hook useAdminTraitLibrary",
-            "📏 Code Health : Réduction de la taille de AdminTraitLibrary.tsx (517 -> 240 lignes)"
-        ]
-    },
-    {
-        "version": "2.49.32",
-        "date": "2026-02-15",
-        "type": "refactor",
-        "changes": [
-            "🛠️ Refactoring : Extraction de la logique de ColumnarEditor dans des hooks spécialisés (Navigation, Dessin)",
-            "🛡️ Typage : Élimination des types 'any' résiduels dans les factories et le grimoire",
-            "🧹 Ménage : Suppression de la dépendance inutilisée 'tiptap-pagination-plus' et nettoyage des imports Admin"
-        ]
-    },
-    {
-        "version": "2.49.31",
+        "version": "2.49.61",
         "date": "2026-02-15",
         "type": "fix",
         "changes": [
-            "📔 Journal : Suppression de la barre de défilement verticale parasite sur Windows via overflow-y: auto",
-            "👥 Groupe : Restauration des dimensions fixes du tableau de groupe (1484x1000px) pour préserver l'alignement avec le grimoire",
-            "📐 Layout : Optimisation de la gestion de l'overflow pour déléguer les barres de défilement globales au navigateur"
-        ],
-        "major": false
+            "🐞 Sync : Correction des erreurs de typage bloquant le build",
+            "🔍 Debug : Ajout de logs dans la console pour le suivi de la synchronisation cloud"
+        ]
     },
     {
-        "version": "2.49.30",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "📱 Responsive : Activation du défilement horizontal sur les petits écrans (suppression de 'no-scrollbar')",
-            "📐 Layout : Ajustement des contraintes de largeur minimale pour éviter le troncage du grimoire",
-            "📔 Chapitres : Finalisation du renommage de la sidebar et de l'alignement des info-bulles"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.29",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🏛️ UI : Renommage de la sidebar 'Structure' en 'Chapitres' pour plus de clarté",
-            "🐛 Fix : Correction du troncage des info-bulles (tooltips) dans la barre latérale en les déplaçant vers la gauche"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.28",
+        "version": "2.49.60",
         "date": "2026-02-15",
         "type": "feat",
         "changes": [
-            "🖌️ Édition : Ajout d'une palette de surlignage 'Aquarelle' (5 couleurs immersives)",
-            "🧹 Outils : Implémentation d'une gomme (Eraser) pour effacer instantanément toute la mise en forme du texte",
-            "✨ UX : Activation du mode multicolore pour le surlignage Tiptap",
-            "🛡️ Typage : Optimisation de la configuration des extensions du livre"
-        ],
-        "major": false
+            "🔔 Synchronisation : Notification automatique des mises à jour disponibles sur le Cloud",
+            "✨ UI : Ajout d'un indicateur visuel (badge ambre pulsant) sur le bouton Sync",
+            "🛡️ Sync : Préservation des métadonnées de synchronisation lors des mises à jour partielles"
+        ]
     },
     {
-        "version": "2.49.27",
+        "version": "2.49.59",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "💾 Admin : Correction ordre de sauvegarde (Habilités avant Compétences) pour garantir les liens"
+        ]
+    },
+    {
+        "version": "2.49.58",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🔍 Admin : Ajout d'un filtre 'Mystique' dans la réserve de compétences",
+            "🐞 Admin : Correction de l'erreur d'import dans LibraryLoader"
+        ]
+    },
+    {
+        "version": "2.49.57",
         "date": "2026-02-15",
         "type": "feat",
         "changes": [
-            "🏛️ UI : Réorganisation du journal de campagne avec une nouvelle barre latérale de structure",
-            "📔 Structure : Déplacement des boutons 'Chapitre' vers la sidebar latérale pour un espace de travail plus propre",
-            "🎨 Design : Amélioration de la barre d'outils supérieure et maintien du bouton Image dans le menu texte",
-            "🖋️ Édition : Rétablissement de l'affichage des numéros de listes avec style ambré thématique",
-            "🎨 Palette : Ajout d'une sélection d'encres (Noir, Bleu, Sang, Vert, Or, Violet) dans l'éditeur",
-            "🛠️ Maintenance : Migration sécurisée des imports Tiptap TextStyle vers des exports nommés"
-        ],
-        "major": false
+            "🔗 Admin : Possibilité de lier les compétences à des 'Habilités Mystiques'",
+            "🎨 UI : Nouvelle option dans l'édition de compétence pour désigner une habilité mystique",
+            "🗄️ BDD : Migration SQL pour supporter le lien entre compétences et habilités"
+        ]
     },
     {
-        "version": "2.49.26",
-        "date": "2026-02-15",
-        "type": "maintenance",
-        "changes": [
-            "🏗️ Refactoring : Extraction des extensions Tiptap de `ColumnarEditor.tsx` vers `/extensions/bookExtensions.ts`",
-            "🏗️ Refactoring : Extraction de la logique métier de `AdminSkillLibrary.tsx` vers le hook `useAdminSkillLibrary.ts`",
-            "🛡️ Typage : Amélioration de la sécurité des types dans `ImageSyncResolver.ts` (supression restrictive de `any`)",
-            "🛡️ Typage : Typage strict des extensions Tiptap `ChapterHeading` et `BookImage`",
-            "🧹 Nettoyage : Remplacement des derniers `console.error` par `logger.error` dans le module de déploiement",
-            "📈 Maintenance : Allègement des fichiers composants volumineux pour une meilleure maintenabilité"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.25",
+        "version": "2.49.56",
         "date": "2026-02-15",
         "type": "feat",
         "changes": [
-            "✒️ Grimoire : Nouvelles fonctions d'édition (Souligné, Barré, Listes à puces/numéros)",
-            "📜 Grimoire : Style 'Citation' (Blockquote) immersif avec bordures et guillemets stylisés",
-            "🖋️ Grimoire : Surlignage type 'Encre Ambre' pour marquer les passages clés",
-            "📏 Grimoire : Ligne de séparation décorative (Horizontal Rule) avec icône ◈",
-            "🛠️ UI : Barre d'outils réorganisée en groupes logiques et icônes affinées"
-        ],
-        "major": false
+            "🔮 Admin : Ajout de la bibliothèque des 'Habilités Mystiques'",
+            "📚 Data : Configuration par défaut (Arts Martiaux, Magies, Psy, etc.)",
+            "🛠️ Admin : Interface de gestion complète (CRUD) pour les habilités mystiques",
+            "🔄 Migration : Initialisation automatique de la bibliothèque pour les campagnes existantes"
+        ]
     },
     {
-        "version": "2.49.23",
-        "date": "2026-02-14",
-        "type": "fix",
-        "content": "🛡️ E2E Pagination : Augmentation de la charge de texte (100 lignes) pour garantir le déclenchement des seuils de pagination dans les tests automatisés.",
-        "major": false
-    },
-    {
-        "version": "2.49.22",
-        "date": "2026-02-14",
-        "type": "fix",
-        "content": "🛡️ E2E Stability : Résolution des erreurs de connexion (ports) et gestion de l'écran de sélection des règles dans le CI. Migration des tests vers le nouveau Grimoire Numérique (TiPTap).",
-        "major": false
-    },
-    {
-        "version": "2.49.21",
-        "date": "2026-02-14",
-        "type": "chore",
-        "content": "⚡ Turbo CI : Fusion des jobs pour éviter les installations redondantes, ajout du cache pour les navigateurs Playwright (gain de ~3-5 min) et exécution des tests E2E sur le build de production.",
-        "major": false
-    },
-    {
-        "version": "2.49.20",
-        "date": "2026-02-14",
-        "type": "chore",
-        "content": "🚀 CI/CD : Suppression des runs en doublon sur la branche develop et synchronisation de deploy.yml avec les derniers correctifs de tests unitaires.",
-        "major": false
-    },
-    {
-        "version": "2.49.19",
-        "date": "2026-02-14",
-        "type": "chore",
-        "content": "🚀 CI : Optimisation du workflow GitHub Actions. Les tests E2E Playwright sont désormais restreints aux Pull Requests et à la branche main pour accélérer les push sur develop. Correction des variables d'environnement manquantes pour Vitest.",
-        "major": false
-    },
-    {
-        "version": "2.49.18",
-        "date": "2026-02-14",
+        "version": "2.49.55",
+        "date": "2026-02-15",
         "type": "feat",
         "changes": [
-            "📖 Grimoire : Table des Matières dynamique et interactive (TOC)",
-            "🖼️ Grimoire : Mode 'Tracer une zone' pour insérer et dimensionner des images directement dans le livre",
-            "🧭 Navigation : Correction de l'accès aux Notes de Campagne et ajustement des onglets",
-            "👋 Campagne : Ajout d'une modale d'information de campagne (Welcome Message) pour les joueurs"
-        ],
-        "major": false
+            "⚙️ Admin : Ajout d'un paramètre de configuration mondiale pour le coût en XP des traits",
+            "📊 Budget : Intégration du coût des traits dans le calcul du budget de création (Mode Points)",
+            "⚖️ XP : Préparation du moteur de calcul d'XP pour supporter les traits achetés après création",
+            "🛡️ Typage : Mise à jour du schéma de données et des réconciliateurs pour inclure le traitCost"
+        ]
     },
     {
-        "version": "2.49.17",
-        "date": "2026-02-14",
-        "type": "fix",
+        "version": "2.49.54",
+        "date": "2026-02-15",
+        "type": "feat",
         "changes": [
-            "🚀 Performance : Lazy-loading du Grimoire numérique pour accélérer le chargement initial de la fiche personnage",
-            "🛡️ Stabilité : Résolution du warning 'flushSync' de React 18 lors de l'initialisation de TiPTap",
-            "📱 Responsive : Ajustement du titre principal de la fiche pour éviter les débordements sur petits écrans",
-            "🧹 Code Health : Nettoyage des imports statiques lourds au profit du chargement à la demande"
-        ],
-        "major": false
+            "📝 Terminologie : Remplacement de 'Échelon' par 'Rang' dans tout le système d'administration",
+            "🎨 UI : Retrait de la mention 'Niveau du Talent' dans la configuration des rangs",
+            "🖋️ UI : Remplacement de 'Slots' par 'Rangs Disponibles' pour une meilleure clarté sémantique"
+        ]
+    },
+    {
+        "version": "2.49.53",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🌐 Admin : Traduction en français des onglets de bibliothèques (Skills, Backgrounds, Counters, Specializations)",
+            "🏗️ Refactoring : Amélioration de la structure des onglets de bibliothèques dans AdminApp.tsx"
+        ]
+    },
+    {
+        "version": "2.49.52",
+        "date": "2026-02-15",
+        "type": "docs",
+        "changes": [
+            "📝 Documentation : Création du guide complet sur la gestion des conflits et la synchronisation sécurisée (SYNC_CONFLICT_MANAGEMENT.md)",
+            "🏗️ Architecture : Synthèse des scénarios de réconciliation (Ajout/Suppression MJ, Dirty Checking)"
+        ]
     }
 ]

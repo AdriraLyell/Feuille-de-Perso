@@ -52,7 +52,8 @@ export const extractRulesFromCharacter = (
             skills: [],
             specializations: [],
             backgrounds: [],
-            counters: []
+            counters: [],
+            mysticAbilities: []
         };
     }
 

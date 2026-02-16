@@ -80,6 +80,7 @@ export interface CharacterSheetData {
     attributeFactor: number;
     skillFactor: number;
     specializationFactor: number;
+    traitCost: number;
   };
   page2: Page2Data;
   // Key is skill ID, Value is array of specialization strings (Player defined based on dots)
@@ -89,6 +90,7 @@ export interface CharacterSheetData {
   library: LibraryEntry[]; // New field for the Virtue/Flaw library
   skillLibrary: LibrarySkillEntry[]; // New field for Skill Reserve
   specializationLibrary?: LibrarySpecializationEntry[]; // Catalogue de spécialisations réutilisables
+  mysticAbilities?: LibrarySkillEntry[]; // Categories of mystic powers (Martial Arts, Magic, etc.)
   xpLogs: XPEntry[];
   appLogs: LogEntry[];
   campaignNotes: CampaignNoteEntry[];
@@ -107,7 +109,9 @@ export interface CharacterSheetData {
     settingId?: string;   // Campaign ID
     settingName?: string; // Campaign name (cached for display)
     lastSynced?: number;  // Timestamp of last sync
+    lastSyncedHash?: string; // Digital signature of the data at last sync
     isAutoSyncEnabled?: boolean; // New: Automatic cloud save
+    mjMessage?: string;   // Note left by the MJ when signaling an update
   };
   _rulesVersion?: string; // Version des règles appliquées (pour optimisation de la réconciliation)
   _schemaVersion?: number; // Version du schéma de données (pour migrations séquentielles)
