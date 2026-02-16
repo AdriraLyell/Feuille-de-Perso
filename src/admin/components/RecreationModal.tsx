@@ -64,12 +64,16 @@ const RecreationModal: React.FC<RecreationModalProps> = ({
                         <p className="text-rose-200 text-[11px] font-black uppercase tracking-widest">Avertissement</p>
                         <ul className="text-[10px] text-stone-400 space-y-2 list-none leading-tight">
                             <li className="flex gap-2">
-                                <span className="text-rose-700">•</span>
-                                <div><span className="text-stone-200">Reset Total</span> : Attributs et compétences reviennent à leur minimum.</div>
+                                <span className="text-emerald-700 font-bold">✓</span>
+                                <div><span className="text-stone-200">Conservation</span> : Identité, Image, Équipement et Notes sont préservés.</div>
                             </li>
                             <li className="flex gap-2">
                                 <span className="text-rose-700">•</span>
-                                <div><span className="text-stone-200">Perte de Spécialisations</span> : Tous les raffinements de compétences sont effacés.</div>
+                                <div><span className="text-stone-200">Reset Statistique</span> : Attributs et compétences reviennent à leur minimum.</div>
+                            </li>
+                            <li className="flex gap-2">
+                                <span className="text-rose-700">•</span>
+                                <div><span className="text-stone-200">Perte de Spécialisations</span> : Ces raffinements doivent être redistribués.</div>
                             </li>
                             <li className="flex gap-2">
                                 <span className="text-rose-700">•</span>

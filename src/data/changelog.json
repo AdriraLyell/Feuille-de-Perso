@@ -1,5 +1,42 @@
 [
     {
+        "version": "2.49.77",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🔄 Recréation : Rétablissement du statut 'variable' (ex: Artisanat : ..., Langue : ...) pour les compétences le nécessitant",
+            "🧹 Skills : Le nettoyage préserve désormais l'intention de spécialisation des compétences tout en effaçant le choix précédent"
+        ]
+    },
+    {
+        "version": "2.49.76",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🔄 Recréation : Nettoyage automatique des variantes et compétences personnalisées pour ne garder que le socle de la campagne",
+            "🧹 Skills : Correction de la persistance des compétences vides ou hors-règles lors du reset forcé par le MJ"
+        ]
+    },
+    {
+        "version": "2.49.75",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "👤 Personnage : Clonage du personnage Ayame vers Nika pour le joueur Polo effectué avec succès"
+        ]
+    },
+    {
+        "version": "2.49.74",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🔄 Recréation : Amélioration chirurgicale du processus de reset pour préserver l'Identité, le Social, l'Équipement et l'Image du personnage",
+            "🛡️ Traits : Conservation des Avantages/Désavantages lors d'une recréation imposée par le MJ",
+            "💰 XP : Simplification du remboursement basé sur l'intégralité de l'historique des logs de progression",
+            "🎨 UI : Mise à jour de la modale de recréation pour clarifier les éléments préservés et réinitialisés"
+        ]
+    },
+    {
         "version": "2.49.73",
         "date": "2026-02-16",
         "type": "fix",
@@ -151,48 +188,6 @@
         "changes": [
             "🔍 Admin : Ajout d'un filtre 'Mystique' dans la réserve de compétences",
             "🐞 Admin : Correction de l'erreur d'import dans LibraryLoader"
-        ]
-    },
-    {
-        "version": "2.49.57",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🔗 Admin : Possibilité de lier les compétences à des 'Habilités Mystiques'",
-            "🎨 UI : Nouvelle option dans l'édition de compétence pour désigner une habilité mystique",
-            "🗄️ BDD : Migration SQL pour supporter le lien entre compétences et habilités"
-        ]
-    },
-    {
-        "version": "2.49.56",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🔮 Admin : Ajout de la bibliothèque des 'Habilités Mystiques'",
-            "📚 Data : Configuration par défaut (Arts Martiaux, Magies, Psy, etc.)",
-            "🛠️ Admin : Interface de gestion complète (CRUD) pour les habilités mystiques",
-            "🔄 Migration : Initialisation automatique de la bibliothèque pour les campagnes existantes"
-        ]
-    },
-    {
-        "version": "2.49.55",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "⚙️ Admin : Ajout d'un paramètre de configuration mondiale pour le coût en XP des traits",
-            "📊 Budget : Intégration du coût des traits dans le calcul du budget de création (Mode Points)",
-            "⚖️ XP : Préparation du moteur de calcul d'XP pour supporter les traits achetés après création",
-            "🛡️ Typage : Mise à jour du schéma de données et des réconciliateurs pour inclure le traitCost"
-        ]
-    },
-    {
-        "version": "2.49.54",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "📝 Terminologie : Remplacement de 'Échelon' par 'Rang' dans tout le système d'administration",
-            "🎨 UI : Retrait de la mention 'Niveau du Talent' dans la configuration des rangs",
-            "🖋️ UI : Remplacement de 'Slots' par 'Rangs Disponibles' pour une meilleure clarté sémantique"
         ]
     }
 ]

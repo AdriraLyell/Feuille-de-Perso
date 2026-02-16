@@ -1,5 +1,47 @@
 [
     {
+        "version": "2.49.57",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🔗 Admin : Possibilité de lier les compétences à des 'Habilités Mystiques'",
+            "🎨 UI : Nouvelle option dans l'édition de compétence pour désigner une habilité mystique",
+            "🗄️ BDD : Migration SQL pour supporter le lien entre compétences et habilités"
+        ]
+    },
+    {
+        "version": "2.49.56",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🔮 Admin : Ajout de la bibliothèque des 'Habilités Mystiques'",
+            "📚 Data : Configuration par défaut (Arts Martiaux, Magies, Psy, etc.)",
+            "🛠️ Admin : Interface de gestion complète (CRUD) pour les habilités mystiques",
+            "🔄 Migration : Initialisation automatique de la bibliothèque pour les campagnes existantes"
+        ]
+    },
+    {
+        "version": "2.49.55",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "⚙️ Admin : Ajout d'un paramètre de configuration mondiale pour le coût en XP des traits",
+            "📊 Budget : Intégration du coût des traits dans le calcul du budget de création (Mode Points)",
+            "⚖️ XP : Préparation du moteur de calcul d'XP pour supporter les traits achetés après création",
+            "🛡️ Typage : Mise à jour du schéma de données et des réconciliateurs pour inclure le traitCost"
+        ]
+    },
+    {
+        "version": "2.49.54",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "📝 Terminologie : Remplacement de 'Échelon' par 'Rang' dans tout le système d'administration",
+            "🎨 UI : Retrait de la mention 'Niveau du Talent' dans la configuration des rangs",
+            "🖋️ UI : Remplacement de 'Slots' par 'Rangs Disponibles' pour une meilleure clarté sémantique"
+        ]
+    },
+    {
         "version": "2.49.53",
         "date": "2026-02-15",
         "type": "feat",
@@ -965,52 +1007,6 @@
             "📱 Mobile UX : Implémentation d'un menu 'hamburger' animé dans la navigation diégétique",
             "🎨 Micro-Interactions : Ajout d'animations Framer Motion sur les cartes de sélection et les boutons d'action",
             "📏 Responsive : Optimisation de la typographie et des espacements pour tablettes et smartphones"
-        ]
-    },
-    {
-        "version": "2.45.3",
-        "date": "2026-02-12",
-        "type": "patch",
-        "changes": [
-            "🛡️ Sécurité & Fiabilité : Ajout de blocs try/catch/finally sur toutes les actions asynchrones de l'Admin",
-            "🧩 Type Safety : Suppression massive de types 'any' et de '@ts-ignore' dans le moteur de réconciliation",
-            "🧪 Tests : Correction de la suite de tests pour supporter le nouveau typage des compteurs",
-            "🧹 Code Clean : Suppression de console.logs et typage strict des accesseurs d'état"
-        ]
-    },
-    {
-        "version": "2.45.2",
-        "date": "2026-02-12",
-        "type": "patch",
-        "changes": [
-            "🛡️ Hotfix : Correction d'un crash critique 'process is not defined' sur l'écran de connexion",
-            "🏗️ Architecture : Transition finale vers le format JSON pour l'exportation et la publication des règles",
-            "🧹 Nettoyage : Suppression de l'injection obsolète de rules.js dans admin.html",
-            "🎨 UI/UX : Refonte de la modale de déploiement GitHub avec le thème Premium Dark Mystic",
-            "🛠️ Core : Mise à jour du RulesGenerator pour une sortie JSON pure"
-        ]
-    },
-    {
-        "version": "2.45.1",
-        "date": "2026-02-12",
-        "type": "patch",
-        "changes": [
-            "✨ Animations Admin : Intégration de framer-motion (MotionFade, MotionCard) sur l'ensemble des éditeurs admin",
-            "🎨 Premium Aesthetic : Application du thème sombre 'Mystic' avec effets de verre et de parchemin sur CharacterReadOnlyView",
-            "🎭 UX : Effets d'apparition séquencés (staggered) sur les boutons du header et les cartes de catégories",
-            "💎 Polish : Amélioration visuelle de l'éditeur de création, des coûts et des compteurs"
-        ]
-    },
-    {
-        "version": "2.45.0",
-        "date": "2026-02-12",
-        "type": "minor",
-        "changes": [
-            "🎨 Admin Thème : Refonte complète de l'interface d'administration (Thème Mystic & Victorien)",
-            "✨ UI/UX : Harmonisation des couleurs (Pierre/Ambre) sur les éditeurs de compétences et propriétés",
-            "🛠️ Composants : Mise à jour des cartes de catégories, de la sidebar et des panneaux de configuration",
-            "🌚 Thème sombre : Support natif du thème Mystic sur les modales de confirmation et d'édition",
-            "💎 Polish : Amélioration des transitions, des ombres et des effets de survol pour un rendu premium"
         ]
     }
 ]

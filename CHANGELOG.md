@@ -1,5 +1,37 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.45.3] - 2026-02-12 [PATCH]
+
+- 🛡️ Sécurité & Fiabilité : Ajout de blocs try/catch/finally sur toutes les actions asynchrones de l'Admin
+- 🧩 Type Safety : Suppression massive de types 'any' et de '@ts-ignore' dans le moteur de réconciliation
+- 🧪 Tests : Correction de la suite de tests pour supporter le nouveau typage des compteurs
+- 🧹 Code Clean : Suppression de console.logs et typage strict des accesseurs d'état
+
+## [2.45.2] - 2026-02-12 [PATCH]
+
+- 🛡️ Hotfix : Correction d'un crash critique 'process is not defined' sur l'écran de connexion
+- 🏗️ Architecture : Transition finale vers le format JSON pour l'exportation et la publication des règles
+- 🧹 Nettoyage : Suppression de l'injection obsolète de rules.js dans admin.html
+- 🎨 UI/UX : Refonte de la modale de déploiement GitHub avec le thème Premium Dark Mystic
+- 🛠️ Core : Mise à jour du RulesGenerator pour une sortie JSON pure
+
+## [2.45.1] - 2026-02-12 [PATCH]
+
+- ✨ Animations Admin : Intégration de framer-motion (MotionFade, MotionCard) sur l'ensemble des éditeurs admin
+- 🎨 Premium Aesthetic : Application du thème sombre 'Mystic' avec effets de verre et de parchemin sur CharacterReadOnlyView
+- 🎭 UX : Effets d'apparition séquencés (staggered) sur les boutons du header et les cartes de catégories
+- 💎 Polish : Amélioration visuelle de l'éditeur de création, des coûts et des compteurs
+
+## [2.45.0] - 2026-02-12 [MINOR]
+
+- 🎨 Admin Thème : Refonte complète de l'interface d'administration (Thème Mystic & Victorien)
+- ✨ UI/UX : Harmonisation des couleurs (Pierre/Ambre) sur les éditeurs de compétences et propriétés
+- 🛠️ Composants : Mise à jour des cartes de catégories, de la sidebar et des panneaux de configuration
+- 🌚 Thème sombre : Support natif du thème Mystic sur les modales de confirmation et d'édition
+- 💎 Polish : Amélioration des transitions, des ombres et des effets de survol pour un rendu premium
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.44.5] - 2026-02-12 [MINOR]
 
 - 🧪 Test Automation : Mise en place d'une suite complète de tests E2E avec Playwright
