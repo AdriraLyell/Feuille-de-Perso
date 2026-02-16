@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.49.49",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🐛 Fix : Correction d'une erreur de référence sur ThematicModal dans la Master List des joueurs",
+            "🛡️ Stabilité : Vérification des imports manquants suite à la mise à jour des signaux MJ"
+        ]
+    },
+    {
         "version": "2.49.48",
         "date": "2026-02-15",
         "type": "feat",
@@ -1012,18 +1021,6 @@
             "🏷️ UX : Ajout de labels ARIA sur l'ensemble de la navigation diégétique",
             "🧹 Code : Nettoyage des stubs ts-ignore dans les générateurs d'état initial",
             "🔧 Service : Ajout de checkSchema dans CampaignService pour la validation manuelle"
-        ]
-    },
-    {
-        "version": "2.44.1",
-        "date": "2026-02-11",
-        "type": "minor",
-        "changes": [
-            "🚀 MJ Dashboard : Implémentation de l'archivage des campagnes",
-            "📝 Métadonnées : Ajout d'une description de campagne et d'un message d'accueil MJ",
-            "👁️ Visibilité : Contrôle MJ sur l'affichage des infos de campagne pour les joueurs",
-            "🛡️ Base de Données : Migration PostgreSQL pour supporter les nouvelles métadonnées",
-            "🧑‍🚀 Expérience Joueur : Modal d'information de campagne avec message de bienvenue automatique"
         ]
     }
 ]

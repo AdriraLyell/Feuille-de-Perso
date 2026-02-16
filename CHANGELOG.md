@@ -1,5 +1,13 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.44.1] - 2026-02-11 [MINOR]
+
+- 🚀 MJ Dashboard : Implémentation de l'archivage des campagnes
+- 📝 Métadonnées : Ajout d'une description de campagne et d'un message d'accueil MJ
+- 👁️ Visibilité : Contrôle MJ sur l'affichage des infos de campagne pour les joueurs
+- 🛡️ Base de Données : Migration PostgreSQL pour supporter les nouvelles métadonnées
+- 🧑‍🚀 Expérience Joueur : Modal d'information de campagne avec message de bienvenue automatique
+
 ## [2.44.0] - 2026-02-12 [MINOR]
 
 - 🏗️ Architecture : Refonte majeure du MainLayout via les hooks useNavigationState, usePrintManager et useRulesSync

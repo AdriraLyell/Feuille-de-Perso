@@ -6,15 +6,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Users, Search, Eye, Trash2, Calendar, Shield, AlertCircle, Loader2, User, Clock, RefreshCw, RotateCcw } from 'lucide-react';
+import { Users, Search, Eye, Trash2, AlertCircle, Loader2, User, Clock, RefreshCw } from 'lucide-react';
 import { CharacterSyncService, SyncedCharacterSummary, SyncedCharacter } from '../../services/CharacterSyncService';
 import CharacterReadOnlyView from './CharacterReadOnlyView';
 import { GameSettingSummary, CampaignService } from '../../services/CampaignService';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 import { MotionCard } from '../../components/ui/motion/MotionCard';
-import RecreationModal from './RecreationModal';
-import { RecreationService } from '../services/RecreationService';
 
 import { ErrorService } from '../../services/ErrorService';
 
@@ -26,8 +24,6 @@ const GlobalPlayersView: React.FC = () => {
     const [selectedCharacter, setSelectedCharacter] = useState<SyncedCharacter | null>(null);
     const [filterOrphans, setFilterOrphans] = useState(false);
     const [characterToDelete, setCharacterToDelete] = useState<string | null>(null);
-    const [characterToRecreate, setCharacterToRecreate] = useState<SyncedCharacter | null>(null);
-    const [isRecreating, setIsRecreating] = useState(false);
 
     useEffect(() => {
         loadData();
@@ -97,52 +93,6 @@ const GlobalPlayersView: React.FC = () => {
             });
         } finally {
             setCharacterToDelete(null);
-        }
-    };
-
-    const handleRecreateRequest = async (id: string) => {
-        try {
-            const fullChar = await CharacterSyncService.getCharacterById(id);
-            if (fullChar) {
-                setCharacterToRecreate(fullChar);
-            }
-        } catch (error) {
-            ErrorService.handleError(error, {
-                context: 'GlobalPlayersView.handleRecreateRequest',
-                userMessage: "Impossible de préparer la recréation."
-            });
-        }
-    };
-
-    const confirmRecreate = async (refundAmount: number) => {
-        if (!characterToRecreate) return;
-        setIsRecreating(true);
-        try {
-            // 1. Charger les règles de la campagne cible pour la réinitialisation correcte
-            const currentRules = await CampaignService.loadSetting(characterToRecreate.setting_id);
-            if (!currentRules) throw new Error("Impossible de charger les règles de la campagne.");
-
-            // 2. Transformer les données
-            const newData = RecreationService.performRecreation(characterToRecreate.data, refundAmount, currentRules);
-
-            // 3. Persister dans Supabase
-            const success = await CharacterSyncService.updateCharacterData(characterToRecreate.id, newData);
-
-            if (success) {
-                // Notifier le joueur via un message forcé
-                await CharacterSyncService.requestForceUpdate(characterToRecreate.id, "Votre personnage a été réinitialisé par le MJ pour une recréation.");
-
-                // Rafraîchir la liste
-                await loadData();
-            }
-        } catch (error) {
-            ErrorService.handleError(error, {
-                context: 'GlobalPlayersView.confirmRecreate',
-                userMessage: "Échec de la recréation."
-            });
-        } finally {
-            setIsRecreating(false);
-            setCharacterToRecreate(null);
         }
     };
 
@@ -298,14 +248,6 @@ const GlobalPlayersView: React.FC = () => {
                                                 Voir
                                             </button>
                                             <button
-                                                onClick={() => handleRecreateRequest(char.id)}
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-900/40 hover:bg-amber-600/20 text-stone-500 hover:text-amber-500 rounded-sm font-black text-[10px] transition-all border border-stone-800 hover:border-amber-900/30 shadow-sm active:scale-95 uppercase tracking-widest"
-                                                title="Lancer une recréation (Respec)"
-                                            >
-                                                <RotateCcw size={14} />
-                                                Recréer
-                                            </button>
-                                            <button
                                                 onClick={() => handleDelete(char.id)}
                                                 className="p-1.5 text-stone-800 hover:text-rose-500 hover:bg-rose-950/20 rounded-sm transition-all grayscale hover:grayscale-0 opacity-40 hover:opacity-100"
                                                 title="Dissoudre le lien"
@@ -326,16 +268,6 @@ const GlobalPlayersView: React.FC = () => {
                 <CharacterReadOnlyView
                     character={selectedCharacter}
                     onClose={() => setSelectedCharacter(null)}
-                />
-            )}
-
-            {/* Recreation Modal */}
-            {characterToRecreate && (
-                <RecreationModal
-                    isOpen={!!characterToRecreate}
-                    onClose={() => setCharacterToRecreate(null)}
-                    onConfirm={confirmRecreate}
-                    character={characterToRecreate.data}
                 />
             )}
 
