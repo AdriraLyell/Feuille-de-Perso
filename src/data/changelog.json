@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.72",
+        "date": "2026-02-16",
+        "type": "docs",
+        "changes": [
+            "📝 Documentation : Mise à jour exhaustive du schéma de base de données (mystic_abilities, vues, relations)",
+            "📝 Documentation : Ajout du guide de procédure pour le clonage de personnage via SQL",
+            "👤 Personnage : Clonage de Ayame vers Akane pour le joueur Polo effectué avec succès"
+        ]
+    },
+    {
         "version": "2.49.71",
         "date": "2026-02-16",
         "type": "fix",
@@ -182,15 +192,6 @@
         "changes": [
             "🌐 Admin : Traduction en français des onglets de bibliothèques (Skills, Backgrounds, Counters, Specializations)",
             "🏗️ Refactoring : Amélioration de la structure des onglets de bibliothèques dans AdminApp.tsx"
-        ]
-    },
-    {
-        "version": "2.49.52",
-        "date": "2026-02-15",
-        "type": "docs",
-        "changes": [
-            "📝 Documentation : Création du guide complet sur la gestion des conflits et la synchronisation sécurisée (SYNC_CONFLICT_MANAGEMENT.md)",
-            "🏗️ Architecture : Synthèse des scénarios de réconciliation (Ajout/Suppression MJ, Dirty Checking)"
         ]
     }
 ]

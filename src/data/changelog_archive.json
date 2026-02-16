@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.49.52",
+        "date": "2026-02-15",
+        "type": "docs",
+        "changes": [
+            "📝 Documentation : Création du guide complet sur la gestion des conflits et la synchronisation sécurisée (SYNC_CONFLICT_MANAGEMENT.md)",
+            "🏗️ Architecture : Synthèse des scénarios de réconciliation (Ajout/Suppression MJ, Dirty Checking)"
+        ]
+    },
+    {
         "version": "2.49.51",
         "date": "2026-02-15",
         "type": "fix",
@@ -1005,18 +1014,6 @@
             "💾 Tests d'Intégration : Couverture des services CampaignService et OfflineStorageService",
             "🛡️ Correction de Bug : Élimination des doublons dans l'affichage des campagnes cachées",
             "🔧 RulesLoader : Gestion optimisée des erreurs 403/429 pour la résilience du chargement"
-        ]
-    },
-    {
-        "version": "2.44.4",
-        "date": "2026-02-12",
-        "type": "patch",
-        "changes": [
-            "🏗️ Architecture : Suppression définitive de l'injection script rules.js",
-            "🔧 Service : Bascule complète vers un chargement de règles JSON via API/CDN",
-            "🛡️ Résilience : Intégration de defaultRules.ts comme ultime fallback embarqué",
-            "🧹 Nettoyage : Suppression de PlayerService au profit de CampaignService unifié",
-            "💾 Migration : Amélioration de migrateRulesToV2 pour garantir l'intégrité des bibliothèques"
         ]
     }
 ]

@@ -1,5 +1,15 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.44.4] - 2026-02-12 [PATCH]
+
+- 🏗️ Architecture : Suppression définitive de l'injection script rules.js
+- 🔧 Service : Bascule complète vers un chargement de règles JSON via API/CDN
+- 🛡️ Résilience : Intégration de defaultRules.ts comme ultime fallback embarqué
+- 🧹 Nettoyage : Suppression de PlayerService au profit de CampaignService unifié
+- 💾 Migration : Amélioration de migrateRulesToV2 pour garantir l'intégrité des bibliothèques
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.44.3] - 2026-02-11 [MINOR]
 
 - 💾 Hybrid Database : Implémentation du OfflineStorageService (IndexedDB)
