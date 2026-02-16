@@ -24,8 +24,19 @@ const normalizeInput = (json: any): CharacterSheetData | null => {
         return json as CharacterSheetData;
     }
 
+    // 4. Specialized Library Export (e.g. skills_campaign.json)
+    if (json.meta && json.data && Array.isArray(json.data) && json.meta.type === 'skills') {
+        // Wrap for normalization
+        return {
+            header: { character_name: 'Library' } as any,
+            attributes: {},
+            skills: {},
+            skillLibrary: json.data
+        } as CharacterSheetData;
+    }
+
     return null;
-};
+}
 
 /**
  * Extracts configuration and definitions from a Character Sheet

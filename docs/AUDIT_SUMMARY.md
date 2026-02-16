@@ -59,7 +59,16 @@
 - **Résultat** : `RuleCalculationsService.ts` réduit à une simple façade (~30 lignes). Logique métier isolée et testable.
 
 ---
-*Dernière mise à jour : 16 Février 2026 - v2.49.71*
+*Dernière mise à jour : 16 Février 2026 - v2.49.87*
+
+### ✅ Phase 23 : Personnalisation des Bibliothèques & UI (Audit v2.49.87) - [RÉSOLU]
+- **Modularité** : Harmonisation visuelle des indicateurs de surcharge (icône Cyan `PencilLine` unifiée).
+- **Flexibilité** : Déverrouillage de l'édition globale pour les compétences ayant des surcharges locales.
+- **Sécurité** : Verrouillage strict de la suppression pour les éléments utilisés dans des campagnes (Correction bug de suppression accidentelle).
+- **Fiabilité** : Correction du bug de "Reset" via la capture automatique de la `masterDefinition` lors de l'édition.
+- **Stabilité React** : Éradication des avertissements de console liés aux valeurs `null` dans les éléments `select`.
+- **Résultat** : Un système de bibliothèque hybride (Global vs Local) totalement fonctionnel, robuste et sans avertissements console.
+
 
 ### ✅ Phase 22 : Santé CI & Typage Strict (Audit v2.49.71) - [RÉSOLU]
 - **CI/CD** : Restauration de l'intégrité du workflow GitHub suite à des erreurs de typage sur les nouvelles fonctionnalités.

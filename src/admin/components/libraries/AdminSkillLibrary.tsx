@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibrarySkillEntry } from '../../../types';
-import { Search, Plus, GraduationCap, Save, AlertOctagon, X, Layers, Edit2, Trash2, UploadCloud, CheckCircle2, Circle, Lock, Globe, Filter, Sparkles } from 'lucide-react';
+import { Search, Plus, GraduationCap, Save, AlertOctagon, X, Layers, Edit2, Trash2, UploadCloud, CheckCircle2, Circle, Lock, Globe, Filter, Sparkles, PencilLine } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import TriStateChip from '../../../components/ui/TriStateChip';
 import { useAdminSkillLibrary } from '../../../hooks/admin/useAdminSkillLibrary';
@@ -46,6 +46,11 @@ const SkillLibraryItem: React.FC<{
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
                     {skill.isGlobal && <div title="Global Reservoir"><Globe size={11} className="text-indigo-400 shrink-0" /></div>}
+                    {skill.isCustomized && (
+                        <div title="Cette compétence possède une surcharge pour cette campagne">
+                            <PencilLine size={11} className="text-cyan-500 shrink-0" />
+                        </div>
+                    )}
                     {skill.isVariable && (
                         <div
                             ref={anchorRef}
@@ -92,8 +97,8 @@ const SkillLibraryItem: React.FC<{
             <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                 <button
                     onClick={() => handleOpenEdit(skill)}
-                    className="text-blue-600 hover:bg-blue-50 p-1 rounded"
-                    title="Modifier"
+                    className="p-1 rounded text-blue-500 hover:bg-blue-50"
+                    title="Modifier la définition globale"
                 >
                     <Edit2 size={14} />
                 </button>
@@ -101,7 +106,7 @@ const SkillLibraryItem: React.FC<{
                     onClick={() => handleDelete(skill.id)}
                     disabled={isLocked}
                     className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
-                    title={isLocked ? "Suppression bloquée : compétence utilisée" : "Supprimer définitivement du repository"}
+                    title={isLocked ? "Suppression bloquée : utilisée ou personnalisée" : "Supprimer définitivement du repository"}
                 >
                     <Trash2 size={14} />
                 </button>
@@ -131,7 +136,6 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
         placedSkillNames,
         filteredList,
         availableCategories,
-        getCategoryLabel,
         handleOpenNew,
         handleOpenEdit,
         handleDelete,
@@ -141,7 +145,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
         handleBulkSelect,
         handlePublishClick,
         executePublish
-    } = useAdminSkillLibrary(rules, onUpdate, globalUsage);
+    } = useAdminSkillLibrary(rules, onUpdate, globalUsage, 'global');
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-120px)] flex flex-col">
@@ -265,7 +269,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                         {filteredList.map(skill => {
                             const isPlaced = placedSkillNames.has(skill.name.trim().toLowerCase());
                             const isGloballyUsed = !!globalUsage[skill.id];
-                            const isLocked = isPlaced || isGloballyUsed;
+                            const isLocked = isPlaced || isGloballyUsed || !!skill.isCustomized;
 
                             return (
                                 <SkillLibraryItem
@@ -287,7 +291,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                 <ThematicModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
-                    title={editingSkill.id ? 'Modifier Compétence' : 'Nouvelle Compétence'}
+                    title="Modification de la Base Globale"
                     icon={<GraduationCap size={20} />}
                     size={showCategoryHelp ? 'lg' : 'md'}
                     footer={
@@ -342,7 +346,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                                         setEditingSkill({ ...editingSkill, mysticAbilityId: firstId });
                                                     }
                                                 } else {
-                                                    const { mysticAbilityId, ...rest } = editingSkill;
+                                                    const { mysticAbilityId: _maId, ...rest } = editingSkill;
                                                     setEditingSkill(rest);
                                                 }
                                             }}

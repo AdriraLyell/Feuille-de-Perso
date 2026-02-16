@@ -81,13 +81,13 @@ export const LibraryLoader = {
             const activeCounterIds = new Set<string>(relCounters.map((r: RelSettingCounter) => r.counter_id));
             const activeMysticIds = new Set<string>(relMysticAbilities.map((r: any) => r.mystic_ability_id));
 
-            const skillDefaultMap = new Map<string, string>(relSkills.map((r: RelSettingSkill) => [r.skill_id, r.default_category]));
+            const skillRelMap = new Map<string, RelSettingSkill>(relSkills.map((r: RelSettingSkill) => [r.skill_id, r]));
             const bgDefaultMap = new Map<string, string>(relBackgrounds.map((r: RelSettingBackground) => [r.background_id, r.default_category]));
             const counterDefaultMap = new Map<string, string>(relCounters.map((r: RelSettingCounter) => [r.counter_id, r.default_category]));
 
             return {
                 traits: traits.map((t: DBTrait) => LibraryMapper.mapTrait(t, activeTraitIds, settingId, traitVarMap.get(t.id))).sort((a, b) => a.name.localeCompare(b.name)),
-                skills: skills.map((s: DBSkill) => LibraryMapper.mapSkill(s, activeSkillIds, settingId, skillVarMap.get(s.id), skillDefaultMap.get(s.id))).sort((a, b) => a.name.localeCompare(b.name)),
+                skills: skills.map((s: DBSkill) => LibraryMapper.mapSkill(s, activeSkillIds, settingId, skillVarMap.get(s.id), skillRelMap.get(s.id))).sort((a, b) => a.name.localeCompare(b.name)),
                 specializations: specs.map((s: DBSpecialization) => LibraryMapper.mapSpec(s, activeSpecIds, settingId)).sort((a, b) => a.name.localeCompare(b.name)),
                 backgrounds: backgrounds.map((b: DBBackground) => LibraryMapper.mapBackground(b, activeBgIds, settingId, bgVarMap.get(b.id), bgDefaultMap.get(b.id))).sort((a, b) => a.name.localeCompare(b.name)),
                 counters: counters.map((c: DBCounter) => LibraryMapper.mapCounter(c, activeCounterIds, settingId, counterDefaultMap.get(c.id))).sort((a, b) => a.name.localeCompare(b.name)),
@@ -121,8 +121,10 @@ export const LibraryLoader = {
                 // Filter out current setting
                 query = query.neq('setting_id', currentSettingId);
 
-                // For tables with categories, only count "placed" items
-                if (t.cat) {
+                // For tables with categories, count "placed" items OR items with overrides
+                if (t.cat && t.table === TABLE_REL_SETTING_SKILLS) {
+                    query = query.or(`default_category.not.is.null,name_override.not.is.null,description_override.not.is.null,is_variable_override.not.is.null,mystic_ability_id_override.not.is.null`);
+                } else if (t.cat) {
                     query = query.not('default_category', 'is', null);
                 }
 

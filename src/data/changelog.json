@@ -1,5 +1,104 @@
 [
     {
+        "version": "2.49.87",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🐞 Sidebar : Fix du bouton Reset qui pouvait échouer selon l'état des données",
+            "⚠️ React : Correction de l'avertissement 'value prop on select should not be null'",
+            "🔧 Système : Robustesse accrue de la gestion des états de personnalisation (isCustomized)"
+        ]
+    },
+    {
+        "version": "2.49.86",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🔓 Bibliothèque : Réactivation de l'édition globale pour les compétences personnalisées",
+            "🛡️ Système : Verrouillage strict de la suppression pour les compétences surchargées localement",
+            "🎨 UI : Harmonisation visuelle avec une icône de surcharge Cyan unifiée (Bibliothèque & Réserve)"
+        ]
+    },
+    {
+        "version": "2.49.85",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🔒 Bibliothèque : Verrouillage de l'édition globale si une compétence est personnalisée localement",
+            "🔄 Réserve : Nouveau bouton 'Reset' pour restaurer instantanément une compétence à son état d'origine",
+            "🏗️ Système : Stockage de la définition master pour permettre la réinitialisation sans perte de données"
+        ]
+    },
+    {
+        "version": "2.49.84",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🧠 Admin : Distinction claire entre édition de la Bibliothèque Globale et Personnalisation de Campagne",
+            "🛡️ Système : La modification via l'onglet Bibliothèque met désormais à jour la base master pour tous les réglages",
+            "🖋️ UI : Titres de modales explicites selon le contexte d'édition (Base Globale vs Campagne)"
+        ]
+    },
+    {
+        "version": "2.49.83",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🔍 Bibliothèques : Correction de la visibilité des compétences à variantes (Artisanat, etc.) en mode filtré",
+            "🛠️ Système : Amélioration de la détection 'Global' pour le catalogue chargé depuis JSON",
+            "🎨 UI : Ajustement de la visibilité des boutons d'édition dans les listes administratives"
+        ]
+    },
+    {
+        "version": "2.49.82",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🚀 Système : Utilisation d'un Portal React pour les modales (correction confinement UI)",
+            "🔄 Admin : Restauration du bouton 'Modifier' dans la bibliothèque globale de compétences",
+            "🎨 UI : Amélioration de la cohérence visuelle entre la bibliothèque et la réserve"
+        ]
+    },
+    {
+        "version": "2.49.81",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🎨 Admin : Migration de la personnalisation des compétences vers la Réserve (sidebar)",
+            "🧹 Admin : Restauration de l'UI épurée de la Bibliothèque globale (suppression édition/badges)",
+            "🛡️ Système : Support complet des overrides de compétences par campagne via la sidebar"
+        ]
+    },
+    {
+        "version": "2.49.80",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🛠️ Admin : Implémentation du système de surcharge locale des compétences par campagne (overrides)",
+            "🛡️ Bibliothèque : Protection contre la suppression des compétences globales si elles sont personnalisées dans un setting",
+            "📂 Exports : Découplage des exports de compétences (génération d'un `skills_[campaign].json` spécifique)",
+            "📥 Imports : Support de l'import flexible des bibliothèques via JSON (détection automatique du format spécifique)",
+            "🎨 UI : Ajout d'un badge 'Custom' dans la réserve pour identifier les compétences modifiées localement"
+        ]
+    },
+    {
+        "version": "2.49.79",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🎨 Admin : Optimisation visuelle des badges dans la réserve (icônes uniquement pour Variantes et Habilités Mystiques)"
+        ]
+    },
+    {
+        "version": "2.49.78",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🎨 Admin : Ajout de l'icône 'Habilité Mystique' (Sparkles) dans la réserve des compétences pour une identification rapide",
+            "🛡️ Schéma : Intégration de `mysticAbilityId` dans le schéma de validation des compétences de la bibliothèque"
+        ]
+    },
+    {
         "version": "2.49.77",
         "date": "2026-02-16",
         "type": "fix",
@@ -95,99 +194,6 @@
             "💰 XP : Remboursement automatique de l'XP de progression (attributs, compétences, compteurs) lors d'une recréation",
             "🛡️ Mode Création : Réactivation du mode création avec injection du remboursement et redistribution auto",
             "🎨 UI : Nouvelle modale de confirmation 'Recréation Éthérée' avec bilan des gains d'XP et avertissements"
-        ]
-    },
-    {
-        "version": "2.49.67",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🛡️ Attributs : Verrouillage de la valeur de création (val1) une fois le mode création validé",
-            "📈 XP : Implémentation de l'achat d'attributs via la colonne val2 avec calcul auto de l'XP dépensée",
-            "🎨 UI : Feedback visuel (opacité, curseur) sur les champs d'attributs verrouillés"
-        ]
-    },
-    {
-        "version": "2.49.66",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🩹 Image : Correction du préfixe Data URI manquant lors de la décompression (fix 431 Request Header Too Large)",
-            "🛡️ Stabilité : Détection automatique des schémas d'images corrompus dans les registres admin"
-        ]
-    },
-    {
-        "version": "2.49.65",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🐛 Admin : Correction critique du chargement des portraits compressés (GZIP) dans la vue Admin",
-            "🖼️ UI : Amélioration de la gestion des erreurs d'image (fallback silhouette)"
-        ]
-    },
-    {
-        "version": "2.49.64",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🖼️ Admin : Correction du bug d'affichage des portraits manquants d'Ayame (Seigneurs des Mystères)",
-            "🛡️ UI : Ajout d'un placeholder 'Silhouette' explicite en cas d'erreur de chargement d'image",
-            "🐛 Fix : Gestion robuste des IDs d'images morts dans la vue Admin"
-        ]
-    },
-    {
-        "version": "2.49.63",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🛡️ Schema : Correction de la structure `mysticAbilities` dans le validateur Zod (LibrarySkillEntry vs DotEntry).",
-            "🚀 Import : Résolution du bug empêchant l'import de fiches contenant des capacités mystiques."
-        ]
-    },
-    {
-        "version": "2.49.62",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🩹 Personnage : Restauration manuelle des attributs d'Ayame (3,1,3,3...) dans le Cloud",
-            "🛡️ Schema : Correction de la validation Zod (mysticAbilities) pour éviter les resets de fiche",
-            "🔍 Sync : Information MJ ajoutée pour guider la joueuse lors de la prochaine synchro"
-        ]
-    },
-    {
-        "version": "2.49.61",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🐞 Sync : Correction des erreurs de typage bloquant le build",
-            "🔍 Debug : Ajout de logs dans la console pour le suivi de la synchronisation cloud"
-        ]
-    },
-    {
-        "version": "2.49.60",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🔔 Synchronisation : Notification automatique des mises à jour disponibles sur le Cloud",
-            "✨ UI : Ajout d'un indicateur visuel (badge ambre pulsant) sur le bouton Sync",
-            "🛡️ Sync : Préservation des métadonnées de synchronisation lors des mises à jour partielles"
-        ]
-    },
-    {
-        "version": "2.49.59",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "💾 Admin : Correction ordre de sauvegarde (Habilités avant Compétences) pour garantir les liens"
-        ]
-    },
-    {
-        "version": "2.49.58",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🔍 Admin : Ajout d'un filtre 'Mystique' dans la réserve de compétences",
-            "🐞 Admin : Correction de l'erreur d'import dans LibraryLoader"
         ]
     }
 ]

@@ -91,6 +91,13 @@ export interface LibrarySkillEntry {
   isLocked?: boolean;
   globalUsage?: number;
   mysticAbilityId?: string; // Links this skill to a specific mystic ability
+  isCustomized?: boolean; // Vrai si la compétence a été modifiée localement pour ce setting
+  masterDefinition?: { // Pour le bouton "Reset"
+    name: string;
+    description: string;
+    isVariable: boolean;
+    mysticAbilityId?: string;
+  };
 }
 
 // Nouveau : Entrée pour le catalogue des spécialisations

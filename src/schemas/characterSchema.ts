@@ -150,7 +150,9 @@ export const LibrarySkillEntrySchema = z.object({
     isGlobal: z.boolean().optional(),
     isActive: z.boolean().optional(),
     isLocked: z.boolean().optional(),
-    globalUsage: z.number().optional()
+    globalUsage: z.number().optional(),
+    mysticAbilityId: z.string().optional(),
+    isCustomized: z.boolean().optional()
 });
 
 export const LibrarySpecializationEntrySchema = z.object({

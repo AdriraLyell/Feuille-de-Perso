@@ -1,5 +1,75 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.45.13] - 2026-02-12 [PATCH]
+
+- 📖 Livre : Suppression totale des barres de défilement (ascenseurs) en mode lecture pour une immersion parfaite
+- 🎨 UI : Ajustement des conteneurs parents pour éviter les débordements visuels et masquer les scrollbars sur toutes les résolutions
+- 📏 Mise en page : Centrage amélioré du livre dans son écrin de bois
+
+## [2.45.12] - 2026-02-12 [PATCH]
+
+- 📖 Livre : Préservation intégrale de la mise en forme (gras, italique, etc.) lors du découpage des paragraphes géants
+- 🛠️ Algorithme : Utilisation de l'API Range du DOM pour un découpage HTML structurellement sûr
+- 📏 Précision : Mesures de hauteur encore plus fidèles grâce au rendu des balises réelles lors du calcul du split
+
+## [2.45.11] - 2026-02-12 [PATCH]
+
+- 📖 Livre : Rétablissement de la vue double-page (cote-à-cote)
+- ✨ UX : Suppression du flickering via la désactivation des coins interactifs (showPageCorners)
+- 🎨 Style : Nettoyage des ombres CSS redondantes pour laisser le moteur FlipBook gérer le relief
+- 🚀 Performance : Optimisation de l'auto-dimensionnement (autoSize: true)
+
+## [2.45.10] - 2026-02-12 [BUGFIX]
+
+- 🐛 Fix : Correction majeure du BookPageSplitter pour gérer les paragraphes géants sans ponctuation
+- 🔄 Algorithme : Implémentation d'une file d'attente (queue) pour le traitement récursif des blocs
+- 🔤 Fallback : Ajout d'un découpage mot-par-mot si le découpage par phrases ne suffit pas
+- 🪵 Logging : Transition vers le logger système (logger.log/info) pour le suivi de la pagination
+
+## [2.45.9] - 2026-02-12 [PATCH]
+
+- 🐛 Fix Critique : Correction du dimensionnement du BookPageSplitter (contenu tronqué en mode Lecture)
+- 📐 Constants : Séparation correcte des dimensions totales (722×980) et zone de contenu (562×836)
+- 📏 CSS : Passage du padding en pixels (72px 80px) pour garantir la synchronisation avec les constantes JS
+
+## [2.45.8] - 2026-02-12 [MINOR]
+
+- 📖 Livre Numérique : Harmonisation rigoureuse des dimensions (722px) entre modes Écriture et Lecture
+- 📏 Layout : Enforced fixed width et correction de l'élargissement infini via overflow-wrap: break-word
+- ✂️ Pagination : Correction du BookPageSplitter (mesures précises via matching des classes CSS)
+- 🖼️ Viewer : Optimisation du rendu double-page avec react-pageflip (size: fixed)
+
+## [2.45.7] - 2026-02-12 [MINOR]
+
+- Phase C : Typage strict des handlers admin (value: any → unknown ou génériques)
+- AdminCountersEditor : Typage générique <K extends keyof RulesCounterDefinition>
+- AdminTraitLibrary : Typage générique <K extends keyof TraitEffect>
+- AdminCreationEditor et sous-composants : any → unknown pour champs dynamiques
+
+## [2.45.6] - 2026-02-12 [MINOR]
+
+- Refactoring majeur de CreationHUD.tsx (537 → 168 lignes)
+- Extraction de useCreationBudget hook pour la logique de calcul
+- Extraction de BudgetGauge et CreationValidationModal en composants réutilisables
+- Suppression de tous les @ts-ignore dans CreationHUD via typage strict
+
+## [2.45.5] - 2026-02-12 [PATCH]
+
+- 🧹 Audit : Suppression de 12 fichiers de débris à la racine du projet (logs, tests, doublons)
+- 🛠️ Build : Correction de 4 erreurs de compilation pré-existantes (imports manquants, exports dupliqués, accès typé)
+- 📄 Docs : Mise à jour de regle.md, AUDIT_SUMMARY.md et .gitignore
+- 🔄 Version : Résolution de la désynchronisation de version entre package.json et constants.ts
+
+## [2.45.4] - 2026-02-12 [PATCH]
+
+- ✨ Landing Page Wow Effect : Refonte immersive de RulesSourceSelector avec le thème 'Mystic' Premium
+- 🛡️ Secure Entry : Harmonisation du LoginScreen avec la même esthétique (lueurs, textures, boutons thématiques)
+- 📱 Mobile UX : Implémentation d'un menu 'hamburger' animé dans la navigation diégétique
+- 🎨 Micro-Interactions : Ajout d'animations Framer Motion sur les cartes de sélection et les boutons d'action
+- 📏 Responsive : Optimisation de la typographie et des espacements pour tablettes et smartphones
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.45.3] - 2026-02-12 [PATCH]
 
 - 🛡️ Sécurité & Fiabilité : Ajout de blocs try/catch/finally sur toutes les actions asynchrones de l'Admin

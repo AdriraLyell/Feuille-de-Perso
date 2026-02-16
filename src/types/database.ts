@@ -117,6 +117,10 @@ export interface RelSettingSkill {
     skill_id: string;
     default_category: string;
     is_active: boolean;
+    name_override?: string;
+    is_variable_override?: boolean;
+    mystic_ability_id_override?: string;
+    description_override?: string;
 }
 
 /**
