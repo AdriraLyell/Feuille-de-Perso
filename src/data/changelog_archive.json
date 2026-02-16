@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.45",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🎨 Admin : Alignement parfait de la Master List avec le thème 'Mystic' (MotionCard et structure de table)",
+            "🌑 UI : Correction du fond de page en vue globale (remplacement du gris par le noir pierre pierre)",
+            "🖋️ Typographie : Utilisation de polices Serif et gestion fine de l'espacement pour les registres",
+            "✨ UX : Intégration de MotionFade sur les lignes de tableaux pour une apparition fluide"
+        ]
+    },
+    {
         "version": "2.49.44",
         "date": "2026-02-15",
         "type": "feat",
@@ -1017,16 +1028,6 @@
             "♿ Accessibilité : Installation de eslint-plugin-jsx-a11y et corrections sémantique (main, nav, aside)",
             "🏷️ UX : Ajout de labels ARIA sur les boutons d'actions (Déconnexion, Suppression, Publication)",
             "🛡️ Typage : Sécurisation du processus d'import de bibliothèque avec validation de types"
-        ]
-    },
-    {
-        "version": "2.43.1",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "🛡️ Sécurité : Mise à jour vers Vite 7 et correction des vulnérabilités (npm audit)",
-            "🧩 Fiabilité : Implémentation d'un Error Boundary global (fallback UI en français)",
-            "🚀 CI/CD : Renforcement du workflow de déploiement (Type Check, Lint, Tests unitaires obligatoires)"
         ]
     }
 ]

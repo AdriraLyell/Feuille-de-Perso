@@ -20,7 +20,23 @@ export const ReadOnlyPortrait: React.FC<ReadOnlyPortraitProps> = ({ imageId, leg
                     const { getImage } = await import('../../../imageDB');
                     const blob = await getImage(imageId);
                     if (blob && active) {
-                        setImageUrl(URL.createObjectURL(blob));
+                        // Check for GZIP compressed data in blob because ImageSyncResolver stores them as text blobs
+                        try {
+                            const text = await new Response(blob).text();
+                            if (text.startsWith('GZIP:')) {
+                                const { ImageCompressionService } = await import('../../../services/ImageCompressionService');
+                                // decompressFull returns the base64 data URI
+                                const decompressed = ImageCompressionService.decompressFull(text);
+                                if (active) setImageUrl(decompressed);
+                            } else {
+                                // Standard blob (object URL) - reuse the original blob, not the text
+                                setImageUrl(URL.createObjectURL(blob));
+                            }
+                        } catch (err) {
+                            // Fallback if text reading fails (unlikely for blob) or other error, try standard object URL
+                            console.warn("Error checking blob content, falling back to createObjectURL", err);
+                            setImageUrl(URL.createObjectURL(blob));
+                        }
                     } else if (active) {
                         // Image ID exists but blob not found in local DB
                         setError(true);
@@ -62,6 +78,7 @@ export const ReadOnlyPortrait: React.FC<ReadOnlyPortraitProps> = ({ imageId, leg
                         <img
                             src={imageUrl}
                             alt="Portrait"
+                            onError={() => setError(true)}
                             className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700 scale-105 group-hover:scale-100"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent opacity-60 pointer-events-none" />

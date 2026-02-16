@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.43.1] - 2026-02-11 [PATCH]
+
+- 🛡️ Sécurité : Mise à jour vers Vite 7 et correction des vulnérabilités (npm audit)
+- 🧩 Fiabilité : Implémentation d'un Error Boundary global (fallback UI en français)
+- 🚀 CI/CD : Renforcement du workflow de déploiement (Type Check, Lint, Tests unitaires obligatoires)
+
 ## [2.43.0] - 2026-02-11 [MINOR]
 
 - 🏗️ Refonte majeure architecturale : Extraction de plus de 1500 lignes de logique vers des hooks personnalisés
