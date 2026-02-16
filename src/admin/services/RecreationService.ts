@@ -1,5 +1,6 @@
 import { CharacterSheetData, RulesData } from '../../types';
 import { recreateCharacterStats } from '../../utils/characterUtils';
+import { generateId } from '../../utils/factories';
 
 /**
  * Service gérant la logique de recréation (Respec) d'un personnage.
@@ -27,16 +28,46 @@ export const RecreationService = {
         // Step 1: Reset chirurgical (garde identité, social, équipement, traits, image)
         const resetData = recreateCharacterStats(data);
 
-        // Step 1.5: Nettoyage des compétences (Suppression des variantes et hors-piste)
-        // On ne garde que ce qui est explicitement défini dans les règles pour chaque catégorie.
+        // Step 1.5: Reconstruction stricte des compétences (Suppression des variantes et hors-piste)
+        // On reconstruit la liste pour matcher EXACTEMENT les règles, sans surplus.
         const definedSkills = currentRules.definitions.skills || {};
-        Object.keys(resetData.skills).forEach(cat => {
+
+        Object.keys(definedSkills).forEach(cat => {
             const ruleNames = definedSkills[cat] || [];
-            // On ne garde que les compétences dont le nom est dans les règles
-            // Note: les compétences vides (spacers) sont aussi conservées si elles sont dans les règles.
-            resetData.skills[cat] = resetData.skills[cat].filter(s =>
-                ruleNames.includes(s.name) || s.name === ""
-            );
+            const existingSkills = resetData.skills[cat] || [];
+            const consumedIds = new Set<string>();
+
+            // On crée une nouvelle liste basée strictement sur les règles
+            const newSkillList = ruleNames.map(ruleName => {
+                // Tenter de trouver une compétence existante correspondante pour garder l'ID (logs, etc.)
+                const match = existingSkills.find(s =>
+                    s.name === ruleName && !consumedIds.has(s.id)
+                );
+
+                if (match) {
+                    consumedIds.add(match.id);
+                    // On garde l'ID mais on reset TOUT le reste pour être sûr
+                    return {
+                        ...match,
+                        value: 0,
+                        creationValue: 0,
+                        variant: undefined, // FORCE RESET du variant
+                        current: 0
+                    };
+                } else {
+                    // Création d'une entrée vierge si non trouvée
+                    return {
+                        id: generateId(),
+                        name: ruleName,
+                        value: 0,
+                        creationValue: 0,
+                        max: 0, // Sera recalculé par le reconciler si besoin
+                        variant: undefined
+                    };
+                }
+            });
+
+            resetData.skills[cat] = newSkillList;
         });
 
         // Step 2: Injecter le remboursement d'XP
