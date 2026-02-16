@@ -70,7 +70,7 @@ describe('RulesReconciler Snapshot', () => {
                 labels: {}
             },
             libraries: {
-                traits: [], skills: [], backgrounds: [], counters: [], specializations: []
+                traits: [], skills: [], backgrounds: [], counters: [], specializations: [], mysticAbilities: []
             }
         };
 

@@ -146,7 +146,11 @@ export const LibrarySkillEntrySchema = z.object({
     name: z.string(),
     description: z.string().optional(),
     defaultCategory: z.string().optional(),
-    isVariable: z.boolean().optional()
+    isVariable: z.boolean().optional(),
+    isGlobal: z.boolean().optional(),
+    isActive: z.boolean().optional(),
+    isLocked: z.boolean().optional(),
+    globalUsage: z.number().optional()
 });
 
 export const LibrarySpecializationEntrySchema = z.object({
@@ -287,6 +291,7 @@ export const CharacterSheetDataSchema = z.object({
     }),
     appVersion: z.string().optional(),
     syncInfo: SyncInfoSchema.optional(),
+    mysticAbilities: z.array(LibrarySkillEntrySchema).optional().nullable(),
     _schemaVersion: z.number().optional()
 });
 

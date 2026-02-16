@@ -92,6 +92,7 @@ export const defaultRules: RulesData = {
         skills: [],
         specializations: [],
         backgrounds: [],
-        counters: []
+        counters: [],
+        mysticAbilities: []
     }
 };

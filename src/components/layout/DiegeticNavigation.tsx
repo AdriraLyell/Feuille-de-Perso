@@ -21,7 +21,7 @@ interface DiegeticNavigationProps {
     onShowChangelog: () => void;
     onOpenAppearance: () => void;
     onOpenSync: () => void;
-    syncStatus?: 'none' | 'synced' | 'pending';
+    syncStatus?: 'none' | 'synced' | 'pending' | 'update-available';
     appVersion: string;
     onShowCampaignInfo: () => void;
 }
@@ -56,7 +56,19 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
             isWarning: stats?.isCritical || stats?.isWarning
         },
         { label: 'Import/Export', icon: <Download size={18} />, onClick: onOpenImportExport },
-        { label: 'Synchro', icon: <UploadCloud size={18} />, onClick: onOpenSync, highlight: data.syncInfo?.isAutoSyncEnabled },
+        {
+            label: 'Synchro',
+            icon: (
+                <div className="relative">
+                    <UploadCloud size={18} />
+                    {syncStatus === 'update-available' && (
+                        <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 border border-gray-900 animate-pulse" />
+                    )}
+                </div>
+            ),
+            onClick: onOpenSync,
+            highlight: data.syncInfo?.isAutoSyncEnabled || syncStatus === 'update-available'
+        },
         { label: 'Imprimer', icon: <Printer size={18} />, onClick: onPrintRequest },
         { label: 'Historique', icon: <History size={18} />, onClick: onShowLogs, active: showLogs },
         { label: 'Guide', icon: <HelpCircle size={18} />, onClick: onShowUserGuide },
@@ -172,10 +184,21 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                         <button
                             onClick={onOpenSync}
-                            className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all text-sm font-bold border ${syncStatus === 'synced' ? 'bg-green-700/20 text-green-500 border-green-700/50' : 'bg-purple-700/20 text-purple-400 border-purple-700/50'}`}
+                            className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all text-sm font-bold border relative ${syncStatus === 'synced'
+                                    ? 'bg-green-700/20 text-green-500 border-green-700/50'
+                                    : syncStatus === 'update-available'
+                                        ? 'bg-amber-700/30 text-amber-400 border-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.2)] animate-pulse'
+                                        : 'bg-purple-700/20 text-purple-400 border-purple-700/50'
+                                }`}
                         >
                             <UploadCloud size={18} className={isSyncing ? "animate-spin-slow" : ""} />
                             <span className="hidden lg:inline">Sync</span>
+                            {syncStatus === 'update-available' && (
+                                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500 border border-gray-900"></span>
+                                </span>
+                            )}
                         </button>
 
                         <button onClick={onPrintRequest} className="p-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg"><Printer size={18} /></button>

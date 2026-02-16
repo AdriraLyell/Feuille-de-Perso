@@ -34,6 +34,7 @@ export const LibrarySkillEntrySchema = z.object({
     variants: z.array(z.string()).nullable().optional(),
     isGlobal: z.boolean().nullable().optional(),
     isActive: z.boolean().nullable().optional(),
+    mysticAbilityId: z.string().nullable().optional(),
 });
 
 export const LibrarySpecializationEntrySchema = z.object({

@@ -90,6 +90,7 @@ export interface CharacterSheetData {
   library: LibraryEntry[]; // New field for the Virtue/Flaw library
   skillLibrary: LibrarySkillEntry[]; // New field for Skill Reserve
   specializationLibrary?: LibrarySpecializationEntry[]; // Catalogue de spécialisations réutilisables
+  mysticAbilities?: LibrarySkillEntry[]; // Categories of mystic powers (Martial Arts, Magic, etc.)
   xpLogs: XPEntry[];
   appLogs: LogEntry[];
   campaignNotes: CampaignNoteEntry[];

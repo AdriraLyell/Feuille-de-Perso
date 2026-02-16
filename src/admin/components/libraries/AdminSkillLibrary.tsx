@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibrarySkillEntry } from '../../../types';
-import { Search, Plus, GraduationCap, Save, AlertOctagon, X, Layers, Edit2, Trash2, UploadCloud, CheckCircle2, Circle, Lock, Globe, Filter } from 'lucide-react';
+import { Search, Plus, GraduationCap, Save, AlertOctagon, X, Layers, Edit2, Trash2, UploadCloud, CheckCircle2, Circle, Lock, Globe, Filter, Sparkles } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import TriStateChip from '../../../components/ui/TriStateChip';
 import { useAdminSkillLibrary } from '../../../hooks/admin/useAdminSkillLibrary';
@@ -74,6 +74,11 @@ const SkillLibraryItem: React.FC<{
                             )}
                         </div>
                     )}
+                    {skill.mysticAbilityId && (
+                        <div title="Compétence Mystique">
+                            <Sparkles size={11} className="text-amber-500 shrink-0" />
+                        </div>
+                    )}
                     {isLocked && <div className="text-amber-500 shrink-0" title={isPlaced ? "Utilisée dans cette campagne" : "Utilisée dans d'autres campagnes"}><Lock size={11} /></div>}
                     {skill.description && (
                         <div className="text-[10px] text-slate-500 italic truncate" title={skill.description}>
@@ -118,6 +123,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
         sourceFilter, setSourceFilter,
         typeFilter, setTypeFilter,
         usageFilter, setUsageFilter,
+        mysticFilter, setMysticFilter,
         showPublishConfirm, setShowPublishConfirm,
         showDeleteConfirm, setShowDeleteConfirm,
         publishResult, setPublishResult,
@@ -211,9 +217,17 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                     activeColor="amber"
                 />
 
-                {(activeFilter !== null || sourceFilter !== null || typeFilter !== null || usageFilter !== null) && (
+                <TriStateChip
+                    label="Mystiques"
+                    value={mysticFilter}
+                    onChange={setMysticFilter}
+                    icon={Sparkles}
+                    activeColor="amber"
+                />
+
+                {(activeFilter !== null || sourceFilter !== null || typeFilter !== null || usageFilter !== null || mysticFilter !== null) && (
                     <button
-                        onClick={() => { setActiveFilter(null); setSourceFilter(null); setTypeFilter(null); setUsageFilter(null); }}
+                        onClick={() => { setActiveFilter(null); setSourceFilter(null); setTypeFilter(null); setUsageFilter(null); setMysticFilter(null); }}
                         className="text-[10px] font-bold text-red-500 hover:text-red-700 ml-auto px-2"
                     >
                         RÉINITIALISER
@@ -310,6 +324,49 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                         <span className="block text-sm font-bold text-blue-900 leading-tight">Variantes requises</span>
                                         <span className="block text-[10px] text-blue-700 leading-tight">Ex: "Artisanat : Forge"</span>
                                     </label>
+                                </div>
+
+                                {/* Mystic Link SECTION */}
+                                <div className={`bg-amber-50 border border-amber-200 rounded p-3 flex flex-col gap-2 transition-all ${!!editingSkill.mysticAbilityId ? 'ring-1 ring-amber-400' : ''}`}>
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            type="checkbox"
+                                            id="isMysticAbility"
+                                            className="w-4 h-4 text-amber-600 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                            checked={!!editingSkill.mysticAbilityId}
+                                            disabled={!rules.libraries.mysticAbilities?.length}
+                                            onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    const firstId = rules.libraries.mysticAbilities?.[0]?.id || '';
+                                                    if (firstId) {
+                                                        setEditingSkill({ ...editingSkill, mysticAbilityId: firstId });
+                                                    }
+                                                } else {
+                                                    const { mysticAbilityId, ...rest } = editingSkill;
+                                                    setEditingSkill(rest);
+                                                }
+                                            }}
+                                        />
+                                        <label htmlFor="isMysticAbility" className="cursor-pointer select-none">
+                                            <span className="block text-sm font-bold text-amber-900 leading-tight">Habilité Mystique</span>
+                                            <span className="block text-[10px] text-amber-700 leading-tight">Lier à une catégorie magique/martiale</span>
+                                            {!rules.libraries.mysticAbilities?.length && (
+                                                <span className="block text-[10px] text-red-600 italic mt-1">Aucune habilité mystique définie dans les règles.</span>
+                                            )}
+                                        </label>
+                                    </div>
+                                    {editingSkill.mysticAbilityId !== undefined && rules.libraries.mysticAbilities && rules.libraries.mysticAbilities.length > 0 && (
+                                        <select
+                                            className="w-full border border-amber-300 rounded px-2 py-1 text-xs focus:border-amber-500 outline-none bg-white font-bold"
+                                            value={editingSkill.mysticAbilityId}
+                                            onChange={(e) => setEditingSkill({ ...editingSkill, mysticAbilityId: e.target.value })}
+                                        >
+                                            <option value="">-- Choisir une habilité --</option>
+                                            {rules.libraries.mysticAbilities?.map(ma => (
+                                                <option key={ma.id} value={ma.id}>{ma.name}</option>
+                                            ))}
+                                        </select>
+                                    )}
                                 </div>
                                 {editingSkill.isVariable && (
                                     <div className="animate-in fade-in slide-in-from-top-2 duration-200">

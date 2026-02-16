@@ -1,5 +1,80 @@
 [
     {
+        "version": "2.49.64",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🖼️ Admin : Correction du bug d'affichage des portraits manquants d'Ayame (Seigneurs des Mystères)",
+            "🛡️ UI : Ajout d'un placeholder 'Silhouette' explicite en cas d'erreur de chargement d'image",
+            "🐛 Fix : Gestion robuste des IDs d'images morts dans la vue Admin"
+        ]
+    },
+    {
+        "version": "2.49.63",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🛡️ Schema : Correction de la structure `mysticAbilities` dans le validateur Zod (LibrarySkillEntry vs DotEntry).",
+            "🚀 Import : Résolution du bug empêchant l'import de fiches contenant des capacités mystiques."
+        ]
+    },
+    {
+        "version": "2.49.62",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🩹 Personnage : Restauration manuelle des attributs d'Ayame (3,1,3,3...) dans le Cloud",
+            "🛡️ Schema : Correction de la validation Zod (mysticAbilities) pour éviter les resets de fiche",
+            "🔍 Sync : Information MJ ajoutée pour guider la joueuse lors de la prochaine synchro"
+        ]
+    },
+    {
+        "version": "2.49.61",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🐞 Sync : Correction des erreurs de typage bloquant le build",
+            "🔍 Debug : Ajout de logs dans la console pour le suivi de la synchronisation cloud"
+        ]
+    },
+    {
+        "version": "2.49.60",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🔔 Synchronisation : Notification automatique des mises à jour disponibles sur le Cloud",
+            "✨ UI : Ajout d'un indicateur visuel (badge ambre pulsant) sur le bouton Sync",
+            "🛡️ Sync : Préservation des métadonnées de synchronisation lors des mises à jour partielles"
+        ]
+    },
+    {
+        "version": "2.49.59",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "💾 Admin : Correction ordre de sauvegarde (Habilités avant Compétences) pour garantir les liens"
+        ]
+    },
+    {
+        "version": "2.49.58",
+        "date": "2026-02-15",
+        "type": "fix",
+        "changes": [
+            "🔍 Admin : Ajout d'un filtre 'Mystique' dans la réserve de compétences",
+            "🐞 Admin : Correction de l'erreur d'import dans LibraryLoader"
+        ]
+    },
+    {
+        "version": "2.49.57",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🔗 Admin : Possibilité de lier les compétences à des 'Habilités Mystiques'",
+            "🎨 UI : Nouvelle option dans l'édition de compétence pour désigner une habilité mystique",
+            "🗄️ BDD : Migration SQL pour supporter le lien entre compétences et habilités"
+        ]
+    },
+    {
         "version": "2.49.56",
         "date": "2026-02-15",
         "type": "feat",
@@ -118,96 +193,6 @@
             "🌑 UI : Correction du fond de page en vue globale (remplacement du gris par le noir pierre pierre)",
             "🖋️ Typographie : Utilisation de polices Serif et gestion fine de l'espacement pour les registres",
             "✨ UX : Intégration de MotionFade sur les lignes de tableaux pour une apparition fluide"
-        ]
-    },
-    {
-        "version": "2.49.44",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🎨 Admin : Application du thème 'Mystic' à la Master List des Voyageurs",
-            "🖋️ UI : Refonte visuelle des registres globaux (couleurs ambre/pierre et typographie serif)",
-            "📜 Fiche : Restauration des colonnes de compétences manquantes (Col_Comp_4 et Col_Comp_8)",
-            "🛡️ Fix : Robustesse accrue sur les filtres de catégories de compétences (insensibilité à la casse)"
-        ]
-    },
-    {
-        "version": "2.49.43",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🖥️ Admin : Expansion verticale massive de l'onglet Joueurs",
-            "📏 UI : Alignement des hauteurs de listes de personnages sur le système des bibliothèques (calc(100vh - 120px))",
-            "🔍 UX : Élargissement de la vue détaillée des personnages (max-w-7xl) pour une meilleure vision d'ensemble",
-            "📊 Global : La Master List des joueurs occupe désormais tout l'espace vertical disponible"
-        ]
-    },
-    {
-        "version": "2.49.42",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "📏 Admin : Augmentation de la hauteur verticale des vues de listes (Bibliothèques & Personnages)",
-            "🖥️ UX : Utilisation optimisée de l'espace vertical pour une meilleure visibilité des données",
-            "📜 Sync : Ajout d'une barre de défilement sur la liste des personnages de campagne"
-        ]
-    },
-    {
-        "version": "2.49.41",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🏛️ Admin : Harmonisation de la terminologie des Traits",
-            "🖋️ UI : Renommage de 'Éclats de Fortune' en 'Avantages' et 'Fardeaux de l'Ombre' en 'Désavantages' dans la vue ReadOnly",
-            "🛠️ Admin : Mise à jour des descriptifs de la bibliothèque de traits pour utiliser 'Désavantages' au lieu de 'Défauts'"
-        ]
-    },
-    {
-        "version": "2.49.40",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "✨ UI : Correction du tronquage des tooltips via React Portals",
-            "🧩 UX : Ajout du composant PortalTooltip pour les variantes (Traits, Compétences, Historiques)",
-            "🏗️ Refactoring : Migration des listes de variantes vers le système de portail pour éviter le clipping overflow"
-        ]
-    },
-    {
-        "version": "2.49.39",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🐛 Fix : Correction d'une violation des règles des Hooks React (useState dans un .map)",
-            "🏗️ Refactoring : Extraction des items de bibliothèque en sous-composants pour stabiliser le rendu"
-        ]
-    },
-    {
-        "version": "2.49.38",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "✨ UX : Ajout d'infobulles dynamiques listant les variantes au survol de l'icône dans la bibliothèque",
-            "📚 Bibliothèques : Implémentation pour les Traits, Compétences et Arrière-plans",
-            "🛡️ Stabilité : Gestion du repli (fallback) vers le titre classique si aucune variante n'est définie"
-        ]
-    },
-    {
-        "version": "2.49.37",
-        "date": "2026-02-15",
-        "type": "refactor",
-        "changes": [
-            "🛠️ Refactoring : Modularisation de RuleCalculationsService.ts",
-            "📏 Code Health : Extraction des calculs d'XP (xpCalculator.ts) et de Tarot (cardCalculator.ts)",
-            "🏗️ Architecture : Simplification du service central vers un pattern Façade"
-        ]
-    },
-    {
-        "version": "2.49.36",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🐛 Fix : Correction d'un plantage dans le ColumnarEditor",
-            "🛡️ Stabilité : Ajout d'une garde contre les accès nuls lors de l'initialisation de l'éditeur Tiptap"
         ]
     }
 ]

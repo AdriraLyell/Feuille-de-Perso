@@ -13,6 +13,7 @@ export const TABLE_LIBRARIES_SKILLS = 'libraries_skills' as const;
 export const TABLE_LIBRARIES_SPECIALIZATIONS = 'libraries_specializations' as const;
 export const TABLE_LIBRARIES_BACKGROUNDS = 'libraries_backgrounds' as const;
 export const TABLE_LIBRARIES_COUNTERS = 'libraries_counters' as const;
+export const TABLE_LIBRARIES_MYSTIC_ABILITIES = 'libraries_mystic_abilities' as const;
 
 // Relation tables
 export const TABLE_REL_SETTING_TRAITS = 'rel_setting_traits' as const;
@@ -20,6 +21,7 @@ export const TABLE_REL_SETTING_SKILLS = 'rel_setting_skills' as const;
 export const TABLE_REL_SETTING_SPECIALIZATIONS = 'rel_setting_specializations' as const;
 export const TABLE_REL_SETTING_BACKGROUNDS = 'rel_setting_backgrounds' as const;
 export const TABLE_REL_SETTING_COUNTERS = 'rel_setting_counters' as const;
+export const TABLE_REL_SETTING_MYSTIC_ABILITIES = 'rel_setting_mystic_abilities' as const;
 
 // Variant tables
 export const TABLE_LIBRARIES_TRAITS_VARIANTS = 'libraries_traits_variants' as const;
@@ -31,6 +33,7 @@ export const TABLE_LIBRARIES_BACKGROUNDS_VARIANTS = 'libraries_backgrounds_varia
  * Maps library keys (e.g., 'skills') to their primary tables, relations, IDs, and variants.
  */
 export const LIBRARY_TYPE_CONFIG = [
+    { key: 'mysticAbilities' as const, table: TABLE_LIBRARIES_MYSTIC_ABILITIES, rel: TABLE_REL_SETTING_MYSTIC_ABILITIES, idKey: 'mystic_ability_id' },
     { key: 'traits' as const, table: TABLE_LIBRARIES_TRAITS, rel: TABLE_REL_SETTING_TRAITS, idKey: 'trait_id', variants: TABLE_LIBRARIES_TRAITS_VARIANTS },
     { key: 'skills' as const, table: TABLE_LIBRARIES_SKILLS, rel: TABLE_REL_SETTING_SKILLS, idKey: 'skill_id', variants: TABLE_LIBRARIES_SKILLS_VARIANTS },
     { key: 'backgrounds' as const, table: TABLE_LIBRARIES_BACKGROUNDS, rel: TABLE_REL_SETTING_BACKGROUNDS, idKey: 'background_id', variants: TABLE_LIBRARIES_BACKGROUNDS_VARIANTS },

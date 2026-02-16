@@ -39,7 +39,8 @@ describe('RulesReconciler E2E', () => {
             skills: [],
             backgrounds: [],
             counters: [],
-            specializations: []
+            specializations: [],
+            mysticAbilities: []
         }
     };
 

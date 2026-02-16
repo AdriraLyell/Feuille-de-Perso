@@ -1,5 +1,61 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.43.0] - 2026-02-11 [MINOR]
+
+- 🏗️ Refonte majeure architecturale : Extraction de plus de 1500 lignes de logique vers des hooks personnalisés
+- 🧩 AdminApp : Extraction de useAdminAuth et useAdminRulesHandler (Optimisation de 60%)
+- 📖 CampaignNotes : Refonte complète du journal avec useJournal et useJournalImages
+- 🎨 TraitLibrary : Modularisation de la bibliothèque de traits et des sélections
+- 🧙 LibraryImportWizard : Simplification de l'assistant d'importation via useLibraryImport
+- 🛡️ Renforcement du typage TypeScript Strict sur l'ensemble des nouveaux modules
+
+## [2.42.1] - 2026-02-11 [PATCH]
+
+- 💄 Amélioration de l'accessibilité du bouton de déconnexion dans l'Admin
+- 🏠 Ajout du bouton de déconnexion sur le Tableau de Bord
+- 👥 Ajout du bouton de déconnexion sur la vue des Joueurs Globaux
+
+## [2.42.0] - 2026-02-11 [MINOR]
+
+- 🛡️ Hardening de la sécurité RLS (Supabase) : Transition vers les claims JWT pour plus de robustesse
+- 🚀 Correction des erreurs 403 Forbidden dans l'administration des campagnes
+- 🔧 Consolidation des politiques de bibliothèques (Skills, Traits, Backgrounds)
+- 🆕 Support multi-campagne : Gestion automatisée de la propriété des personnages (created_by)
+
+## [2.41.0] - 2026-02-11 [MINOR]
+
+- Audit Phase 2 : Amélioration de la Qualité et du Typage
+- Refonte de DatabaseService : Suppression des types 'any' au profit de Partial<T>
+- Nettoyage de rulesReconciler : Suppression des assertions 'as any' pour une réconciliation typée
+- Unification de la limitation du débit GitHub API dans RulesLoader et githubService
+- Centralisation des constantes UI (couleurs, espacement) dans src/constants/theme.ts
+- Ajout de tests unitaires pour RulesContext et CharacterContext (Stabilité et robustesse)
+- Correction des incohérences de schéma Zod pour la validation des configurations de campagne
+
+## [2.40.2] - 2026-02-11 [PATCH]
+
+- Mise à jour de la documentation d'architecture (functional_scope.md, db_schema.md)
+- Ajustements de l'Audit Summary (Phase 1)
+
+## [2.40.1] - 2026-02-11 [PATCH]
+
+- Correction d'un crash dans le modal Changelog dû à des données non définies
+- Ajout de protections contre les erreurs de rendu dans ChangelogModal
+
+## [2.40.0] - 2026-02-11 [MINOR]
+
+- Refactorisation du Reconciler : Extraction de skillsReconciler.ts pour une meilleure maintenabilité
+- Standardisation des variables CSS et nettoyage des styles orphelins
+
+## [2.35.6] - 2026-02-10
+
+- Refactoring majeur du Journal : Extraction du composant JournalPage.
+- Optimisation du code de CampaignNotes (~150 lignes retirées).
+
+## [2.34.16] - 2026-02-10
+
+- [object Object]
+
 ## [2.35.7] - 2026-02-10
 
 - Refactoring technique du Journal : Centralisation des constantes de dimensions et de mise en page.

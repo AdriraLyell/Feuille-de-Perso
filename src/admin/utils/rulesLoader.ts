@@ -122,7 +122,8 @@ export const generateDefaultRules = (): RulesData => {
             skills: data.skillLibrary || [],
             specializations: data.specializationLibrary || [],
             backgrounds: [],
-            counters: []
+            counters: [],
+            mysticAbilities: (data as any).mysticAbilities || []
         }
     };
 };

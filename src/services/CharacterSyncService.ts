@@ -82,11 +82,8 @@ export const CharacterSyncService = {
         data: CharacterSheetData
     ): Promise<SyncResult> {
         try {
-            // Remove syncInfo from the data being stored to avoid circular reference
-            const { syncInfo, ...cleanData } = data;
-
             // Step 1: Resolve and compress images for portable sync
-            const dataToStore = await ImageSyncResolver.resolveImagesForSync(cleanData);
+            const dataToStore = await ImageSyncResolver.resolveImagesForSync(data);
 
             const result = await DatabaseService.upsert<{ id: string }>(
                 'characters',
@@ -180,11 +177,8 @@ export const CharacterSyncService = {
      */
     async updateCharacterData(id: string, data: CharacterSheetData): Promise<boolean> {
         try {
-            // Remove syncInfo to avoid circularity if it was injected
-            const { syncInfo, ...cleanData } = data;
-
             // Re-compress images for storage
-            const dataToStore = await ImageSyncResolver.resolveImagesForSync(cleanData);
+            const dataToStore = await ImageSyncResolver.resolveImagesForSync(data);
 
             return await DatabaseService.update(
                 'characters',
