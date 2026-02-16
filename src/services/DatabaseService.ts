@@ -206,14 +206,6 @@ export const DatabaseService = {
         options: { onConflict?: string, ignoreDuplicates?: boolean } = {},
         context: string = `DatabaseService.upsert(${table})`
     ): Promise<T | null> {
-        // Automatically add owner if missing and user is logged in
-        if (table === 'characters' && !data.created_by) {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                data.created_by = user.id;
-            }
-        }
-
         const { data: result, error } = await supabase
             .from(table)
             .upsert(data, options)

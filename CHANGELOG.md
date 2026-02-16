@@ -1,5 +1,23 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.44.5] - 2026-02-12 [MINOR]
+
+- 🧪 Test Automation : Mise en place d'une suite complète de tests E2E avec Playwright
+- 📡 Robustesse Réseau : Validation des scénarios de repli (Offline, Rate Limit API, CDN Failure)
+- 💾 Tests d'Intégration : Couverture des services CampaignService et OfflineStorageService
+- 🛡️ Correction de Bug : Élimination des doublons dans l'affichage des campagnes cachées
+- 🔧 RulesLoader : Gestion optimisée des erreurs 403/429 pour la résilience du chargement
+
+## [2.44.4] - 2026-02-12 [PATCH]
+
+- 🏗️ Architecture : Suppression définitive de l'injection script rules.js
+- 🔧 Service : Bascule complète vers un chargement de règles JSON via API/CDN
+- 🛡️ Résilience : Intégration de defaultRules.ts comme ultime fallback embarqué
+- 🧹 Nettoyage : Suppression de PlayerService au profit de CampaignService unifié
+- 💾 Migration : Amélioration de migrateRulesToV2 pour garantir l'intégrité des bibliothèques
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.44.3] - 2026-02-11 [MINOR]
 
 - 💾 Hybrid Database : Implémentation du OfflineStorageService (IndexedDB)

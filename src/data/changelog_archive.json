@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.49.53",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🌐 Admin : Traduction en français des onglets de bibliothèques (Skills, Backgrounds, Counters, Specializations)",
+            "🏗️ Refactoring : Amélioration de la structure des onglets de bibliothèques dans AdminApp.tsx"
+        ]
+    },
+    {
+        "version": "2.49.52",
+        "date": "2026-02-15",
+        "type": "docs",
+        "changes": [
+            "📝 Documentation : Création du guide complet sur la gestion des conflits et la synchronisation sécurisée (SYNC_CONFLICT_MANAGEMENT.md)",
+            "🏗️ Architecture : Synthèse des scénarios de réconciliation (Ajout/Suppression MJ, Dirty Checking)"
+        ]
+    },
+    {
         "version": "2.49.51",
         "date": "2026-02-15",
         "type": "fix",
@@ -993,30 +1011,6 @@
             "🛠️ Composants : Mise à jour des cartes de catégories, de la sidebar et des panneaux de configuration",
             "🌚 Thème sombre : Support natif du thème Mystic sur les modales de confirmation et d'édition",
             "💎 Polish : Amélioration des transitions, des ombres et des effets de survol pour un rendu premium"
-        ]
-    },
-    {
-        "version": "2.44.5",
-        "date": "2026-02-12",
-        "type": "minor",
-        "changes": [
-            "🧪 Test Automation : Mise en place d'une suite complète de tests E2E avec Playwright",
-            "📡 Robustesse Réseau : Validation des scénarios de repli (Offline, Rate Limit API, CDN Failure)",
-            "💾 Tests d'Intégration : Couverture des services CampaignService et OfflineStorageService",
-            "🛡️ Correction de Bug : Élimination des doublons dans l'affichage des campagnes cachées",
-            "🔧 RulesLoader : Gestion optimisée des erreurs 403/429 pour la résilience du chargement"
-        ]
-    },
-    {
-        "version": "2.44.4",
-        "date": "2026-02-12",
-        "type": "patch",
-        "changes": [
-            "🏗️ Architecture : Suppression définitive de l'injection script rules.js",
-            "🔧 Service : Bascule complète vers un chargement de règles JSON via API/CDN",
-            "🛡️ Résilience : Intégration de defaultRules.ts comme ultime fallback embarqué",
-            "🧹 Nettoyage : Suppression de PlayerService au profit de CampaignService unifié",
-            "💾 Migration : Amélioration de migrateRulesToV2 pour garantir l'intégrité des bibliothèques"
         ]
     }
 ]
