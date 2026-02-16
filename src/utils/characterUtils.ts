@@ -2,13 +2,17 @@
 import { CharacterSheetData } from '../types';
 
 // --- RESET LOGIC ---
+/**
+ * Reset COMPLET d'une fiche (Table Rase totale).
+ * Utilisé pour redémarrer un personnage de zéro.
+ */
 export const resetCharacterValues = (source: CharacterSheetData): CharacterSheetData => {
     const clean = JSON.parse(JSON.stringify(source));
-    
-    // Reset Header (keep structure)
+
+    // Reset Header
     Object.keys(clean.header).forEach((k: keyof typeof clean.header) => clean.header[k] = "");
-    
-    // Reset XP
+
+    // Reset XP & Logs
     clean.experience = { gain: '0', spent: '0', rest: '0' };
     clean.xpLogs = [];
     clean.appLogs = [];
@@ -24,7 +28,7 @@ export const resetCharacterValues = (source: CharacterSheetData): CharacterSheet
             }
         });
     }
-    
+
     // Secondary Attributes
     if (clean.secondaryAttributes) {
         Object.keys(clean.secondaryAttributes).forEach((cat: string) => {
@@ -47,8 +51,8 @@ export const resetCharacterValues = (source: CharacterSheetData): CharacterSheet
     });
 
     // Combat
-    clean.combat.weapons.forEach((w: any) => { w.weapon=""; w.level=""; w.init=""; w.attack=""; w.damage=""; w.parry=""; });
-    clean.combat.armor.forEach((a: any) => { a.type=""; a.protection=""; a.weight=""; });
+    clean.combat.weapons.forEach((w: any) => { w.weapon = ""; w.level = ""; w.init = ""; w.attack = ""; w.damage = ""; w.parry = ""; });
+    clean.combat.armor.forEach((a: any) => { a.type = ""; a.protection = ""; a.weight = ""; });
     clean.combat.stats = { agility: '', dexterity: '', force: '', size: '' };
 
     // Page 2
@@ -67,14 +71,85 @@ export const resetCharacterValues = (source: CharacterSheetData): CharacterSheet
 
     // Specializations
     clean.specializations = {};
-    
+
     // Campaign Notes
     clean.campaignNotes = [];
-    
+
     // Counters
-    clean.counters.volonte.value = 3; clean.counters.volonte.creationValue = 3; clean.counters.volonte.current = 0;
-    clean.counters.confiance.value = 3; clean.counters.confiance.creationValue = 3; clean.counters.confiance.current = 0;
-    clean.counters.custom.forEach((c: any) => { c.value = 0; c.creationValue = 0; c.current = 0; });
+    if (clean.counters?.volonte) {
+        clean.counters.volonte.value = 3; clean.counters.volonte.creationValue = 3; clean.counters.volonte.current = 0;
+    }
+    if (clean.counters?.confiance) {
+        clean.counters.confiance.value = 3; clean.counters.confiance.creationValue = 3; clean.counters.confiance.current = 0;
+    }
+    if (clean.counters?.custom) {
+        clean.counters.custom.forEach((c: any) => { c.value = 0; c.creationValue = 0; c.current = 0; });
+    }
+
+    return clean;
+};
+
+/**
+ * Reset SURGICAL pour la Recréation (Respec).
+ * Préserve l'identité, le social, l'équipement, les traits et l'image.
+ * Réinitialise uniquement les statistiques (Attributs, Compétences) et prépare le remboursement d'XP.
+ */
+export const recreateCharacterStats = (source: CharacterSheetData): CharacterSheetData => {
+    const clean = JSON.parse(JSON.stringify(source));
+
+    // ON GARDE : Header, Combat, Page2 (Social, Traits, Équipement, Image), CampaignNotes
+
+    // Reset XP & Logs (Prêt pour le remboursement via RecreationService)
+    clean.experience = { gain: '0', spent: '0', rest: '0' };
+    clean.xpLogs = [];
+    clean.appLogs = [];
+
+    // Attributes (On vide les investissements et les valeurs de création)
+    if (clean.attributes) {
+        Object.keys(clean.attributes).forEach((cat: string) => {
+            if (Array.isArray(clean.attributes[cat])) {
+                clean.attributes[cat].forEach((attr: any) => {
+                    attr.val1 = ""; attr.val2 = ""; attr.val3 = "";
+                    attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
+                });
+            }
+        });
+    }
+
+    // Secondary Attributes
+    if (clean.secondaryAttributes) {
+        Object.keys(clean.secondaryAttributes).forEach((cat: string) => {
+            if (Array.isArray(clean.secondaryAttributes[cat])) {
+                clean.secondaryAttributes[cat].forEach((attr: any) => {
+                    attr.val1 = ""; attr.val2 = ""; attr.val3 = "";
+                    attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
+                });
+            }
+        });
+    }
+
+    // Skills (On vide tout, les spécialisations suivront)
+    Object.keys(clean.skills).forEach((cat: string) => {
+        clean.skills[cat].forEach((skill: any) => {
+            skill.value = 0;
+            skill.creationValue = 0;
+            if (typeof skill.current !== 'undefined') skill.current = 0;
+        });
+    });
+
+    // Specializations (Invalidées si on reset les compétences)
+    clean.specializations = {};
+
+    // Counters (Retour aux bases)
+    if (clean.counters?.volonte) {
+        clean.counters.volonte.value = 3; clean.counters.volonte.creationValue = 3; clean.counters.volonte.current = 0;
+    }
+    if (clean.counters?.confiance) {
+        clean.counters.confiance.value = 3; clean.counters.confiance.creationValue = 3; clean.counters.confiance.current = 0;
+    }
+    if (clean.counters?.custom) {
+        clean.counters.custom.forEach((c: any) => { c.value = 0; c.creationValue = 0; c.current = 0; });
+    }
 
     return clean;
 };

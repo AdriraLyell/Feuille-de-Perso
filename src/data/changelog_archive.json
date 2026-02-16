@@ -1,5 +1,26 @@
 [
     {
+        "version": "2.49.55",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "⚙️ Admin : Ajout d'un paramètre de configuration mondiale pour le coût en XP des traits",
+            "📊 Budget : Intégration du coût des traits dans le calcul du budget de création (Mode Points)",
+            "⚖️ XP : Préparation du moteur de calcul d'XP pour supporter les traits achetés après création",
+            "🛡️ Typage : Mise à jour du schéma de données et des réconciliateurs pour inclure le traitCost"
+        ]
+    },
+    {
+        "version": "2.49.54",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "📝 Terminologie : Remplacement de 'Échelon' par 'Rang' dans tout le système d'administration",
+            "🎨 UI : Retrait de la mention 'Niveau du Talent' dans la configuration des rangs",
+            "🖋️ UI : Remplacement de 'Slots' par 'Rangs Disponibles' pour une meilleure clarté sémantique"
+        ]
+    },
+    {
         "version": "2.49.53",
         "date": "2026-02-15",
         "type": "feat",
@@ -988,29 +1009,6 @@
             "🧹 Nettoyage : Suppression de l'injection obsolète de rules.js dans admin.html",
             "🎨 UI/UX : Refonte de la modale de déploiement GitHub avec le thème Premium Dark Mystic",
             "🛠️ Core : Mise à jour du RulesGenerator pour une sortie JSON pure"
-        ]
-    },
-    {
-        "version": "2.45.1",
-        "date": "2026-02-12",
-        "type": "patch",
-        "changes": [
-            "✨ Animations Admin : Intégration de framer-motion (MotionFade, MotionCard) sur l'ensemble des éditeurs admin",
-            "🎨 Premium Aesthetic : Application du thème sombre 'Mystic' avec effets de verre et de parchemin sur CharacterReadOnlyView",
-            "🎭 UX : Effets d'apparition séquencés (staggered) sur les boutons du header et les cartes de catégories",
-            "💎 Polish : Amélioration visuelle de l'éditeur de création, des coûts et des compteurs"
-        ]
-    },
-    {
-        "version": "2.45.0",
-        "date": "2026-02-12",
-        "type": "minor",
-        "changes": [
-            "🎨 Admin Thème : Refonte complète de l'interface d'administration (Thème Mystic & Victorien)",
-            "✨ UI/UX : Harmonisation des couleurs (Pierre/Ambre) sur les éditeurs de compétences et propriétés",
-            "🛠️ Composants : Mise à jour des cartes de catégories, de la sidebar et des panneaux de configuration",
-            "🌚 Thème sombre : Support natif du thème Mystic sur les modales de confirmation et d'édition",
-            "💎 Polish : Amélioration des transitions, des ombres et des effets de survol pour un rendu premium"
         ]
     }
 ]

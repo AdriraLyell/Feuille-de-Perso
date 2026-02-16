@@ -1,5 +1,22 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.45.1] - 2026-02-12 [PATCH]
+
+- ✨ Animations Admin : Intégration de framer-motion (MotionFade, MotionCard) sur l'ensemble des éditeurs admin
+- 🎨 Premium Aesthetic : Application du thème sombre 'Mystic' avec effets de verre et de parchemin sur CharacterReadOnlyView
+- 🎭 UX : Effets d'apparition séquencés (staggered) sur les boutons du header et les cartes de catégories
+- 💎 Polish : Amélioration visuelle de l'éditeur de création, des coûts et des compteurs
+
+## [2.45.0] - 2026-02-12 [MINOR]
+
+- 🎨 Admin Thème : Refonte complète de l'interface d'administration (Thème Mystic & Victorien)
+- ✨ UI/UX : Harmonisation des couleurs (Pierre/Ambre) sur les éditeurs de compétences et propriétés
+- 🛠️ Composants : Mise à jour des cartes de catégories, de la sidebar et des panneaux de configuration
+- 🌚 Thème sombre : Support natif du thème Mystic sur les modales de confirmation et d'édition
+- 💎 Polish : Amélioration des transitions, des ombres et des effets de survol pour un rendu premium
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.44.5] - 2026-02-12 [MINOR]
 
 - 🧪 Test Automation : Mise en place d'une suite complète de tests E2E avec Playwright
