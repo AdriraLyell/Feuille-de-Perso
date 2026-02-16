@@ -47,7 +47,10 @@ export const migrateCampaignNotes = (parsed: any): void => {
                         type: 'bookImage',
                         attrs: {
                             imageId: img.imageId,
-                            width: typeof img.config?.width === 'number' ? `${img.config.width}%` : (img.config?.width || '100%'),
+                            width: typeof img.config?.width === 'number'
+                                ? `${Math.min(100, Math.round((img.config.width / 600) * 100))}%`
+                                : (img.config?.width || '100%'),
+                            height: 'auto',
                             align: img.config?.align || 'center',
                             caption: ''
                         }
