@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.43.3] - 2026-02-11 [PATCH]
+
+- 🏗️ Architecture : Extraction de la logique complexe de CharacterSheet.tsx vers useEditMode et useVariableSkills
+- 🏗️ Architecture : Modularisation de LibraryView.tsx via le nouveau hook useSkillLibrary
+- 🧹 Nettoyage : Réduction de la taille des composants principaux (~300 lignes extraites)
+- 🚀 Performance : Optimisation des rendus via useMemo dans les nouveaux hooks
+
 ## [2.43.2] - 2026-02-11 [PATCH]
 
 - 💎 Qualité : Suppression massive de 'as any' pour un typage TypeScript strict (~90 occurrences)

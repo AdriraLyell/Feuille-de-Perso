@@ -8,7 +8,8 @@ const AttributeRow: React.FC<{
     category: string,
     onUpdate: (category: string, id: string, field: 'val1' | 'val2' | 'val3', value: string) => void;
     bonus?: BonusInfo;
-}> = ({ entry, category, onUpdate, bonus }) => {
+    isCreationMode?: boolean;
+}> = ({ entry, category, onUpdate, bonus, isCreationMode }) => {
     const ref1 = useRef<HTMLInputElement>(null);
     const ref2 = useRef<HTMLInputElement>(null);
     const ref3 = useRef<HTMLInputElement>(null);
@@ -46,14 +47,15 @@ const AttributeRow: React.FC<{
             <div className="flex items-center gap-1 flex-grow justify-end">
                 <input
                     ref={ref1}
-                    className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50 no-spinner"
+                    className={`w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50 no-spinner ${!isCreationMode ? 'opacity-70 cursor-not-allowed border-stone-200' : ''}`}
                     value={entry.val1}
-                    onChange={(e) => onUpdate(category, entry.id, 'val1', e.target.value)}
+                    onChange={(e) => isCreationMode && onUpdate(category, entry.id, 'val1', e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, ref2)}
-                    onFocus={(e) => e.target.select()}
+                    onFocus={(e) => isCreationMode && e.target.select()}
                     placeholder=""
                     type="text"
                     inputMode="numeric"
+                    disabled={!isCreationMode}
                 />
                 <span className="text-stone-400 font-handwriting">+</span>
                 <input
@@ -99,10 +101,10 @@ export const AttributeBlock = React.memo<{
     title: string;
     items: AttributeEntry[];
     cat: string;
-    onUpdate: (category: string, id: string, field: 'val1' | 'val2' | 'val3', value: string) => void;
     bonuses: Record<string, BonusInfo>;
     secondaryItems?: AttributeEntry[];
-}>(({ title, items, cat, onUpdate, bonuses, secondaryItems }) => {
+    isCreationMode?: boolean;
+}>(({ title, items, cat, onUpdate, bonuses, secondaryItems, isCreationMode }) => {
     return (
         <div className="flex flex-col border-r last:border-r-0 border-stone-400 h-full">
             <SectionHeader title={title} />
@@ -114,6 +116,7 @@ export const AttributeBlock = React.memo<{
                         category={cat}
                         onUpdate={onUpdate}
                         bonus={bonuses[item.name.trim().toLowerCase()]}
+                        isCreationMode={isCreationMode}
                     />
                 ))}
 
@@ -128,6 +131,7 @@ export const AttributeBlock = React.memo<{
                                 category={cat}
                                 onUpdate={onUpdate}
                                 bonus={bonuses[item.name.trim().toLowerCase()]}
+                                isCreationMode={isCreationMode}
                             />
                         ))}
                     </>

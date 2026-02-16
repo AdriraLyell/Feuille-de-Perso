@@ -153,6 +153,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                             cat={cat.id}
                             onUpdate={updateAttribute}
                             bonuses={attributeBonuses}
+                            isCreationMode={!!creationActive}
                         />
                     ))}
                 </div>

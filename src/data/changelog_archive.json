@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.49.47",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🏛️ Admin : Allègement du Registre des Destins (retrait des colonnes Col 4 et Col 8)",
+            "⚡ Performance : Restauration de la vue SQL simplifiée pour les résumés de personnages"
+        ]
+    },
+    {
         "version": "2.49.46",
         "date": "2026-02-15",
         "type": "feat",
@@ -1017,17 +1026,6 @@
             "🏗️ Architecture : Refactorisation de LibraryView via useSkillLibrary",
             "🧹 Code : Suppression de code dupliqué et amélioration de la séparation des préoccupations",
             "🛡️ Stabilité : Correction des types TypeScript et amélioration de la robustesse de la synchro des règles"
-        ]
-    },
-    {
-        "version": "2.43.3",
-        "date": "2026-02-11",
-        "type": "patch",
-        "changes": [
-            "🏗️ Architecture : Extraction de la logique complexe de CharacterSheet.tsx vers useEditMode et useVariableSkills",
-            "🏗️ Architecture : Modularisation de LibraryView.tsx via le nouveau hook useSkillLibrary",
-            "🧹 Nettoyage : Réduction de la taille des composants principaux (~300 lignes extraites)",
-            "🚀 Performance : Optimisation des rendus via useMemo dans les nouveaux hooks"
         ]
     }
 ]

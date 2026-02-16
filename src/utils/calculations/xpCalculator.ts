@@ -273,11 +273,12 @@ function calculateAttributeXP(
 
         if (allAttrs) {
             allAttrs.forEach(attr => {
-                const val = parseInt(attr.val1) || 0;
-                const bonus = getAttributeBonus(attr.name);
-                const effectiveCreation = (attr.creationVal1 || 0) + bonus;
-                const costPerPoint = data.xpCosts?.attributeFactor ?? 6;
-                attrSpent += getXPCost(val, effectiveCreation, costPerPoint, false);
+                // Seul val2 représente les dépenses d'XP (points achetés après création)
+                const val2 = parseInt(attr.val2) || 0;
+                if (val2 > 0) {
+                    const costPerPoint = data.xpCosts?.attributeFactor ?? 6;
+                    attrSpent += val2 * costPerPoint;
+                }
             });
         }
     });

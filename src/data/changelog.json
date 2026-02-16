@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.67",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🛡️ Attributs : Verrouillage de la valeur de création (val1) une fois le mode création validé",
+            "📈 XP : Implémentation de l'achat d'attributs via la colonne val2 avec calcul auto de l'XP dépensée",
+            "🎨 UI : Feedback visuel (opacité, curseur) sur les champs d'attributs verrouillés"
+        ]
+    },
+    {
         "version": "2.49.66",
         "date": "2026-02-16",
         "type": "fix",
@@ -180,15 +190,6 @@
             "💬 Admin : Possibilité pour le MJ d'envoyer un message personnalisé lors d'un signal de mise à jour",
             "🔔 UX : Affichage des notes du MJ et alerte de 'Version plus récente disponible' dans la modale de synchronisation du joueur",
             "⚙️ Service : Optimisation du CharacterSyncService pour gérer les messages et les signatures numériques (hashes)"
-        ]
-    },
-    {
-        "version": "2.49.47",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🏛️ Admin : Allègement du Registre des Destins (retrait des colonnes Col 4 et Col 8)",
-            "⚡ Performance : Restauration de la vue SQL simplifiée pour les résumés de personnages"
         ]
     }
 ]

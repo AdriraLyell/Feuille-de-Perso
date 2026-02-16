@@ -170,6 +170,12 @@ export const useCharacterSheetActions = (
                 if (idx === -1) return null;
                 const newList = [...list];
                 const item = newList[idx];
+
+                // Garde pour val1 hors mode création
+                if (field === 'val1' && !isCreationMode) {
+                    return null;
+                }
+
                 const creationKey = `creation${field.charAt(0).toUpperCase() + field.slice(1)}`;
                 newList[idx] = isCreationMode
                     ? { ...item, [field]: value, [creationKey]: numValue }
