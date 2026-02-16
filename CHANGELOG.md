@@ -1,5 +1,13 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.45.2] - 2026-02-12 [PATCH]
+
+- 🛡️ Hotfix : Correction d'un crash critique 'process is not defined' sur l'écran de connexion
+- 🏗️ Architecture : Transition finale vers le format JSON pour l'exportation et la publication des règles
+- 🧹 Nettoyage : Suppression de l'injection obsolète de rules.js dans admin.html
+- 🎨 UI/UX : Refonte de la modale de déploiement GitHub avec le thème Premium Dark Mystic
+- 🛠️ Core : Mise à jour du RulesGenerator pour une sortie JSON pure
+
 ## [2.45.1] - 2026-02-12 [PATCH]
 
 - ✨ Animations Admin : Intégration de framer-motion (MotionFade, MotionCard) sur l'ensemble des éditeurs admin

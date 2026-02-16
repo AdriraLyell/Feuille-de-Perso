@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.49.76",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🔄 Recréation : Nettoyage automatique des variantes et compétences personnalisées pour ne garder que le socle de la campagne",
+            "🧹 Skills : Correction de la persistance des compétences vides ou hors-règles lors du reset forcé par le MJ"
+        ]
+    },
+    {
         "version": "2.49.75",
         "date": "2026-02-16",
         "type": "feat",
@@ -180,17 +189,6 @@
             "🔗 Admin : Possibilité de lier les compétences à des 'Habilités Mystiques'",
             "🎨 UI : Nouvelle option dans l'édition de compétence pour désigner une habilité mystique",
             "🗄️ BDD : Migration SQL pour supporter le lien entre compétences et habilités"
-        ]
-    },
-    {
-        "version": "2.49.56",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🔮 Admin : Ajout de la bibliothèque des 'Habilités Mystiques'",
-            "📚 Data : Configuration par défaut (Arts Martiaux, Magies, Psy, etc.)",
-            "🛠️ Admin : Interface de gestion complète (CRUD) pour les habilités mystiques",
-            "🔄 Migration : Initialisation automatique de la bibliothèque pour les campagnes existantes"
         ]
     }
 ]

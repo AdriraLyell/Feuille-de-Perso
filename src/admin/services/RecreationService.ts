@@ -27,6 +27,18 @@ export const RecreationService = {
         // Step 1: Reset chirurgical (garde identité, social, équipement, traits, image)
         const resetData = recreateCharacterStats(data);
 
+        // Step 1.5: Nettoyage des compétences (Suppression des variantes et hors-piste)
+        // On ne garde que ce qui est explicitement défini dans les règles pour chaque catégorie.
+        const definedSkills = currentRules.definitions.skills || {};
+        Object.keys(resetData.skills).forEach(cat => {
+            const ruleNames = definedSkills[cat] || [];
+            // On ne garde que les compétences dont le nom est dans les règles
+            // Note: les compétences vides (spacers) sont aussi conservées si elles sont dans les règles.
+            resetData.skills[cat] = resetData.skills[cat].filter(s =>
+                ruleNames.includes(s.name) || s.name === ""
+            );
+        });
+
         // Step 2: Injecter le remboursement d'XP
         if (refundAmount > 0) {
             const recreationLog = {

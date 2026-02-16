@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.49.56",
+        "date": "2026-02-15",
+        "type": "feat",
+        "changes": [
+            "🔮 Admin : Ajout de la bibliothèque des 'Habilités Mystiques'",
+            "📚 Data : Configuration par défaut (Arts Martiaux, Magies, Psy, etc.)",
+            "🛠️ Admin : Interface de gestion complète (CRUD) pour les habilités mystiques",
+            "🔄 Migration : Initialisation automatique de la bibliothèque pour les campagnes existantes"
+        ]
+    },
+    {
         "version": "2.49.55",
         "date": "2026-02-15",
         "type": "feat",
@@ -997,18 +1008,6 @@
             "🧩 Type Safety : Suppression massive de types 'any' et de '@ts-ignore' dans le moteur de réconciliation",
             "🧪 Tests : Correction de la suite de tests pour supporter le nouveau typage des compteurs",
             "🧹 Code Clean : Suppression de console.logs et typage strict des accesseurs d'état"
-        ]
-    },
-    {
-        "version": "2.45.2",
-        "date": "2026-02-12",
-        "type": "patch",
-        "changes": [
-            "🛡️ Hotfix : Correction d'un crash critique 'process is not defined' sur l'écran de connexion",
-            "🏗️ Architecture : Transition finale vers le format JSON pour l'exportation et la publication des règles",
-            "🧹 Nettoyage : Suppression de l'injection obsolète de rules.js dans admin.html",
-            "🎨 UI/UX : Refonte de la modale de déploiement GitHub avec le thème Premium Dark Mystic",
-            "🛠️ Core : Mise à jour du RulesGenerator pour une sortie JSON pure"
         ]
     }
 ]
