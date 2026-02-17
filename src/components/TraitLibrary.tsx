@@ -18,9 +18,13 @@ interface TraitLibraryProps {
     isEditable?: boolean;
     defaultFilter?: 'all' | 'avantage' | 'desavantage';
     hidePossessed?: boolean;
+    lockFilter?: boolean;
 }
 
-const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, onMultiSelect, isEditable = true, defaultFilter = 'all', hidePossessed = false }) => {
+const TraitLibrary: React.FC<TraitLibraryProps> = ({
+    data, onUpdate, onSelect, onMultiSelect,
+    isEditable = true, defaultFilter = 'all', hidePossessed = false, lockFilter = false
+}) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<'all' | 'avantage' | 'desavantage'>(defaultFilter);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -127,13 +131,15 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
                         <input className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80" placeholder="Rechercher..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                     </div>
-                    <div className="flex bg-[#bfae85]/20 rounded-sm p-0.5 shrink-0">
-                        {['all', 'avantage', 'desavantage'].map((t) => (
-                            <button key={t} onClick={() => setFilterType(t as any)} className={`px-3 py-1 text-xs font-bold rounded-sm transition-colors ${filterType === t ? 'bg-white text-[#5c4d41] shadow-sm' : 'text-[#5c4d41]/70 hover:text-[#5c4d41]'}`}>
-                                {t === 'all' ? 'Tout' : t === 'avantage' ? 'Avantages' : 'Désavantages'}
-                            </button>
-                        ))}
-                    </div>
+                    {!lockFilter && (
+                        <div className="flex bg-[#bfae85]/20 rounded-sm p-0.5 shrink-0">
+                            {['all', 'avantage', 'desavantage'].map((t) => (
+                                <button key={t} onClick={() => setFilterType(t as any)} className={`px-3 py-1 text-xs font-bold rounded-sm transition-colors ${filterType === t ? 'bg-white text-[#5c4d41] shadow-sm' : 'text-[#5c4d41]/70 hover:text-[#5c4d41]'}`}>
+                                    {t === 'all' ? 'Tout' : t === 'avantage' ? 'Avantages' : 'Désavantages'}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-2 text-xs border-t border-[#bfae85]/20 pt-2">
