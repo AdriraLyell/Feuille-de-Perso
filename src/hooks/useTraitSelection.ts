@@ -13,12 +13,12 @@ export const useTraitSelection = (onMultiSelect?: (instances: { entry: LibraryEn
     const [selection, setSelection] = useState<SelectedInstance[]>([]);
     const [variantPicker, setVariantPicker] = useState<LibraryEntry | null>(null);
 
-    const isVariableCost = (entry: LibraryEntry) => {
-        if (entry.isVariableCost) return true;
-        const cost = entry.cost;
-        if (!cost) return false;
+    const isVariableCost = (entry: any) => {
+        if (entry.isVariableCost || entry.is_variable_cost) return true;
+        const label = entry.pointsLabel || entry.points_label || entry.cost;
+        if (!label) return false;
         // Check for range characters or multiple values
-        return /[-,–—,;]/.test(cost) || cost.includes('..');
+        return /[-,–—,;]/.test(label) || label.includes('..');
     };
 
     const toggleSelection = useCallback((id: string, hybridList: MergedEntry<LibraryEntry>[]) => {
@@ -26,7 +26,7 @@ export const useTraitSelection = (onMultiSelect?: (instances: { entry: LibraryEn
         if (!entry) return;
 
         // Open configuration modal if it has variants OR variable cost
-        if (entry.isVariable || isVariableCost(entry)) {
+        if (entry.isVariable || (entry as any).is_variable || isVariableCost(entry)) {
             setVariantPicker(entry);
         } else {
             setSelection(prev => {

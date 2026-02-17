@@ -10,17 +10,22 @@ interface TraitVariantPickerProps {
 
 const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, onClose, onSelect }) => {
     const [customVariant, setCustomVariant] = useState('');
-    const [selectedCost, setSelectedCost] = useState(variantPicker.cost);
+    const [selectedCost, setSelectedCost] = useState(variantPicker.pointsLabel || (variantPicker as any).points_label || variantPicker.cost);
 
     // Unified variable cost detection (hyphen, en-dash, em-dash, comma, semicolon, dots)
-    const isVariableCost = variantPicker.isVariableCost ||
-        (variantPicker.cost && /[-,–—,;]/.test(variantPicker.cost)) ||
-        (variantPicker.cost && variantPicker.cost.includes('..'));
+    const isVariableCost = useMemo(() => {
+        if (variantPicker.isVariableCost || (variantPicker as any).is_variable_cost) return true;
+        const label = variantPicker.pointsLabel || (variantPicker as any).points_label || variantPicker.cost;
+        if (!label) return false;
+        return /[-,–—,;]/.test(label) || label.includes('..');
+    }, [variantPicker]);
+
+    const isVariable = variantPicker.isVariable || (variantPicker as any).is_variable;
 
     // Suggestions for costs if it's a range (1-3) or list (1, 3, 5)
     const costSuggestions = useMemo(() => {
         if (!isVariableCost) return [];
-        const label = variantPicker.pointsLabel || variantPicker.cost;
+        const label = variantPicker.pointsLabel || (variantPicker as any).points_label || variantPicker.cost;
         if (!label) return [];
 
         const numbers = label.match(/\d+/g);
@@ -37,13 +42,14 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, 
 
         // Handle List: 1, 3, 5
         return numbers;
-    }, [isVariableCost, variantPicker.cost, variantPicker.pointsLabel]);
+    }, [isVariableCost, variantPicker.cost, variantPicker.pointsLabel, (variantPicker as any).points_label]);
 
     const handleConfirm = (variant: string) => {
         let finalCost = selectedCost;
 
         // If user didn't change the range string (e.g. "1-3"), try to pick the first number
-        if (isVariableCost && finalCost === variantPicker.cost) {
+        const originalLabel = variantPicker.pointsLabel || (variantPicker as any).points_label || variantPicker.cost;
+        if (isVariableCost && finalCost === originalLabel) {
             const match = finalCost.match(/\d+/);
             if (match) finalCost = match[0];
         }
@@ -79,7 +85,7 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, 
                             {/* Suggested costs as buttons */}
                             {costSuggestions.length > 0 && (
                                 <div className="flex flex-wrap gap-1.5 mb-2">
-                                    {costSuggestions.map(c => (
+                                    {costSuggestions.map((c: string) => (
                                         <button
                                             key={c}
                                             onClick={() => setSelectedCost(c)}
@@ -105,7 +111,7 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, 
                     )}
 
                     {/* Variant Section */}
-                    {(variantPicker.isVariable || (variantPicker.variants && variantPicker.variants.length > 0)) ? (
+                    {(isVariable || (variantPicker.variants && variantPicker.variants.length > 0)) ? (
                         <div className="space-y-3">
                             <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider">Précision / Variant (Ex: Alcool, Chats...)</label>
                             <div className="flex gap-2">
