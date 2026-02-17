@@ -14,12 +14,13 @@ interface TraitLibraryProps {
     data: CharacterSheetData;
     onUpdate: (newData: CharacterSheetData) => void;
     onSelect?: (entry: LibraryEntry) => void;
-    onMultiSelect?: (instances: { entry: LibraryEntry; variant?: string }[]) => void;
+    onMultiSelect?: (instances: { entry: LibraryEntry; variant?: string; cost?: string }[]) => void;
     isEditable?: boolean;
     defaultFilter?: 'all' | 'avantage' | 'desavantage';
+    hidePossessed?: boolean;
 }
 
-const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, onMultiSelect, isEditable = true, defaultFilter = 'all' }) => {
+const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, onMultiSelect, isEditable = true, defaultFilter = 'all', hidePossessed = false }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<'all' | 'avantage' | 'desavantage'>(defaultFilter);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -27,7 +28,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
     const { processedList, hybridList, allAvailableTags } = useTraitLibrary(
-        data, searchTerm, filterType, selectedTags, sortBy, sortOrder
+        data, searchTerm, filterType, selectedTags, sortBy, sortOrder, hidePossessed
     );
 
     const {

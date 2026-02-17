@@ -287,14 +287,45 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
                                                             {stats.conflicts.map((conflict, i) => {
                                                                 const isExcluded = options.excludedIds?.includes(conflict.candidate.id);
 
+                                                                const toggleFieldExclusion = (itemId: string, field: string) => {
+                                                                    setOptions(prev => {
+                                                                        const fieldExclusions = prev.fieldExclusions || {};
+                                                                        const itemExclusions = fieldExclusions[itemId] || [];
+
+                                                                        const newExclusions = itemExclusions.includes(field)
+                                                                            ? itemExclusions.filter(f => f !== field)
+                                                                            : [...itemExclusions, field];
+
+                                                                        return {
+                                                                            ...prev,
+                                                                            fieldExclusions: {
+                                                                                ...fieldExclusions,
+                                                                                [itemId]: newExclusions
+                                                                            }
+                                                                        };
+                                                                    });
+                                                                };
+
+                                                                const itemFieldExclusions = options.fieldExclusions?.[conflict.id] || [];
+                                                                const isPartiallyExcluded = !isExcluded && itemFieldExclusions.length > 0 && itemFieldExclusions.length < conflict.differences.length;
+                                                                const isFullyFieldExcluded = !isExcluded && itemFieldExclusions.length === conflict.differences.length;
+
                                                                 // Dynamic Badge Text
                                                                 let actionLabel = "Ignoré";
                                                                 let actionClass = "bg-gray-100 text-gray-500 border-gray-200";
 
                                                                 if (!isExcluded) {
                                                                     if (options.libraryStrategy === 'overwrite') {
-                                                                        actionLabel = "Remplacé";
-                                                                        actionClass = "bg-amber-100 text-amber-700 border-amber-200";
+                                                                        if (isPartiallyExcluded) {
+                                                                            actionLabel = "Partiel";
+                                                                            actionClass = "bg-blue-50 text-blue-600 border-blue-200";
+                                                                        } else if (isFullyFieldExcluded) {
+                                                                            actionLabel = "Ignoré";
+                                                                            actionClass = "bg-gray-100 text-gray-500 border-gray-200";
+                                                                        } else {
+                                                                            actionLabel = "Remplacé";
+                                                                            actionClass = "bg-amber-100 text-amber-700 border-amber-200";
+                                                                        }
                                                                     } else if (options.libraryStrategy === 'copy') {
                                                                         actionLabel = "Doublon";
                                                                         actionClass = "bg-blue-100 text-blue-700 border-blue-200";
@@ -305,7 +336,7 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
                                                                 }
 
                                                                 return (
-                                                                    <div key={i} className={`border rounded p-3 transition-colors ${isExcluded ? 'bg-gray-50 border-gray-200 opacity-60' : 'bg-white border-slate-200 hover:border-amber-300'}`}>
+                                                                    <div key={i} className={`border rounded-lg p-3 transition-colors ${isExcluded ? 'bg-gray-50 border-gray-200 opacity-60' : 'bg-white border-slate-200 hover:border-amber-300 shadow-sm'}`}>
                                                                         <div className="flex items-center gap-3 mb-2">
                                                                             <input
                                                                                 type="checkbox"
@@ -318,10 +349,32 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
                                                                                 {actionLabel}
                                                                             </span>
                                                                         </div>
-                                                                        {!isExcluded && (
-                                                                            <ul className="list-disc list-inside space-y-1 text-xs text-slate-600 pl-7">
+                                                                        {!isExcluded && options.libraryStrategy === 'overwrite' && (
+                                                                            <div className="pl-7 space-y-1.5 mt-2 pt-2 border-t border-slate-50">
+                                                                                {conflict.differences.map((d, di) => {
+                                                                                    const isFieldExcluded = itemFieldExclusions.includes(d.field);
+                                                                                    return (
+                                                                                        <label key={di} className={`flex items-start gap-2 text-xs group cursor-pointer ${isFieldExcluded ? 'opacity-50' : ''}`}>
+                                                                                            <input
+                                                                                                type="checkbox"
+                                                                                                checked={!isFieldExcluded}
+                                                                                                onChange={() => toggleFieldExclusion(conflict.id, d.field)}
+                                                                                                className="mt-0.5 w-3 h-3 rounded text-blue-500 focus:ring-blue-400"
+                                                                                            />
+                                                                                            <div className="flex-grow">
+                                                                                                <span className="font-semibold text-slate-700">{d.label} : </span>
+                                                                                                <span className="text-slate-400 line-through mr-1">{typeof d.prev === 'string' ? d.prev : JSON.stringify(d.prev)}</span>
+                                                                                                <span className="text-blue-600 font-medium">→ {typeof d.next === 'string' ? d.next : JSON.stringify(d.next)}</span>
+                                                                                            </div>
+                                                                                        </label>
+                                                                                    );
+                                                                                })}
+                                                                            </div>
+                                                                        )}
+                                                                        {!isExcluded && options.libraryStrategy !== 'overwrite' && (
+                                                                            <ul className="list-disc list-inside space-y-1 text-xs text-slate-400 pl-7 italic">
                                                                                 {conflict.differences.map((d, di) => (
-                                                                                    <li key={di}>{d}</li>
+                                                                                    <li key={di}>{d.label} sera {options.libraryStrategy === 'copy' ? 'copié' : 'ignoré'}</li>
                                                                                 ))}
                                                                             </ul>
                                                                         )}

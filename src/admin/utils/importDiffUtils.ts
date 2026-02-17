@@ -2,10 +2,18 @@
 import { RulesData } from '../../types/rules';
 import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry } from '../../types/system';
 
+export interface FieldDifference {
+    field: string;
+    label: string;
+    prev: any;
+    next: any;
+}
+
 export interface LibraryConflict {
+    id: string; // Ensure ID is present for field exclusion tracking
     name: string;
     type: string;
-    differences: string[]; // Ex: ["Coût: 3 -> 5", "Description modifiée"]
+    differences: FieldDifference[]; // Structured differences
     current: any;
     candidate: any;
 }
@@ -39,6 +47,7 @@ export interface ImportOptions {
     };
     libraryStrategy: 'ignore' | 'overwrite' | 'copy';
     excludedIds?: string[]; // IDs of items to ignore during specific category merge
+    fieldExclusions?: Record<string, string[]>; // ItemID -> Fields (names) to KEEP from CURRENT
 }
 
 const isDifferent = (a: any, b: any) => JSON.stringify(a) !== JSON.stringify(b);
@@ -46,22 +55,22 @@ const isDifferent = (a: any, b: any) => JSON.stringify(a) !== JSON.stringify(b);
 /**
  * Compares two library items and returns a list of human-readable differences.
  */
-const getDetailedDifferences = (curr: any, cand: any): string[] => {
-    const diffs: string[] = [];
-    if (curr.name !== cand.name) diffs.push(`Nom: "${curr.name}" -> "${cand.name}"`);
-    if (curr.type !== cand.type) diffs.push(`Type: ${curr.type} -> ${cand.type}`);
-    if (curr.cost !== cand.cost) diffs.push(`Coût: ${curr.cost} -> ${cand.cost}`);
-    if (curr.pointsLabel !== cand.pointsLabel) diffs.push(`Label: ${curr.pointsLabel} -> ${cand.pointsLabel}`);
-    if (curr.description !== cand.description) diffs.push("Description modifiée");
+const getDetailedDifferences = (curr: any, cand: any): FieldDifference[] => {
+    const diffs: FieldDifference[] = [];
+    if (curr.name !== cand.name) diffs.push({ field: 'name', label: 'Nom', prev: curr.name, next: cand.name });
+    if (curr.type !== cand.type) diffs.push({ field: 'type', label: 'Type', prev: curr.type, next: cand.type });
+    if (curr.cost !== cand.cost) diffs.push({ field: 'cost', label: 'Coût', prev: curr.cost, next: cand.cost });
+    if (curr.pointsLabel !== cand.pointsLabel) diffs.push({ field: 'pointsLabel', label: 'Label', prev: curr.pointsLabel, next: cand.pointsLabel });
+    if (curr.description !== cand.description) diffs.push({ field: 'description', label: 'Description', prev: '...', next: '...' });
 
     // Compare tags
     if (isDifferent(curr.tags, cand.tags)) {
-        diffs.push("Tags modifiés");
+        diffs.push({ field: 'tags', label: 'Tags', prev: curr.tags, next: cand.tags });
     }
 
     // Compare effects
     if (isDifferent(curr.effects, cand.effects)) {
-        diffs.push("Effets modifiés");
+        diffs.push({ field: 'effects', label: 'Effets', prev: '...', next: '...' });
     }
 
     return diffs;
@@ -137,6 +146,7 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
                 if (isDifferent(existing, item)) {
                     stats.conflict++;
                     stats.conflicts.push({
+                        id: existing.id, // Store ID for exclusion tracking
                         name: item.name || "Sans nom",
                         type: (item as any).type || "item",
                         differences: getDetailedDifferences(existing, item),
@@ -234,10 +244,32 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
                     map.set(item.id, item);
                 } else {
                     // Conflict (either same ID or same Name)
-                    const targetId = existingById ? item.id : (existingByName?.id || item.id);
+                    const existing = existingById || existingByName;
+                    const targetId = existing?.id || item.id;
 
                     if (options.libraryStrategy === 'overwrite') {
-                        map.set(targetId, item);
+                        // CHECK FOR FIELD EXCLUSIONS
+                        const itemFieldExclusions = options.fieldExclusions?.[targetId];
+
+                        if (itemFieldExclusions && itemFieldExclusions.length > 0) {
+                            // Granular Merge
+                            const currentItem = map.get(targetId);
+                            if (currentItem) {
+                                const mergedItem = { ...item };
+                                // For each excluded field, RESTORE value from current
+                                itemFieldExclusions.forEach(field => {
+                                    if (field in currentItem) {
+                                        (mergedItem as any)[field] = (currentItem as any)[field];
+                                    }
+                                });
+                                map.set(targetId, mergedItem);
+                            } else {
+                                map.set(targetId, item);
+                            }
+                        } else {
+                            // Classic overwrite
+                            map.set(targetId, item);
+                        }
                     } else if (options.libraryStrategy === 'copy') {
                         // Create copy with new ID even if name matches
                         const copy = { ...item, id: crypto.randomUUID() };

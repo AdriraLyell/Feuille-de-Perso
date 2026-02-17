@@ -1,63 +1,157 @@
-import React from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { X, Settings, Check } from 'lucide-react';
 import { LibraryEntry } from '../../types';
 
 interface TraitVariantPickerProps {
     variantPicker: LibraryEntry;
     onClose: () => void;
-    onSelect: (entry: LibraryEntry, variant: string) => void;
+    onSelect: (entry: LibraryEntry, variant: string, cost?: string) => void;
 }
 
 const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, onClose, onSelect }) => {
+    const [customVariant, setCustomVariant] = useState('');
+    const [selectedCost, setSelectedCost] = useState(variantPicker.cost);
+
+    // Unified variable cost detection (hyphen, en-dash, em-dash, comma, semicolon, dots)
+    const isVariableCost = variantPicker.isVariableCost ||
+        (variantPicker.cost && /[-,–—,;]/.test(variantPicker.cost)) ||
+        (variantPicker.cost && variantPicker.cost.includes('..'));
+
+    // Suggestions for costs if it's a range (1-3) or list (1, 3, 5)
+    const costSuggestions = useMemo(() => {
+        if (!isVariableCost) return [];
+        const label = variantPicker.pointsLabel || variantPicker.cost;
+        if (!label) return [];
+
+        const numbers = label.match(/\d+/g);
+        if (!numbers || numbers.length < 2) return [];
+
+        // Handle Range: 1-3, 1..3, 1–3
+        if (label.includes('-') || label.includes('..') || label.includes('–')) {
+            const start = parseInt(numbers[0]);
+            const end = parseInt(numbers[1]);
+            // Limit range to 10 items to avoid UI clutter
+            if (isNaN(start) || isNaN(end) || end < start || end - start > 10) return numbers;
+            return Array.from({ length: end - start + 1 }, (_, i) => (start + i).toString());
+        }
+
+        // Handle List: 1, 3, 5
+        return numbers;
+    }, [isVariableCost, variantPicker.cost, variantPicker.pointsLabel]);
+
+    const handleConfirm = (variant: string) => {
+        let finalCost = selectedCost;
+
+        // If user didn't change the range string (e.g. "1-3"), try to pick the first number
+        if (isVariableCost && finalCost === variantPicker.cost) {
+            const match = finalCost.match(/\d+/);
+            if (match) finalCost = match[0];
+        }
+
+        onSelect(variantPicker, variant.trim(), finalCost);
+    };
+
     return (
-        <div className="fixed inset-0 bg-black/40 z-[110] flex items-center justify-center p-4 backdrop-blur-[2px] animate-in fade-in duration-200">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md border border-amber-200 overflow-hidden">
-                <div className="p-3 bg-stone-100 border-b border-stone-200 flex justify-between items-center">
-                    <h4 className="font-bold text-[#4a3b32] text-sm">Choisir une variante : {variantPicker.name}</h4>
-                    <button onClick={onClose} className="text-stone-400 hover:text-stone-600"><X size={18} /></button>
+        <div className="fixed inset-0 bg-black/40 z-[120] flex items-center justify-center p-4 backdrop-blur-[2px] animate-in fade-in duration-200">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200 border border-stone-200">
+                <div className="p-4 border-b bg-stone-50 flex justify-between items-center">
+                    <h4 className="font-bold text-stone-800 flex items-center gap-2">
+                        <Settings size={18} className="text-blue-600" />
+                        Configuration du Trait
+                    </h4>
+                    <button onClick={onClose} className="text-stone-400 hover:text-stone-600 transition-colors"><X size={20} /></button>
                 </div>
-                <div className="p-4 flex flex-col gap-4">
-                    {variantPicker.variants && variantPicker.variants.length > 0 && (
-                        <div>
-                            <label className="block text-[10px] font-bold text-stone-500 uppercase mb-2">Suggestions</label>
-                            <div className="flex flex-wrap gap-2">
+
+                <div className="p-5 space-y-6">
+                    {/* Trait Summary */}
+                    <div className="bg-stone-50 p-3 rounded border border-stone-200">
+                        <div className="text-sm font-bold text-stone-900">{variantPicker.name}</div>
+                        <div className="text-[10px] text-stone-500 uppercase font-bold mt-1 tracking-tight">
+                            {variantPicker.type === 'avantage' ? 'Avantage' : 'Désavantage'} • {variantPicker.cost} pts
+                        </div>
+                    </div>
+
+                    {/* Cost Selector (if variable) */}
+                    {isVariableCost && (
+                        <div className="space-y-3 bg-blue-50/50 p-3 rounded border border-blue-100">
+                            <label className="block text-[10px] font-bold text-blue-800 uppercase tracking-wider">Valeur / Coût ({variantPicker.cost})</label>
+
+                            {/* Suggested costs as buttons */}
+                            {costSuggestions.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 mb-2">
+                                    {costSuggestions.map(c => (
+                                        <button
+                                            key={c}
+                                            onClick={() => setSelectedCost(c)}
+                                            className={`px-3 py-1 text-xs font-bold rounded border transition-all ${selectedCost === c ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:border-blue-400'}`}
+                                        >
+                                            {c}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Valeur choisie..."
+                                    className="flex-grow border border-stone-200 rounded px-3 py-1.5 text-sm focus:border-blue-500 outline-none font-mono"
+                                    value={selectedCost}
+                                    onChange={(e) => setSelectedCost(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Variant Section */}
+                    <div className="space-y-3">
+                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider">Précision / Variant (Ex: Alcool, Chats...)</label>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                className="flex-grow border border-stone-200 rounded px-3 py-1.5 text-sm focus:border-blue-500 outline-none"
+                                placeholder="Saisir un variant..."
+                                value={customVariant}
+                                onChange={(e) => setCustomVariant(e.target.value)}
+                                autoFocus={!isVariableCost}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleConfirm(customVariant);
+                                    if (e.key === 'Escape') onClose();
+                                }}
+                            />
+                            <button
+                                onClick={() => handleConfirm(customVariant)}
+                                className="bg-blue-600 text-white px-4 py-1.5 rounded text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1"
+                            >
+                                <Check size={16} /> OK
+                            </button>
+                        </div>
+
+                        {/* Suggested Variants */}
+                        {variantPicker.variants && variantPicker.variants.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
                                 {variantPicker.variants.map(v => (
                                     <button
                                         key={v}
-                                        onClick={() => onSelect(variantPicker, v)}
-                                        className="px-3 py-1.5 text-xs bg-stone-50 border border-stone-200 hover:border-amber-400 hover:bg-amber-50 rounded text-stone-700 transition-all font-medium"
+                                        onClick={() => handleConfirm(v)}
+                                        className="bg-stone-100 hover:bg-stone-200 text-stone-700 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border border-stone-200"
                                     >
                                         {v}
                                     </button>
                                 ))}
                             </div>
-                        </div>
-                    )}
-                    <div>
-                        <label className="block text-[10px] font-bold text-stone-500 uppercase mb-2">Saisie Libre</label>
-                        <div className="flex gap-2">
-                            <input
-                                id="variant-custom-input"
-                                placeholder="Ex: Chats, Pollen..."
-                                className="flex-grow border border-stone-200 rounded px-3 py-1.5 text-sm focus:border-amber-500 outline-none"
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        const val = (e.target as HTMLInputElement).value;
-                                        if (val.trim()) onSelect(variantPicker, val.trim());
-                                    } else if (e.key === 'Escape') onClose();
-                                }}
-                            />
-                            <button
-                                onClick={() => {
-                                    const input = document.getElementById('variant-custom-input') as HTMLInputElement;
-                                    if (input.value.trim()) onSelect(variantPicker, input.value.trim());
-                                }}
-                                className="bg-[#5c4d41] text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-[#4a3b32] transition-colors"
-                            >
-                                OK
-                            </button>
-                        </div>
+                        )}
+
+                        {/* Final check for traits with NO variants but only cost variable */}
+                        {!variantPicker.isVariable && (!variantPicker.variants || variantPicker.variants.length === 0) && isVariableCost && (
+                            <p className="text-[10px] text-stone-400 italic mt-2">Ce trait ne nécessite pas de variant, seulement le choix du coût.</p>
+                        )}
                     </div>
+                </div>
+
+                <div className="px-5 py-3 bg-stone-50 border-t flex justify-between items-center text-[10px] text-stone-500 italic">
+                    <span>* Cliquer sur un bouton ou appuyer sur Entrée</span>
+                    <button onClick={onClose} className="text-stone-400 hover:text-stone-600 py-1">Annuler</button>
                 </div>
             </div>
         </div>

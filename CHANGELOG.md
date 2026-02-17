@@ -1,5 +1,22 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.48.7] - 2026-02-13 [PATCH]
+
+- 🛡️ Schéma : Correction critique du Zod schema pour inclure bookDocument (évite la perte de données au rechargement)
+- 🔧 Typage : Amélioration du typage dans ChapterHeaderView (suppression des 'any' Tiptap)
+- 📋 Task List : Mise à jour du suivi de progression du Grimoire
+
+## [2.48.6] - 2026-02-13 [MINOR]
+
+- 📖 Sommaire : Implémentation du Sommaire dynamique (Table des Matières) automatique en début de livre
+- 🚀 Navigation : Support de la navigation par clic depuis le sommaire vers les chapitres correspondants
+- 🔄 Migration : Automatisation de la migration des anciennes notes de journal vers le nouveau format Grimoire (v2)
+- 🧹 Clean Up : Suppression des anciens composants de journal obsolètes (NotebookTextarea, useJournal, etc.)
+
+## [2.48.5] - 2026-02-13 [PATCH]
+
+- 🧠 UX : Migration vers la sélection native Tiptap (setTextSelection) pour un surlignage fiable et persistant des titres de chapitres
+
 ## [2.48.4] - 2026-02-13 [PATCH]
 
 - 🎯 UX : Correction critique de la sélection locale des chapitres (ne saute plus au premier chapitre du livre)

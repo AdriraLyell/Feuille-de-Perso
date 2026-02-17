@@ -1,5 +1,36 @@
 [
     {
+        "version": "2.55.0",
+        "date": "2026-02-18",
+        "type": "feat",
+        "changes": [
+            "✨ Traits : Unification complète du système d'ajout (suppression de l'éditeur individuel au profit de la bibliothèque)",
+            "⚖️ Système : Support des coûts variables et listes de coûts (ex: '1-3', '1, 3, 5') avec configuration interactive",
+            "🛡️ Bibliothèque : Filtrage automatique pour masquer les traits non-variants déjà possédés par le personnage",
+            "🛠️ UX : Nouvelle modale de configuration des traits combinant sélection de variante et choix du coût précis"
+        ]
+    },
+    {
+        "version": "2.54.0",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "✨ Import : Fusion granulaire des conflits (choix des champs à écraser : Nom, Coût, Description, etc.)",
+            "🔍 UI : Visualisation détaillée des différences de valeurs lors de la résolution des conflits",
+            "🛡️ Système : Support des exclusions par champ dans le moteur de fusion des règles"
+        ]
+    },
+    {
+        "version": "2.53.0",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🛠️ Admin : Correction de l'erreur 400 lors de la sauvegarde des traits (alignement SQL cost/points)",
+            "🛡️ Système : Amélioration de la détection d'erreurs en cascade pour garantir que la modale 'Sauvegarde Réussie' ne s'affiche qu'en cas de succès réel",
+            "📊 Bibliothèque : Support complet des coûts textuels (ex: '1-3', 'Variable') dans la couche de persistance"
+        ]
+    },
+    {
         "version": "2.52.0",
         "date": "2026-02-17",
         "type": "feat",
@@ -161,36 +192,6 @@
             "🐞 Sidebar : Fix du bouton Reset qui pouvait échouer selon l'état des données",
             "⚠️ React : Correction de l'avertissement 'value prop on select should not be null'",
             "🔧 Système : Robustesse accrue de la gestion des états de personnalisation (isCustomized)"
-        ]
-    },
-    {
-        "version": "2.49.86",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🔓 Bibliothèque : Réactivation de l'édition globale pour les compétences personnalisées",
-            "🛡️ Système : Verrouillage strict de la suppression pour les compétences surchargées localement",
-            "🎨 UI : Harmonisation visuelle avec une icône de surcharge Cyan unifiée (Bibliothèque & Réserve)"
-        ]
-    },
-    {
-        "version": "2.49.85",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🔒 Bibliothèque : Verrouillage de l'édition globale si une compétence est personnalisée localement",
-            "🔄 Réserve : Nouveau bouton 'Reset' pour restaurer instantanément une compétence à son état d'origine",
-            "🏗️ Système : Stockage de la définition master pour permettre la réinitialisation sans perte de données"
-        ]
-    },
-    {
-        "version": "2.49.84",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🧠 Admin : Distinction claire entre édition de la Bibliothèque Globale et Personnalisation de Campagne",
-            "🛡️ Système : La modification via l'onglet Bibliothèque met désormais à jour la base master pour tous les réglages",
-            "🖋️ UI : Titres de modales explicites selon le contexte d'édition (Base Globale vs Campagne)"
         ]
     }
 ]

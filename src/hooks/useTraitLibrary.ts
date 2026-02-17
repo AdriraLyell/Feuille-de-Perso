@@ -13,7 +13,8 @@ export const useTraitLibrary = (
     filterType: 'all' | 'avantage' | 'desavantage',
     selectedTags: string[],
     sortBy: SortOption,
-    sortOrder: SortOrder
+    sortOrder: SortOrder,
+    hidePossessed: boolean = false
 ) => {
     const { rules } = useRules();
 
@@ -22,6 +23,16 @@ export const useTraitLibrary = (
         const official = rules?.libraries?.traits || [];
         return mergeLibraries(local, official);
     }, [data.library, rules]);
+
+    // Pre-calculate possessed trait names for fast lookup
+    const possessedTraitNames = useMemo(() => {
+        if (!hidePossessed || !data?.page2) return new Set<string>();
+        const names = new Set<string>();
+        [...(data.page2.avantages || []), ...(data.page2.desavantages || [])].forEach(t => {
+            if (t.name) names.add(t.name.trim().toLowerCase());
+        });
+        return names;
+    }, [data?.page2, hidePossessed]);
 
     const allAvailableTags = useMemo(() => {
         const tags = new Set<string>();
@@ -32,6 +43,14 @@ export const useTraitLibrary = (
     const processedList = useMemo(() => {
         const list = hybridList.filter(m => {
             const entry = m.entry;
+
+            // Filter already possessed standard traits if requested
+            if (hidePossessed && !entry.isVariable) {
+                if (possessedTraitNames.has(entry.name.trim().toLowerCase())) {
+                    return false;
+                }
+            }
+
             const entryTags = entry.tags || [];
             const matchesSearch = smartIncludes(entry.name, searchTerm) ||
                 smartIncludes(entry.description, searchTerm) ||
@@ -57,7 +76,7 @@ export const useTraitLibrary = (
         });
 
         return list;
-    }, [hybridList, searchTerm, filterType, selectedTags, sortBy, sortOrder]);
+    }, [hybridList, searchTerm, filterType, selectedTags, sortBy, sortOrder, hidePossessed, possessedTraitNames]);
 
     return {
         hybridList,

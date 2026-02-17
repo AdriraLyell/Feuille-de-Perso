@@ -23,7 +23,10 @@
       "Bash(while read hash rest)",
       "Bash(do git show \"$hash\" --)",
       "Bash(echo:*)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(git -C \"d:/Projet JdR/feuille-de-perso\" show b43627b~1:src/components/campaign/JournalPage.tsx)",
+      "Bash(git -C \"d:/Projet JdR/feuille-de-perso\" show b43627b~1:src/hooks/useJournal.ts)",
+      "Bash(git -C \"d:/Projet JdR/feuille-de-perso\" show b43627b~1:src/hooks/useJournalImages.ts)"
     ]
   },
   "enableAllProjectMcpServers": true,

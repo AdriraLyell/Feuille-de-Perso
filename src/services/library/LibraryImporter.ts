@@ -39,7 +39,7 @@ export const LibraryImporter = {
             id: ensureUUID(t.id),
             type: t.type,
             name: t.name,
-            points: parseInt(t.cost) || 0,
+            cost: t.cost || '0',
             points_label: t.pointsLabel || t.cost,
             is_variable_cost: t.isVariableCost || false,
             description: t.description || '',
