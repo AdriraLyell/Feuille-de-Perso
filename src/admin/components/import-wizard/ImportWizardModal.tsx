@@ -27,7 +27,8 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
             counters: true,
             libraries: true
         },
-        libraryStrategy: 'ignore' // Safer default
+        libraryStrategy: 'ignore', // Safer default
+        excludedIds: []
     });
 
     const diff = useMemo(() => calculateDiff(currentRules, candidateRules), [currentRules, candidateRules]);
@@ -42,6 +43,17 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
     const handleConfirm = () => {
         const merged = mergeRules(currentRules, candidateRules, options);
         onConfirm(merged);
+    };
+
+    const toggleExclusion = (id: string) => {
+        setOptions(prev => {
+            const excluded = prev.excludedIds || [];
+            if (excluded.includes(id)) {
+                return { ...prev, excludedIds: excluded.filter(x => x !== id) };
+            } else {
+                return { ...prev, excludedIds: [...excluded, id] };
+            }
+        });
     };
 
     const [showDetails, setShowDetails] = useState(false);
@@ -237,40 +249,85 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
                                             <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 flex justify-between items-center text-xs font-bold text-slate-700 uppercase">
                                                 <span>{key} ({stats.newItems.length + stats.conflicts.length})</span>
                                             </div>
-                                            <div className="p-3 space-y-3">
+                                            <div className="p-3 space-y-4">
                                                 {/* New Items */}
                                                 {stats.newItems.length > 0 && (
-                                                    <div className="space-y-1.5">
+                                                    <div className="space-y-2">
                                                         <div className="text-[10px] font-bold text-green-600 uppercase flex items-center gap-1">
                                                             <PlusCircle size={12} /> Nouveaux éléments ({stats.newItems.length})
                                                         </div>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {stats.newItems.map((name, i) => (
-                                                                <span key={i} className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded border border-green-100 italic">
-                                                                    {name}
-                                                                </span>
-                                                            ))}
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                            {stats.newItems.map((item, i) => {
+                                                                const isExcluded = options.excludedIds?.includes(item.id);
+                                                                return (
+                                                                    <label key={i} className={`flex items-center gap-2 p-2 rounded border transition-colors cursor-pointer ${isExcluded ? 'bg-gray-50 border-gray-200 opacity-60' : 'bg-green-50/30 border-green-100 hover:bg-green-50'}`}>
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={!isExcluded}
+                                                                            onChange={() => toggleExclusion(item.id)}
+                                                                            className="w-3.5 h-3.5 rounded text-green-600 focus:ring-green-500"
+                                                                        />
+                                                                        <span className="text-xs font-medium text-slate-700 truncate">{item.name}</span>
+                                                                        {!isExcluded && <span className="ml-auto text-[9px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded uppercase font-mono">Ajouté</span>}
+                                                                        {isExcluded && <span className="ml-auto text-[9px] font-bold bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded uppercase text-nowrap font-mono">Exclu</span>}
+                                                                    </label>
+                                                                );
+                                                            })}
                                                         </div>
                                                     </div>
                                                 )}
 
                                                 {/* Conflicts */}
                                                 {stats.conflicts.length > 0 && (
-                                                    <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                                                    <div className="space-y-2 pt-2 border-t border-slate-100">
                                                         <div className="text-[10px] font-bold text-amber-600 uppercase flex items-center gap-1">
                                                             <AlertTriangle size={12} /> Conflits détectés ({stats.conflicts.length})
                                                         </div>
                                                         <div className="space-y-2">
-                                                            {stats.conflicts.map((conflict, i) => (
-                                                                <div key={i} className="text-xs border border-amber-100 bg-amber-50/50 rounded p-2">
-                                                                    <div className="font-bold text-slate-800 mb-1">{conflict.name}</div>
-                                                                    <ul className="list-disc list-inside space-y-0.5 text-slate-600">
-                                                                        {conflict.differences.map((d, di) => (
-                                                                            <li key={di}>{d}</li>
-                                                                        ))}
-                                                                    </ul>
-                                                                </div>
-                                                            ))}
+                                                            {stats.conflicts.map((conflict, i) => {
+                                                                const isExcluded = options.excludedIds?.includes(conflict.candidate.id);
+
+                                                                // Dynamic Badge Text
+                                                                let actionLabel = "Ignoré";
+                                                                let actionClass = "bg-gray-100 text-gray-500 border-gray-200";
+
+                                                                if (!isExcluded) {
+                                                                    if (options.libraryStrategy === 'overwrite') {
+                                                                        actionLabel = "Remplacé";
+                                                                        actionClass = "bg-amber-100 text-amber-700 border-amber-200";
+                                                                    } else if (options.libraryStrategy === 'copy') {
+                                                                        actionLabel = "Doublon";
+                                                                        actionClass = "bg-blue-100 text-blue-700 border-blue-200";
+                                                                    }
+                                                                } else {
+                                                                    actionLabel = "Exclu";
+                                                                    actionClass = "bg-red-50 text-red-500 border-red-100";
+                                                                }
+
+                                                                return (
+                                                                    <div key={i} className={`border rounded p-3 transition-colors ${isExcluded ? 'bg-gray-50 border-gray-200 opacity-60' : 'bg-white border-slate-200 hover:border-amber-300'}`}>
+                                                                        <div className="flex items-center gap-3 mb-2">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={!isExcluded}
+                                                                                onChange={() => toggleExclusion(conflict.candidate.id)}
+                                                                                className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500"
+                                                                            />
+                                                                            <div className="font-bold text-sm text-slate-800">{conflict.name}</div>
+                                                                            <span className={`ml-auto text-[10px] font-bold border px-2 py-0.5 rounded-full uppercase font-mono ${actionClass}`}>
+                                                                                {actionLabel}
+                                                                            </span>
+                                                                        </div>
+                                                                        {!isExcluded && (
+                                                                            <ul className="list-disc list-inside space-y-1 text-xs text-slate-600 pl-7">
+                                                                                {conflict.differences.map((d, di) => (
+                                                                                    <li key={di}>{d}</li>
+                                                                                ))}
+                                                                            </ul>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
                                                         </div>
                                                     </div>
                                                 )}

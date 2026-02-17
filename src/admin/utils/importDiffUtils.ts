@@ -19,11 +19,11 @@ export interface DiffReport {
         backgrounds: string[];
         counters: string[];
         libraries: {
-            traits: { new: number, conflict: number, identical: number, newItems: string[], conflicts: LibraryConflict[] };
-            skills: { new: number, conflict: number, identical: number, newItems: string[], conflicts: LibraryConflict[] };
-            specializations: { new: number, conflict: number, identical: number, newItems: string[], conflicts: LibraryConflict[] };
-            backgrounds: { new: number, conflict: number, identical: number, newItems: string[], conflicts: LibraryConflict[] };
-            counters: { new: number, conflict: number, identical: number, newItems: string[], conflicts: LibraryConflict[] };
+            traits: { new: number, conflict: number, identical: number, newItems: { id: string, name: string }[], conflicts: LibraryConflict[] };
+            skills: { new: number, conflict: number, identical: number, newItems: { id: string, name: string }[], conflicts: LibraryConflict[] };
+            specializations: { new: number, conflict: number, identical: number, newItems: { id: string, name: string }[], conflicts: LibraryConflict[] };
+            backgrounds: { new: number, conflict: number, identical: number, newItems: { id: string, name: string }[], conflicts: LibraryConflict[] };
+            counters: { new: number, conflict: number, identical: number, newItems: { id: string, name: string }[], conflicts: LibraryConflict[] };
         };
     };
 }
@@ -38,6 +38,7 @@ export interface ImportOptions {
         libraries: boolean; // Content
     };
     libraryStrategy: 'ignore' | 'overwrite' | 'copy';
+    excludedIds?: string[]; // IDs of items to ignore during specific category merge
 }
 
 const isDifferent = (a: any, b: any) => JSON.stringify(a) !== JSON.stringify(b);
@@ -116,7 +117,7 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
             new: 0,
             conflict: 0,
             identical: 0,
-            newItems: [] as string[],
+            newItems: [] as { id: string, name: string }[],
             conflicts: [] as LibraryConflict[]
         };
         const currIdMap = new Map(curr.map(i => [i.id, i]));
@@ -131,7 +132,7 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
 
             if (!existing) {
                 stats.new++;
-                stats.newItems.push(item.name || "Sans nom");
+                stats.newItems.push({ id: item.id, name: item.name || "Sans nom" });
             } else {
                 if (isDifferent(existing, item)) {
                     stats.conflict++;
@@ -219,8 +220,11 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
         const mergeLibList = <T extends { id: string, name?: string }>(curr: T[], cand: T[]) => {
             const map = new Map(curr.map(i => [i.id, i]));
             const nameMap = new Map(curr.filter(i => i.name).map(i => [i.name?.trim().toLowerCase(), i]));
+            const excluded = new Set(options.excludedIds || []);
 
             cand.forEach(item => {
+                if (excluded.has(item.id)) return; // Skip individually excluded items
+
                 const trimmedName = item.name?.trim().toLowerCase();
                 const existingById = map.get(item.id);
                 const existingByName = trimmedName ? nameMap.get(trimmedName) : undefined;

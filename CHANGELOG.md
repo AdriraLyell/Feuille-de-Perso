@@ -1,5 +1,13 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.48.4] - 2026-02-13 [PATCH]
+
+- 🎯 UX : Correction critique de la sélection locale des chapitres (ne saute plus au premier chapitre du livre)
+
+## [2.48.3] - 2026-02-13 [PATCH]
+
+- ✍️ UX : Garantie de la sélection automatique du titre (surlignage) lors de la création d'un chapitre via un cycle de rendu stabilisé
+
 ## [2.48.2] - 2026-02-13 [PATCH]
 
 - ✍️ UX : Correction de la sélection du titre lors de l'ajout d'un chapitre (désormais correctement surligné pour modification immédiate)

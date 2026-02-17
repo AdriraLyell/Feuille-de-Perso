@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.52.0",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "✅ Import : Sélection individuelle des items (nouveaux et conflits) via des cases à cocher",
+            "🎭 UI : Feedback dynamique des badges (Ignoré, Remplacé, Doublon, Exclu) en fonction de la stratégie",
+            "🛠️ Core : Support technique de l'exclusion via IDs uniques dans le moteur de fusion"
+        ]
+    },
+    {
         "version": "2.51.0",
         "date": "2026-02-17",
         "type": "feat",
@@ -181,26 +191,6 @@
             "🧠 Admin : Distinction claire entre édition de la Bibliothèque Globale et Personnalisation de Campagne",
             "🛡️ Système : La modification via l'onglet Bibliothèque met désormais à jour la base master pour tous les réglages",
             "🖋️ UI : Titres de modales explicites selon le contexte d'édition (Base Globale vs Campagne)"
-        ]
-    },
-    {
-        "version": "2.49.83",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🔍 Bibliothèques : Correction de la visibilité des compétences à variantes (Artisanat, etc.) en mode filtré",
-            "🛠️ Système : Amélioration de la détection 'Global' pour le catalogue chargé depuis JSON",
-            "🎨 UI : Ajustement de la visibilité des boutons d'édition dans les listes administratives"
-        ]
-    },
-    {
-        "version": "2.49.82",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🚀 Système : Utilisation d'un Portal React pour les modales (correction confinement UI)",
-            "🔄 Admin : Restauration du bouton 'Modifier' dans la bibliothèque globale de compétences",
-            "🎨 UI : Amélioration de la cohérence visuelle entre la bibliothèque et la réserve"
         ]
     }
 ]

@@ -1,5 +1,25 @@
 [
     {
+        "version": "2.49.83",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🔍 Bibliothèques : Correction de la visibilité des compétences à variantes (Artisanat, etc.) en mode filtré",
+            "🛠️ Système : Amélioration de la détection 'Global' pour le catalogue chargé depuis JSON",
+            "🎨 UI : Ajustement de la visibilité des boutons d'édition dans les listes administratives"
+        ]
+    },
+    {
+        "version": "2.49.82",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🚀 Système : Utilisation d'un Portal React pour les modales (correction confinement UI)",
+            "🔄 Admin : Restauration du bouton 'Modifier' dans la bibliothèque globale de compétences",
+            "🎨 UI : Amélioration de la cohérence visuelle entre la bibliothèque et la réserve"
+        ]
+    },
+    {
         "version": "2.49.81",
         "date": "2026-02-16",
         "type": "feat",
@@ -974,22 +994,6 @@
         "type": "patch",
         "changes": [
             "🧠 UX : Migration vers la sélection native Tiptap (setTextSelection) pour un surlignage fiable et persistant des titres de chapitres"
-        ]
-    },
-    {
-        "version": "2.48.4",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🎯 UX : Correction critique de la sélection locale des chapitres (ne saute plus au premier chapitre du livre)"
-        ]
-    },
-    {
-        "version": "2.48.3",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "✍️ UX : Garantie de la sélection automatique du titre (surlignage) lors de la création d'un chapitre via un cycle de rendu stabilisé"
         ]
     }
 ]
