@@ -98,55 +98,74 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, 
                                     className="flex-grow border border-stone-200 rounded px-3 py-1.5 text-sm focus:border-blue-500 outline-none font-mono"
                                     value={selectedCost}
                                     onChange={(e) => setSelectedCost(e.target.value)}
+                                    autoFocus={isVariableCost}
                                 />
                             </div>
                         </div>
                     )}
 
                     {/* Variant Section */}
-                    <div className="space-y-3">
-                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider">Précision / Variant (Ex: Alcool, Chats...)</label>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                className="flex-grow border border-stone-200 rounded px-3 py-1.5 text-sm focus:border-blue-500 outline-none"
-                                placeholder="Saisir un variant..."
-                                value={customVariant}
-                                onChange={(e) => setCustomVariant(e.target.value)}
-                                autoFocus={!isVariableCost}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleConfirm(customVariant);
-                                    if (e.key === 'Escape') onClose();
-                                }}
-                            />
-                            <button
-                                onClick={() => handleConfirm(customVariant)}
-                                className="bg-blue-600 text-white px-4 py-1.5 rounded text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1"
-                            >
-                                <Check size={16} /> OK
-                            </button>
-                        </div>
-
-                        {/* Suggested Variants */}
-                        {variantPicker.variants && variantPicker.variants.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                {variantPicker.variants.map(v => (
-                                    <button
-                                        key={v}
-                                        onClick={() => handleConfirm(v)}
-                                        className="bg-stone-100 hover:bg-stone-200 text-stone-700 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border border-stone-200"
-                                    >
-                                        {v}
-                                    </button>
-                                ))}
+                    {(variantPicker.isVariable || (variantPicker.variants && variantPicker.variants.length > 0)) ? (
+                        <div className="space-y-3">
+                            <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider">Précision / Variant (Ex: Alcool, Chats...)</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    className="flex-grow border border-stone-200 rounded px-3 py-1.5 text-sm focus:border-blue-500 outline-none"
+                                    placeholder="Saisir un variant..."
+                                    value={customVariant}
+                                    onChange={(e) => setCustomVariant(e.target.value)}
+                                    autoFocus={!isVariableCost}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleConfirm(customVariant);
+                                        if (e.key === 'Escape') onClose();
+                                    }}
+                                />
+                                <button
+                                    onClick={() => handleConfirm(customVariant)}
+                                    className="bg-blue-600 text-white px-4 py-1.5 rounded text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1"
+                                >
+                                    <Check size={16} /> OK
+                                </button>
                             </div>
-                        )}
 
-                        {/* Final check for traits with NO variants but only cost variable */}
-                        {!variantPicker.isVariable && (!variantPicker.variants || variantPicker.variants.length === 0) && isVariableCost && (
-                            <p className="text-[10px] text-stone-400 italic mt-2">Ce trait ne nécessite pas de variant, seulement le choix du coût.</p>
-                        )}
-                    </div>
+                            {/* Suggested Variants */}
+                            {variantPicker.variants && variantPicker.variants.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {variantPicker.variants.map(v => (
+                                        <button
+                                            key={v}
+                                            onClick={() => {
+                                                if (isVariableCost) {
+                                                    // If cost is variable, just fill the input to let user check cost before confirming
+                                                    setCustomVariant(v);
+                                                } else {
+                                                    // Quick confirm if only variants matter
+                                                    handleConfirm(v);
+                                                }
+                                            }}
+                                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${customVariant === v ? 'bg-blue-100 text-blue-800 border-blue-300' : 'bg-stone-100 hover:bg-stone-200 text-stone-700 border-stone-200'}`}
+                                        >
+                                            {v}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        /* No variants defined, but variable cost: Show a centered confirmation button */
+                        isVariableCost && (
+                            <div className="flex flex-col items-center gap-4 py-2">
+                                <p className="text-[10px] text-stone-400 italic">Ce trait ne nécessite pas de variant, seulement le choix du coût.</p>
+                                <button
+                                    onClick={() => handleConfirm('')}
+                                    className="w-full bg-blue-600 text-white px-6 py-2.5 rounded font-bold hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center gap-2 animate-in fade-in zoom-in duration-300"
+                                >
+                                    <Check size={18} /> Confirmer ce trait
+                                </button>
+                            </div>
+                        )
+                    )}
                 </div>
 
                 <div className="px-5 py-3 bg-stone-50 border-t flex justify-between items-center text-[10px] text-stone-500 italic">
