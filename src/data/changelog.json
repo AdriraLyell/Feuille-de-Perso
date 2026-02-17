@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.55.3",
+        "date": "2026-02-18",
+        "type": "feat",
+        "changes": [
+            "✨ Admin : Implémentation de l'Input de Coût Intelligent pour les traits",
+            "🪄 UI : Remplacement des termes techniques (Valeur Pivot, Affichage) par un champ unique auto-détecté",
+            "🔍 UX : Feedback visuel en temps réel sur l'interprétation du coût (Fixe, Plage, Liste)",
+            "🛠️ Core : Simplification radicale du formulaire d'édition des traits"
+        ]
+    },
+    {
         "version": "2.55.1",
         "date": "2026-02-18",
         "type": "fix",

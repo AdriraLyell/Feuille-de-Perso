@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { LibraryEntry, TraitEffect } from '../../types';
-import { Edit2, Plus, X, AlignLeft, Save, AlertCircle } from 'lucide-react';
+import { Edit2, Plus, X, AlignLeft, Save, AlertCircle, Coins, Info } from 'lucide-react';
 import TraitEffectEditor from './TraitEffectEditor';
 import ThematicModal from '../ui/ThematicModal';
 
@@ -23,6 +23,7 @@ interface TraitFormProps {
     removeEffect: (id: string) => void;
 }
 
+
 const TraitForm: React.FC<TraitFormProps> = ({
     editForm,
     library,
@@ -41,6 +42,35 @@ const TraitForm: React.FC<TraitFormProps> = ({
     removeEffect
 }) => {
     const [variantDraft, setVariantDraft] = React.useState(editForm.variants?.join(', ') || '');
+
+    // Logic for "Smart Cost Information"
+    const parsedCostInfo = React.useMemo(() => {
+        const val = editForm.pointsLabel?.toString() || '';
+        if (!val.trim()) return { type: 'none', label: 'Aucun coût défini' };
+
+        // 1. Simple Number (Fixed)
+        if (/^\d+$/.test(val.trim())) {
+            return { type: 'fixed', label: `Prix fixe : ${val} pts`, color: 'text-emerald-600' };
+        }
+
+        // 2. Range (1-5)
+        if (/[-,–—]/.test(val) || val.includes('..')) {
+            const nums = val.match(/\d+/g);
+            if (nums && nums.length >= 2) {
+                return { type: 'range', label: `Plage de ${nums[0]} à ${nums[1]} pts`, color: 'text-amber-600' };
+            }
+        }
+
+        // 3. List (1, 3, 5)
+        if (val.includes(',') || val.includes(';')) {
+            const nums = val.match(/\d+/g);
+            if (nums && nums.length > 0) {
+                return { type: 'list', label: `Choix multiples : ${nums.join(', ')} pts`, color: 'text-blue-600' };
+            }
+        }
+
+        return { type: 'text', label: 'Coût narratif / Spécial', color: 'text-stone-500' };
+    }, [editForm.pointsLabel]);
 
     React.useEffect(() => {
         setVariantDraft(editForm.variants?.join(', ') || '');
@@ -98,9 +128,9 @@ const TraitForm: React.FC<TraitFormProps> = ({
                     </div>
                 </div>
 
-                {/* Name & Cost */}
-                <div className="grid grid-cols-4 gap-4">
-                    <div className="col-span-2">
+                {/* Name & Cost (Smart Input) */}
+                <div className="grid grid-cols-5 gap-4">
+                    <div className="col-span-3">
                         <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest">Nom du Trait</label>
                         <input
                             className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm placeholder-stone-300"
@@ -109,50 +139,44 @@ const TraitForm: React.FC<TraitFormProps> = ({
                             placeholder="Ex: Chance, Ennemi..."
                         />
                     </div>
-                    <div className="col-span-1">
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest text-center truncate" title="Valeur Technique (BDD)">Valeur Pivot</label>
-                        <input
-                            type="number"
-                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-mono text-center focus:border-amber-500 outline-none text-[#1c1917] bg-white/50 shadow-sm font-bold"
-                            value={editForm.cost}
-                            onChange={(e) => {
-                                const val = e.target.value;
-                                setEditForm({ ...editForm, cost: val, pointsLabel: editForm.isVariableCost ? editForm.pointsLabel : val });
-                            }}
-                            placeholder="Pt"
-                        />
-                    </div>
-                    <div className="col-span-1">
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest text-center">Affichage</label>
-                        <input
-                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-mono text-center focus:border-amber-500 outline-none text-[#1c1917] bg-white/50 shadow-sm font-bold"
-                            value={editForm.pointsLabel}
-                            onChange={(e) => setEditForm({ ...editForm, pointsLabel: e.target.value })}
-                            placeholder="Ex: 1-5"
-                            disabled={!editForm.isVariableCost}
-                        />
-                    </div>
-                </div>
+                    <div className="col-span-2 relative">
+                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest flex items-center justify-between">
+                            <span>Coût / Valeur</span>
+                            <div className="group relative">
+                                <Info size={12} className="text-[#bfae85] cursor-help" />
+                                <div className="absolute right-0 bottom-full mb-2 w-48 bg-stone-800 text-white text-[9px] p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 font-sans normal-case tracking-normal leading-normal">
+                                    Saisissez un nombre (ex: 3), une plage (ex: 1-5) ou une liste (ex: 1, 3, 5).
+                                </div>
+                            </div>
+                        </label>
+                        <div className="relative">
+                            <input
+                                className="w-full border border-[#bfae85]/50 rounded-sm pl-8 pr-3 py-2 font-mono focus:border-amber-500 outline-none text-[#1c1917] bg-white/50 shadow-sm font-bold"
+                                value={editForm.pointsLabel}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    const firstNumMatch = val.match(/\d+/);
+                                    const firstNum = firstNumMatch ? firstNumMatch[0] : '0';
+                                    const isVar = /[-,–—,;]/.test(val) || val.includes('..');
 
-                {/* Coût Multiple Toggle */}
-                <div className="flex items-center gap-3 px-1 -mt-2">
-                    <input
-                        type="checkbox"
-                        id="isVariableCost"
-                        className="w-4 h-4 accent-amber-600 cursor-pointer"
-                        checked={editForm.isVariableCost || false}
-                        onChange={(e) => {
-                            const checked = e.target.checked;
-                            setEditForm({
-                                ...editForm,
-                                isVariableCost: checked,
-                                pointsLabel: checked ? editForm.pointsLabel : editForm.cost
-                            });
-                        }}
-                    />
-                    <label htmlFor="isVariableCost" className="cursor-pointer select-none text-[10px] font-bold text-[#5c4d41] uppercase tracking-wide">
-                        Coût Variable ou Multiple <span className="text-[#bfae85]">(ex: 1-5, 1/3/5)</span>
-                    </label>
+                                    setEditForm({
+                                        ...editForm,
+                                        pointsLabel: val,
+                                        cost: firstNum,
+                                        isVariableCost: isVar
+                                    });
+                                }}
+                                placeholder="ex: 1-5"
+                            />
+                            <Coins size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#bfae85]" />
+                        </div>
+
+                        {/* Cost Helper Legend */}
+                        <div className={`text-[9px] mt-1.5 font-bold flex items-center gap-1.5 ${parsedCostInfo.color} animate-in fade-in slide-in-from-left-1 duration-300`}>
+                            <div className={`w-1.5 h-1.5 rounded-full bg-current opacity-40`} />
+                            {parsedCostInfo.label}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Description */}
