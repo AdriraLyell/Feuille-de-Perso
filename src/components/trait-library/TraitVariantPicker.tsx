@@ -80,7 +80,7 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, 
                     {/* Cost Selector (if variable) */}
                     {isVariableCost && (
                         <div className="space-y-3 bg-blue-50/50 p-3 rounded border border-blue-100">
-                            <label className="block text-[10px] font-bold text-blue-800 uppercase tracking-wider">Valeur / Coût ({variantPicker.cost})</label>
+                            <label className="block text-[10px] font-bold text-blue-800 uppercase tracking-wider">Valeur</label>
 
                             {/* Suggested costs as buttons */}
                             {costSuggestions.length > 0 && (
