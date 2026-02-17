@@ -2,6 +2,14 @@
 import { RulesData } from '../../types/rules';
 import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry } from '../../types/system';
 
+export interface LibraryConflict {
+    name: string;
+    type: string;
+    differences: string[]; // Ex: ["Coût: 3 -> 5", "Description modifiée"]
+    current: any;
+    candidate: any;
+}
+
 export interface DiffReport {
     hasChanges: boolean;
     details: {
@@ -11,11 +19,11 @@ export interface DiffReport {
         backgrounds: string[];
         counters: string[];
         libraries: {
-            traits: { new: number, conflict: number, identical: number };
-            skills: { new: number, conflict: number, identical: number };
-            specializations: { new: number, conflict: number, identical: number };
-            backgrounds: { new: number, conflict: number, identical: number };
-            counters: { new: number, conflict: number, identical: number };
+            traits: { new: number, conflict: number, identical: number, newItems: string[], conflicts: LibraryConflict[] };
+            skills: { new: number, conflict: number, identical: number, newItems: string[], conflicts: LibraryConflict[] };
+            specializations: { new: number, conflict: number, identical: number, newItems: string[], conflicts: LibraryConflict[] };
+            backgrounds: { new: number, conflict: number, identical: number, newItems: string[], conflicts: LibraryConflict[] };
+            counters: { new: number, conflict: number, identical: number, newItems: string[], conflicts: LibraryConflict[] };
         };
     };
 }
@@ -34,6 +42,30 @@ export interface ImportOptions {
 
 const isDifferent = (a: any, b: any) => JSON.stringify(a) !== JSON.stringify(b);
 
+/**
+ * Compares two library items and returns a list of human-readable differences.
+ */
+const getDetailedDifferences = (curr: any, cand: any): string[] => {
+    const diffs: string[] = [];
+    if (curr.name !== cand.name) diffs.push(`Nom: "${curr.name}" -> "${cand.name}"`);
+    if (curr.type !== cand.type) diffs.push(`Type: ${curr.type} -> ${cand.type}`);
+    if (curr.cost !== cand.cost) diffs.push(`Coût: ${curr.cost} -> ${cand.cost}`);
+    if (curr.pointsLabel !== cand.pointsLabel) diffs.push(`Label: ${curr.pointsLabel} -> ${cand.pointsLabel}`);
+    if (curr.description !== cand.description) diffs.push("Description modifiée");
+
+    // Compare tags
+    if (isDifferent(curr.tags, cand.tags)) {
+        diffs.push("Tags modifiés");
+    }
+
+    // Compare effects
+    if (isDifferent(curr.effects, cand.effects)) {
+        diffs.push("Effets modifiés");
+    }
+
+    return diffs;
+};
+
 export const calculateDiff = (current: RulesData, candidate: RulesData): DiffReport => {
     const report: DiffReport = {
         hasChanges: false,
@@ -44,11 +76,11 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
             backgrounds: [],
             counters: [],
             libraries: {
-                traits: { new: 0, conflict: 0, identical: 0 },
-                skills: { new: 0, conflict: 0, identical: 0 },
-                specializations: { new: 0, conflict: 0, identical: 0 },
-                backgrounds: { new: 0, conflict: 0, identical: 0 },
-                counters: { new: 0, conflict: 0, identical: 0 }
+                traits: { new: 0, conflict: 0, identical: 0, newItems: [], conflicts: [] },
+                skills: { new: 0, conflict: 0, identical: 0, newItems: [], conflicts: [] },
+                specializations: { new: 0, conflict: 0, identical: 0, newItems: [], conflicts: [] },
+                backgrounds: { new: 0, conflict: 0, identical: 0, newItems: [], conflicts: [] },
+                counters: { new: 0, conflict: 0, identical: 0, newItems: [], conflicts: [] }
             }
         }
     };
@@ -80,7 +112,13 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
 
     // 4. Libraries Analysis
     const analyzeLib = <T extends { id: string, name?: string }>(curr: T[], cand: T[]) => {
-        const stats = { new: 0, conflict: 0, identical: 0 };
+        const stats = {
+            new: 0,
+            conflict: 0,
+            identical: 0,
+            newItems: [] as string[],
+            conflicts: [] as LibraryConflict[]
+        };
         const currIdMap = new Map(curr.map(i => [i.id, i]));
         const currNameMap = new Map(curr.filter(i => i.name).map(i => [i.name?.trim().toLowerCase(), i]));
 
@@ -93,9 +131,17 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
 
             if (!existing) {
                 stats.new++;
+                stats.newItems.push(item.name || "Sans nom");
             } else {
                 if (isDifferent(existing, item)) {
                     stats.conflict++;
+                    stats.conflicts.push({
+                        name: item.name || "Sans nom",
+                        type: (item as any).type || "item",
+                        differences: getDetailedDifferences(existing, item),
+                        current: existing,
+                        candidate: item
+                    });
                 } else {
                     stats.identical++;
                 }

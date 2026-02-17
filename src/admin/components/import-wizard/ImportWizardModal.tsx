@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { calculateDiff, mergeRules, ImportOptions } from '../../utils/importDiffUtils';
-import { Check, X, AlertTriangle, Settings, BookOpen, Database, Layers, CheckCircle2 } from 'lucide-react';
+import { Check, X, AlertTriangle, Settings, BookOpen, Database, Layers, CheckCircle2, ChevronRight, ChevronDown, PlusCircle } from 'lucide-react';
 
 interface ImportWizardModalProps {
     isOpen: boolean;
@@ -43,6 +43,8 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
         const merged = mergeRules(currentRules, candidateRules, options);
         onConfirm(merged);
     };
+
+    const [showDetails, setShowDetails] = useState(false);
 
     const SectionCard = ({ id, label, icon: Icon, details }: { id: keyof ImportOptions['sections'], label: string, icon: any, details: string[] }) => {
         const hasChanges = details.length > 0;
@@ -211,6 +213,71 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
                                         </label>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Details View */}
+                    <div className="mt-4">
+                        <button
+                            onClick={() => setShowDetails(!showDetails)}
+                            className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors bg-white px-4 py-2 rounded-lg border border-slate-200"
+                        >
+                            {showDetails ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                            Voir le détail des changements dans les bibliothèques
+                        </button>
+
+                        {showDetails && (
+                            <div className="mt-3 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                                {Object.entries(diff.details.libraries).map(([key, stats]) => {
+                                    if (stats.newItems.length === 0 && stats.conflicts.length === 0) return null;
+
+                                    return (
+                                        <div key={key} className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
+                                            <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 flex justify-between items-center text-xs font-bold text-slate-700 uppercase">
+                                                <span>{key} ({stats.newItems.length + stats.conflicts.length})</span>
+                                            </div>
+                                            <div className="p-3 space-y-3">
+                                                {/* New Items */}
+                                                {stats.newItems.length > 0 && (
+                                                    <div className="space-y-1.5">
+                                                        <div className="text-[10px] font-bold text-green-600 uppercase flex items-center gap-1">
+                                                            <PlusCircle size={12} /> Nouveaux éléments ({stats.newItems.length})
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {stats.newItems.map((name, i) => (
+                                                                <span key={i} className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded border border-green-100 italic">
+                                                                    {name}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Conflicts */}
+                                                {stats.conflicts.length > 0 && (
+                                                    <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                                                        <div className="text-[10px] font-bold text-amber-600 uppercase flex items-center gap-1">
+                                                            <AlertTriangle size={12} /> Conflits détectés ({stats.conflicts.length})
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            {stats.conflicts.map((conflict, i) => (
+                                                                <div key={i} className="text-xs border border-amber-100 bg-amber-50/50 rounded p-2">
+                                                                    <div className="font-bold text-slate-800 mb-1">{conflict.name}</div>
+                                                                    <ul className="list-disc list-inside space-y-0.5 text-slate-600">
+                                                                        {conflict.differences.map((d, di) => (
+                                                                            <li key={di}>{d}</li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

@@ -1,5 +1,9 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.48.2] - 2026-02-13 [PATCH]
+
+- ✍️ UX : Correction de la sélection du titre lors de l'ajout d'un chapitre (désormais correctement surligné pour modification immédiate)
+
 ## [2.48.1] - 2026-02-13 [PATCH]
 
 - 📅 UX : L'icône calendrier ouvre désormais un sélecteur de date natif

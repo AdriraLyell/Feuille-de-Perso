@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.49.81",
+        "date": "2026-02-16",
+        "type": "feat",
+        "changes": [
+            "🎨 Admin : Migration de la personnalisation des compétences vers la Réserve (sidebar)",
+            "🧹 Admin : Restauration de l'UI épurée de la Bibliothèque globale (suppression édition/badges)",
+            "🛡️ Système : Support complet des overrides de compétences par campagne via la sidebar"
+        ]
+    },
+    {
         "version": "2.49.80",
         "date": "2026-02-16",
         "type": "feat",
@@ -980,14 +990,6 @@
         "type": "patch",
         "changes": [
             "✍️ UX : Garantie de la sélection automatique du titre (surlignage) lors de la création d'un chapitre via un cycle de rendu stabilisé"
-        ]
-    },
-    {
-        "version": "2.48.2",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "✍️ UX : Correction de la sélection du titre lors de l'ajout d'un chapitre (désormais correctement surligné pour modification immédiate)"
         ]
     }
 ]
