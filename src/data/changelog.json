@@ -1,5 +1,130 @@
 [
     {
+        "version": "2.50.0",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "🛡️ Admin : Renforcement de la détection des conflits lors de l'import (ID + Nom)",
+            "🧹 Bibliothèque : Prévention de la pollution par doublons visuels lors de l'import de fiches personnages",
+            "📥 Système : Amélioration de la robustesse de l'Assistant d'Importation pour tous les types de contenu (Traits, Skills, Backgrounds, Counters)"
+        ]
+    },
+    {
+        "version": "2.49.99",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "🛠️ Admin : Correction du bug de réinitialisation des coûts des traits (mismatch SQL points/cost)",
+            "📊 Bibliothèque : Implémentation des coûts variables et multiples (ex: 1-5, 1/3/5) avec libellés personnalisables",
+            "💾 Persistance : Ajout des colonnes points_label et is_variable_cost pour une gestion robuste des coûts en BDD"
+        ]
+    },
+    {
+        "version": "2.49.98",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "✨ Bibliothèque : Ajout de l'icône 'Habilités Mystiques' (Sparkles) dans la réserve de la fiche personnage",
+            "📊 UI : Implémentation d'une légende complète des icônes dans la réserve de compétences et la bibliothèque de traits"
+        ]
+    },
+    {
+        "version": "2.49.97",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "📝 Grimoire : Amélioration de la réactivité de l'enroulement (Wrap) par suppression des délais d'animation pendant le drag",
+            "🖼️ UX : Système de collision solide pour les images en mode libre, forçant le recalcul du flux dans les colonnes CSS"
+        ]
+    },
+    {
+        "version": "2.49.96",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "📝 Grimoire : Correction définitive de l'enroulement (Wrap) globale. Le texte est désormais physique poussé par l'image via un système de marges 4D (Haut/Bas/Gauche/Droite)",
+            "🖼️ Layout : Suppression des transformations visuelles (fantômes) pour garantir que le texte ne se cache plus jamais derrière une image"
+        ]
+    },
+    {
+        "version": "2.49.95",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "📝 Grimoire : L'enroulement du texte (Wrap) suit désormais le décalage vertical des images grâce à un système de marges dynamiques",
+            "🖱️ UX : Le bouton 'F' restaure désormais l'alignement latéral précédent (L/R) au lieu de forcer le centré",
+            "🖼️ Layout : Correction des chevauchements de texte en mode déplacement libre"
+        ]
+    },
+    {
+        "version": "2.49.94",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🖱️ UX : Le bouton 'F' (Libre) permet désormais de basculer (toggle) entre le mode libre et le mode centré",
+            "🔄 Système : La désactivation du mode libre réinitialise automatiquement la position de l'image (Reset Offsets)"
+        ]
+    },
+    {
+        "version": "2.49.93",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🛡️ UI : La barre d'outils suit désormais l'image dans ses déplacements libres (Flush Toolbar)",
+            "🔼 UX : La sélection d'une image la fait désormais passer au-dessus de tous les éléments (sommaire, menus) via un Z-index dynamique",
+            "🛠️ Système : Correction des problèmes d'images 'bloquées' derrière l'interface du grimoire"
+        ]
+    },
+    {
+        "version": "2.49.92",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "🖱️ UX : Double sens d'enroulement (Float L/R) désormais disponible en mode déplacement libre",
+            "📊 UI : Ajout d'un HUD (Head-Up Display) affichant les coordonnées X/Y et la taille en temps réel",
+            "🖼️ Grimoire : Guide de recadrage (Crop) ajusté pour exclure dynamiquement la bordure blanche",
+            "🔧 UX : Amélioration de la réactivité des poignées de redimensionnement et de sélection"
+        ]
+    },
+    {
+        "version": "2.49.91",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🎨 UI : Le cadre de sélection bleu suit désormais précisément les dimensions de l'image même en déplacement libre",
+            "🛡️ Système : Désactivation intelligente du recadrage (Crop) sur les images à hauteur automatique",
+            "📋 Audit : Réalisation d'un audit complet du système d'images pour prévenir les conflits d'options"
+        ]
+    },
+    {
+        "version": "2.49.90",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🖼️ Grimoire : Ajustement automatique de la largeur lors du passage en mode libre pour un meilleur enroulement",
+            "🎨 UI : Cadre de sélection plus serré (fit-content) sur les images libres"
+        ]
+    },
+    {
+        "version": "2.49.89",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🖱️ UX : Le mode déplacement libre ne s'active désormais que lorsque l'image est sélectionnée",
+            "📖 Grimoire : Support de l'enroulement du texte (wrap) en mode déplacement libre"
+        ]
+    },
+    {
+        "version": "2.49.88",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "🖼️ Grimoire : Ajout du mode 'Déplacement Libre' (F) pour les images",
+            "🖱️ UX : Déplacement des images par Drag & Drop dans tout l'espace de la page",
+            "🔄 UI : Nouveau bouton de réinitialisation de la position et support des coordonnées persistantes"
+        ]
+    },
+    {
         "version": "2.49.87",
         "date": "2026-02-16",
         "type": "fix",
@@ -67,133 +192,6 @@
             "🎨 Admin : Migration de la personnalisation des compétences vers la Réserve (sidebar)",
             "🧹 Admin : Restauration de l'UI épurée de la Bibliothèque globale (suppression édition/badges)",
             "🛡️ Système : Support complet des overrides de compétences par campagne via la sidebar"
-        ]
-    },
-    {
-        "version": "2.49.80",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🛠️ Admin : Implémentation du système de surcharge locale des compétences par campagne (overrides)",
-            "🛡️ Bibliothèque : Protection contre la suppression des compétences globales si elles sont personnalisées dans un setting",
-            "📂 Exports : Découplage des exports de compétences (génération d'un `skills_[campaign].json` spécifique)",
-            "📥 Imports : Support de l'import flexible des bibliothèques via JSON (détection automatique du format spécifique)",
-            "🎨 UI : Ajout d'un badge 'Custom' dans la réserve pour identifier les compétences modifiées localement"
-        ]
-    },
-    {
-        "version": "2.49.79",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🎨 Admin : Optimisation visuelle des badges dans la réserve (icônes uniquement pour Variantes et Habilités Mystiques)"
-        ]
-    },
-    {
-        "version": "2.49.78",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🎨 Admin : Ajout de l'icône 'Habilité Mystique' (Sparkles) dans la réserve des compétences pour une identification rapide",
-            "🛡️ Schéma : Intégration de `mysticAbilityId` dans le schéma de validation des compétences de la bibliothèque"
-        ]
-    },
-    {
-        "version": "2.49.77",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🔄 Recréation : Rétablissement du statut 'variable' (ex: Artisanat : ..., Langue : ...) pour les compétences le nécessitant",
-            "🧹 Skills : Le nettoyage préserve désormais l'intention de spécialisation des compétences tout en effaçant le choix précédent"
-        ]
-    },
-    {
-        "version": "2.49.76",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🔄 Recréation : Nettoyage automatique des variantes et compétences personnalisées pour ne garder que le socle de la campagne",
-            "🧹 Skills : Correction de la persistance des compétences vides ou hors-règles lors du reset forcé par le MJ"
-        ]
-    },
-    {
-        "version": "2.49.75",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "👤 Personnage : Clonage du personnage Ayame vers Nika pour le joueur Polo effectué avec succès"
-        ]
-    },
-    {
-        "version": "2.49.74",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🔄 Recréation : Amélioration chirurgicale du processus de reset pour préserver l'Identité, le Social, l'Équipement et l'Image du personnage",
-            "🛡️ Traits : Conservation des Avantages/Désavantages lors d'une recréation imposée par le MJ",
-            "💰 XP : Simplification du remboursement basé sur l'intégralité de l'historique des logs de progression",
-            "🎨 UI : Mise à jour de la modale de recréation pour clarifier les éléments préservés et réinitialisés"
-        ]
-    },
-    {
-        "version": "2.49.73",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🛡️ Sécurité : Suppression de l'attribution automatique de propriété dans DatabaseService pour éviter le verrouillage des fiches legacy",
-            "👤 Personnage : Déverrouillage des fiches d'Ayame et Louise (reset created_by à NULL) pour restaurer l'accès public",
-            "🔓 RLS : Mise à jour des politiques Supabase pour autoriser la lecture anonyme des fiches sans propriétaire"
-        ]
-    },
-    {
-        "version": "2.49.72",
-        "date": "2026-02-16",
-        "type": "docs",
-        "changes": [
-            "📝 Documentation : Mise à jour exhaustive du schéma de base de données (mystic_abilities, vues, relations)",
-            "📝 Documentation : Ajout du guide de procédure pour le clonage de personnage via SQL",
-            "👤 Personnage : Clonage de Ayame vers Akane pour le joueur Polo effectué avec succès"
-        ]
-    },
-    {
-        "version": "2.49.71",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🛡️ CI : Correction des erreurs de typage TypeScript bloquant le workflow (RecreationService)",
-            "🧩 UI : Fix du typage missing onUpdate dans le composant AttributeBlock",
-            "🧹 Lint : Suppression d'un double cast booléen redondant dans AdminSkillLibrary"
-        ]
-    },
-    {
-        "version": "2.49.70",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "📖 Journal : Fix de la conversion des dimensions d'images lors de la migration (px vers %)",
-            "🖼️ UI : Ajout d'une limite de hauteur maximale (800px) pour les images du Grimoire",
-            "📏 Migration : Correction du ratio d'aspect forcé à 'auto' pour les images importées"
-        ]
-    },
-    {
-        "version": "2.49.69",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "📂 Admin : Déplacement de la fonctionnalité de recréation vers les paramètres spécifiques de chaque campagne (Fiches des Destins)",
-            "🧩 Imports : Correction d'une erreur de référence sur l'icône RotateCcw",
-            "⏳ UX : Ajout d'états de chargement et verrouillage pendant le processus de recréation"
-        ]
-    },
-    {
-        "version": "2.49.68",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🔄 Recréation : Implémentation du système de 'Respec' pour les personnages (Admin)",
-            "💰 XP : Remboursement automatique de l'XP de progression (attributs, compétences, compteurs) lors d'une recréation",
-            "🛡️ Mode Création : Réactivation du mode création avec injection du remboursement et redistribution auto",
-            "🎨 UI : Nouvelle modale de confirmation 'Recréation Éthérée' avec bilan des gains d'XP et avertissements"
         ]
     }
 ]

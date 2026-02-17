@@ -9,6 +9,8 @@ export interface DBTrait {
     name: string;
     description?: string;
     points?: number;
+    points_label?: string;   // Label for multiple costs (ex: "1, 3, 5" or "1-5")
+    is_variable_cost?: boolean;
     category?: string;
     type?: string;           // 'avantage' | 'desavantage'
     tags?: string[];

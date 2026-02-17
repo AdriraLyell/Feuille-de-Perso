@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Eye, EyeOff, CheckCircle2, Globe, RefreshCw, Download, Layers, Edit2, Trash2, GraduationCap } from 'lucide-react';
+import { Search, Plus, Eye, EyeOff, CheckCircle2, Globe, RefreshCw, Download, Layers, Edit2, Trash2, GraduationCap, Sparkles } from 'lucide-react';
 import { LibrarySkillEntry } from '../../types';
 import { MergedEntry } from '../../utils/libraryMerger';
 
@@ -59,14 +59,22 @@ const SkillLibraryTab: React.FC<SkillLibraryTabProps> = ({
                 </div>
 
                 {/* Shared Legend - Center */}
-                <div className="flex justify-center gap-3">
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-green-50/50 border border-green-200/50 rounded-full w-fit">
+                <div className="flex justify-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 bg-green-50/50 border border-green-200/50 rounded-full w-fit">
                         <CheckCircle2 size={10} className="text-green-600" />
                         <span className="text-[9px] font-bold text-green-800/70 uppercase tracking-tight whitespace-nowrap">Présent</span>
                     </div>
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50/50 border border-blue-200/50 rounded-full w-fit">
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-50/50 border border-blue-200/50 rounded-full w-fit">
                         <Globe size={10} className="text-indigo-600" />
                         <span className="text-[9px] font-bold text-indigo-800/70 uppercase tracking-tight whitespace-nowrap">Officiel</span>
+                    </div>
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-50/50 border border-amber-200/50 rounded-full w-fit">
+                        <Sparkles size={10} className="text-amber-600" />
+                        <span className="text-[9px] font-bold text-amber-800/70 uppercase tracking-tight whitespace-nowrap">Mystique</span>
+                    </div>
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-50/50 border border-blue-200/50 rounded-full w-fit">
+                        <Layers size={10} className="text-blue-600" />
+                        <span className="text-[9px] font-bold text-blue-800/70 uppercase tracking-tight whitespace-nowrap">Variant</span>
                     </div>
                 </div>
 
@@ -129,6 +137,11 @@ const SkillLibraryTab: React.FC<SkillLibraryTabProps> = ({
                                                 {skill.isVariable && (
                                                     <span title="Compétence à variations">
                                                         <Layers size={10} className="text-blue-600 shrink-0" />
+                                                    </span>
+                                                )}
+                                                {skill.mysticAbilityId && (
+                                                    <span title="Habilité Mystique">
+                                                        <Sparkles size={10} className="text-amber-500 shrink-0" />
                                                     </span>
                                                 )}
                                                 {isOfficial && (

@@ -1,5 +1,84 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.48.1] - 2026-02-13 [PATCH]
+
+- 📅 UX : L'icône calendrier ouvre désormais un sélecteur de date natif
+- ✍️ UX : Auto-focus et sélection automatique du texte lors de la création d'un chapitre pour une saisie immédiate
+
+## [2.48.0] - 2026-02-13 [MINOR]
+
+- 📖 Journal : Implémentation de la création manuelle de Chapitres/Sessions
+- 🛠️ Interface : Ajout d'une barre d'outils flottante persistante pour le formatage (Gras, Italique)
+- 🔖 Structure : Les chapitres forcent désormais un saut de page (double-page) pour une organisation claire du récit
+- 📅 Metadata : Intégration d'un champ Date intelligent au sein de chaque en-tête de chapitre
+- 🖼️ Média : Accès rapide à l'insertion d'images via la barre d'outils
+
+## [2.47.0] - 2026-02-13 [MINOR]
+
+- 🎨 UI : Ajustement précis des marges (100px table, 50px toolbar) pour un rendu premium
+- 🏛️ Structure : Calibration du tableau de groupe (PartyTable) sur les dimensions du grimoire (1484x1000px)
+- 📜 Esthétique : Migration vers un thème unifié 'Parchemin ivoire' (#fbf4e9) pour tout le module campagne
+- 🐞 Bugfix : Nettoyage automatique des pages vides lors de la suppression de texte
+- 📖 Expérience : Navigation intelligente (masquage flèches aux limites) et affichage forcé par paires de pages (spreads)
+- 🏗️ Robustesse : Correction du bug de décalage de 40px en fin de livre (ghost shift)
+
+## [2.46.0] - 2026-02-13 [MAJOR]
+
+- 📖 Journal : Implémentation du nouveau moteur 'Columnar' basé sur les colonnes CSS natives
+- 🚀 Performance : Suppression de toute la logique de pagination lourde au profit d'un rendu navigateur ultra-fluide
+- 🎨 UI : Nouveau design en double-page (spread) avec navigation ancrées et centrage dynamique
+- 🖼️ Média : Gestion optimisée des images (évite les coupes entre colonnes) et intégration Tiptap Image
+- 🧹 Clean Up : Suppression massive de code obsolète (BookLayout, FlipView, BookEditorContext, etc.)
+
+## [2.45.22] - 2026-02-13 [FIX]
+
+- 📖 Pagination : Correction du décalage Chapitres/Pages entre les modes Édition et Lecture
+- 🔧 Core : Robustesse de la détection de coupe (posAtDOM) pour supporter les overlays graphiques
+- 🧹 Code Clean : Suppression du code de debug (window.editor)
+
+## [2.45.21] - 2026-02-13 [FIX]
+
+- 📖 Livre : Correction de la pagination en mode Lecture. Les pages sont désormais calculées correctement même quand l'éditeur est masqué.
+- 📏 Dimensions : Ajustement des hauteurs (Page: 1000px, Cadre: 1200px) pour un meilleur équilibre entre espace et pagination cohérente.
+
+## [2.45.20] - 2026-02-13 [PATCH]
+
+- 📖 Livre : L'ombre de la pliure centrale est maintenant limitée à la hauteur réelle des pages du livre (et ne déborde plus sur l'en-tête)
+- 🏗️ Refactoring : Déplacement de la décoration de pliure dans BookFlipView pour un alignement au pixel près
+
+## [2.45.19] - 2026-02-13 [PATCH]
+
+- 👥 Groupe : Suppression de l'ombre de pliure centrale dans l'onglet Groupe pour une meilleure lisibilité du tableau
+
+## [2.45.18] - 2026-02-13 [PATCH]
+
+- 📖 Livre : Agrandissement vertical du cadre (1200px -> 1400px) et de l'effet table
+- 🎨 UI : Retrait de l'ombre de pliure centrale en mode Édition pour une vue plus 'plate' et moderne
+
+## [2.45.17] - 2026-02-13 [REFACTOR]
+
+- 🏗️ Architecture : Refactorisation majeure de CampaignNotes (suppression de DigitalBookEditor)
+- ⚡ Performance : Extraction de la logique de calcul des pages vers useBookPages
+- 🎨 UI : Correction des cadres imbriqués et suppression des backgrounds redondants
+
+## [2.45.16] - 2026-02-13 [PATCH]
+
+- 📖 Livre : Ajout d'une page vierge à droite si le nombre de pages est impair pour respecter l'aspect 'livre ouvert'
+- 🎨 UI : Masquage du numéro de page sur les pages vierges
+- 📐 Layout : Alignement vertical (Top) parfait entre les modes Édition et Lecture (0px delta)
+
+## [2.45.15] - 2026-02-12 [MINOR]
+
+- 📖 Livre numérique : Ajout d'une séparation visuelle entre les pages en mode édition
+- ✨ UX : Intégration de 'tiptap-pagination-plus' pour gérer les sauts de page dynamiquement
+- 📐 Layout : Ajustement des marges et du rendu pour correspondre au format papier
+
+## [2.45.14] - 2026-02-12 [PATCH]
+
+- 📖 Livre : Correction de la pagination pour éviter la disparition de la dernière ligne en bas de page
+- 📏 Algorithme : Prise en compte précise des marges et fusion des blocks (margin-collapse) lors du calcul des pages
+- ⚡ Performance : Optimisation de la découpe des longs paragraphes par recherche binaire
+
 ## [2.45.13] - 2026-02-12 [PATCH]
 
 - 📖 Livre : Suppression totale des barres de défilement (ascenseurs) en mode lecture pour une immersion parfaite

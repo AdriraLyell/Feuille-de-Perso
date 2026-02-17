@@ -60,7 +60,9 @@ export function useLibraryImport(
                 name: t.name,
                 data: t,
                 isSelected: true,
-                isDuplicate: (currentRules.libraries?.traits || []).some((l: any) => l.name === t.name),
+                isDuplicate: (currentRules.libraries?.traits || []).some((l: any) =>
+                    (t.definitionId && l.id === t.definitionId) || l.name?.trim().toLowerCase() === t.name?.trim().toLowerCase()
+                ),
                 isVariable: t.isVariable
             }));
             setTraitCandidates(traits);
@@ -76,7 +78,9 @@ export function useLibraryImport(
                             name: s.name,
                             data: { ...s, defaultCategory: catId },
                             isSelected: true,
-                            isDuplicate: (currentRules.libraries?.skills || []).some((l: any) => l.name === s.name),
+                            isDuplicate: (currentRules.libraries?.skills || []).some((l: any) =>
+                                (s.definitionId && l.id === s.definitionId) || l.name?.trim().toLowerCase() === s.name?.trim().toLowerCase()
+                            ),
                             isVariable: (s as any).isVariable
                         });
                     }
@@ -96,7 +100,9 @@ export function useLibraryImport(
                                     name: spec.name,
                                     data: spec,
                                     isSelected: true,
-                                    isDuplicate: false,
+                                    isDuplicate: (currentRules.libraries?.specializations || []).some((l: any) =>
+                                        l.name?.trim().toLowerCase() === spec.name?.trim().toLowerCase()
+                                    ),
                                     isVariable: false
                                 });
                             }
@@ -111,7 +117,9 @@ export function useLibraryImport(
                 name: b.name,
                 data: b,
                 isSelected: true,
-                isDuplicate: (currentRules.libraries?.backgrounds || []).some((l: any) => l.name === b.name),
+                isDuplicate: (currentRules.libraries?.backgrounds || []).some((l: any) =>
+                    (b.definitionId && l.id === b.definitionId) || l.name?.trim().toLowerCase() === b.name?.trim().toLowerCase()
+                ),
                 isVariable: false
             }));
             setBackgroundCandidates(backgrounds);
@@ -130,7 +138,9 @@ export function useLibraryImport(
                                 name: c.name,
                                 data: c,
                                 isSelected: true,
-                                isDuplicate: (currentRules.libraries?.counters || []).some((l: any) => l.name === c.name),
+                                isDuplicate: (currentRules.libraries?.counters || []).some((l: any) =>
+                                    (c.definitionId && l.id === c.definitionId) || l.name?.trim().toLowerCase() === c.name?.trim().toLowerCase()
+                                ),
                                 isVariable: false
                             });
                         }
@@ -140,12 +150,15 @@ export function useLibraryImport(
                         name: item.name,
                         data: item,
                         isSelected: true,
-                        isDuplicate: (currentRules.libraries?.counters || []).some((l: any) => l.name === item.name),
+                        isDuplicate: (currentRules.libraries?.counters || []).some((l: any) =>
+                            (item.definitionId && l.id === item.definitionId) || l.name?.trim().toLowerCase() === item.name?.trim().toLowerCase()
+                        ),
                         isVariable: false
                     });
                 }
             });
             setCounterCandidates(countersFlat);
+
 
         } catch (err) {
             logger.error("Failed to analyze character data for import", err);

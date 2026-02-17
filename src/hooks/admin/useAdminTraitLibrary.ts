@@ -82,6 +82,8 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
             name: '',
             type: typeFilter === false ? 'desavantage' : 'avantage',
             cost: '1',
+            pointsLabel: '1',
+            isVariableCost: false,
             description: '',
             tags: [],
             effects: []

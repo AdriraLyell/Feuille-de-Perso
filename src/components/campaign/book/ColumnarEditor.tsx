@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useEditor, EditorContent, JSONContent } from '@tiptap/react';
 import { getBookExtensions } from './extensions/bookExtensions';
 import { PAGE_WIDTH, PAGE_HEIGHT } from '../constants';
@@ -7,6 +7,7 @@ import { useBookTableOfContents } from './useBookTableOfContents';
 import { useColumnarNavigation } from './hooks/useColumnarNavigation';
 import { useColumnarDrawing } from './hooks/useColumnarDrawing';
 import { Editor } from '@tiptap/react';
+import { saveImage } from '../../../imageDB';
 
 const INK_COLORS = [
     { name: 'Noir Corbeau', color: '#1c1917' },
@@ -120,6 +121,28 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         });
         return () => cancelAnimationFrame(frame);
     }, []);
+
+    const handleQuickInsertImage = useCallback(() => {
+        if (!editor) return;
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (!file) return;
+            try {
+                const imageId = await saveImage(file);
+                editor.chain().focus().setBookImage({
+                    imageId,
+                    width: '50%',
+                    height: 'auto',
+                    fit: 'contain',
+                    align: 'center',
+                }).run();
+            } catch { /* silently fail */ }
+        };
+        input.click();
+    }, [editor]);
 
     if (!editor) return null;
 
@@ -319,6 +342,14 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                         Espace Image
+                    </button>
+                    <button
+                        onClick={handleQuickInsertImage}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded transition-all border font-serif font-bold text-[10px] uppercase h-8 bg-stone-800 text-stone-300 hover:bg-stone-700 border-stone-600"
+                        title="Insertion rapide d'image au curseur"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" /><line x1="16" y1="5" x2="22" y2="5" /><line x1="19" y1="2" x2="19" y2="8" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></svg>
+                        Image
                     </button>
                 </div>
             </div>
@@ -537,6 +568,14 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                         img, .book-image-view {
                             break-inside: avoid;
                             max-width: 100%;
+                        }
+
+                        /* Make TipTap node-view wrappers transparent for floated images
+                           so that float works properly (text wraps, images can be side-by-side) */
+                        .ProseMirror > [data-node-view-wrapper]:has(.book-image-view[data-align="left"]),
+                        .ProseMirror > [data-node-view-wrapper]:has(.book-image-view[data-align="right"]),
+                        .ProseMirror > [data-node-view-wrapper]:has(.book-image-view[data-align="free"]) {
+                            display: contents;
                         }
 
                         /* Custom Rich Styles for Grimoire */

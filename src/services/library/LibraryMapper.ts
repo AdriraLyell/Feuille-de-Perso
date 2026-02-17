@@ -20,6 +20,8 @@ export const LibraryMapper = {
         type: (t.type || 'avantage') as 'avantage' | 'desavantage',
         name: t.name,
         cost: String(t.points || '0'),
+        pointsLabel: t.points_label || String(t.points || '0'),
+        isVariableCost: t.is_variable_cost || false,
         description: t.description || '',
         tags: t.tags || [],
         isVariable: t.is_variable || false,

@@ -16,6 +16,7 @@ export const LibraryEntrySchema = z.object({
     type: z.enum(['avantage', 'desavantage', 'vertu', 'defaut']), // Support legacy terms if needed
     name: z.string(),
     cost: z.string().nullable().optional(),
+    pointsLabel: z.string().optional().default(''),
     description: z.string().nullable().optional(),
     tags: z.array(z.string()).nullable().optional(),
     isVariable: z.boolean().nullable().optional(),

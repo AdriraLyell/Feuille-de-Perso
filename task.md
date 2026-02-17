@@ -1,5 +1,17 @@
-# Tâches : Correction Migration & Contraintes Images Journal
+# Task: Free Movement for Journal Images
 
-- [ ] Appliquer la limite de hauteur (800px) dans `BookImageView.tsx` <!-- id: 0 -->
-- [ ] Corriger la logique de conversion de largeur dans `migrateCampaignNotes.ts` <!-- id: 1 -->
-- [ ] Vérifier la compilation (`npm run typecheck` ou build) <!-- id: 2 -->
+## Status
+- [x] Research & Planning
+  - [x] Analyze `bookImage.ts` and `BookImageView.tsx`
+  - [x] Identify positioning strategies for CSS Columns
+- [x] Implementation
+  - [x] Update `bookImage.ts` attributes
+  - [x] Implement "Free Move" mode in `BookImageView.tsx`
+  - [x] Add UI controls for free movement
+- [x] Verification
+  - [x] Test alignment switching
+  - [x] Test dragging in free mode
+  - [x] Test persistence of coordinates
+- [x] Finalization
+  - [x] Version bump & changelog
+  - [x] Documentation update

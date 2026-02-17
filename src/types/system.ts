@@ -66,7 +66,9 @@ export interface LibraryEntry {
   id: string;
   type: 'avantage' | 'desavantage'; // Renamed from vertu/defaut
   name: string;
-  cost: string;
+  cost: string; // The numeric part (primary cost or min)
+  pointsLabel: string; // The display label (ex: "1, 3, 5")
+  isVariableCost?: boolean;
   description: string;
   tags?: string[];
   isVariable?: boolean; // Si vrai, demande une précision (variant) à l'ajout

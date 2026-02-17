@@ -100,7 +100,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
 
                 {/* Name & Cost */}
                 <div className="grid grid-cols-4 gap-4">
-                    <div className="col-span-3">
+                    <div className="col-span-2">
                         <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest">Nom du Trait</label>
                         <input
                             className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm placeholder-stone-300"
@@ -110,14 +110,49 @@ const TraitForm: React.FC<TraitFormProps> = ({
                         />
                     </div>
                     <div className="col-span-1">
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest">Coût</label>
+                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest text-center truncate" title="Valeur Technique (BDD)">Valeur Pivot</label>
                         <input
+                            type="number"
                             className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-mono text-center focus:border-amber-500 outline-none text-[#1c1917] bg-white/50 shadow-sm font-bold"
                             value={editForm.cost}
-                            onChange={(e) => setEditForm({ ...editForm, cost: e.target.value })}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setEditForm({ ...editForm, cost: val, pointsLabel: editForm.isVariableCost ? editForm.pointsLabel : val });
+                            }}
                             placeholder="Pt"
                         />
                     </div>
+                    <div className="col-span-1">
+                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest text-center">Affichage</label>
+                        <input
+                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-mono text-center focus:border-amber-500 outline-none text-[#1c1917] bg-white/50 shadow-sm font-bold"
+                            value={editForm.pointsLabel}
+                            onChange={(e) => setEditForm({ ...editForm, pointsLabel: e.target.value })}
+                            placeholder="Ex: 1-5"
+                            disabled={!editForm.isVariableCost}
+                        />
+                    </div>
+                </div>
+
+                {/* Coût Multiple Toggle */}
+                <div className="flex items-center gap-3 px-1 -mt-2">
+                    <input
+                        type="checkbox"
+                        id="isVariableCost"
+                        className="w-4 h-4 accent-amber-600 cursor-pointer"
+                        checked={editForm.isVariableCost || false}
+                        onChange={(e) => {
+                            const checked = e.target.checked;
+                            setEditForm({
+                                ...editForm,
+                                isVariableCost: checked,
+                                pointsLabel: checked ? editForm.pointsLabel : editForm.cost
+                            });
+                        }}
+                    />
+                    <label htmlFor="isVariableCost" className="cursor-pointer select-none text-[10px] font-bold text-[#5c4d41] uppercase tracking-wide">
+                        Coût Variable ou Multiple <span className="text-[#bfae85]">(ex: 1-5, 1/3/5)</span>
+                    </label>
                 </div>
 
                 {/* Description */}

@@ -79,15 +79,22 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
     });
 
     // 4. Libraries Analysis
-    const analyzeLib = <T extends { id: string }>(curr: T[], cand: T[]) => {
+    const analyzeLib = <T extends { id: string, name?: string }>(curr: T[], cand: T[]) => {
         const stats = { new: 0, conflict: 0, identical: 0 };
-        const currMap = new Map(curr.map(i => [i.id, i]));
+        const currIdMap = new Map(curr.map(i => [i.id, i]));
+        const currNameMap = new Map(curr.filter(i => i.name).map(i => [i.name?.trim().toLowerCase(), i]));
 
         cand.forEach(item => {
-            if (!currMap.has(item.id)) {
+            const trimmedName = item.name?.trim().toLowerCase();
+            const existingById = currIdMap.get(item.id);
+            const existingByName = trimmedName ? currNameMap.get(trimmedName) : undefined;
+
+            const existing = existingById || existingByName;
+
+            if (!existing) {
                 stats.new++;
             } else {
-                if (isDifferent(currMap.get(item.id), item)) {
+                if (isDifferent(existing, item)) {
                     stats.conflict++;
                 } else {
                     stats.identical++;
@@ -103,6 +110,15 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
     if (candidate.libraries?.skills) {
         report.details.libraries.skills = analyzeLib(current.libraries?.skills || [], candidate.libraries.skills);
     }
+    if (candidate.libraries?.backgrounds) {
+        report.details.libraries.backgrounds = analyzeLib(current.libraries?.backgrounds || [], candidate.libraries.backgrounds);
+    }
+    if (candidate.libraries?.counters) {
+        report.details.libraries.counters = analyzeLib(current.libraries?.counters || [], candidate.libraries.counters);
+    }
+    if (candidate.libraries?.specializations) {
+        report.details.libraries.specializations = analyzeLib(current.libraries?.specializations || [], candidate.libraries.specializations);
+    }
 
     // Calculate Global Change Flag
     report.hasChanges =
@@ -110,8 +126,9 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
         report.details.attributes.length > 0 ||
         report.details.skills.length > 0 ||
         report.details.libraries.traits.new > 0 ||
-        report.details.libraries.traits.conflict > 0;
-    // ... (add others)
+        report.details.libraries.traits.conflict > 0 ||
+        report.details.libraries.skills.new > 0 ||
+        report.details.libraries.skills.conflict > 0;
 
     return report;
 };
@@ -153,19 +170,26 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
         // Ensure library buckets exist
         if (!result.libraries) result.libraries = { traits: [], skills: [], specializations: [], backgrounds: [], counters: [], mysticAbilities: [] };
 
-        const mergeLibList = <T extends { id: string }>(curr: T[], cand: T[]) => {
+        const mergeLibList = <T extends { id: string, name?: string }>(curr: T[], cand: T[]) => {
             const map = new Map(curr.map(i => [i.id, i]));
+            const nameMap = new Map(curr.filter(i => i.name).map(i => [i.name?.trim().toLowerCase(), i]));
 
             cand.forEach(item => {
-                if (!map.has(item.id)) {
+                const trimmedName = item.name?.trim().toLowerCase();
+                const existingById = map.get(item.id);
+                const existingByName = trimmedName ? nameMap.get(trimmedName) : undefined;
+
+                if (!existingById && !existingByName) {
                     // New item
                     map.set(item.id, item);
                 } else {
-                    // Conflict
+                    // Conflict (either same ID or same Name)
+                    const targetId = existingById ? item.id : (existingByName?.id || item.id);
+
                     if (options.libraryStrategy === 'overwrite') {
-                        map.set(item.id, item);
+                        map.set(targetId, item);
                     } else if (options.libraryStrategy === 'copy') {
-                        // Create copy with new ID
+                        // Create copy with new ID even if name matches
                         const copy = { ...item, id: crypto.randomUUID() };
                         map.set(copy.id, copy);
                     }
@@ -181,7 +205,17 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
         if (candidate.libraries?.skills) {
             result.libraries.skills = mergeLibList(current.libraries?.skills || [], candidate.libraries.skills);
         }
+        if (candidate.libraries?.backgrounds) {
+            result.libraries.backgrounds = mergeLibList(current.libraries?.backgrounds || [], candidate.libraries.backgrounds);
+        }
+        if (candidate.libraries?.counters) {
+            result.libraries.counters = mergeLibList(current.libraries?.counters || [], candidate.libraries.counters);
+        }
+        if (candidate.libraries?.specializations) {
+            result.libraries.specializations = mergeLibList(current.libraries?.specializations || [], candidate.libraries.specializations);
+        }
     }
+
 
     return result;
 };

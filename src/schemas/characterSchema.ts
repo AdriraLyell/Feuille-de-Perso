@@ -136,6 +136,7 @@ export const LibraryEntrySchema = z.object({
     type: z.enum(['avantage', 'desavantage']),
     name: z.string(),
     cost: z.string(),
+    pointsLabel: z.string().optional().default(''),
     description: z.string(),
     tags: z.array(z.string()).optional(),
     effects: z.array(TraitEffectSchema).optional()

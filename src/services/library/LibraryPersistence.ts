@@ -46,7 +46,9 @@ export const LibraryPersistence = {
                     // Add type-specific fields
                     if (typeCfg.key === 'traits') {
                         payload.type = item.type;
-                        payload.cost = item.cost;
+                        payload.points = parseInt(item.cost) || 0;
+                        payload.points_label = item.pointsLabel || item.cost;
+                        payload.is_variable_cost = item.isVariableCost || false;
                         payload.tags = item.tags || [];
                         payload.is_variable = item.isVariable;
                         payload.effects = item.effects || [];
@@ -96,7 +98,9 @@ export const LibraryPersistence = {
 
                 if (typeCfg.key === 'traits') {
                     payload.type = item.type;
-                    payload.cost = item.cost;
+                    payload.points = parseInt(item.cost) || 0;
+                    payload.points_label = item.pointsLabel || item.cost;
+                    payload.is_variable_cost = item.isVariableCost || false;
                     payload.tags = item.tags;
                     payload.is_variable = item.isVariable;
                     payload.effects = item.effects;

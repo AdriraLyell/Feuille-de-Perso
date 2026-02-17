@@ -16,6 +16,7 @@ describe('useCharacterBonuses Hook', () => {
             type: 'avantage',
             name: 'Robuste',
             cost: '1',
+            pointsLabel: '1',
             description: '',
             effects: [{ id: 'e1', type: 'attribute_bonus', target: 'constitution', value: 1 }]
         }];
@@ -38,6 +39,7 @@ describe('useCharacterBonuses Hook', () => {
                 type: 'avantage',
                 name: 'Agile',
                 cost: '1',
+                pointsLabel: '1',
                 description: '',
                 effects: [{ id: 'e1', type: 'attribute_bonus', target: 'dexterity', value: 1 }]
             },
@@ -46,6 +48,7 @@ describe('useCharacterBonuses Hook', () => {
                 type: 'avantage',
                 name: 'Chat',
                 cost: '1',
+                pointsLabel: '1',
                 description: '',
                 effects: [{ id: 'e2', type: 'attribute_bonus', target: 'dexterity', value: 1 }]
             }
