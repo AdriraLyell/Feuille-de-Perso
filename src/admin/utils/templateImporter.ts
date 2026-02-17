@@ -35,6 +35,21 @@ const normalizeInput = (json: any): CharacterSheetData | null => {
         } as CharacterSheetData;
     }
 
+    // 5. Direct Library Export (e.g. { libraries: { traits: [] } })
+    if (json.libraries && typeof json.libraries === 'object') {
+        const libs = json.libraries;
+        return {
+            header: { character_name: 'Library' } as any,
+            attributes: {},
+            skills: {},
+            library: libs.traits || [],
+            skillLibrary: libs.skills || libs.skillLibrary || [],
+            specializationLibrary: libs.specializations || [],
+            backgroundLibrary: libs.backgrounds || libs.backgroundLibrary || [],
+            counterLibrary: libs.counters || libs.counterLibrary || []
+        } as any;
+    }
+
     return null;
 }
 
@@ -196,6 +211,21 @@ export const extractRulesFromCharacter = (
     if (sheet.specializationLibrary && Array.isArray(sheet.specializationLibrary)) {
         newRules.libraries.specializations = sheet.specializationLibrary;
         success.push(`Bibliothèque de Spécialisations (${sheet.specializationLibrary.length} items)`);
+    }
+
+    if (sheet.backgroundLibrary && Array.isArray(sheet.backgroundLibrary)) {
+        newRules.libraries.backgrounds = sheet.backgroundLibrary;
+        success.push(`Bibliothèque d'Arrière-Plans (${sheet.backgroundLibrary.length} items)`);
+    }
+
+    if (sheet.counterLibrary && Array.isArray(sheet.counterLibrary)) {
+        newRules.libraries.counters = sheet.counterLibrary;
+        success.push(`Bibliothèque de Compteurs (${sheet.counterLibrary.length} items)`);
+    }
+
+    if (sheet.mysticAbilities && Array.isArray(sheet.mysticAbilities)) {
+        newRules.libraries.mysticAbilities = sheet.mysticAbilities;
+        success.push(`Bibliothèque d'Habilités Mystiques (${sheet.mysticAbilities.length} items)`);
     }
 
     return { rules: newRules, report: { success, warnings } };

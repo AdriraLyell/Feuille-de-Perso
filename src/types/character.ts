@@ -15,6 +15,8 @@ import {
   LibraryEntry,
   LibrarySkillEntry,
   LibrarySpecializationEntry,
+  LibraryBackgroundEntry,
+  LibraryCounterEntry,
   XPEntry,
   LogEntry,
   SuggestionEntry
@@ -90,6 +92,8 @@ export interface CharacterSheetData {
   library: LibraryEntry[]; // New field for the Virtue/Flaw library
   skillLibrary: LibrarySkillEntry[]; // New field for Skill Reserve
   specializationLibrary?: LibrarySpecializationEntry[]; // Catalogue de spécialisations réutilisables
+  backgroundLibrary?: LibraryBackgroundEntry[]; // Catalogue d'arrière-plans
+  counterLibrary?: LibraryCounterEntry[]; // Catalogue de compteurs
   mysticAbilities?: LibrarySkillEntry[]; // Categories of mystic powers (Martial Arts, Magic, etc.)
   xpLogs: XPEntry[];
   appLogs: LogEntry[];
