@@ -1,5 +1,18 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.48.9] - 2026-02-13 [PATCH]
+
+- 🎨 UI Image : Ajout de filtres visuels (Sépia, Noir & Blanc) pour coller à l'esthétique Grimoire
+- ✏️ Légendes : Édition directe des légendes sous les images
+- 🖼️ Design : Ajout d'un cadre 'photo' avec ombre portée pour dissocier l'image du parchemin
+
+## [2.48.8] - 2026-02-13 [MINOR]
+
+- 🖼️ Images : Phase 1 de l'optimisation du Grimoire
+- 💾 Stockage : Migration du Base64 vers IndexedDB (gain de place massif dans les sauvegardes)
+- 🔄 Auto-Migration : Script automatique convertissant les anciennes images lors du chargement ou de l'import
+- 🛠️ Extension : Activation de l'extension BookImage avec gestion de l'alignement et de la taille
+
 ## [2.48.7] - 2026-02-13 [PATCH]
 
 - 🛡️ Schéma : Correction critique du Zod schema pour inclure bookDocument (évite la perte de données au rechargement)

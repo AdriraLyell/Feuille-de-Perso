@@ -1,5 +1,25 @@
 [
     {
+        "version": "2.49.88",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "🖼️ Grimoire : Ajout du mode 'Déplacement Libre' (F) pour les images",
+            "🖱️ UX : Déplacement des images par Drag & Drop dans tout l'espace de la page",
+            "🔄 UI : Nouveau bouton de réinitialisation de la position et support des coordonnées persistantes"
+        ]
+    },
+    {
+        "version": "2.49.87",
+        "date": "2026-02-16",
+        "type": "fix",
+        "changes": [
+            "🐞 Sidebar : Fix du bouton Reset qui pouvait échouer selon l'état des données",
+            "⚠️ React : Correction de l'avertissement 'value prop on select should not be null'",
+            "🔧 Système : Robustesse accrue de la gestion des états de personnalisation (isCustomized)"
+        ]
+    },
+    {
         "version": "2.49.86",
         "date": "2026-02-16",
         "type": "feat",
@@ -974,27 +994,6 @@
         "changes": [
             "🛠️ Fix Image : Correction de la visibilité des contrôles sur les petites images (25%)",
             "📏 Mise en page : La barre d'outils de l'image peut désormais déborder du cadre et passer à la ligne si nécessaire"
-        ]
-    },
-    {
-        "version": "2.48.9",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🎨 UI Image : Ajout de filtres visuels (Sépia, Noir & Blanc) pour coller à l'esthétique Grimoire",
-            "✏️ Légendes : Édition directe des légendes sous les images",
-            "🖼️ Design : Ajout d'un cadre 'photo' avec ombre portée pour dissocier l'image du parchemin"
-        ]
-    },
-    {
-        "version": "2.48.8",
-        "date": "2026-02-13",
-        "type": "minor",
-        "changes": [
-            "🖼️ Images : Phase 1 de l'optimisation du Grimoire",
-            "💾 Stockage : Migration du Base64 vers IndexedDB (gain de place massif dans les sauvegardes)",
-            "🔄 Auto-Migration : Script automatique convertissant les anciennes images lors du chargement ou de l'import",
-            "🛠️ Extension : Activation de l'extension BookImage avec gestion de l'alignement et de la taille"
         ]
     }
 ]

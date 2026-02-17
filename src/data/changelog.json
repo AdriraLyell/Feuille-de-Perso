@@ -7,209 +7,191 @@
             "🎨 UI : Remplacement de l'intitulé 'Valeur / Coût' par 'Valeur' dans le configurateur de traits du joueur"
         ]
     },
-    "date": "2026-02-18",
-    "type": "feat",
-    "changes": [
-        "✨ Admin : Implémentation de l'Input de Coût Intelligent pour les traits",
-        "🪄 UI : Remplacement des termes techniques (Valeur Pivot, Affichage) par un champ unique auto-détecté",
-        "🔍 UX : Feedback visuel en temps réel sur l'interprétation du coût (Fixe, Plage, Liste)",
-        "🛠️ Core : Simplification radicale du formulaire d'édition des traits"
-    ]
-},
-{
-    "version": "2.55.1",
-    "date": "2026-02-18",
-    "type": "fix",
-    "changes": [
-        "🐞 Fix : Correction de la séquence de sélection pour les traits ayant à la fois des variants et un coût variable",
-        "🧹 UI : Masquage automatique de la saisie de variant pour les traits n'ayant que le coût comme variable",
-        "✨ Traits : Unification complète du système d'ajout",
-        "⚖️ Système : Support des coûts variables et listes de coûts",
-        "🛡️ Bibliothèque : Filtrage automatique des traits possédés"
-    ]
-},
-{
-    "version": "2.54.0",
-    "date": "2026-02-17",
-    "type": "feat",
-    "changes": [
-        "✨ Import : Fusion granulaire des conflits (choix des champs à écraser : Nom, Coût, Description, etc.)",
-        "🔍 UI : Visualisation détaillée des différences de valeurs lors de la résolution des conflits",
-        "🛡️ Système : Support des exclusions par champ dans le moteur de fusion des règles"
-    ]
-},
-{
-    "version": "2.53.0",
-    "date": "2026-02-17",
-    "type": "fix",
-    "changes": [
-        "🛠️ Admin : Correction de l'erreur 400 lors de la sauvegarde des traits (alignement SQL cost/points)",
-        "🛡️ Système : Amélioration de la détection d'erreurs en cascade pour garantir que la modale 'Sauvegarde Réussie' ne s'affiche qu'en cas de succès réel",
-        "📊 Bibliothèque : Support complet des coûts textuels (ex: '1-3', 'Variable') dans la couche de persistance"
-    ]
-},
-{
-    "version": "2.52.0",
-    "date": "2026-02-17",
-    "type": "feat",
-    "changes": [
-        "✅ Import : Sélection individuelle des items (nouveaux et conflits) via des cases à cocher",
-        "🎭 UI : Feedback dynamique des badges (Ignoré, Remplacé, Doublon, Exclu) en fonction de la stratégie",
-        "🛠️ Core : Support technique de l'exclusion via IDs uniques dans le moteur de fusion"
-    ]
-},
-{
-    "version": "2.51.0",
-    "date": "2026-02-17",
-    "type": "feat",
-    "changes": [
-        "🔍 UI : Ajout d'une vue détaillée des changements dans l'assistant d'importation (Nouveaux items et Conflits)",
-        "📋 Import : Comparaison précise des propriétés des items (coût, description, effets, etc.) avec visualisation Ancien vs Nouveau",
-        "🔠 Système : Détection inteligente ignorant la casse pour éviter les doublons tout en permettant la normalisation"
-    ]
-},
-{
-    "version": "2.50.1",
-    "date": "2026-02-17",
-    "type": "feat",
-    "changes": [
-        "📥 Système : Support de l'import de fichiers JSON partiels (ex: uniquement les traits ou compétences)",
-        "🛡️ Validation : Renforcement du schéma de données pour inclure toutes les bibliothèques dans les exports de fiches"
-    ]
-},
-{
-    "version": "2.50.0",
-    "date": "2026-02-17",
-    "type": "feat",
-    "changes": [
-        "🛡️ Admin : Renforcement de la détection des conflits lors de l'import (ID + Nom)",
-        "🧹 Bibliothèque : Prévention de la pollution par doublons visuels lors de l'import de fiches personnages",
-        "📥 Système : Amélioration de la robustesse de l'Assistant d'Importation pour tous les types de contenu (Traits, Skills, Backgrounds, Counters)"
-    ]
-},
-{
-    "version": "2.49.99",
-    "date": "2026-02-17",
-    "type": "feat",
-    "changes": [
-        "🛠️ Admin : Correction du bug de réinitialisation des coûts des traits (mismatch SQL points/cost)",
-        "📊 Bibliothèque : Implémentation des coûts variables et multiples (ex: 1-5, 1/3/5) avec libellés personnalisables",
-        "💾 Persistance : Ajout des colonnes points_label et is_variable_cost pour une gestion robuste des coûts en BDD"
-    ]
-},
-{
-    "version": "2.49.98",
-    "date": "2026-02-17",
-    "type": "feat",
-    "changes": [
-        "✨ Bibliothèque : Ajout de l'icône 'Habilités Mystiques' (Sparkles) dans la réserve de la fiche personnage",
-        "📊 UI : Implémentation d'une légende complète des icônes dans la réserve de compétences et la bibliothèque de traits"
-    ]
-},
-{
-    "version": "2.49.97",
-    "date": "2026-02-17",
-    "type": "fix",
-    "changes": [
-        "📝 Grimoire : Amélioration de la réactivité de l'enroulement (Wrap) par suppression des délais d'animation pendant le drag",
-        "🖼️ UX : Système de collision solide pour les images en mode libre, forçant le recalcul du flux dans les colonnes CSS"
-    ]
-},
-{
-    "version": "2.49.96",
-    "date": "2026-02-17",
-    "type": "fix",
-    "changes": [
-        "📝 Grimoire : Correction définitive de l'enroulement (Wrap) globale. Le texte est désormais physique poussé par l'image via un système de marges 4D (Haut/Bas/Gauche/Droite)",
-        "🖼️ Layout : Suppression des transformations visuelles (fantômes) pour garantir que le texte ne se cache plus jamais derrière une image"
-    ]
-},
-{
-    "version": "2.49.95",
-    "date": "2026-02-17",
-    "type": "fix",
-    "changes": [
-        "📝 Grimoire : L'enroulement du texte (Wrap) suit désormais le décalage vertical des images grâce à un système de marges dynamiques",
-        "🖱️ UX : Le bouton 'F' restaure désormais l'alignement latéral précédent (L/R) au lieu de forcer le centré",
-        "🖼️ Layout : Correction des chevauchements de texte en mode déplacement libre"
-    ]
-},
-{
-    "version": "2.49.94",
-    "date": "2026-02-17",
-    "type": "fix",
-    "changes": [
-        "🖱️ UX : Le bouton 'F' (Libre) permet désormais de basculer (toggle) entre le mode libre et le mode centré",
-        "🔄 Système : La désactivation du mode libre réinitialise automatiquement la position de l'image (Reset Offsets)"
-    ]
-},
-{
-    "version": "2.49.93",
-    "date": "2026-02-17",
-    "type": "fix",
-    "changes": [
-        "🛡️ UI : La barre d'outils suit désormais l'image dans ses déplacements libres (Flush Toolbar)",
-        "🔼 UX : La sélection d'une image la fait désormais passer au-dessus de tous les éléments (sommaire, menus) via un Z-index dynamique",
-        "🛠️ Système : Correction des problèmes d'images 'bloquées' derrière l'interface du grimoire"
-    ]
-},
-{
-    "version": "2.49.92",
-    "date": "2026-02-17",
-    "type": "feat",
-    "changes": [
-        "🖱️ UX : Double sens d'enroulement (Float L/R) désormais disponible en mode déplacement libre",
-        "📊 UI : Ajout d'un HUD (Head-Up Display) affichant les coordonnées X/Y et la taille en temps réel",
-        "🖼️ Grimoire : Guide de recadrage (Crop) ajusté pour exclure dynamiquement la bordure blanche",
-        "🔧 UX : Amélioration de la réactivité des poignées de redimensionnement et de sélection"
-    ]
-},
-{
-    "version": "2.49.91",
-    "date": "2026-02-17",
-    "type": "fix",
-    "changes": [
-        "🎨 UI : Le cadre de sélection bleu suit désormais précisément les dimensions de l'image même en déplacement libre",
-        "🛡️ Système : Désactivation intelligente du recadrage (Crop) sur les images à hauteur automatique",
-        "📋 Audit : Réalisation d'un audit complet du système d'images pour prévenir les conflits d'options"
-    ]
-},
-{
-    "version": "2.49.90",
-    "date": "2026-02-17",
-    "type": "fix",
-    "changes": [
-        "🖼️ Grimoire : Ajustement automatique de la largeur lors du passage en mode libre pour un meilleur enroulement",
-        "🎨 UI : Cadre de sélection plus serré (fit-content) sur les images libres"
-    ]
-},
-{
-    "version": "2.49.89",
-    "date": "2026-02-17",
-    "type": "fix",
-    "changes": [
-        "🖱️ UX : Le mode déplacement libre ne s'active désormais que lorsque l'image est sélectionnée",
-        "📖 Grimoire : Support de l'enroulement du texte (wrap) en mode déplacement libre"
-    ]
-},
-{
-    "version": "2.49.88",
-    "date": "2026-02-17",
-    "type": "feat",
-    "changes": [
-        "🖼️ Grimoire : Ajout du mode 'Déplacement Libre' (F) pour les images",
-        "🖱️ UX : Déplacement des images par Drag & Drop dans tout l'espace de la page",
-        "🔄 UI : Nouveau bouton de réinitialisation de la position et support des coordonnées persistantes"
-    ]
-},
-{
-    "version": "2.49.87",
-    "date": "2026-02-16",
-    "type": "fix",
-    "changes": [
-        "🐞 Sidebar : Fix du bouton Reset qui pouvait échouer selon l'état des données",
-        "⚠️ React : Correction de l'avertissement 'value prop on select should not be null'",
-        "🔧 Système : Robustesse accrue de la gestion des états de personnalisation (isCustomized)"
-    ]
-}
+    {
+        "version": "2.55.3",
+        "date": "2026-02-18",
+        "type": "feat",
+        "changes": [
+            "✨ Admin : Implémentation de l'Input de Coût Intelligent pour les traits",
+            "🪄 UI : Remplacement des termes techniques (Valeur Pivot, Affichage) par un champ unique auto-détecté",
+            "🔍 UX : Feedback visuel en temps réel sur l'interprétation du coût (Fixe, Plage, Liste)",
+            "🛠️ Core : Simplification radicale du formulaire d'édition des traits"
+        ]
+    },
+    {
+        "version": "2.55.1",
+        "date": "2026-02-18",
+        "type": "fix",
+        "changes": [
+            "🐞 Fix : Correction de la séquence de sélection pour les traits ayant à la fois des variants et un coût variable",
+            "🧹 UI : Masquage automatique de la saisie de variant pour les traits n'ayant que le coût comme variable",
+            "✨ Traits : Unification complète du système d'ajout",
+            "⚖️ Système : Support des coûts variables et listes de coûts",
+            "🛡️ Bibliothèque : Filtrage automatique des traits possédés"
+        ]
+    },
+    {
+        "version": "2.54.0",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "✨ Import : Fusion granulaire des conflits (choix des champs à écraser : Nom, Coût, Description, etc.)",
+            "🔍 UI : Visualisation détaillée des différences de valeurs lors de la résolution des conflits",
+            "🛡️ Système : Support des exclusions par champ dans le moteur de fusion des règles"
+        ]
+    },
+    {
+        "version": "2.53.0",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🛠️ Admin : Correction de l'erreur 400 lors de la sauvegarde des traits (alignement SQL cost/points)",
+            "🛡️ Système : Amélioration de la détection d'erreurs en cascade pour garantir que la modale 'Sauvegarde Réussie' ne s'affiche qu'en cas de succès réel",
+            "📊 Bibliothèque : Support complet des coûts textuels (ex: '1-3', 'Variable') dans la couche de persistance"
+        ]
+    },
+    {
+        "version": "2.52.0",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "✅ Import : Sélection individuelle des items (nouveaux et conflits) via des cases à cocher",
+            "🎭 UI : Feedback dynamique des badges (Ignoré, Remplacé, Doublon, Exclu) en fonction de la stratégie",
+            "🛠️ Core : Support technique de l'exclusion via IDs uniques dans le moteur de fusion"
+        ]
+    },
+    {
+        "version": "2.51.0",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "🔍 UI : Ajout d'une vue détaillée des changements dans l'assistant d'importation (Nouveaux items et Conflits)",
+            "📋 Import : Comparaison précise des propriétés des items (coût, description, effets, etc.) avec visualisation Ancien vs Nouveau",
+            "🔠 Système : Détection inteligente ignorant la casse pour éviter les doublons tout en permettant la normalisation"
+        ]
+    },
+    {
+        "version": "2.50.1",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "📥 Système : Support de l'import de fichiers JSON partiels (ex: uniquement les traits ou compétences)",
+            "🛡️ Validation : Renforcement du schéma de données pour inclure toutes les bibliothèques dans les exports de fiches"
+        ]
+    },
+    {
+        "version": "2.50.0",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "🛡️ Admin : Renforcement de la détection des conflits lors de l'import (ID + Nom)",
+            "🧹 Bibliothèque : Prévention de la pollution par doublons visuels lors de l'import de fiches personnages",
+            "📥 Système : Amélioration de la robustesse de l'Assistant d'Importation pour tous les types de contenu (Traits, Skills, Backgrounds, Counters)"
+        ]
+    },
+    {
+        "version": "2.49.99",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "🛠️ Admin : Correction du bug de réinitialisation des coûts des traits (mismatch SQL points/cost)",
+            "📊 Bibliothèque : Implémentation des coûts variables et multiples (ex: 1-5, 1/3/5) avec libellés personnalisables",
+            "💾 Persistance : Ajout des colonnes points_label et is_variable_cost pour une gestion robuste des coûts en BDD"
+        ]
+    },
+    {
+        "version": "2.49.98",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "✨ Bibliothèque : Ajout de l'icône 'Habilités Mystiques' (Sparkles) dans la réserve de la fiche personnage",
+            "📊 UI : Implémentation d'une légende complète des icônes dans la réserve de compétences et la bibliothèque de traits"
+        ]
+    },
+    {
+        "version": "2.49.97",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "📝 Grimoire : Amélioration de la réactivité de l'enroulement (Wrap) par suppression des délais d'animation pendant le drag",
+            "🖼️ UX : Système de collision solide pour les images en mode libre, forçant le recalcul du flux dans les colonnes CSS"
+        ]
+    },
+    {
+        "version": "2.49.96",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "📝 Grimoire : Correction définitive de l'enroulement (Wrap) globale. Le texte est désormais physique poussé par l'image via un système de marges 4D (Haut/Bas/Gauche/Droite)",
+            "🖼️ Layout : Suppression des transformations visuelles (fantômes) pour garantir que le texte ne se cache plus jamais derrière une image"
+        ]
+    },
+    {
+        "version": "2.49.95",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "📝 Grimoire : L'enroulement du texte (Wrap) suit désormais le décalage vertical des images grâce à un système de marges dynamiques",
+            "🖱️ UX : Le bouton 'F' restaure désormais l'alignement latéral précédent (L/R) au lieu de forcer le centré",
+            "🖼️ Layout : Correction des chevauchements de texte en mode déplacement libre"
+        ]
+    },
+    {
+        "version": "2.49.94",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🖱️ UX : Le bouton 'F' (Libre) permet désormais de basculer (toggle) entre le mode libre et le mode centré",
+            "🔄 Système : La désactivation du mode libre réinitialise automatiquement la position de l'image (Reset Offsets)"
+        ]
+    },
+    {
+        "version": "2.49.93",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🛡️ UI : La barre d'outils suit désormais l'image dans ses déplacements libres (Flush Toolbar)",
+            "🔼 UX : La sélection d'une image la fait désormais passer au-dessus de tous les éléments (sommaire, menus) via un Z-index dynamique",
+            "🛠️ Système : Correction des problèmes d'images 'bloquées' derrière l'interface du grimoire"
+        ]
+    },
+    {
+        "version": "2.49.92",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "🖱️ UX : Double sens d'enroulement (Float L/R) désormais disponible en mode déplacement libre",
+            "📊 UI : Ajout d'un HUD (Head-Up Display) affichant les coordonnées X/Y et la taille en temps réel",
+            "🖼️ Grimoire : Guide de recadrage (Crop) ajusté pour exclure dynamiquement la bordure blanche",
+            "🔧 UX : Amélioration de la réactivité des poignées de redimensionnement et de sélection"
+        ]
+    },
+    {
+        "version": "2.49.91",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🎨 UI : Le cadre de sélection bleu suit désormais précisément les dimensions de l'image même en déplacement libre",
+            "🛡️ Système : Désactivation intelligente du recadrage (Crop) sur les images à hauteur automatique",
+            "📋 Audit : Réalisation d'un audit complet du système d'images pour prévenir les conflits d'options"
+        ]
+    },
+    {
+        "version": "2.49.90",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🖼️ Grimoire : Ajustement automatique de la largeur lors du passage en mode libre pour un meilleur enroulement",
+            "🎨 UI : Cadre de sélection plus serré (fit-content) sur les images libres"
+        ]
+    },
+    {
+        "version": "2.49.89",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🖱️ UX : Le mode déplacement libre ne s'active désormais que lorsque l'image est sélectionnée",
+            "📖 Grimoire : Support de l'enroulement du texte (wrap) en mode déplacement libre"
+        ]
+    }
 ]
