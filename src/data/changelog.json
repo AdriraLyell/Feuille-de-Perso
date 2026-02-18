@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.56.4",
+        "date": "2026-02-18",
+        "changes": [
+            "fix(sheet): Correction de la saisie des variantes de compétences côté joueur",
+            "fix(sheet): Initialisation correcte du champ variant lors de l'ajout depuis la réserve",
+            "feat(sheet): Possibilité de modifier une variante déjà saisie"
+        ],
+        "type": "patch"
+    },
+    {
         "version": "2.56.3",
         "date": "2026-02-18",
         "changes": [
@@ -184,15 +194,6 @@
             "🛠️ Admin : Correction du bug de réinitialisation des coûts des traits (mismatch SQL points/cost)",
             "📊 Bibliothèque : Implémentation des coûts variables et multiples (ex: 1-5, 1/3/5) avec libellés personnalisables",
             "💾 Persistance : Ajout des colonnes points_label et is_variable_cost pour une gestion robuste des coûts en BDD"
-        ]
-    },
-    {
-        "version": "2.49.98",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "✨ Bibliothèque : Ajout de l'icône 'Habilités Mystiques' (Sparkles) dans la réserve de la fiche personnage",
-            "📊 UI : Implémentation d'une légende complète des icônes dans la réserve de compétences et la bibliothèque de traits"
         ]
     }
 ]

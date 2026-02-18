@@ -99,6 +99,7 @@ export const useCharacterSheetActions = (
                 value: 0,
                 creationValue: 0,
                 max: 5,
+                variant: itemData.isVariable ? "" : undefined,
                 description: itemData.description,
                 definitionId: itemData.id
             };

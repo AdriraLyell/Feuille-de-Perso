@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.48.19] - 2026-02-13 [PATCH]
+
+- 📸 Pan & Scan : Nouveau mode de recadrage interne pour les images en mode 'Remplir' (Cover)
+- 🖱️ Interaction : Cliquez sur l'icône de cadrage et faites glisser l'image à l'intérieur de son cadre pour choisir la meilleure zone
+- 💾 Sauvegarde : La position du cadrage (posX/posY) est désormais conservée par image
+- ✨ UI : Ajout d'indices visuels lors du mode recadrage
+
 ## [2.48.18] - 2026-02-13 [PATCH]
 
 - 🎨 Esthétique : Suppression du fond gris derrière les images (fond transparent)

@@ -71,7 +71,7 @@ const DotRow: React.FC<{
         : 5;
 
     const handleClick = () => {
-        if (isUndefinedVariable && onDefineVariant) {
+        if (entry.variant !== undefined && onDefineVariant) {
             onDefineVariant(category, entry.id, entry.name);
         } else if (hasSpecs) {
             setIsOpen(true);

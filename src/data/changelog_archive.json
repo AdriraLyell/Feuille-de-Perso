@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.49.98",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "✨ Bibliothèque : Ajout de l'icône 'Habilités Mystiques' (Sparkles) dans la réserve de la fiche personnage",
+            "📊 UI : Implémentation d'une légende complète des icônes dans la réserve de compétences et la bibliothèque de traits"
+        ]
+    },
+    {
         "version": "2.49.97",
         "date": "2026-02-17",
         "type": "fix",
@@ -976,17 +985,6 @@
         "changes": [
             "🛠️ Fix Toolbar : Correction d'un bug qui empêchait de quitter le mode 'Recadrage' à cause de l'interception des clics par le conteneur d'image",
             "🖱️ UX : La barre d'outils est désormais isolée des interactions de glissement de l'image"
-        ]
-    },
-    {
-        "version": "2.48.19",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "📸 Pan & Scan : Nouveau mode de recadrage interne pour les images en mode 'Remplir' (Cover)",
-            "🖱️ Interaction : Cliquez sur l'icône de cadrage et faites glisser l'image à l'intérieur de son cadre pour choisir la meilleure zone",
-            "💾 Sauvegarde : La position du cadrage (posX/posY) est désormais conservée par image",
-            "✨ UI : Ajout d'indices visuels lors du mode recadrage"
         ]
     }
 ]
