@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.56.7",
+        "date": "2026-02-18",
+        "changes": [
+            "fix(sheet): Activation immédiate de la saisie de variante lorsqu'une compétence devient variable suite à une mise à jour des règles"
+        ],
+        "type": "patch"
+    },
+    {
         "version": "2.56.6",
         "date": "2026-02-18",
         "changes": [
@@ -183,15 +191,6 @@
             "🔍 UI : Ajout d'une vue détaillée des changements dans l'assistant d'importation (Nouveaux items et Conflits)",
             "📋 Import : Comparaison précise des propriétés des items (coût, description, effets, etc.) avec visualisation Ancien vs Nouveau",
             "🔠 Système : Détection inteligente ignorant la casse pour éviter les doublons tout en permettant la normalisation"
-        ]
-    },
-    {
-        "version": "2.50.1",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "📥 Système : Support de l'import de fichiers JSON partiels (ex: uniquement les traits ou compétences)",
-            "🛡️ Validation : Renforcement du schéma de données pour inclure toutes les bibliothèques dans les exports de fiches"
         ]
     }
 ]

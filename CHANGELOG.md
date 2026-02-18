@@ -1,5 +1,13 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.0] - 2026-02-14 [MINOR]
+
+- ☁️ Cloud Sync : Activation de la synchronisation des images (Grimoire & Portraits) vers le cloud
+- 🗜️ Compression : Implémentation du pipeline WebP (qualité 50%) + GZIP pour minimiser le poids sur Supabase
+- 🔄 Synchronisation : Les images vous suivent désormais sur tous vos appareils via le Cloud
+- 👀 Admin : Les MJ peuvent désormais voir les illustrations des joueurs dans la vue Administrateur
+- 🛡️ Architecture : Conversion automatique IDs locaux <-> Données compressées lors des cycles de Sync
+
 ## [2.48.21] - 2026-02-13 [PATCH]
 
 - 🛠️ Fix Resizing : Correction des poignées de redimensionnement qui étaient masquées par le cadre blanc

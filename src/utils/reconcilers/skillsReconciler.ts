@@ -80,7 +80,8 @@ function processSkillCategories(
                             name,
                             definitionId,
                             max,
-                            description: description || existing.description
+                            description: description || existing.description,
+                            variant: existing.variant !== undefined ? existing.variant : ""
                         };
                     });
                 } else {
