@@ -18,7 +18,8 @@ const DotRow: React.FC<{
     allowExtendedSkills?: boolean;
     isEditing?: boolean;
     onRemove?: (category: string, id: string) => void;
-}> = ({ entry, category, onUpdate, specializations = [], theme, imposedSpecs = [], onDefineVariant, allowExtendedSkills = false, isEditing = false, onRemove }) => {
+    validateIncrease?: (id: string, newValue: number) => { allowed: boolean; reason?: string };
+}> = ({ entry, category, onUpdate, specializations = [], theme, imposedSpecs = [], onDefineVariant, allowExtendedSkills = false, isEditing = false, onRemove, validateIncrease }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     // Spacer logic
@@ -103,6 +104,25 @@ const DotRow: React.FC<{
 
     const textColor = getTextColor();
 
+    // Validation Check for Interaction
+    const handleUpdate = (val: number) => {
+        if (validateIncrease && val > entry.value) {
+            const check = validateIncrease(entry.id, val);
+            if (!check.allowed) {
+                // Show toast/alert? For now just block and maybe log
+                // Ideally we show a tooltip on hover if blocked?
+                // But DotRating handles clicks.
+                // We just won't call onUpdate if invalid?
+                // And show a browser alert or console warning is brutal.
+                // Let's rely on the parent to handle the "rejection" or just block.
+                logger.warn(`Skill increase blocked: ${check.reason}`);
+                alert(check.reason); // Simple fallback
+                return;
+            }
+        }
+        onUpdate('skills', category, entry.id, val);
+    };
+
     return (
         <div
             className={`flex justify-between items-center px-2 border-b border-dotted border-stone-300 h-5 hover:bg-stone-50 transition-colors relative group ${isEditing ? 'cursor-grab active:cursor-grabbing select-none' : ''}`}
@@ -166,7 +186,7 @@ const DotRow: React.FC<{
             <DotRating
                 value={entry.value}
                 creationValue={entry.creationValue}
-                onChange={(val: number) => onUpdate('skills', category, entry.id, val)}
+                onChange={handleUpdate}
                 className="scale-90 origin-right ml-auto"
                 creationColor={theme?.creationColor}
                 xpColor={theme?.xpColor}
@@ -202,7 +222,8 @@ export const SkillBlock = React.memo<{
     categoryBehavior?: 'Compétence' | 'Secondaire' | 'Arrière-plan' | 'Compteur';
     onDrop?: (category: string, item: any, targetIndex: number) => void;
     onRemove?: (category: string, id: string) => void;
-}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, isEditing = false, onDrop, onRemove }) => {
+    validateIncrease?: (id: string, newValue: number) => { allowed: boolean; reason?: string };
+}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, isEditing = false, onDrop, onRemove, validateIncrease }) => {
     const [showDesc, setShowDesc] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
     const [dropIndex, setDropIndex] = useState<number>(-1);
@@ -309,6 +330,7 @@ export const SkillBlock = React.memo<{
                             allowExtendedSkills={allowExtendedSkills}
                             isEditing={isEditing}
                             onRemove={onRemove}
+                            validateIncrease={validateIncrease}
                         />
                     );
                 })}

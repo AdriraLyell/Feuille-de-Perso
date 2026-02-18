@@ -128,20 +128,64 @@ const AdminMysticLibrary: React.FC<AdminMysticLibraryProps> = ({ rules, onUpdate
 
     const handleSave = () => {
         if (!editingItem) return;
-        if (!editingItem.name.trim()) { setError("Le nom est requis."); return; }
+        const itemName = editingItem.name.trim();
 
-        const duplicate = list.find(b => b.id !== editingItem.id && b.name.trim().toLowerCase() === editingItem.name.trim().toLowerCase());
+        if (!itemName) { setError("Le nom est requis."); return; }
+
+        const duplicate = list.find(b => b.id !== editingItem.id && b.name.trim().toLowerCase() === itemName.toLowerCase());
         if (duplicate) { setError("Une habilité portant ce nom existe déjà."); return; }
 
+        const updatedAbility = { ...editingItem, name: itemName };
+
         const newList = list.some(b => b.id === editingItem.id)
-            ? list.map(b => b.id === editingItem.id ? editingItem : b)
-            : [...list, editingItem];
+            ? list.map(b => b.id === editingItem.id ? updatedAbility : b)
+            : [...list, updatedAbility];
 
         newList.sort((a, b) => a.name.localeCompare(b.name));
 
+        // SYNC LOGIC: Auto-Manage associated Trait
+        const currentTraits = rules.libraries.traits || [];
+        // Find if a trait is already linked or matches name
+        let targetTraitIndex = currentTraits.findIndex(t =>
+            t.mysticAbilityId === editingItem.id ||
+            (!t.mysticAbilityId && t.name.toLowerCase() === itemName.toLowerCase())
+        );
+
+        let newTraits = [...currentTraits];
+        const traitBaseData = {
+            name: itemName,
+            type: 'avantage' as const,
+            isVariableCost: true,
+            cost: "1",
+            pointsLabel: "1-5",
+            description: editingItem.description || "Habilité mystique",
+            mysticAbilityId: editingItem.id, // Ensure link
+            isActive: editingItem.isActive,
+            isGlobal: editingItem.isGlobal,
+            tags: ['Mystique']
+        };
+
+        if (targetTraitIndex >= 0) {
+            // Update existing
+            newTraits[targetTraitIndex] = {
+                ...newTraits[targetTraitIndex],
+                ...traitBaseData
+            };
+        } else {
+            // Create new
+            newTraits.push({
+                id: crypto.randomUUID(),
+                ...traitBaseData
+            });
+        }
+
         onUpdate({
             ...rules,
-            libraries: { ...rules.libraries, mysticAbilities: newList }
+            libraries: {
+                ...rules.libraries,
+                mysticAbilities: newList,
+                traits: newTraits
+            }
         });
         setIsModalOpen(false);
         setEditingItem(null);

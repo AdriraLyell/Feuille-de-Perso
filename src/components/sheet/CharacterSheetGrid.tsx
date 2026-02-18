@@ -23,6 +23,7 @@ interface CharacterSheetGridProps {
     renderExtraColumn?: () => React.ReactNode;
     // For Portrait extra sections
     renderBottomSection?: () => React.ReactNode;
+    validateSkillIncrease?: (id: string, newValue: number) => { allowed: boolean; reason?: string };
 }
 
 const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
@@ -40,7 +41,8 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
     onDropItem,
     onRemoveItem,
     renderExtraColumn,
-    renderBottomSection
+    renderBottomSection,
+    validateSkillIncrease
 }) => {
 
     const renderSkillBlock = (block: SkillBlockType) => (
@@ -60,6 +62,7 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
             categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
             onDrop={onDropItem}
             onRemove={onRemoveItem}
+            validateIncrease={validateSkillIncrease}
         />
     );
 

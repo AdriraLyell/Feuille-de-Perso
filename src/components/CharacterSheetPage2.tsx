@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CharacterSheetData, TraitEntry } from '../types';
+import { CharacterSheetData, TraitEntry, LibraryEntry, LibrarySkillEntry } from '../types';
 import { BookOpen, X, Edit, Trash2, Check, CheckSquare } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import { useCharacter } from '../context/CharacterContext';
@@ -14,6 +14,7 @@ import TraitRow from './sheet/page2/TraitRow';
 import { Page2SectionHeader } from './sheet/page2/Page2Components';
 import { useTraitEditor } from '../hooks/sheet/useTraitEditor';
 import { useReputationManager } from '../hooks/sheet/useReputationManager';
+import MysticSkillWizard from './sheet/ui/MysticSkillWizard';
 
 interface Props {
     isLandscape?: boolean;
@@ -33,6 +34,84 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         updateReputationEntry,
         handleReputationKeyDown
     } = useReputationManager(data, onChange, onAddLog);
+
+    // Mystic Wizard State
+    const [wizardState, setWizardState] = React.useState<{ isOpen: boolean, mysticAbilityId: string | null, mysticAbilityName: string }>({
+        isOpen: false,
+        mysticAbilityId: null,
+        mysticAbilityName: ''
+    });
+
+    // Wrapped handleMultiAdd to detect Mystic Ability link
+    // Wrapped handleMultiAdd to detect Mystic Ability link
+    const handleMultiAddWrapper = (instances: { entry: LibraryEntry; variant?: string; cost?: string }[]) => {
+        handleMultiAdd(instances);
+
+        // Check for mystic ability links
+        // We only trigger wizard for the first mystic trait found (simpler UX for now)
+        // If multiple are added, user can manually add skills later or re-trigger via edit?
+        const mysticInstance = instances.find(instance => instance.entry.mysticAbilityId);
+
+        if (mysticInstance && rules?.configurations?.creation?.mysticAbilities?.active) {
+            // Open Wizard
+            setTimeout(() => {
+                setWizardState({
+                    isOpen: true,
+                    mysticAbilityId: mysticInstance.entry.mysticAbilityId!,
+                    mysticAbilityName: mysticInstance.entry.name
+                });
+            }, 100);
+        }
+    };
+
+    const handleWizardConfirm = (skillIds: string[]) => {
+        if (!wizardState.mysticAbilityId) return;
+
+        // Add skills to sheet
+        const newSkills = { ...data.skills };
+        let newLibrary = [...(data.skillLibrary || [])];
+        const libSkills = rules?.libraries?.skills || [];
+
+        let addedCount = 0;
+
+        skillIds.forEach(id => {
+            const skillDef = libSkills.find(s => s.id === id);
+            if (!skillDef) return;
+
+            // Ensure category exists
+            const category = skillDef.defaultCategory || 'Compétence';
+            if (!newSkills[category]) newSkills[category] = [];
+
+            // Check if already exists
+            const existing = newSkills[category].find(s => s.name === skillDef.name);
+            if (!existing) {
+                // Add to skills
+                newSkills[category].push({
+                    id: crypto.randomUUID(),
+                    name: skillDef.name,
+                    value: 1,
+                    max: 5,
+                    variant: skillDef.isVariable ? '' : undefined,
+                    description: skillDef.description
+                });
+
+                // Add to local library if not present
+                if (!newLibrary.find(l => l.id === skillDef.id)) {
+                    newLibrary.push(skillDef);
+                }
+                addedCount++;
+            }
+        });
+
+        if (addedCount > 0) {
+            onChange({
+                ...data,
+                skills: newSkills,
+                skillLibrary: newLibrary
+            });
+            onAddLog(`Ajout de ${addedCount} compétence(s) mystique(s) liée(s) à ${wizardState.mysticAbilityName}`, 'info', 'sheet', 'Compétences');
+        }
+    };
 
     const updateStringField = (field: keyof CharacterSheetData['page2'], value: string) => {
         onChange({ ...data, page2: { ...data.page2, [field]: value } });
@@ -164,9 +243,21 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                             <h3 className="font-bold text-lg flex items-center gap-2"><BookOpen size={20} />Ajouter des {multiSelectTarget === 'avantages' ? 'Avantages' : 'Désavantages'}</h3>
                             <button onClick={() => setMultiSelectTarget(null)} className="hover:bg-white/20 p-1 rounded transition-colors"><X size={24} /></button>
                         </div>
-                        <div className="flex-grow overflow-hidden relative"><TraitLibrary data={data} onUpdate={onChange} isEditable={false} defaultFilter={multiSelectTarget === 'avantages' ? 'avantage' : 'desavantage'} onMultiSelect={handleMultiAdd} hidePossessed={true} lockFilter={true} /></div>
+                        <div className="flex-grow overflow-hidden relative"><TraitLibrary data={data} onUpdate={onChange} isEditable={false} defaultFilter={multiSelectTarget === 'avantages' ? 'avantage' : 'desavantage'} onMultiSelect={handleMultiAddWrapper} hidePossessed={true} lockFilter={true} /></div>
                     </div>
                 </div>
+            )}
+
+            {wizardState.isOpen && wizardState.mysticAbilityId && rules && (
+                <MysticSkillWizard
+                    isOpen={wizardState.isOpen}
+                    onClose={() => setWizardState(prev => ({ ...prev, isOpen: false }))}
+                    onConfirm={handleWizardConfirm}
+                    mysticAbilityId={wizardState.mysticAbilityId}
+                    mysticAbilityName={wizardState.mysticAbilityName}
+                    sheet={data}
+                    rules={rules}
+                />
             )}
         </>
     );

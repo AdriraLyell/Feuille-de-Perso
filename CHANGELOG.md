@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.1] - 2026-02-14 [PATCH]
+
+- 🛡️ Typage Strict : Amélioration de la sécurité des types dans l'éditeur de compétences Admin
+- 🧹 Refactoring : Extraction de la logique de réconciliation des compétences et historiques vers `skillsReconciler.ts`
+- 🔧 Hooks : Renforcement du typage pour `useCharacterSheetActions` et suppression des `any` résiduels
+- 🐛 Fix : Correction des types pour `BookDocument` et `ChapterHeading`
+
 ## [2.49.0] - 2026-02-14 [MINOR]
 
 - ☁️ Cloud Sync : Activation de la synchronisation des images (Grimoire & Portraits) vers le cloud

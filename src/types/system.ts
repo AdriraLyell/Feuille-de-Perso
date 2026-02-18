@@ -83,6 +83,7 @@ export interface LibraryEntry {
   isActive?: boolean;
   isLocked?: boolean;
   globalUsage?: number;
+  mysticAbilityId?: string; // ID of the linked Mystic Ability
 }
 
 // Nouveau : Entrée pour la réserve de compétences

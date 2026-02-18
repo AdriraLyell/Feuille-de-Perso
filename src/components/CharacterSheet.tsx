@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { DotEntry, SkillCategoryKey, SuggestionEntry } from '../types';
 import { normalizeString } from '../utils/stringUtils';
 import { calculateCardValue } from '../utils/mechanics';
+import { canIncreaseMysticSkill, canLearnNewMysticSkill } from '../utils/mysticUtils';
 
 // Imports des sous-composants refactorisés
 import { AttributeBlock } from './sheet/AttributeBlock';
@@ -107,6 +108,25 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
 
     const { columns, backgrounds } = getDynamicColumns(isLandscape);
 
+    const validateSkillIncrease = useCallback((id: string, newValue: number) => {
+        // Find the skill by ID
+        const allSkills = Object.values(data.skills).flat();
+        const skill = allSkills.find(s => s.id === id);
+        if (!skill) return { allowed: true };
+
+        // 1. Check Learning (0 -> 1)
+        if (skill.value === 0 && newValue > 0) {
+            return canLearnNewMysticSkill(data, skill.name, rules, !!creationActive);
+        }
+
+        // 2. Check Increase (>0)
+        if (skill.value > 0 && newValue > skill.value) {
+            return canIncreaseMysticSkill(data, skill.name, rules);
+        }
+
+        return { allowed: true };
+    }, [data, rules, creationActive]);
+
     return (
         <div className={`sheet-container ${isLandscape ? 'landscape' : ''}`}>
 
@@ -174,6 +194,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 onDefineVariant={handleDefineVariant}
                 onDropItem={handleDropItem}
                 onRemoveItem={handleRemoveItem}
+                validateSkillIncrease={validateSkillIncrease}
                 renderExtraColumn={() => (
                     <>
                         <div className="flex-none border-b border-stone-400 overflow-hidden">

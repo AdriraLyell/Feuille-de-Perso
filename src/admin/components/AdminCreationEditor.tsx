@@ -8,6 +8,7 @@ import CampaignMetadataSettings from './creation/CampaignMetadataSettings';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 import { useCreationEditorActions } from '../hooks/useCreationEditorActions';
 import { ConfigQuickSummary } from './creation/ConfigQuickSummary';
+import CreationMysticSettings from './creation/CreationMysticSettings';
 
 interface AdminCreationEditorProps {
     rules: RulesData;
@@ -24,7 +25,8 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
         updateCardConfig,
         updateXPCost,
         updateRankSlot,
-        updateRootField
+        updateRootField,
+        updateMysticConfig
     } = useCreationEditorActions(rules, onUpdate);
 
     return (
@@ -57,6 +59,13 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
                             config={config}
                             onUpdateConfig={updateCreationConfig}
                             onUpdatePointsBuckets={updatePointsBuckets}
+                        />
+                    </MotionFade>
+
+                    <MotionFade delay={0.40}>
+                        <CreationMysticSettings
+                            config={config.mysticAbilities}
+                            onUpdate={updateMysticConfig}
                         />
                     </MotionFade>
 

@@ -39,7 +39,8 @@ export const useTraitEditor = (
                     description: entry.description,
                     tag: entry.tags?.[0] || '',
                     variant: instance.variant || '',
-                    definitionId: entry.id
+                    definitionId: entry.id,
+                    mysticAbilityId: entry.mysticAbilityId
                 };
                 addedCount++;
             }

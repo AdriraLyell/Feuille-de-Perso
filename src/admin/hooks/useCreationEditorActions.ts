@@ -92,12 +92,38 @@ export function useCreationEditorActions(rules: RulesData, onUpdate: (newRules: 
         });
     };
 
+    const updateMysticConfig = <K extends keyof NonNullable<RulesCreationConfig['mysticAbilities']>>(
+        field: K,
+        value: NonNullable<RulesCreationConfig['mysticAbilities']>[K]
+    ) => {
+        const currentMystic = rules.configurations.creation.mysticAbilities || {
+            active: false,
+            progressionWithoutTrait: false,
+            skillsPerLevel: { "1": 1, "2": 2, "3": 4, "4": 7, "5": -1 }
+        };
+
+        onUpdate({
+            ...rules,
+            configurations: {
+                ...rules.configurations,
+                creation: {
+                    ...rules.configurations.creation,
+                    mysticAbilities: {
+                        ...currentMystic,
+                        [field]: value
+                    }
+                }
+            }
+        });
+    };
+
     return {
         updateCreationConfig,
         updatePointsBuckets,
         updateCardConfig,
         updateXPCost,
         updateRankSlot,
-        updateRootField
+        updateRootField,
+        updateMysticConfig
     };
 }

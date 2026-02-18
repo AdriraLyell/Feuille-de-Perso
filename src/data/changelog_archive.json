@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.51.0",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "🔍 UI : Ajout d'une vue détaillée des changements dans l'assistant d'importation (Nouveaux items et Conflits)",
+            "📋 Import : Comparaison précise des propriétés des items (coût, description, effets, etc.) avec visualisation Ancien vs Nouveau",
+            "🔠 Système : Détection inteligente ignorant la casse pour éviter les doublons tout en permettant la normalisation"
+        ]
+    },
+    {
         "version": "2.50.1",
         "date": "2026-02-17",
         "type": "feat",
@@ -973,17 +983,6 @@
             "Correction des imports de types et signatures génériques dans les composants Admin",
             "Suppression des types 'any' résiduels dans LibraryLoader et LibraryImporter",
             "Validation du build complet sans erreurs de typage"
-        ]
-    },
-    {
-        "version": "2.49.1",
-        "date": "2026-02-14",
-        "type": "patch",
-        "changes": [
-            "🛡️ Typage Strict : Amélioration de la sécurité des types dans l'éditeur de compétences Admin",
-            "🧹 Refactoring : Extraction de la logique de réconciliation des compétences et historiques vers `skillsReconciler.ts`",
-            "🔧 Hooks : Renforcement du typage pour `useCharacterSheetActions` et suppression des `any` résiduels",
-            "🐛 Fix : Correction des types pour `BookDocument` et `ChapterHeading`"
         ]
     }
 ]
