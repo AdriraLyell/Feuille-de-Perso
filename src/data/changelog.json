@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.56.3",
+        "date": "2026-02-18",
+        "changes": [
+            "fix(logic): Correction de la lecture des surcharges 'isVariable' (gestion du NULL)",
+            "fix(logic): Les valeurs NULL en base sont désormais ignorées au profit de la définition globale, corrigeant la disparition des variantes."
+        ],
+        "type": "patch"
+    },
+    {
         "version": "2.56.2",
         "date": "2026-02-18",
         "changes": [
@@ -184,15 +193,6 @@
         "changes": [
             "✨ Bibliothèque : Ajout de l'icône 'Habilités Mystiques' (Sparkles) dans la réserve de la fiche personnage",
             "📊 UI : Implémentation d'une légende complète des icônes dans la réserve de compétences et la bibliothèque de traits"
-        ]
-    },
-    {
-        "version": "2.49.97",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "📝 Grimoire : Amélioration de la réactivité de l'enroulement (Wrap) par suppression des délais d'animation pendant le drag",
-            "🖼️ UX : Système de collision solide pour les images en mode libre, forçant le recalcul du flux dans les colonnes CSS"
         ]
     }
 ]

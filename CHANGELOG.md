@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.48.18] - 2026-02-13 [PATCH]
+
+- 🎨 Esthétique : Suppression du fond gris derrière les images (fond transparent)
+- 🖼️ Design : Renforcement du cadre blanc (5px) pour un effet 'Polaroid/Photo'
+- 🌗 Ombres : Amélioration des ombres portées pour une meilleure intégration sur le papier
+
 ## [2.48.17] - 2026-02-13 [PATCH]
 
 - 🎯 Centrage : Les images centrées respectent désormais leur largeur personnalisée (plus besoin de forcer 100%)

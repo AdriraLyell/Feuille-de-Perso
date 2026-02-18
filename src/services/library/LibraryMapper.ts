@@ -39,7 +39,7 @@ export const LibraryMapper = {
             name: rel?.name_override || s.name,
             description: rel?.description_override || s.description || '',
             defaultCategory: legacySkillMap[rel?.default_category || ''] || rel?.default_category || s.defaultCategory,
-            isVariable: rel?.is_variable_override !== undefined ? rel.is_variable_override : (s.is_variable || false),
+            isVariable: (rel?.is_variable_override !== undefined && rel?.is_variable_override !== null) ? rel.is_variable_override : (s.is_variable || false),
             variants: variants,
             isGlobal: s.setting_id == null,
             isActive: activeIds.has(s.id) || s.setting_id === sid,

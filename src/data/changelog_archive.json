@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.49.97",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "📝 Grimoire : Amélioration de la réactivité de l'enroulement (Wrap) par suppression des délais d'animation pendant le drag",
+            "🖼️ UX : Système de collision solide pour les images en mode libre, forçant le recalcul du flux dans les colonnes CSS"
+        ]
+    },
+    {
         "version": "2.49.96",
         "date": "2026-02-17",
         "type": "fix",
@@ -978,16 +987,6 @@
             "🖱️ Interaction : Cliquez sur l'icône de cadrage et faites glisser l'image à l'intérieur de son cadre pour choisir la meilleure zone",
             "💾 Sauvegarde : La position du cadrage (posX/posY) est désormais conservée par image",
             "✨ UI : Ajout d'indices visuels lors du mode recadrage"
-        ]
-    },
-    {
-        "version": "2.48.18",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🎨 Esthétique : Suppression du fond gris derrière les images (fond transparent)",
-            "🖼️ Design : Renforcement du cadre blanc (5px) pour un effet 'Polaroid/Photo'",
-            "🌗 Ombres : Amélioration des ombres portées pour une meilleure intégration sur le papier"
         ]
     }
 ]
