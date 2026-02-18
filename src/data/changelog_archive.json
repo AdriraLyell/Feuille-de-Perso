@@ -1,5 +1,82 @@
 [
     {
+        "version": "2.49.96",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "📝 Grimoire : Correction définitive de l'enroulement (Wrap) globale. Le texte est désormais physique poussé par l'image via un système de marges 4D (Haut/Bas/Gauche/Droite)",
+            "🖼️ Layout : Suppression des transformations visuelles (fantômes) pour garantir que le texte ne se cache plus jamais derrière une image"
+        ]
+    },
+    {
+        "version": "2.49.95",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "📝 Grimoire : L'enroulement du texte (Wrap) suit désormais le décalage vertical des images grâce à un système de marges dynamiques",
+            "🖱️ UX : Le bouton 'F' restaure désormais l'alignement latéral précédent (L/R) au lieu de forcer le centré",
+            "🖼️ Layout : Correction des chevauchements de texte en mode déplacement libre"
+        ]
+    },
+    {
+        "version": "2.49.94",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🖱️ UX : Le bouton 'F' (Libre) permet désormais de basculer (toggle) entre le mode libre et le mode centré",
+            "🔄 Système : La désactivation du mode libre réinitialise automatiquement la position de l'image (Reset Offsets)"
+        ]
+    },
+    {
+        "version": "2.49.93",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🛡️ UI : La barre d'outils suit désormais l'image dans ses déplacements libres (Flush Toolbar)",
+            "🔼 UX : La sélection d'une image la fait désormais passer au-dessus de tous les éléments (sommaire, menus) via un Z-index dynamique",
+            "🛠️ Système : Correction des problèmes d'images 'bloquées' derrière l'interface du grimoire"
+        ]
+    },
+    {
+        "version": "2.49.92",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "🖱️ UX : Double sens d'enroulement (Float L/R) désormais disponible en mode déplacement libre",
+            "📊 UI : Ajout d'un HUD (Head-Up Display) affichant les coordonnées X/Y et la taille en temps réel",
+            "🖼️ Grimoire : Guide de recadrage (Crop) ajusté pour exclure dynamiquement la bordure blanche",
+            "🔧 UX : Amélioration de la réactivité des poignées de redimensionnement et de sélection"
+        ]
+    },
+    {
+        "version": "2.49.91",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🎨 UI : Le cadre de sélection bleu suit désormais précisément les dimensions de l'image même en déplacement libre",
+            "🛡️ Système : Désactivation intelligente du recadrage (Crop) sur les images à hauteur automatique",
+            "📋 Audit : Réalisation d'un audit complet du système d'images pour prévenir les conflits d'options"
+        ]
+    },
+    {
+        "version": "2.49.90",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🖼️ Grimoire : Ajustement automatique de la largeur lors du passage en mode libre pour un meilleur enroulement",
+            "🎨 UI : Cadre de sélection plus serré (fit-content) sur les images libres"
+        ]
+    },
+    {
+        "version": "2.49.89",
+        "date": "2026-02-17",
+        "type": "fix",
+        "changes": [
+            "🖱️ UX : Le mode déplacement libre ne s'active désormais que lorsque l'image est sélectionnée",
+            "📖 Grimoire : Support de l'enroulement du texte (wrap) en mode déplacement libre"
+        ]
+    },
+    {
         "version": "2.49.88",
         "date": "2026-02-17",
         "type": "feat",
@@ -911,89 +988,6 @@
             "🎨 Esthétique : Suppression du fond gris derrière les images (fond transparent)",
             "🖼️ Design : Renforcement du cadre blanc (5px) pour un effet 'Polaroid/Photo'",
             "🌗 Ombres : Amélioration des ombres portées pour une meilleure intégration sur le papier"
-        ]
-    },
-    {
-        "version": "2.48.17",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🎯 Centrage : Les images centrées respectent désormais leur largeur personnalisée (plus besoin de forcer 100%)",
-            "📏 Correction Auto : Résolution du bug de hauteur infinie et de rendu vide pour les images verticales en mode Auto",
-            "💎 Stabilité : Amélioration de la robustesse CSS pour prévenir les dépendances circulaires de hauteur"
-        ]
-    },
-    {
-        "version": "2.48.16",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🖱️ Déplacement : Activation du Drag & Drop natif pour déplacer les images dans le flow du texte",
-            "🧹 Nettoyage : Suppression du filtre Sépia (obsolète)",
-            "🏗️ Stabilité : Correction des types d'images et nettoyage des imports"
-        ]
-    },
-    {
-        "version": "2.48.15",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🔳 Images : Ajout de poignées de redimensionnement multidirectionnelles",
-            "↔️ Axe Horizontal : Nouvelle barre latérale pour ajuster uniquement la largeur (avec magnétisme)",
-            "↕️ Axe Vertical : Nouvelle barre inférieure pour ajuster uniquement la hauteur",
-            "📐 Coin Diagonal : Conservation de la poignée de coin pour un redimensionnement libre",
-            "🖱️ Ergonomie : Curseurs contextuels indiquant l'axe de redimensionnement"
-        ]
-    },
-    {
-        "version": "2.48.14",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🔳 Images : Remplacement des boutons S/M/L par un redimensionnement manuel fluide",
-            "🧲 Aimant Magnétique : Le redimensionnement s'accroche proprement aux tailles standards (25%, 33%, 50%, 75%, 100%)",
-            "📝 Habillage Texte : Le texte enroule désormais les images alignées à gauche ou à droite",
-            "🛡️ Limites Intelligentes : L'image s'auto-limite à 55% de largeur en mode habillage pour préserver la lisibilité"
-        ]
-    },
-    {
-        "version": "2.48.13",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "✨ Journal : Restauration du traçage visuel des images",
-            "🖱️ Mode Dessin : Cliquer sur le bouton Image permet désormais de tracer directement un rectangle sur la page pour définir la zone d'insertion",
-            "📏 Intelligence : La largeur et la hauteur de l'image sont automatiquement calculées d'après votre tracé",
-            "🎯 Précision : L'image est insérée à l'emplacement exact (paragraphe) où vous relâchez la souris"
-        ]
-    },
-    {
-        "version": "2.48.12",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🔳 Images : Restauration du concept de 'Zone Rectangulaire'",
-            "📏 Contrôle Height : Ajout de boutons +/- pour ajuster la hauteur de l'image indépendamment de sa largeur",
-            "🖼️ Mode Remplissage : Ajout d'un bouton pour basculer entre 'Ajuster' (Contain) et 'Remplir' (Cover - zoom pour remplir le cadre)",
-            "🔄 Flexibilité : Bouton 'Auto' pour revenir au ratio naturel de l'image"
-        ]
-    },
-    {
-        "version": "2.48.11",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🛠️ Fix Layout : Correction de la mise à jour dynamique de la zone de défilement lors du redimensionnement massif d'images",
-            "📏 Pagination : Ajout d'un système de synchronisation plus robuste pour détecter les nouvelles pages créées par le reflow CSS"
-        ]
-    },
-    {
-        "version": "2.48.10",
-        "date": "2026-02-13",
-        "type": "patch",
-        "changes": [
-            "🛠️ Fix Image : Correction de la visibilité des contrôles sur les petites images (25%)",
-            "📏 Mise en page : La barre d'outils de l'image peut désormais déborder du cadre et passer à la ligne si nécessaire"
         ]
     }
 ]

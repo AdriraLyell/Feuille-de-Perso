@@ -322,6 +322,7 @@ const MainLayout: React.FC = () => {
                             isOpen={showAppearance}
                             onClose={() => setShowAppearance(false)}
                             data={data}
+                            rules={rules}
                             onUpdate={(newData) => setData(newData)}
                         />
                         <SyncModal

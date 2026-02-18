@@ -1,11 +1,16 @@
 
-import { CharacterSheetData, LibrarySkillEntry, DotEntry } from '../types';
+import { CharacterSheetData, LibrarySkillEntry, DotEntry, ThemeConfig } from '../types';
 import { createDotEntry, createAttributeEntry, createCombatEntry, generateId } from '../utils/factories';
 
-export const DEFAULT_THEME = {
+export const DEFAULT_THEME: ThemeConfig = {
   creationColor: '#2563eb', // blue-600
   xpColor: '#292524',       // stone-800
-  dotSymbol: 'circle'
+  dotSymbol: 'circle',
+  skillColors: {
+    variable: '#d97706',      // Amber-600 (Orange)
+    mysticDefault: '#8b5cf6', // Violet-500
+    mysticOverrides: {}
+  }
 };
 
 export const DEFAULT_MYSTIC_ABILITIES = [

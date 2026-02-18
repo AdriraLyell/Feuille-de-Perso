@@ -1,12 +1,13 @@
 
 import React from 'react';
 import { CharacterSheetData, ThemeConfig } from '../../types';
+import { RulesData } from '../../types/rules';
 import {
     Palette, RotateCcw, Circle, Square, Diamond, Triangle, Hexagon, Star, Heart,
     Zap, Shield, Skull, Plus, Sword, Flame, Moon, LucideIcon,
     Crown, Ghost, Axe, Hammer, Eye, Droplets, Wind, Sun, Cloud,
     Target, Crosshair, Trophy, Key, Anchor, Feather, PawPrint,
-    TreeDeciduous, Mountain, Waves
+    TreeDeciduous, Mountain, Waves, Sparkles, Layers, RefreshCcw
 } from 'lucide-react';
 import { DEFAULT_THEME } from '../../data/initialState';
 
@@ -14,17 +15,63 @@ interface AppearanceEditorProps {
     data: CharacterSheetData;
     onUpdate: (newData: CharacterSheetData) => void;
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings') => void;
+    rules: RulesData | null;
 }
 
-const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onAddLog }) => {
-    const theme = data.theme || DEFAULT_THEME;
+const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onAddLog, rules }) => {
+    const theme: ThemeConfig = data.theme || DEFAULT_THEME;
 
-    const updateTheme = (field: keyof ThemeConfig, value: string) => {
+    const updateTheme = (field: keyof ThemeConfig, value: any) => {
         onUpdate({
             ...data,
             theme: {
                 ...theme,
                 [field]: value
+            }
+        });
+    };
+
+    const updateSkillColor = (key: 'variable' | 'mysticDefault', value: string) => {
+        onUpdate({
+            ...data,
+            theme: {
+                ...theme,
+                skillColors: {
+                    ...(theme.skillColors || {}),
+                    [key]: value
+                }
+            }
+        });
+    };
+
+    const updateMysticOverride = (abilityId: string, value: string) => {
+        onUpdate({
+            ...data,
+            theme: {
+                ...theme,
+                skillColors: {
+                    ...(theme.skillColors || {}),
+                    mysticOverrides: {
+                        ...(theme.skillColors?.mysticOverrides || {}),
+                        [abilityId]: value
+                    }
+                }
+            }
+        });
+    };
+
+    const removeMysticOverride = (abilityId: string) => {
+        const newOverrides = { ...(theme.skillColors?.mysticOverrides || {}) };
+        delete newOverrides[abilityId];
+
+        onUpdate({
+            ...data,
+            theme: {
+                ...theme,
+                skillColors: {
+                    ...(theme.skillColors || {}),
+                    mysticOverrides: newOverrides
+                }
             }
         });
     };
@@ -65,11 +112,6 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                                 className="w-12 h-12 border-none rounded-sm cursor-pointer bg-white shadow-sm ring-1 ring-[#bfae85]/30"
                             />
                             <div className="flex-grow flex flex-col justify-center">
-                                <div className="flex gap-1.5 mb-1">
-                                    <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: theme.creationColor }}></span>
-                                    <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: theme.creationColor }}></span>
-                                    <span className="w-4 h-4 rounded-full border border-[#bfae85] bg-transparent"></span>
-                                </div>
                                 <span className="text-xs font-mono font-bold text-[#5c4d41]">{theme.creationColor}</span>
                             </div>
                         </div>
@@ -86,15 +128,126 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                                 className="w-12 h-12 border-none rounded-sm cursor-pointer bg-white shadow-sm ring-1 ring-[#bfae85]/30"
                             />
                             <div className="flex-grow flex flex-col justify-center">
-                                <div className="flex gap-1.5 mb-1">
-                                    <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: theme.xpColor }}></span>
-                                    <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: theme.xpColor }}></span>
-                                    <span className="w-4 h-4 rounded-full border border-[#bfae85] bg-transparent"></span>
-                                </div>
                                 <span className="text-xs font-mono font-bold text-[#5c4d41]">{theme.xpColor}</span>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Skill Text Colors Section */}
+                <div className="mt-6 border-t border-[#bfae85]/30 pt-4">
+                    <h5 className="font-bold text-[#5c4d41] uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
+                        <Palette size={14} className="text-[#8b2e2e]" /> Couleurs des Textes (Compétences)
+                    </h5>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* 1. Variable Skills */}
+                        <div className="space-y-3 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <label className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest flex items-center gap-1.5">
+                                        <Layers size={12} /> Compétences Variables
+                                    </label>
+                                    <p className="text-[10px] text-[#5c4d41]/70 mb-2 italic">Ex: Artisanat, Savoir, Langue...</p>
+                                </div>
+                                {theme.skillColors?.variable && (
+                                    <button
+                                        onClick={() => updateSkillColor('variable', '')}
+                                        className="text-[10px] text-[#5c4d41]/40 hover:text-red-500"
+                                        title="Réinitialiser (Défaut)"
+                                    >
+                                        <RefreshCcw size={10} />
+                                    </button>
+                                )}
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="color"
+                                    value={theme.skillColors?.variable || '#4a3b32'}
+                                    onChange={(e) => updateSkillColor('variable', e.target.value)}
+                                    className="w-10 h-10 border-none rounded-sm cursor-pointer bg-white shadow-sm ring-1 ring-[#bfae85]/30"
+                                />
+                                <span className="text-xs font-bold" style={{ color: theme.skillColors?.variable || '#4a3b32' }}>
+                                    Exemple de Nom
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* 2. Default Mystic */}
+                        <div className="space-y-3 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <label className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest flex items-center gap-1.5">
+                                        <Sparkles size={12} /> Mystique (Défaut)
+                                    </label>
+                                    <p className="text-[10px] text-[#5c4d41]/70 mb-2 italic">Couleur de base des habilités mystiques.</p>
+                                </div>
+                                {theme.skillColors?.mysticDefault && (
+                                    <button
+                                        onClick={() => updateSkillColor('mysticDefault', '')}
+                                        className="text-[10px] text-[#5c4d41]/40 hover:text-red-500"
+                                        title="Réinitialiser (Défaut)"
+                                    >
+                                        <RefreshCcw size={10} />
+                                    </button>
+                                )}
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="color"
+                                    value={theme.skillColors?.mysticDefault || '#b45309'}
+                                    onChange={(e) => updateSkillColor('mysticDefault', e.target.value)}
+                                    className="w-10 h-10 border-none rounded-sm cursor-pointer bg-white shadow-sm ring-1 ring-[#bfae85]/30"
+                                />
+                                <span className="text-xs font-bold" style={{ color: theme.skillColors?.mysticDefault || '#b45309' }}>
+                                    Exemple de Pouvoir
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 3. Mystic Overrides */}
+                    {rules?.libraries?.mysticAbilities && rules.libraries.mysticAbilities.length > 0 && (
+                        <div className="mt-4 space-y-3 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20">
+                            <label className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest">Surcharges par Habilité</label>
+                            <p className="text-[10px] text-[#5c4d41]/70 italic mb-3">Définissez une couleur spécifique pour chaque voie mystique.</p>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                {rules.libraries.mysticAbilities.map(ability => {
+                                    // Logic for resolving current color: Override > Default > Fallback
+                                    const hasOverride = theme.skillColors?.mysticOverrides?.[ability.id];
+                                    const currentColor = hasOverride
+                                        || theme.skillColors?.mysticDefault
+                                        || '#b45309';
+
+                                    return (
+                                        <div key={ability.id} className="flex items-center gap-2 bg-white/40 p-2 rounded border border-[#bfae85]/20">
+                                            <input
+                                                type="color"
+                                                value={currentColor}
+                                                onChange={(e) => updateMysticOverride(ability.id, e.target.value)}
+                                                className="w-6 h-6 border-none rounded-sm cursor-pointer bg-white shadow-sm ring-1 ring-[#bfae85]/30 shrink-0"
+                                            />
+                                            <div className="flex-grow min-w-0">
+                                                <span className="block text-[10px] font-bold truncate" style={{ color: currentColor }}>
+                                                    {ability.name}
+                                                </span>
+                                            </div>
+                                            {hasOverride && (
+                                                <button
+                                                    onClick={() => removeMysticOverride(ability.id)}
+                                                    className="text-stone-400 hover:text-red-500 shrink-0"
+                                                    title="Réinitialiser"
+                                                >
+                                                    <RotateCcw size={10} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Symbol Selection */}

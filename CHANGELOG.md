@@ -1,5 +1,56 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.48.17] - 2026-02-13 [PATCH]
+
+- 🎯 Centrage : Les images centrées respectent désormais leur largeur personnalisée (plus besoin de forcer 100%)
+- 📏 Correction Auto : Résolution du bug de hauteur infinie et de rendu vide pour les images verticales en mode Auto
+- 💎 Stabilité : Amélioration de la robustesse CSS pour prévenir les dépendances circulaires de hauteur
+
+## [2.48.16] - 2026-02-13 [PATCH]
+
+- 🖱️ Déplacement : Activation du Drag & Drop natif pour déplacer les images dans le flow du texte
+- 🧹 Nettoyage : Suppression du filtre Sépia (obsolète)
+- 🏗️ Stabilité : Correction des types d'images et nettoyage des imports
+
+## [2.48.15] - 2026-02-13 [PATCH]
+
+- 🔳 Images : Ajout de poignées de redimensionnement multidirectionnelles
+- ↔️ Axe Horizontal : Nouvelle barre latérale pour ajuster uniquement la largeur (avec magnétisme)
+- ↕️ Axe Vertical : Nouvelle barre inférieure pour ajuster uniquement la hauteur
+- 📐 Coin Diagonal : Conservation de la poignée de coin pour un redimensionnement libre
+- 🖱️ Ergonomie : Curseurs contextuels indiquant l'axe de redimensionnement
+
+## [2.48.14] - 2026-02-13 [PATCH]
+
+- 🔳 Images : Remplacement des boutons S/M/L par un redimensionnement manuel fluide
+- 🧲 Aimant Magnétique : Le redimensionnement s'accroche proprement aux tailles standards (25%, 33%, 50%, 75%, 100%)
+- 📝 Habillage Texte : Le texte enroule désormais les images alignées à gauche ou à droite
+- 🛡️ Limites Intelligentes : L'image s'auto-limite à 55% de largeur en mode habillage pour préserver la lisibilité
+
+## [2.48.13] - 2026-02-13 [PATCH]
+
+- ✨ Journal : Restauration du traçage visuel des images
+- 🖱️ Mode Dessin : Cliquer sur le bouton Image permet désormais de tracer directement un rectangle sur la page pour définir la zone d'insertion
+- 📏 Intelligence : La largeur et la hauteur de l'image sont automatiquement calculées d'après votre tracé
+- 🎯 Précision : L'image est insérée à l'emplacement exact (paragraphe) où vous relâchez la souris
+
+## [2.48.12] - 2026-02-13 [PATCH]
+
+- 🔳 Images : Restauration du concept de 'Zone Rectangulaire'
+- 📏 Contrôle Height : Ajout de boutons +/- pour ajuster la hauteur de l'image indépendamment de sa largeur
+- 🖼️ Mode Remplissage : Ajout d'un bouton pour basculer entre 'Ajuster' (Contain) et 'Remplir' (Cover - zoom pour remplir le cadre)
+- 🔄 Flexibilité : Bouton 'Auto' pour revenir au ratio naturel de l'image
+
+## [2.48.11] - 2026-02-13 [PATCH]
+
+- 🛠️ Fix Layout : Correction de la mise à jour dynamique de la zone de défilement lors du redimensionnement massif d'images
+- 📏 Pagination : Ajout d'un système de synchronisation plus robuste pour détecter les nouvelles pages créées par le reflow CSS
+
+## [2.48.10] - 2026-02-13 [PATCH]
+
+- 🛠️ Fix Image : Correction de la visibilité des contrôles sur les petites images (25%)
+- 📏 Mise en page : La barre d'outils de l'image peut désormais déborder du cadre et passer à la ligne si nécessaire
+
 ## [2.48.9] - 2026-02-13 [PATCH]
 
 - 🎨 UI Image : Ajout de filtres visuels (Sépia, Noir & Blanc) pour coller à l'esthétique Grimoire

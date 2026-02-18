@@ -1,19 +1,21 @@
 
 import React from 'react';
 import ThematicModal from './ui/ThematicModal';
+import ThematicButton from './ui/ThematicButton';
 import AppearanceEditor from './settings/AppearanceEditor';
 import { Palette, X } from 'lucide-react';
 import { CharacterSheetData } from '../types';
-import ThematicButton from './ui/ThematicButton';
+import { RulesData } from '../types/rules';
 
 interface AppearanceModalProps {
     isOpen: boolean;
     onClose: () => void;
     data: CharacterSheetData;
     onUpdate: (newData: CharacterSheetData) => void;
+    rules: RulesData | null;
 }
 
-const AppearanceModal: React.FC<AppearanceModalProps> = ({ isOpen, onClose, data, onUpdate }) => {
+const AppearanceModal: React.FC<AppearanceModalProps> = ({ isOpen, onClose, data, onUpdate, rules }) => {
     return (
         <ThematicModal
             isOpen={isOpen}
@@ -31,7 +33,7 @@ const AppearanceModal: React.FC<AppearanceModalProps> = ({ isOpen, onClose, data
         >
             <div className="p-4">
                 {/* Reuse existing logic directly from AppearanceEditor */}
-                <AppearanceEditor data={data} onUpdate={onUpdate} onAddLog={() => { }} />
+                <AppearanceEditor data={data} onUpdate={onUpdate} onAddLog={() => { }} rules={rules} />
             </div>
         </ThematicModal>
     );

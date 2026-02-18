@@ -113,7 +113,12 @@ export const CreationConfigSchema = z.object({
 export const ThemeConfigSchema = z.object({
     creationColor: z.string(),
     xpColor: z.string(),
-    dotSymbol: z.string().optional()
+    dotSymbol: z.string().optional(),
+    skillColors: z.object({
+        variable: z.string().optional(),
+        mysticDefault: z.string().optional(),
+        mysticOverrides: z.record(z.string(), z.string()).optional()
+    }).optional()
 });
 
 export const ExperienceDataSchema = z.object({

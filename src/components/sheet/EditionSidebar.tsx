@@ -8,9 +8,11 @@ import {
     Search,
     X,
     Target,
-    Sparkles
+    Sparkles,
+    Layers,
+    Globe
 } from 'lucide-react';
-import { LibrarySkillEntry } from '../../types';
+import { LibrarySkillEntry, DotEntry } from '../../types';
 
 interface EditionSidebarProps {
     onClose: () => void;
@@ -28,8 +30,8 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
     // Get all currently placed items (skills and backgrounds)
     const currentItemNames = useMemo(() => {
         const names = new Set<string>();
-        Object.values(data.skills).forEach(categorySkills => {
-            categorySkills.forEach(skill => {
+        Object.values(data.skills).forEach((categorySkills: DotEntry[]) => {
+            categorySkills.forEach((skill: DotEntry) => {
                 if (skill.name) names.add(skill.name.trim().toLowerCase());
             });
         });
@@ -39,7 +41,7 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
     // Filter available items from libraries
     const availableItems = useMemo(() => {
         const library = activeTab === 'skills' ? (rules?.libraries?.skills || []) : (rules?.libraries?.backgrounds || []);
-        return library.filter(item => {
+        return library.filter((item: LibrarySkillEntry) => {
             if (item.isActive === false) return false;
 
             const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -175,7 +177,7 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                         <p className="text-sm text-slate-500 italic">Aucun résultat</p>
                     </div>
                 ) : (
-                    availableItems.map((item) => (
+                    availableItems.map((item: LibrarySkillEntry) => (
                         <div
                             key={item.id}
                             draggable
@@ -188,11 +190,32 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                                     <span className="text-sm font-medium text-slate-200 truncate group-hover:text-white transition-colors">
                                         {item.name}
                                     </span>
-                                    {item.isVariable && (
-                                        <span className="text-[10px] text-[#bfae85]/70 flex items-center gap-1">
-                                            <Sparkles size={10} /> Variable
-                                        </span>
-                                    )}
+                                    <div className="flex items-center gap-1.5 min-w-0 mt-0.5">
+                                        {(item.isVariable || item.mysticAbilityId || item.isGlobal) && (
+                                            <div className="flex items-center gap-1 shrink-0">
+                                                {item.isVariable && (
+                                                    <span title="Variations">
+                                                        <Layers size={10} className="text-blue-400" />
+                                                    </span>
+                                                )}
+                                                {item.mysticAbilityId && (
+                                                    <span title="Mystique">
+                                                        <Sparkles size={10} className="text-amber-400" />
+                                                    </span>
+                                                )}
+                                                {item.isGlobal && (
+                                                    <span title="Officiel">
+                                                        <Globe size={10} className="text-indigo-400" />
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+                                        {item.description && (
+                                            <p className="text-[9px] text-slate-500 italic truncate opacity-70 group-hover:opacity-100 transition-opacity">
+                                                {item.description}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             <Plus size={14} className="text-slate-600 group-hover:text-[#bfae85] opacity-0 group-hover:opacity-100 transition-all" />

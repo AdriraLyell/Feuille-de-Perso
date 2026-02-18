@@ -1,4 +1,5 @@
 import { DatabaseService } from '../../services/DatabaseService';
+import { supabase } from '../../services/supabase';
 import { RulesData } from '../../types/rules';
 import { LIBRARY_TYPE_CONFIG } from '../../constants/db';
 
@@ -105,7 +106,7 @@ export const LibraryPersistence = {
                     payload.is_variable = item.isVariable;
                     payload.effects = item.effects;
                 } else if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds') {
-                    payload.is_variable = item.isVariable;
+                    payload.is_variable = !!item.isVariable;
                     if (typeCfg.key === 'skills') {
                         // SURGICAL: If it's a customization in a setting, do not overwrite global mystic link
                         if (item.isCustomized && settingId) {
@@ -153,7 +154,7 @@ export const LibraryPersistence = {
                     // SKILL OVERRIDES
                     if (typeCfg.key === 'skills' && item.isCustomized) {
                         link.name_override = item.name;
-                        link.is_variable_override = item.isVariable;
+                        link.is_variable_override = !!item.isVariable;
                         link.mystic_ability_id_override = item.mysticAbilityId;
                         link.description_override = item.description;
                     }
@@ -165,19 +166,39 @@ export const LibraryPersistence = {
             // 3. Refresh VARIANTS (if applicable)
             if ('variants' in typeCfg && typeCfg.variants) {
                 const variantsTable = typeCfg.variants as string;
+
+                // A. Delete all LOCAL variants for this setting
                 await DatabaseService.deleteBy(variantsTable, 'setting_id', settingId, `LibraryPersistence.sync.${typeCfg.key}.deleteVariants`);
+
+                // B. Surgical cleanup for GLOBAL variants of the items we are processing
+                // This prevents duplicates and ensures the global repository is in sync
+                const globalItemIds = currentItems
+                    .filter((i: any) => i.isGlobal && !i.isCustomized)
+                    .map((i: any) => i.id);
+
+                if (globalItemIds.length > 0) {
+                    await supabase.from(variantsTable)
+                        .delete()
+                        .in(typeCfg.idKey, globalItemIds)
+                        .is('setting_id', null);
+                }
+
                 const variantsPayload: any[] = [];
                 currentItems.forEach((item: any) => {
                     if (item.variants && item.variants.length > 0) {
+                        const isGlobalItem = item.isGlobal && !item.isCustomized;
+                        const targetSid = isGlobalItem ? null : settingId;
+
                         item.variants.forEach((v: string) => {
                             variantsPayload.push({
                                 [typeCfg.idKey]: item.id,
-                                setting_id: settingId,
+                                setting_id: targetSid,
                                 name: v
                             });
                         });
                     }
                 });
+
                 if (variantsPayload.length > 0) {
                     await DatabaseService.insert(variantsTable, variantsPayload, `LibraryPersistence.sync.${typeCfg.key}.insertVariants`);
                 }

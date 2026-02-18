@@ -45,6 +45,11 @@ export interface ThemeConfig {
   creationColor: string; // Couleur des points "acquis à la création"
   xpColor: string;       // Couleur des points "acquis par XP"
   dotSymbol?: string;    // Forme des points de notation
+  skillColors?: {
+    variable?: string;
+    mysticDefault?: string;
+    mysticOverrides?: Record<string, string>;
+  };
 }
 
 export interface ExperienceData {

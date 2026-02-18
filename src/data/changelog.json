@@ -1,5 +1,83 @@
 [
     {
+        "version": "2.56.2",
+        "date": "2026-02-18",
+        "changes": [
+            "fix(logic): Correction robuste de la persistance du flag 'isVariable' (booléens stricts)",
+            "fix(logic): Empêche les valeurs null/undefined en base d'écraser le statut variable au rechargement"
+        ],
+        "type": "patch"
+    },
+    {
+        "version": "2.56.1",
+        "date": "2026-02-18",
+        "changes": [
+            "fix(admin): Correction de la sauvegarde des variantes pour les compétences globales",
+            "fix(logic): Les variantes des compétences de la réserve sont désormais correctement partagées entre toutes les campagnes",
+            "fix(logic): Nettoyage chirurgical des doublons de variantes lors de la synchronisation"
+        ],
+        "type": "patch"
+    },
+    {
+        "version": "2.56.0",
+        "date": "2026-02-18",
+        "changes": [
+            "feat(ui): Nouvelles couleurs par défaut pour les compétences",
+            "style(theme): Orange (#d97706) pour les compétences variables",
+            "style(theme): Violet (#8b5cf6) pour les habilités mystiques",
+            "fix(logic): Alignement des fallbacks de couleurs sur le nouveau thème"
+        ],
+        "type": "minor"
+    },
+    {
+        "version": "2.55.9",
+        "date": "2026-02-18",
+        "changes": [
+            "fix(ui): Correction de l'application des couleurs personnalisées sur la feuille",
+            "fix(logic): Réactivation de l'enrichissement des métadonnées pour les Arrière-plans",
+            "fix(logic): Robustesse de la détection des compétences variables"
+        ],
+        "type": "patch"
+    },
+    {
+        "version": "2.55.8",
+        "date": "2026-02-18",
+        "changes": [
+            "fix(ui): Restauration des couleurs par défaut des points (Bleu pour Création, Pierre pour XP)",
+            "chore: Alignement des paramètres par défaut du thème"
+        ],
+        "type": "patch"
+    },
+    {
+        "version": "2.55.7",
+        "date": "2026-02-18",
+        "changes": [
+            "feat(ui): Ajout de la personnalisation des couleurs pour les compétences variables et mystiques",
+            "fix(ts): Résolution des erreurs de typage dans ThemeConfig et SkillBlock",
+            "fix(ui): Correction de l'import manquant de ThematicButton dans AppearanceModal"
+        ],
+        "type": "minor"
+    },
+    {
+        "version": "2.55.6",
+        "date": "2026-02-18",
+        "type": "fix",
+        "changes": [
+            "🎨 UI : Repositionnement des icônes descriptives sous le nom des compétences dans la barre latérale",
+            "📏 UX : Optimisation de l'alignement vertical entre icônes et descriptions pour une meilleure lisibilité"
+        ]
+    },
+    {
+        "version": "2.55.5",
+        "date": "2026-02-18",
+        "type": "feat",
+        "changes": [
+            "✨ UI : Ajout des icônes descriptives (Mystique, Variations, Officiel) dans la barre latérale du mode Édition",
+            "🔍 UX : Affichage des descriptions des compétences et historiques dans la liste d'édition pour faciliter le choix",
+            "🛡️ Système : Correction des types et suppression des attributs HTML invalides dans la barre latérale"
+        ]
+    },
+    {
         "version": "2.55.4",
         "date": "2026-02-18",
         "type": "fix",
@@ -115,83 +193,6 @@
         "changes": [
             "📝 Grimoire : Amélioration de la réactivité de l'enroulement (Wrap) par suppression des délais d'animation pendant le drag",
             "🖼️ UX : Système de collision solide pour les images en mode libre, forçant le recalcul du flux dans les colonnes CSS"
-        ]
-    },
-    {
-        "version": "2.49.96",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "📝 Grimoire : Correction définitive de l'enroulement (Wrap) globale. Le texte est désormais physique poussé par l'image via un système de marges 4D (Haut/Bas/Gauche/Droite)",
-            "🖼️ Layout : Suppression des transformations visuelles (fantômes) pour garantir que le texte ne se cache plus jamais derrière une image"
-        ]
-    },
-    {
-        "version": "2.49.95",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "📝 Grimoire : L'enroulement du texte (Wrap) suit désormais le décalage vertical des images grâce à un système de marges dynamiques",
-            "🖱️ UX : Le bouton 'F' restaure désormais l'alignement latéral précédent (L/R) au lieu de forcer le centré",
-            "🖼️ Layout : Correction des chevauchements de texte en mode déplacement libre"
-        ]
-    },
-    {
-        "version": "2.49.94",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🖱️ UX : Le bouton 'F' (Libre) permet désormais de basculer (toggle) entre le mode libre et le mode centré",
-            "🔄 Système : La désactivation du mode libre réinitialise automatiquement la position de l'image (Reset Offsets)"
-        ]
-    },
-    {
-        "version": "2.49.93",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🛡️ UI : La barre d'outils suit désormais l'image dans ses déplacements libres (Flush Toolbar)",
-            "🔼 UX : La sélection d'une image la fait désormais passer au-dessus de tous les éléments (sommaire, menus) via un Z-index dynamique",
-            "🛠️ Système : Correction des problèmes d'images 'bloquées' derrière l'interface du grimoire"
-        ]
-    },
-    {
-        "version": "2.49.92",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "🖱️ UX : Double sens d'enroulement (Float L/R) désormais disponible en mode déplacement libre",
-            "📊 UI : Ajout d'un HUD (Head-Up Display) affichant les coordonnées X/Y et la taille en temps réel",
-            "🖼️ Grimoire : Guide de recadrage (Crop) ajusté pour exclure dynamiquement la bordure blanche",
-            "🔧 UX : Amélioration de la réactivité des poignées de redimensionnement et de sélection"
-        ]
-    },
-    {
-        "version": "2.49.91",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🎨 UI : Le cadre de sélection bleu suit désormais précisément les dimensions de l'image même en déplacement libre",
-            "🛡️ Système : Désactivation intelligente du recadrage (Crop) sur les images à hauteur automatique",
-            "📋 Audit : Réalisation d'un audit complet du système d'images pour prévenir les conflits d'options"
-        ]
-    },
-    {
-        "version": "2.49.90",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🖼️ Grimoire : Ajustement automatique de la largeur lors du passage en mode libre pour un meilleur enroulement",
-            "🎨 UI : Cadre de sélection plus serré (fit-content) sur les images libres"
-        ]
-    },
-    {
-        "version": "2.49.89",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🖱️ UX : Le mode déplacement libre ne s'active désormais que lorsque l'image est sélectionnée",
-            "📖 Grimoire : Support de l'enroulement du texte (wrap) en mode déplacement libre"
         ]
     }
 ]
