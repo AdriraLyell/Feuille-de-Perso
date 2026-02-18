@@ -111,7 +111,8 @@ function processSkillCategories(
                         max,
                         name,
                         description: description || existing.description,
-                        definitionId
+                        definitionId,
+                        variant: (existing.variant === "" || existing.variant === undefined) ? undefined : existing.variant
                     }];
                 } else {
                     return [{

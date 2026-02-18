@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.48.21] - 2026-02-13 [PATCH]
+
+- 🛠️ Fix Resizing : Correction des poignées de redimensionnement qui étaient masquées par le cadre blanc
+- 📏 Précision : Décalage des poignées vers l'extérieur et augmentation de leur priorité visuelle (z-index)
+
 ## [2.48.20] - 2026-02-13 [PATCH]
 
 - 🛠️ Fix Toolbar : Correction d'un bug qui empêchait de quitter le mode 'Recadrage' à cause de l'interception des clics par le conteneur d'image

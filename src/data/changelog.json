@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.56.6",
+        "date": "2026-02-18",
+        "changes": [
+            "fix(sheet): Nettoyage automatique des variants vides lorsque le statut 'variable' est désactivé dans l'Admin",
+            "fix(sheet): Correction du bug d'affichage orange persistant après désactivation du statut variant"
+        ],
+        "type": "patch"
+    },
+    {
         "version": "2.56.5",
         "date": "2026-02-18",
         "changes": [
@@ -183,16 +192,6 @@
         "changes": [
             "📥 Système : Support de l'import de fichiers JSON partiels (ex: uniquement les traits ou compétences)",
             "🛡️ Validation : Renforcement du schéma de données pour inclure toutes les bibliothèques dans les exports de fiches"
-        ]
-    },
-    {
-        "version": "2.50.0",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "🛡️ Admin : Renforcement de la détection des conflits lors de l'import (ID + Nom)",
-            "🧹 Bibliothèque : Prévention de la pollution par doublons visuels lors de l'import de fiches personnages",
-            "📥 Système : Amélioration de la robustesse de l'Assistant d'Importation pour tous les types de contenu (Traits, Skills, Backgrounds, Counters)"
         ]
     }
 ]
