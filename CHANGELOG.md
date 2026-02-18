@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.48.20] - 2026-02-13 [PATCH]
+
+- 🛠️ Fix Toolbar : Correction d'un bug qui empêchait de quitter le mode 'Recadrage' à cause de l'interception des clics par le conteneur d'image
+- 🖱️ UX : La barre d'outils est désormais isolée des interactions de glissement de l'image
+
 ## [2.48.19] - 2026-02-13 [PATCH]
 
 - 📸 Pan & Scan : Nouveau mode de recadrage interne pour les images en mode 'Remplir' (Cover)
