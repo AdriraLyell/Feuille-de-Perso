@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { UploadCloud, AlertTriangle, CheckCircle, RefreshCw, MessageSquare, History, RotateCcw } from 'lucide-react';
 import ThematicModal from './ui/ThematicModal';
 import { CharacterSyncService, CharacterHistoryEntry } from '../services/CharacterSyncService';
