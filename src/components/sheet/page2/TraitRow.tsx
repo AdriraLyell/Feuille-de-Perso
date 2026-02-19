@@ -1,15 +1,16 @@
 
 import React from 'react';
 import { TraitEntry } from '../../../types';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Wand2 } from 'lucide-react';
 
 interface TraitRowProps {
     item: TraitEntry;
     onClick: () => void;
     onRemove: (e: React.MouseEvent) => void;
+    onManageMystic?: (e: React.MouseEvent) => void;
 }
 
-const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove }) => {
+const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove, onManageMystic }) => {
     const isEmpty = !item.name.trim();
 
     return (
@@ -32,6 +33,19 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove }) => {
                     {item.variant && <span className="font-bold ml-1 text-slate-600">: {item.variant}</span>}
                 </span>
             </div>
+
+            {!isEmpty && item.mysticAbilityId && onManageMystic && (
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onManageMystic(e);
+                    }}
+                    className="opacity-100 sm:opacity-0 group-hover:opacity-100 text-purple-400 hover:text-purple-600 scale-75 transition-all shrink-0 p-1 hover:bg-purple-50 rounded"
+                    title="Gérer les compétences mystiques"
+                >
+                    <Wand2 size={14} />
+                </div>
+            )}
 
             {!isEmpty && (
                 <div

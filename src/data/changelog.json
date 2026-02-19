@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.56.10",
+        "date": "2026-02-19",
+        "changes": [
+            "fix(ui): Amélioration de la lisibilité du Wizard Mystique (fond sombre)",
+            "fix(logic): Correction du calcul des capacités mystiques via l'injection d'ID proactive",
+            "fix(logic): Résolution du problème de visibilité des compétences ajoutées (mapping des colonnes)",
+            "ux(wizard): Fermeture automatique de l'assistant après confirmation"
+        ],
+        "type": "patch"
+    },
+    {
         "version": "2.56.9",
         "date": "2026-02-19",
         "changes": [
@@ -181,16 +192,6 @@
             "✨ Import : Fusion granulaire des conflits (choix des champs à écraser : Nom, Coût, Description, etc.)",
             "🔍 UI : Visualisation détaillée des différences de valeurs lors de la résolution des conflits",
             "🛡️ Système : Support des exclusions par champ dans le moteur de fusion des règles"
-        ]
-    },
-    {
-        "version": "2.53.0",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🛠️ Admin : Correction de l'erreur 400 lors de la sauvegarde des traits (alignement SQL cost/points)",
-            "🛡️ Système : Amélioration de la détection d'erreurs en cascade pour garantir que la modale 'Sauvegarde Réussie' ne s'affiche qu'en cas de succès réel",
-            "📊 Bibliothèque : Support complet des coûts textuels (ex: '1-3', 'Variable') dans la couche de persistance"
         ]
     }
 ]

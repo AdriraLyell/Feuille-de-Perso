@@ -6,6 +6,8 @@ trigger: always_on
 
 Ces règles sont la source de vérité pour le comportement de l'agent dans ce workspace.
 
+Privilégier le Francais dans les docs/rapports/plans
+
 ## 1. ARCHITECTURE & PRINCIPES
 - **Hybrid Database Engine** : Supabase est maître. L'app est "Online First", mais doit TOUJOURS fonctionner Offline (via `default_rules.json`).
 - **Chirurgie du Code** : Modifications minimales et précises. Ne jamais réécrire un fichier complet inutilement.

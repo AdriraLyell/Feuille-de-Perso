@@ -51,14 +51,30 @@ export const getMysticCapacity = (sheet: CharacterSheetData, mysticAbilityId: st
 
     // Count skills linked to this ability that have value > 0 (are learned)
     // We scan all skill categories
+    // Count skills linked to this ability that have value > 0 (are learned)
+    // We scan all skill categories
     let current = 0;
     const allSkills = Object.values(sheet.skills).flat();
-    const skillLibrary = sheet.skillLibrary || [];
+    const skillLibrary = rules?.libraries?.skills || []; // Use rules library for definition source
 
     allSkills.forEach(skill => {
         if (skill.value > 0) {
-            const abilityId = isMysticSkill(skill, skillLibrary);
-            if (abilityId === mysticAbilityId) {
+            // Check linkage via multiple methods
+            let isLinked = false;
+
+            // 1. Direct link on skill instance (if copied)
+            if ('mysticAbilityId' in skill && (skill as any).mysticAbilityId === mysticAbilityId) {
+                isLinked = true;
+            }
+            // 2. Link via Library definition
+            else {
+                const libDef = skillLibrary.find(s => s.name === skill.name);
+                if (libDef && libDef.mysticAbilityId === mysticAbilityId) {
+                    isLinked = true;
+                }
+            }
+
+            if (isLinked) {
                 current++;
             }
         }

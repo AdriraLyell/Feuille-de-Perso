@@ -87,7 +87,7 @@ const MysticSkillWizard: React.FC<MysticSkillWizardProps> = ({
                 </>
             }
         >
-            <div className="space-y-4">
+            <div className="space-y-4 bg-stone-900 p-6 rounded-lg border border-stone-700">
                 {/* Capacity Info */}
                 <div className="bg-purple-900/20 border border-purple-500/30 rounded p-4 flex items-center justify-between">
                     <div>

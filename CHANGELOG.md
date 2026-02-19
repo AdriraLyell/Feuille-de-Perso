@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.3] - 2026-02-14 [REFACTOR]
+
+- 🧠 Refactoring : Extraction massive des sections de `CharacterReadOnlyView.tsx` en 10 sous-composants modulaires
+- 📚 Admin : Décomposition de `AdminSpecializationLibrary.tsx` pour une meilleure maintenance
+- 🚀 Performance : Réduction de la taille des fichiers composants et isolation des responsabilités UI
+- 🎨 UI : Conservation de l'esthétique premium tout en simplifiant la structure du code
+
 ## [2.49.2] - 2026-02-14 [FEAT]
 
 - Renforcement du typage strict des éditeurs Admin (Creation, Counters, Skills)

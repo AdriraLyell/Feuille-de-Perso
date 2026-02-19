@@ -8,6 +8,7 @@ import { useCharacter } from '../context/CharacterContext';
 import { useRules } from '../context/RulesContext';
 
 // Imports Refactorisés
+import { LEGACY_SKILL_MAP } from '../utils/migrations/migrateSkills';
 import NotebookInput from './shared/NotebookInput';
 import CharacterImageWidget from './shared/CharacterImageWidget';
 import TraitRow from './sheet/page2/TraitRow';
@@ -44,21 +45,51 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
 
     // Wrapped handleMultiAdd to detect Mystic Ability link
     // Wrapped handleMultiAdd to detect Mystic Ability link
+    // Wrapped handleMultiAdd to detect Mystic Ability link
     const handleMultiAddWrapper = (instances: { entry: LibraryEntry; variant?: string; cost?: string }[]) => {
-        handleMultiAdd(instances);
+        let mysticId: string | undefined;
+        let mysticName: string | undefined;
 
-        // Check for mystic ability links
-        // We only trigger wizard for the first mystic trait found (simpler UX for now)
-        // If multiple are added, user can manually add skills later or re-trigger via edit?
-        const mysticInstance = instances.find(instance => instance.entry.mysticAbilityId);
+        // Pre-process instances to inject missing mysticAbilityId
+        const processedInstances = instances.map(instance => {
+            // 1. Existing ID
+            if (instance.entry.mysticAbilityId) {
+                mysticId = instance.entry.mysticAbilityId;
+                mysticName = instance.entry.name;
+                return instance;
+            }
 
-        if (mysticInstance && rules?.configurations?.creation?.mysticAbilities?.active) {
+            // 2. Fallback: Search by Name
+            if (rules?.libraries?.mysticAbilities && rules.configurations?.creation?.mysticAbilities?.active) {
+                const match = rules.libraries.mysticAbilities.find(
+                    ma => ma.name.toLowerCase().trim() === instance.entry.name.toLowerCase().trim()
+                );
+                if (match) {
+                    mysticId = match.id;
+                    mysticName = match.name;
+                    // Return patched instance
+                    return {
+                        ...instance,
+                        entry: {
+                            ...instance.entry,
+                            mysticAbilityId: match.id
+                        }
+                    };
+                }
+            }
+            return instance;
+        });
+
+        // Add the processed instances (with patched IDs)
+        handleMultiAdd(processedInstances);
+
+        if (mysticId && mysticName && rules?.configurations?.creation?.mysticAbilities?.active) {
             // Open Wizard
             setTimeout(() => {
                 setWizardState({
                     isOpen: true,
-                    mysticAbilityId: mysticInstance.entry.mysticAbilityId!,
-                    mysticAbilityName: mysticInstance.entry.name
+                    mysticAbilityId: mysticId!,
+                    mysticAbilityName: mysticName!
                 });
             }, 100);
         }
@@ -78,8 +109,10 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             const skillDef = libSkills.find(s => s.id === id);
             if (!skillDef) return;
 
-            // Ensure category exists
-            const category = skillDef.defaultCategory || 'Compétence';
+            // Map legacy category ID to generic ID if needed
+            const rawCategory = skillDef.defaultCategory || 'competences';
+            const category = LEGACY_SKILL_MAP[rawCategory] || rawCategory;
+
             if (!newSkills[category]) newSkills[category] = [];
 
             // Check if already exists
@@ -90,6 +123,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     id: crypto.randomUUID(),
                     name: skillDef.name,
                     value: 1,
+                    creationValue: 1, // Learned during creation wizard
                     max: 5,
                     variant: skillDef.isVariable ? '' : undefined,
                     description: skillDef.description
@@ -111,6 +145,9 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             });
             onAddLog(`Ajout de ${addedCount} compétence(s) mystique(s) liée(s) à ${wizardState.mysticAbilityName}`, 'info', 'sheet', 'Compétences');
         }
+
+        // Close wizard (even if 0 added, user confirmed)
+        setWizardState(prev => ({ ...prev, isOpen: false }));
     };
 
     const updateStringField = (field: keyof CharacterSheetData['page2'], value: string) => {
@@ -136,6 +173,16 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                         onRemove={(e) => {
                             e.stopPropagation();
                             removeTrait('avantages', i);
+                        }}
+                        onManageMystic={(e) => {
+                            e.stopPropagation();
+                            if (item.mysticAbilityId) {
+                                setWizardState({
+                                    isOpen: true,
+                                    mysticAbilityId: item.mysticAbilityId,
+                                    mysticAbilityName: item.name
+                                });
+                            }
                         }}
                     />
                 ))}
