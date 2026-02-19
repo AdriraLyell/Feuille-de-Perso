@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.18",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Correction de la persistance de la catégorie de placement (localisation) pour les habilités mystiques en base de données (ajout des colonnes manquantes et mise à jour des services de synchronisation)."
+    },
+    {
         "version": "2.56.17",
         "date": "2026-02-19",
         "type": "fix",
@@ -933,15 +939,5 @@
         "type": "chore",
         "content": "🧹 Nettoyage des logs : Remplacement systématique des console.log/warn/error par le logger applicatif et suppression des logs de debug.",
         "major": false
-    },
-    {
-        "version": "2.49.11",
-        "date": "2026-02-14",
-        "type": "fix",
-        "changes": [
-            "📊 Admin : Repositionnement de la colonne 'Taille' entre 'Dernière Sync' et 'Actions'",
-            "📂 Admin : Ajout de la colonne 'Taille' dans la vue par campagne (`CampaignCharactersView`)",
-            "🎨 UI : Alignement centré et style mono pour les indicateurs de taille"
-        ]
     }
 ]

@@ -79,9 +79,13 @@ export const CharacterSyncService = {
         settingId: string,
         playerName: string,
         characterName: string,
-        data: CharacterSheetData
+        data: CharacterSheetData,
+        mode: 'manual' | 'auto' = 'manual'
     ): Promise<SyncResult> {
         try {
+            // Step 0: Inject sync mode
+            data.syncInfo = { ...data.syncInfo, syncMode: mode };
+
             // Step 1: Resolve and compress images for portable sync
             const dataToStore = await ImageSyncResolver.resolveImagesForSync(data);
 

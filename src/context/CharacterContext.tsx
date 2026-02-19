@@ -25,6 +25,7 @@ interface CharacterActionsContextType {
     addLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', deduplicationId?: string) => void;
     resetData: () => void;
     importData: (newData: CharacterSheetData) => void;
+    sync: (mode?: 'manual' | 'auto') => Promise<void>;
 }
 
 const CharacterStateContext = createContext<CharacterStateContextType | undefined>(undefined);
@@ -200,6 +201,69 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         }
     }, [addLog, rules]);
 
+    const sync = useCallback(async (mode: 'manual' | 'auto' = 'manual') => {
+        const syncInfo = data.syncInfo;
+        // If auto mode but auto-sync is disabled, do nothing
+        if (mode === 'auto' && !syncInfo?.isAutoSyncEnabled) return;
+
+        if (!syncInfo?.syncId || !syncInfo?.settingId) {
+            if (mode === 'manual') addLog("Pas de synchronisation configurée", 'danger', 'settings');
+            return;
+        }
+
+        const playerName = data.header?.player;
+        const characterName = data.header?.name;
+        if (!playerName || !characterName) {
+            if (mode === 'manual') addLog("Nom du joueur ou du personnage manquant", 'danger', 'settings');
+            return;
+        }
+
+        setIsSyncing(true);
+        if (mode === 'manual') addLog("Synchronisation en cours...", 'info', 'settings', 'sync-start');
+
+        try {
+            const result = await CharacterSyncService.syncCharacter(
+                syncInfo.settingId,
+                playerName,
+                characterName,
+                data,
+                mode
+            );
+
+            if (result.success && result.syncId) {
+                const newHash = result.hash;
+                setData(prev => {
+                    if (prev.syncInfo?.syncId === syncInfo.syncId) {
+                        return {
+                            ...prev,
+                            syncInfo: {
+                                ...prev.syncInfo,
+                                lastSynced: Date.now(),
+                                lastSyncedHash: newHash,
+                                syncMode: mode // Update local state too
+                            }
+                        };
+                    }
+                    return prev;
+                });
+
+                if (mode === 'manual') {
+                    addLog("Synchronisation réussie", 'success', 'settings', 'sync-success');
+                } else {
+                    logger.log(`[CharacterContext] Auto-sync success (Hash: ${newHash})`);
+                }
+            } else if (result.error) {
+                logger.warn("[CharacterContext] Sync failed:", result.error);
+                if (mode === 'manual') addLog(`Échec de la synchronisation : ${result.error}`, 'danger', 'settings', 'sync-failure');
+            }
+        } catch (e) {
+            logger.error("[CharacterContext] Sync exception:", e);
+            if (mode === 'manual') addLog("Erreur critique lors de la synchronisation", 'danger', 'settings');
+        } finally {
+            setIsSyncing(false);
+        }
+    }, [data, addLog]);
+
     // 3. Effects
     useEffect(() => {
         // Prepare data with latest local settings before saving
@@ -250,77 +314,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         processImages();
     }, [data.bookDocument?.id]);
 
-    // 2a. Auto-Sync Effect (Cloud)
-    // Runs when data changes, with a 10s debounce, if auto-sync is enabled.
-    useEffect(() => {
-        const syncInfo = data.syncInfo;
-        if (!syncInfo?.isAutoSyncEnabled || !syncInfo?.syncId || !syncInfo?.settingId) {
-            return;
-        }
 
-        const playerName = data.header?.player;
-        const characterName = data.header?.name;
-        if (!playerName || !characterName) {
-            return;
-        }
-
-        const timer = setTimeout(async () => {
-            logger.log(`[CharacterContext] Auto-syncing character "${characterName}"...`);
-            setIsSyncing(true);
-
-            const result = await CharacterSyncService.syncCharacter(
-                syncInfo.settingId!,
-                playerName,
-                characterName,
-                data
-            );
-
-            if (result.success && result.syncId) {
-                // Update lastSynced without triggering another sync
-                // We use the functional update to ensure we don't overwrite concurrent changes
-                setData(prev => {
-                    // Only update if sync info exists and we haven't switched character/sync settings
-                    if (prev.syncInfo?.syncId === syncInfo.syncId) {
-                        return {
-                            ...prev,
-                            syncInfo: {
-                                ...prev.syncInfo,
-                                lastSynced: Date.now(),
-                                lastSyncedHash: result.hash
-                            }
-                        };
-                    }
-                    return prev;
-                });
-                addLog("Synchronisation automatique réussie", 'success', 'settings', 'auto-sync-success');
-            } else if (result.error) {
-                logger.warn("[CharacterContext] Auto-sync failed:", result.error);
-                // We don't use ErrorService.handleError here to avoid spamming the user
-                // but we could log it silently.
-                addLog("Échec de la synchronisation automatique", 'danger', 'settings', 'auto-sync-failure');
-            }
-
-            setIsSyncing(false);
-        }, 10000); // 10 seconds debounce
-
-        return () => clearTimeout(timer);
-    }, [
-        // Dependencies: anything that should trigger a sync
-        data.header,
-        data.attributes,
-        data.skills,
-        data.combat,
-        data.counters,
-        data.experience,
-        data.page2,
-        data.specializations,
-        data.library,
-        data.skillLibrary,
-        // syncInfo changes but we only care about isAutoSyncEnabled change
-        data.syncInfo?.isAutoSyncEnabled,
-        data.syncInfo?.syncId,
-        addLog // Add addLog to dependencies as it's used inside the effect
-    ]);
 
     // 2b. Auto-Update Effect (Smart Re-Hydration)
     // When rules are loaded (and not null), we reconcile them with the current data.
@@ -408,8 +402,9 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         updateData,
         addLog,
         resetData,
-        importData
-    }), [updateData, addLog, resetData, importData]);
+        importData,
+        sync
+    }), [updateData, addLog, resetData, importData, sync]);
 
     return (
         <CharacterStateContext.Provider value={stateValue}>

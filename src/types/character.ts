@@ -120,6 +120,7 @@ export interface CharacterSheetData {
       expertMode?: boolean;
       activeRulesId?: string;
     };
+    syncMode?: 'manual' | 'auto'; // Distinction pour le trigger historique
   };
   appVersion?: string; // Version de l'application lors de la sauvegarde
   _rulesVersion?: string; // Version des règles appliquées (pour optimisation de la réconciliation)

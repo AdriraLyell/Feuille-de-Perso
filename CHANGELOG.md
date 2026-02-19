@@ -1,5 +1,13 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.11] - 2026-02-14 [FIX]
+
+- 📊 Admin : Repositionnement de la colonne 'Taille' entre 'Dernière Sync' et 'Actions'
+- 📂 Admin : Ajout de la colonne 'Taille' dans la vue par campagne (`CampaignCharactersView`)
+- 🎨 UI : Alignement centré et style mono pour les indicateurs de taille
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.49.10] - 2026-02-14 [FEAT]
 
 - 📊 Admin : Affichage de la taille des données (JSONB) pour chaque personnage dans la Master List

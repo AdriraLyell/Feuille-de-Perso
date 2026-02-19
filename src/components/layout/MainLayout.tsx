@@ -14,6 +14,7 @@ import { ErrorService } from '../../services/ErrorService';
 import { INITIAL_DATA } from '../../data/initialState';
 import { logger } from '../../utils/logger';
 import { useCloudSyncCheck } from '../../hooks/useCloudSyncCheck';
+import { useAutoSave } from '../../hooks/useAutoSave';
 
 // Static Components
 import DiegeticNavigation from './DiegeticNavigation';
@@ -47,7 +48,7 @@ import { useRulesSync } from '../../hooks/layout/useRulesSync';
 import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, TrendingUp, History, Clock, X, Trash2, Save, Book, LogOut, Menu, Upload } from 'lucide-react';
 
 const MainLayout: React.FC = () => {
-    const { data, updateData: setData, addLog, importData, isSyncing } = useCharacter();
+    const { data, updateData: setData, addLog, importData, isSyncing, sync } = useCharacter();
     const { rules, updateRules } = useRules();
 
     // Custom Hooks
@@ -76,6 +77,9 @@ const MainLayout: React.FC = () => {
     } = useRulesSync(data, rules, setData, updateRules, addLog);
 
     const { hasUpdate, mjMessage } = useCloudSyncCheck(data);
+
+    // Auto-Save Logic
+    const { countdown } = useAutoSave(data, false, (mode) => sync(mode));
 
     // Other UI States
     const [lastSavedState, setLastSavedState] = useState<string>("");
@@ -223,7 +227,9 @@ const MainLayout: React.FC = () => {
                                 data.syncInfo ? 'synced' : 'none'
                     }
                     appVersion={APP_VERSION}
+                    appVersion={APP_VERSION}
                     onShowCampaignInfo={() => setShowCampaignInfo(true)}
+                    autoSaveCountdown={countdown}
                 />
 
                 <div className="relative z-10 flex flex-col min-h-screen">
