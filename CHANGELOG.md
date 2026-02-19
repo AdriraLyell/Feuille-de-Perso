@@ -1,5 +1,17 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.16] - 2026-02-14 [CHORE]
+
+
+
+## [2.49.15] - 2026-02-14 [FIX]
+
+
+
+## [2.49.14] - 2026-02-14 [REFACTOR]
+
+
+
 ## [2.49.13] - 2026-02-14 [REFACTOR]
 
 
