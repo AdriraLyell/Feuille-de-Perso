@@ -1,5 +1,19 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.8] - 2026-02-14 [REFACTOR]
+
+- 📂 Structure : Déplacement de `src/constants.ts` vers `src/constants/app.ts` pour une meilleure organisation
+- 🔗 Imports : Mise à jour de tous les chemins d'importation des constantes globales à travers le projet
+- 🛠️ Build : Mise à jour du script `sync-version` pour supporter la nouvelle structure de fichiers
+
+## [2.49.7] - 2026-02-14 [MAINTENANCE]
+
+- 🛡️ Typage Admin : Refonte complète de la sécurité des types pour la gestion des bibliothèques (Phase C & E)
+- 🧹 Code Health : Éradication massive des `@ts-ignore` et `any` dans les composants d'administration critiques
+- 🔧 Hooks Admin : Typage strict des handlers génériques pour la mise à jour des compteurs et de la configuration de création
+- 🧩 Composants : Amélioration de la robustesse de `AdminTraitLibrary`, `AdminBackgroundLibrary` et `AdminCounterLibrary`
+- 🛡️ DB Fetches : Sécurisation des appels `DatabaseService` dans les services de chargement et d'import (Phase D)
+
 ## [2.49.6] - 2026-02-14 [REFACTOR]
 
 - 🎨 Design System : Extraction des constantes magiques vers des variables CSS (--color-paper, --shadow-sheet, etc.)

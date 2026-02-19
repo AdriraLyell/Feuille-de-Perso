@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.56.15",
+        "date": "2026-02-19",
+        "type": "feat",
+        "description": "Affichage du code de placement (colonne) directement sur les cartes des bibliothèques Admin (Skills, BG, Compteurs, Mystique) pour une meilleure visibilité immédiate."
+    },
+    {
+        "version": "2.56.14",
+        "date": "2026-02-19",
+        "type": "feat",
+        "description": "Restauration des sélecteurs de catégorie dans les bibliothèques Admin (Skills, BG, Compteurs, Mystique) avec sécurisation du système de Reset (masterDefinition). Ajout du placement mystique configurable dans les paramètres de création."
+    },
+    {
         "version": "2.56.13",
         "date": "2026-02-19",
         "type": "fix",
@@ -939,28 +951,6 @@
             "🔔 Alertes : Ajout d'indicateurs visuels globaux dans la barre de navigation (Orange >= 70%, Rouge >= 90%)",
             "📱 Mobile : Intégration des alertes de stockage dans le menu mobile",
             "🔄 UX : Rafraîchissement automatique des statistiques de stockage lors du focus de la page"
-        ]
-    },
-    {
-        "version": "2.49.8",
-        "date": "2026-02-14",
-        "type": "refactor",
-        "changes": [
-            "📂 Structure : Déplacement de `src/constants.ts` vers `src/constants/app.ts` pour une meilleure organisation",
-            "🔗 Imports : Mise à jour de tous les chemins d'importation des constantes globales à travers le projet",
-            "🛠️ Build : Mise à jour du script `sync-version` pour supporter la nouvelle structure de fichiers"
-        ]
-    },
-    {
-        "version": "2.49.7",
-        "date": "2026-02-14",
-        "type": "maintenance",
-        "changes": [
-            "🛡️ Typage Admin : Refonte complète de la sécurité des types pour la gestion des bibliothèques (Phase C & E)",
-            "🧹 Code Health : Éradication massive des `@ts-ignore` et `any` dans les composants d'administration critiques",
-            "🔧 Hooks Admin : Typage strict des handlers génériques pour la mise à jour des compteurs et de la configuration de création",
-            "🧩 Composants : Amélioration de la robustesse de `AdminTraitLibrary`, `AdminBackgroundLibrary` et `AdminCounterLibrary`",
-            "🛡️ DB Fetches : Sécurisation des appels `DatabaseService` dans les services de chargement et d'import (Phase D)"
         ]
     }
 ]

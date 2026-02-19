@@ -5,6 +5,7 @@ import { MotionFade } from '../ui/motion/MotionFade';
 import ThematicModal from '../ui/ThematicModal';
 import { OfflineStorageService } from '../../services/OfflineStorageService';
 import ThematicButton from '../ui/ThematicButton';
+import { logger } from '../../utils/logger';
 
 const StorageMonitor: React.FC = () => {
     const { stats, loading, refresh } = useStorageUsage();
@@ -18,7 +19,7 @@ const StorageMonitor: React.FC = () => {
             // Force reload to clear everything from memory and restart
             window.location.href = window.location.origin + window.location.pathname;
         } catch (error) {
-            console.error('Purge failed:', error);
+            logger.error('Purge failed:', error);
             setIsPurging(false);
             setShowPurgeConfirm(false);
         }

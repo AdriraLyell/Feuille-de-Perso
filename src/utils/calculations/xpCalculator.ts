@@ -6,6 +6,7 @@ import {
     RulesData
 } from '../../types';
 import { normalizeString } from '../stringUtils';
+import { logger } from '../logger';
 
 /**
  * Calcule la somme triangulaire : n + (n-1) + ... + 1
@@ -80,7 +81,7 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
     const totalTraitXP = fixedBonus + perScenarioBonus;
     if (totalTraitXP !== 0) {
         const sessionNames = scenarioLogs.map(l => l.scenario || `ID:${l.id.substring(0, 4)}`).join(', ');
-        console.log(`[xpCalculator] Traits XP Bonus: ${totalTraitXP} (Fixed: ${fixedBonus}, PerScenario: ${perScenarioBonus}, Sessions: ${scenarioCount} [${sessionNames}])`);
+        logger.log(`[xpCalculator] Traits XP Bonus: ${totalTraitXP} (Fixed: ${fixedBonus}, PerScenario: ${perScenarioBonus}, Sessions: ${scenarioCount} [${sessionNames}])`);
     }
 
     // 2. Calcul de l'XP dépensée

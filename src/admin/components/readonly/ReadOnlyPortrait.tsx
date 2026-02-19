@@ -34,7 +34,7 @@ export const ReadOnlyPortrait: React.FC<ReadOnlyPortraitProps> = ({ imageId, leg
                             }
                         } catch (err) {
                             // Fallback if text reading fails (unlikely for blob) or other error, try standard object URL
-                            console.warn("Error checking blob content, falling back to createObjectURL", err);
+                            logger.warn("Error checking blob content, falling back to createObjectURL", err);
                             setImageUrl(URL.createObjectURL(blob));
                         }
                     } else if (active) {

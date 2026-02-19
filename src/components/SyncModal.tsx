@@ -6,6 +6,7 @@ import { CharacterSheetData } from '../types/character';
 import { GameSettingSummary, CampaignService } from '../services/CampaignService';
 import { useRules } from '../context/RulesContext';
 import { ErrorService } from '../services/ErrorService';
+import { logger } from '../utils/logger';
 
 interface SyncModalProps {
     isOpen: boolean;
@@ -70,7 +71,7 @@ const SyncModal: React.FC<SyncModalProps> = ({
                 });
             }
         } catch (e) {
-            console.error("Failed to check cloud version", e);
+            logger.error("Failed to check cloud version", e);
         }
     };
 

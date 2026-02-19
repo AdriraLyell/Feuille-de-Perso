@@ -1,6 +1,6 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.56.31)
+# Audit - État des Lieux & Roadmap (Synthèse v2.56.35)
 
-> **Dernière mise à jour** : 2026-02-20 — Version 2.56.31
+> **Dernière mise à jour** : 2026-02-19 — Version 2.56.35
 
 ## 1. Phases Complétées
 
@@ -22,11 +22,19 @@
 - [x] **Tests E2E** : Migration des tests vers le nouveau Grimoire Digital (TiPTap + CSS Columns) et correction des sélecteurs de démarrage.
 - [x] **Performance CI** : Réduction du temps de run de ~3 minutes grâce au cache Playwright.
 
+### ✅ Phase 14 : Hygiène & Logging (v2.56.34)
+- [x] **Racine Propre** : Déplacement des scripts utilitaires vers `/scripts` et archivage des SQL temporaires vers `docs/archive/sql/`.
+- [x] **Logging System** : Migration des derniers reliquats de `console.*` directs vers le `logger` applicatif (xpCalculator, useCloudSyncCheck, SyncModal, StorageMonitor, ReadOnlyPortrait).
+- [x] **Purge Logs** : Suppression des fichiers volumineux de logs ESLint à la racine.
+
+### ✅ Phase 15 : Refactorisation Admin (v2.56.35)
+- [x] **Découpage Bibliothèques** : Extraction des composants `Item` (Skill, Background, Mystic, Counter) dans des fichiers dédiés.
+- [x] **Maintenance** : Réduction drastique de la taille des fichiers sources critiques (gain ~150 lignes/fichier).
+
 ## 2. Issues Restantes & Roadmap
 
-### 🔶 Issue 4.1 — `console.log` directs (PARTIELLE)
-- **12 occurrences** de `console.*` directs restantes (hors logger).
-- Logger conditionnel `src/utils/logger.ts` adopté dans les composants critiques (CharacterReadOnlyView, etc.).
+### ✅ Issue 4.1 — `console.log` directs (COMPLÉTÉE)
+- Migration systématique vers `src/utils/logger.ts`.
 
 **Score global : 14/15 corrigés, 1 restant (4.1-partiel/4.3)**
 
@@ -101,8 +109,9 @@
 - Phases A à E complétées. Plus de `@ts-ignore` bloquants ou de `any` injustifiés en production.
 
 ### ✅ Issue 4.3 — Fichiers volumineux (CORRIGÉE/STABILISÉE)
-- **Récemment optimisés** : `SkillsEditor` (479→156L), `ImportPanel` (440→150L).
-- Aucun fichier critique > 400 lignes identifié. `AdminApp` refactorisé via hooks.
+- **Récemment optimisés (v2.56.35)** : `AdminSkillLibrary` (508→370L), `AdminBackgroundLibrary` (450→318L), `AdminMysticLibrary` (404→300L), `AdminCounterLibrary` (359→280L).
+- **Précédemment** : `SkillsEditor` (479→156L), `ImportPanel` (440→150L).
+- Aucun fichier critique de logique pure > 400 lignes.
 
 ### ✅ Issue 5.1 — Variables CSS (CORRIGÉE)
 - Bloc `:root` consolidé dans `src/index.css` avec 14 variables de couleur et 6 de dimension.
