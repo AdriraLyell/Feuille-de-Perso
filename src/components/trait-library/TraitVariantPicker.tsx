@@ -73,7 +73,7 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, 
                     <div className="bg-stone-50 p-3 rounded border border-stone-200">
                         <div className="text-sm font-bold text-stone-900">{variantPicker.name}</div>
                         <div className="text-[10px] text-stone-500 uppercase font-bold mt-1 tracking-tight">
-                            {variantPicker.type === 'avantage' ? 'Avantage' : 'Désavantage'} • {variantPicker.cost} pts
+                            {variantPicker.type === 'avantage' ? 'Avantage' : 'Désavantage'} • {selectedCost} {selectedCost === "1" ? "pt" : "pts"}
                         </div>
                     </div>
 

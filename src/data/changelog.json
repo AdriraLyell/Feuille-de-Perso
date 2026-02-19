@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.20",
+        "date": "2026-02-19",
+        "type": "refactor",
+        "description": "Refactorisation majeure de l'éditeur du grimoire (ColumnarEditor.tsx). Extraction de la barre d'outils, du fond de page et de la barre latérale des chapitres en composants distincts. Migration des styles CSS vers un fichier externe. Amélioration de la maintenabilité et réduction du bruit dans le fichier principal."
+    },
+    {
         "version": "2.56.19",
         "date": "2026-02-19",
         "type": "fix",
