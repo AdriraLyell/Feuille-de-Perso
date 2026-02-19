@@ -1,6 +1,6 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.49.22)
+# Audit - État des Lieux & Roadmap (Synthèse v2.56.20)
 
-> **Dernière mise à jour** : 2026-02-14 — Version 2.49.22
+> **Dernière mise à jour** : 2026-02-19 — Version 2.56.20
 
 ## 1. Phases Complétées
 
@@ -59,7 +59,13 @@
 - **Résultat** : `RuleCalculationsService.ts` réduit à une simple façade (~30 lignes). Logique métier isolée et testable.
 
 ---
-*Dernière mise à jour : 16 Février 2026 - v2.49.87*
+*Dernière mise à jour : 19 Février 2026 - v2.56.20*
+
+### ✅ Phase 24 : Refactorisation de ColumnarEditor (Audit v2.56.20) - [RÉSOLU]
+- **Refactoring** : Éclatement d'un composant massif (670+ lignes) en sous-composants spécialisés.
+- **Composants créés** : `BookEditorToolbar.tsx`, `BookPageBackground.tsx`, `BookChapterSidebar.tsx`, `ColumnarEditorStyles.tsx`.
+- **Résultat** : Réduction drastique de la taille de `ColumnarEditor.tsx` (~670 -> ~280 lignes). Amélioration de la lisibilité et séparation claire UI vs Logique. Suppression du CSS inline au profit d'un composant de style dédié.
+- **Maintenance** : Mise à jour des imports et validation du build de production.
 
 ### ✅ Phase 23 : Personnalisation des Bibliothèques & UI (Audit v2.49.87) - [RÉSOLU]
 - **Modularité** : Harmonisation visuelle des indicateurs de surcharge (icône Cyan `PencilLine` unifiée).
