@@ -109,9 +109,18 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             const skillDef = libSkills.find(s => s.id === id);
             if (!skillDef) return;
 
-            // Map legacy category ID to generic ID if needed
-            const rawCategory = skillDef.defaultCategory || 'competences';
-            const category = LEGACY_SKILL_MAP[rawCategory] || rawCategory;
+            // Fallback placement logic
+            let category = '';
+            if (skillDef.defaultCategory) {
+                category = LEGACY_SKILL_MAP[skillDef.defaultCategory] || skillDef.defaultCategory;
+            } else {
+                // Specific fallbacks for Wizard-added skills without default category
+                if (skillDef.name.toLowerCase().includes('art martial')) {
+                    category = 'Col_Comp_7'; // Martial Arts column
+                } else {
+                    category = 'Col_Comp_5'; // Default column for others
+                }
+            }
 
             if (!newSkills[category]) newSkills[category] = [];
 

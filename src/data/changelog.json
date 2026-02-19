@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.12",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Logique de placement de secours pour les compétences Wizard : Arts Martiaux en Col_Comp_7, autres en Col_Comp_5."
+    },
+    {
         "version": "2.56.11",
         "date": "2026-02-19",
         "type": "fix",
