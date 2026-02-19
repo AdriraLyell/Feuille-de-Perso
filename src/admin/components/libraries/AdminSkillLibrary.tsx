@@ -46,8 +46,11 @@ const SkillLibraryItem: React.FC<{
                         {skill.name}
                     </div>
                     {skill.defaultCategory && (
-                        <span className="text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200 px-1 rounded-sm uppercase tracking-tighter shrink-0" title={`Placement : ${skill.defaultCategory}`}>
-                            {skill.defaultCategory}
+                        <span
+                            className="text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200 px-1 rounded-sm uppercase tracking-tighter shrink-0"
+                            title={`Placement : ${availableCategories.find(c => c.code === skill.defaultCategory)?.label || skill.defaultCategory}`}
+                        >
+                            {availableCategories.find(c => c.code === skill.defaultCategory)?.label || skill.defaultCategory}
                         </span>
                     )}
                 </div>

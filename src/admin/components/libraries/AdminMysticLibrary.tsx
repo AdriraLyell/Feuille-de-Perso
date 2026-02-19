@@ -38,8 +38,11 @@ const MysticLibraryItem: React.FC<{
                         {item.name}
                     </div>
                     {item.defaultCategory && (
-                        <span className="text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200 px-1 rounded-sm uppercase tracking-tighter shrink-0" title={`Placement : ${item.defaultCategory}`}>
-                            {item.defaultCategory}
+                        <span
+                            className="text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200 px-1 rounded-sm uppercase tracking-tighter shrink-0"
+                            title={`Placement : ${rules.definitions.skillCategories?.find(c => c.id === item.defaultCategory)?.label || item.defaultCategory}`}
+                        >
+                            {rules.definitions.skillCategories?.find(c => c.id === item.defaultCategory)?.label || item.defaultCategory}
                         </span>
                     )}
                 </div>
@@ -142,7 +145,11 @@ const AdminMysticLibrary: React.FC<AdminMysticLibraryProps> = ({ rules, onUpdate
         const duplicate = list.find(b => b.id !== editingItem.id && b.name.trim().toLowerCase() === itemName.toLowerCase());
         if (duplicate) { setError("Une habilité portant ce nom existe déjà."); return; }
 
-        const updatedAbility = { ...editingItem, name: itemName };
+        const updatedAbility = {
+            ...editingItem,
+            name: itemName,
+            defaultCategory: editingItem.defaultCategory || undefined
+        };
 
         const newList = list.some(b => b.id === editingItem.id)
             ? list.map(b => b.id === editingItem.id ? updatedAbility : b)

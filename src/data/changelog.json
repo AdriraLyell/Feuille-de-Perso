@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.16",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Amélioration des badges de bibliothèques Admin : affichage des noms des catégories au lieu des codes techniques. Correction du bug de sauvegarde du placement pour les Habilités Mystiques."
+    },
+    {
         "version": "2.56.15",
         "date": "2026-02-19",
         "type": "feat",

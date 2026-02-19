@@ -207,8 +207,11 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                                     {item.name}
                                                 </div>
                                                 {item.defaultCategory && (
-                                                    <span className="text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200 px-1 rounded-sm uppercase tracking-tighter shrink-0" title={`Placement : ${item.defaultCategory}`}>
-                                                        {item.defaultCategory}
+                                                    <span
+                                                        className="text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200 px-1 rounded-sm uppercase tracking-tighter shrink-0"
+                                                        title={`Placement : ${rules.definitions.skillCategories?.find(c => c.id === item.defaultCategory)?.label || item.defaultCategory}`}
+                                                    >
+                                                        {rules.definitions.skillCategories?.find(c => c.id === item.defaultCategory)?.label || item.defaultCategory}
                                                     </span>
                                                 )}
                                             </div>
