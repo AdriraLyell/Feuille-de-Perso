@@ -54,10 +54,11 @@ export const LibraryMapper = {
         };
     },
 
-    mapMysticAbility: (m: DBMysticAbility, activeIds: Set<string>, sid: string): LibrarySkillEntry => ({
+    mapMysticAbility: (m: DBMysticAbility, activeIds: Set<string>, sid: string, localDefaultCategory?: string): LibrarySkillEntry => ({
         id: m.id,
         name: m.name,
         description: m.description || '',
+        defaultCategory: legacySkillMap[localDefaultCategory || ''] || localDefaultCategory || legacySkillMap[m.default_category || ''] || m.default_category,
         isVariable: m.is_variable || false,
         isGlobal: m.setting_id == null,
         isActive: activeIds.has(m.id) || m.setting_id === sid

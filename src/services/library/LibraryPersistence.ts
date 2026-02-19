@@ -30,8 +30,8 @@ export const LibraryPersistence = {
 
                 if (existingId) {
                     const link: any = { setting_id: settingId, [typeCfg.idKey]: existingId, is_active: true };
-                    // Default categories for skills/backgrounds/counters
-                    if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters') {
+                    // Default categories for skills/backgrounds/counters/mysticAbilities
+                    if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters' || typeCfg.key === 'mysticAbilities') {
                         link.default_category = item.defaultCategory;
                     }
                     toLink.push(link);
@@ -58,6 +58,7 @@ export const LibraryPersistence = {
                         if (typeCfg.key === 'skills') payload.mystic_ability_id = item.mysticAbilityId;
                     } else if (typeCfg.key === 'mysticAbilities') {
                         payload.is_variable = item.isVariable;
+                        payload.default_category = item.defaultCategory;
                     } else if (typeCfg.key === 'counters') {
                         payload.max_value = item.maxValue;
                         payload.default_value = item.defaultValue;
@@ -69,7 +70,7 @@ export const LibraryPersistence = {
 
                     toCreate.push(payload);
                     const link: any = { setting_id: settingId, [typeCfg.idKey]: item.id, is_active: true };
-                    if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters') {
+                    if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters' || typeCfg.key === 'mysticAbilities') {
                         link.default_category = item.defaultCategory;
                     }
                     toLink.push(link);
@@ -123,6 +124,7 @@ export const LibraryPersistence = {
                     }
                 } else if (typeCfg.key === 'mysticAbilities') {
                     payload.is_variable = item.isVariable;
+                    payload.default_category = item.defaultCategory;
                 } else if (typeCfg.key === 'counters') {
                     payload.max_value = item.maxValue;
                     payload.default_value = item.defaultValue;
@@ -146,8 +148,8 @@ export const LibraryPersistence = {
                         [typeCfg.idKey]: item.id,
                         is_active: true
                     };
-                    // Skills, backgrounds and counters have default categories
-                    if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters') {
+                    // Skills, backgrounds, counters and mystic abilities have default categories
+                    if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters' || typeCfg.key === 'mysticAbilities') {
                         link.default_category = item.defaultCategory;
                     }
 

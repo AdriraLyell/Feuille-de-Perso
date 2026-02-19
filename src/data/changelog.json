@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.18",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Correction de la persistance de la catégorie de placement (localisation) pour les habilités mystiques en base de données (ajout des colonnes manquantes et mise à jour des services de synchronisation)."
+    },
+    {
         "version": "2.56.17",
         "date": "2026-02-19",
         "type": "fix",

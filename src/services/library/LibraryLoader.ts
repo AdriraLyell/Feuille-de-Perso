@@ -84,6 +84,8 @@ export const LibraryLoader = {
             const skillRelMap = new Map<string, RelSettingSkill>(relSkills.map((r: RelSettingSkill) => [r.skill_id, r]));
             const bgDefaultMap = new Map<string, string>(relBackgrounds.map((r: RelSettingBackground) => [r.background_id, r.default_category]));
             const counterDefaultMap = new Map<string, string>(relCounters.map((r: RelSettingCounter) => [r.counter_id, r.default_category]));
+            const mysticRelMap = new Map<string, any>(relMysticAbilities.map((r: any) => [r.mystic_ability_id, r]));
+            const mysticDefaultMap = new Map<string, string>(relMysticAbilities.map((r: any) => [r.mystic_ability_id, r.default_category]));
 
             return {
                 traits: traits.map((t: DBTrait) => LibraryMapper.mapTrait(t, activeTraitIds, settingId, traitVarMap.get(t.id))).sort((a, b) => a.name.localeCompare(b.name)),
@@ -91,7 +93,7 @@ export const LibraryLoader = {
                 specializations: specs.map((s: DBSpecialization) => LibraryMapper.mapSpec(s, activeSpecIds, settingId)).sort((a, b) => a.name.localeCompare(b.name)),
                 backgrounds: backgrounds.map((b: DBBackground) => LibraryMapper.mapBackground(b, activeBgIds, settingId, bgVarMap.get(b.id), bgDefaultMap.get(b.id))).sort((a, b) => a.name.localeCompare(b.name)),
                 counters: counters.map((c: DBCounter) => LibraryMapper.mapCounter(c, activeCounterIds, settingId, counterDefaultMap.get(c.id))).sort((a, b) => a.name.localeCompare(b.name)),
-                mysticAbilities: mysticAbilities.map((m: any) => LibraryMapper.mapMysticAbility(m, activeMysticIds, settingId)).sort((a: any, b: any) => a.name.localeCompare(b.name))
+                mysticAbilities: mysticAbilities.map((m: any) => LibraryMapper.mapMysticAbility(m, activeMysticIds, settingId, mysticDefaultMap.get(m.id))).sort((a: any, b: any) => a.name.localeCompare(b.name))
             };
         } catch (error) {
             ErrorService.handleError(error, {

@@ -42,6 +42,7 @@ export interface DBMysticAbility {
     name: string;
     description?: string;
     is_variable?: boolean;
+    default_category?: string;
     created_at?: string;
     updated_at?: string;
 }
@@ -158,6 +159,7 @@ export interface RelSettingMysticAbility {
     setting_id: string;
     mystic_ability_id: string;
     is_active: boolean;
+    default_category?: string;
 }
 
 /**
