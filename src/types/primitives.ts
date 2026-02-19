@@ -72,6 +72,7 @@ export interface TraitEntry {
   tag?: string;
   variant?: string; // Précision (ex: pour "Allergie", variant="Chats")
   definitionId?: string; // ID de la définition parente
+  mysticAbilityId?: string; // Link to Mystic Ability
 }
 
 export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus';
@@ -80,5 +81,6 @@ export interface TraitEffect {
   id: string;
   type: EffectType;
   value: number; // Montant XP ou Rang Max Gratuit
+  method?: 'fixed' | 'per_scenario';
   target?: string; // Nom de la compétence ciblée (pour free_skill_rank)
 }

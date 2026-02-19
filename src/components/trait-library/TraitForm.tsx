@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { LibraryEntry, TraitEffect } from '../../types';
-import { Edit2, Plus, X, AlignLeft, Save, AlertCircle } from 'lucide-react';
+import { Edit2, Plus, X, AlignLeft, Save, AlertCircle, Coins, Info } from 'lucide-react';
 import TraitEffectEditor from './TraitEffectEditor';
 import ThematicModal from '../ui/ThematicModal';
 
@@ -15,13 +15,14 @@ interface TraitFormProps {
     setEditForm: (entry: LibraryEntry | null) => void;
     setTagInput: (val: string) => void;
     onClose: () => void;
-    onSave: () => void;
+    onSave: (updatedTrait?: LibraryEntry) => void;
     addTag: () => void;
     removeTag: (tag: string) => void;
     addEffect: () => void;
     updateEffect: <K extends keyof TraitEffect>(id: string, field: K, value: TraitEffect[K]) => void;
     removeEffect: (id: string) => void;
 }
+
 
 const TraitForm: React.FC<TraitFormProps> = ({
     editForm,
@@ -42,14 +43,46 @@ const TraitForm: React.FC<TraitFormProps> = ({
 }) => {
     const [variantDraft, setVariantDraft] = React.useState(editForm.variants?.join(', ') || '');
 
+    // Logic for "Smart Cost Information"
+    const parsedCostInfo = React.useMemo(() => {
+        const val = editForm.pointsLabel?.toString() || '';
+        if (!val.trim()) return { type: 'none', label: 'Aucun coût défini' };
+
+        // 1. Simple Number (Fixed)
+        if (/^\d+$/.test(val.trim())) {
+            return { type: 'fixed', label: `Prix fixe : ${val} pts`, color: 'text-emerald-600' };
+        }
+
+        // 2. Range (1-5)
+        if (/[-,–—]/.test(val) || val.includes('..')) {
+            const nums = val.match(/\d+/g);
+            if (nums && nums.length >= 2) {
+                return { type: 'range', label: `Plage de ${nums[0]} à ${nums[1]} pts`, color: 'text-amber-600' };
+            }
+        }
+
+        // 3. List (1, 3, 5)
+        if (val.includes(',') || val.includes(';')) {
+            const nums = val.match(/\d+/g);
+            if (nums && nums.length > 0) {
+                return { type: 'list', label: `Choix multiples : ${nums.join(', ')} pts`, color: 'text-blue-600' };
+            }
+        }
+
+        return { type: 'text', label: 'Coût narratif / Spécial', color: 'text-stone-500' };
+    }, [editForm.pointsLabel]);
+
     React.useEffect(() => {
         setVariantDraft(editForm.variants?.join(', ') || '');
     }, [editForm.id, editForm.variants?.join(',')]);
 
     const handleSave = () => {
         const cleaned = variantDraft.split(',').map(v => v.trim()).filter(Boolean);
-        setEditForm({ ...editForm, variants: cleaned });
-        onSave();
+        const finalForm = { ...editForm, variants: cleaned };
+
+        // Update local state just in case, but pass final version to onSave immediately
+        setEditForm(finalForm);
+        onSave(finalForm);
     };
     const isNew = !library.some(l => l.id === editForm.id);
 
@@ -98,8 +131,8 @@ const TraitForm: React.FC<TraitFormProps> = ({
                     </div>
                 </div>
 
-                {/* Name & Cost */}
-                <div className="grid grid-cols-4 gap-4">
+                {/* Name & Cost (Smart Input) */}
+                <div className="grid grid-cols-5 gap-4">
                     <div className="col-span-3">
                         <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest">Nom du Trait</label>
                         <input
@@ -109,14 +142,43 @@ const TraitForm: React.FC<TraitFormProps> = ({
                             placeholder="Ex: Chance, Ennemi..."
                         />
                     </div>
-                    <div className="col-span-1">
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest">Coût</label>
-                        <input
-                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-mono text-center focus:border-amber-500 outline-none text-[#1c1917] bg-white/50 shadow-sm font-bold"
-                            value={editForm.cost}
-                            onChange={(e) => setEditForm({ ...editForm, cost: e.target.value })}
-                            placeholder="Pt"
-                        />
+                    <div className="col-span-2 relative">
+                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest flex items-center justify-between">
+                            <span>Coût / Valeur</span>
+                            <div className="group relative">
+                                <Info size={12} className="text-[#bfae85] cursor-help" />
+                                <div className="absolute right-0 bottom-full mb-2 w-48 bg-stone-800 text-white text-[9px] p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 font-sans normal-case tracking-normal leading-normal">
+                                    Saisissez un nombre (ex: 3), une plage (ex: 1-5) ou une liste (ex: 1, 3, 5).
+                                </div>
+                            </div>
+                        </label>
+                        <div className="relative">
+                            <input
+                                className="w-full border border-[#bfae85]/50 rounded-sm pl-8 pr-3 py-2 font-mono focus:border-amber-500 outline-none text-[#1c1917] bg-white/50 shadow-sm font-bold"
+                                value={editForm.pointsLabel}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    const firstNumMatch = val.match(/\d+/);
+                                    const firstNum = firstNumMatch ? firstNumMatch[0] : '0';
+                                    const isVar = /[-,–—,;]/.test(val) || val.includes('..');
+
+                                    setEditForm({
+                                        ...editForm,
+                                        pointsLabel: val,
+                                        cost: firstNum,
+                                        isVariableCost: isVar
+                                    });
+                                }}
+                                placeholder="ex: 1-5"
+                            />
+                            <Coins size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#bfae85]" />
+                        </div>
+
+                        {/* Cost Helper Legend */}
+                        <div className={`text-[9px] mt-1.5 font-bold flex items-center gap-1.5 ${parsedCostInfo.color} animate-in fade-in slide-in-from-left-1 duration-300`}>
+                            <div className={`w-1.5 h-1.5 rounded-full bg-current opacity-40`} />
+                            {parsedCostInfo.label}
+                        </div>
                     </div>
                 </div>
 
@@ -125,7 +187,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
                     <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest flex items-center gap-1"><AlignLeft size={12} /> Description Narrative</label>
                     <textarea
                         className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-3 text-sm text-[#1c1917] bg-white/50 min-h-[100px] focus:border-amber-500 outline-none resize-y placeholder-stone-300 italic leading-relaxed shadow-sm"
-                        value={editForm.description}
+                        value={editForm.description || ""}
                         onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                         placeholder="Décrivez les effets narratifs ou les conditions d'utilisation..."
                     />

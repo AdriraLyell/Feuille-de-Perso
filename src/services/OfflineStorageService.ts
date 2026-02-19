@@ -1,4 +1,4 @@
-import { get as getCache, set as setCache, entries } from 'idb-keyval';
+import { get as getCache, set as setCache, entries, clear as clearIDB } from 'idb-keyval';
 import { RulesData } from '../types/rules';
 import { logger } from '../utils/logger';
 
@@ -80,6 +80,30 @@ export const OfflineStorageService = {
         } catch (err) {
             logger.error('[OfflineStorage] Failed to list cached campaigns:', err);
             return [];
+        }
+    },
+    /**
+     * Deep purge of all local data.
+     * Clears IndexedDB (rules, images) and LocalStorage (preferences, session).
+     * WARNING: This is a destructive action.
+     */
+    async clearAllLocalData(): Promise<void> {
+        try {
+            logger.warn('[OfflineStorage] Starting deep purge...');
+
+            // 1. Clear IndexedDB
+            await clearIDB();
+
+            // 2. Clear LocalStorage
+            localStorage.clear();
+
+            // 3. Optional: Clear session storage if needed
+            sessionStorage.clear();
+
+            logger.log('[OfflineStorage] Deep purge completed.');
+        } catch (err) {
+            logger.error('[OfflineStorage] Deep purge failed:', err);
+            throw err;
         }
     }
 };

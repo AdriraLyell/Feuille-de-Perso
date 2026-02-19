@@ -51,11 +51,20 @@ doc
 
 | Fichier | Rôle | Statut |
 |---------|------|--------|
-| `ColumnarEditor.tsx` | Éditeur principal. Instance Tiptap avec CSS Columns, toolbar intégrée (gras, italique, listes, titres, alignement, insertion chapitre/image), persistence debounced vers CharacterSheetData. | ✅ DONE |
-| `BookImageView.tsx` | NodeView React du `bookImage` : chargement IndexedDB, décompression GZIP, handles de resize, contrôles align/fit/filter/delete, pan & scan (posX/posY). | ✅ DONE |
+| `ColumnarEditor.tsx` | Éditeur principal. Instance Tiptap. Orchestre les sous-composants (`Toolbar`, `PageBackground`, `ChaptersSidebar`). | ✅ DONE |
+| `ColumnarEditorStyles.tsx` | Composant injectant les styles CSS globaux spécifiques au livre (ProseMirror, colonnes, effets). | ✅ DONE |
+| `BookImageView.tsx` | NodeView React du `bookImage` : chargement IndexedDB, handles de resize, contrôles align/fit/filter/delete, pan & scan. | ✅ DONE |
 | `ChapterHeaderView.tsx` | NodeView React du `chapterHeading` : bordure décorative, sélecteur de date, titre éditable. | ✅ DONE |
-| `BookTableOfContents.tsx` | Sommaire auto-généré depuis les noeuds `chapterHeading`. Affiche titre et date. Cliquable pour naviguer. | ✅ DONE |
-| `useBookTableOfContents.ts` | Hook scannant le document Tiptap pour collecter les `chapterHeading` et générer les entrées du sommaire. | ✅ DONE |
+| `BookTableOfContents.tsx` | Sommaire auto-généré depuis les noeuds `chapterHeading`. Affiche titre et date. | ✅ DONE |
+| `useBookTableOfContents.ts` | Hook scannant le document Tiptap pour collecter les `chapterHeading`. | ✅ DONE |
+
+### Sous-composants (`src/components/campaign/book/components/`)
+
+| Fichier | Rôle | Statut |
+|---------|------|--------|
+| `BookEditorToolbar.tsx` | Barre d'outils riche (Gras, Couleur, Highlight, Listes, Images, Alignement). | ✅ DONE |
+| `BookPageBackground.tsx` | Rendu visuel des pages (fond parchemin, numérotation, ombres de reliure). | ✅ DONE |
+| `BookChapterSidebar.tsx` | Barre latérale pour l'insertion rapide de chapitres. | ✅ DONE |
 
 ### Utilitaires
 

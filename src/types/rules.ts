@@ -24,6 +24,15 @@ export interface RulesCreationConfig {
         [key: number]: number; // Allow for extended ranks if needed
     };
     extendedSkills?: boolean;
+
+    // Nouvelle Configuration Habilités Mystiques
+    mysticAbilities?: {
+        active: boolean; // "Lier Habilités Mystiques aux Avantages"
+        progressionWithoutTrait: boolean; // "Progression sans Avantage"
+        skillsPerLevel: Record<string, number>; // "1": 1, "2": 2...
+        defaultMartialArtsCategory?: string; // Target column for Martial Arts (e.g., Col_Comp_7)
+        defaultMysticOtherCategory?: string; // Target column for regular Mystic Abilities (e.g., Col_Comp_5)
+    };
 }
 
 export interface RulesXPCosts {

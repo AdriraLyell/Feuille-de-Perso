@@ -26,6 +26,12 @@ export const ImageSyncResolver = {
         const processed: Record<string, unknown> = {};
 
         for (const [key, value] of Object.entries(obj)) {
+            // SKIP if already compressed
+            if (typeof value === 'string' && value.startsWith(GZIP_MARKER)) {
+                processed[key] = value;
+                continue;
+            }
+
             // Case 1: Portrait Image ID
             if (key === 'characterImageId' && typeof value === 'string' && value.startsWith('img_')) {
                 try {
@@ -49,6 +55,13 @@ export const ImageSyncResolver = {
                 try {
                     const attrs = obj.attrs as Record<string, any>;
                     const imageId = attrs.imageId;
+
+                    // If imageId is already compressed, skip it
+                    if (typeof imageId === 'string' && imageId.startsWith(GZIP_MARKER)) {
+                        processed[key] = value;
+                        continue;
+                    }
+
                     if (typeof imageId === 'string' && imageId.startsWith('img_')) {
                         const blob = await getImage(imageId);
                         if (blob) {
@@ -118,6 +131,18 @@ export const ImageSyncResolver = {
                     processed[key] = '';
                 }
             }
+            // Case 1.1: Portrait Legacy (compressed string in characterImage field)
+            else if (key === 'characterImage' && typeof value === 'string' && value.startsWith(GZIP_MARKER)) {
+                try {
+                    const blob = await base64ToBlob(value);
+                    const newId = await saveImage(blob);
+                    processed.characterImageId = newId;
+                    processed.characterImage = '';
+                } catch (e) {
+                    logger.error("[ImageSyncResolver] Failed to inject legacy character image:", e);
+                    processed[key] = '';
+                }
+            }
             // Case 2: Grimoire Image Node (compressed string in imageId attr)
             else if (key === 'type' && value === 'bookImage' && (obj.attrs as Record<string, any> | undefined)?.imageId?.startsWith?.(GZIP_MARKER)) {
                 try {
@@ -141,7 +166,32 @@ export const ImageSyncResolver = {
                 }
                 processed[key] = value;
             }
-            // Case 3: Generic Compressed Image
+            // Case 3: Campaign Note Cover (base64Cover field)
+            else if (key === 'base64Cover' && typeof value === 'string' && value.startsWith(GZIP_MARKER)) {
+                try {
+                    const blob = await base64ToBlob(value);
+                    const newId = await saveImage(blob);
+                    processed.imageId = newId;
+                    // We don't return here because we want to keep processing other fields in the note
+                } catch (e) {
+                    logger.error("[ImageSyncResolver] Failed to inject note cover image:", e);
+                }
+                // Don't include base64Cover in the final object
+                continue;
+            }
+            // Case 4: Campaign Note Gallery Image (base64Data field)
+            else if (key === 'base64Data' && typeof value === 'string' && value.startsWith(GZIP_MARKER)) {
+                try {
+                    const blob = await base64ToBlob(value);
+                    const newId = await saveImage(blob);
+                    processed.imageId = newId;
+                } catch (e) {
+                    logger.error("[ImageSyncResolver] Failed to inject note gallery image:", e);
+                }
+                // Don't include base64Data in the final object
+                continue;
+            }
+            // Case 5: Generic Compressed Image
             else if (typeof value === 'string' && value.startsWith(GZIP_MARKER)) {
                 try {
                     processed[key] = ImageCompressionService.decompressFull(value);

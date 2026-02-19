@@ -24,13 +24,14 @@ interface DiegeticNavigationProps {
     syncStatus?: 'none' | 'synced' | 'pending' | 'update-available';
     appVersion: string;
     onShowCampaignInfo: () => void;
+    autoSaveCountdown?: number;
 }
 
 const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     currentMode, onModeChange, onOpenImportExport,
     onPrintRequest, onToggleLandscape, isLandscape,
     onShowLogs, showLogs, onShowUserGuide, onShowChangelog, onOpenAppearance, onOpenSync, syncStatus, appVersion,
-    onShowCampaignInfo
+    onShowCampaignInfo, autoSaveCountdown
 }) => {
     const { data, isSyncing } = useCharacter();
     const { rules } = useRules();
@@ -185,10 +186,10 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                         <button
                             onClick={onOpenSync}
                             className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all text-sm font-bold border relative ${syncStatus === 'synced'
-                                    ? 'bg-green-700/20 text-green-500 border-green-700/50'
-                                    : syncStatus === 'update-available'
-                                        ? 'bg-amber-700/30 text-amber-400 border-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.2)] animate-pulse'
-                                        : 'bg-purple-700/20 text-purple-400 border-purple-700/50'
+                                ? 'bg-green-700/20 text-green-500 border-green-700/50'
+                                : syncStatus === 'update-available'
+                                    ? 'bg-amber-700/30 text-amber-400 border-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.2)] animate-pulse'
+                                    : 'bg-purple-700/20 text-purple-400 border-purple-700/50'
                                 }`}
                         >
                             <UploadCloud size={18} className={isSyncing ? "animate-spin-slow" : ""} />
@@ -197,6 +198,12 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                                 <span className="absolute -top-1 -right-1 flex h-3 w-3">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500 border border-gray-900"></span>
+                                </span>
+                            )}
+                            {/* Auto-Save Countdown Badge */}
+                            {typeof autoSaveCountdown === 'number' && (
+                                <span className="absolute -bottom-2 -right-2 bg-blue-600 text-white text-[10px] font-mono font-bold w-5 h-5 flex items-center justify-center rounded-full shadow border-2 border-gray-800 z-10">
+                                    {autoSaveCountdown}
                                 </span>
                             )}
                         </button>

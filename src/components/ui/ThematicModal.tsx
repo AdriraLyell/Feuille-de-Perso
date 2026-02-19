@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -79,7 +80,7 @@ const ThematicModal: React.FC<ThematicModalProps> = ({
         ? "text-stone-500 hover:text-amber-500 hover:bg-amber-900/20 focus:ring-amber-500"
         : "text-[#5c4d41] hover:text-[#8b2e2e] hover:bg-[#8b2e2e]/10 focus:ring-[#8b2e2e]";
 
-    return (
+    const modalContent = (
         <AnimatePresence>
             {isOpen && (
                 <div
@@ -166,6 +167,7 @@ const ThematicModal: React.FC<ThematicModalProps> = ({
             )}
         </AnimatePresence>
     );
+    return createPortal(modalContent, document.body);
 };
 
 export default ThematicModal;

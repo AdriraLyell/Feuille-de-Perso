@@ -12,13 +12,14 @@ const DotRow: React.FC<{
     category: string;
     onUpdate: (section: 'skills', category: string, id: string, value: number) => void;
     specializations?: string[];
-    theme?: { creationColor: string, xpColor: string, dotSymbol?: string };
+    theme?: { creationColor: string, xpColor: string, dotSymbol?: string, skillColors?: { variable?: string, mysticDefault?: string, mysticOverrides?: Record<string, string> } };
     imposedSpecs?: { name: string, minLevel: number }[];
     onDefineVariant?: (category: string, id: string, name: string) => void;
     allowExtendedSkills?: boolean;
     isEditing?: boolean;
     onRemove?: (category: string, id: string) => void;
-}> = ({ entry, category, onUpdate, specializations = [], theme, imposedSpecs = [], onDefineVariant, allowExtendedSkills = false, isEditing = false, onRemove }) => {
+    validateIncrease?: (id: string, newValue: number) => { allowed: boolean; reason?: string };
+}> = ({ entry, category, onUpdate, specializations = [], theme, imposedSpecs = [], onDefineVariant, allowExtendedSkills = false, isEditing = false, onRemove, validateIncrease }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     // Spacer logic
@@ -78,6 +79,50 @@ const DotRow: React.FC<{
         }
     };
 
+    const getTextColor = (): string | undefined => {
+        const skill = entry as any;
+        const colors = theme?.skillColors;
+
+        // 1. Surcharge spécifique Habilité Mystique
+        if (skill.mysticAbilityId && colors?.mysticOverrides?.[skill.mysticAbilityId]) {
+            return colors.mysticOverrides[skill.mysticAbilityId];
+        }
+
+        // 2. Défaut Mystique
+        if (skill.mysticAbilityId) {
+            return colors?.mysticDefault || '#8b5cf6';
+        }
+
+        // 3. Compétence Variable
+        // On considère variable si flag isVariable présent OU si un variant est défini (même vide)
+        if (skill.isVariable || entry.variant !== undefined) {
+            return colors?.variable || '#d97706';
+        }
+
+        return undefined;
+    };
+
+    const textColor = getTextColor();
+
+    // Validation Check for Interaction
+    const handleUpdate = (val: number) => {
+        if (validateIncrease && val > entry.value) {
+            const check = validateIncrease(entry.id, val);
+            if (!check.allowed) {
+                // Show toast/alert? For now just block and maybe log
+                // Ideally we show a tooltip on hover if blocked?
+                // But DotRating handles clicks.
+                // We just won't call onUpdate if invalid?
+                // And show a browser alert or console warning is brutal.
+                // Let's rely on the parent to handle the "rejection" or just block.
+                logger.warn(`Skill increase blocked: ${check.reason}`);
+                alert(check.reason); // Simple fallback
+                return;
+            }
+        }
+        onUpdate('skills', category, entry.id, val);
+    };
+
     return (
         <div
             className={`flex justify-between items-center px-2 border-b border-dotted border-stone-300 h-5 hover:bg-stone-50 transition-colors relative group ${isEditing ? 'cursor-grab active:cursor-grabbing select-none' : ''}`}
@@ -95,19 +140,22 @@ const DotRow: React.FC<{
         >
             <span
                 className={`text-xs truncate font-medium transition-colors ${isUndefinedVariable
-                    ? 'text-amber-600 font-bold cursor-pointer hover:underline'
+                    ? 'font-bold cursor-pointer hover:underline' // Removed text-color classes to let style override
                     : hasSpecs
-                        ? 'text-blue-900 font-semibold cursor-help underline underline-offset-2 decoration-blue-300'
-                        : 'text-stone-700 cursor-default'}`}
+                        ? 'font-semibold cursor-help underline underline-offset-2 decoration-blue-300' // Removed text-blue-900
+                        : 'cursor-default'}`} // Removed text-stone-700
                 // Dynamic width adjustment to avoid overlap with extra bubbles
-                style={{ width: effectiveMax > 5 ? '45%' : '65%' }}
+                style={{
+                    width: effectiveMax > 5 ? '45%' : '65%',
+                    color: textColor ? textColor : (isUndefinedVariable ? '#d97706' : (hasSpecs ? '#1e3a8a' : '#44403c')) // Fallbacks: amber-600, blue-900, stone-700
+                }}
                 onClick={handleClick}
                 title={entry.description || (entry.variant ? `${entry.name} : ${entry.variant}` : entry.name)}
             >
                 {entry.variant !== undefined ? (
                     <>
-                        <span className="text-amber-600 font-bold">{entry.name}{' : '}</span>
-                        <span className={`${isUndefinedVariable ? 'italic opacity-60' : 'text-stone-500 font-normal'}`}>
+                        <span style={{ color: textColor || '#d97706' }} className="font-bold">{entry.name}{' : '}</span>
+                        <span className={`${isUndefinedVariable ? 'italic opacity-60' : 'font-normal'}`} style={{ color: textColor ? textColor : (isUndefinedVariable ? 'inherit' : '#78716c') }}>
                             {entry.variant || '...'}
                         </span>
                     </>
@@ -138,7 +186,7 @@ const DotRow: React.FC<{
             <DotRating
                 value={entry.value}
                 creationValue={entry.creationValue}
-                onChange={(val) => onUpdate('skills', category, entry.id, val)}
+                onChange={handleUpdate}
                 className="scale-90 origin-right ml-auto"
                 creationColor={theme?.creationColor}
                 xpColor={theme?.xpColor}
@@ -166,7 +214,7 @@ export const SkillBlock = React.memo<{
     onUpdate: (section: 'skills', category: string, id: string, value: number) => void;
     userSpecs?: Record<string, string[]>;
     imposedSpecs?: Record<string, { name: string, minLevel: number }[]>;
-    theme?: { creationColor: string, xpColor: string, dotSymbol?: string };
+    theme?: { creationColor: string, xpColor: string, dotSymbol?: string, skillColors?: { variable?: string, mysticDefault?: string, mysticOverrides?: Record<string, string> } };
     onDefineVariant?: (category: string, id: string, name: string) => void;
     allowExtendedSkills?: boolean;
     description?: string;
@@ -174,7 +222,8 @@ export const SkillBlock = React.memo<{
     categoryBehavior?: 'Compétence' | 'Secondaire' | 'Arrière-plan' | 'Compteur';
     onDrop?: (category: string, item: any, targetIndex: number) => void;
     onRemove?: (category: string, id: string) => void;
-}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, isEditing = false, onDrop, onRemove }) => {
+    validateIncrease?: (id: string, newValue: number) => { allowed: boolean; reason?: string };
+}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, isEditing = false, onDrop, onRemove, validateIncrease }) => {
     const [showDesc, setShowDesc] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
     const [dropIndex, setDropIndex] = useState<number>(-1);
@@ -281,6 +330,7 @@ export const SkillBlock = React.memo<{
                             allowExtendedSkills={allowExtendedSkills}
                             isEditing={isEditing}
                             onRemove={onRemove}
+                            validateIncrease={validateIncrease}
                         />
                     );
                 })}

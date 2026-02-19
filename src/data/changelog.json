@@ -1,193 +1,122 @@
 [
     {
-        "version": "2.49.77",
-        "date": "2026-02-16",
+        "version": "2.56.46",
+        "date": "2026-02-19",
         "type": "fix",
-        "changes": [
-            "🔄 Recréation : Rétablissement du statut 'variable' (ex: Artisanat : ..., Langue : ...) pour les compétences le nécessitant",
-            "🧹 Skills : Le nettoyage préserve désormais l'intention de spécialisation des compétences tout en effaçant le choix précédent"
-        ]
+        "description": "Nettoyage final du journal des modifications et validation de la structure JSON."
     },
     {
-        "version": "2.49.76",
-        "date": "2026-02-16",
+        "version": "2.56.45",
+        "date": "2026-02-19",
         "type": "fix",
-        "changes": [
-            "🔄 Recréation : Nettoyage automatique des variantes et compétences personnalisées pour ne garder que le socle de la campagne",
-            "🧹 Skills : Correction de la persistance des compétences vides ou hors-règles lors du reset forcé par le MJ"
-        ]
+        "description": "Correction finale d'une erreur de syntaxe JSON dans le journal des modifications qui bloquait le serveur de développement."
     },
     {
-        "version": "2.49.75",
-        "date": "2026-02-16",
+        "version": "2.56.44",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Correction de l'affichage du Journal des Modifications : les descriptions de versions s'affichent désormais correctement dans l'interface."
+    },
+    {
+        "version": "2.56.43",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Stabilisation technique : Correction des erreurs de syntaxe JSON, suppression des doublons d'attributs JSX et rétablissement des imports React dans la modale de synchronisation."
+    },
+    {
+        "version": "2.56.39",
+        "date": "2026-02-19",
         "type": "feat",
-        "changes": [
-            "👤 Personnage : Clonage du personnage Ayame vers Nika pour le joueur Polo effectué avec succès"
-        ]
+        "description": "Ajout de l'interface de restauration des backups (SyncModal). Les joueurs peuvent désormais consulter leurs deux dernières versions historiques sur le cloud et les restaurer d'un clic."
     },
     {
-        "version": "2.49.74",
-        "date": "2026-02-16",
+        "version": "2.56.38",
+        "date": "2026-02-19",
         "type": "feat",
-        "changes": [
-            "🔄 Recréation : Amélioration chirurgicale du processus de reset pour préserver l'Identité, le Social, l'Équipement et l'Image du personnage",
-            "🛡️ Traits : Conservation des Avantages/Désavantages lors d'une recréation imposée par le MJ",
-            "💰 XP : Simplification du remboursement basé sur l'intégralité de l'historique des logs de progression",
-            "🎨 UI : Mise à jour de la modale de recréation pour clarifier les éléments préservés et réinitialisés"
-        ]
+        "description": "Implémentation de l'Auto-Save (1min) et backups rotatifs (Trigger SQL). Ajout d'un compteur visuel sur le bouton de synchronisation Cloud et gestion intelligente de l'historique (2 versions max) côté serveur."
     },
     {
-        "version": "2.49.73",
-        "date": "2026-02-16",
+        "version": "2.56.37",
+        "date": "2026-02-19",
         "type": "fix",
-        "changes": [
-            "🛡️ Sécurité : Suppression de l'attribution automatique de propriété dans DatabaseService pour éviter le verrouillage des fiches legacy",
-            "👤 Personnage : Déverrouillage des fiches d'Ayame et Louise (reset created_by à NULL) pour restaurer l'accès public",
-            "🔓 RLS : Mise à jour des politiques Supabase pour autoriser la lecture anonyme des fiches sans propriétaire"
-        ]
+        "description": "Correction critique du calcul des bonus XP des traits (ex: Apprentissage Rapide). Le calculateur prend désormais en compte les définitions globales des traits (Base de Données) lorsque ceux-ci ne sont pas redéfinis localement, assurant l'application correcte des effets."
     },
     {
-        "version": "2.49.72",
-        "date": "2026-02-16",
-        "type": "docs",
-        "changes": [
-            "📝 Documentation : Mise à jour exhaustive du schéma de base de données (mystic_abilities, vues, relations)",
-            "📝 Documentation : Ajout du guide de procédure pour le clonage de personnage via SQL",
-            "👤 Personnage : Clonage de Ayame vers Akane pour le joueur Polo effectué avec succès"
-        ]
+        "version": "2.56.36",
+        "date": "2026-02-19",
+        "type": "chore",
+        "description": "Maintenance Base de Données : Activation de la sécurité RLS sur les tables Mystiques, ajout des index manquants sur les clés étrangères pour la performance, et optimisation des requêtes de vérification des droits Admin."
     },
     {
-        "version": "2.49.71",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🛡️ CI : Correction des erreurs de typage TypeScript bloquant le workflow (RecreationService)",
-            "🧩 UI : Fix du typage missing onUpdate dans le composant AttributeBlock",
-            "🧹 Lint : Suppression d'un double cast booléen redondant dans AdminSkillLibrary"
-        ]
+        "version": "2.56.35",
+        "date": "2026-02-19",
+        "type": "refactor",
+        "description": "Optimisation de la structure Admin : Découpage des bibliothèques (Compétences, Historiques, Habilités Mystiques, Compteurs) en sous-composants dédiés pour améliorer la maintenabilité et réduire la taille des fichiers sources (gain de ~150-200 lignes par fichier critique)."
     },
     {
-        "version": "2.49.70",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "📖 Journal : Fix de la conversion des dimensions d'images lors de la migration (px vers %)",
-            "🖼️ UI : Ajout d'une limite de hauteur maximale (800px) pour les images du Grimoire",
-            "📏 Migration : Correction du ratio d'aspect forcé à 'auto' pour les images importées"
-        ]
+        "version": "2.56.34",
+        "date": "2026-02-19",
+        "type": "chore",
+        "description": "Opération 'Racine Propre' : Migration des scripts utilitaires vers le dossier dédié, archivage des fichiers SQL temporaires et nettoyage des logs. Migration systématique des derniers `console.log/warn/error` vers le logger applicatif pour une meilleure hygiène de production."
     },
     {
-        "version": "2.49.69",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "📂 Admin : Déplacement de la fonctionnalité de recréation vers les paramètres spécifiques de chaque campagne (Fiches des Destins)",
-            "🧩 Imports : Correction d'une erreur de référence sur l'icône RotateCcw",
-            "⏳ UX : Ajout d'états de chargement et verrouillage pendant le processus de recréation"
-        ]
-    },
-    {
-        "version": "2.49.68",
-        "date": "2026-02-16",
+        "version": "2.56.33",
+        "date": "2026-02-19",
         "type": "feat",
-        "changes": [
-            "🔄 Recréation : Implémentation du système de 'Respec' pour les personnages (Admin)",
-            "💰 XP : Remboursement automatique de l'XP de progression (attributs, compétences, compteurs) lors d'une recréation",
-            "🛡️ Mode Création : Réactivation du mode création avec injection du remboursement et redistribution auto",
-            "🎨 UI : Nouvelle modale de confirmation 'Recréation Éthérée' avec bilan des gains d'XP et avertissements"
-        ]
+        "description": "Amélioration de la persistance des données portables : Synchronisation complète des images du Grimoire et des couvertures de Notes de Campagne. Persistance des paramètres locaux (Mode Expert, Source des Règles) dans le JSON exporté pour une expérience sans couture entre appareils. Sécurisation de la compression d'images (idempotence WebP/Gzip)."
     },
     {
-        "version": "2.49.67",
-        "date": "2026-02-16",
+        "version": "2.56.32",
+        "date": "2026-02-19",
         "type": "feat",
-        "changes": [
-            "🛡️ Attributs : Verrouillage de la valeur de création (val1) une fois le mode création validé",
-            "📈 XP : Implémentation de l'achat d'attributs via la colonne val2 avec calcul auto de l'XP dépensée",
-            "🎨 UI : Feedback visuel (opacité, curseur) sur les champs d'attributs verrouillés"
-        ]
+        "description": "Implémentation de la 'Purge Profonde' séparée de la réinitialisation de fiche. Ajout d'un bouton de purge dans l'onglet Cloud (Moniteur de Stockage) permettant de vider complètement l'IndexedDB (images, règles) et le LocalStorage en cas de blocage majeur, avec redémarrage automatique."
     },
     {
-        "version": "2.49.66",
-        "date": "2026-02-16",
+        "version": "2.56.31",
+        "date": "2026-02-20",
         "type": "fix",
-        "changes": [
-            "🩹 Image : Correction du préfixe Data URI manquant lors de la décompression (fix 431 Request Header Too Large)",
-            "🛡️ Stabilité : Détection automatique des schémas d'images corrompus dans les registres admin"
-        ]
+        "description": "Correction du calcul du bonus d'XP par scénario (Traits). Les sessions sont désormais mieux détectées même si le montant est à 0 (détection via le nom du scénario). Amélioration des logs de diagnostic XP et fixation des erreurs de validation Zod lors du chargement initial."
     },
     {
-        "version": "2.49.65",
-        "date": "2026-02-16",
+        "version": "2.56.30",
+        "date": "2026-02-20",
         "type": "fix",
-        "changes": [
-            "🐛 Admin : Correction critique du chargement des portraits compressés (GZIP) dans la vue Admin",
-            "🖼️ UI : Amélioration de la gestion des erreurs d'image (fallback silhouette)"
-        ]
+        "description": "Sécurisation et typage strict des champs optionnels (mysticAbilityId, coûts, descriptions) à travers l'application. Harmonisation des Interfaces et Schémas Zod pour éliminer les erreurs de build et prévenir les plantages liés aux valeurs nulles."
     },
     {
-        "version": "2.49.64",
-        "date": "2026-02-16",
+        "version": "2.56.29",
+        "date": "2026-02-20",
         "type": "fix",
-        "changes": [
-            "🖼️ Admin : Correction du bug d'affichage des portraits manquants d'Ayame (Seigneurs des Mystères)",
-            "🛡️ UI : Ajout d'un placeholder 'Silhouette' explicite en cas d'erreur de chargement d'image",
-            "🐛 Fix : Gestion robuste des IDs d'images morts dans la vue Admin"
-        ]
+        "description": "Correction d'un blocage de navigation après réinitialisation des paramètres. Ajout de la modale de confirmation d'abandon et amélioration de la détection des changements non enregistrés."
     },
     {
-        "version": "2.49.63",
-        "date": "2026-02-16",
+        "version": "2.56.28",
+        "date": "2026-02-19",
         "type": "fix",
-        "changes": [
-            "🛡️ Schema : Correction de la structure `mysticAbilities` dans le validateur Zod (LibrarySkillEntry vs DotEntry).",
-            "🚀 Import : Résolution du bug empêchant l'import de fiches contenant des capacités mystiques."
-        ]
+        "description": "Refonte majeure de la robustesse du schéma de données personnage (Zod) pour éliminer les erreurs de chargement au rafraîchissement. Ajout de logs de diagnostic pour le calcul des bonus XP des traits."
     },
     {
-        "version": "2.49.62",
-        "date": "2026-02-15",
+        "version": "2.56.27",
+        "date": "2026-02-19",
         "type": "fix",
-        "changes": [
-            "🩹 Personnage : Restauration manuelle des attributs d'Ayame (3,1,3,3...) dans le Cloud",
-            "🛡️ Schema : Correction de la validation Zod (mysticAbilities) pour éviter les resets de fiche",
-            "🔍 Sync : Information MJ ajoutée pour guider la joueuse lors de la prochaine synchro"
-        ]
+        "description": "Correction d'une erreur de validation (Zod) au chargement du personnage liée aux nouveaux IDs d'effets de traits."
     },
     {
-        "version": "2.49.61",
-        "date": "2026-02-15",
+        "version": "2.56.26",
+        "date": "2026-02-19",
         "type": "fix",
-        "changes": [
-            "🐞 Sync : Correction des erreurs de typage bloquant le build",
-            "🔍 Debug : Ajout de logs dans la console pour le suivi de la synchronisation cloud"
-        ]
+        "description": "Correction de la persistance du mode de calcul des bonus XP (Fixe vs Par Scénario) dans les bibliothèques Admin."
     },
     {
-        "version": "2.49.60",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🔔 Synchronisation : Notification automatique des mises à jour disponibles sur le Cloud",
-            "✨ UI : Ajout d'un indicateur visuel (badge ambre pulsant) sur le bouton Sync",
-            "🛡️ Sync : Préservation des métadonnées de synchronisation lors des mises à jour partielles"
-        ]
-    },
-    {
-        "version": "2.49.59",
-        "date": "2026-02-15",
+        "version": "2.56.25",
+        "date": "2026-02-19",
         "type": "fix",
-        "changes": [
-            "💾 Admin : Correction ordre de sauvegarde (Habilités avant Compétences) pour garantir les liens"
-        ]
+        "description": "Correction de l'avertissement React sur les clés manquantes dans l'éditeur d'effets de traits (TraitEffectEditor) et garantie des IDs uniques lors de l'édition."
     },
     {
-        "version": "2.49.58",
-        "date": "2026-02-15",
+        "version": "2.56.24",
+        "date": "2026-02-19",
         "type": "fix",
-        "changes": [
-            "🔍 Admin : Ajout d'un filtre 'Mystique' dans la réserve de compétences",
-            "🐞 Admin : Correction de l'erreur d'import dans LibraryLoader"
-        ]
+        "description": "Correction de la sauvegarde des effets mécaniques des traits dans la bibliothèque Admin (évite les réinitialisations). Synchronisation automatique des bibliothèques (traits, compétences) sur la feuille lors de la mise à jour des règles, assurant la transmission correcte des effets."
     }
 ]

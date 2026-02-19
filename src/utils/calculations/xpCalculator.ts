@@ -6,6 +6,7 @@ import {
     RulesData
 } from '../../types';
 import { normalizeString } from '../stringUtils';
+import { logger } from '../logger';
 
 /**
  * Calcule la somme triangulaire : n + (n-1) + ... + 1
@@ -35,7 +36,7 @@ export const getXPCost = (currentValue: number, creationValue: number = 0, facto
  */
 export const calculateExperienceResults = (data: CharacterSheetData, rules?: RulesData): ExperienceData => {
     // 0. Extraction des effets actifs des traits
-    const activeEffects = getActiveTraitEffects(data);
+    const activeEffects = getActiveTraitEffects(data, rules);
 
     // 1. Helpers pour les bonus
     const getFreeRankLimit = (skillName: string) => {
@@ -56,9 +57,31 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
         return effect ? effect.value : 0;
     };
 
-    const traitXPBonus = activeEffects
-        .filter(e => e.type === 'xp_bonus')
+    // Calcul des bonus XP (Fixe vs Par Scénario)
+    const xpEffects = activeEffects.filter(e => e.type === 'xp_bonus');
+
+    // Bonus Fixes
+    const fixedBonus = xpEffects
+        .filter(e => !e.method || e.method === 'fixed')
         .reduce((sum, e) => sum + e.value, 0);
+
+    // Bonus par Scénario
+    const scenarioLogs = (data.xpLogs || []).filter(log =>
+        log.countsAsScenario !== undefined
+            ? log.countsAsScenario
+            : (log.amount > 0 || (log.scenario && log.scenario.trim() !== ''))
+    );
+    const scenarioCount = scenarioLogs.length;
+
+    const perScenarioBonus = xpEffects
+        .filter(e => e.method === 'per_scenario')
+        .reduce((sum, e) => sum + (e.value * scenarioCount), 0);
+
+    const totalTraitXP = fixedBonus + perScenarioBonus;
+    if (totalTraitXP !== 0) {
+        const sessionNames = scenarioLogs.map(l => l.scenario || `ID:${l.id.substring(0, 4)}`).join(', ');
+        logger.log(`[xpCalculator] Traits XP Bonus: ${totalTraitXP} (Fixed: ${fixedBonus}, PerScenario: ${perScenarioBonus}, Sessions: ${scenarioCount} [${sessionNames}])`);
+    }
 
     // 2. Calcul de l'XP dépensée
     let totalSpent = 0;
@@ -78,10 +101,22 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 
     // 3. Calcul du bilan final
     const gainFromLogs = (data.xpLogs || []).reduce((sum, entry) => sum + (entry.amount || 0), 0);
-    const totalGain = gainFromLogs + traitXPBonus;
+    const totalGain = gainFromLogs + totalTraitXP;
+
+    // Construction de l'affichage détaillé
+    let gainDisplay = totalGain.toString();
+    let tooltip = `Total : ${totalGain} XP\n\nBase (Historique) : ${gainFromLogs}`;
+
+    if (totalTraitXP > 0) {
+        gainDisplay += ` (+${totalTraitXP})`;
+
+        if (fixedBonus > 0) tooltip += `\nBonus Fixe : +${fixedBonus}`;
+        if (perScenarioBonus > 0) tooltip += `\nBonus Scénarios (${scenarioCount} sessions) : +${perScenarioBonus}`;
+    }
 
     return {
-        gain: traitXPBonus > 0 ? `${gainFromLogs} (+${traitXPBonus})` : gainFromLogs.toString(),
+        gain: gainDisplay,
+        gainTooltip: tooltip,
         spent: totalSpent.toString(),
         rest: (totalGain - totalSpent).toString()
     };
@@ -89,14 +124,32 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 
 /**
  * Extrait tous les effets de traits actifs du personnage
+ * Recherche d'abord dans la bibliothèque locale, puis dans les règles globales
  */
-function getActiveTraitEffects(data: CharacterSheetData): TraitEffect[] {
+function getActiveTraitEffects(data: CharacterSheetData, rules?: RulesData): TraitEffect[] {
     const activeEffects: TraitEffect[] = [];
+
+    // Indexation pour éviter les O(N²)
+    const globalTraits = rules?.libraries?.traits || [];
+    const globalTraitMap = new Map(globalTraits.map(t => [normalizeString(t.name), t]));
+
     const findEffects = (traitName: string) => {
         if (!traitName) return;
-        const entry = data.library?.find(l => l.name.trim().toLowerCase() === traitName.trim().toLowerCase());
-        if (entry && entry.effects) {
-            entry.effects.forEach(e => activeEffects.push(e));
+        const normalizedName = normalizeString(traitName);
+
+        // 1. Recherche Local
+        const localEntry = data.library?.find(l => normalizeString(l.name) === normalizedName);
+        if (localEntry && localEntry.effects && localEntry.effects.length > 0) {
+            localEntry.effects.forEach(e => activeEffects.push(e));
+            return;
+        }
+
+        // 2. Recherche Global (si pas trouvé en local ou pas d'effets en local)
+        const globalEntry = globalTraitMap.get(normalizedName);
+        if (globalEntry && globalEntry.effects && globalEntry.effects.length > 0) {
+            // Log pour debug
+            // logger.log(`[xpCalculator] Using global effects for trait "${traitName}"`);
+            globalEntry.effects.forEach(e => activeEffects.push(e));
         }
     };
 
@@ -146,8 +199,8 @@ function calculateSkillXP(
                     const libDef = libCounters.find(c => c.id === skill.id)
                         || libCounters.find(c => normalizeString(c.name) === normalizeString(displayName));
 
-                    const baseCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 5);
-                    const freeBase = libDef?.defaultValue !== undefined ? libDef.defaultValue : (sysDef?.defaultValue ?? 0);
+                    const baseCost = libDef?.xpCost != null ? libDef.xpCost : (sysDef?.xpCost ?? 5);
+                    const freeBase = libDef?.defaultValue != null ? libDef.defaultValue : (sysDef?.defaultValue ?? 0);
                     const effectiveBase = Math.max(skill.creationValue || 0, freeBase);
 
                     baseFactor = baseCost * multiplier;
@@ -220,7 +273,7 @@ function calculateCounterXP(
         const libDef = libCounters.find(c => c.id === key)
             || libCounters.find(c => normalizeString(c.name) === normalizeString(displayName));
 
-        const xpCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 0);
+        const xpCost = libDef?.xpCost != null ? libDef.xpCost : (sysDef?.xpCost ?? 0);
 
         if (xpCost > 0) {
             let multiplier = 1.0;
@@ -244,10 +297,10 @@ function calculateCounterXP(
                 || libCounters.find(c => normalizeString(c.name) === normalizeString(counter.name));
             const sysDef = Object.values(rulesCounters).find(c => c.name === counter.name);
 
-            const xpCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 0);
+            const xpCost = libDef?.xpCost != null ? libDef.xpCost : (sysDef?.xpCost ?? 0);
 
             if (xpCost > 0) {
-                const modelDefault = libDef?.defaultValue ?? (sysDef?.defaultValue ?? 0);
+                const modelDefault = libDef?.defaultValue != null ? libDef.defaultValue : (sysDef?.defaultValue ?? 0);
                 const creationValue = Math.max(counter.creationValue || 0, modelDefault);
                 counterSpent += getXPCost(counter.value, creationValue, xpCost, false);
             }

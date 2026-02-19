@@ -1,5 +1,380 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.16] - 2026-02-14 [CHORE]
+
+
+
+## [2.49.15] - 2026-02-14 [FIX]
+
+
+
+## [2.49.14] - 2026-02-14 [REFACTOR]
+
+
+
+## [2.49.13] - 2026-02-14 [REFACTOR]
+
+
+
+## [2.49.12] - 2026-02-14 [CHORE]
+
+
+
+## [2.49.11] - 2026-02-14 [FIX]
+
+- 📊 Admin : Repositionnement de la colonne 'Taille' entre 'Dernière Sync' et 'Actions'
+- 📂 Admin : Ajout de la colonne 'Taille' dans la vue par campagne (`CampaignCharactersView`)
+- 🎨 UI : Alignement centré et style mono pour les indicateurs de taille
+
+# Historique Ancien (Legacy Changelog)
+
+## [2.49.10] - 2026-02-14 [FEAT]
+
+- 📊 Admin : Affichage de la taille des données (JSONB) pour chaque personnage dans la Master List
+- ⚡ Performance : Optimisation via une vue SQL (`pg_column_size`) pour éviter de charger les données complètes lors du listing
+- 📁 UI : Ajout d'une colonne 'Taille' avec formatage intelligent (o, ko, Mo)
+
+## [2.49.9] - 2026-02-14 [FEAT]
+
+- 📦 Stockage : Implémentation du `StorageMonitor` pour visualiser l'espace IndexedDB (Cloud / Réglages)
+- 🔔 Alertes : Ajout d'indicateurs visuels globaux dans la barre de navigation (Orange >= 70%, Rouge >= 90%)
+- 📱 Mobile : Intégration des alertes de stockage dans le menu mobile
+- 🔄 UX : Rafraîchissement automatique des statistiques de stockage lors du focus de la page
+
+## [2.49.8] - 2026-02-14 [REFACTOR]
+
+- 📂 Structure : Déplacement de `src/constants.ts` vers `src/constants/app.ts` pour une meilleure organisation
+- 🔗 Imports : Mise à jour de tous les chemins d'importation des constantes globales à travers le projet
+- 🛠️ Build : Mise à jour du script `sync-version` pour supporter la nouvelle structure de fichiers
+
+## [2.49.7] - 2026-02-14 [MAINTENANCE]
+
+- 🛡️ Typage Admin : Refonte complète de la sécurité des types pour la gestion des bibliothèques (Phase C & E)
+- 🧹 Code Health : Éradication massive des `@ts-ignore` et `any` dans les composants d'administration critiques
+- 🔧 Hooks Admin : Typage strict des handlers génériques pour la mise à jour des compteurs et de la configuration de création
+- 🧩 Composants : Amélioration de la robustesse de `AdminTraitLibrary`, `AdminBackgroundLibrary` et `AdminCounterLibrary`
+- 🛡️ DB Fetches : Sécurisation des appels `DatabaseService` dans les services de chargement et d'import (Phase D)
+
+## [2.49.6] - 2026-02-14 [REFACTOR]
+
+- 🎨 Design System : Extraction des constantes magiques vers des variables CSS (--color-paper, --shadow-sheet, etc.)
+- 🧹 Nettoyage : Standardisation du fichier index.css et suppression des redondances de couleurs hexadécimales
+- 📏 Géométrie : Centralisation des dimensions de la fiche (Portrait/Paysage) et des facteurs de zoom d'impression
+- 🛡️ Stabilité : Validation du build de production avec le nouveau système de variables
+
+## [2.49.5] - 2026-02-14 [MAINTENANCE]
+
+- 🧠 Refactoring Majeur : Optimisation complète de `SkillsEditor` et `ImportPanel` (réduction de 50% du code)
+- 🏗️ Architecture : Création de hooks dédiés `useSkillsEditorActions` et `useImportLogic`
+- 🧩 Composants : Extraction de `SkillCategoryEditor`, `FileDropZone`, `FileAnalysisHeader`, `MigrationSuccessModal`
+- 🚀 Performance : Allègement significatif des composants critiques de la fiche joueur
+- 🔧 Types : Éradication des `any` critiques dans les migrations et l'import/export (+50 corrections)
+- 🛡️ Stabilité : Renforcement de la logique d'import de fichiers JSON avec typage strict
+
+## [2.49.4] - 2026-02-14 [REFACTOR]
+
+- 🧠 Refactoring Admin : Extraction massive de la logique vers `useDashboardActions`, `useSkillEditorActions` et `useCreationEditorActions`
+- 🧩 Modularité : Décomposition des composants `AdminDashboard`, `AdminSkillsEditor` et `AdminCreationEditor` en sous-composants réutilisables
+- 📉 Dette Technique : Réduction drastique de la taille des fichiers Admin principaux (jusqu'à -60% de lignes)
+- 🧹 Dépendances : Suppression de `tiptap-pagination-plus` (obsolète)
+- 🔧 Types : Correction et alignement des types pour `useLibraryImport` et `CandidateLine`
+- 🐛 Fix : Résolution du chemin d'import critique pour `useCampaignLabels` dans l'admin
+- ✅ Build : Validation finale du build de production et de l'administration
+
+## [2.49.3] - 2026-02-14 [REFACTOR]
+
+- 🧠 Refactoring : Extraction massive des sections de `CharacterReadOnlyView.tsx` en 10 sous-composants modulaires
+- 📚 Admin : Décomposition de `AdminSpecializationLibrary.tsx` pour une meilleure maintenance
+- 🚀 Performance : Réduction de la taille des fichiers composants et isolation des responsabilités UI
+- 🎨 UI : Conservation de l'esthétique premium tout en simplifiant la structure du code
+
+## [2.49.2] - 2026-02-14 [FEAT]
+
+- Renforcement du typage strict des éditeurs Admin (Creation, Counters, Skills)
+- Correction des imports de types et signatures génériques dans les composants Admin
+- Suppression des types 'any' résiduels dans LibraryLoader et LibraryImporter
+- Validation du build complet sans erreurs de typage
+
+## [2.49.1] - 2026-02-14 [PATCH]
+
+- 🛡️ Typage Strict : Amélioration de la sécurité des types dans l'éditeur de compétences Admin
+- 🧹 Refactoring : Extraction de la logique de réconciliation des compétences et historiques vers `skillsReconciler.ts`
+- 🔧 Hooks : Renforcement du typage pour `useCharacterSheetActions` et suppression des `any` résiduels
+- 🐛 Fix : Correction des types pour `BookDocument` et `ChapterHeading`
+
+## [2.49.0] - 2026-02-14 [MINOR]
+
+- ☁️ Cloud Sync : Activation de la synchronisation des images (Grimoire & Portraits) vers le cloud
+- 🗜️ Compression : Implémentation du pipeline WebP (qualité 50%) + GZIP pour minimiser le poids sur Supabase
+- 🔄 Synchronisation : Les images vous suivent désormais sur tous vos appareils via le Cloud
+- 👀 Admin : Les MJ peuvent désormais voir les illustrations des joueurs dans la vue Administrateur
+- 🛡️ Architecture : Conversion automatique IDs locaux <-> Données compressées lors des cycles de Sync
+
+## [2.48.21] - 2026-02-13 [PATCH]
+
+- 🛠️ Fix Resizing : Correction des poignées de redimensionnement qui étaient masquées par le cadre blanc
+- 📏 Précision : Décalage des poignées vers l'extérieur et augmentation de leur priorité visuelle (z-index)
+
+## [2.48.20] - 2026-02-13 [PATCH]
+
+- 🛠️ Fix Toolbar : Correction d'un bug qui empêchait de quitter le mode 'Recadrage' à cause de l'interception des clics par le conteneur d'image
+- 🖱️ UX : La barre d'outils est désormais isolée des interactions de glissement de l'image
+
+## [2.48.19] - 2026-02-13 [PATCH]
+
+- 📸 Pan & Scan : Nouveau mode de recadrage interne pour les images en mode 'Remplir' (Cover)
+- 🖱️ Interaction : Cliquez sur l'icône de cadrage et faites glisser l'image à l'intérieur de son cadre pour choisir la meilleure zone
+- 💾 Sauvegarde : La position du cadrage (posX/posY) est désormais conservée par image
+- ✨ UI : Ajout d'indices visuels lors du mode recadrage
+
+## [2.48.18] - 2026-02-13 [PATCH]
+
+- 🎨 Esthétique : Suppression du fond gris derrière les images (fond transparent)
+- 🖼️ Design : Renforcement du cadre blanc (5px) pour un effet 'Polaroid/Photo'
+- 🌗 Ombres : Amélioration des ombres portées pour une meilleure intégration sur le papier
+
+## [2.48.17] - 2026-02-13 [PATCH]
+
+- 🎯 Centrage : Les images centrées respectent désormais leur largeur personnalisée (plus besoin de forcer 100%)
+- 📏 Correction Auto : Résolution du bug de hauteur infinie et de rendu vide pour les images verticales en mode Auto
+- 💎 Stabilité : Amélioration de la robustesse CSS pour prévenir les dépendances circulaires de hauteur
+
+## [2.48.16] - 2026-02-13 [PATCH]
+
+- 🖱️ Déplacement : Activation du Drag & Drop natif pour déplacer les images dans le flow du texte
+- 🧹 Nettoyage : Suppression du filtre Sépia (obsolète)
+- 🏗️ Stabilité : Correction des types d'images et nettoyage des imports
+
+## [2.48.15] - 2026-02-13 [PATCH]
+
+- 🔳 Images : Ajout de poignées de redimensionnement multidirectionnelles
+- ↔️ Axe Horizontal : Nouvelle barre latérale pour ajuster uniquement la largeur (avec magnétisme)
+- ↕️ Axe Vertical : Nouvelle barre inférieure pour ajuster uniquement la hauteur
+- 📐 Coin Diagonal : Conservation de la poignée de coin pour un redimensionnement libre
+- 🖱️ Ergonomie : Curseurs contextuels indiquant l'axe de redimensionnement
+
+## [2.48.14] - 2026-02-13 [PATCH]
+
+- 🔳 Images : Remplacement des boutons S/M/L par un redimensionnement manuel fluide
+- 🧲 Aimant Magnétique : Le redimensionnement s'accroche proprement aux tailles standards (25%, 33%, 50%, 75%, 100%)
+- 📝 Habillage Texte : Le texte enroule désormais les images alignées à gauche ou à droite
+- 🛡️ Limites Intelligentes : L'image s'auto-limite à 55% de largeur en mode habillage pour préserver la lisibilité
+
+## [2.48.13] - 2026-02-13 [PATCH]
+
+- ✨ Journal : Restauration du traçage visuel des images
+- 🖱️ Mode Dessin : Cliquer sur le bouton Image permet désormais de tracer directement un rectangle sur la page pour définir la zone d'insertion
+- 📏 Intelligence : La largeur et la hauteur de l'image sont automatiquement calculées d'après votre tracé
+- 🎯 Précision : L'image est insérée à l'emplacement exact (paragraphe) où vous relâchez la souris
+
+## [2.48.12] - 2026-02-13 [PATCH]
+
+- 🔳 Images : Restauration du concept de 'Zone Rectangulaire'
+- 📏 Contrôle Height : Ajout de boutons +/- pour ajuster la hauteur de l'image indépendamment de sa largeur
+- 🖼️ Mode Remplissage : Ajout d'un bouton pour basculer entre 'Ajuster' (Contain) et 'Remplir' (Cover - zoom pour remplir le cadre)
+- 🔄 Flexibilité : Bouton 'Auto' pour revenir au ratio naturel de l'image
+
+## [2.48.11] - 2026-02-13 [PATCH]
+
+- 🛠️ Fix Layout : Correction de la mise à jour dynamique de la zone de défilement lors du redimensionnement massif d'images
+- 📏 Pagination : Ajout d'un système de synchronisation plus robuste pour détecter les nouvelles pages créées par le reflow CSS
+
+## [2.48.10] - 2026-02-13 [PATCH]
+
+- 🛠️ Fix Image : Correction de la visibilité des contrôles sur les petites images (25%)
+- 📏 Mise en page : La barre d'outils de l'image peut désormais déborder du cadre et passer à la ligne si nécessaire
+
+## [2.48.9] - 2026-02-13 [PATCH]
+
+- 🎨 UI Image : Ajout de filtres visuels (Sépia, Noir & Blanc) pour coller à l'esthétique Grimoire
+- ✏️ Légendes : Édition directe des légendes sous les images
+- 🖼️ Design : Ajout d'un cadre 'photo' avec ombre portée pour dissocier l'image du parchemin
+
+## [2.48.8] - 2026-02-13 [MINOR]
+
+- 🖼️ Images : Phase 1 de l'optimisation du Grimoire
+- 💾 Stockage : Migration du Base64 vers IndexedDB (gain de place massif dans les sauvegardes)
+- 🔄 Auto-Migration : Script automatique convertissant les anciennes images lors du chargement ou de l'import
+- 🛠️ Extension : Activation de l'extension BookImage avec gestion de l'alignement et de la taille
+
+## [2.48.7] - 2026-02-13 [PATCH]
+
+- 🛡️ Schéma : Correction critique du Zod schema pour inclure bookDocument (évite la perte de données au rechargement)
+- 🔧 Typage : Amélioration du typage dans ChapterHeaderView (suppression des 'any' Tiptap)
+- 📋 Task List : Mise à jour du suivi de progression du Grimoire
+
+## [2.48.6] - 2026-02-13 [MINOR]
+
+- 📖 Sommaire : Implémentation du Sommaire dynamique (Table des Matières) automatique en début de livre
+- 🚀 Navigation : Support de la navigation par clic depuis le sommaire vers les chapitres correspondants
+- 🔄 Migration : Automatisation de la migration des anciennes notes de journal vers le nouveau format Grimoire (v2)
+- 🧹 Clean Up : Suppression des anciens composants de journal obsolètes (NotebookTextarea, useJournal, etc.)
+
+## [2.48.5] - 2026-02-13 [PATCH]
+
+- 🧠 UX : Migration vers la sélection native Tiptap (setTextSelection) pour un surlignage fiable et persistant des titres de chapitres
+
+## [2.48.4] - 2026-02-13 [PATCH]
+
+- 🎯 UX : Correction critique de la sélection locale des chapitres (ne saute plus au premier chapitre du livre)
+
+## [2.48.3] - 2026-02-13 [PATCH]
+
+- ✍️ UX : Garantie de la sélection automatique du titre (surlignage) lors de la création d'un chapitre via un cycle de rendu stabilisé
+
+## [2.48.2] - 2026-02-13 [PATCH]
+
+- ✍️ UX : Correction de la sélection du titre lors de l'ajout d'un chapitre (désormais correctement surligné pour modification immédiate)
+
+## [2.48.1] - 2026-02-13 [PATCH]
+
+- 📅 UX : L'icône calendrier ouvre désormais un sélecteur de date natif
+- ✍️ UX : Auto-focus et sélection automatique du texte lors de la création d'un chapitre pour une saisie immédiate
+
+## [2.48.0] - 2026-02-13 [MINOR]
+
+- 📖 Journal : Implémentation de la création manuelle de Chapitres/Sessions
+- 🛠️ Interface : Ajout d'une barre d'outils flottante persistante pour le formatage (Gras, Italique)
+- 🔖 Structure : Les chapitres forcent désormais un saut de page (double-page) pour une organisation claire du récit
+- 📅 Metadata : Intégration d'un champ Date intelligent au sein de chaque en-tête de chapitre
+- 🖼️ Média : Accès rapide à l'insertion d'images via la barre d'outils
+
+## [2.47.0] - 2026-02-13 [MINOR]
+
+- 🎨 UI : Ajustement précis des marges (100px table, 50px toolbar) pour un rendu premium
+- 🏛️ Structure : Calibration du tableau de groupe (PartyTable) sur les dimensions du grimoire (1484x1000px)
+- 📜 Esthétique : Migration vers un thème unifié 'Parchemin ivoire' (#fbf4e9) pour tout le module campagne
+- 🐞 Bugfix : Nettoyage automatique des pages vides lors de la suppression de texte
+- 📖 Expérience : Navigation intelligente (masquage flèches aux limites) et affichage forcé par paires de pages (spreads)
+- 🏗️ Robustesse : Correction du bug de décalage de 40px en fin de livre (ghost shift)
+
+## [2.46.0] - 2026-02-13 [MAJOR]
+
+- 📖 Journal : Implémentation du nouveau moteur 'Columnar' basé sur les colonnes CSS natives
+- 🚀 Performance : Suppression de toute la logique de pagination lourde au profit d'un rendu navigateur ultra-fluide
+- 🎨 UI : Nouveau design en double-page (spread) avec navigation ancrées et centrage dynamique
+- 🖼️ Média : Gestion optimisée des images (évite les coupes entre colonnes) et intégration Tiptap Image
+- 🧹 Clean Up : Suppression massive de code obsolète (BookLayout, FlipView, BookEditorContext, etc.)
+
+## [2.45.22] - 2026-02-13 [FIX]
+
+- 📖 Pagination : Correction du décalage Chapitres/Pages entre les modes Édition et Lecture
+- 🔧 Core : Robustesse de la détection de coupe (posAtDOM) pour supporter les overlays graphiques
+- 🧹 Code Clean : Suppression du code de debug (window.editor)
+
+## [2.45.21] - 2026-02-13 [FIX]
+
+- 📖 Livre : Correction de la pagination en mode Lecture. Les pages sont désormais calculées correctement même quand l'éditeur est masqué.
+- 📏 Dimensions : Ajustement des hauteurs (Page: 1000px, Cadre: 1200px) pour un meilleur équilibre entre espace et pagination cohérente.
+
+## [2.45.20] - 2026-02-13 [PATCH]
+
+- 📖 Livre : L'ombre de la pliure centrale est maintenant limitée à la hauteur réelle des pages du livre (et ne déborde plus sur l'en-tête)
+- 🏗️ Refactoring : Déplacement de la décoration de pliure dans BookFlipView pour un alignement au pixel près
+
+## [2.45.19] - 2026-02-13 [PATCH]
+
+- 👥 Groupe : Suppression de l'ombre de pliure centrale dans l'onglet Groupe pour une meilleure lisibilité du tableau
+
+## [2.45.18] - 2026-02-13 [PATCH]
+
+- 📖 Livre : Agrandissement vertical du cadre (1200px -> 1400px) et de l'effet table
+- 🎨 UI : Retrait de l'ombre de pliure centrale en mode Édition pour une vue plus 'plate' et moderne
+
+## [2.45.17] - 2026-02-13 [REFACTOR]
+
+- 🏗️ Architecture : Refactorisation majeure de CampaignNotes (suppression de DigitalBookEditor)
+- ⚡ Performance : Extraction de la logique de calcul des pages vers useBookPages
+- 🎨 UI : Correction des cadres imbriqués et suppression des backgrounds redondants
+
+## [2.45.16] - 2026-02-13 [PATCH]
+
+- 📖 Livre : Ajout d'une page vierge à droite si le nombre de pages est impair pour respecter l'aspect 'livre ouvert'
+- 🎨 UI : Masquage du numéro de page sur les pages vierges
+- 📐 Layout : Alignement vertical (Top) parfait entre les modes Édition et Lecture (0px delta)
+
+## [2.45.15] - 2026-02-12 [MINOR]
+
+- 📖 Livre numérique : Ajout d'une séparation visuelle entre les pages en mode édition
+- ✨ UX : Intégration de 'tiptap-pagination-plus' pour gérer les sauts de page dynamiquement
+- 📐 Layout : Ajustement des marges et du rendu pour correspondre au format papier
+
+## [2.45.14] - 2026-02-12 [PATCH]
+
+- 📖 Livre : Correction de la pagination pour éviter la disparition de la dernière ligne en bas de page
+- 📏 Algorithme : Prise en compte précise des marges et fusion des blocks (margin-collapse) lors du calcul des pages
+- ⚡ Performance : Optimisation de la découpe des longs paragraphes par recherche binaire
+
+## [2.45.13] - 2026-02-12 [PATCH]
+
+- 📖 Livre : Suppression totale des barres de défilement (ascenseurs) en mode lecture pour une immersion parfaite
+- 🎨 UI : Ajustement des conteneurs parents pour éviter les débordements visuels et masquer les scrollbars sur toutes les résolutions
+- 📏 Mise en page : Centrage amélioré du livre dans son écrin de bois
+
+## [2.45.12] - 2026-02-12 [PATCH]
+
+- 📖 Livre : Préservation intégrale de la mise en forme (gras, italique, etc.) lors du découpage des paragraphes géants
+- 🛠️ Algorithme : Utilisation de l'API Range du DOM pour un découpage HTML structurellement sûr
+- 📏 Précision : Mesures de hauteur encore plus fidèles grâce au rendu des balises réelles lors du calcul du split
+
+## [2.45.11] - 2026-02-12 [PATCH]
+
+- 📖 Livre : Rétablissement de la vue double-page (cote-à-cote)
+- ✨ UX : Suppression du flickering via la désactivation des coins interactifs (showPageCorners)
+- 🎨 Style : Nettoyage des ombres CSS redondantes pour laisser le moteur FlipBook gérer le relief
+- 🚀 Performance : Optimisation de l'auto-dimensionnement (autoSize: true)
+
+## [2.45.10] - 2026-02-12 [BUGFIX]
+
+- 🐛 Fix : Correction majeure du BookPageSplitter pour gérer les paragraphes géants sans ponctuation
+- 🔄 Algorithme : Implémentation d'une file d'attente (queue) pour le traitement récursif des blocs
+- 🔤 Fallback : Ajout d'un découpage mot-par-mot si le découpage par phrases ne suffit pas
+- 🪵 Logging : Transition vers le logger système (logger.log/info) pour le suivi de la pagination
+
+## [2.45.9] - 2026-02-12 [PATCH]
+
+- 🐛 Fix Critique : Correction du dimensionnement du BookPageSplitter (contenu tronqué en mode Lecture)
+- 📐 Constants : Séparation correcte des dimensions totales (722×980) et zone de contenu (562×836)
+- 📏 CSS : Passage du padding en pixels (72px 80px) pour garantir la synchronisation avec les constantes JS
+
+## [2.45.8] - 2026-02-12 [MINOR]
+
+- 📖 Livre Numérique : Harmonisation rigoureuse des dimensions (722px) entre modes Écriture et Lecture
+- 📏 Layout : Enforced fixed width et correction de l'élargissement infini via overflow-wrap: break-word
+- ✂️ Pagination : Correction du BookPageSplitter (mesures précises via matching des classes CSS)
+- 🖼️ Viewer : Optimisation du rendu double-page avec react-pageflip (size: fixed)
+
+## [2.45.7] - 2026-02-12 [MINOR]
+
+- Phase C : Typage strict des handlers admin (value: any → unknown ou génériques)
+- AdminCountersEditor : Typage générique <K extends keyof RulesCounterDefinition>
+- AdminTraitLibrary : Typage générique <K extends keyof TraitEffect>
+- AdminCreationEditor et sous-composants : any → unknown pour champs dynamiques
+
+## [2.45.6] - 2026-02-12 [MINOR]
+
+- Refactoring majeur de CreationHUD.tsx (537 → 168 lignes)
+- Extraction de useCreationBudget hook pour la logique de calcul
+- Extraction de BudgetGauge et CreationValidationModal en composants réutilisables
+- Suppression de tous les @ts-ignore dans CreationHUD via typage strict
+
+## [2.45.5] - 2026-02-12 [PATCH]
+
+- 🧹 Audit : Suppression de 12 fichiers de débris à la racine du projet (logs, tests, doublons)
+- 🛠️ Build : Correction de 4 erreurs de compilation pré-existantes (imports manquants, exports dupliqués, accès typé)
+- 📄 Docs : Mise à jour de regle.md, AUDIT_SUMMARY.md et .gitignore
+- 🔄 Version : Résolution de la désynchronisation de version entre package.json et constants.ts
+
+## [2.45.4] - 2026-02-12 [PATCH]
+
+- ✨ Landing Page Wow Effect : Refonte immersive de RulesSourceSelector avec le thème 'Mystic' Premium
+- 🛡️ Secure Entry : Harmonisation du LoginScreen avec la même esthétique (lueurs, textures, boutons thématiques)
+- 📱 Mobile UX : Implémentation d'un menu 'hamburger' animé dans la navigation diégétique
+- 🎨 Micro-Interactions : Ajout d'animations Framer Motion sur les cartes de sélection et les boutons d'action
+- 📏 Responsive : Optimisation de la typographie et des espacements pour tablettes et smartphones
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.45.3] - 2026-02-12 [PATCH]
 
 - 🛡️ Sécurité & Fiabilité : Ajout de blocs try/catch/finally sur toutes les actions asynchrones de l'Admin

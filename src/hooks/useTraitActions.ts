@@ -25,6 +25,7 @@ export const useTraitActions = (
             name: '',
             type: defaultType,
             cost: '1',
+            pointsLabel: '1 point',
             description: '',
             tags: [],
             effects: []

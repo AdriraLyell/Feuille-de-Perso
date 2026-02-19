@@ -1,31 +1,32 @@
-# Plan de Correction : Migration & Contraintes Images
+# Implementation Plan: Free Movement for Journal Images
 
-## Objectif
-Corriger l'import des images de l'ancien journal vers le nouveau Grimoire et sécuriser l'affichage pour éviter les débordements verticaux.
+## Goal
+Enable users to position journal images freely on the page using drag and drop, while maintaining the existing columnar layout for regular text.
 
-## Changements Proposés
+## Proposed Changes
 
-### 1. Limite de hauteur (`src/components/campaign/book/BookImageView.tsx`)
-- Ajouter une contrainte `max-height: 800px` au style de l'image.
-- S'assurer que le ratio est conservé (`width: auto` si nécessaire quand la hauteur est contrainte).
+### 1. Tiptap Extension (`src/extensions/bookImage.ts`)
+- Add `offsetX` and `offsetY` to `BookImageAttributes`.
+- Update `addAttributes` to include these with default values of `0`.
+- Update `align` attribute to include `'free'`.
 
-### 2. Correction Migration (`src/utils/migrations/migrateCampaignNotes.ts`)
-- Détecter si `width` est en pixels (type `number`).
-- **Logique de conversion** :
-  - Si `width > 500px` (ou centré) → `100%`.
-  - Sinon → convertir en pourcentage approximatif de la colonne (~600px) : `Math.min(100, Math.round((px / 600) * 100)) + '%'`.
-- S'assurer que les images migrées n'ont pas de hauteur fixée qui pourrait écraser le ratio (laisser `auto` ou vide par défaut).
+### 2. React NodeView (`src/components/campaign/book/BookImageView.tsx`)
+- Add `'drag-free'` interaction mode.
+- Update `style` to use `transform: translate(offsetX, offsetY)` when in `free` mode.
+- Update UI to include "Free" alignment button.
+- Add drag handling for free movement using `activeInteraction`.
+- Add a "Reset Position" button.
 
-## Plan de Vérification
+## Verification Plan
 
-### Tests Manuels
-1. **Migration** :
-   - (Idéalement) Importer un JSON d'ancien personnage (si disponible).
-   - À défaut : Vérifier que le code compile et que la logique TypeScript est saine.
-2. **Affichage** :
-   - Insérer une image très haute dans le journal.
-   - Vérifier qu'elle est contrainte à 800px et ne déborde pas sur la page suivante (ou ne laisse pas une page vide).
-   - Vérifier que le redimensionnement manuel fonctionne toujours.
+### Manual Tests
+1. **Free Alignment**:
+   - Select an image and click "F" (Free).
+   - Drag the image to different positions.
+   - Switch back to "C" (Center) and verify it returns to flow.
+   - Switch back to "F" and verify it remembers its last offset.
+2. **Persistence**:
+   - Move an image, save/reload and verify position persists.
 
-### Validation Automatique
-- exécution de `npm run typecheck` pour s'assurer qu'aucune régression de type n'est introduite.
+### Automatic Validation
+- `npm run build` to ensure no TypeScript or JSX errors.

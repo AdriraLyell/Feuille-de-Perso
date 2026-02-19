@@ -80,7 +80,8 @@ function processSkillCategories(
                             name,
                             definitionId,
                             max,
-                            description: description || existing.description
+                            description: description || existing.description,
+                            variant: existing.variant !== undefined ? existing.variant : ""
                         };
                     });
                 } else {
@@ -111,7 +112,8 @@ function processSkillCategories(
                         max,
                         name,
                         description: description || existing.description,
-                        definitionId
+                        definitionId,
+                        variant: (existing.variant === "" || existing.variant === undefined) ? undefined : existing.variant
                     }];
                 } else {
                     return [{

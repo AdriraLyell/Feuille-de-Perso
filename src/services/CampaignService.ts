@@ -205,12 +205,11 @@ export const CampaignService = {
         // 2. Synchronize Libraries
         try {
             await LibraryService.syncLibraries(id, rules);
+            return { success: true };
         } catch (libError) {
             ErrorService.handleError(libError, { context: 'CampaignService.saveSetting', userMessage: "Erreur sauvegarde bibliothèques." });
             return { success: false, message: `Erreur Bibliothèques: ${(libError as Error).message}` };
         }
-
-        return { success: true };
     },
 
     /**

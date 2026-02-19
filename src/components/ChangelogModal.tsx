@@ -81,6 +81,12 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ isOpen, onClose }) => {
                                         )}
                                     </div>
 
+                                    {entry.description && (
+                                        <p className="text-sm text-slate-700 leading-relaxed mb-3">
+                                            {entry.description}
+                                        </p>
+                                    )}
+
                                     <ul className="space-y-2">
                                         {(entry.changes || []).map((change: string | { type: string, text: string, category: string }, i: number) => {
                                             const text = typeof change === 'string' ? change : change.text;

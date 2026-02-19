@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CharacterSheetData, LibraryEntry } from '../types';
-import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, Download, RefreshCw, X } from 'lucide-react';
+import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, Download, RefreshCw, X, Globe, Zap, Sparkles } from 'lucide-react';
 import TraitCard from './trait-library/TraitCard';
 import TraitForm from './trait-library/TraitForm';
 import TraitImportModal from './trait-library/TraitImportModal';
@@ -14,12 +14,17 @@ interface TraitLibraryProps {
     data: CharacterSheetData;
     onUpdate: (newData: CharacterSheetData) => void;
     onSelect?: (entry: LibraryEntry) => void;
-    onMultiSelect?: (instances: { entry: LibraryEntry; variant?: string }[]) => void;
+    onMultiSelect?: (instances: { entry: LibraryEntry; variant?: string; cost?: string }[]) => void;
     isEditable?: boolean;
     defaultFilter?: 'all' | 'avantage' | 'desavantage';
+    hidePossessed?: boolean;
+    lockFilter?: boolean;
 }
 
-const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, onMultiSelect, isEditable = true, defaultFilter = 'all' }) => {
+const TraitLibrary: React.FC<TraitLibraryProps> = ({
+    data, onUpdate, onSelect, onMultiSelect,
+    isEditable = true, defaultFilter = 'all', hidePossessed = false, lockFilter = false
+}) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<'all' | 'avantage' | 'desavantage'>(defaultFilter);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -27,7 +32,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
     const { processedList, hybridList, allAvailableTags } = useTraitLibrary(
-        data, searchTerm, filterType, selectedTags, sortBy, sortOrder
+        data, searchTerm, filterType, selectedTags, sortBy, sortOrder, hidePossessed
     );
 
     const {
@@ -105,18 +110,36 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                     )}
                 </div>
 
+                {/* Legend Section */}
+                <div className="flex flex-wrap gap-2 pt-1 border-t border-[#bfae85]/10">
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50/50 border border-blue-200/50 rounded-full w-fit">
+                        <Globe size={10} className="text-indigo-600" />
+                        <span className="text-[9px] font-bold text-indigo-800/70 uppercase tracking-tight whitespace-nowrap">Officiel</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50/50 border border-blue-200/50 rounded-full w-fit">
+                        <Layers size={10} className="text-blue-600" />
+                        <span className="text-[9px] font-bold text-blue-800/70 uppercase tracking-tight whitespace-nowrap">Variant</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-50/50 border border-amber-200/50 rounded-full w-fit">
+                        <Zap size={10} className="text-amber-500 fill-amber-500" />
+                        <span className="text-[9px] font-bold text-amber-800/70 uppercase tracking-tight whitespace-nowrap">Effets</span>
+                    </div>
+                </div>
+
                 <div className="flex gap-2 items-center flex-wrap md:flex-nowrap">
                     <div className="relative flex-grow min-w-[150px]">
                         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
                         <input className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80" placeholder="Rechercher..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                     </div>
-                    <div className="flex bg-[#bfae85]/20 rounded-sm p-0.5 shrink-0">
-                        {['all', 'avantage', 'desavantage'].map((t) => (
-                            <button key={t} onClick={() => setFilterType(t as any)} className={`px-3 py-1 text-xs font-bold rounded-sm transition-colors ${filterType === t ? 'bg-white text-[#5c4d41] shadow-sm' : 'text-[#5c4d41]/70 hover:text-[#5c4d41]'}`}>
-                                {t === 'all' ? 'Tout' : t === 'avantage' ? 'Avantages' : 'Désavantages'}
-                            </button>
-                        ))}
-                    </div>
+                    {!lockFilter && (
+                        <div className="flex bg-[#bfae85]/20 rounded-sm p-0.5 shrink-0">
+                            {['all', 'avantage', 'desavantage'].map((t) => (
+                                <button key={t} onClick={() => setFilterType(t as any)} className={`px-3 py-1 text-xs font-bold rounded-sm transition-colors ${filterType === t ? 'bg-white text-[#5c4d41] shadow-sm' : 'text-[#5c4d41]/70 hover:text-[#5c4d41]'}`}>
+                                    {t === 'all' ? 'Tout' : t === 'avantage' ? 'Avantages' : 'Désavantages'}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-2 text-xs border-t border-[#bfae85]/20 pt-2">
@@ -175,63 +198,71 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                 </div>
             </div>
 
-            {showFooter && (
-                <div className="absolute bottom-0 left-0 right-0 p-3 bg-[#fdfbf7] border-t border-[#bfae85]/30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex flex-col gap-2 z-20">
-                    {selection.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto py-1">
-                            {selection.map(s => (
-                                <div key={s.tempId} className="flex items-center gap-1 bg-amber-100/50 border border-amber-200 rounded-full pl-2 pr-1 py-0.5 text-[10px] text-amber-900 group/item animate-in zoom-in-50 duration-200">
-                                    <span className="font-bold">{s.entry.name}</span>
-                                    {s.variant && <span className="opacity-60 italic">: {s.variant}</span>}
-                                    <button onClick={() => removeInstance(s.tempId)} className="p-0.5 hover:bg-amber-200 rounded-full transition-colors"><X size={10} /></button>
-                                </div>
-                            ))}
+            {
+                showFooter && (
+                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-[#fdfbf7] border-t border-[#bfae85]/30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex flex-col gap-2 z-20">
+                        {selection.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto py-1">
+                                {selection.map(s => (
+                                    <div key={s.tempId} className="flex items-center gap-1 bg-amber-100/50 border border-amber-200 rounded-full pl-2 pr-1 py-0.5 text-[10px] text-amber-900 group/item animate-in zoom-in-50 duration-200">
+                                        <span className="font-bold">{s.entry.name}</span>
+                                        {s.variant && <span className="opacity-60 italic">: {s.variant}</span>}
+                                        <button onClick={() => removeInstance(s.tempId)} className="p-0.5 hover:bg-amber-200 rounded-full transition-colors"><X size={10} /></button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        <div className="flex justify-between items-center">
+                            <span className="text-xs font-bold text-[#5c4d41]">{selection.length} trait(s) sélectionné(s)</span>
+                            <button onClick={handleConfirmMultiSelect} disabled={selection.length === 0} className="bg-[#5c4d41] hover:bg-[#4a3b32] disabled:item-stone-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-sm font-bold text-sm flex items-center gap-2 shadow-sm transition-all">
+                                <Plus size={16} /> Ajouter la sélection
+                            </button>
                         </div>
-                    )}
-                    <div className="flex justify-between items-center">
-                        <span className="text-xs font-bold text-[#5c4d41]">{selection.length} trait(s) sélectionné(s)</span>
-                        <button onClick={handleConfirmMultiSelect} disabled={selection.length === 0} className="bg-[#5c4d41] hover:bg-[#4a3b32] disabled:item-stone-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-sm font-bold text-sm flex items-center gap-2 shadow-sm transition-all">
-                            <Plus size={16} /> Ajouter la sélection
-                        </button>
                     </div>
-                </div>
-            )}
+                )
+            }
 
-            {isImportModalOpen && (
-                <TraitImportModal
-                    data={data}
-                    onClose={() => setIsImportModalOpen(false)}
-                    onImport={(entries) => { handleImportTraits(entries); setIsImportModalOpen(false); }}
-                />
-            )}
+            {
+                isImportModalOpen && (
+                    <TraitImportModal
+                        data={data}
+                        onClose={() => setIsImportModalOpen(false)}
+                        onImport={(entries) => { handleImportTraits(entries); setIsImportModalOpen(false); }}
+                    />
+                )
+            }
 
-            {variantPicker && (
-                <TraitVariantPicker
-                    variantPicker={variantPicker}
-                    onClose={() => setVariantPicker(null)}
-                    onSelect={addInstanceWithVariant}
-                />
-            )}
+            {
+                variantPicker && (
+                    <TraitVariantPicker
+                        variantPicker={variantPicker}
+                        onClose={() => setVariantPicker(null)}
+                        onSelect={addInstanceWithVariant}
+                    />
+                )
+            }
 
-            {isModalOpen && editForm && (
-                <TraitForm
-                    editForm={editForm}
-                    library={[]}
-                    allSkills={allSkills}
-                    allAttributes={allAttributes}
-                    tagInput={tagInput}
-                    error={error}
-                    setEditForm={setEditForm}
-                    setTagInput={setTagInput}
-                    onClose={() => setIsModalOpen(false)}
-                    onSave={handleSave}
-                    addTag={addTag}
-                    removeTag={removeTag}
-                    addEffect={addEffect}
-                    updateEffect={updateEffect}
-                    removeEffect={removeEffect}
-                />
-            )}
+            {
+                isModalOpen && editForm && (
+                    <TraitForm
+                        editForm={editForm}
+                        library={[]}
+                        allSkills={allSkills}
+                        allAttributes={allAttributes}
+                        tagInput={tagInput}
+                        error={error}
+                        setEditForm={setEditForm}
+                        setTagInput={setTagInput}
+                        onClose={() => setIsModalOpen(false)}
+                        onSave={handleSave}
+                        addTag={addTag}
+                        removeTag={removeTag}
+                        addEffect={addEffect}
+                        updateEffect={updateEffect}
+                        removeEffect={removeEffect}
+                    />
+                )
+            }
 
             <ConfirmationModal
                 isOpen={showOfficialUpdateConfirm}
@@ -263,7 +294,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({ data, onUpdate, onSelect, o
                 type={updateResult?.success ? "success" : "danger"}
                 cancelLabel=""
             />
-        </div>
+        </div >
     );
 };
 

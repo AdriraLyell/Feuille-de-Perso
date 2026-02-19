@@ -1,6 +1,6 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.49.22)
+# Audit - État des Lieux & Roadmap (Synthèse v2.56.35)
 
-> **Dernière mise à jour** : 2026-02-14 — Version 2.49.22
+> **Dernière mise à jour** : 2026-02-19 — Version 2.56.35
 
 ## 1. Phases Complétées
 
@@ -22,11 +22,19 @@
 - [x] **Tests E2E** : Migration des tests vers le nouveau Grimoire Digital (TiPTap + CSS Columns) et correction des sélecteurs de démarrage.
 - [x] **Performance CI** : Réduction du temps de run de ~3 minutes grâce au cache Playwright.
 
+### ✅ Phase 14 : Hygiène & Logging (v2.56.34)
+- [x] **Racine Propre** : Déplacement des scripts utilitaires vers `/scripts` et archivage des SQL temporaires vers `docs/archive/sql/`.
+- [x] **Logging System** : Migration des derniers reliquats de `console.*` directs vers le `logger` applicatif (xpCalculator, useCloudSyncCheck, SyncModal, StorageMonitor, ReadOnlyPortrait).
+- [x] **Purge Logs** : Suppression des fichiers volumineux de logs ESLint à la racine.
+
+### ✅ Phase 15 : Refactorisation Admin (v2.56.35)
+- [x] **Découpage Bibliothèques** : Extraction des composants `Item` (Skill, Background, Mystic, Counter) dans des fichiers dédiés.
+- [x] **Maintenance** : Réduction drastique de la taille des fichiers sources critiques (gain ~150 lignes/fichier).
+
 ## 2. Issues Restantes & Roadmap
 
-### 🔶 Issue 4.1 — `console.log` directs (PARTIELLE)
-- **12 occurrences** de `console.*` directs restantes (hors logger).
-- Logger conditionnel `src/utils/logger.ts` adopté dans les composants critiques (CharacterReadOnlyView, etc.).
+### ✅ Issue 4.1 — `console.log` directs (COMPLÉTÉE)
+- Migration systématique vers `src/utils/logger.ts`.
 
 **Score global : 14/15 corrigés, 1 restant (4.1-partiel/4.3)**
 
@@ -59,7 +67,22 @@
 - **Résultat** : `RuleCalculationsService.ts` réduit à une simple façade (~30 lignes). Logique métier isolée et testable.
 
 ---
-*Dernière mise à jour : 16 Février 2026 - v2.49.71*
+*Dernière mise à jour : 19 Février 2026 - v2.56.20*
+
+### ✅ Phase 24 : Refactorisation de ColumnarEditor (Audit v2.56.20) - [RÉSOLU]
+- **Refactoring** : Éclatement d'un composant massif (670+ lignes) en sous-composants spécialisés.
+- **Composants créés** : `BookEditorToolbar.tsx`, `BookPageBackground.tsx`, `BookChapterSidebar.tsx`, `ColumnarEditorStyles.tsx`.
+- **Résultat** : Réduction drastique de la taille de `ColumnarEditor.tsx` (~670 -> ~280 lignes). Amélioration de la lisibilité et séparation claire UI vs Logique. Suppression du CSS inline au profit d'un composant de style dédié.
+- **Maintenance** : Mise à jour des imports et validation du build de production.
+
+### ✅ Phase 23 : Personnalisation des Bibliothèques & UI (Audit v2.49.87) - [RÉSOLU]
+- **Modularité** : Harmonisation visuelle des indicateurs de surcharge (icône Cyan `PencilLine` unifiée).
+- **Flexibilité** : Déverrouillage de l'édition globale pour les compétences ayant des surcharges locales.
+- **Sécurité** : Verrouillage strict de la suppression pour les éléments utilisés dans des campagnes (Correction bug de suppression accidentelle).
+- **Fiabilité** : Correction du bug de "Reset" via la capture automatique de la `masterDefinition` lors de l'édition.
+- **Stabilité React** : Éradication des avertissements de console liés aux valeurs `null` dans les éléments `select`.
+- **Résultat** : Un système de bibliothèque hybride (Global vs Local) totalement fonctionnel, robuste et sans avertissements console.
+
 
 ### ✅ Phase 22 : Santé CI & Typage Strict (Audit v2.49.71) - [RÉSOLU]
 - **CI/CD** : Restauration de l'intégrité du workflow GitHub suite à des erreurs de typage sur les nouvelles fonctionnalités.
@@ -86,8 +109,9 @@
 - Phases A à E complétées. Plus de `@ts-ignore` bloquants ou de `any` injustifiés en production.
 
 ### ✅ Issue 4.3 — Fichiers volumineux (CORRIGÉE/STABILISÉE)
-- **Récemment optimisés** : `SkillsEditor` (479→156L), `ImportPanel` (440→150L).
-- Aucun fichier critique > 400 lignes identifié. `AdminApp` refactorisé via hooks.
+- **Récemment optimisés (v2.56.35)** : `AdminSkillLibrary` (508→370L), `AdminBackgroundLibrary` (450→318L), `AdminMysticLibrary` (404→300L), `AdminCounterLibrary` (359→280L).
+- **Précédemment** : `SkillsEditor` (479→156L), `ImportPanel` (440→150L).
+- Aucun fichier critique de logique pure > 400 lignes.
 
 ### ✅ Issue 5.1 — Variables CSS (CORRIGÉE)
 - Bloc `:root` consolidé dans `src/index.css` avec 14 variables de couleur et 6 de dimension.

@@ -76,6 +76,7 @@ const TraitImportModal: React.FC<TraitImportModalProps> = ({ data, onClose, onIm
                 type: t.type,
                 name: t.entry.name,
                 cost: t.entry.value,
+                pointsLabel: `${t.entry.value} points`,
                 description: t.entry.description || '',
                 tags: t.entry.tag ? [t.entry.tag] : [],
                 effects: existing ? existing.effects : [] // Preserve effects on update? Or clear? Strategy: Preserve.

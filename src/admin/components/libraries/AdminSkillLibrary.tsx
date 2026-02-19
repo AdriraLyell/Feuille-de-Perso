@@ -1,114 +1,17 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React from 'react';
 import { RulesData } from '../../../types/rules';
-import { LibrarySkillEntry } from '../../../types';
-import { Search, Plus, GraduationCap, Save, AlertOctagon, X, Layers, Edit2, Trash2, UploadCloud, CheckCircle2, Circle, Lock, Globe, Filter, Sparkles } from 'lucide-react';
+import { Search, Plus, GraduationCap, Save, AlertOctagon, X, Layers, UploadCloud, CheckCircle2, Circle, Globe, Filter, Sparkles } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import TriStateChip from '../../../components/ui/TriStateChip';
 import { useAdminSkillLibrary } from '../../../hooks/admin/useAdminSkillLibrary';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
-import { PortalTooltip } from '../../../components/ui/PortalTooltip';
+import { SkillLibraryItem } from './skill/SkillLibraryItem';
 
 interface AdminSkillLibraryProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
     globalUsage?: Record<string, number>;
 }
-
-const SkillLibraryItem: React.FC<{
-    skill: LibrarySkillEntry;
-    isPlaced: boolean;
-    isLocked: boolean;
-    toggleSkillActive: (skill: LibrarySkillEntry) => void;
-    handleOpenEdit: (skill: LibrarySkillEntry) => void;
-    handleDelete: (id: string) => void;
-}> = ({ skill, isPlaced, isLocked, toggleSkillActive, handleOpenEdit, handleDelete }) => {
-    const hasVariants = skill.variants && skill.variants.length > 0;
-    const [showVariantsTooltip, setShowVariantsTooltip] = useState(false);
-    const anchorRef = useRef<HTMLDivElement>(null);
-
-    return (
-        <div className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${skill.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
-            {/* 1. Toggle (Fixed width) */}
-            <div className="w-8 flex justify-center shrink-0">
-                <input
-                    type="checkbox"
-                    checked={skill.isActive !== false}
-                    onChange={() => toggleSkillActive(skill)}
-                    className="w-4 h-4 text-blue-600 rounded cursor-pointer"
-                    title={skill.isActive !== false ? "Désactiver (Retirer de la campagne)" : "Activer (Ajouter à la campagne)"}
-                />
-            </div>
-
-            {/* 2. Content (Flexible) */}
-            <div className="flex-grow overflow-hidden pr-2">
-                <div className={`font-bold truncate text-sm ${skill.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={skill.name}>
-                    {skill.name}
-                </div>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                    {skill.isGlobal && <div title="Global Reservoir"><Globe size={11} className="text-indigo-400 shrink-0" /></div>}
-                    {skill.isVariable && (
-                        <div
-                            ref={anchorRef}
-                            className="relative"
-                            onMouseEnter={() => setShowVariantsTooltip(true)}
-                            onMouseLeave={() => setShowVariantsTooltip(false)}
-                            title={!hasVariants ? "Compétence à variantes" : undefined}
-                        >
-                            <Layers
-                                size={11}
-                                className="text-blue-400 shrink-0"
-                            />
-
-                            {hasVariants && (
-                                <PortalTooltip
-                                    anchorRef={anchorRef}
-                                    isOpen={showVariantsTooltip}
-                                    title="Variantes (Réserve)"
-                                >
-                                    <div className="flex flex-wrap gap-1">
-                                        {skill.variants?.map((v, i) => (
-                                            <span key={i} className="bg-slate-700 px-1 rounded-sm border border-slate-600">{v}</span>
-                                        ))}
-                                    </div>
-                                </PortalTooltip>
-                            )}
-                        </div>
-                    )}
-                    {skill.mysticAbilityId && (
-                        <div title="Compétence Mystique">
-                            <Sparkles size={11} className="text-amber-500 shrink-0" />
-                        </div>
-                    )}
-                    {isLocked && <div className="text-amber-500 shrink-0" title={isPlaced ? "Utilisée dans cette campagne" : "Utilisée dans d'autres campagnes"}><Lock size={11} /></div>}
-                    {skill.description && (
-                        <div className="text-[10px] text-slate-500 italic truncate" title={skill.description}>
-                            {skill.description}
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* 4. Actions (Fixed width) */}
-            <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                <button
-                    onClick={() => handleOpenEdit(skill)}
-                    className="text-blue-600 hover:bg-blue-50 p-1 rounded"
-                    title="Modifier"
-                >
-                    <Edit2 size={14} />
-                </button>
-                <button
-                    onClick={() => handleDelete(skill.id)}
-                    disabled={isLocked}
-                    className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
-                    title={isLocked ? "Suppression bloquée : compétence utilisée" : "Supprimer définitivement du repository"}
-                >
-                    <Trash2 size={14} />
-                </button>
-            </div>
-        </div>
-    );
-};
 
 const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
     const {
@@ -131,7 +34,6 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
         placedSkillNames,
         filteredList,
         availableCategories,
-        getCategoryLabel,
         handleOpenNew,
         handleOpenEdit,
         handleDelete,
@@ -141,7 +43,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
         handleBulkSelect,
         handlePublishClick,
         executePublish
-    } = useAdminSkillLibrary(rules, onUpdate, globalUsage);
+    } = useAdminSkillLibrary(rules, onUpdate, globalUsage, 'global');
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-120px)] flex flex-col">
@@ -265,7 +167,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                         {filteredList.map(skill => {
                             const isPlaced = placedSkillNames.has(skill.name.trim().toLowerCase());
                             const isGloballyUsed = !!globalUsage[skill.id];
-                            const isLocked = isPlaced || isGloballyUsed;
+                            const isLocked = isPlaced || isGloballyUsed || !!skill.isCustomized;
 
                             return (
                                 <SkillLibraryItem
@@ -276,6 +178,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                     toggleSkillActive={toggleSkillActive}
                                     handleOpenEdit={handleOpenEdit}
                                     handleDelete={handleDelete}
+                                    availableCategories={availableCategories}
                                 />
                             );
                         })}
@@ -287,7 +190,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                 <ThematicModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
-                    title={editingSkill.id ? 'Modifier Compétence' : 'Nouvelle Compétence'}
+                    title="Modification de la Base Globale"
                     icon={<GraduationCap size={20} />}
                     size={showCategoryHelp ? 'lg' : 'md'}
                     footer={
@@ -311,6 +214,29 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                         value={editingSkill.name}
                                         onChange={(e) => setEditingSkill({ ...editingSkill, name: e.target.value })}
                                     />
+                                </div>
+                                <div>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <label htmlFor="skill-category" className="block text-xs font-bold text-slate-500 uppercase">Catégorie de Placement</label>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCategoryHelp(!showCategoryHelp)}
+                                            className="text-[10px] text-blue-600 hover:underline font-bold"
+                                        >
+                                            {showCategoryHelp ? 'Masquer aide' : 'Aide codes'}
+                                        </button>
+                                    </div>
+                                    <select
+                                        id="skill-category"
+                                        className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 outline-none bg-white font-bold"
+                                        value={editingSkill.defaultCategory || ''}
+                                        onChange={(e) => setEditingSkill({ ...editingSkill, defaultCategory: e.target.value })}
+                                    >
+                                        <option value="">-- Automatique (Base) --</option>
+                                        {availableCategories.map(cat => (
+                                            <option key={cat.code} value={cat.code}>{cat.label} ({cat.code})</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="bg-blue-50 border border-blue-200 rounded p-3 flex items-center gap-3">
                                     <input
@@ -342,7 +268,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                                         setEditingSkill({ ...editingSkill, mysticAbilityId: firstId });
                                                     }
                                                 } else {
-                                                    const { mysticAbilityId, ...rest } = editingSkill;
+                                                    const { mysticAbilityId: _maId, ...rest } = editingSkill;
                                                     setEditingSkill(rest);
                                                 }
                                             }}
@@ -358,7 +284,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                     {editingSkill.mysticAbilityId !== undefined && rules.libraries.mysticAbilities && rules.libraries.mysticAbilities.length > 0 && (
                                         <select
                                             className="w-full border border-amber-300 rounded px-2 py-1 text-xs focus:border-amber-500 outline-none bg-white font-bold"
-                                            value={editingSkill.mysticAbilityId}
+                                            value={editingSkill.mysticAbilityId || ""}
                                             onChange={(e) => setEditingSkill({ ...editingSkill, mysticAbilityId: e.target.value })}
                                         >
                                             <option value="">-- Choisir une habilité --</option>

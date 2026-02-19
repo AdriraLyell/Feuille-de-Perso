@@ -7,6 +7,7 @@ import { createTemplateFromData } from '../../utils/importExportUtils';
 import { getImage, blobToBase64 } from '../../imageDB';
 import { useNotification } from '../../context/NotificationContext';
 import { ImageCompressionService } from '../../services/ImageCompressionService';
+import { ImageSyncResolver } from '../../services/ImageSyncResolver';
 import { ErrorService } from '../../services/ErrorService';
 
 interface ExportPanelProps {
@@ -51,6 +52,20 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
         // Resolve Campaign Notes Images
         if (dataToProcess.campaignNotes) {
             for (const note of dataToProcess.campaignNotes) {
+                // Main Image
+                if (note.imageId && note.imageId.startsWith('img_')) {
+                    try {
+                        const blob = await getImage(note.imageId);
+                        if (blob) {
+                            (note as any).base64Cover = await blobToBase64(blob);
+                        }
+                    } catch (e) {
+                        ErrorService.handleError(e, { context: 'ExportPanel.exportNoteCover', silent: true });
+                    }
+                    delete note.imageId;
+                }
+
+                // Gallery Images
                 if (note.images && Array.isArray(note.images)) {
                     for (const img of note.images) {
                         if (img.imageId) {
@@ -68,6 +83,18 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                 }
             }
         }
+
+        // --- PERSIST LOCAL SETTINGS ---
+        const expertMode = localStorage.getItem('rpg-sheet-expert-mode') === 'true';
+        const activeRulesId = localStorage.getItem('rules-source-id') || undefined;
+
+        dataToProcess.syncInfo = {
+            ...dataToProcess.syncInfo,
+            localSettings: {
+                expertMode,
+                activeRulesId
+            }
+        };
 
         if (!dataToProcess.appVersion) {
             dataToProcess.appVersion = APP_VERSION;
@@ -123,7 +150,10 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
         // --- COMPRESS IMAGES IN EXPORT DATA ---
         addLog("Compression des images en cours...", 'info', 'sheet', 'img-compress');
         try {
-            exportData = await ImageCompressionService.processImages(exportData, 'compress');
+            // resolveImagesForSync is more comprehensive than simple processImages
+            // because it handles bookImage nodes too.
+            const portableData = await ImageSyncResolver.resolveImagesForSync(exportData);
+            exportData = portableData;
             addLog("Images compressées avec succès.", 'success', 'sheet', 'img-compress');
         } catch (e) {
             ErrorService.handleError(e, { context: 'ExportPanel.compression', silent: true });

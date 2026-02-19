@@ -214,7 +214,7 @@ export const DatabaseService = {
 
         if (error) {
             ErrorService.handleError(error, { context, userMessage: "Erreur lors de la synchronisation (upsert)." });
-            return null;
+            throw error;
         }
         return result as T;
     },

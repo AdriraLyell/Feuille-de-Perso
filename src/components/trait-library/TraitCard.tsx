@@ -105,7 +105,7 @@ const TraitCard: React.FC<TraitCardProps> = ({
                         {entry.name}
                     </span>
                     <span className="text-[10px] font-mono font-bold text-[#5c4d41] bg-[#bfae85]/20 px-1 rounded-sm border border-[#bfae85]/10 shrink-0">
-                        {entry.cost} pts
+                        {entry.pointsLabel || entry.cost} pts
                     </span>
                 </div>
                 {entry.description && (

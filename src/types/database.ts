@@ -8,7 +8,9 @@ export interface DBTrait {
     setting_id: string | null; // Global if null
     name: string;
     description?: string;
-    points?: number;
+    cost?: string;
+    points_label?: string;   // Label for multiple costs (ex: "1, 3, 5" or "1-5")
+    is_variable_cost?: boolean;
     category?: string;
     type?: string;           // 'avantage' | 'desavantage'
     tags?: string[];
@@ -40,6 +42,7 @@ export interface DBMysticAbility {
     name: string;
     description?: string;
     is_variable?: boolean;
+    default_category?: string;
     created_at?: string;
     updated_at?: string;
 }
@@ -117,6 +120,10 @@ export interface RelSettingSkill {
     skill_id: string;
     default_category: string;
     is_active: boolean;
+    name_override?: string;
+    is_variable_override?: boolean;
+    mystic_ability_id_override?: string;
+    description_override?: string;
 }
 
 /**
@@ -152,6 +159,7 @@ export interface RelSettingMysticAbility {
     setting_id: string;
     mystic_ability_id: string;
     is_active: boolean;
+    default_category?: string;
 }
 
 /**

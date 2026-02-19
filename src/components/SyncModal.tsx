@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { UploadCloud, AlertTriangle, CheckCircle, RefreshCw, MessageSquare } from 'lucide-react';
+import { UploadCloud, AlertTriangle, CheckCircle, RefreshCw, MessageSquare, History, RotateCcw } from 'lucide-react';
 import ThematicModal from './ui/ThematicModal';
-import { CharacterSyncService } from '../services/CharacterSyncService';
+import { CharacterSyncService, CharacterHistoryEntry } from '../services/CharacterSyncService';
 import { CharacterSheetData } from '../types/character';
 import { GameSettingSummary, CampaignService } from '../services/CampaignService';
 import { useRules } from '../context/RulesContext';
 import { ErrorService } from '../services/ErrorService';
+import { logger } from '../utils/logger';
 
 interface SyncModalProps {
     isOpen: boolean;
     onClose: () => void;
     characterData: CharacterSheetData;
     onSyncComplete: (syncInfo: CharacterSheetData['syncInfo']) => void;
+    onRestore?: (data: CharacterSheetData) => void;
 }
 
 type SyncStatus = 'idle' | 'loading' | 'success' | 'error';
@@ -20,7 +22,8 @@ const SyncModal: React.FC<SyncModalProps> = ({
     isOpen,
     onClose,
     characterData,
-    onSyncComplete
+    onSyncComplete,
+    onRestore
 }) => {
     const { isOnlineMode, rules } = useRules();
     const [campaigns, setCampaigns] = useState<GameSettingSummary[]>([]);
@@ -32,6 +35,38 @@ const SyncModal: React.FC<SyncModalProps> = ({
     const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(false);
     const [isAutoSync, setIsAutoSync] = useState(false);
     const [cloudVersion, setCloudVersion] = useState<{ lastSynced: number, mjMessage?: string } | null>(null);
+    const [history, setHistory] = useState<CharacterHistoryEntry[]>([]);
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+    const [isRestoring, setIsRestoring] = useState(false);
+
+    const loadHistory = async (syncId: string) => {
+        setIsLoadingHistory(true);
+        try {
+            const versions = await CharacterSyncService.getCharacterHistory(syncId);
+            setHistory(versions);
+        } catch (e) {
+            logger.error("Failed to load history", e);
+        } finally {
+            setIsLoadingHistory(false);
+        }
+    };
+
+    const handleRestore = async (entry: CharacterHistoryEntry) => {
+        if (!onRestore) return;
+
+        setIsRestoring(true);
+        try {
+            // Decrypt/Inject images for UI
+            const restoredData = await CharacterSyncService.processImages(entry.data, 'decompress');
+            onRestore(restoredData);
+            onClose();
+        } catch (e) {
+            logger.error("Restoration failed", e);
+            setErrorMessage("Erreur lors de la restauration.");
+        } finally {
+            setIsRestoring(false);
+        }
+    };
 
     // Pre-fill from existing syncInfo or header
     useEffect(() => {
@@ -54,9 +89,11 @@ const SyncModal: React.FC<SyncModalProps> = ({
             // Check if a newer version exists on cloud
             if (characterData.syncInfo?.syncId) {
                 checkCloudVersion(characterData.syncInfo.syncId);
+                loadHistory(characterData.syncInfo.syncId);
             }
         } else {
             setCloudVersion(null);
+            setHistory([]);
         }
     }, [isOpen, characterData, isOnlineMode, rules]);
 
@@ -70,7 +107,7 @@ const SyncModal: React.FC<SyncModalProps> = ({
                 });
             }
         } catch (e) {
-            console.error("Failed to check cloud version", e);
+            logger.error("Failed to check cloud version", e);
         }
     };
 
@@ -257,10 +294,11 @@ const SyncModal: React.FC<SyncModalProps> = ({
 
                 {/* Player Name */}
                 <div>
-                    <label className="block text-sm font-bold text-[#4a3b32] mb-1.5">
+                    <label htmlFor="player-name-input" className="block text-sm font-bold text-[#4a3b32] mb-1.5">
                         Nom du Joueur
                     </label>
                     <input
+                        id="player-name-input"
                         type="text"
                         value={playerName}
                         onChange={(e) => setPlayerName(e.target.value)}
@@ -271,10 +309,11 @@ const SyncModal: React.FC<SyncModalProps> = ({
 
                 {/* Character Name */}
                 <div>
-                    <label className="block text-sm font-bold text-[#4a3b32] mb-1.5">
+                    <label htmlFor="character-name-input" className="block text-sm font-bold text-[#4a3b32] mb-1.5">
                         Nom du Personnage
                     </label>
                     <input
+                        id="character-name-input"
                         type="text"
                         value={characterName}
                         onChange={(e) => setCharacterName(e.target.value)}
@@ -327,6 +366,52 @@ const SyncModal: React.FC<SyncModalProps> = ({
                         Dernière sync : {new Date(characterData.syncInfo.lastSynced || Date.now()).toLocaleString('fr-FR')}
                         <br />
                         Campagne : {characterData.syncInfo.settingName}
+                    </div>
+                )}
+
+                {/* Database Backups History */}
+                {characterData.syncInfo?.syncId && (
+                    <div className="mt-6 border-t border-[#bfae85]/50 pt-5">
+                        <div className="flex items-center gap-2 text-sm font-bold text-[#4a3b32] mb-3">
+                            <History size={18} className="text-[#8b2e2e]" />
+                            Historique des sauvegardes (Cloud)
+                        </div>
+
+                        {isLoadingHistory ? (
+                            <div className="flex items-center justify-center py-4 text-stone-400">
+                                <RefreshCw size={20} className="animate-spin" />
+                            </div>
+                        ) : history.length === 0 ? (
+                            <div className="bg-stone-50 border border-dashed border-stone-200 rounded p-4 text-center text-xs text-stone-500 italic">
+                                Aucun historique disponible pour ce personnage.
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                {history.map((entry) => (
+                                    <div key={entry.id} className="flex items-center justify-between p-3 bg-white border border-stone-200 rounded-md hover:border-[#bfae85] transition-colors group">
+                                        <div className="flex flex-col">
+                                            <span className="text-xs font-bold text-stone-700">
+                                                {new Date(entry.archived_at).toLocaleString('fr-FR')}
+                                            </span>
+                                            <span className={`text-[10px] uppercase font-black ${entry.version_reason === 'manual' ? 'text-blue-600' : 'text-amber-600'}`}>
+                                                {entry.version_reason === 'manual' ? 'Sauvegarde manuelle' : 'Auto-save (1h)'}
+                                            </span>
+                                        </div>
+                                        <button
+                                            onClick={() => handleRestore(entry)}
+                                            disabled={isRestoring}
+                                            className="px-3 py-1.5 bg-stone-100 hover:bg-[#8b2e2e] hover:text-white text-[#8b2e2e] text-xs font-bold rounded flex items-center gap-1.5 transition-all disabled:opacity-50"
+                                        >
+                                            <RotateCcw size={12} />
+                                            Restaurer
+                                        </button>
+                                    </div>
+                                ))}
+                                <p className="text-[10px] text-stone-400 italic mt-2 text-center">
+                                    Seules les 2 dernières versions sont conservées.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

@@ -41,7 +41,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                         Aucun effet configuré. Ce trait sera purement narratif.
                     </div>
                 )}
-                {(effects || []).map(effect => {
+                {(effects || []).map((effect, index) => {
                     // Configuration visuelle par type
                     let typeIcon = <Star size={16} />;
                     let themeColor = 'text-amber-700';
@@ -66,7 +66,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                     }
 
                     return (
-                        <div key={effect.id} className={`rounded-lg border ${borderColor} ${bgColor} shadow-sm overflow-hidden group`}>
+                        <div key={effect.id || `effect-${index}`} className={`rounded-lg border ${borderColor} ${bgColor} shadow-sm overflow-hidden group`}>
 
                             {/* Header Row: Type Selector & Delete */}
                             <div className="flex items-center justify-between p-2 border-b border-black/5 bg-white/60">
@@ -95,15 +95,30 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                             {/* Content Row: Specific Inputs */}
                             <div className="p-3">
                                 {effect.type === 'xp_bonus' ? (
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-bold text-[#5c4d41] uppercase tracking-wide">Montant XP :</span>
-                                        <input
-                                            type="number"
-                                            className="flex-grow border border-[#bfae85]/30 rounded-sm px-2 py-1 text-sm font-mono text-center focus:border-amber-500 outline-none bg-white/80 text-[#1c1917] font-bold"
-                                            placeholder="0"
-                                            value={effect.value}
-                                            onChange={(e) => onUpdate(effect.id, 'value', parseInt(e.target.value) || 0)}
-                                        />
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-bold text-[#5c4d41] uppercase tracking-wide w-24">Type de Bonus :</span>
+                                            <select
+                                                className="flex-grow text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1 focus:border-amber-500 outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm cursor-pointer"
+                                                value={effect.method || 'fixed'}
+                                                onChange={(e) => onUpdate(effect.id, 'method', e.target.value as any)}
+                                            >
+                                                <option value="fixed">Montant Fixe</option>
+                                                <option value="per_scenario">Par Scénario Joué</option>
+                                            </select>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-bold text-[#5c4d41] uppercase tracking-wide w-24">
+                                                {effect.method === 'per_scenario' ? 'XP / Scénario :' : 'Montant XP :'}
+                                            </span>
+                                            <input
+                                                type="number"
+                                                className="flex-grow border border-[#bfae85]/30 rounded-sm px-2 py-1 text-sm font-mono text-center focus:border-amber-500 outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm"
+                                                placeholder="0"
+                                                value={effect.value}
+                                                onChange={(e) => onUpdate(effect.id, 'value', parseInt(e.target.value) || 0)}
+                                            />
+                                        </div>
                                     </div>
                                 ) : effect.type === 'free_skill_rank' ? (
                                     <div className="grid grid-cols-3 gap-3">
@@ -116,8 +131,8 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                     onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
                                                 >
                                                     <option value="" className="text-stone-300">-- Choisir --</option>
-                                                    {allSkills.map(s => (
-                                                        <option key={s.id} value={s.name}>{s.name}</option>
+                                                    {allSkills.map((s, si) => (
+                                                        <option key={s.id || `skill-${si}`} value={s.name}>{s.name}</option>
                                                     ))}
                                                 </select>
                                                 <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-blue-800/40" />
@@ -144,8 +159,8 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                     onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
                                                 >
                                                     <option value="" className="text-stone-300">-- Choisir --</option>
-                                                    {allAttributes.map(a => (
-                                                        <option key={a.id} value={a.name}>{a.name}</option>
+                                                    {allAttributes.map((a, ai) => (
+                                                        <option key={a.id || `attr-${ai}`} value={a.name}>{a.name}</option>
                                                     ))}
                                                 </select>
                                                 <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-[#8b2e2e]/40" />

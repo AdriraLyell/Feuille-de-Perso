@@ -1,8 +1,7 @@
-import { supabase } from '../../services/supabase'; // Keep for selects until fully abstracted or use execute
 import { DatabaseService } from '../../services/DatabaseService';
+import { supabase } from '../../services/supabase';
 import { RulesData } from '../../types/rules';
-import { LibraryEntry as LibraryTraitEntry } from '../../types/system';
-import { LIBRARY_TYPE_CONFIG, LibraryTypeKey } from '../../constants/db';
+import { LIBRARY_TYPE_CONFIG } from '../../constants/db';
 
 export const LibraryPersistence = {
     /**
@@ -31,8 +30,8 @@ export const LibraryPersistence = {
 
                 if (existingId) {
                     const link: any = { setting_id: settingId, [typeCfg.idKey]: existingId, is_active: true };
-                    // Default categories for skills/backgrounds/counters
-                    if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters') {
+                    // Default categories for skills/backgrounds/counters/mysticAbilities
+                    if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters' || typeCfg.key === 'mysticAbilities') {
                         link.default_category = item.defaultCategory;
                     }
                     toLink.push(link);
@@ -48,7 +47,9 @@ export const LibraryPersistence = {
                     // Add type-specific fields
                     if (typeCfg.key === 'traits') {
                         payload.type = item.type;
-                        payload.cost = item.cost;
+                        payload.cost = item.cost || '0';
+                        payload.points_label = item.pointsLabel || item.cost;
+                        payload.is_variable_cost = item.isVariableCost || false;
                         payload.tags = item.tags || [];
                         payload.is_variable = item.isVariable;
                         payload.effects = item.effects || [];
@@ -57,6 +58,7 @@ export const LibraryPersistence = {
                         if (typeCfg.key === 'skills') payload.mystic_ability_id = item.mysticAbilityId;
                     } else if (typeCfg.key === 'mysticAbilities') {
                         payload.is_variable = item.isVariable;
+                        payload.default_category = item.defaultCategory;
                     } else if (typeCfg.key === 'counters') {
                         payload.max_value = item.maxValue;
                         payload.default_value = item.defaultValue;
@@ -68,7 +70,7 @@ export const LibraryPersistence = {
 
                     toCreate.push(payload);
                     const link: any = { setting_id: settingId, [typeCfg.idKey]: item.id, is_active: true };
-                    if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters') {
+                    if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters' || typeCfg.key === 'mysticAbilities') {
                         link.default_category = item.defaultCategory;
                     }
                     toLink.push(link);
@@ -98,15 +100,31 @@ export const LibraryPersistence = {
 
                 if (typeCfg.key === 'traits') {
                     payload.type = item.type;
-                    payload.cost = item.cost;
+                    payload.cost = item.cost || '0';
+                    payload.points_label = item.pointsLabel || item.cost;
+                    payload.is_variable_cost = item.isVariableCost || false;
                     payload.tags = item.tags;
                     payload.is_variable = item.isVariable;
                     payload.effects = item.effects;
                 } else if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds') {
-                    payload.is_variable = item.isVariable;
-                    if (typeCfg.key === 'skills') payload.mystic_ability_id = item.mysticAbilityId || null;
+                    payload.is_variable = !!item.isVariable;
+                    if (typeCfg.key === 'skills') {
+                        // SURGICAL: If it's a customization in a setting, do not overwrite global mystic link
+                        if (item.isCustomized && settingId) {
+                            // We skip upserting the global entry if it's already there and we are only customizing locally.
+                            // If it's a new item (no ID or not in DB), we might still want to create it?
+                            // But usually customized means it exists.
+                            // Let's check if it's global.
+                            if (item.isGlobal) {
+                                // Skip global upsert for modified global items to protect the library
+                                continue;
+                            }
+                        }
+                        payload.mystic_ability_id = item.mysticAbilityId || null;
+                    }
                 } else if (typeCfg.key === 'mysticAbilities') {
                     payload.is_variable = item.isVariable;
+                    payload.default_category = item.defaultCategory;
                 } else if (typeCfg.key === 'counters') {
                     payload.max_value = item.maxValue;
                     payload.default_value = item.defaultValue;
@@ -130,9 +148,17 @@ export const LibraryPersistence = {
                         [typeCfg.idKey]: item.id,
                         is_active: true
                     };
-                    // Skills, backgrounds and counters have default categories
-                    if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters') {
+                    // Skills, backgrounds, counters and mystic abilities have default categories
+                    if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters' || typeCfg.key === 'mysticAbilities') {
                         link.default_category = item.defaultCategory;
+                    }
+
+                    // SKILL OVERRIDES
+                    if (typeCfg.key === 'skills' && item.isCustomized) {
+                        link.name_override = item.name;
+                        link.is_variable_override = !!item.isVariable;
+                        link.mystic_ability_id_override = item.mysticAbilityId;
+                        link.description_override = item.description;
                     }
                     return link;
                 });
@@ -142,19 +168,39 @@ export const LibraryPersistence = {
             // 3. Refresh VARIANTS (if applicable)
             if ('variants' in typeCfg && typeCfg.variants) {
                 const variantsTable = typeCfg.variants as string;
+
+                // A. Delete all LOCAL variants for this setting
                 await DatabaseService.deleteBy(variantsTable, 'setting_id', settingId, `LibraryPersistence.sync.${typeCfg.key}.deleteVariants`);
+
+                // B. Surgical cleanup for GLOBAL variants of the items we are processing
+                // This prevents duplicates and ensures the global repository is in sync
+                const globalItemIds = currentItems
+                    .filter((i: any) => i.isGlobal && !i.isCustomized)
+                    .map((i: any) => i.id);
+
+                if (globalItemIds.length > 0) {
+                    await supabase.from(variantsTable)
+                        .delete()
+                        .in(typeCfg.idKey, globalItemIds)
+                        .is('setting_id', null);
+                }
+
                 const variantsPayload: any[] = [];
                 currentItems.forEach((item: any) => {
                     if (item.variants && item.variants.length > 0) {
+                        const isGlobalItem = item.isGlobal && !item.isCustomized;
+                        const targetSid = isGlobalItem ? null : settingId;
+
                         item.variants.forEach((v: string) => {
                             variantsPayload.push({
                                 [typeCfg.idKey]: item.id,
-                                setting_id: settingId,
+                                setting_id: targetSid,
                                 name: v
                             });
                         });
                     }
                 });
+
                 if (variantsPayload.length > 0) {
                     await DatabaseService.insert(variantsTable, variantsPayload, `LibraryPersistence.sync.${typeCfg.key}.insertVariants`);
                 }

@@ -95,10 +95,29 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
 
         skillsSet.forEach(cat => {
             const items = data.skills[cat.id] || [];
+
+            // Enrich items with metadata from rules (search in all relevant libraries)
+            const enrichedItems = items.map(item => {
+                const targetId = item.definitionId || item.id;
+                // Search in skills AND mysticAbilities libraries
+                const def =
+                    rules?.libraries?.skills.find(s => s.id === targetId) ||
+                    rules?.libraries?.mysticAbilities.find(s => s.id === targetId);
+
+                if (def) {
+                    return {
+                        ...item,
+                        mysticAbilityId: def.mysticAbilityId || (rules?.libraries?.mysticAbilities.some(ma => ma.id === targetId) ? targetId : undefined),
+                        isVariable: def.isVariable
+                    };
+                }
+                return item;
+            });
+
             const map = mapping[cat.id] || { col: 0, row: 'top' };
             const block: SkillBlock = {
                 title: cat.label,
-                items,
+                items: enrichedItems,
                 cat: cat.id,
                 description: cat.description
             };
@@ -116,12 +135,31 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
         return {
             columns,
             columnCount,
-            backgrounds: backgroundsSet.map(cat => ({
-                title: cat.label,
-                items: data.skills[cat.id] || [],
-                cat: cat.id,
-                description: cat.description
-            })),
+            backgrounds: backgroundsSet.map(cat => {
+                const items = data.skills[cat.id] || [];
+                const enrichedItems = items.map(item => {
+                    const targetId = item.definitionId || item.id;
+                    const def =
+                        rules?.libraries?.skills.find(s => s.id === targetId) ||
+                        rules?.libraries?.mysticAbilities.find(s => s.id === targetId) ||
+                        rules?.libraries?.backgrounds.find(s => s.id === targetId);
+
+                    if (def) {
+                        return {
+                            ...item,
+                            mysticAbilityId: def.mysticAbilityId || (rules?.libraries?.mysticAbilities.some(ma => ma.id === targetId) ? targetId : undefined),
+                            isVariable: def.isVariable
+                        };
+                    }
+                    return item;
+                });
+                return {
+                    title: cat.label,
+                    items: enrichedItems,
+                    cat: cat.id,
+                    description: cat.description
+                };
+            }),
             counters: countersSet.map(cat => ({
                 title: cat.label,
                 id: cat.id,

@@ -10,7 +10,12 @@ import { publishFileToGitHub } from '../../services/githubService';
  * Hook to manage the state and logic for AdminSkillLibrary.
  * Extracts CRUD, filtering, and publishing logic from the component.
  */
-export const useAdminSkillLibrary = (rules: RulesData, onUpdate: (newRules: RulesData) => void, globalUsage: Record<string, number> = {}) => {
+export const useAdminSkillLibrary = (
+    rules: RulesData,
+    onUpdate: (newRules: RulesData) => void,
+    globalUsage: Record<string, number> = {},
+    mode: 'global' | 'override' = 'global'
+) => {
     const list = rules.libraries?.skills || [];
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -109,9 +114,24 @@ export const useAdminSkillLibrary = (rules: RulesData, onUpdate: (newRules: Rule
     };
 
     const handleOpenEdit = (skill: LibrarySkillEntry) => {
+        // Ensure we have a master definition if we are in a campaign and about to customize
+        const skillWithMaster = { ...skill };
+        if (!!rules.settingId && !skillWithMaster.isCustomized && !skillWithMaster.masterDefinition) {
+            skillWithMaster.masterDefinition = {
+                name: skill.name,
+                description: skill.description || '',
+                isVariable: !!skill.isVariable,
+                mysticAbilityId: skill.mysticAbilityId || undefined,
+                defaultCategory: skill.defaultCategory || undefined
+            };
+        }
+
+        setEditingSkill({
+            ...skillWithMaster,
+            mysticAbilityId: skillWithMaster.mysticAbilityId || ""
+        });
+        setVariantDraft(skillWithMaster.variants?.join(', ') || '');
         setError(null);
-        setEditingSkill({ ...skill });
-        setVariantDraft(skill.variants?.join(', ') || '');
         setIsModalOpen(true);
     };
 
@@ -128,6 +148,43 @@ export const useAdminSkillLibrary = (rules: RulesData, onUpdate: (newRules: Rule
         setShowDeleteConfirm(null);
     };
 
+    const handleReset = (skillId: string) => {
+        const skillIndex = list.findIndex(s => s.id === skillId);
+        if (skillIndex === -1) return;
+
+        const skill = list[skillIndex];
+
+        let resetSkill: LibrarySkillEntry;
+
+        if (skill.masterDefinition) {
+            resetSkill = {
+                ...skill,
+                name: skill.masterDefinition.name,
+                description: skill.masterDefinition.description,
+                isVariable: skill.masterDefinition.isVariable,
+                mysticAbilityId: skill.masterDefinition.mysticAbilityId || "",
+                defaultCategory: skill.masterDefinition.defaultCategory,
+                isCustomized: false,
+            };
+        } else {
+            // Fallback for legacy data without masterDefinition
+            // We just remove the flag. The values will revert on next engine reload,
+            // or stay as-is for now but without the 'Custom' status.
+            resetSkill = {
+                ...skill,
+                isCustomized: false
+            };
+        }
+
+        const newList = [...list];
+        newList[skillIndex] = resetSkill;
+
+        onUpdate({
+            ...rules,
+            libraries: { ...rules.libraries, skills: newList }
+        });
+    };
+
     const handleSave = () => {
         if (!editingSkill) return;
         if (!editingSkill.name.trim()) { setError("Le nom est requis."); return; }
@@ -140,7 +197,12 @@ export const useAdminSkillLibrary = (rules: RulesData, onUpdate: (newRules: Rule
             .map(v => v.trim())
             .filter(v => v !== '');
 
-        const skillToSave = { ...editingSkill, variants: cleanedVariants };
+        // LOGIC CHANGE: Only force customization if in override mode (sidebar)
+        const skillToSave: LibrarySkillEntry = {
+            ...editingSkill,
+            variants: cleanedVariants,
+            isCustomized: (mode === 'override' && !!rules.settingId) ? true : editingSkill.isCustomized
+        };
 
         const newList = list.some(s => s.id === skillToSave.id)
             ? list.map(s => s.id === skillToSave.id ? skillToSave : s)
@@ -200,10 +262,13 @@ export const useAdminSkillLibrary = (rules: RulesData, onUpdate: (newRules: Rule
                 data: list
             }, null, 2);
 
+            const settingSlug = rules.settingName ? rules.settingName.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '_') : '';
+            const fileName = (rules.settingId && settingSlug) ? `public/data/skills_${settingSlug}.json` : 'public/data/skills.json';
+
             const result = await publishFileToGitHub(
-                'public/data/skills.json',
+                fileName,
                 content,
-                `update(skills): Mise à jour bibliothèque compétences v${rules.version}`,
+                `update(skills): Mise à jour bibliothèque compétences ${rules.settingName || ''} v${rules.version}`,
                 { token, owner, repo, branch: 'main' }
             );
 
@@ -244,6 +309,7 @@ export const useAdminSkillLibrary = (rules: RulesData, onUpdate: (newRules: Rule
         toggleSkillActive,
         confirmDelete,
         handleSave,
+        handleReset,
         handleBulkSelect,
         handlePublishClick,
         executePublish

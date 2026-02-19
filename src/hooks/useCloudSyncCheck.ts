@@ -57,7 +57,7 @@ export const useCloudSyncCheck = (characterData: CharacterSheetData) => {
                     setStatus(prev => ({ ...prev, isLoading: false }));
                 }
             } catch (error) {
-                console.error('Error checking cloud sync status:', error);
+                logger.error('Error checking cloud sync status:', error);
                 setStatus(prev => ({ ...prev, isLoading: false }));
             }
         };

@@ -31,6 +31,19 @@ export interface SyncedCharacterSummary {
     data_size?: number; // Real size in bytes from view_characters_summary
 }
 
+export interface CharacterHistoryEntry {
+    id: string;
+    character_id: string;
+    data: CharacterSheetData;
+    metadata: {
+        player_name: string;
+        character_name: string;
+        last_synced: string;
+    };
+    archived_at: string;
+    version_reason: 'manual' | 'auto_1h';
+}
+
 export interface SyncResult {
     success: boolean;
     syncId?: string;
@@ -54,7 +67,7 @@ export const CharacterSyncService = {
     generateDataHash(data: CharacterSheetData): string {
         try {
             // We ignore volatile fields for the hash
-            const { syncInfo, appLogs, xpLogs, _rulesVersion, ...stableData } = data;
+            const { syncInfo: _s, appLogs: _a, xpLogs: _x, _rulesVersion: _r, ...stableData } = data;
 
             // Fast hashing via string manipulation
             const str = JSON.stringify(stableData);
@@ -79,9 +92,13 @@ export const CharacterSyncService = {
         settingId: string,
         playerName: string,
         characterName: string,
-        data: CharacterSheetData
+        data: CharacterSheetData,
+        mode: 'manual' | 'auto' = 'manual'
     ): Promise<SyncResult> {
         try {
+            // Step 0: Inject sync mode
+            data.syncInfo = { ...data.syncInfo, syncMode: mode };
+
             // Step 1: Resolve and compress images for portable sync
             const dataToStore = await ImageSyncResolver.resolveImagesForSync(data);
 
@@ -243,5 +260,20 @@ export const CharacterSyncService = {
         return action === 'compress'
             ? ImageSyncResolver.resolveImagesForSync(obj)
             : ImageSyncResolver.injectImagesAfterSync(obj);
+    },
+
+    /**
+     * Get historical versions for a character.
+     */
+    async getCharacterHistory(characterId: string): Promise<CharacterHistoryEntry[]> {
+        return await DatabaseService.fetchAll<CharacterHistoryEntry>(
+            'characters_history',
+            {
+                select: '*',
+                eq: { character_id: characterId },
+                order: { column: 'archived_at', ascending: false }
+            },
+            'CharacterSyncService.getCharacterHistory'
+        );
     }
 };

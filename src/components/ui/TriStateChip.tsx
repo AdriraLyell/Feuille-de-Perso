@@ -52,7 +52,7 @@ const TriStateChip: React.FC<TriStateChipProps> = ({
         },
         indigo: {
             active: 'bg-indigo-600 text-white border-indigo-600 shadow-sm',
-            indigo: 'bg-red-50 text-red-700 border-red-200 line-through opacity-80', // Fix: should be inactive
+            inactive: 'bg-red-50 text-red-700 border-red-200 line-through opacity-80',
             neutral: 'bg-white text-slate-600 border-slate-300 hover:border-slate-400 hover:bg-slate-50'
         },
         slate: {

@@ -87,6 +87,6 @@ export const migrateDefaults = (parsed: any): void => {
         parsed.partyNotes = INITIAL_DATA.partyNotes;
     }
     if (parsed.partyNotes && !parsed.partyNotes.staticColWidths) {
-        parsed.partyNotes.staticColWidths = INITIAL_DATA.partyNotes.staticColWidths;
+        parsed.partyNotes.staticColWidths = INITIAL_DATA.partyNotes?.staticColWidths;
     }
 };
