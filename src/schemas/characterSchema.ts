@@ -75,6 +75,7 @@ export const TraitEffectSchema = z.object({
     id: z.string(),
     type: z.enum(['xp_bonus', 'free_skill_rank', 'attribute_bonus']),
     value: z.number(),
+    method: z.enum(['fixed', 'per_scenario']).optional(),
     target: z.string().optional()
 });
 

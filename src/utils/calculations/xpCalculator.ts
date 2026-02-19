@@ -38,6 +38,7 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
     const activeEffects = getActiveTraitEffects(data);
 
     // 1. Helpers pour les bonus
+    // 1. Helpers pour les bonus
     const getFreeRankLimit = (skillName: string) => {
         const effect = activeEffects.find(e =>
             e.type === 'free_skill_rank' &&
@@ -56,9 +57,30 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
         return effect ? effect.value : 0;
     };
 
-    const traitXPBonus = activeEffects
-        .filter(e => e.type === 'xp_bonus')
+    // Calcul des bonus XP (Fixe vs Par Scénario)
+    const xpEffects = activeEffects.filter(e => e.type === 'xp_bonus');
+
+    // Bonus Fixes
+    const fixedBonus = xpEffects
+        .filter(e => !e.method || e.method === 'fixed')
         .reduce((sum, e) => sum + e.value, 0);
+
+    // Bonus par Scénario
+    // On compte le nombre d'entrées de log valides (celles qui ont une date ou un scénario)
+    // On exclut potentiellement les entrées "système" ou vides si nécessaire, 
+    // mais dans l'usage standard chaque log est une session/scénario.
+    // On utilise le flag explicite s'il existe, sinon on fallback sur amount > 0
+    const scenarioCount = (data.xpLogs || []).filter(log =>
+        log.countsAsScenario !== undefined
+            ? log.countsAsScenario
+            : log.amount > 0
+    ).length;
+
+    const perScenarioBonus = xpEffects
+        .filter(e => e.method === 'per_scenario')
+        .reduce((sum, e) => sum + (e.value * scenarioCount), 0);
+
+    const totalTraitXP = fixedBonus + perScenarioBonus;
 
     // 2. Calcul de l'XP dépensée
     let totalSpent = 0;
@@ -78,10 +100,22 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 
     // 3. Calcul du bilan final
     const gainFromLogs = (data.xpLogs || []).reduce((sum, entry) => sum + (entry.amount || 0), 0);
-    const totalGain = gainFromLogs + traitXPBonus;
+    const totalGain = gainFromLogs + totalTraitXP;
+
+    // Construction de l'affichage détaillé
+    let gainDisplay = totalGain.toString();
+    let tooltip = `Total : ${totalGain} XP\n\nBase (Historique) : ${gainFromLogs}`;
+
+    if (totalTraitXP > 0) {
+        gainDisplay += ` (+${totalTraitXP})`;
+
+        if (fixedBonus > 0) tooltip += `\nBonus Fixe : +${fixedBonus}`;
+        if (perScenarioBonus > 0) tooltip += `\nBonus Scénarios (${scenarioCount} sessions) : +${perScenarioBonus}`;
+    }
 
     return {
-        gain: traitXPBonus > 0 ? `${gainFromLogs} (+${traitXPBonus})` : gainFromLogs.toString(),
+        gain: gainDisplay,
+        gainTooltip: tooltip,
         spent: totalSpent.toString(),
         rest: (totalGain - totalSpent).toString()
     };

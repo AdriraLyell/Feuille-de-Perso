@@ -54,6 +54,7 @@ export interface ThemeConfig {
 
 export interface ExperienceData {
   gain: string;
+  gainTooltip?: string;
   spent: string;
   rest: string;
 }
@@ -65,6 +66,7 @@ export interface XPEntry {
   spendingLocation?: string; // New field: Lieu de dépense / Investissement
   amount: number;
   mj: string;
+  countsAsScenario?: boolean;
 }
 
 export interface LibraryEntry {

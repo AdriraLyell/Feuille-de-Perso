@@ -95,15 +95,30 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                             {/* Content Row: Specific Inputs */}
                             <div className="p-3">
                                 {effect.type === 'xp_bonus' ? (
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-bold text-[#5c4d41] uppercase tracking-wide">Montant XP :</span>
-                                        <input
-                                            type="number"
-                                            className="flex-grow border border-[#bfae85]/30 rounded-sm px-2 py-1 text-sm font-mono text-center focus:border-amber-500 outline-none bg-white/80 text-[#1c1917] font-bold"
-                                            placeholder="0"
-                                            value={effect.value}
-                                            onChange={(e) => onUpdate(effect.id, 'value', parseInt(e.target.value) || 0)}
-                                        />
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-bold text-[#5c4d41] uppercase tracking-wide w-24">Type de Bonus :</span>
+                                            <select
+                                                className="flex-grow text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1 focus:border-amber-500 outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm cursor-pointer"
+                                                value={effect.method || 'fixed'}
+                                                onChange={(e) => onUpdate(effect.id, 'method', e.target.value as any)}
+                                            >
+                                                <option value="fixed">Montant Fixe</option>
+                                                <option value="per_scenario">Par Scénario Joué</option>
+                                            </select>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-bold text-[#5c4d41] uppercase tracking-wide w-24">
+                                                {effect.method === 'per_scenario' ? 'XP / Scénario :' : 'Montant XP :'}
+                                            </span>
+                                            <input
+                                                type="number"
+                                                className="flex-grow border border-[#bfae85]/30 rounded-sm px-2 py-1 text-sm font-mono text-center focus:border-amber-500 outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm"
+                                                placeholder="0"
+                                                value={effect.value}
+                                                onChange={(e) => onUpdate(effect.id, 'value', parseInt(e.target.value) || 0)}
+                                            />
+                                        </div>
                                     </div>
                                 ) : effect.type === 'free_skill_rank' ? (
                                     <div className="grid grid-cols-3 gap-3">

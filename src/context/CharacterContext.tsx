@@ -339,13 +339,15 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
 
         if (data.experience.spent !== newExpState.spent ||
             data.experience.rest !== newExpState.rest ||
-            data.experience.gain !== newExpState.gain) {
+            data.experience.gain !== newExpState.gain ||
+            data.experience.gainTooltip !== newExpState.gainTooltip) {
 
             setData(prev => ({
                 ...prev,
                 experience: {
                     ...prev.experience,
                     gain: newExpState.gain,
+                    gainTooltip: newExpState.gainTooltip,
                     spent: newExpState.spent,
                     rest: newExpState.rest
                 }
