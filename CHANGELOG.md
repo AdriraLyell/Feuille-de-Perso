@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.2] - 2026-02-14 [FEAT]
+
+- Renforcement du typage strict des éditeurs Admin (Creation, Counters, Skills)
+- Correction des imports de types et signatures génériques dans les composants Admin
+- Suppression des types 'any' résiduels dans LibraryLoader et LibraryImporter
+- Validation du build complet sans erreurs de typage
+
 ## [2.49.1] - 2026-02-14 [PATCH]
 
 - 🛡️ Typage Strict : Amélioration de la sécurité des types dans l'éditeur de compétences Admin

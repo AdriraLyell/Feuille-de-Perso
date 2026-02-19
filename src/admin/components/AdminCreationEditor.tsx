@@ -26,7 +26,8 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
         updateXPCost,
         updateRankSlot,
         updateRootField,
-        updateMysticConfig
+        updateMysticConfig,
+        syncMysticTraits
     } = useCreationEditorActions(rules, onUpdate);
 
     return (
@@ -66,6 +67,7 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
                         <CreationMysticSettings
                             config={config.mysticAbilities}
                             onUpdate={updateMysticConfig}
+                            onSync={syncMysticTraits}
                         />
                     </MotionFade>
 

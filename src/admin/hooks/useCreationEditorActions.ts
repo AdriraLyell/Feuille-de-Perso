@@ -92,6 +92,65 @@ export function useCreationEditorActions(rules: RulesData, onUpdate: (newRules: 
         });
     };
 
+    const syncMysticTraits = () => {
+        const mysticAbilities = rules.libraries.mysticAbilities || [];
+        const currentTraits = rules.libraries.traits || [];
+        let newTraits = [...currentTraits];
+        let hasChanges = false;
+
+        mysticAbilities.forEach(ability => {
+            // Find if a trait is already linked or matches name
+            let targetTraitIndex = newTraits.findIndex(t =>
+                t.mysticAbilityId === ability.id ||
+                (!t.mysticAbilityId && t.name.toLowerCase() === ability.name.toLowerCase())
+            );
+
+            const traitBaseData = {
+                name: ability.name,
+                type: 'avantage' as const,
+                isVariableCost: true,
+                cost: "1",
+                pointsLabel: "1-5",
+                description: ability.description || "Habilité mystique",
+                mysticAbilityId: ability.id,
+                isActive: ability.isActive !== false,
+                isGlobal: ability.isGlobal !== false,
+                tags: ['Mystique']
+            };
+
+            if (targetTraitIndex >= 0) {
+                // Update existing if sync is missing or data changed
+                const existing = newTraits[targetTraitIndex];
+                if (existing.mysticAbilityId !== ability.id || existing.name !== ability.name) {
+                    newTraits[targetTraitIndex] = {
+                        ...existing,
+                        ...traitBaseData
+                    };
+                    hasChanges = true;
+                }
+            } else {
+                // Create new
+                newTraits.push({
+                    id: crypto.randomUUID(),
+                    ...traitBaseData
+                });
+                hasChanges = true;
+            }
+        });
+
+        if (hasChanges) {
+            onUpdate({
+                ...rules,
+                libraries: {
+                    ...rules.libraries,
+                    traits: newTraits
+                }
+            });
+        }
+
+        return hasChanges;
+    };
+
     const updateMysticConfig = <K extends keyof NonNullable<RulesCreationConfig['mysticAbilities']>>(
         field: K,
         value: NonNullable<RulesCreationConfig['mysticAbilities']>[K]
@@ -124,6 +183,7 @@ export function useCreationEditorActions(rules: RulesData, onUpdate: (newRules: 
         updateXPCost,
         updateRankSlot,
         updateRootField,
-        updateMysticConfig
+        updateMysticConfig,
+        syncMysticTraits
     };
 }

@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.52.0",
+        "date": "2026-02-17",
+        "type": "feat",
+        "changes": [
+            "✅ Import : Sélection individuelle des items (nouveaux et conflits) via des cases à cocher",
+            "🎭 UI : Feedback dynamique des badges (Ignoré, Remplacé, Doublon, Exclu) en fonction de la stratégie",
+            "🛠️ Core : Support technique de l'exclusion via IDs uniques dans le moteur de fusion"
+        ]
+    },
+    {
         "version": "2.51.0",
         "date": "2026-02-17",
         "type": "feat",
@@ -972,17 +982,6 @@
             "📚 Admin : Décomposition de `AdminSpecializationLibrary.tsx` pour une meilleure maintenance",
             "🚀 Performance : Réduction de la taille des fichiers composants et isolation des responsabilités UI",
             "🎨 UI : Conservation de l'esthétique premium tout en simplifiant la structure du code"
-        ]
-    },
-    {
-        "version": "2.49.2",
-        "date": "2026-02-14",
-        "type": "feat",
-        "changes": [
-            "Renforcement du typage strict des éditeurs Admin (Creation, Counters, Skills)",
-            "Correction des imports de types et signatures génériques dans les composants Admin",
-            "Suppression des types 'any' résiduels dans LibraryLoader et LibraryImporter",
-            "Validation du build complet sans erreurs de typage"
         ]
     }
 ]

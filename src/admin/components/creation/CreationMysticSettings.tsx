@@ -5,9 +5,10 @@ import { Sparkles, Lock, Unlock } from 'lucide-react';
 interface CreationMysticSettingsProps {
     config: RulesCreationConfig['mysticAbilities'];
     onUpdate: (field: keyof NonNullable<RulesCreationConfig['mysticAbilities']>, value: any) => void;
+    onSync?: () => boolean;
 }
 
-const CreationMysticSettings: React.FC<CreationMysticSettingsProps> = ({ config, onUpdate }) => {
+const CreationMysticSettings: React.FC<CreationMysticSettingsProps> = ({ config, onUpdate, onSync }) => {
     // Default safe values if config is undefined (legacy rules)
     const active = config?.active ?? false;
     const progressionWithoutTrait = config?.progressionWithoutTrait ?? false;
@@ -104,6 +105,28 @@ const CreationMysticSettings: React.FC<CreationMysticSettingsProps> = ({ config,
                         </div>
                         <p className="text-[10px] text-stone-500 mt-2 italic text-center">
                             Utilisez -1 pour "Infini"
+                        </p>
+                    </div>
+
+                    {/* Sync Button */}
+                    <div className="pt-4 border-t border-stone-700/50">
+                        <button
+                            onClick={() => {
+                                if (onSync) {
+                                    const changed = onSync();
+                                    if (changed) {
+                                        alert("Synchronisation réussie ! Les Avantages correspondants ont été créés ou mis à jour.");
+                                    } else {
+                                        alert("Tous les Avantages sont déjà synchronisés.");
+                                    }
+                                }
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/30 rounded text-sm font-bold transition-colors"
+                        >
+                            <Sparkles size={14} /> Synchroniser les Avantages manquants
+                        </button>
+                        <p className="text-[10px] text-stone-500 mt-2">
+                            Parcourt la bibliothèque des habilités mystiques pour créer automatiquement les Avantages (Traits) liés s'ils n'existent pas encore.
                         </p>
                     </div>
 
