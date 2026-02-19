@@ -8,7 +8,7 @@ export interface DBTrait {
     setting_id: string | null; // Global if null
     name: string;
     description?: string;
-    points?: number;
+    cost?: string;
     points_label?: string;   // Label for multiple costs (ex: "1, 3, 5" or "1-5")
     is_variable_cost?: boolean;
     category?: string;
