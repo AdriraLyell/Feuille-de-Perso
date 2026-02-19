@@ -105,6 +105,7 @@ export interface LibrarySkillEntry {
     description: string;
     isVariable: boolean;
     mysticAbilityId?: string;
+    defaultCategory?: string;
   };
 }
 

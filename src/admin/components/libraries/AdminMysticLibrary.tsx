@@ -346,6 +346,20 @@ const AdminMysticLibrary: React.FC<AdminMysticLibraryProps> = ({ rules, onUpdate
                                 onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
                             />
                         </div>
+                        <div>
+                            <label htmlFor="mystic-category" className="block text-xs font-bold text-slate-500 uppercase mb-1">Catégorie de Placement</label>
+                            <select
+                                id="mystic-category"
+                                className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-amber-500 outline-none bg-white font-bold"
+                                value={editingItem.defaultCategory || ''}
+                                onChange={(e) => setEditingItem({ ...editingItem, defaultCategory: e.target.value })}
+                            >
+                                <option value="">-- Par Défaut (Mystique) --</option>
+                                {rules.definitions.skillCategories?.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.label} ({cat.id})</option>
+                                ))}
+                            </select>
+                        </div>
                         {error && (
                             <div className="bg-red-50 text-red-800 text-xs p-3 rounded border border-red-200 font-bold flex items-center gap-2">
                                 <AlertOctagon size={16} /> {error}

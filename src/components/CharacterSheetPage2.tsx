@@ -118,10 +118,11 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                 const isMystic = skillDef.name.includes('Art Martial') || wizardState.mysticAbilityName;
 
                 if (isMystic) {
+                    const mysticConfig = rules?.configurations?.creation?.mysticAbilities;
                     if (skillDef.name.toLowerCase().includes('art martial')) {
-                        category = 'Col_Comp_7'; // Martial Arts column
+                        category = mysticConfig?.defaultMartialArtsCategory || 'Col_Comp_7';
                     } else {
-                        category = 'Col_Comp_5'; // Other mystic skills column
+                        category = mysticConfig?.defaultMysticOtherCategory || 'Col_Comp_5';
                     }
                 } else {
                     category = 'competences'; // Default fallback for everything else

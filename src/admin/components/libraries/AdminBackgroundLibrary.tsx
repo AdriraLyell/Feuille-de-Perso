@@ -367,6 +367,23 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                                 onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
                             />
                         </div>
+                        <div>
+                            <label htmlFor="bg-category" className="block text-xs font-bold text-slate-500 uppercase mb-1">Catégorie de Placement</label>
+                            <select
+                                id="bg-category"
+                                className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-purple-500 outline-none bg-white font-bold"
+                                value={editingItem.defaultCategory || ''}
+                                onChange={(e) => setEditingItem({ ...editingItem, defaultCategory: e.target.value })}
+                            >
+                                <option value="">-- Par Défaut (Col 8) --</option>
+                                {rules.definitions.skillCategories
+                                    ?.filter(cat => cat.behavior === 'Arrière-plan')
+                                    .map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.label} ({cat.id})</option>
+                                    ))
+                                }
+                            </select>
+                        </div>
                         <div className="bg-purple-50 border border-purple-200 rounded p-3 flex items-center gap-3">
                             <input
                                 type="checkbox"

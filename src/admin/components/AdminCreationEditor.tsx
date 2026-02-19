@@ -66,6 +66,7 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
                     <MotionFade delay={0.40}>
                         <CreationMysticSettings
                             config={config.mysticAbilities}
+                            skillCategories={rules.definitions.skillCategories}
                             onUpdate={updateMysticConfig}
                             onSync={syncMysticTraits}
                         />

@@ -316,6 +316,29 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                         onChange={(e) => setEditingSkill({ ...editingSkill, name: e.target.value })}
                                     />
                                 </div>
+                                <div>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <label htmlFor="skill-category" className="block text-xs font-bold text-slate-500 uppercase">Catégorie de Placement</label>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCategoryHelp(!showCategoryHelp)}
+                                            className="text-[10px] text-blue-600 hover:underline font-bold"
+                                        >
+                                            {showCategoryHelp ? 'Masquer aide' : 'Aide codes'}
+                                        </button>
+                                    </div>
+                                    <select
+                                        id="skill-category"
+                                        className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 outline-none bg-white font-bold"
+                                        value={editingSkill.defaultCategory || ''}
+                                        onChange={(e) => setEditingSkill({ ...editingSkill, defaultCategory: e.target.value })}
+                                    >
+                                        <option value="">-- Automatique (Base) --</option>
+                                        {availableCategories.map(cat => (
+                                            <option key={cat.code} value={cat.code}>{cat.label} ({cat.code})</option>
+                                        ))}
+                                    </select>
+                                </div>
                                 <div className="bg-blue-50 border border-blue-200 rounded p-3 flex items-center gap-3">
                                     <input
                                         type="checkbox"

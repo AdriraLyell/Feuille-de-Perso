@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.14",
+        "date": "2026-02-19",
+        "type": "feat",
+        "description": "Restauration des sélecteurs de catégorie dans les bibliothèques Admin (Skills, BG, Compteurs, Mystique) avec sécurisation du système de Reset (masterDefinition). Ajout du placement mystique configurable dans les paramètres de création."
+    },
+    {
         "version": "2.56.13",
         "date": "2026-02-19",
         "type": "fix",

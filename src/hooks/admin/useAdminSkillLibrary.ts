@@ -121,7 +121,8 @@ export const useAdminSkillLibrary = (
                 name: skill.name,
                 description: skill.description || '',
                 isVariable: !!skill.isVariable,
-                mysticAbilityId: skill.mysticAbilityId
+                mysticAbilityId: skill.mysticAbilityId,
+                defaultCategory: skill.defaultCategory
             };
         }
 
@@ -162,6 +163,7 @@ export const useAdminSkillLibrary = (
                 description: skill.masterDefinition.description,
                 isVariable: skill.masterDefinition.isVariable,
                 mysticAbilityId: skill.masterDefinition.mysticAbilityId || "",
+                defaultCategory: skill.masterDefinition.defaultCategory,
                 isCustomized: false,
             };
         } else {

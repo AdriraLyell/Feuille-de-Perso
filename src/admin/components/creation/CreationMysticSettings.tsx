@@ -4,11 +4,12 @@ import { Sparkles, Lock, Unlock } from 'lucide-react';
 
 interface CreationMysticSettingsProps {
     config: RulesCreationConfig['mysticAbilities'];
+    skillCategories?: { id: string; label: string; behavior?: string }[];
     onUpdate: (field: keyof NonNullable<RulesCreationConfig['mysticAbilities']>, value: any) => void;
     onSync?: () => boolean;
 }
 
-const CreationMysticSettings: React.FC<CreationMysticSettingsProps> = ({ config, onUpdate, onSync }) => {
+const CreationMysticSettings: React.FC<CreationMysticSettingsProps> = ({ config, skillCategories = [], onUpdate, onSync }) => {
     // Default safe values if config is undefined (legacy rules)
     const active = config?.active ?? false;
     const progressionWithoutTrait = config?.progressionWithoutTrait ?? false;
@@ -106,6 +107,42 @@ const CreationMysticSettings: React.FC<CreationMysticSettingsProps> = ({ config,
                         <p className="text-[10px] text-stone-500 mt-2 italic text-center">
                             Utilisez -1 pour "Infini"
                         </p>
+                    </div>
+
+                    {/* Default Placements Config */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-stone-700/50">
+                        <div>
+                            <label htmlFor="martial_arts_cat" className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-2">
+                                Colonne "Arts Martiaux"
+                            </label>
+                            <select
+                                id="martial_arts_cat"
+                                value={config?.defaultMartialArtsCategory || 'Col_Comp_7'}
+                                onChange={(e) => onUpdate('defaultMartialArtsCategory', e.target.value)}
+                                className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-2 text-sm text-stone-200 focus:border-purple-500 outline-none font-bold"
+                            >
+                                {skillCategories.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.label} ({cat.id})</option>
+                                ))}
+                            </select>
+                            <p className="text-[10px] text-stone-500 mt-1">Où placer les skills "Art Martial : ..."</p>
+                        </div>
+                        <div>
+                            <label htmlFor="mystic_other_cat" className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-2">
+                                Colonne "Habilités Mystiques"
+                            </label>
+                            <select
+                                id="mystic_other_cat"
+                                value={config?.defaultMysticOtherCategory || 'Col_Comp_5'}
+                                onChange={(e) => onUpdate('defaultMysticOtherCategory', e.target.value)}
+                                className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-2 text-sm text-stone-200 focus:border-purple-500 outline-none font-bold"
+                            >
+                                {skillCategories.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.label} ({cat.id})</option>
+                                ))}
+                            </select>
+                            <p className="text-[10px] text-stone-500 mt-1">Où placer les autres habilités du wizard</p>
+                        </div>
                     </div>
 
                     {/* Sync Button */}

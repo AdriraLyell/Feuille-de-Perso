@@ -273,7 +273,23 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                 placeholder="Expliquez à quoi sert ce compteur..."
                             />
                         </div>
-
+                        <div>
+                            <label htmlFor="counter-category" className="block text-xs font-bold text-slate-500 uppercase mb-1">Catégorie de Placement</label>
+                            <select
+                                id="counter-category"
+                                className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-red-500 outline-none bg-white font-bold"
+                                value={editingItem.defaultCategory || ''}
+                                onChange={(e) => setEditingItem({ ...editingItem, defaultCategory: e.target.value })}
+                            >
+                                <option value="">-- Par Défaut (Col 9) --</option>
+                                {rules.definitions.skillCategories
+                                    ?.filter(cat => cat.behavior === 'Compteur')
+                                    .map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.label} ({cat.id})</option>
+                                    ))
+                                }
+                            </select>
+                        </div>
                         <div className="grid grid-cols-3 gap-4">
                             <div>
                                 <label htmlFor="counter-max" className="block text-xs font-bold text-slate-500 uppercase mb-1">Max (Cases)</label>
