@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.56.17",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Correction d'une erreur de référence (ReferenceError) dans les bibliothèques d'administration introduite lors de la mise à jour des badges."
+    },
+    {
+        "version": "2.56.16",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Amélioration des badges de bibliothèques Admin : affichage des noms des catégories au lieu des codes techniques. Correction du bug de sauvegarde du placement pour les Habilités Mystiques."
+    },
+    {
         "version": "2.56.15",
         "date": "2026-02-19",
         "type": "feat",
@@ -930,27 +942,6 @@
             "📊 Admin : Repositionnement de la colonne 'Taille' entre 'Dernière Sync' et 'Actions'",
             "📂 Admin : Ajout de la colonne 'Taille' dans la vue par campagne (`CampaignCharactersView`)",
             "🎨 UI : Alignement centré et style mono pour les indicateurs de taille"
-        ]
-    },
-    {
-        "version": "2.49.10",
-        "date": "2026-02-14",
-        "type": "feat",
-        "changes": [
-            "📊 Admin : Affichage de la taille des données (JSONB) pour chaque personnage dans la Master List",
-            "⚡ Performance : Optimisation via une vue SQL (`pg_column_size`) pour éviter de charger les données complètes lors du listing",
-            "📁 UI : Ajout d'une colonne 'Taille' avec formatage intelligent (o, ko, Mo)"
-        ]
-    },
-    {
-        "version": "2.49.9",
-        "date": "2026-02-14",
-        "type": "feat",
-        "changes": [
-            "📦 Stockage : Implémentation du `StorageMonitor` pour visualiser l'espace IndexedDB (Cloud / Réglages)",
-            "🔔 Alertes : Ajout d'indicateurs visuels globaux dans la barre de navigation (Orange >= 70%, Rouge >= 90%)",
-            "📱 Mobile : Intégration des alertes de stockage dans le menu mobile",
-            "🔄 UX : Rafraîchissement automatique des statistiques de stockage lors du focus de la page"
         ]
     }
 ]

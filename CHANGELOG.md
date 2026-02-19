@@ -1,5 +1,18 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.10] - 2026-02-14 [FEAT]
+
+- 📊 Admin : Affichage de la taille des données (JSONB) pour chaque personnage dans la Master List
+- ⚡ Performance : Optimisation via une vue SQL (`pg_column_size`) pour éviter de charger les données complètes lors du listing
+- 📁 UI : Ajout d'une colonne 'Taille' avec formatage intelligent (o, ko, Mo)
+
+## [2.49.9] - 2026-02-14 [FEAT]
+
+- 📦 Stockage : Implémentation du `StorageMonitor` pour visualiser l'espace IndexedDB (Cloud / Réglages)
+- 🔔 Alertes : Ajout d'indicateurs visuels globaux dans la barre de navigation (Orange >= 70%, Rouge >= 90%)
+- 📱 Mobile : Intégration des alertes de stockage dans le menu mobile
+- 🔄 UX : Rafraîchissement automatique des statistiques de stockage lors du focus de la page
+
 ## [2.49.8] - 2026-02-14 [REFACTOR]
 
 - 📂 Structure : Déplacement de `src/constants.ts` vers `src/constants/app.ts` pour une meilleure organisation

@@ -36,9 +36,8 @@ export const getXPCost = (currentValue: number, creationValue: number = 0, facto
  */
 export const calculateExperienceResults = (data: CharacterSheetData, rules?: RulesData): ExperienceData => {
     // 0. Extraction des effets actifs des traits
-    const activeEffects = getActiveTraitEffects(data);
+    const activeEffects = getActiveTraitEffects(data, rules);
 
-    // 1. Helpers pour les bonus
     // 1. Helpers pour les bonus
     const getFreeRankLimit = (skillName: string) => {
         const effect = activeEffects.find(e =>
@@ -125,14 +124,32 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 
 /**
  * Extrait tous les effets de traits actifs du personnage
+ * Recherche d'abord dans la bibliothèque locale, puis dans les règles globales
  */
-function getActiveTraitEffects(data: CharacterSheetData): TraitEffect[] {
+function getActiveTraitEffects(data: CharacterSheetData, rules?: RulesData): TraitEffect[] {
     const activeEffects: TraitEffect[] = [];
+
+    // Indexation pour éviter les O(N²)
+    const globalTraits = rules?.libraries?.traits || [];
+    const globalTraitMap = new Map(globalTraits.map(t => [normalizeString(t.name), t]));
+
     const findEffects = (traitName: string) => {
         if (!traitName) return;
-        const entry = data.library?.find(l => l.name.trim().toLowerCase() === traitName.trim().toLowerCase());
-        if (entry && entry.effects) {
-            entry.effects.forEach(e => activeEffects.push(e));
+        const normalizedName = normalizeString(traitName);
+
+        // 1. Recherche Local
+        const localEntry = data.library?.find(l => normalizeString(l.name) === normalizedName);
+        if (localEntry && localEntry.effects && localEntry.effects.length > 0) {
+            localEntry.effects.forEach(e => activeEffects.push(e));
+            return;
+        }
+
+        // 2. Recherche Global (si pas trouvé en local ou pas d'effets en local)
+        const globalEntry = globalTraitMap.get(normalizedName);
+        if (globalEntry && globalEntry.effects && globalEntry.effects.length > 0) {
+            // Log pour debug
+            // logger.log(`[xpCalculator] Using global effects for trait "${traitName}"`);
+            globalEntry.effects.forEach(e => activeEffects.push(e));
         }
     };
 

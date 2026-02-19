@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.56.37",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Correction critique du calcul des bonus XP des traits (ex: Apprentissage Rapide). Le calculateur prend désormais en compte les définitions globales des traits (Base de Données) lorsque ceux-ci ne sont pas redéfinis localement, assurant l'application correcte des effets."
+    },
+    {
+        "version": "2.56.36",
+        "date": "2026-02-19",
+        "type": "chore",
+        "description": "Maintenance Base de Données : Activation de la sécurité RLS sur les tables Mystiques, ajout des index manquants sur les clés étrangères pour la performance, et optimisation des requêtes de vérification des droits Admin."
+    },
+    {
         "version": "2.56.35",
         "date": "2026-02-19",
         "type": "refactor",
@@ -106,17 +118,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Correction de la persistance de la catégorie de placement (localisation) pour les habilités mystiques en base de données (ajout des colonnes manquantes et mise à jour des services de synchronisation)."
-    },
-    {
-        "version": "2.56.17",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction d'une erreur de référence (ReferenceError) dans les bibliothèques d'administration introduite lors de la mise à jour des badges."
-    },
-    {
-        "version": "2.56.16",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Amélioration des badges de bibliothèques Admin : affichage des noms des catégories au lieu des codes techniques. Correction du bug de sauvegarde du placement pour les Habilités Mystiques."
     }
 ]
