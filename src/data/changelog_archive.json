@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.20",
+        "date": "2026-02-19",
+        "type": "refactor",
+        "description": "Refactorisation majeure de l'éditeur du grimoire (ColumnarEditor.tsx). Extraction de la barre d'outils, du fond de page et de la barre latérale des chapitres en composants distincts. Migration des styles CSS vers un fichier externe. Amélioration de la maintenabilité et réduction du bruit dans le fichier principal."
+    },
+    {
         "version": "2.56.19",
         "date": "2026-02-19",
         "type": "fix",
@@ -930,13 +936,6 @@
         "date": "2026-02-14",
         "type": "refactor",
         "content": "🏗️ Architecture & Typing Phase E : Finalisation du typage dynamique du layout, extraction du composant `CharacterSheetGrid` et nettoyage des dépendances obsolètes.",
-        "major": false
-    },
-    {
-        "version": "2.49.13",
-        "date": "2026-02-14",
-        "type": "refactor",
-        "content": "🛡️ Typage Phase C : Éradication des `any` restants dans l'admin, refactoring du reconciler de compétences et consolidation des variables CSS.",
         "major": false
     }
 ]
