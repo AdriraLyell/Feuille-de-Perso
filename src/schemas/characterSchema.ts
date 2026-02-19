@@ -48,7 +48,11 @@ export const SyncInfoSchema = z.object({
     settingName: z.string().optional(),
     syncId: z.string().optional(),
     lastSynced: z.number().optional(),
-    isAutoSyncEnabled: z.boolean().optional()
+    isAutoSyncEnabled: z.boolean().optional(),
+    localSettings: z.object({
+        expertMode: z.boolean().optional(),
+        activeRulesId: z.string().optional()
+    }).optional()
 });
 
 export const CombatEntrySchema = z.object({

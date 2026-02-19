@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.56.33",
+        "date": "2026-02-19",
+        "type": "feat",
+        "description": "Amélioration de la persistance des données portables : Synchronisation complète des images du Grimoire et des couvertures de Notes de Campagne. Persistance des paramètres locaux (Mode Expert, Source des Règles) dans le JSON exporté pour une expérience sans couture entre appareils. Sécurisation de la compression d'images (idempotence WebP/Gzip)."
+    },
+    {
+        "version": "2.56.32",
+        "date": "2026-02-19",
+        "type": "feat",
+        "description": "Implémentation de la 'Purge Profonde' séparée de la réinitialisation de fiche. Ajout d'un bouton de purge dans l'onglet Cloud (Moniteur de Stockage) permettant de vider complètement l'IndexedDB (images, règles) et le LocalStorage en cas de blocage majeur, avec redémarrage automatique."
+    },
+    {
         "version": "2.56.31",
         "date": "2026-02-20",
         "type": "fix",
@@ -106,23 +118,5 @@
         "date": "2026-02-19",
         "type": "feat",
         "description": "Restauration des sélecteurs de catégorie dans les bibliothèques Admin (Skills, BG, Compteurs, Mystique) avec sécurisation du système de Reset (masterDefinition). Ajout du placement mystique configurable dans les paramètres de création."
-    },
-    {
-        "version": "2.56.13",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de la logique de placement : Seules les Habilités Mystiques utilisent désormais le placement de secours (Col 7 pour l'Art Martial, Col 5 pour le reste)."
-    },
-    {
-        "version": "2.56.12",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Logique de placement de secours pour les compétences Wizard : Arts Martiaux en Col_Comp_7, autres en Col_Comp_5."
-    },
-    {
-        "version": "2.56.11",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Initialisation des compétences Wizard au niveau 0 pour permettre le nettoyage facile et documentation des règles de placement."
     }
 ]

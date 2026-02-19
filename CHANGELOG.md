@@ -1,5 +1,31 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.6] - 2026-02-14 [REFACTOR]
+
+- 🎨 Design System : Extraction des constantes magiques vers des variables CSS (--color-paper, --shadow-sheet, etc.)
+- 🧹 Nettoyage : Standardisation du fichier index.css et suppression des redondances de couleurs hexadécimales
+- 📏 Géométrie : Centralisation des dimensions de la fiche (Portrait/Paysage) et des facteurs de zoom d'impression
+- 🛡️ Stabilité : Validation du build de production avec le nouveau système de variables
+
+## [2.49.5] - 2026-02-14 [MAINTENANCE]
+
+- 🧠 Refactoring Majeur : Optimisation complète de `SkillsEditor` et `ImportPanel` (réduction de 50% du code)
+- 🏗️ Architecture : Création de hooks dédiés `useSkillsEditorActions` et `useImportLogic`
+- 🧩 Composants : Extraction de `SkillCategoryEditor`, `FileDropZone`, `FileAnalysisHeader`, `MigrationSuccessModal`
+- 🚀 Performance : Allègement significatif des composants critiques de la fiche joueur
+- 🔧 Types : Éradication des `any` critiques dans les migrations et l'import/export (+50 corrections)
+- 🛡️ Stabilité : Renforcement de la logique d'import de fichiers JSON avec typage strict
+
+## [2.49.4] - 2026-02-14 [REFACTOR]
+
+- 🧠 Refactoring Admin : Extraction massive de la logique vers `useDashboardActions`, `useSkillEditorActions` et `useCreationEditorActions`
+- 🧩 Modularité : Décomposition des composants `AdminDashboard`, `AdminSkillsEditor` et `AdminCreationEditor` en sous-composants réutilisables
+- 📉 Dette Technique : Réduction drastique de la taille des fichiers Admin principaux (jusqu'à -60% de lignes)
+- 🧹 Dépendances : Suppression de `tiptap-pagination-plus` (obsolète)
+- 🔧 Types : Correction et alignement des types pour `useLibraryImport` et `CandidateLine`
+- 🐛 Fix : Résolution du chemin d'import critique pour `useCampaignLabels` dans l'admin
+- ✅ Build : Validation finale du build de production et de l'administration
+
 ## [2.49.3] - 2026-02-14 [REFACTOR]
 
 - 🧠 Refactoring : Extraction massive des sections de `CharacterReadOnlyView.tsx` en 10 sous-composants modulaires

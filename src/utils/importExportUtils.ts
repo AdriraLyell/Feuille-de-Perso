@@ -2,6 +2,7 @@ import { CharacterSheetData, LibraryEntry, LibrarySkillEntry, LibrarySpecializat
 import { APP_VERSION } from '../constants/app';
 import { getImage, blobToBase64 } from '../imageDB';
 import { ImageCompressionService } from '../services/ImageCompressionService';
+import { ImageSyncResolver } from '../services/ImageSyncResolver';
 import { ErrorService } from '../services/ErrorService';
 
 /**
@@ -28,6 +29,20 @@ export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (
     // Resolve Campaign Notes Images
     if (dataToProcess.campaignNotes) {
         for (const note of dataToProcess.campaignNotes) {
+            // Main Image
+            if (note.imageId && note.imageId.startsWith('img_')) {
+                try {
+                    const blob = await getImage(note.imageId);
+                    if (blob) {
+                        (note as any).base64Cover = await blobToBase64(blob);
+                    }
+                } catch (e) {
+                    ErrorService.handleError(e, { context: 'ExportCharacter', userMessage: `Impossible d'exporter l'image de couverture de la note ${note.id}` });
+                }
+                delete note.imageId;
+            }
+
+            // Gallery Images
             if (note.images && Array.isArray(note.images)) {
                 for (const img of note.images) {
                     if (img.imageId) {
@@ -47,6 +62,18 @@ export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (
         }
     }
 
+    // --- PERSIST LOCAL SETTINGS ---
+    const expertMode = localStorage.getItem('rpg-sheet-expert-mode') === 'true';
+    const activeRulesId = localStorage.getItem('rules-source-id') || undefined;
+
+    dataToProcess.syncInfo = {
+        ...dataToProcess.syncInfo,
+        localSettings: {
+            expertMode,
+            activeRulesId
+        }
+    };
+
     if (!(dataToProcess as any).appVersion) {
         (dataToProcess as any).appVersion = APP_VERSION;
     }
@@ -55,7 +82,7 @@ export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (
     if (addLog) addLog("Compression des images en cours...", 'info', 'sheet');
     let finalData = dataToProcess;
     try {
-        finalData = await ImageCompressionService.processImages(dataToProcess, 'compress');
+        finalData = await ImageSyncResolver.resolveImagesForSync(dataToProcess) as CharacterSheetData;
         if (addLog) addLog("Images compressées avec succès.", 'success', 'sheet');
     } catch (e) {
         ErrorService.handleError(e, { context: 'ExportCharacter', silent: true });

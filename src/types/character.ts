@@ -116,6 +116,10 @@ export interface CharacterSheetData {
     lastSyncedHash?: string; // Digital signature of the data at last sync
     isAutoSyncEnabled?: boolean; // New: Automatic cloud save
     mjMessage?: string;   // Note left by the MJ when signaling an update
+    localSettings?: {
+      expertMode?: boolean;
+      activeRulesId?: string;
+    };
   };
   appVersion?: string; // Version de l'application lors de la sauvegarde
   _rulesVersion?: string; // Version des règles appliquées (pour optimisation de la réconciliation)

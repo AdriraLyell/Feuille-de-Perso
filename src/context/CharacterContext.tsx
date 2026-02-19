@@ -99,6 +99,14 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
                 if (validated.creationConfig) {
                     validated.creationConfig.active = false;
                 }
+
+                // Restore Local Settings
+                if (validated.syncInfo?.localSettings) {
+                    const { expertMode, activeRulesId } = validated.syncInfo.localSettings;
+                    if (expertMode !== undefined) localStorage.setItem('rpg-sheet-expert-mode', String(expertMode));
+                    if (activeRulesId !== undefined) localStorage.setItem('rules-source-id', activeRulesId);
+                }
+
                 return validated;
             } catch (e) {
                 ErrorService.handleError(e, { context: 'CharacterContext.Init', userMessage: "Erreur lors du chargement des données locales." });
@@ -177,6 +185,13 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
             } as CharacterSheetData;
             const finalData = rules ? reconcileRulesWithState(sanitizedData, rules) : sanitizedData;
 
+            // Restore Local Settings from Imported Data
+            if (finalData.syncInfo?.localSettings) {
+                const { expertMode, activeRulesId } = finalData.syncInfo.localSettings;
+                if (expertMode !== undefined) localStorage.setItem('rpg-sheet-expert-mode', String(expertMode));
+                if (activeRulesId !== undefined) localStorage.setItem('rules-source-id', activeRulesId);
+            }
+
             setData(finalData);
             addLog("Données importées avec succès", 'success', 'settings');
         } catch (e) {
@@ -187,7 +202,22 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
 
     // 3. Effects
     useEffect(() => {
-        localStorage.setItem('rpg-sheet-data', JSON.stringify(data));
+        // Prepare data with latest local settings before saving
+        const expertMode = localStorage.getItem('rpg-sheet-expert-mode') === 'true';
+        const activeRulesId = localStorage.getItem('rules-source-id') || undefined;
+
+        const dataWithSettings = {
+            ...data,
+            syncInfo: {
+                ...data.syncInfo,
+                localSettings: {
+                    expertMode,
+                    activeRulesId
+                }
+            }
+        };
+
+        localStorage.setItem('rpg-sheet-data', JSON.stringify(dataWithSettings));
     }, [data]);
 
     // 4. Image Migration Effect (Base64 -> IndexedDB)

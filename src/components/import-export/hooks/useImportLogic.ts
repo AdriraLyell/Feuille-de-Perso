@@ -5,6 +5,7 @@ import { useCharacter } from '../../../context/CharacterContext';
 import { APP_VERSION } from '../../../constants/app';
 import { createTemplateFromData, detectConflicts, smartMerge, DataConflict } from '../../../utils/importExportUtils';
 import { base64ToBlob, saveImage } from '../../../imageDB';
+import { ImageSyncResolver } from '../../../services/ImageSyncResolver';
 import { ErrorService } from '../../../services/ErrorService';
 
 export interface FileAnalysis {
@@ -81,41 +82,15 @@ export function useImportLogic({ data, variant, onImportSuccess, onClose }: UseI
     };
 
     const processImportedData = async (dataObj: Partial<CharacterSheetData>) => {
-        // 1. Character Image
-        if (dataObj.page2 && dataObj.page2.characterImage && dataObj.page2.characterImage.length > 100) {
-            try {
-                const blob = await base64ToBlob(dataObj.page2.characterImage);
-                const newId = await saveImage(blob);
-                dataObj.page2.characterImageId = newId;
-                dataObj.page2.characterImage = "";
-            } catch (e) {
-                ErrorService.handleError(e, { context: 'ImportPanel.importCharImage', silent: true });
-            }
+        try {
+            // ImageSyncResolver.injectImagesAfterSync is the source of truth for restoring 
+            // portable data (compressed base64) to local data (IndexedDB IDs).
+            const localData = await ImageSyncResolver.injectImagesAfterSync(dataObj);
+            return localData;
+        } catch (e) {
+            ErrorService.handleError(e, { context: 'useImportLogic.processImportedData', silent: true });
+            return dataObj;
         }
-        // 2. Campaign Note Images
-        if (dataObj.campaignNotes) {
-            for (const note of dataObj.campaignNotes) {
-                if (note.images && Array.isArray(note.images)) {
-                    for (const img of note.images) {
-                        // Cast img to check for base64Data which comes from JSON but isn't in standard type yet (unless we added it)
-                        // We added base64Data to NoteImage, so it should be fine if typed correctly.
-                        // But img here comes from parsed json so it's 'any' implicitly inside the loop if note.images is NoteImage[]?
-                        // No, Partial<CharacterSheetData> implies typed children.
-                        if (img.base64Data) {
-                            try {
-                                const blob = await base64ToBlob(img.base64Data);
-                                const newId = await saveImage(blob);
-                                img.imageId = newId;
-                                delete img.base64Data;
-                            } catch (e) {
-                                ErrorService.handleError(e, { context: 'ImportPanel.importNoteImage', silent: true });
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return dataObj;
     };
 
     const executeImport = async () => {
