@@ -227,7 +227,6 @@ const MainLayout: React.FC = () => {
                                 data.syncInfo ? 'synced' : 'none'
                     }
                     appVersion={APP_VERSION}
-                    appVersion={APP_VERSION}
                     onShowCampaignInfo={() => setShowCampaignInfo(true)}
                     autoSaveCountdown={countdown}
                 />

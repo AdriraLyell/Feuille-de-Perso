@@ -1,5 +1,9 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.12] - 2026-02-14 [CHORE]
+
+
+
 ## [2.49.11] - 2026-02-14 [FIX]
 
 - 📊 Admin : Repositionnement de la colonne 'Taille' entre 'Dernière Sync' et 'Actions'

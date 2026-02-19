@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.19",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Amélioration du placement automatique des compétences mystiques (Art Martial/Martiaux). Les compétences héritent désormais de la catégorie de placement de leur habilité parente si aucune n'est définie. Correction de la détection de la casse et du pluriel pour les Arts Martiaux."
+    },
+    {
         "version": "2.56.18",
         "date": "2026-02-19",
         "type": "fix",
@@ -931,13 +937,6 @@
         "date": "2026-02-14",
         "type": "refactor",
         "content": "🛡️ Typage Phase C : Éradication des `any` restants dans l'admin, refactoring du reconciler de compétences et consolidation des variables CSS.",
-        "major": false
-    },
-    {
-        "version": "2.49.12",
-        "date": "2026-02-14",
-        "type": "chore",
-        "content": "🧹 Nettoyage des logs : Remplacement systématique des console.log/warn/error par le logger applicatif et suppression des logs de debug.",
         "major": false
     }
 ]
