@@ -340,6 +340,10 @@ const MainLayout: React.FC = () => {
                                 setData((prev: CharacterSheetData) => ({ ...prev, syncInfo }));
                                 addLog(`Fiche synchronisée avec ${syncInfo?.settingName}`, 'success', 'sheet');
                             }}
+                            onRestore={(restoredData) => {
+                                setData(restoredData);
+                                addLog("Version historique restaurée avec succès", 'success', 'sheet');
+                            }}
                         />
 
                         <CampaignConflictModal
