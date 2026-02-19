@@ -1,15 +1,15 @@
 [
     {
-        "version": "2.56.22",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Ajout de la possibilité de définir des bonus d'XP par scénario dans les effets de traits. L'XP totale est calculée dynamiquement en fonction du nombre de scénarios joués (entrées dans l'historique)."
-    },
-    {
         "version": "2.56.23",
         "date": "2026-02-19",
         "type": "feat",
         "description": "Amélioration de l'affichage de l'expérience (Total XP incluant les bonus + infobulle de détail). Ajout d'une case à cocher 'Session' dans l'historique d'XP pour contrôler explicitement quelles entrées comptent pour le bonus par scénario, résolvant les problèmes de détection automatique."
+    },
+    {
+        "version": "2.56.22",
+        "date": "2026-02-19",
+        "type": "feat",
+        "description": "Ajout de la possibilité de définir des bonus d'XP par scénario dans les effets de traits. L'XP totale est calculée dynamiquement en fonction du nombre de scénarios joués (entrées dans l'historique)."
     },
     {
         "version": "2.56.21",
