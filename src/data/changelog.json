@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.13",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Correction de la logique de placement : Seules les Habilités Mystiques utilisent désormais le placement de secours (Col 7 pour l'Art Martial, Col 5 pour le reste)."
+    },
+    {
         "version": "2.56.12",
         "date": "2026-02-19",
         "type": "fix",
@@ -10,15 +16,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Initialisation des compétences Wizard au niveau 0 pour permettre le nettoyage facile et documentation des règles de placement."
-    },
-    {
-        "version": "2.56.10",
-        "date": "2026-02-19",
-        "changes": [
-            "Amélioration du style du Wizard (contrastes et lisibilité)",
-            "Correction du calcul des slots (injection du mysticAbilityId)",
-            "Correction de la visibilité des compétences (mapping des catégories)",
-            "Fermeture automatique du Wizard après confirmation"
-        ]
     }
 ]

@@ -114,11 +114,17 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             if (skillDef.defaultCategory) {
                 category = LEGACY_SKILL_MAP[skillDef.defaultCategory] || skillDef.defaultCategory;
             } else {
-                // Specific fallbacks for Wizard-added skills without default category
-                if (skillDef.name.toLowerCase().includes('art martial')) {
-                    category = 'Col_Comp_7'; // Martial Arts column
+                // Determine if it's a Mystic Ability skill by its source category in rules or behavior
+                const isMystic = skillDef.name.includes('Art Martial') || wizardState.mysticAbilityName;
+
+                if (isMystic) {
+                    if (skillDef.name.toLowerCase().includes('art martial')) {
+                        category = 'Col_Comp_7'; // Martial Arts column
+                    } else {
+                        category = 'Col_Comp_5'; // Other mystic skills column
+                    }
                 } else {
-                    category = 'Col_Comp_5'; // Default column for others
+                    category = 'competences'; // Default fallback for everything else
                 }
             }
 
