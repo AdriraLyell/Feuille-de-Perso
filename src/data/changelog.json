@@ -1,10 +1,16 @@
 [
     {
-        "version": "2.56.41",
+        "version": "2.56.42",
         "date": "2026-02-19",
         "type": "fix",
-        "description": "Correction de l'erreur 'useState is not defined' dans SyncModal.tsx (imports React manquants)."
+        "description": "Stabilisation finale : Correction des erreurs de syntaxe JSON et des imports React."
     },
+    "version": "2.56.41",
+    "date": "2026-02-19",
+    "type": "fix",
+    "description": "Correction de l'erreur 'useState is not defined' dans SyncModal.tsx (imports React manquants)."
+},
+{
     "version": "2.56.40",
     "date": "2026-02-19",
     "type": "fix",
