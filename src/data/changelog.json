@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.15",
+        "date": "2026-02-19",
+        "type": "feat",
+        "description": "Affichage du code de placement (colonne) directement sur les cartes des bibliothèques Admin (Skills, BG, Compteurs, Mystique) pour une meilleure visibilité immédiate."
+    },
+    {
         "version": "2.56.14",
         "date": "2026-02-19",
         "type": "feat",

@@ -41,8 +41,15 @@ const SkillLibraryItem: React.FC<{
 
             {/* 2. Content (Flexible) */}
             <div className="flex-grow overflow-hidden pr-2">
-                <div className={`font-bold truncate text-sm ${skill.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={skill.name}>
-                    {skill.name}
+                <div className="flex items-center gap-2 overflow-hidden">
+                    <div className={`font-bold truncate text-sm ${skill.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={skill.name}>
+                        {skill.name}
+                    </div>
+                    {skill.defaultCategory && (
+                        <span className="text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200 px-1 rounded-sm uppercase tracking-tighter shrink-0" title={`Placement : ${skill.defaultCategory}`}>
+                            {skill.defaultCategory}
+                        </span>
+                    )}
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
                     {skill.isGlobal && <div title="Global Reservoir"><Globe size={11} className="text-indigo-400 shrink-0" /></div>}

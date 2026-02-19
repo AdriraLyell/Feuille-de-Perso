@@ -41,8 +41,15 @@ const BackgroundLibraryItem: React.FC<{
 
             {/* 2. Content */}
             <div className="flex-grow overflow-hidden pr-2">
-                <div className={`font-bold truncate text-sm ${item.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={item.name}>
-                    {item.name}
+                <div className="flex items-center gap-2 overflow-hidden">
+                    <div className={`font-bold truncate text-sm ${item.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={item.name}>
+                        {item.name}
+                    </div>
+                    {item.defaultCategory && (
+                        <span className="text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200 px-1 rounded-sm uppercase tracking-tighter shrink-0" title={`Placement : ${item.defaultCategory}`}>
+                            {item.defaultCategory}
+                        </span>
+                    )}
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
                     {item.isVariable && (
