@@ -1,122 +1,127 @@
 [
     {
-        "version": "2.56.39",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Ajout de l'interface de restauration des backups (SyncModal). Les joueurs peuvent désormais consulter leurs deux dernières versions historiques sur le cloud et les restaurer d'un clic."
-    },
-    {
-        "version": "2.56.38",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Implémentation de l'Auto-Save (1min) et backups rotatifs (Trigger SQL). Ajout d'un compteur visuel sur le bouton de synchronisation Cloud et gestion intelligente de l'historique (2 versions max) côté serveur."
-    },
-    {
-        "version": "2.56.37",
+        "version": "2.56.40",
         "date": "2026-02-19",
         "type": "fix",
-        "description": "Correction critique du calcul des bonus XP des traits (ex: Apprentissage Rapide). Le calculateur prend désormais en compte les définitions globales des traits (Base de Données) lorsque ceux-ci ne sont pas redéfinis localement, assurant l'application correcte des effets."
+        "description": "Correction de régressions mineures : doublon d'attribut JSX dans MainLayout et erreur de syntaxe JSON dans le journal des modifications."
     },
-    {
-        "version": "2.56.36",
-        "date": "2026-02-19",
-        "type": "chore",
-        "description": "Maintenance Base de Données : Activation de la sécurité RLS sur les tables Mystiques, ajout des index manquants sur les clés étrangères pour la performance, et optimisation des requêtes de vérification des droits Admin."
-    },
-    {
-        "version": "2.56.35",
-        "date": "2026-02-19",
-        "type": "refactor",
-        "description": "Optimisation de la structure Admin : Découpage des bibliothèques (Compétences, Historiques, Habilités Mystiques, Compteurs) en sous-composants dédiés pour améliorer la maintenabilité et réduire la taille des fichiers sources (gain de ~150-200 lignes par fichier critique)."
-    },
-    {
-        "version": "2.56.34",
-        "date": "2026-02-19",
-        "type": "chore",
-        "description": "Opération 'Racine Propre' : Migration des scripts utilitaires vers le dossier dédié, archivage des fichiers SQL temporaires et nettoyage des logs. Migration systématique des derniers `console.log/warn/error` vers le logger applicatif pour une meilleure hygiène de production."
-    },
-    {
-        "version": "2.56.33",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Amélioration de la persistance des données portables : Synchronisation complète des images du Grimoire et des couvertures de Notes de Campagne. Persistance des paramètres locaux (Mode Expert, Source des Règles) dans le JSON exporté pour une expérience sans couture entre appareils. Sécurisation de la compression d'images (idempotence WebP/Gzip)."
-    },
-    {
-        "version": "2.56.32",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Implémentation de la 'Purge Profonde' séparée de la réinitialisation de fiche. Ajout d'un bouton de purge dans l'onglet Cloud (Moniteur de Stockage) permettant de vider complètement l'IndexedDB (images, règles) et le LocalStorage en cas de blocage majeur, avec redémarrage automatique."
-    },
-    {
-        "version": "2.56.31",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction du calcul du bonus d'XP par scénario (Traits). Les sessions sont désormais mieux détectées même si le montant est à 0 (détection via le nom du scénario). Amélioration des logs de diagnostic XP et fixation des erreurs de validation Zod lors du chargement initial."
-    },
-    {
-        "version": "2.56.30",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Sécurisation et typage strict des champs optionnels (mysticAbilityId, coûts, descriptions) à travers l'application. Harmonisation des Interfaces et Schémas Zod pour éliminer les erreurs de build et prévenir les plantages liés aux valeurs nulles."
-    },
-    {
-        "version": "2.56.29",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction d'un blocage de navigation après réinitialisation des paramètres. Ajout de la modale de confirmation d'abandon et amélioration de la détection des changements non enregistrés."
-    },
-    {
-        "version": "2.56.28",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Refonte majeure de la robustesse du schéma de données personnage (Zod) pour éliminer les erreurs de chargement au rafraîchissement. Ajout de logs de diagnostic pour le calcul des bonus XP des traits."
-    },
-    {
-        "version": "2.56.27",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction d'une erreur de validation (Zod) au chargement du personnage liée aux nouveaux IDs d'effets de traits."
-    },
-    {
-        "version": "2.56.26",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de la persistance du mode de calcul des bonus XP (Fixe vs Par Scénario) dans les bibliothèques Admin."
-    },
-    {
-        "version": "2.56.25",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de l'avertissement React sur les clés manquantes dans l'éditeur d'effets de traits (TraitEffectEditor) et garantie des IDs uniques lors de l'édition."
-    },
-    {
-        "version": "2.56.24",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de la sauvegarde des effets mécaniques des traits dans la bibliothèque Admin (évite les réinitialisations). Synchronisation automatique des bibliothèques (traits, compétences) sur la feuille lors de la mise à jour des règles, assurant la transmission correcte des effets."
-    },
-    {
-        "version": "2.56.23",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Amélioration de l'affichage de l'expérience (Total XP incluant les bonus + infobulle de détail). Ajout d'une case à cocher 'Session' dans l'historique d'XP pour contrôler explicitement quelles entrées comptent pour le bonus par scénario, résolvant les problèmes de détection automatique."
-    },
-    {
-        "version": "2.56.22",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Ajout de la possibilité de définir des bonus d'XP par scénario dans les effets de traits. L'XP totale est calculée dynamiquement en fonction du nombre de scénarios joués (entrées dans l'historique)."
-    },
-    {
-        "version": "2.56.21",
-        "date": "2026-02-19",
-        "type": "ui",
-        "description": "Amélioration du layout des bibliothèques Admin (Arrière-plans, Habilités Mystiques, Compétences) : le badge de catégorie de placement a été déplacé sous le nom de l'item, sur la même ligne que les icônes de statut, pour clarifier l'interface."
-    },
-    {
-        "version": "2.56.20",
-        "date": "2026-02-19",
-        "type": "refactor",
-        "description": "Refactorisation majeure de l'éditeur du grimoire (ColumnarEditor.tsx). Extraction de la barre d'outils, du fond de page et de la barre latérale des chapitres en composants distincts. Migration des styles CSS vers un fichier externe. Amélioration de la maintenabilité et réduction du bruit dans le fichier principal."
-    }
+    "version": "2.56.39",
+    "date": "2026-02-19",
+    "type": "feat",
+    "description": "Ajout de l'interface de restauration des backups (SyncModal). Les joueurs peuvent désormais consulter leurs deux dernières versions historiques sur le cloud et les restaurer d'un clic."
+},
+{
+    "version": "2.56.38",
+    "date": "2026-02-19",
+    "type": "feat",
+    "description": "Implémentation de l'Auto-Save (1min) et backups rotatifs (Trigger SQL). Ajout d'un compteur visuel sur le bouton de synchronisation Cloud et gestion intelligente de l'historique (2 versions max) côté serveur."
+},
+{
+    "version": "2.56.37",
+    "date": "2026-02-19",
+    "type": "fix",
+    "description": "Correction critique du calcul des bonus XP des traits (ex: Apprentissage Rapide). Le calculateur prend désormais en compte les définitions globales des traits (Base de Données) lorsque ceux-ci ne sont pas redéfinis localement, assurant l'application correcte des effets."
+},
+{
+    "version": "2.56.36",
+    "date": "2026-02-19",
+    "type": "chore",
+    "description": "Maintenance Base de Données : Activation de la sécurité RLS sur les tables Mystiques, ajout des index manquants sur les clés étrangères pour la performance, et optimisation des requêtes de vérification des droits Admin."
+},
+{
+    "version": "2.56.35",
+    "date": "2026-02-19",
+    "type": "refactor",
+    "description": "Optimisation de la structure Admin : Découpage des bibliothèques (Compétences, Historiques, Habilités Mystiques, Compteurs) en sous-composants dédiés pour améliorer la maintenabilité et réduire la taille des fichiers sources (gain de ~150-200 lignes par fichier critique)."
+},
+{
+    "version": "2.56.34",
+    "date": "2026-02-19",
+    "type": "chore",
+    "description": "Opération 'Racine Propre' : Migration des scripts utilitaires vers le dossier dédié, archivage des fichiers SQL temporaires et nettoyage des logs. Migration systématique des derniers `console.log/warn/error` vers le logger applicatif pour une meilleure hygiène de production."
+},
+{
+    "version": "2.56.33",
+    "date": "2026-02-19",
+    "type": "feat",
+    "description": "Amélioration de la persistance des données portables : Synchronisation complète des images du Grimoire et des couvertures de Notes de Campagne. Persistance des paramètres locaux (Mode Expert, Source des Règles) dans le JSON exporté pour une expérience sans couture entre appareils. Sécurisation de la compression d'images (idempotence WebP/Gzip)."
+},
+{
+    "version": "2.56.32",
+    "date": "2026-02-19",
+    "type": "feat",
+    "description": "Implémentation de la 'Purge Profonde' séparée de la réinitialisation de fiche. Ajout d'un bouton de purge dans l'onglet Cloud (Moniteur de Stockage) permettant de vider complètement l'IndexedDB (images, règles) et le LocalStorage en cas de blocage majeur, avec redémarrage automatique."
+},
+{
+    "version": "2.56.31",
+    "date": "2026-02-20",
+    "type": "fix",
+    "description": "Correction du calcul du bonus d'XP par scénario (Traits). Les sessions sont désormais mieux détectées même si le montant est à 0 (détection via le nom du scénario). Amélioration des logs de diagnostic XP et fixation des erreurs de validation Zod lors du chargement initial."
+},
+{
+    "version": "2.56.30",
+    "date": "2026-02-20",
+    "type": "fix",
+    "description": "Sécurisation et typage strict des champs optionnels (mysticAbilityId, coûts, descriptions) à travers l'application. Harmonisation des Interfaces et Schémas Zod pour éliminer les erreurs de build et prévenir les plantages liés aux valeurs nulles."
+},
+{
+    "version": "2.56.29",
+    "date": "2026-02-20",
+    "type": "fix",
+    "description": "Correction d'un blocage de navigation après réinitialisation des paramètres. Ajout de la modale de confirmation d'abandon et amélioration de la détection des changements non enregistrés."
+},
+{
+    "version": "2.56.28",
+    "date": "2026-02-19",
+    "type": "fix",
+    "description": "Refonte majeure de la robustesse du schéma de données personnage (Zod) pour éliminer les erreurs de chargement au rafraîchissement. Ajout de logs de diagnostic pour le calcul des bonus XP des traits."
+},
+{
+    "version": "2.56.27",
+    "date": "2026-02-19",
+    "type": "fix",
+    "description": "Correction d'une erreur de validation (Zod) au chargement du personnage liée aux nouveaux IDs d'effets de traits."
+},
+{
+    "version": "2.56.26",
+    "date": "2026-02-19",
+    "type": "fix",
+    "description": "Correction de la persistance du mode de calcul des bonus XP (Fixe vs Par Scénario) dans les bibliothèques Admin."
+},
+{
+    "version": "2.56.25",
+    "date": "2026-02-19",
+    "type": "fix",
+    "description": "Correction de l'avertissement React sur les clés manquantes dans l'éditeur d'effets de traits (TraitEffectEditor) et garantie des IDs uniques lors de l'édition."
+},
+{
+    "version": "2.56.24",
+    "date": "2026-02-19",
+    "type": "fix",
+    "description": "Correction de la sauvegarde des effets mécaniques des traits dans la bibliothèque Admin (évite les réinitialisations). Synchronisation automatique des bibliothèques (traits, compétences) sur la feuille lors de la mise à jour des règles, assurant la transmission correcte des effets."
+},
+{
+    "version": "2.56.23",
+    "date": "2026-02-19",
+    "type": "feat",
+    "description": "Amélioration de l'affichage de l'expérience (Total XP incluant les bonus + infobulle de détail). Ajout d'une case à cocher 'Session' dans l'historique d'XP pour contrôler explicitement quelles entrées comptent pour le bonus par scénario, résolvant les problèmes de détection automatique."
+},
+{
+    "version": "2.56.22",
+    "date": "2026-02-19",
+    "type": "feat",
+    "description": "Ajout de la possibilité de définir des bonus d'XP par scénario dans les effets de traits. L'XP totale est calculée dynamiquement en fonction du nombre de scénarios joués (entrées dans l'historique)."
+},
+{
+    "version": "2.56.21",
+    "date": "2026-02-19",
+    "type": "ui",
+    "description": "Amélioration du layout des bibliothèques Admin (Arrière-plans, Habilités Mystiques, Compétences) : le badge de catégorie de placement a été déplacé sous le nom de l'item, sur la même ligne que les icônes de statut, pour clarifier l'interface."
+},
+{
+    "version": "2.56.20",
+    "date": "2026-02-19",
+    "type": "refactor",
+    "description": "Refactorisation majeure de l'éditeur du grimoire (ColumnarEditor.tsx). Extraction de la barre d'outils, du fond de page et de la barre latérale des chapitres en composants distincts. Migration des styles CSS vers un fichier externe. Amélioration de la maintenabilité et réduction du bruit dans le fichier principal."
+}
 ]
