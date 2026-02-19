@@ -399,7 +399,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                     {editingSkill.mysticAbilityId !== undefined && rules.libraries.mysticAbilities && rules.libraries.mysticAbilities.length > 0 && (
                                         <select
                                             className="w-full border border-amber-300 rounded px-2 py-1 text-xs focus:border-amber-500 outline-none bg-white font-bold"
-                                            value={editingSkill.mysticAbilityId}
+                                            value={editingSkill.mysticAbilityId || ""}
                                             onChange={(e) => setEditingSkill({ ...editingSkill, mysticAbilityId: e.target.value })}
                                         >
                                             <option value="">-- Choisir une habilité --</option>

@@ -121,8 +121,8 @@ export const useAdminSkillLibrary = (
                 name: skill.name,
                 description: skill.description || '',
                 isVariable: !!skill.isVariable,
-                mysticAbilityId: skill.mysticAbilityId,
-                defaultCategory: skill.defaultCategory
+                mysticAbilityId: skill.mysticAbilityId || undefined,
+                defaultCategory: skill.defaultCategory || undefined
             };
         }
 

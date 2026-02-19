@@ -1,5 +1,5 @@
 
-import { CharacterSheetData, LibrarySkillEntry, DotEntry, ThemeConfig } from '../types';
+import { CharacterSheetData, LibrarySkillEntry, DotEntry, ThemeConfig, AttributeEntry } from '../types';
 import { createDotEntry, createAttributeEntry, createCombatEntry, generateId } from '../utils/factories';
 
 export const DEFAULT_THEME: ThemeConfig = {
@@ -21,12 +21,10 @@ export const DEFAULT_MYSTIC_ABILITIES = [
   'Psy'
 ];
 
-// Define initial skills first to use them for Library generation
-// [!IMPORTANT]
-// CE FICHIER CONTIENT DES DONNÉES DE REPLI (FALLBACK).
-// Dans l'application normale, ces données sont écrasées par le chargement dynamique des règles (rules.js).
-// Ne pas supprimer ce fichier sous peine de briser le typage ou le mode hors-ligne initial.
-export const INITIAL_SKILLS: Record<string, DotEntry[]> = {
+// --- Factories for Initial Data ---
+
+// Generate Initial Skills with fresh IDs
+const getInitialSkills = (): Record<string, DotEntry[]> => ({
   Col_Comp_1: [
     createDotEntry('Vigilance'), createDotEntry('Repérage'), createDotEntry('T.O.C'),
     createDotEntry(''), // Spacer
@@ -105,19 +103,19 @@ export const INITIAL_SKILLS: Record<string, DotEntry[]> = {
   Col_Comp_9: [
     createDotEntry('Volonté'), createDotEntry('Confiance')
   ]
-};
+});
 
-// Generate Default Library from Skills
-const generateDefaultSkillLibrary = (): LibrarySkillEntry[] => {
+// Generate Default Library from Skills (Helper)
+const generateDefaultSkillLibrary = (skills: Record<string, DotEntry[]>): LibrarySkillEntry[] => {
   const lib: LibrarySkillEntry[] = [];
   const seenNames = new Set<string>();
 
   // Skills that are variable by default
   const defaultVariableSkills = ['artisanat', 'jouer', 'art martial'];
 
-  Object.keys(INITIAL_SKILLS).forEach(key => {
+  Object.keys(skills).forEach(key => {
     if (key === 'Col_Comp_8') return; // Skip backgrounds in default library
-    INITIAL_SKILLS[key].forEach((skill) => {
+    skills[key].forEach((skill) => {
       if (skill.name && skill.name.trim() !== '') {
         const normalized = skill.name.trim().toLowerCase();
         if (!seenNames.has(normalized)) {
@@ -136,144 +134,162 @@ const generateDefaultSkillLibrary = (): LibrarySkillEntry[] => {
   return lib.sort((a, b) => a.name.localeCompare(b.name));
 };
 
-export const INITIAL_DATA: CharacterSheetData = {
-  creationConfig: {
-    active: false,
-    mode: 'rangs',
-    pointsDistributionMode: 'global',
-    startingXP: 350,
-    pointsBuckets: {
-      attributes: 60,
-      skills: 140,
-      backgrounds: 20
+/**
+ * Generates a FRESH initial state with unique IDs.
+ * Use this function for Reset or New Character operations.
+ */
+export const getInitialCharacterData = (): CharacterSheetData => {
+  const skills = getInitialSkills();
+  return {
+    creationConfig: {
+      active: false,
+      mode: 'rangs',
+      pointsDistributionMode: 'global',
+      startingXP: 350,
+      pointsBuckets: {
+        attributes: 60,
+        skills: 140,
+        backgrounds: 20
+      },
+      attributePoints: 12,
+      attributeCost: 6,
+      attributeMin: -1,
+      attributeMax: 3,
+      backgroundPoints: 7,
+      rankSlots: { 1: 10, 2: 8, 3: 6, 4: 2, 5: 0 },
+      cardConfig: {
+        active: true,
+        bestSkillsCount: 6,
+        increment: 0.5,
+        baseStart: 2
+      },
+      extendedSkills: false
     },
-    attributePoints: 12,
-    attributeCost: 6,
-    attributeMin: -1,
-    attributeMax: 3,
-    backgroundPoints: 7,
-    rankSlots: { 1: 10, 2: 8, 3: 6, 4: 2, 5: 0 },
-    cardConfig: {
-      active: true,
-      bestSkillsCount: 6,
-      increment: 0.5,
-      baseStart: 2
+    theme: JSON.parse(JSON.stringify(DEFAULT_THEME)),
+    header: {
+      name: '', age: '', sex: '',
+      player: '', born: '', height: '',
+      chronicle: '', nature: '', hair: '',
+      status: '', conduct: '', eyes: '',
     },
-    extendedSkills: false
-  },
-  theme: DEFAULT_THEME,
-  header: {
-    name: '', age: '', sex: '',
-    player: '', born: '', height: '',
-    chronicle: '', nature: '', hair: '',
-    status: '', conduct: '', eyes: '',
-  },
-  syncInfo: {
-    isAutoSyncEnabled: false
-  },
-  experience: { gain: '0', spent: '0', rest: '0' },
-  // Default Attributes Configuration
-  attributeSettings: [
-    { id: 'pave_attributs_1', label: 'Physique' },
-    { id: 'pave_attributs_2', label: 'Mental' },
-    { id: 'pave_attributs_3', label: 'Social' }
-  ],
-  attributes: {
-    pave_attributs_1: [
-      createAttributeEntry('Force'),
-      createAttributeEntry('Constitution'),
-      createAttributeEntry('Dextérité'),
-      createAttributeEntry('Agilité'),
+    syncInfo: {
+      isAutoSyncEnabled: false
+    },
+    experience: { gain: '0', spent: '0', rest: '0' },
+    // Default Attributes Configuration
+    attributeSettings: [
+      { id: 'pave_attributs_1', label: 'Physique' },
+      { id: 'pave_attributs_2', label: 'Mental' },
+      { id: 'pave_attributs_3', label: 'Social' }
     ],
-    pave_attributs_2: [
-      createAttributeEntry('Intellect'),
-      createAttributeEntry('Volonté'),
-      createAttributeEntry('Intuition'),
-      createAttributeEntry('Perception'),
-    ],
-    pave_attributs_3: [
-      createAttributeEntry('Charisme'),
-      createAttributeEntry('Empathie'),
-      createAttributeEntry('Apparence'),
-      createAttributeEntry('Communication'),
-    ]
-  },
-  secondaryAttributesActive: false,
-  secondaryAttributes: {
-    pave_attributs_1: [
-      createAttributeEntry('Corpulence'),
-      createAttributeEntry('Apparence'),
-    ],
-    pave_attributs_2: [
-      createAttributeEntry('Conscience'),
-      createAttributeEntry('Attraction'),
-    ],
-    pave_attributs_3: [
-      createAttributeEntry('Présence'),
-      createAttributeEntry('Charme'),
-    ],
-    pave_attributs_4: [
-      createAttributeEntry('Aura'),
-      createAttributeEntry('Fascination'),
-    ]
-  },
-  skills: INITIAL_SKILLS, // Use the extracted object
-  combat: {
-    weapons: [
-      createCombatEntry(),
-      createCombatEntry(),
-      createCombatEntry(),
-      createCombatEntry(),
-      createCombatEntry(),
-    ],
-    armor: [
-      { type: '', protection: '', weight: '' },
-      { type: '', protection: '', weight: '' }
-    ],
-    stats: { agility: '', dexterity: '', force: '', size: '' }
-  },
-  counters: {
-    volonte: { id: 'volonte', name: 'Volonté', value: 3, creationValue: 3, max: 10, current: 0 },
-    confiance: { id: 'confiance', name: 'Confiance', value: 3, creationValue: 3, max: 10, current: 0 },
-    custom: [],
-  },
-  page2: {
-    lieux_importants: "",
-    contacts: "",
-    reputation: [
-      ...Array(7).fill(null).map(() => ({ reputation: '', lieu: '', valeur: '' }))
-    ],
-    connaissances: "",
-    valeurs_monetaires: "",
-    armes_list: "",
-    avantages: [
-      ...Array(28).fill(null).map(() => ({ name: '', value: '' }))
-    ],
-    desavantages: [
-      ...Array(28).fill(null).map(() => ({ name: '', value: '' }))
-    ],
-    equipement: "",
-    notes: "",
-    characterImage: '',
-  },
-  specializations: {},
-  imposedSpecializations: {},
-  library: [],
-  skillLibrary: generateDefaultSkillLibrary(), // Pre-filled by default
-  specializationLibrary: [], // Vide par défaut
-  mysticAbilities: DEFAULT_MYSTIC_ABILITIES.map(name => ({
-    id: generateId(),
-    name,
-    description: "",
-    isActive: true,
-    isGlobal: true
-  })),
-  xpLogs: [],
-  appLogs: [],
-  campaignNotes: [],
-  partyNotes: {
-    members: [],
-    columns: [],
-    staticColWidths: { character: 200, player: 200 }
-  }
+    attributes: {
+      pave_attributs_1: [
+        createAttributeEntry('Force'),
+        createAttributeEntry('Constitution'),
+        createAttributeEntry('Dextérité'),
+        createAttributeEntry('Agilité'),
+      ],
+      pave_attributs_2: [
+        createAttributeEntry('Intellect'),
+        createAttributeEntry('Volonté'),
+        createAttributeEntry('Intuition'),
+        createAttributeEntry('Perception'),
+      ],
+      pave_attributs_3: [
+        createAttributeEntry('Charisme'),
+        createAttributeEntry('Empathie'),
+        createAttributeEntry('Apparence'),
+        createAttributeEntry('Communication'),
+      ]
+    },
+    secondaryAttributesActive: false,
+    secondaryAttributes: {
+      pave_attributs_1: [
+        createAttributeEntry('Corpulence'),
+        createAttributeEntry('Apparence'),
+      ],
+      pave_attributs_2: [
+        createAttributeEntry('Conscience'),
+        createAttributeEntry('Attraction'),
+      ],
+      pave_attributs_3: [
+        createAttributeEntry('Présence'),
+        createAttributeEntry('Charme'),
+      ],
+      pave_attributs_4: [
+        createAttributeEntry('Aura'),
+        createAttributeEntry('Fascination'),
+      ]
+    },
+    skills: skills,
+    combat: {
+      weapons: [
+        createCombatEntry(),
+        createCombatEntry(),
+        createCombatEntry(),
+        createCombatEntry(),
+        createCombatEntry(),
+      ],
+      armor: [
+        { type: '', protection: '', weight: '' },
+        { type: '', protection: '', weight: '' }
+      ],
+      stats: { agility: '', dexterity: '', force: '', size: '' }
+    },
+    counters: {
+      volonte: { id: 'volonte', name: 'Volonté', value: 3, creationValue: 3, max: 10, current: 0 },
+      confiance: { id: 'confiance', name: 'Confiance', value: 3, creationValue: 3, max: 10, current: 0 },
+      custom: [],
+    },
+    page2: {
+      lieux_importants: "",
+      contacts: "",
+      reputation: [
+        ...Array(7).fill(null).map(() => ({ reputation: '', lieu: '', valeur: '' }))
+      ],
+      connaissances: "",
+      valeurs_monetaires: "",
+      armes_list: "",
+      avantages: [
+        ...Array(28).fill(null).map(() => ({ name: '', value: '' }))
+      ],
+      desavantages: [
+        ...Array(28).fill(null).map(() => ({ name: '', value: '' }))
+      ],
+      equipement: "",
+      notes: "",
+      characterImage: '',
+    },
+    specializations: {},
+    imposedSpecializations: {},
+    library: [],
+    skillLibrary: generateDefaultSkillLibrary(skills),
+    specializationLibrary: [],
+    mysticAbilities: DEFAULT_MYSTIC_ABILITIES.map(name => ({
+      id: generateId(),
+      name,
+      description: "",
+      isActive: true,
+      isGlobal: true
+    })),
+    xpLogs: [],
+    appLogs: [],
+    campaignNotes: [],
+    partyNotes: {
+      members: [],
+      columns: [],
+      staticColWidths: { character: 200, player: 200 }
+    }
+  };
 };
+
+/**
+ * @deprecated Use getInitialCharacterData() instead to ensure fresh IDs.
+ * Kept for backward compatibility with existing imports.
+ */
+export const INITIAL_DATA: CharacterSheetData = getInitialCharacterData();
+
+/**
+ * @deprecated Use getInitialCharacterData() internal logic.
+ */
+export const INITIAL_SKILLS: Record<string, DotEntry[]> = getInitialSkills();

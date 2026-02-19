@@ -307,7 +307,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                     id="counter-max"
                                     type="number"
                                     className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-red-500 outline-none"
-                                    value={editingItem.maxValue}
+                                    value={editingItem.maxValue ?? 10}
                                     onChange={(e) => setEditingItem({ ...editingItem, maxValue: Number(e.target.value) })}
                                 />
                             </div>
@@ -317,7 +317,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                     id="counter-default"
                                     type="number"
                                     className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-red-500 outline-none"
-                                    value={editingItem.defaultValue}
+                                    value={editingItem.defaultValue ?? 0}
                                     onChange={(e) => setEditingItem({ ...editingItem, defaultValue: Number(e.target.value) })}
                                 />
                             </div>
@@ -327,7 +327,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                     id="counter-xp-cost"
                                     type="number"
                                     className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-red-500 outline-none"
-                                    value={editingItem.xpCost}
+                                    value={editingItem.xpCost ?? 0}
                                     onChange={(e) => setEditingItem({ ...editingItem, xpCost: Number(e.target.value) })}
                                 />
                             </div>

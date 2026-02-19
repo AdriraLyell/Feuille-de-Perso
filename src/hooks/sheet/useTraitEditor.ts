@@ -35,12 +35,12 @@ export const useTraitEditor = (
             if (listIndex < currentList.length) {
                 currentList[listIndex] = {
                     name: entry.name,
-                    value: instance.cost || entry.cost,
-                    description: entry.description,
+                    value: instance.cost || entry.cost || "",
+                    description: entry.description || "",
                     tag: entry.tags?.[0] || '',
                     variant: instance.variant || '',
                     definitionId: entry.id,
-                    mysticAbilityId: entry.mysticAbilityId
+                    mysticAbilityId: entry.mysticAbilityId || undefined
                 };
                 addedCount++;
             }

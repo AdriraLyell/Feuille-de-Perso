@@ -240,6 +240,46 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
     }
 }
 
+/**
+ * Synchronizes character libraries with rules libraries.
+ * 
+ * @param newState - The current draft state
+ * @param rules - The rules containing library definitions
+ */
+const reconcileLibraries = (newState: CharacterSheetData, rules: RulesData) => {
+    if (!rules.libraries) return;
+
+    // 1. Traits
+    if (rules.libraries.traits) {
+        newState.library = rules.libraries.traits;
+    }
+
+    // 2. Skills
+    if (rules.libraries.skills) {
+        newState.skillLibrary = rules.libraries.skills;
+    }
+
+    // 3. Specializations
+    if (rules.libraries.specializations) {
+        newState.specializationLibrary = rules.libraries.specializations;
+    }
+
+    // 4. Backgrounds
+    if (rules.libraries.backgrounds) {
+        newState.backgroundLibrary = rules.libraries.backgrounds;
+    }
+
+    // 5. Counters
+    if (rules.libraries.counters) {
+        newState.counterLibrary = rules.libraries.counters;
+    }
+
+    // 6. Mystic Abilities
+    if (rules.libraries.mysticAbilities) {
+        newState.mysticAbilities = rules.libraries.mysticAbilities;
+    }
+};
+
 // --- Main Function ---
 
 /**
@@ -263,6 +303,7 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
     reconcileSkillsAndBackgrounds(newState, currentState, rules);
     reconcileCounters(newState, currentState, rules);
     reconcileTraits(newState, currentState, rules);
+    reconcileLibraries(newState, rules);
 
     return newState;
 };

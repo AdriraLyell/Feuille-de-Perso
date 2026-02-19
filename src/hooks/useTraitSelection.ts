@@ -34,7 +34,7 @@ export const useTraitSelection = (onMultiSelect?: (instances: { entry: LibraryEn
                 if (isAlreadySelected) {
                     return prev.filter(s => s.entry.id !== id);
                 } else {
-                    return [...prev, { tempId: Math.random().toString(36).substr(2, 9), entry, cost: entry.cost }];
+                    return [...prev, { tempId: Math.random().toString(36).substr(2, 9), entry, cost: entry.cost || undefined }];
                 }
             });
         }
@@ -43,7 +43,7 @@ export const useTraitSelection = (onMultiSelect?: (instances: { entry: LibraryEn
     const addInstanceWithVariant = useCallback((entry: LibraryEntry, variant: string, cost?: string) => {
         setSelection(prev => [
             ...prev,
-            { tempId: Math.random().toString(36).substr(2, 9), entry, variant, cost: cost || entry.cost }
+            { tempId: Math.random().toString(36).substr(2, 9), entry, variant, cost: cost || entry.cost || undefined }
         ]);
         setVariantPicker(null);
     }, []);

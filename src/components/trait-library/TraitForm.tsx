@@ -15,7 +15,7 @@ interface TraitFormProps {
     setEditForm: (entry: LibraryEntry | null) => void;
     setTagInput: (val: string) => void;
     onClose: () => void;
-    onSave: () => void;
+    onSave: (updatedTrait?: LibraryEntry) => void;
     addTag: () => void;
     removeTag: (tag: string) => void;
     addEffect: () => void;
@@ -78,8 +78,11 @@ const TraitForm: React.FC<TraitFormProps> = ({
 
     const handleSave = () => {
         const cleaned = variantDraft.split(',').map(v => v.trim()).filter(Boolean);
-        setEditForm({ ...editForm, variants: cleaned });
-        onSave();
+        const finalForm = { ...editForm, variants: cleaned };
+
+        // Update local state just in case, but pass final version to onSave immediately
+        setEditForm(finalForm);
+        onSave(finalForm);
     };
     const isNew = !library.some(l => l.id === editForm.id);
 
@@ -184,7 +187,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
                     <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest flex items-center gap-1"><AlignLeft size={12} /> Description Narrative</label>
                     <textarea
                         className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-3 text-sm text-[#1c1917] bg-white/50 min-h-[100px] focus:border-amber-500 outline-none resize-y placeholder-stone-300 italic leading-relaxed shadow-sm"
-                        value={editForm.description}
+                        value={editForm.description || ""}
                         onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                         placeholder="Décrivez les effets narratifs ou les conditions d'utilisation..."
                     />

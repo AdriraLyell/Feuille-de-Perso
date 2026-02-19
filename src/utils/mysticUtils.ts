@@ -23,7 +23,7 @@ export const isMysticSkill = (skill: DotEntry | LibrarySkillEntry, library: Libr
 
     // Check if the DotEntry matches a library skill that has the ID
     const libSkill = library.find(s => s.name === skill.name);
-    return libSkill?.mysticAbilityId;
+    return libSkill?.mysticAbilityId || undefined;
 };
 
 /**

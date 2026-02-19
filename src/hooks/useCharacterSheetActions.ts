@@ -249,8 +249,8 @@ export const useCharacterSheetActions = (
                 const displayName = current.name || sysDef?.name || id;
                 const libDef = rules?.libraries?.counters?.find(c => c.id === id || normalizeString(c.name) === normalizeString(displayName));
 
-                const xpCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 0);
-                const defaultValue = libDef?.defaultValue !== undefined ? libDef.defaultValue : (sysDef?.defaultValue ?? 0);
+                const xpCost = libDef?.xpCost != null ? libDef.xpCost : (sysDef?.xpCost ?? 0);
+                const defaultValue = libDef?.defaultValue != null ? libDef.defaultValue : (sysDef?.defaultValue ?? 0);
 
                 if (field === 'value' && (libDef || sysDef)) {
                     if (xpCost <= 0 && value > current.value) return prev;

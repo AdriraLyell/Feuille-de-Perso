@@ -95,7 +95,7 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
                 <input
                   type="date"
                   className="w-full bg-transparent border-b border-dotted border-stone-300 focus:border-blue-500 outline-none text-sm font-handwriting text-ink"
-                  value={entry.date}
+                  value={entry.date || ''}
                   onChange={(e) => updateRow(entry.id, 'date', e.target.value)}
                   style={{ colorScheme: 'light' }}
                 />
@@ -116,7 +116,7 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
                   type="text"
                   placeholder="Nom du scénario..."
                   className="w-full bg-transparent border-b border-dotted border-stone-300 focus:border-blue-500 outline-none text-sm font-handwriting text-ink"
-                  value={entry.scenario}
+                  value={entry.scenario || ''}
                   onChange={(e) => updateRow(entry.id, 'scenario', e.target.value)}
                 />
               </div>

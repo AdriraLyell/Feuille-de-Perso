@@ -229,5 +229,9 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
     }
 
 
+    if (rules.version) {
+        newState._rulesVersion = rules.version;
+    }
+
     return newState;
 };

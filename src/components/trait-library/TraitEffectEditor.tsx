@@ -41,7 +41,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                         Aucun effet configuré. Ce trait sera purement narratif.
                     </div>
                 )}
-                {(effects || []).map(effect => {
+                {(effects || []).map((effect, index) => {
                     // Configuration visuelle par type
                     let typeIcon = <Star size={16} />;
                     let themeColor = 'text-amber-700';
@@ -66,7 +66,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                     }
 
                     return (
-                        <div key={effect.id} className={`rounded-lg border ${borderColor} ${bgColor} shadow-sm overflow-hidden group`}>
+                        <div key={effect.id || `effect-${index}`} className={`rounded-lg border ${borderColor} ${bgColor} shadow-sm overflow-hidden group`}>
 
                             {/* Header Row: Type Selector & Delete */}
                             <div className="flex items-center justify-between p-2 border-b border-black/5 bg-white/60">
@@ -131,8 +131,8 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                     onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
                                                 >
                                                     <option value="" className="text-stone-300">-- Choisir --</option>
-                                                    {allSkills.map(s => (
-                                                        <option key={s.id} value={s.name}>{s.name}</option>
+                                                    {allSkills.map((s, si) => (
+                                                        <option key={s.id || `skill-${si}`} value={s.name}>{s.name}</option>
                                                     ))}
                                                 </select>
                                                 <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-blue-800/40" />
@@ -159,8 +159,8 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                     onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
                                                 >
                                                     <option value="" className="text-stone-300">-- Choisir --</option>
-                                                    {allAttributes.map(a => (
-                                                        <option key={a.id} value={a.name}>{a.name}</option>
+                                                    {allAttributes.map((a, ai) => (
+                                                        <option key={a.id || `attr-${ai}`} value={a.name}>{a.name}</option>
                                                     ))}
                                                 </select>
                                                 <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-[#8b2e2e]/40" />

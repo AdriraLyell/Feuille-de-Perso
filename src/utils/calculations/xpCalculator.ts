@@ -66,21 +66,22 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
         .reduce((sum, e) => sum + e.value, 0);
 
     // Bonus par Scénario
-    // On compte le nombre d'entrées de log valides (celles qui ont une date ou un scénario)
-    // On exclut potentiellement les entrées "système" ou vides si nécessaire, 
-    // mais dans l'usage standard chaque log est une session/scénario.
-    // On utilise le flag explicite s'il existe, sinon on fallback sur amount > 0
-    const scenarioCount = (data.xpLogs || []).filter(log =>
+    const scenarioLogs = (data.xpLogs || []).filter(log =>
         log.countsAsScenario !== undefined
             ? log.countsAsScenario
-            : log.amount > 0
-    ).length;
+            : (log.amount > 0 || (log.scenario && log.scenario.trim() !== ''))
+    );
+    const scenarioCount = scenarioLogs.length;
 
     const perScenarioBonus = xpEffects
         .filter(e => e.method === 'per_scenario')
         .reduce((sum, e) => sum + (e.value * scenarioCount), 0);
 
     const totalTraitXP = fixedBonus + perScenarioBonus;
+    if (totalTraitXP !== 0) {
+        const sessionNames = scenarioLogs.map(l => l.scenario || `ID:${l.id.substring(0, 4)}`).join(', ');
+        console.log(`[xpCalculator] Traits XP Bonus: ${totalTraitXP} (Fixed: ${fixedBonus}, PerScenario: ${perScenarioBonus}, Sessions: ${scenarioCount} [${sessionNames}])`);
+    }
 
     // 2. Calcul de l'XP dépensée
     let totalSpent = 0;
@@ -180,8 +181,8 @@ function calculateSkillXP(
                     const libDef = libCounters.find(c => c.id === skill.id)
                         || libCounters.find(c => normalizeString(c.name) === normalizeString(displayName));
 
-                    const baseCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 5);
-                    const freeBase = libDef?.defaultValue !== undefined ? libDef.defaultValue : (sysDef?.defaultValue ?? 0);
+                    const baseCost = libDef?.xpCost != null ? libDef.xpCost : (sysDef?.xpCost ?? 5);
+                    const freeBase = libDef?.defaultValue != null ? libDef.defaultValue : (sysDef?.defaultValue ?? 0);
                     const effectiveBase = Math.max(skill.creationValue || 0, freeBase);
 
                     baseFactor = baseCost * multiplier;
@@ -254,7 +255,7 @@ function calculateCounterXP(
         const libDef = libCounters.find(c => c.id === key)
             || libCounters.find(c => normalizeString(c.name) === normalizeString(displayName));
 
-        const xpCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 0);
+        const xpCost = libDef?.xpCost != null ? libDef.xpCost : (sysDef?.xpCost ?? 0);
 
         if (xpCost > 0) {
             let multiplier = 1.0;
@@ -278,10 +279,10 @@ function calculateCounterXP(
                 || libCounters.find(c => normalizeString(c.name) === normalizeString(counter.name));
             const sysDef = Object.values(rulesCounters).find(c => c.name === counter.name);
 
-            const xpCost = libDef?.xpCost !== undefined ? libDef.xpCost : (sysDef?.xpCost ?? 0);
+            const xpCost = libDef?.xpCost != null ? libDef.xpCost : (sysDef?.xpCost ?? 0);
 
             if (xpCost > 0) {
-                const modelDefault = libDef?.defaultValue ?? (sysDef?.defaultValue ?? 0);
+                const modelDefault = libDef?.defaultValue != null ? libDef.defaultValue : (sysDef?.defaultValue ?? 0);
                 const creationValue = Math.max(counter.creationValue || 0, modelDefault);
                 counterSpent += getXPCost(counter.value, creationValue, xpCost, false);
             }

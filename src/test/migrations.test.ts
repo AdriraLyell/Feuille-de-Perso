@@ -400,7 +400,7 @@ describe('Data Migrations - migrateData', () => {
             const result = migrateData(clone(MINIMAL_VALID_DATA));
 
             expect(result.partyNotes).toBeDefined();
-            expect(result.partyNotes.staticColWidths).toBeDefined();
+            expect(result.partyNotes?.staticColWidths).toBeDefined();
         });
 
         it('should ensure all 9 skill categories exist', () => {

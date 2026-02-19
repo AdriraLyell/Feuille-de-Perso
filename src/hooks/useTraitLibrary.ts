@@ -53,7 +53,7 @@ export const useTraitLibrary = (
 
             const entryTags = entry.tags || [];
             const matchesSearch = smartIncludes(entry.name, searchTerm) ||
-                smartIncludes(entry.description, searchTerm) ||
+                smartIncludes(entry.description || "", searchTerm) ||
                 entryTags.some(t => smartIncludes(t, searchTerm));
             const matchesType = filterType === 'all' || entry.type === filterType;
             const matchesTags = selectedTags.length === 0 || selectedTags.every(sel =>
@@ -68,7 +68,7 @@ export const useTraitLibrary = (
 
             let comparison = 0;
             if (sortBy === 'name') comparison = ea.name.localeCompare(eb.name);
-            else if (sortBy === 'cost') comparison = (parseInt(ea.cost) || 0) - (parseInt(eb.cost) || 0);
+            else if (sortBy === 'cost') comparison = (parseInt(ea.cost || "0") || 0) - (parseInt(eb.cost || "0") || 0);
             else if (sortBy === 'type') comparison = ea.type.localeCompare(eb.type);
 
             if (comparison === 0) return ea.name.localeCompare(eb.name);

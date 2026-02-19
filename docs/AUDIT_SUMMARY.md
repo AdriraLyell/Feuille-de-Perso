@@ -1,6 +1,6 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.56.20)
+# Audit - État des Lieux & Roadmap (Synthèse v2.56.31)
 
-> **Dernière mise à jour** : 2026-02-19 — Version 2.56.20
+> **Dernière mise à jour** : 2026-02-20 — Version 2.56.31
 
 ## 1. Phases Complétées
 

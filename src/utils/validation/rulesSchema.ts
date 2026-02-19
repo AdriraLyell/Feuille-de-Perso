@@ -3,7 +3,9 @@ import { z } from 'zod';
 // --- Primitives ---
 
 export const TraitEffectSchema = z.object({
+    id: z.string().optional(),
     type: z.string(),
+    method: z.string().optional(),
     value: z.any().optional(),
     target: z.string().optional(),
     conditions: z.any().optional(),

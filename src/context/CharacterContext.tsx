@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { CharacterSheetData, LogEntry } from '../types';
-import { INITIAL_DATA } from '../data/initialState';
+import { getInitialCharacterData, INITIAL_DATA } from '../data/initialState';
 import { migrateData } from '../utils/migrations';
 import { calculateExperienceResults } from '../utils/mechanics';
 import { validateCharacterData } from '../schemas/characterSchema';
@@ -112,8 +112,8 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
             }
         }
 
-        // For fresh initialization, use INITIAL_DATA directly without migration
-        return JSON.parse(JSON.stringify(INITIAL_DATA));
+        // For fresh initialization, use getInitialCharacterData directly to ensure unique IDs
+        return getInitialCharacterData();
     });
 
     const [isSyncing, setIsSyncing] = useState(false);
@@ -151,7 +151,8 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
     }, []);
 
     const resetData = useCallback(() => {
-        const base = JSON.parse(JSON.stringify(INITIAL_DATA));
+        // Use factory to get fresh IDs
+        const base = getInitialCharacterData();
         // Apply rules if available
         const newState = rules ? applyRulesToState(base, rules) : base;
 
@@ -173,7 +174,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
             const sanitizedData = {
                 ...validated,
                 mysticAbilities: validated.mysticAbilities || []
-            };
+            } as CharacterSheetData;
             const finalData = rules ? reconcileRulesWithState(sanitizedData, rules) : sanitizedData;
 
             setData(finalData);

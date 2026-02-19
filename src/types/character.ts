@@ -82,7 +82,7 @@ export interface CharacterSheetData {
     attributeFactor: number;
     skillFactor: number;
     specializationFactor: number;
-    traitCost: number;
+    traitCost?: number;
   };
   page2: Page2Data;
   // Key is skill ID, Value is array of specialization strings (Player defined based on dots)
@@ -94,12 +94,12 @@ export interface CharacterSheetData {
   specializationLibrary?: LibrarySpecializationEntry[]; // Catalogue de spécialisations réutilisables
   backgroundLibrary?: LibraryBackgroundEntry[]; // Catalogue d'arrière-plans
   counterLibrary?: LibraryCounterEntry[]; // Catalogue de compteurs
-  mysticAbilities?: LibrarySkillEntry[]; // Categories of mystic powers (Martial Arts, Magic, etc.)
+  mysticAbilities?: LibrarySkillEntry[] | null; // Categories of mystic powers (Martial Arts, Magic, etc.)
   xpLogs: XPEntry[];
   appLogs: LogEntry[];
   campaignNotes: CampaignNoteEntry[];
   bookDocument?: BookDocument;
-  partyNotes: {
+  partyNotes?: {
     members: PartyMemberEntry[];
     columns: PartyColumn[];
     staticColWidths?: { // Widths for the fixed columns
@@ -117,6 +117,7 @@ export interface CharacterSheetData {
     isAutoSyncEnabled?: boolean; // New: Automatic cloud save
     mjMessage?: string;   // Note left by the MJ when signaling an update
   };
+  appVersion?: string; // Version de l'application lors de la sauvegarde
   _rulesVersion?: string; // Version des règles appliquées (pour optimisation de la réconciliation)
   _schemaVersion?: number; // Version du schéma de données (pour migrations séquentielles)
   suggestions?: SuggestionEntry[]; // Nouveau : Suggestions envoyées au MJ

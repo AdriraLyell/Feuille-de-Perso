@@ -46,9 +46,9 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
                 onChange(prev => ({
                     ...prev,
                     partyNotes: {
-                        ...prev.partyNotes,
+                        ...(prev.partyNotes || { columns: [], members: [] }),
                         staticColWidths: {
-                            ...prev.partyNotes.staticColWidths!,
+                            ...(prev.partyNotes?.staticColWidths || { character: 200, player: 200 }),
                             [colId]: newWidth
                         }
                     }
@@ -57,8 +57,8 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
                 onChange(prev => ({
                     ...prev,
                     partyNotes: {
-                        ...prev.partyNotes,
-                        columns: prev.partyNotes.columns.map(c => c.id === colId ? { ...c, width: newWidth } : c)
+                        ...(prev.partyNotes || { members: [], staticColWidths: { character: 200, player: 200 } }),
+                        columns: (prev.partyNotes?.columns || []).map(c => c.id === colId ? { ...c, width: newWidth } : c)
                     }
                 }));
             }
@@ -95,7 +95,7 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
         onChange({
             ...data,
             partyNotes: {
-                ...data.partyNotes,
+                ...(data.partyNotes || { members: [], staticColWidths: { character: 200, player: 200 } }),
                 columns: [...columns, newCol]
             }
         });
@@ -107,7 +107,7 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
         onChange({
             ...data,
             partyNotes: {
-                ...data.partyNotes,
+                ...(data.partyNotes || { members: [], staticColWidths: { character: 200, player: 200 } }),
                 columns: columns.filter(c => c.id !== colId)
             }
         });
@@ -117,7 +117,7 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
         onChange({
             ...data,
             partyNotes: {
-                ...data.partyNotes,
+                ...(data.partyNotes || { members: [], staticColWidths: { character: 200, player: 200 } }),
                 columns: columns.map(c => c.id === colId ? { ...c, label: newVal } : c)
             }
         });
@@ -133,7 +133,7 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
         onChange({
             ...data,
             partyNotes: {
-                ...data.partyNotes,
+                ...(data.partyNotes || { columns: [], staticColWidths: { character: 200, player: 200 } }),
                 members: [...members, newMember]
             }
         });
@@ -152,7 +152,7 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
         onChange({
             ...data,
             partyNotes: {
-                ...data.partyNotes,
+                ...(data.partyNotes || { columns: [], staticColWidths: { character: 200, player: 200 } }),
                 members: newMembers
             }
         });
@@ -162,7 +162,7 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
         onChange({
             ...data,
             partyNotes: {
-                ...data.partyNotes,
+                ...(data.partyNotes || { columns: [], staticColWidths: { character: 200, player: 200 } }),
                 members: members.filter(m => m.id !== memberId)
             }
         });

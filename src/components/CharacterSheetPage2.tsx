@@ -155,7 +155,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     creationValue: 0, // Initially learned at level 0
                     max: 5,
                     variant: skillDef.isVariable ? '' : undefined,
-                    description: skillDef.description
+                    description: skillDef.description || undefined
                 });
 
                 // Add to local library if not present

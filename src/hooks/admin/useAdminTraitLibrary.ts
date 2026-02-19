@@ -97,7 +97,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         setEditForm({
             ...entry,
             tags: [...(entry.tags || [])],
-            effects: (entry.effects || []).map(e => ({ ...e }))
+            effects: (entry.effects || []).map(e => ({ ...e, id: e.id || crypto.randomUUID() }))
         });
         setIsModalOpen(true);
     }, []);
@@ -115,17 +115,18 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         setShowDeleteConfirm(null);
     }, [library, onUpdate, rules, showDeleteConfirm]);
 
-    const handleSave = useCallback(() => {
-        if (!editForm) return;
-        if (!editForm.name.trim()) { setError("Le nom est requis."); return; }
+    const handleSave = useCallback((updatedTrait?: LibraryEntry) => {
+        const traitToSave = updatedTrait || editForm;
+        if (!traitToSave) return;
+        if (!traitToSave.name.trim()) { setError("Le nom est requis."); return; }
 
-        const duplicate = library.find(l => l.id !== editForm.id && l.name.trim().toLowerCase() === editForm.name.trim().toLowerCase());
+        const duplicate = library.find(l => l.id !== traitToSave.id && l.name.trim().toLowerCase() === traitToSave.name.trim().toLowerCase());
         if (duplicate) { setError("Un trait avec ce nom existe déjà."); return; }
 
-        const exists = library.some(l => l.id === editForm.id);
+        const exists = library.some(l => l.id === traitToSave.id);
         const newLibrary = exists
-            ? library.map(l => l.id === editForm.id ? editForm : l)
-            : [editForm, ...library];
+            ? library.map(l => l.id === traitToSave.id ? traitToSave : l)
+            : [traitToSave, ...library];
 
         onUpdate({
             ...rules,
@@ -192,7 +193,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         const list = library.filter(entry => {
             const entryTags = entry.tags || [];
             const matchesSearch = smartIncludes(entry.name, searchTerm) ||
-                smartIncludes(entry.description, searchTerm) ||
+                smartIncludes(entry.description || "", searchTerm) ||
                 entryTags.some(t => smartIncludes(t, searchTerm));
 
             const matchesType = typeFilter === null || (typeFilter ? entry.type === 'avantage' : entry.type === 'desavantage');
@@ -208,7 +209,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         list.sort((a, b) => {
             let comparison = 0;
             if (sortBy === 'name') comparison = a.name.localeCompare(b.name);
-            else if (sortBy === 'cost') comparison = (parseInt(a.cost) || 0) - (parseInt(b.cost) || 0);
+            else if (sortBy === 'cost') comparison = (parseInt(a.cost || "0") || 0) - (parseInt(b.cost || "0") || 0);
             else if (sortBy === 'type') comparison = a.type.localeCompare(b.type);
 
             if (comparison === 0) return a.name.localeCompare(b.name);

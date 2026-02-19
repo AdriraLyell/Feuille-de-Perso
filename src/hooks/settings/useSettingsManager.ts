@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CharacterSheetData } from '../../types';
-import { INITIAL_DATA } from '../../data/initialState';
+import { getInitialCharacterData, INITIAL_DATA } from '../../data/initialState';
 import { applyRulesToState } from '../../utils/rulesAdapter';
 import { RulesData } from '../../types/rules';
 
@@ -21,7 +21,17 @@ export const useSettingsManager = (
 
     // Helper to compare data excluding volatile/computed fields
     const getComparableData = useCallback((d: CharacterSheetData) => {
-        const { appLogs, xpLogs, experience, ...rest } = d;
+        const {
+            appLogs,
+            xpLogs,
+            experience,
+            syncInfo,
+            appVersion,
+            _rulesVersion,
+            _schemaVersion,
+            suggestions,
+            ...rest
+        } = d;
         return rest;
     }, []);
 
@@ -52,7 +62,8 @@ export const useSettingsManager = (
     }, []);
 
     const performReset = useCallback(() => {
-        const base = JSON.parse(JSON.stringify(INITIAL_DATA));
+        // Use factory to get fresh IDs
+        const base = getInitialCharacterData();
         const newState = rules ? applyRulesToState(base, rules) : base;
 
         setLocalData(newState);

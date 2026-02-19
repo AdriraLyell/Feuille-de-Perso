@@ -61,46 +61,46 @@ export interface ExperienceData {
 
 export interface XPEntry {
   id: string;
-  date: string;
-  scenario: string;
-  spendingLocation?: string; // New field: Lieu de dépense / Investissement
+  date?: string | null;
+  scenario?: string | null;
+  spendingLocation?: string | null; // New field: Lieu de dépense / Investissement
   amount: number;
-  mj: string;
+  mj?: string | null;
   countsAsScenario?: boolean;
 }
 
 export interface LibraryEntry {
   id: string;
-  type: 'avantage' | 'desavantage'; // Renamed from vertu/defaut
+  type: 'avantage' | 'desavantage' | 'vertu' | 'defaut'; // Renamed from vertu/defaut but kept for legacy
   name: string;
-  cost: string; // The numeric part (primary cost or min)
-  pointsLabel: string; // The display label (ex: "1, 3, 5")
+  cost?: string | null; // The numeric part (primary cost or min)
+  pointsLabel?: string; // The display label (ex: "1, 3, 5")
   isVariableCost?: boolean;
-  description: string;
-  tags?: string[];
+  description?: string | null;
+  tags?: string[] | null;
   isVariable?: boolean; // Si vrai, demande une précision (variant) à l'ajout
-  variants?: string[]; // Liste des variantes suggérées (ex: "Chats", "Pollen" pour Allergie)
-  effects?: TraitEffect[]; // New Effects System
+  variants?: string[] | null; // Liste des variantes suggérées (ex: "Chats", "Pollen" pour Allergie)
+  effects?: TraitEffect[] | null; // New Effects System
   isGlobal?: boolean;
   isActive?: boolean;
   isLocked?: boolean;
   globalUsage?: number;
-  mysticAbilityId?: string; // ID of the linked Mystic Ability
+  mysticAbilityId?: string | null; // ID of the linked Mystic Ability
 }
 
 // Nouveau : Entrée pour la réserve de compétences
 export interface LibrarySkillEntry {
   id: string;
   name: string;
-  description?: string;
-  defaultCategory?: string; // Hint for auto-placement (optional)
+  description?: string | null;
+  defaultCategory?: string | null; // Hint for auto-placement (optional)
   isVariable?: boolean; // Si vrai, permet les doublons avec des variants différents (ex: "Artisanat : Forge")
-  variants?: string[]; // Liste des variantes suggérées (ex: "Forge", "Histoire", "Épées")
+  variants?: string[] | null; // Liste des variantes suggérées (ex: "Forge", "Histoire", "Épées")
   isGlobal?: boolean; // True if from global library
   isActive?: boolean; // True if selected for this campaign
   isLocked?: boolean;
   globalUsage?: number;
-  mysticAbilityId?: string; // Links this skill to a specific mystic ability
+  mysticAbilityId?: string | null; // Links this skill to a specific mystic ability
   isCustomized?: boolean; // Vrai si la compétence a été modifiée localement pour ce setting
   masterDefinition?: { // Pour le bouton "Reset"
     name: string;
@@ -129,11 +129,11 @@ export type LibraryBackgroundEntry = LibrarySkillEntry;
 export interface LibraryCounterEntry {
   id: string;
   name: string;
-  description?: string; // New: Description for tooltip
-  maxValue: number; // Default 10
-  defaultValue: number; // Default 0
-  xpCost: number; // 0 = free
-  defaultCategory?: string;
+  description?: string | null; // New: Description for tooltip
+  maxValue?: number | null; // Default 10
+  defaultValue?: number | null; // Default 0
+  xpCost?: number | null; // 0 = free
+  defaultCategory?: string | null;
   isGlobal?: boolean;
   isActive?: boolean;
   isLocked?: boolean;

@@ -47,7 +47,8 @@ export const SyncInfoSchema = z.object({
     settingId: z.string().optional(),
     settingName: z.string().optional(),
     syncId: z.string().optional(),
-    lastSynced: z.number().optional()
+    lastSynced: z.number().optional(),
+    isAutoSyncEnabled: z.boolean().optional()
 });
 
 export const CombatEntrySchema = z.object({
@@ -68,11 +69,16 @@ export const ReputationEntrySchema = z.object({
 
 export const TraitEntrySchema = z.object({
     name: z.string(),
-    value: z.string()
+    value: z.string(),
+    description: z.string().optional(),
+    tag: z.string().optional(),
+    variant: z.string().optional(),
+    definitionId: z.string().optional(),
+    mysticAbilityId: z.string().optional()
 });
 
 export const TraitEffectSchema = z.object({
-    id: z.string(),
+    id: z.string().default(() => Math.random().toString(36).substr(2, 9)),
     type: z.enum(['xp_bonus', 'free_skill_rank', 'attribute_bonus']),
     value: z.number(),
     method: z.enum(['fixed', 'per_scenario']).optional(),
@@ -108,7 +114,9 @@ export const CreationConfigSchema = z.object({
         bestSkillsCount: z.number(),
         increment: z.number(),
         baseStart: z.number()
-    })
+    }),
+    extendedSkills: z.boolean().optional(),
+    backgroundCost: z.number().optional()
 });
 
 export const ThemeConfigSchema = z.object({
@@ -130,36 +138,47 @@ export const ExperienceDataSchema = z.object({
 
 export const XPEntrySchema = z.object({
     id: z.string(),
-    date: z.string(),
-    scenario: z.string(),
-    spendingLocation: z.string().optional(),
-    amount: z.number(),
-    mj: z.string()
+    date: z.string().nullable().optional(),
+    scenario: z.string().nullable().optional(),
+    spendingLocation: z.string().nullable().optional(),
+    amount: z.preprocess((val) => Number(val), z.number()),
+    mj: z.string().nullable().optional(),
+    countsAsScenario: z.boolean().optional()
 });
 
 export const LibraryEntrySchema = z.object({
     id: z.string(),
-    type: z.enum(['avantage', 'desavantage']),
+    type: z.enum(['avantage', 'desavantage', 'vertu', 'defaut']), // Added legacy support
     name: z.string(),
-    cost: z.string(),
+    cost: z.string().nullable().optional(),
     pointsLabel: z.string().optional().default(''),
-    description: z.string(),
-    tags: z.array(z.string()).optional(),
-    effects: z.array(TraitEffectSchema).optional()
+    isVariableCost: z.boolean().optional(),
+    description: z.string().nullable().optional(),
+    tags: z.array(z.string()).nullable().optional(),
+    isVariable: z.boolean().optional(),
+    variants: z.array(z.string()).nullable().optional(),
+    effects: z.array(TraitEffectSchema).nullable().optional(),
+    isGlobal: z.boolean().optional(),
+    isActive: z.boolean().optional(),
+    isLocked: z.boolean().optional(),
+    globalUsage: z.number().optional(),
+    mysticAbilityId: z.string().optional()
 });
 
 export const LibrarySkillEntrySchema = z.object({
     id: z.string(),
     name: z.string(),
-    description: z.string().optional(),
-    defaultCategory: z.string().optional(),
+    description: z.string().nullable().optional(),
+    defaultCategory: z.string().nullable().optional(),
     isVariable: z.boolean().optional(),
+    variants: z.array(z.string()).nullable().optional(),
     isGlobal: z.boolean().optional(),
     isActive: z.boolean().optional(),
     isLocked: z.boolean().optional(),
     globalUsage: z.number().optional(),
-    mysticAbilityId: z.string().optional(),
-    isCustomized: z.boolean().optional()
+    mysticAbilityId: z.string().nullable().optional(),
+    isCustomized: z.boolean().optional(),
+    masterDefinition: z.any().optional()
 });
 
 export const LibrarySpecializationEntrySchema = z.object({
@@ -169,6 +188,21 @@ export const LibrarySpecializationEntrySchema = z.object({
     defaultMinLevel: z.number(),
     description: z.string().optional()
 });
+
+export const LibraryCounterEntrySchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string().nullable().optional(),
+    maxValue: z.number().nullable().optional(),
+    defaultValue: z.number().nullable().optional(),
+    xpCost: z.number().nullable().optional(),
+    isGlobal: z.boolean().optional(),
+    isActive: z.boolean().optional(),
+    defaultCategory: z.string().nullable().optional()
+});
+
+export const LibraryBackgroundEntrySchema = LibrarySkillEntrySchema;
+
 
 export const LogEntrySchema = z.object({
     id: z.string(),
@@ -259,6 +293,12 @@ export const CharacterSheetDataSchema = z.object({
     secondaryAttributes: z.record(z.string(), z.array(AttributeEntrySchema)),
     secondaryAttributesActive: z.boolean(),
     attributeSettings: z.array(AttributeCategoryDefSchema),
+    xpCosts: z.object({
+        attributeFactor: z.number(),
+        skillFactor: z.number(),
+        specializationFactor: z.number(),
+        traitCost: z.number().optional()
+    }).optional(),
     skills: z.record(z.string(), z.array(DotEntrySchema)),
     combat: z.object({
         weapons: z.array(CombatEntrySchema),
@@ -283,12 +323,14 @@ export const CharacterSheetDataSchema = z.object({
     page2: Page2DataSchema,
     specializations: z.record(z.string(), z.array(z.string())),
     imposedSpecializations: z.record(z.string(), z.array(ImposedSpecializationSchema)),
-    library: z.array(LibraryEntrySchema),
-    skillLibrary: z.array(LibrarySkillEntrySchema),
-    specializationLibrary: z.array(LibrarySpecializationEntrySchema).optional(),
-    xpLogs: z.array(XPEntrySchema),
-    appLogs: z.array(LogEntrySchema),
-    campaignNotes: z.array(CampaignNoteEntrySchema),
+    library: z.array(LibraryEntrySchema).optional().default([]),
+    skillLibrary: z.array(LibrarySkillEntrySchema).optional().default([]),
+    specializationLibrary: z.array(LibrarySpecializationEntrySchema).optional().default([]),
+    backgroundLibrary: z.array(LibrarySkillEntrySchema).optional().default([]),
+    counterLibrary: z.array(LibraryCounterEntrySchema).optional().default([]),
+    xpLogs: z.array(XPEntrySchema).optional().default([]),
+    appLogs: z.array(LogEntrySchema).optional().default([]),
+    campaignNotes: z.array(CampaignNoteEntrySchema).optional().default([]),
     bookDocument: BookDocumentSchema.optional(),
     partyNotes: z.object({
         members: z.array(PartyMemberEntrySchema),
@@ -297,10 +339,12 @@ export const CharacterSheetDataSchema = z.object({
             character: z.number(),
             player: z.number()
         }).optional()
-    }),
+    }).optional(),
     appVersion: z.string().optional(),
     syncInfo: SyncInfoSchema.optional(),
-    mysticAbilities: z.array(LibrarySkillEntrySchema).optional().nullable(),
+    mysticAbilities: z.array(LibrarySkillEntrySchema).optional().nullable().default([]),
+    suggestions: z.array(z.any()).optional().default([]),
+    _rulesVersion: z.string().optional(),
     _schemaVersion: z.number().optional()
 });
 

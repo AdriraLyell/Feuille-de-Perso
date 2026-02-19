@@ -36,6 +36,7 @@ const RulesSourceSelector = lazy(() => import('../RulesSourceSelector'));
 const SyncModal = lazy(() => import('../SyncModal'));
 const CampaignConflictModal = lazy(() => import('../ui/CampaignConflictModal'));
 const CampaignInfoModal = lazy(() => import('../ui/CampaignInfoModal'));
+import ConfirmationModal from '../ui/ConfirmationModal';
 
 import { exportCharacterAsJSON } from '../../utils/importExportUtils';
 import { useNavigationState } from '../../hooks/layout/useNavigationState';
@@ -352,6 +353,17 @@ const MainLayout: React.FC = () => {
                             campaignName={rules?.settingName || 'Ma Campagne'}
                             description={rules?.description}
                             welcomeMessage={rules?.welcomeMessage}
+                        />
+
+                        <ConfirmationModal
+                            isOpen={showDiscardConfirm}
+                            onClose={() => setShowDiscardConfirm(false)}
+                            onConfirm={confirmDiscard}
+                            title="Abandonner les modifications ?"
+                            message="Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter sans sauvegarder ?"
+                            confirmLabel="Quitter sans sauvegarder"
+                            cancelLabel="Rester ici"
+                            type="warning"
                         />
                     </Suspense>
                 </div>
