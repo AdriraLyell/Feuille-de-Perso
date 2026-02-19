@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.19",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Amélioration du placement automatique des compétences mystiques (Art Martial/Martiaux). Les compétences héritent désormais de la catégorie de placement de leur habilité parente si aucune n'est définie. Correction de la détection de la casse et du pluriel pour les Arts Martiaux."
+    },
+    {
         "version": "2.56.18",
         "date": "2026-02-19",
         "type": "fix",

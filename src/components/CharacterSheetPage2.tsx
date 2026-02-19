@@ -111,15 +111,28 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
 
             // Fallback placement logic
             let category = '';
+
+            // 1. Check direct skill default category
             if (skillDef.defaultCategory) {
                 category = LEGACY_SKILL_MAP[skillDef.defaultCategory] || skillDef.defaultCategory;
-            } else {
-                // Determine if it's a Mystic Ability skill by its source category in rules or behavior
-                const isMystic = skillDef.name.includes('Art Martial') || wizardState.mysticAbilityName;
+            }
+            // 2. Check parent mystic ability default category
+            else {
+                const parentAbility = rules?.libraries?.mysticAbilities?.find(ma => ma.id === (skillDef.mysticAbilityId || wizardState.mysticAbilityId));
+                if (parentAbility?.defaultCategory) {
+                    category = LEGACY_SKILL_MAP[parentAbility.defaultCategory] || parentAbility.defaultCategory;
+                }
+            }
+
+            // 3. Last resort: Hardcoded naming logic
+            if (!category) {
+                const nameLower = skillDef.name.toLowerCase();
+                const isMartialArt = nameLower.includes('art martia');
+                const isMystic = isMartialArt || wizardState.mysticAbilityName;
 
                 if (isMystic) {
                     const mysticConfig = rules?.configurations?.creation?.mysticAbilities;
-                    if (skillDef.name.toLowerCase().includes('art martial')) {
+                    if (isMartialArt) {
                         category = mysticConfig?.defaultMartialArtsCategory || 'Col_Comp_7';
                     } else {
                         category = mysticConfig?.defaultMysticOtherCategory || 'Col_Comp_5';
