@@ -122,8 +122,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                 newSkills[category].push({
                     id: crypto.randomUUID(),
                     name: skillDef.name,
-                    value: 1,
-                    creationValue: 1, // Learned during creation wizard
+                    value: 0,
+                    creationValue: 0, // Initially learned at level 0
                     max: 5,
                     variant: skillDef.isVariable ? '' : undefined,
                     description: skillDef.description
