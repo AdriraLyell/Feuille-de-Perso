@@ -46,14 +46,6 @@ const SkillLibraryItem: React.FC<{
                     <div className={`font-bold truncate text-sm ${skill.isActive === false ? 'text-slate-500 line-through' : 'text-slate-800'}`} title={skill.name}>
                         {skill.name}
                     </div>
-                    {skill.defaultCategory && (
-                        <span
-                            className="text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200 px-1 rounded-sm uppercase tracking-tighter shrink-0"
-                            title={`Placement : ${availableCategories.find(c => c.code === skill.defaultCategory)?.label || skill.defaultCategory}`}
-                        >
-                            {availableCategories.find(c => c.code === skill.defaultCategory)?.label || skill.defaultCategory}
-                        </span>
-                    )}
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
                     {skill.isGlobal && <div title="Global Reservoir"><Globe size={11} className="text-indigo-400 shrink-0" /></div>}
@@ -96,6 +88,16 @@ const SkillLibraryItem: React.FC<{
                         </div>
                     )}
                     {isLocked && <div className="text-amber-500 shrink-0" title={isPlaced ? "Utilisée dans cette campagne" : "Utilisée dans d'autres campagnes"}><Lock size={11} /></div>}
+
+                    {skill.defaultCategory && (
+                        <span
+                            className="text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200 px-1 rounded-sm uppercase tracking-tighter shrink-0"
+                            title={`Placement : ${availableCategories.find(c => c.code === skill.defaultCategory)?.label || skill.defaultCategory}`}
+                        >
+                            {availableCategories.find(c => c.code === skill.defaultCategory)?.label || skill.defaultCategory}
+                        </span>
+                    )}
+
                     {skill.description && (
                         <div className="text-[10px] text-slate-500 italic truncate" title={skill.description}>
                             {skill.description}

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.21",
+        "date": "2026-02-19",
+        "type": "ui",
+        "description": "Amélioration du layout des bibliothèques Admin (Arrière-plans, Habilités Mystiques, Compétences) : le badge de catégorie de placement a été déplacé sous le nom de l'item, sur la même ligne que les icônes de statut, pour clarifier l'interface."
+    },
+    {
         "version": "2.56.20",
         "date": "2026-02-19",
         "type": "refactor",
