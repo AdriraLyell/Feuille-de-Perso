@@ -1,5 +1,23 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.19] - 2026-02-14 [CHORE]
+
+
+
+## [2.49.18] - 2026-02-14 [FEAT]
+
+- 📖 Grimoire : Table des Matières dynamique et interactive (TOC)
+- 🖼️ Grimoire : Mode 'Tracer une zone' pour insérer et dimensionner des images directement dans le livre
+- 🧭 Navigation : Correction de l'accès aux Notes de Campagne et ajustement des onglets
+- 👋 Campagne : Ajout d'une modale d'information de campagne (Welcome Message) pour les joueurs
+
+## [2.49.17] - 2026-02-14 [FIX]
+
+- 🚀 Performance : Lazy-loading du Grimoire numérique pour accélérer le chargement initial de la fiche personnage
+- 🛡️ Stabilité : Résolution du warning 'flushSync' de React 18 lors de l'initialisation de TiPTap
+- 📱 Responsive : Ajustement du titre principal de la fiche pour éviter les débordements sur petits écrans
+- 🧹 Code Health : Nettoyage des imports statiques lourds au profit du chargement à la demande
+
 ## [2.49.16] - 2026-02-14 [CHORE]
 
 

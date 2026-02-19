@@ -6,6 +6,7 @@ import { Calculator, AlertTriangle, Sliders, Feather, AlertOctagon } from 'lucid
 import { useCreationBudget } from '../hooks/useCreationBudget';
 import { BudgetGauge } from './creation/BudgetGauge';
 import { CreationValidationModal } from './creation/CreationValidationModal';
+import { CreationGuidance } from './creation/CreationGuidance';
 
 const CreationHUD: React.FC = () => {
     const { data, updateData: setData, addLog } = useCharacter();
@@ -55,6 +56,8 @@ const CreationHUD: React.FC = () => {
 
     return (
         <>
+            <CreationGuidance />
+
             <div className={`fixed bottom-0 left-0 right-0 z-[90] bg-stone-900 text-stone-100 shadow-[0_-5px_20px_rgba(0,0,0,0.5)] border-t-4 transition-colors duration-300 animate-in slide-in-from-bottom no-print ${hasErrors ? 'border-red-700' : 'border-amber-600'}`}>
                 <div className="max-w-[1600px] mx-auto px-6 py-6 flex flex-col xl:flex-row items-center justify-between gap-6">
 

@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.56.26",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Correction de la persistance du mode de calcul des bonus XP (Fixe vs Par Scénario) dans les bibliothèques Admin."
+    },
+    {
+        "version": "2.56.25",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Correction de l'avertissement React sur les clés manquantes dans l'éditeur d'effets de traits (TraitEffectEditor) et garantie des IDs uniques lors de l'édition."
+    },
+    {
+        "version": "2.56.24",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Correction de la sauvegarde des effets mécaniques des traits dans la bibliothèque Admin (évite les réinitialisations). Synchronisation automatique des bibliothèques (traits, compétences) sur la feuille lors de la mise à jour des règles, assurant la transmission correcte des effets."
+    },
+    {
         "version": "2.56.23",
         "date": "2026-02-19",
         "type": "feat",
@@ -902,37 +920,6 @@
         "date": "2026-02-14",
         "type": "chore",
         "content": "🚀 CI/CD : Suppression des runs en doublon sur la branche develop et synchronisation de deploy.yml avec les derniers correctifs de tests unitaires.",
-        "major": false
-    },
-    {
-        "version": "2.49.19",
-        "date": "2026-02-14",
-        "type": "chore",
-        "content": "🚀 CI : Optimisation du workflow GitHub Actions. Les tests E2E Playwright sont désormais restreints aux Pull Requests et à la branche main pour accélérer les push sur develop. Correction des variables d'environnement manquantes pour Vitest.",
-        "major": false
-    },
-    {
-        "version": "2.49.18",
-        "date": "2026-02-14",
-        "type": "feat",
-        "changes": [
-            "📖 Grimoire : Table des Matières dynamique et interactive (TOC)",
-            "🖼️ Grimoire : Mode 'Tracer une zone' pour insérer et dimensionner des images directement dans le livre",
-            "🧭 Navigation : Correction de l'accès aux Notes de Campagne et ajustement des onglets",
-            "👋 Campagne : Ajout d'une modale d'information de campagne (Welcome Message) pour les joueurs"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.17",
-        "date": "2026-02-14",
-        "type": "fix",
-        "changes": [
-            "🚀 Performance : Lazy-loading du Grimoire numérique pour accélérer le chargement initial de la fiche personnage",
-            "🛡️ Stabilité : Résolution du warning 'flushSync' de React 18 lors de l'initialisation de TiPTap",
-            "📱 Responsive : Ajustement du titre principal de la fiche pour éviter les débordements sur petits écrans",
-            "🧹 Code Health : Nettoyage des imports statiques lourds au profit du chargement à la demande"
-        ],
         "major": false
     }
 ]

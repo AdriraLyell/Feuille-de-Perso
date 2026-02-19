@@ -1,17 +1,16 @@
-# Task: Free Movement for Journal Images
+# Task: Implement Mystic Abilities HUD
 
 ## Status
 - [x] Research & Planning
-  - [x] Analyze `bookImage.ts` and `BookImageView.tsx`
-  - [x] Identify positioning strategies for CSS Columns
+  - [x] Analyze `CreationHUD.tsx` layout
+  - [x] Understand `mysticUtils.ts` and `RulesContext` usage
+  - [x] Determine optimal placement (Banner vs Tab highlight)
 - [x] Implementation
-  - [x] Update `bookImage.ts` attributes
-  - [x] Implement "Free Move" mode in `BookImageView.tsx`
-  - [x] Add UI controls for free movement
+  - [x] Create `CreationGuidance.tsx` component
+  - [x] Integrate `CreationGuidance` into `CreationHUD.tsx`
+  - [x] Add highlight logic to "Détails & Equipement" tab in `MainLayout.tsx`
 - [x] Verification
-  - [x] Test alignment switching
-  - [x] Test dragging in free mode
-  - [x] Test persistence of coordinates
+  - [x] Verify build passes (`npm run build`)
+  - [x] Check logic conditions (Creation Mode + Active Rules + No Trait)
 - [x] Finalization
-  - [x] Version bump & changelog
-  - [x] Documentation update
+  - [x] Version bump (2.56.47) & changelog update

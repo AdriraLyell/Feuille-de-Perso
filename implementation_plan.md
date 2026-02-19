@@ -1,32 +1,23 @@
-# Implementation Plan: Free Movement for Journal Images
+# Implementation Plan: Mystic Abilities HUD Guidance
 
 ## Goal
-Enable users to position journal images freely on the page using drag and drop, while maintaining the existing columnar layout for regular text.
+Guide users to configure Mystic Abilities first if they are active in the rules but not yet selected.
 
-## Proposed Changes
+## Components
+### 1. `CreationGuidance.tsx` (`src/components/creation/`)
+- A fixed banner at the bottom (above HUD).
+- Checks `rules.mysticAbilities.active` and `!hasMysticTrait`.
+- Dismissible via `X` button.
+- Styling: Amber/Gold gradient, Sparkles icon, "Oracle's Advice".
 
-### 1. Tiptap Extension (`src/extensions/bookImage.ts`)
-- Add `offsetX` and `offsetY` to `BookImageAttributes`.
-- Update `addAttributes` to include these with default values of `0`.
-- Update `align` attribute to include `'free'`.
+### 2. `CreationHUD.tsx` (`src/components/CreationHUD.tsx`)
+- Integrates `CreationGuidance` inside the main fragment.
+- Component renders only in Creation Mode (controlled by `MainLayout`).
 
-### 2. React NodeView (`src/components/campaign/book/BookImageView.tsx`)
-- Add `'drag-free'` interaction mode.
-- Update `style` to use `transform: translate(offsetX, offsetY)` when in `free` mode.
-- Update UI to include "Free" alignment button.
-- Add drag handling for free movement using `activeInteraction`.
-- Add a "Reset Position" button.
+### 3. `MainLayout.tsx` (`src/components/layout/MainLayout.tsx`)
+- Adds conditional highlighting (amber pulse + dot) to the "Détails & Equipement" tab button (Page 2).
+- Logic matches `CreationGuidance` but persists until the condition is resolved (trait added).
 
-## Verification Plan
-
-### Manual Tests
-1. **Free Alignment**:
-   - Select an image and click "F" (Free).
-   - Drag the image to different positions.
-   - Switch back to "C" (Center) and verify it returns to flow.
-   - Switch back to "F" and verify it remembers its last offset.
-2. **Persistence**:
-   - Move an image, save/reload and verify position persists.
-
-### Automatic Validation
-- `npm run build` to ensure no TypeScript or JSX errors.
+## Status
+- [x] Implementation Complete (v2.56.47)
+- [x] Build Verified

@@ -92,6 +92,13 @@ const MainLayout: React.FC = () => {
     const [showSync, setShowSync] = useState(false);
     const [showCampaignInfo, setShowCampaignInfo] = useState(false);
 
+    // Guidance Logic
+    const shouldHighlightMystic = React.useMemo(() => {
+        const active = rules?.configurations?.creation?.mysticAbilities?.active;
+        const hasTrait = data?.page2?.avantages?.some((t: any) => t.mysticAbilityId);
+        return !!(active && !hasTrait && data?.creationConfig?.active);
+    }, [rules, data]);
+
     // Initialize Reference State & Error Service
     useEffect(() => {
         if (data) setLastSavedState(JSON.stringify(data));
@@ -275,7 +282,22 @@ const MainLayout: React.FC = () => {
                                         <div className="pointer-events-auto flex gap-4 bg-white/90 backdrop-blur p-1.5 rounded-full shadow-lg border border-gray-200 flex-wrap justify-center">
                                             <button onClick={() => setSheetTab('p1')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'p1' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Layers size={16} /> Personnage</button>
                                             <button onClick={() => setSheetTab('specs')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'specs' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><List size={16} /> Spécialisations</button>
-                                            <button onClick={() => setSheetTab('p2')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'p2' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><FileType size={16} /> Détails & Equipement</button>
+                                            <button
+                                                onClick={() => setSheetTab('p2')}
+                                                className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all 
+                                                    ${sheetTab === 'p2'
+                                                        ? 'bg-blue-600 text-white shadow-md'
+                                                        : shouldHighlightMystic
+                                                            ? 'bg-amber-100/30 text-amber-600 border border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.2)] animate-pulse'
+                                                            : 'text-gray-600 hover:bg-gray-100'
+                                                    }`}
+                                            >
+                                                <FileType size={16} />
+                                                Détails & Equipement
+                                                {shouldHighlightMystic && sheetTab !== 'p2' && (
+                                                    <span className="ml-1 w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                                                )}
+                                            </button>
                                             <button onClick={() => setSheetTab('xp')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'xp' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><TrendingUp size={16} /> Gestion XP</button>
                                             <button onClick={() => setSheetTab('notes')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'notes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Book size={16} /> Notes de Campagne</button>
                                         </div>
