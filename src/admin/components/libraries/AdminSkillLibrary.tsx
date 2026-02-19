@@ -21,7 +21,8 @@ const SkillLibraryItem: React.FC<{
     toggleSkillActive: (skill: LibrarySkillEntry) => void;
     handleOpenEdit: (skill: LibrarySkillEntry) => void;
     handleDelete: (id: string) => void;
-}> = ({ skill, isPlaced, isLocked, toggleSkillActive, handleOpenEdit, handleDelete }) => {
+    availableCategories: { code: string; label: string }[];
+}> = ({ skill, isPlaced, isLocked, toggleSkillActive, handleOpenEdit, handleDelete, availableCategories }) => {
     const hasVariants = skill.variants && skill.variants.length > 0;
     const [showVariantsTooltip, setShowVariantsTooltip] = useState(false);
     const anchorRef = useRef<HTMLDivElement>(null);
@@ -290,6 +291,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                     toggleSkillActive={toggleSkillActive}
                                     handleOpenEdit={handleOpenEdit}
                                     handleDelete={handleDelete}
+                                    availableCategories={availableCategories}
                                 />
                             );
                         })}

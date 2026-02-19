@@ -19,7 +19,8 @@ const MysticLibraryItem: React.FC<{
     onToggleActive: (id: string, current: boolean) => void;
     handleOpenEdit: (item: LibrarySkillEntry) => void;
     handleDelete: (id: string) => void;
-}> = ({ item, isLocked, onToggleActive, handleOpenEdit, handleDelete }) => {
+    rules: RulesData;
+}> = ({ item, isLocked, onToggleActive, handleOpenEdit, handleDelete, rules }) => {
     return (
         <div className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${item.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
             <div className="w-8 flex justify-center shrink-0">
@@ -318,6 +319,7 @@ const AdminMysticLibrary: React.FC<AdminMysticLibraryProps> = ({ rules, onUpdate
                                     }}
                                     handleOpenEdit={handleOpenEdit}
                                     handleDelete={handleDelete}
+                                    rules={rules}
                                 />
                             );
                         })}

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.17",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Correction d'une erreur de référence (ReferenceError) dans les bibliothèques d'administration introduite lors de la mise à jour des badges."
+    },
+    {
         "version": "2.56.16",
         "date": "2026-02-19",
         "type": "fix",

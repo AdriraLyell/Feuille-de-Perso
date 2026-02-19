@@ -21,7 +21,8 @@ const BackgroundLibraryItem: React.FC<{
     onToggleActive: (id: string, current: boolean) => void;
     handleOpenEdit: (item: LibraryBackgroundEntry) => void;
     handleDelete: (id: string) => void;
-}> = ({ item, isPlaced, isLocked, onToggleActive, handleOpenEdit, handleDelete }) => {
+    rules: RulesData;
+}> = ({ item, isPlaced, isLocked, onToggleActive, handleOpenEdit, handleDelete, rules }) => {
     const hasVariants = item.variants && item.variants.length > 0;
     const [showVariantsTooltip, setShowVariantsTooltip] = useState(false);
     const anchorRef = useRef<HTMLDivElement>(null);
@@ -335,6 +336,7 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                                     }}
                                     handleOpenEdit={handleOpenEdit}
                                     handleDelete={handleDelete}
+                                    rules={rules}
                                 />
                             );
                         })}
