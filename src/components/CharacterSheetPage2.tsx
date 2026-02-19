@@ -100,7 +100,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
 
         // Add skills to sheet
         const newSkills = { ...data.skills };
-        let newLibrary = [...(data.skillLibrary || [])];
+        const newLibrary = [...(data.skillLibrary || [])];
         const libSkills = rules?.libraries?.skills || [];
 
         let addedCount = 0;

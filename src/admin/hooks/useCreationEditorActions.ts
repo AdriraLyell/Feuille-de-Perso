@@ -95,12 +95,12 @@ export function useCreationEditorActions(rules: RulesData, onUpdate: (newRules: 
     const syncMysticTraits = () => {
         const mysticAbilities = rules.libraries.mysticAbilities || [];
         const currentTraits = rules.libraries.traits || [];
-        let newTraits = [...currentTraits];
+        const newTraits = [...currentTraits];
         let hasChanges = false;
 
         mysticAbilities.forEach(ability => {
             // Find if a trait is already linked or matches name
-            let targetTraitIndex = newTraits.findIndex(t =>
+            const targetTraitIndex = newTraits.findIndex(t =>
                 t.mysticAbilityId === ability.id ||
                 (!t.mysticAbilityId && t.name.toLowerCase() === ability.name.toLowerCase())
             );

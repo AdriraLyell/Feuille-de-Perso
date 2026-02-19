@@ -163,12 +163,12 @@ const AdminMysticLibrary: React.FC<AdminMysticLibraryProps> = ({ rules, onUpdate
         // SYNC LOGIC: Auto-Manage associated Trait
         const currentTraits = rules.libraries.traits || [];
         // Find if a trait is already linked or matches name
-        let targetTraitIndex = currentTraits.findIndex(t =>
+        const targetTraitIndex = currentTraits.findIndex(t =>
             t.mysticAbilityId === editingItem.id ||
             (!t.mysticAbilityId && t.name.toLowerCase() === itemName.toLowerCase())
         );
 
-        let newTraits = [...currentTraits];
+        const newTraits = [...currentTraits];
         const traitBaseData = {
             name: itemName,
             type: 'avantage' as const,
