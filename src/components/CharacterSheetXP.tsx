@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { useCharacter } from '../context/CharacterContext';
 import { XPEntry } from '../types';
-import { Plus, Trash2, Calendar, FileText, TrendingUp, User, MessageSquare, History, Clock, ArrowUpRight, ArrowDownRight, RotateCcw } from 'lucide-react';
+import { Plus, Trash2, Calendar, FileText, TrendingUp, User, MessageSquare } from 'lucide-react';
+import { XPReceiptView } from './sheet/XPReceiptView';
 
 interface Props {
   isLandscape?: boolean;
@@ -80,22 +81,12 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
 
   // Date: 110px, MJ: 0.5fr, Scenario: 1.5fr, Notes: 2fr, XP: 45px, Action: 40px, Session: 40px
   const sessionGridClass = "grid grid-cols-[110px_0.5fr_1.5fr_2fr_45px_40px_40px]";
-  // Date/Time: 160px, Type: 100px, Description: 1.5fr, Source: 1fr, Amount: 80px
-  const historyGridClass = "grid grid-cols-[160px_100px_1.5fr_1fr_80px]";
 
   return (
     <div className={`sheet-container xp-sheet p-8 ${isLandscape ? 'landscape' : ''}`}>
 
-      {/* Title Header with Button */}
+      {/* Title Header */}
       <div className="py-3 border-b-2 border-stone-800 mb-6 relative flex items-center justify-center bg-white">
-        <div className="absolute left-0">
-          <button
-            onClick={addRow}
-            className="flex items-center gap-2 bg-blue-700 text-white px-4 py-2 rounded shadow hover:bg-blue-800 transition-colors text-sm font-bold"
-          >
-            <Plus size={16} /> Ajouter une entrée
-          </button>
-        </div>
         <h1 className="text-3xl font-black text-center uppercase tracking-[0.2em] flex items-center justify-center gap-3 text-indigo-950 font-serif">
           <TrendingUp size={32} /> Gestion de l'Expérience
         </h1>
@@ -119,7 +110,7 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
             : 'border-transparent text-stone-400 hover:text-stone-600'
             }`}
         >
-          <History size={18} /> Historique des Dépenses
+          <TrendingUp size={18} /> Historique des Dépenses
         </button>
       </div>
 
@@ -205,50 +196,24 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
                   </div>
                 </div>
               ))}
+
+              <div className="p-4 flex justify-center border-t border-stone-200 bg-white/50 sticky bottom-0">
+                <button
+                  onClick={addRow}
+                  className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-full shadow-md transition-all active:scale-95 text-sm font-bold uppercase tracking-wider"
+                >
+                  <Plus size={18} /> Ajouter une session
+                </button>
+              </div>
             </div>
           </>
         ) : (
-          <>
-            {/* Table Header - History */}
-            <div className={`${historyGridClass} bg-indigo-100 border-b border-stone-400 font-bold text-sm uppercase py-2 px-4 text-indigo-900 text-center`}>
-              <div className="flex items-center gap-2 justify-center"><Clock size={14} /> Date & Heure</div>
-              <div>Type</div>
-              <div className="text-left pl-4">Sujet / Description</div>
-              <div>Provenance</div>
-              <div>Montant</div>
-            </div>
-
-            {/* Table Body - History */}
-            <div className="flex-grow overflow-auto bg-stone-50/20">
-              {(!data.xpTransactions || data.xpTransactions.length === 0) && (
-                <div className="text-center text-stone-400 italic py-10">
-                  Aucun historique de dépense enregistré.
-                </div>
-              )}
-
-              {(data.xpTransactions || []).map((t) => (
-                <div key={t.id} className={`${historyGridClass} border-b border-stone-200 hover:bg-indigo-50/30 items-center py-2 px-4 transition-colors font-mono text-[13px]`}>
-                  <div className="text-stone-500 text-center">
-                    {new Date(t.timestamp).toLocaleDateString()} <span className="text-[10px] bg-stone-100 px-1 rounded">{new Date(t.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                  </div>
-                  <div className="flex justify-center">
-                    {t.type === 'earn' && <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1"><ArrowUpRight size={10} /> GAIN</span>}
-                    {t.type === 'spend' && <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1"><ArrowDownRight size={10} /> DÉPENSE</span>}
-                    {t.type === 'refund' && <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1"><RotateCcw size={10} /> REMBOURSE</span>}
-                  </div>
-                  <div className="text-indigo-900 font-bold pl-4">
-                    {t.description}
-                  </div>
-                  <div className="text-stone-500 text-center italic text-[11px]">
-                    {t.source || '-'}
-                  </div>
-                  <div className={`text-right font-bold pr-2 ${t.type === 'earn' ? 'text-green-600' : t.type === 'spend' ? 'text-red-600' : 'text-blue-600'}`}>
-                    {t.type === 'spend' ? '-' : '+'}{t.amount} XP
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
+          <XPReceiptView
+            transactions={data.xpTransactions || []}
+            totalGain={gain}
+            totalSpent={spent}
+            totalRest={rest}
+          />
         )}
 
         {/* Table Footer / Summary */}

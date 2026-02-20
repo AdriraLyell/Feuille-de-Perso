@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.45",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Correction finale d'une erreur de syntaxe JSON dans le journal des modifications qui bloquait le serveur de développement."
+    },
+    {
         "version": "2.56.44",
         "date": "2026-02-19",
         "type": "fix",
@@ -849,15 +855,6 @@
             "🛠️ Refactoring : Modularisation de RuleCalculationsService.ts",
             "📏 Code Health : Extraction des calculs d'XP (xpCalculator.ts) et de Tarot (cardCalculator.ts)",
             "🏗️ Architecture : Simplification du service central vers un pattern Façade"
-        ]
-    },
-    {
-        "version": "2.49.36",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🐛 Fix : Correction d'un plantage dans le ColumnarEditor",
-            "🛡️ Stabilité : Ajout d'une garde contre les accès nuls lors de l'initialisation de l'éditeur Tiptap"
         ]
     }
 ]

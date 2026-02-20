@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.36] - 2026-02-15 [FIX]
+
+- 🐛 Fix : Correction d'un plantage dans le ColumnarEditor
+- 🛡️ Stabilité : Ajout d'une garde contre les accès nuls lors de l'initialisation de l'éditeur Tiptap
+
 ## [2.49.35] - 2026-02-15 [REFACTOR]
 
 - 🛠️ Refactoring : Simplification de CampaignService.ts

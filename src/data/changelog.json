@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.67",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Nouveau tableau de bord de Suivi d'XP (Concept B) : vue interactive et catégorisée (Gains et Investissements) remplaçant l'historique brut, avec infobulles contextuelles et tri par catégorie."
+    },
+    {
         "version": "2.56.65",
         "date": "2026-02-21",
         "type": "style",
@@ -112,11 +118,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Nettoyage final du journal des modifications et validation de la structure JSON."
-    },
-    {
-        "version": "2.56.45",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction finale d'une erreur de syntaxe JSON dans le journal des modifications qui bloquait le serveur de développement."
     }
 ]
