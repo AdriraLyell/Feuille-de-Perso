@@ -96,6 +96,7 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
                             <ThematicButton
                                 onClick={handleReduceTrait}
                                 variant="primary"
+                                size="sm"
                                 className="bg-emerald-600 hover:bg-emerald-700 text-white"
                                 leftIcon={<Sparkles size={16} />}
                             >

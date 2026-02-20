@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.38",
+        "date": "2026-02-19",
+        "type": "feat",
+        "description": "Implémentation de l'Auto-Save (1min) et backups rotatifs (Trigger SQL). Ajout d'un compteur visuel sur le bouton de synchronisation Cloud et gestion intelligente de l'historique (2 versions max) côté serveur."
+    },
+    {
         "version": "2.56.37",
         "date": "2026-02-19",
         "type": "fix",
@@ -863,16 +869,6 @@
         "changes": [
             "🛠️ Refactoring : Extraction de la logique de AdminTraitLibrary dans le hook useAdminTraitLibrary",
             "📏 Code Health : Réduction de la taille de AdminTraitLibrary.tsx (517 -> 240 lignes)"
-        ]
-    },
-    {
-        "version": "2.49.32",
-        "date": "2026-02-15",
-        "type": "refactor",
-        "changes": [
-            "🛠️ Refactoring : Extraction de la logique de ColumnarEditor dans des hooks spécialisés (Navigation, Dessin)",
-            "🛡️ Typage : Élimination des types 'any' résiduels dans les factories et le grimoire",
-            "🧹 Ménage : Suppression de la dépendance inutilisée 'tiptap-pagination-plus' et nettoyage des imports Admin"
         ]
     }
 ]

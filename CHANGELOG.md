@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.32] - 2026-02-15 [REFACTOR]
+
+- 🛠️ Refactoring : Extraction de la logique de ColumnarEditor dans des hooks spécialisés (Navigation, Dessin)
+- 🛡️ Typage : Élimination des types 'any' résiduels dans les factories et le grimoire
+- 🧹 Ménage : Suppression de la dépendance inutilisée 'tiptap-pagination-plus' et nettoyage des imports Admin
+
 ## [2.49.31] - 2026-02-15 [FIX]
 
 - 📔 Journal : Suppression de la barre de défilement verticale parasite sur Windows via overflow-y: auto

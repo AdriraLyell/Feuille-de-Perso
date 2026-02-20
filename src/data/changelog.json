@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.62",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Peaufinage UI : Réduction de la taille du bouton de rachat de désavantage dans la modale d'édition pour une interface plus compacte."
+    },
+    {
         "version": "2.56.61",
         "date": "2026-02-21",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-19",
         "type": "feat",
         "description": "Ajout de l'interface de restauration des backups (SyncModal). Les joueurs peuvent désormais consulter leurs deux dernières versions historiques sur le cloud et les restaurer d'un clic."
-    },
-    {
-        "version": "2.56.38",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Implémentation de l'Auto-Save (1min) et backups rotatifs (Trigger SQL). Ajout d'un compteur visuel sur le bouton de synchronisation Cloud et gestion intelligente de l'historique (2 versions max) côté serveur."
     }
 ]
