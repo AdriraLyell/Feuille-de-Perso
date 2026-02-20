@@ -73,6 +73,8 @@ export interface TraitEntry {
   variant?: string; // Précision (ex: pour "Allergie", variant="Chats")
   definitionId?: string; // ID de la définition parente
   mysticAbilityId?: string; // Link to Mystic Ability
+  isPostCreation?: boolean;
+  creationValue?: string;
 }
 
 export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus';

@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.31] - 2026-02-15 [FIX]
+
+- 📔 Journal : Suppression de la barre de défilement verticale parasite sur Windows via overflow-y: auto
+- 👥 Groupe : Restauration des dimensions fixes du tableau de groupe (1484x1000px) pour préserver l'alignement avec le grimoire
+- 📐 Layout : Optimisation de la gestion de l'overflow pour déléguer les barres de défilement globales au navigateur
+
 ## [2.49.30] - 2026-02-15 [FIX]
 
 - 📱 Responsive : Activation du défilement horizontal sur les petits écrans (suppression de 'no-scrollbar')

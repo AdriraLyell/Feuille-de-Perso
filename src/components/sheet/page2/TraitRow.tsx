@@ -12,23 +12,28 @@ interface TraitRowProps {
 
 const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove, onManageMystic }) => {
     const isEmpty = !item.name.trim();
+    const isResolved = item.value === '0' && item.creationValue !== undefined;
+    const isPostCreationAdvantage = item.isPostCreation && !isResolved;
 
     return (
         <div
             onClick={onClick}
             className={`flex gap-1 items-center h-[22px] px-1 transition-all rounded-sm cursor-pointer group select-none ${isEmpty
                 ? 'hover:bg-slate-50 border-b border-dotted border-stone-200'
-                : 'hover:bg-blue-50 bg-white/50 border-b border-stone-300 shadow-sm'
+                : isPostCreationAdvantage
+                    ? 'bg-emerald-50 hover:bg-emerald-100 border-b border-emerald-200 shadow-sm'
+                    : 'hover:bg-blue-50 bg-white/50 border-b border-stone-300 shadow-sm'
                 }`}
         >
             <div className={`w-8 shrink-0 text-center font-bold text-xs h-full flex items-center justify-center border-r border-stone-300 ${isEmpty ? 'text-stone-300' : 'text-stone-800 font-handwriting bg-white'
-                }`} style={{ fontSize: '0.9rem' }}>
+                } ${isResolved ? 'line-through opacity-50' : ''}`} style={{ fontSize: '0.9rem' }}>
                 {item.value || (isEmpty ? '-' : '')}
             </div>
 
             <div className={`flex-grow h-full flex items-center px-1 font-handwriting min-w-0 ${isEmpty ? 'text-stone-300 italic text-[10px]' : 'text-ink'
-                }`} style={{ fontSize: isEmpty ? '0.7rem' : '0.9rem' }}>
+                } ${isResolved ? 'line-through opacity-50' : ''}`} style={{ fontSize: isEmpty ? '0.7rem' : '0.9rem' }}>
                 <span className="truncate w-full block" title={!isEmpty ? (item.variant ? `${item.name} : ${item.variant}` : item.name) : undefined}>
+                    {item.isPostCreation && <span className="mr-1 text-emerald-600" title="Acquis avec XP">❇️</span>}
                     {item.name || "Vide"}
                     {item.variant && <span className="font-bold ml-1 text-slate-600">: {item.variant}</span>}
                 </span>

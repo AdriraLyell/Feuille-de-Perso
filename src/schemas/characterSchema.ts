@@ -78,7 +78,9 @@ export const TraitEntrySchema = z.object({
     tag: z.string().optional(),
     variant: z.string().optional(),
     definitionId: z.string().optional(),
-    mysticAbilityId: z.string().optional()
+    mysticAbilityId: z.string().optional(),
+    isPostCreation: z.boolean().optional(),
+    creationValue: z.string().optional()
 });
 
 export const TraitEffectSchema = z.object({

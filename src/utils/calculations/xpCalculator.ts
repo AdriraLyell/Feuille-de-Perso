@@ -344,12 +344,27 @@ function calculateAttributeXP(
 function calculateTraitXP(data: CharacterSheetData, rules: RulesData | undefined): number {
     const traitCostFactor = rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
 
-    // Pour l'instant, les traits n'ont pas de creationValue.
-    // Cette fonction pourra être affinée si le système permet l'achat de traits après création.
-    // Si creationConfig.active est vrai, on est encore en création, le budget est géré par useCreationBudget.
-
     if (data.creationConfig?.active) return 0;
 
-    // TODO: Si on ajoute creationValue aux traits, on pourra calculer l'XP dépensée ici après la création.
-    return 0;
+    let traitSpent = 0;
+
+    // 1. Avantages achetés post-création
+    data.page2.avantages?.forEach(trait => {
+        if (trait.isPostCreation) {
+            const val = parseInt(trait.value) || 0;
+            traitSpent += val * traitCostFactor;
+        }
+    });
+
+    // 2. Désavantages rachetés (réduits) post-création
+    data.page2.desavantages?.forEach(trait => {
+        if (trait.creationValue !== undefined) {
+            const currentVal = parseInt(trait.value) || 0;
+            const creationVal = parseInt(trait.creationValue) || 0;
+            const diff = Math.max(0, creationVal - currentVal);
+            traitSpent += diff * traitCostFactor;
+        }
+    });
+
+    return traitSpent;
 }

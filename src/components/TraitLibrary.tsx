@@ -9,6 +9,7 @@ import ConfirmationModal from './ui/ConfirmationModal';
 import { useTraitLibrary, SortOption, SortOrder } from '../hooks/useTraitLibrary';
 import { useTraitSelection } from '../hooks/useTraitSelection';
 import { useTraitActions } from '../hooks/useTraitActions';
+import { useRules } from '../context/RulesContext';
 
 interface TraitLibraryProps {
     data: CharacterSheetData;
@@ -25,6 +26,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
     data, onUpdate, onSelect, onMultiSelect,
     isEditable = true, defaultFilter = 'all', hidePossessed = false, lockFilter = false
 }) => {
+    const { rules } = useRules();
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<'all' | 'avantage' | 'desavantage'>(defaultFilter);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -213,7 +215,18 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                             </div>
                         )}
                         <div className="flex justify-between items-center">
-                            <span className="text-xs font-bold text-[#5c4d41]">{selection.length} trait(s) sélectionné(s)</span>
+                            <div className="flex flex-col">
+                                <span className="text-xs font-bold text-[#5c4d41]">{selection.length} trait(s) sélectionné(s)</span>
+                                {!data.creationConfig?.active && (
+                                    <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700">
+                                        <Sparkles size={12} />
+                                        Coût total : {selection.reduce((sum, s) => {
+                                            const traitCostFactor = rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
+                                            return sum + (parseInt(s.cost || s.entry.cost || "0") * traitCostFactor);
+                                        }, 0)} XP
+                                    </div>
+                                )}
+                            </div>
                             <button onClick={handleConfirmMultiSelect} disabled={selection.length === 0} className="bg-[#5c4d41] hover:bg-[#4a3b32] disabled:item-stone-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded-sm font-bold text-sm flex items-center gap-2 shadow-sm transition-all">
                                 <Plus size={16} /> Ajouter la sélection
                             </button>

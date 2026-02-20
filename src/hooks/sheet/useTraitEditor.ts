@@ -24,10 +24,15 @@ export const useTraitEditor = (
         if (!multiSelectTarget) return;
         const currentList = [...data.page2[multiSelectTarget]];
         let addedCount = 0;
+        let totalXPCost = 0;
         let listIndex = 0;
+        const isPostCreation = !data.creationConfig?.active;
+        const traitCostFactor = _rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
 
         instances.forEach(instance => {
             const entry = instance.entry;
+            const costValue = instance.cost || entry.cost || "";
+
             while (listIndex < currentList.length && currentList[listIndex].name.trim() !== '') {
                 listIndex++;
             }
@@ -35,20 +40,43 @@ export const useTraitEditor = (
             if (listIndex < currentList.length) {
                 currentList[listIndex] = {
                     name: entry.name,
-                    value: instance.cost || entry.cost || "",
+                    value: costValue,
                     description: entry.description || "",
                     tag: entry.tags?.[0] || '',
                     variant: instance.variant || '',
                     definitionId: entry.id,
-                    mysticAbilityId: entry.mysticAbilityId || undefined
+                    mysticAbilityId: entry.mysticAbilityId || undefined,
+                    isPostCreation: isPostCreation ? true : undefined,
+                    creationValue: isPostCreation ? "0" : undefined
                 };
+
+                if (isPostCreation) {
+                    const points = parseInt(costValue) || 0;
+                    totalXPCost += points * traitCostFactor;
+                }
                 addedCount++;
             }
         });
 
         if (addedCount > 0) {
-            onChange({ ...data, page2: { ...data.page2, [multiSelectTarget]: currentList } });
-            onAddLog(`Ajout de ${addedCount} trait(s).`, 'success', 'sheet');
+            const newData = { ...data, page2: { ...data.page2, [multiSelectTarget]: currentList } };
+
+            // Si post-création, on ajoute une ligne dans l'historique d'XP
+            if (isPostCreation && totalXPCost > 0) {
+                const xpLog = {
+                    id: crypto.randomUUID(),
+                    date: new Date().toLocaleDateString(),
+                    scenario: "Achat de traits",
+                    spendingLocation: multiSelectTarget === 'avantages' ? "Avantages" : "Désavantages",
+                    amount: -totalXPCost
+                };
+                newData.xpLogs = [xpLog, ...(data.xpLogs || [])];
+                onAddLog(`Achat de ${addedCount} trait(s) pour ${totalXPCost} XP.`, 'success', 'sheet');
+            } else {
+                onAddLog(`Ajout de ${addedCount} trait(s).`, 'success', 'sheet');
+            }
+
+            onChange(newData);
         }
         setMultiSelectTarget(null);
     };
