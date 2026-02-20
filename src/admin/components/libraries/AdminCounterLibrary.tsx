@@ -65,8 +65,21 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
 
     const confirmDelete = () => {
         if (!showDeleteConfirm) return;
+
+        const counterToDelete = list.find(c => c.id === showDeleteConfirm);
+        const newDefinitionsCounters = { ...(rules.definitions.counters || {}) };
+
+        if (counterToDelete) {
+            const key = counterToDelete.id || counterToDelete.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+            delete newDefinitionsCounters[key];
+        }
+
         onUpdate({
             ...rules,
+            definitions: {
+                ...rules.definitions,
+                counters: newDefinitionsCounters
+            },
             libraries: { ...rules.libraries, counters: list.filter(c => c.id !== showDeleteConfirm) }
         });
         setShowDeleteConfirm(null);
@@ -93,8 +106,28 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
         // Sort
         newList.sort((a, b) => a.name.localeCompare(b.name));
 
+        // Update definitions as well so it's ready to be saved correctly to the DB
+        const newDefinitionsCounters = { ...(rules.definitions.counters || {}) };
+
+        // key format as in campaignReconciler.ts
+        const key = safeItem.id || safeItem.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+
+        newDefinitionsCounters[key] = {
+            id: safeItem.id,
+            name: safeItem.name,
+            description: safeItem.description || newDefinitionsCounters[key]?.description || '',
+            max: safeItem.maxValue ?? newDefinitionsCounters[key]?.max ?? 10,
+            value: safeItem.defaultValue ?? newDefinitionsCounters[key]?.value,
+            defaultValue: safeItem.defaultValue ?? newDefinitionsCounters[key]?.defaultValue,
+            xpCost: safeItem.xpCost ?? newDefinitionsCounters[key]?.xpCost ?? 0
+        };
+
         onUpdate({
             ...rules,
+            definitions: {
+                ...rules.definitions,
+                counters: newDefinitionsCounters
+            },
             libraries: { ...rules.libraries, counters: newList }
         });
         setIsModalOpen(false);
@@ -106,6 +139,10 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
         const newList = list.map(item =>
             visibleIds.has(item.id) ? { ...item, isActive: active } : item
         );
+
+        // No need to update definitions.counters here since it's just isActive flag, 
+        // the list remains the same, but wait! Are deactivated counters removed from the definitions map? No, definitions map just stores metadata, active list comes from libraries in the end.
+
         onUpdate({
             ...rules,
             libraries: { ...rules.libraries, counters: newList }

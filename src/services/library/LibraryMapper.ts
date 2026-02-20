@@ -93,10 +93,10 @@ export const LibraryMapper = {
         id: c.id,
         name: c.name,
         description: c.description || '',
-        maxValue: c.maxValue ?? 10,
-        defaultValue: c.defaultValue ?? 0,
-        xpCost: c.xpCost ?? 0,
-        defaultCategory: localDefaultCategory || c.defaultCategory,
+        maxValue: (c as any).max_value ?? c.maxValue ?? 10,
+        defaultValue: (c as any).default_value ?? c.defaultValue ?? 0,
+        xpCost: (c as any).xp_cost ?? c.xpCost ?? 0,
+        defaultCategory: localDefaultCategory || c.defaultCategory || (c as any).default_category,
         isGlobal: c.setting_id == null,
         isActive: activeIds.has(c.id) || c.setting_id === sid
     })
