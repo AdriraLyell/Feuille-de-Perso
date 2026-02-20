@@ -3,6 +3,7 @@ import { useCharacter } from '../context/CharacterContext';
 import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../types';
 import SpecializationOmnibar from './specialization-library/SpecializationOmnibar';
 import SpecializationLibraryDrawer from './specialization-library/SpecializationLibraryDrawer';
+import ConfirmationModal from './ui/ConfirmationModal';
 import { Award, Book, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useRules } from '../context/RulesContext';
@@ -23,6 +24,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
     const { data, updateData: onChange, addLog: onAddLog } = useCharacter();
     const { rules } = useRules();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [duplicateErrorModal, setDuplicateErrorModal] = useState<string | null>(null);
 
     const getSkillName = (skillId: string): string => {
         for (const cat of Object.keys(data.skills)) {
@@ -69,6 +71,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
             if (isDuplicate) {
                 onAddLog(`La compétence secondaire "${specName}" existe déjà.`, 'danger', 'sheet');
+                setDuplicateErrorModal(specName);
                 return;
             }
 
@@ -307,6 +310,28 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                 isOpen={isDrawerOpen}
                 onClose={() => setIsDrawerOpen(false)}
             />
+
+            {duplicateErrorModal && (
+                <ConfirmationModal
+                    isOpen={!!duplicateErrorModal}
+                    onClose={() => setDuplicateErrorModal(null)}
+                    onConfirm={() => setDuplicateErrorModal(null)}
+                    title="Promotion Impossible"
+                    message={
+                        <span>
+                            La compétence secondaire <strong>"{duplicateErrorModal}"</strong> existe déjà.
+                            <br /><br />
+                            <span className="text-[11px] opacity-80">
+                                Veuillez supprimer la compétence existante ou choisir une autre spécialisation à promouvoir.
+                            </span>
+                        </span>
+                    }
+                    confirmLabel="Compris"
+                    cancelLabel=""
+                    type="danger"
+                    scheme="paper"
+                />
+            )}
         </div>
     );
 };

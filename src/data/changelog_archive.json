@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.29",
+        "date": "2026-02-20",
+        "type": "fix",
+        "description": "Correction d'un blocage de navigation après réinitialisation des paramètres. Ajout de la modale de confirmation d'abandon et amélioration de la détection des changements non enregistrés."
+    },
+    {
         "version": "2.56.28",
         "date": "2026-02-19",
         "type": "fix",
@@ -911,13 +917,6 @@
         "date": "2026-02-14",
         "type": "fix",
         "content": "🛡️ E2E Pagination : Augmentation de la charge de texte (100 lignes) pour garantir le déclenchement des seuils de pagination dans les tests automatisés.",
-        "major": false
-    },
-    {
-        "version": "2.49.22",
-        "date": "2026-02-14",
-        "type": "fix",
-        "content": "🛡️ E2E Stability : Résolution des erreurs de connexion (ports) et gestion de l'écran de sélection des règles dans le CI. Migration des tests vers le nouveau Grimoire Numérique (TiPTap).",
         "major": false
     }
 ]

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.53",
+        "date": "2026-02-20",
+        "type": "feat",
+        "description": "Amélioration UI : Ajout d'une modale d'erreur explicite ('Promotion Impossible') si la compétence secondaire existe déjà."
+    },
+    {
         "version": "2.56.51",
         "date": "2026-02-20",
         "type": "style",
@@ -112,11 +118,5 @@
         "date": "2026-02-20",
         "type": "fix",
         "description": "Sécurisation et typage strict des champs optionnels (mysticAbilityId, coûts, descriptions) à travers l'application. Harmonisation des Interfaces et Schémas Zod pour éliminer les erreurs de build et prévenir les plantages liés aux valeurs nulles."
-    },
-    {
-        "version": "2.56.29",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction d'un blocage de navigation après réinitialisation des paramètres. Ajout de la modale de confirmation d'abandon et amélioration de la détection des changements non enregistrés."
     }
 ]
