@@ -203,7 +203,7 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGa
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-2 bg-stone-50/50 font-sans max-h-[600px] overflow-y-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-2 bg-stone-50/50 font-sans">
 
             {/* Colonne Gains */}
             <div className="flex flex-col gap-1">

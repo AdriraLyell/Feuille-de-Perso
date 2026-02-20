@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.44] - 2026-02-15 [FEAT]
+
+- 🎨 Admin : Application du thème 'Mystic' à la Master List des Voyageurs
+- 🖋️ UI : Refonte visuelle des registres globaux (couleurs ambre/pierre et typographie serif)
+- 📜 Fiche : Restauration des colonnes de compétences manquantes (Col_Comp_4 et Col_Comp_8)
+- 🛡️ Fix : Robustesse accrue sur les filtres de catégories de compétences (insensibilité à la casse)
+
 ## [2.49.43] - 2026-02-15 [FEAT]
 
 - 🖥️ Admin : Expansion verticale massive de l'onglet Joueurs
