@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.50",
+        "date": "2026-02-20",
+        "type": "feat",
+        "description": "Promotion des spécialisations : Ajout d'une fonctionnalité permettant de convertir une spécialisation en compétence secondaire via un bouton d'action dans l'onglet Spécialisations. Cette action libère l'emplacement de spécialisation et crée une nouvelle compétence à 0 point dans la catégorie secondaire."
+    },
+    {
         "version": "2.56.49",
         "date": "2026-02-20",
         "type": "style",
@@ -112,11 +118,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Refonte majeure de la robustesse du schéma de données personnage (Zod) pour éliminer les erreurs de chargement au rafraîchissement. Ajout de logs de diagnostic pour le calcul des bonus XP des traits."
-    },
-    {
-        "version": "2.56.27",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction d'une erreur de validation (Zod) au chargement du personnage liée aux nouveaux IDs d'effets de traits."
     }
 ]

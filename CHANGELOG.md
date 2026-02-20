@@ -1,5 +1,9 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.20] - 2026-02-14 [CHORE]
+
+
+
 ## [2.49.19] - 2026-02-14 [CHORE]
 
 

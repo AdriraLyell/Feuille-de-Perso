@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Award, Plus } from 'lucide-react';
+import { Search, Award, Plus, ArrowUpCircle } from 'lucide-react';
 import { useCharacterData } from '../../context/CharacterContext';
 import { LibrarySpecializationEntry } from '../../types';
 import { smartIncludes } from '../../utils/stringUtils';
@@ -10,6 +10,7 @@ interface SpecializationOmnibarProps {
     onChange: (value: string) => void;
     onSelect?: (entry: LibrarySpecializationEntry) => void;
     onBlur?: (value: string) => void;
+    onPromote?: (value: string) => void;
     placeholder?: string;
     className?: string;
     skillId?: string; // Si fourni, filtre les suggestions pour cette compétence
@@ -22,6 +23,7 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
     onChange,
     onSelect,
     onBlur,
+    onPromote,
     placeholder = "Saisir une spécialisation...",
     className = "",
     skillId,
@@ -36,7 +38,7 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
     const library = data.specializationLibrary || [];
 
     // Filtrer les suggestions
-    const suggestions = library.filter(entry => {
+    const suggestions = library.filter((entry: LibrarySpecializationEntry) => {
         // Filtrage par texte
         const matchText = smartIncludes(entry.name, value);
         // Filtrage par compétence (optionnel)
@@ -81,7 +83,7 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
 
     return (
         <div className={`relative ${className}`} ref={containerRef}>
-            <div className="relative">
+            <div className="relative flex items-center group/omnibar">
                 <input
                     type="text"
                     value={value}
@@ -101,8 +103,24 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
                         : "w-full border border-[#bfae85]/50 bg-[#fefaf2] rounded-sm px-2 py-1 text-sm text-[#1c1917] font-bold focus:border-amber-600 outline-none transition-colors shadow-sm placeholder-[#bfae85]/60"
                     }
                 />
+
+                {variant === 'sheet' && value && onPromote && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm(`Promouvoir "${value}" en compétence secondaire ?`)) {
+                                onPromote(value);
+                            }
+                        }}
+                        className="opacity-0 group-hover/omnibar:opacity-100 transition-opacity p-0.5 text-amber-600 hover:text-amber-800"
+                        title="Promouvoir en compétence secondaire"
+                    >
+                        <ArrowUpCircle size={12} />
+                    </button>
+                )}
+
                 {suggestions.length > 0 && isOpen && (
-                    <div className="absolute z-[100] left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-100">
+                    <div className="absolute z-[100] left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-100">
                         <div className="p-1 bg-amber-50 text-[10px] font-bold text-amber-700 border-b flex items-center gap-1 uppercase tracking-wider">
                             <Award size={10} /> Catalogue
                         </div>

@@ -7,6 +7,7 @@ import { Award, Book, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useRules } from '../context/RulesContext';
 import { ErrorService } from '../services/ErrorService';
+import { createDotEntry } from '../utils/factories';
 
 interface Props {
     isLandscape?: boolean;
@@ -55,6 +56,44 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         onAddLog(`Spécialisation modifiée (${skillName}) : ${value}`, 'info', 'sheet', `spec_${skillId}_${index}`);
     };
 
+    const handlePromote = (skillId: string, index: number, specName: string) => {
+        try {
+            // 1. Identifier la catégorie cible "Secondaire"
+            const secondaryCat = rules?.definitions?.skillCategories?.find((cat: any) => cat.behavior === 'Secondaire' || cat.label.toLowerCase().includes('secondaire'))?.id || 'competences_secondaires';
+
+            console.log(`[Promotion] Promouvoir "${specName}" vers ${secondaryCat} (Skill ID: ${skillId}, Index: ${index})`);
+
+            // 2. Créer la nouvelle compétence (valeur 0 comme demandé)
+            const newSkill = createDotEntry(specName, 0);
+
+            // 3. Mettre à jour les données de manière fonctionnelle pour éviter tout souci de synchronisation
+            onChange((prev: CharacterSheetData) => {
+                const currentSpecs = prev.specializations[skillId] || [];
+                const newSpecs = [...currentSpecs];
+                newSpecs[index] = ""; // Libère l'emplacement
+
+                const currentCatSkills = prev.skills[secondaryCat] || [];
+
+                return {
+                    ...prev,
+                    skills: {
+                        ...prev.skills,
+                        [secondaryCat]: [...currentCatSkills, newSkill]
+                    },
+                    specializations: {
+                        ...prev.specializations,
+                        [skillId]: newSpecs
+                    }
+                };
+            });
+
+            onAddLog(`Spécialisation "${specName}" promue en compétence secondaire.`, 'success', 'sheet');
+        } catch (err) {
+            console.error(`[Promotion] Error:`, err);
+            ErrorService.handleError(err, { context: 'CharacterSheetSpecializations.handlePromote' });
+        }
+    };
+
     const handleDrop = (e: React.DragEvent, skillId: string) => {
         e.preventDefault();
         try {
@@ -93,7 +132,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
     const renderSkillBox = (skill: DotEntry) => {
         const count = skill.value;
         const imposedSpecs = skill.value > 0
-            ? (data.imposedSpecializations[skill.id] || []).filter(spec => skill.value >= (spec.minLevel || 0))
+            ? (data.imposedSpecializations[skill.id] || []).filter((spec: any) => skill.value >= (spec.minLevel || 0))
             : [];
 
         if (count <= 0 && imposedSpecs.length === 0) return null;
@@ -123,7 +162,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                     {/* Render Imposed Specializations first (Read Only) */}
-                    {imposedSpecs.map((spec, i) => (
+                    {imposedSpecs.map((spec: any, i: number) => (
                         <div key={`imp-${i}`} className="bg-slate-100 border border-slate-200 rounded-full py-0.5 px-2 flex items-center shadow-inner h-5">
                             <div className="w-1 h-1 rounded-full bg-slate-400 mr-1.5 shrink-0"></div>
                             <span className="text-[10px] font-bold text-slate-600 truncate leading-none" title={spec.name}>
@@ -145,7 +184,8 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                             >
                                 <SpecializationOmnibar
                                     value={userSpecs[i] || ''}
-                                    onChange={(val) => updateSpecialization(skill.id, i, val)}
+                                    onChange={(val: string) => updateSpecialization(skill.id, i, val)}
+                                    onPromote={(val: string) => handlePromote(skill.id, i, val)}
                                     skillId={skill.id}
                                     className="w-full"
                                     variant="sheet"
@@ -169,7 +209,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         if (!categoryData || !Array.isArray(categoryData)) return null;
 
         // Show skill if it has dots OR imposed specializations
-        const skills = categoryData.filter(s => {
+        const skills = categoryData.filter((s: any) => {
             if (!s || !s.name || s.name.trim() === '') return false; // Skip spacers
             // GLOBAL FIX: If skill value is 0, we don't show it (no specs visible at 0)
             return s.value > 0;
@@ -231,8 +271,8 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                 <div className="space-y-0.5 overflow-auto">
                     {/* Dynamic Rendering from Rules */}
                     {rules?.definitions?.skillCategories
-                        ?.filter(cat => cat.behavior === 'Compétence' || cat.behavior === 'Secondaire')
-                        ?.map(cat => (
+                        ?.filter((cat: any) => cat.behavior === 'Compétence' || cat.behavior === 'Secondaire')
+                        ?.map((cat: any) => (
                             <div key={cat.id}>
                                 {renderCategory(cat.label, cat.id as any)}
                             </div>
