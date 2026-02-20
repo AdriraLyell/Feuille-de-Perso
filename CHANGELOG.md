@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.39] - 2026-02-15 [FIX]
+
+- 🐛 Fix : Correction d'une violation des règles des Hooks React (useState dans un .map)
+- 🏗️ Refactoring : Extraction des items de bibliothèque en sous-composants pour stabiliser le rendu
+
 ## [2.49.38] - 2026-02-15 [FEAT]
 
 - ✨ UX : Ajout d'infobulles dynamiques listant les variantes au survol de l'icône dans la bibliothèque

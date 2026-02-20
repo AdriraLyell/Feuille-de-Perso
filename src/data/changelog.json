@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.70",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Restauration UI & Mise en forme : Correction des classes CSS corrompues (espaces), retour aux libellés en majuscules pour les onglets et en-têtes de tableaux, et ajustement des dimensions du bilan d'XP (suppression du bloc solde redondant et retour à une granularité fine des gains) tout en conservant le moteur de calcul basé sur l'état."
+    },
+    {
         "version": "2.56.69",
         "date": "2026-02-21",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-20",
         "type": "style",
         "description": "Amélioration UX : Harmonisation de la taille du Hub Cloud. La modale de synchronisation utilise désormais une taille large unifiée pour les onglets 'Push' et 'Pull', évitant les sauts de redimensionnement lors de la navigation."
-    },
-    {
-        "version": "2.56.48",
-        "date": "2026-02-19",
-        "type": "refactor",
-        "description": "Refonte du 'Hub Cloud' : Fusion de la synchronisation (Push) et de la bibliothèque (Pull) dans une interface unifiée via le bouton Synchro. Le 'Grimoire de Sauvegarde' est désormais dédié exclusivement aux opérations locales (JSON)."
     }
 ]

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.48",
+        "date": "2026-02-19",
+        "type": "refactor",
+        "description": "Refonte du 'Hub Cloud' : Fusion de la synchronisation (Push) et de la bibliothèque (Pull) dans une interface unifiée via le bouton Synchro. Le 'Grimoire de Sauvegarde' est désormais dédié exclusivement aux opérations locales (JSON)."
+    },
+    {
         "version": "2.56.47",
         "date": "2026-02-19",
         "type": "feat",
@@ -838,15 +844,6 @@
             "✨ UI : Correction du tronquage des tooltips via React Portals",
             "🧩 UX : Ajout du composant PortalTooltip pour les variantes (Traits, Compétences, Historiques)",
             "🏗️ Refactoring : Migration des listes de variantes vers le système de portail pour éviter le clipping overflow"
-        ]
-    },
-    {
-        "version": "2.49.39",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🐛 Fix : Correction d'une violation des règles des Hooks React (useState dans un .map)",
-            "🏗️ Refactoring : Extraction des items de bibliothèque en sous-composants pour stabiliser le rendu"
         ]
     }
 ]

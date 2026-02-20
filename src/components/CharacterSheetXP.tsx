@@ -95,36 +95,36 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
       <div className="flex gap-4 mb-4 border-b border-stone-200">
         <button
           onClick={() => setActiveTab('sessions')}
-          className={`px - 6 py - 2 font - bold uppercase tracking - wider transition - all flex items - center gap - 2 border - b - 2 ${activeTab === 'sessions'
+          className={`px-6 py-2 font-bold uppercase tracking-wider transition-all flex items-center gap-2 border-b-2 ${activeTab === 'sessions'
             ? 'border-blue-600 text-blue-700 bg-blue-50/50'
             : 'border-transparent text-stone-400 hover:text-stone-600'
-            } `}
+            }`}
         >
-          <Calendar size={18} /> Sessions & Résumé
+          <Calendar size={18} /> SESSIONS & RÉSUMÉ
         </button>
         <button
           onClick={() => setActiveTab('history')}
-          className={`px - 6 py - 2 font - bold uppercase tracking - wider transition - all flex items - center gap - 2 border - b - 2 ${activeTab === 'history'
+          className={`px-6 py-2 font-bold uppercase tracking-wider transition-all flex items-center gap-2 border-b-2 ${activeTab === 'history'
             ? 'border-indigo-600 text-indigo-700 bg-indigo-50/50'
             : 'border-transparent text-stone-400 hover:text-stone-600'
-            } `}
+            }`}
         >
-          <TrendingUp size={18} /> Historique des Dépenses
+          <TrendingUp size={18} /> HISTORIQUE DES DÉPENSES
         </button>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white border border-stone-400 rounded-sm overflow-hidden shadow-sm">
+      <div className="bg-white border border-stone-400 rounded-sm overflow-hidden shadow-sm flex flex-col">
         {activeTab === 'sessions' ? (
           <>
             {/* Table Header - Sessions */}
-            <div className={`${sessionGridClass} bg - slate - 200 border - b border - stone - 400 font - bold text - sm uppercase py - 2 px - 4 text - slate - 800`}>
-              <div className="flex items-center gap-2"><Calendar size={14} /> Date</div>
+            <div className={`${sessionGridClass} bg-slate-200 border-b border-stone-400 font-bold text-sm uppercase py-2 px-4 text-slate-800`}>
+              <div className="flex items-center gap-2"><Calendar size={14} /> DATE</div>
               <div className="flex items-center gap-2"><User size={14} /> MJ</div>
-              <div className="flex items-center gap-2"><FileText size={14} /> Scénario</div>
-              <div className="flex items-center gap-2"><MessageSquare size={14} /> Notes & Commentaires</div>
+              <div className="flex items-center gap-2"><FileText size={14} /> SCÉNARIO</div>
+              <div className="flex items-center gap-2"><MessageSquare size={14} /> NOTES & COMMENTAIRES</div>
               <div className="text-center">XP</div>
               <div className="text-center"></div>
-              <div className="text-center text-[10px]">Session</div>
+              <div className="text-center text-[10px]">SESSION</div>
             </div>
 
             {/* Table Body - Sessions */}
@@ -136,7 +136,7 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
               )}
 
               {(data.xpLogs || []).map((entry) => (
-                <div key={entry.id} className={`${sessionGridClass} border - b border - stone - 200 hover: bg - blue - 50 / 50 items - center py - 2 px - 4 transition - colors`}>
+                <div key={entry.id} className={`${sessionGridClass} border-b border-stone-200 hover:bg-blue-50/50 items-center py-2 px-4 transition-colors`}>
                   <div className="pr-2">
                     <input
                       type="date"

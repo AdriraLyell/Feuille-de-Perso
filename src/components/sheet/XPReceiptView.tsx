@@ -51,14 +51,21 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGa
             };
         };
 
+        const gainsRaw = breakdown.gains || [];
+        const sessionGains = gainsRaw.filter(g => g.name.startsWith('Base :'));
+        const traitGains = gainsRaw.filter(g => g.name.startsWith('Bonus :'));
+        const otherGains = gainsRaw.filter(g => !g.name.startsWith('Base :') && !g.name.startsWith('Bonus :'));
+
         const gains = [
-            finalize('gains', 'Sessions, Bonus & Création', <BookOpen size={16} />, 'text-emerald-700', breakdown.gains, 'earn')
+            finalize('sessions', 'Sessions & Scénarios', <BookOpen size={16} />, 'text-emerald-700', sessionGains, 'earn'),
+            finalize('traits_gain', 'Traits (Désavantages/Bonus)', <Database size={16} />, 'text-amber-600', traitGains, 'earn'),
+            finalize('other_gain', 'Autres Gains', <Sparkles size={16} />, 'text-indigo-600', otherGains, 'earn')
         ].filter(c => c.entries.length > 0);
 
         const spends = [
             finalize('attributes', 'Attributs', <User size={16} />, 'text-amber-600', breakdown.attributes, 'spend'),
             finalize('skills', 'Compétences', <Activity size={16} />, 'text-rose-600', breakdown.skills, 'spend'),
-            finalize('traits_spend', 'Traits (Avantages & Rerolls)', <Database size={16} />, 'text-purple-600', breakdown.traits, 'spend'),
+            finalize('traits_spend', 'Traits (Avantages)', <Database size={16} />, 'text-purple-600', breakdown.traits, 'spend'),
             finalize('counters', 'Compteurs', <Maximize2 size={16} />, 'text-cyan-600', breakdown.counters, 'spend'),
             finalize('mystic', 'Habilités Mystiques', <Sparkles size={16} />, 'text-indigo-600', breakdown.mystic || [], 'spend')
         ].filter(c => c.entries.length > 0);
@@ -162,16 +169,16 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGa
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 bg-stone-50/50 flex-grow font-sans h-full overflow-y-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-2 bg-stone-50/50 font-sans max-h-[600px] overflow-y-auto">
 
             {/* Colonne Gains */}
-            <div className="flex flex-col gap-2">
-                <div className="flex items-end justify-between mb-4 border-b border-stone-300 pb-2">
-                    <h2 className="text-xl font-bold font-serif text-emerald-900 flex items-center gap-2">
-                        <ArrowUpRight className="text-emerald-600" size={24} />
-                        Recettes & Gains
+            <div className="flex flex-col gap-1">
+                <div className="flex items-end justify-between mb-2 border-b border-stone-300 pb-1">
+                    <h2 className="text-lg font-bold font-serif text-emerald-900 flex items-center gap-2">
+                        <ArrowUpRight className="text-emerald-600" size={20} />
+                        RECETTES & GAINS
                     </h2>
-                    <div className="text-2xl font-black text-emerald-700 tracking-tighter">
+                    <div className="text-xl font-black text-emerald-700 tracking-tighter">
                         {totalGain} <span className="text-sm text-emerald-600 font-normal">XP</span>
                     </div>
                 </div>
@@ -188,13 +195,13 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGa
             </div>
 
             {/* Colonne Dépenses */}
-            <div className="flex flex-col gap-2">
-                <div className="flex items-end justify-between mb-4 border-b border-stone-300 pb-2">
-                    <h2 className="text-xl font-bold font-serif text-rose-900 flex items-center gap-2">
-                        <ArrowDownRight className="text-rose-600" size={24} />
-                        Investissements
+            <div className="flex flex-col gap-1">
+                <div className="flex items-end justify-between mb-2 border-b border-stone-300 pb-1">
+                    <h2 className="text-lg font-bold font-serif text-rose-900 flex items-center gap-2">
+                        <ArrowDownRight className="text-rose-600" size={20} />
+                        INVESTISSEMENTS
                     </h2>
-                    <div className="text-2xl font-black text-rose-700 tracking-tighter">
+                    <div className="text-xl font-black text-rose-700 tracking-tighter">
                         {totalSpent} <span className="text-sm text-rose-600 font-normal">XP</span>
                     </div>
                 </div>
@@ -209,21 +216,6 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGa
                     )}
                 </div>
 
-                {/* Solde Card */}
-                <div className="mt-auto pt-6">
-                    <div className="bg-indigo-950 text-indigo-50 p-5 rounded-xl shadow-lg border border-indigo-900 flex items-center justify-between relative overflow-hidden">
-                        <div className="absolute -right-4 -top-4 opacity-10">
-                            <Sparkles size={100} />
-                        </div>
-                        <div>
-                            <div className="text-indigo-300 text-sm font-bold uppercase tracking-widest mb-1">Solde Disponible</div>
-                            <div className="text-xs text-indigo-400/80">Reste à dépenser</div>
-                        </div>
-                        <div className="text-4xl font-black tracking-tighter font-mono bg-clip-text text-transparent bg-gradient-to-tr from-indigo-200 to-white">
-                            {totalRest} <span className="text-base text-indigo-300 font-normal">XP</span>
-                        </div>
-                    </div>
-                </div>
             </div>
 
         </div>
