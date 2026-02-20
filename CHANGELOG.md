@@ -1,5 +1,22 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.26] - 2026-02-15 [MAINTENANCE]
+
+- 🏗️ Refactoring : Extraction des extensions Tiptap de `ColumnarEditor.tsx` vers `/extensions/bookExtensions.ts`
+- 🏗️ Refactoring : Extraction de la logique métier de `AdminSkillLibrary.tsx` vers le hook `useAdminSkillLibrary.ts`
+- 🛡️ Typage : Amélioration de la sécurité des types dans `ImageSyncResolver.ts` (supression restrictive de `any`)
+- 🛡️ Typage : Typage strict des extensions Tiptap `ChapterHeading` et `BookImage`
+- 🧹 Nettoyage : Remplacement des derniers `console.error` par `logger.error` dans le module de déploiement
+- 📈 Maintenance : Allègement des fichiers composants volumineux pour une meilleure maintenabilité
+
+## [2.49.25] - 2026-02-15 [FEAT]
+
+- ✒️ Grimoire : Nouvelles fonctions d'édition (Souligné, Barré, Listes à puces/numéros)
+- 📜 Grimoire : Style 'Citation' (Blockquote) immersif avec bordures et guillemets stylisés
+- 🖋️ Grimoire : Surlignage type 'Encre Ambre' pour marquer les passages clés
+- 📏 Grimoire : Ligne de séparation décorative (Horizontal Rule) avec icône ◈
+- 🛠️ UI : Barre d'outils réorganisée en groupes logiques et icônes affinées
+
 ## [2.49.23] - 2026-02-14 [FIX]
 
 

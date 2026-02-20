@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.56.32",
+        "date": "2026-02-19",
+        "type": "feat",
+        "description": "Implémentation de la 'Purge Profonde' séparée de la réinitialisation de fiche. Ajout d'un bouton de purge dans l'onglet Cloud (Moniteur de Stockage) permettant de vider complètement l'IndexedDB (images, règles) et le LocalStorage en cas de blocage majeur, avec redémarrage automatique."
+    },
+    {
+        "version": "2.56.31",
+        "date": "2026-02-20",
+        "type": "fix",
+        "description": "Correction du calcul du bonus d'XP par scénario (Traits). Les sessions sont désormais mieux détectées même si le montant est à 0 (détection via le nom du scénario). Amélioration des logs de diagnostic XP et fixation des erreurs de validation Zod lors du chargement initial."
+    },
+    {
         "version": "2.56.30",
         "date": "2026-02-20",
         "type": "fix",
@@ -888,33 +900,6 @@
             "🖋️ Édition : Rétablissement de l'affichage des numéros de listes avec style ambré thématique",
             "🎨 Palette : Ajout d'une sélection d'encres (Noir, Bleu, Sang, Vert, Or, Violet) dans l'éditeur",
             "🛠️ Maintenance : Migration sécurisée des imports Tiptap TextStyle vers des exports nommés"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.26",
-        "date": "2026-02-15",
-        "type": "maintenance",
-        "changes": [
-            "🏗️ Refactoring : Extraction des extensions Tiptap de `ColumnarEditor.tsx` vers `/extensions/bookExtensions.ts`",
-            "🏗️ Refactoring : Extraction de la logique métier de `AdminSkillLibrary.tsx` vers le hook `useAdminSkillLibrary.ts`",
-            "🛡️ Typage : Amélioration de la sécurité des types dans `ImageSyncResolver.ts` (supression restrictive de `any`)",
-            "🛡️ Typage : Typage strict des extensions Tiptap `ChapterHeading` et `BookImage`",
-            "🧹 Nettoyage : Remplacement des derniers `console.error` par `logger.error` dans le module de déploiement",
-            "📈 Maintenance : Allègement des fichiers composants volumineux pour une meilleure maintenabilité"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.25",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "✒️ Grimoire : Nouvelles fonctions d'édition (Souligné, Barré, Listes à puces/numéros)",
-            "📜 Grimoire : Style 'Citation' (Blockquote) immersif avec bordures et guillemets stylisés",
-            "🖋️ Grimoire : Surlignage type 'Encre Ambre' pour marquer les passages clés",
-            "📏 Grimoire : Ligne de séparation décorative (Horizontal Rule) avec icône ◈",
-            "🛠️ UI : Barre d'outils réorganisée en groupes logiques et icônes affinées"
         ],
         "major": false
     }

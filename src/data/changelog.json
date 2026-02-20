@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.56",
+        "date": "2026-02-20",
+        "type": "feat",
+        "description": "Recréation Administration : Ajout de l'option 'Ouverture Simple' permettant de renvoyer le joueur en mode création sans réinitialiser ni purger ses statistiques existantes."
+    },
+    {
         "version": "2.56.55",
         "date": "2026-02-20",
         "type": "feat",
@@ -112,17 +118,5 @@
         "date": "2026-02-19",
         "type": "feat",
         "description": "Amélioration de la persistance des données portables : Synchronisation complète des images du Grimoire et des couvertures de Notes de Campagne. Persistance des paramètres locaux (Mode Expert, Source des Règles) dans le JSON exporté pour une expérience sans couture entre appareils. Sécurisation de la compression d'images (idempotence WebP/Gzip)."
-    },
-    {
-        "version": "2.56.32",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Implémentation de la 'Purge Profonde' séparée de la réinitialisation de fiche. Ajout d'un bouton de purge dans l'onglet Cloud (Moniteur de Stockage) permettant de vider complètement l'IndexedDB (images, règles) et le LocalStorage en cas de blocage majeur, avec redémarrage automatique."
-    },
-    {
-        "version": "2.56.31",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction du calcul du bonus d'XP par scénario (Traits). Les sessions sont désormais mieux détectées même si le montant est à 0 (détection via le nom du scénario). Amélioration des logs de diagnostic XP et fixation des erreurs de validation Zod lors du chargement initial."
     }
 ]

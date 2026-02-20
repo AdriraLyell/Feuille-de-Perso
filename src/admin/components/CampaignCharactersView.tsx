@@ -86,7 +86,7 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
         }
     };
 
-    const confirmRecreate = async (refundAmount: number) => {
+    const confirmRecreate = async (refundAmount: number, fullReset: boolean) => {
         if (!characterToRecreate) return;
         setIsRecreating(true);
         try {
@@ -95,7 +95,7 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
             if (!currentRules) throw new Error("Impossible de charger les règles de la campagne.");
 
             // 2. Transformer les données
-            const newData = RecreationService.performRecreation(characterToRecreate.data, refundAmount, currentRules);
+            const newData = RecreationService.performRecreation(characterToRecreate.data, refundAmount, currentRules, fullReset);
 
             // 3. Persister dans Supabase
             const success = await CharacterSyncService.updateCharacterData(characterToRecreate.id, newData);
