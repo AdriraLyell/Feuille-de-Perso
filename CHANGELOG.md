@@ -1,5 +1,14 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.27] - 2026-02-15 [FEAT]
+
+- 🏛️ UI : Réorganisation du journal de campagne avec une nouvelle barre latérale de structure
+- 📔 Structure : Déplacement des boutons 'Chapitre' vers la sidebar latérale pour un espace de travail plus propre
+- 🎨 Design : Amélioration de la barre d'outils supérieure et maintien du bouton Image dans le menu texte
+- 🖋️ Édition : Rétablissement de l'affichage des numéros de listes avec style ambré thématique
+- 🎨 Palette : Ajout d'une sélection d'encres (Noir, Bleu, Sang, Vert, Or, Violet) dans l'éditeur
+- 🛠️ Maintenance : Migration sécurisée des imports Tiptap TextStyle vers des exports nommés
+
 ## [2.49.26] - 2026-02-15 [MAINTENANCE]
 
 - 🏗️ Refactoring : Extraction des extensions Tiptap de `ColumnarEditor.tsx` vers `/extensions/bookExtensions.ts`

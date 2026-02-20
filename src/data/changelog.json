@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.57",
+        "date": "2026-02-20",
+        "type": "fix",
+        "description": "Correction Arrière-plans : Résolution du bug de couleur (noir au lieu de bleu) et de coût XP erroné en mode création. Les points d'arrière-plan sont désormais correctement identifiés comme acquis à la création."
+    },
+    {
         "version": "2.56.56",
         "date": "2026-02-20",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-19",
         "type": "chore",
         "description": "Opération 'Racine Propre' : Migration des scripts utilitaires vers le dossier dédié, archivage des fichiers SQL temporaires et nettoyage des logs. Migration systématique des derniers `console.log/warn/error` vers le logger applicatif pour une meilleure hygiène de production."
-    },
-    {
-        "version": "2.56.33",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Amélioration de la persistance des données portables : Synchronisation complète des images du Grimoire et des couvertures de Notes de Campagne. Persistance des paramètres locaux (Mode Expert, Source des Règles) dans le JSON exporté pour une expérience sans couture entre appareils. Sécurisation de la compression d'images (idempotence WebP/Gzip)."
     }
 ]

@@ -39,7 +39,7 @@ export const useCharacterSheetActions = (
             const isCreationMode = prev.creationConfig && prev.creationConfig.active;
             const catDef = rules?.definitions?.skillCategories?.find(c => c.id === category);
             const behavior = catDef?.behavior;
-            const isBaseSkill = !behavior || behavior === 'Compétence' || behavior === 'Secondaire';
+            const isBaseSkill = !behavior || behavior === 'Compétence' || behavior === 'Secondaire' || behavior === 'Arrière-plan';
 
             const newList = list.map(item => {
                 if (item.id !== id) return item;
