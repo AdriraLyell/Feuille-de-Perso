@@ -84,6 +84,7 @@ export interface DBCounter {
     defaultValue?: number;
     xpCost?: number;
     defaultCategory?: string;
+    appearance?: 'squares_only' | null;
     created_at?: string;
     updated_at?: string;
 }

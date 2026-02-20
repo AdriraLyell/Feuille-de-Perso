@@ -73,12 +73,12 @@ export interface TraitEntry {
   variant?: string; // Précision (ex: pour "Allergie", variant="Chats")
   definitionId?: string; // ID de la définition parente
   mysticAbilityId?: string; // Link to Mystic Ability
+  associatedCounterId?: string; // Link to a dynamically created trait counter
   isPostCreation?: boolean;
   creationValue?: string;
 }
 
-export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus';
-
+export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus' | 'trait_counter';
 export interface TraitEffect {
   id: string;
   type: EffectType;
@@ -86,4 +86,5 @@ export interface TraitEffect {
   method?: 'fixed' | 'per_scenario';
   target?: string; // Nom de la compétence ciblée (pour free_skill_rank)
   source?: string; // Nom du trait d'origine (optionnel)
+  associatedCounterId?: string; // Rétrocompatibilité ou option alternative
 }

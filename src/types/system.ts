@@ -163,6 +163,7 @@ export interface LibraryCounterEntry {
   defaultValue?: number | null; // Default 0
   xpCost?: number | null; // 0 = free
   defaultCategory?: string | null;
+  appearance?: 'squares_only' | null;
   isGlobal?: boolean;
   isActive?: boolean;
   isLocked?: boolean;

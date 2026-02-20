@@ -146,6 +146,19 @@ const AdminCountersEditor: React.FC<AdminCountersEditorProps> = ({ rules, onUpda
                                         />
                                     </div>
                                 </div>
+                                <div className="mt-3 bg-stone-950/50 p-2 rounded-sm border border-stone-800 flex items-start gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id={`counter-appearance-${counter.id}`}
+                                        className="mt-1 accent-amber-600"
+                                        checked={counter.appearance === 'squares_only'}
+                                        onChange={(e) => handleUpdateCounter(counter.id, 'appearance', e.target.checked ? 'squares_only' : undefined)}
+                                    />
+                                    <label htmlFor={`counter-appearance-${counter.id}`} className="text-xs text-stone-400 cursor-pointer">
+                                        <strong className="text-stone-300 block">Carrés uniquement</strong>
+                                        <span className="text-[10px] leading-tight block">Masque la rangée de bulles rondes (utile pour les Compteurs de Traits).</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </MotionFade>

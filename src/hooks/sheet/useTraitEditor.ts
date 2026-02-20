@@ -16,6 +16,33 @@ export const useTraitEditor = (
         const removedItem = list[index];
         const removedName = removedItem.name;
 
+        // Determine if this trait has a trait_counter effect and an associated counter
+        let newCustomCounters = [...data.counters.custom];
+        let hasCounterChanges = false;
+
+        // Either the trait has a definitionId with the counter, or it's just removed based on the name matching a counter
+        // The safest way is to find the definition from the library if we don't store it on the trait directly
+        if (removedItem.definitionId && _rules?.libraries?.traits) {
+            const traitDef = _rules.libraries.traits.find(t => t.id === removedItem.definitionId);
+            if (traitDef) {
+                const counterEffect = traitDef.effects?.find(e => e.type === 'trait_counter');
+                const associatedCounterId = counterEffect?.target || counterEffect?.associatedCounterId;
+
+                if (associatedCounterId && _rules?.libraries?.counters) {
+                    const counterDef = _rules.libraries.counters.find(c => c.id === associatedCounterId);
+                    if (counterDef) {
+                        // Find this counter in custom counters
+                        const counterIndex = newCustomCounters.findIndex(c => c.id === counterDef.id);
+                        if (counterIndex !== -1) {
+                            newCustomCounters[counterIndex] = { id: Math.random().toString(36).substr(2, 9), name: '', value: 0, max: 10, current: 0 };
+                            hasCounterChanges = true;
+                            onAddLog(`Compteur lié supprimé : ${counterDef.name}`, 'info', 'sheet');
+                        }
+                    }
+                }
+            }
+        }
+
         // Record refund if it was a paid trait
         if (recordXPTransaction && removedItem.name.trim()) {
             const isPostCreation = removedItem.isPostCreation;
@@ -33,7 +60,12 @@ export const useTraitEditor = (
         }
 
         list[index] = { name: '', value: '', variant: '', description: '', tag: '', definitionId: undefined };
-        onChange({ ...data, page2: { ...data.page2, [type]: list } });
+        const newData = {
+            ...data,
+            page2: { ...data.page2, [type]: list },
+            counters: hasCounterChanges ? { ...data.counters, custom: newCustomCounters } : data.counters
+        };
+        onChange(newData);
         if (removedName.trim()) {
             onAddLog(`Suppression ${type === 'avantages' ? 'Avantage' : 'Désavantage'} : ${removedName}`, 'info', 'sheet');
         }
@@ -48,6 +80,9 @@ export const useTraitEditor = (
         const isPostCreation = !data.creationConfig?.active;
         const traitCostFactor = _rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
 
+        let newCustomCounters = [...data.counters.custom];
+        let hasCounterChanges = false;
+
         instances.forEach(instance => {
             const entry = instance.entry;
             const costValue = instance.cost || entry.cost || "";
@@ -57,6 +92,35 @@ export const useTraitEditor = (
             }
 
             if (listIndex < currentList.length) {
+                // Determine if this trait has a trait_counter effect
+                let associatedCounterId: string | undefined = undefined;
+                const counterEffect = entry.effects?.find(e => e.type === 'trait_counter');
+
+                if (counterEffect) {
+                    associatedCounterId = counterEffect.target || counterEffect.associatedCounterId;
+
+                    if (associatedCounterId && _rules?.libraries?.counters) {
+                        const counterDef = _rules.libraries.counters.find(c => c.id === associatedCounterId);
+                        if (counterDef) {
+                            // Find an empty custom counter slot
+                            const emptyCounterIndex = newCustomCounters.findIndex(c => c.name.trim() === '');
+                            if (emptyCounterIndex !== -1) {
+                                newCustomCounters[emptyCounterIndex] = {
+                                    id: counterDef.id,
+                                    name: counterDef.name,
+                                    value: counterDef.defaultValue ?? 0,
+                                    max: counterDef.maxValue ?? 10,
+                                    current: counterDef.defaultValue ?? 0,
+                                    creationValue: counterDef.defaultValue ?? 0,
+                                    variant: counterDef.appearance === 'squares_only' ? 'squares_only' : undefined // We map appearance to variant for now or just wait we don't need 'variant' for appearance, we need to handle it. Actually the TraitEntry Schema didn't add associatedCounterId.
+                                };
+                                hasCounterChanges = true;
+                                onAddLog(`Compteur ajouté : ${counterDef.name}`, 'info', 'sheet');
+                            }
+                        }
+                    }
+                }
+
                 currentList[listIndex] = {
                     name: entry.name,
                     value: costValue,
@@ -66,8 +130,10 @@ export const useTraitEditor = (
                     definitionId: entry.id,
                     mysticAbilityId: entry.mysticAbilityId || undefined,
                     isPostCreation: isPostCreation ? true : undefined,
-                    creationValue: isPostCreation ? "0" : undefined
+                    creationValue: isPostCreation ? "0" : undefined,
                 };
+
+                // Add associatedCounterId if available (Need to extend TraitEntrySchema later if we persist it directly on the trait)
 
                 if (isPostCreation) {
                     const points = parseInt(costValue) || 0;
@@ -78,7 +144,11 @@ export const useTraitEditor = (
         });
 
         if (addedCount > 0) {
-            const newData = { ...data, page2: { ...data.page2, [multiSelectTarget]: currentList } };
+            const newData = {
+                ...data,
+                page2: { ...data.page2, [multiSelectTarget]: currentList },
+                counters: hasCounterChanges ? { ...data.counters, custom: newCustomCounters } : data.counters
+            };
 
             if (isPostCreation && totalXPCost > 0) {
                 onAddLog(`Achat de ${addedCount} trait(s) pour ${totalXPCost} XP.`, 'success', 'sheet');

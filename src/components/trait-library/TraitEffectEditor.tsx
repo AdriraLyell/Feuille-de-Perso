@@ -63,6 +63,11 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                         themeColor = 'text-[#8b2e2e]';
                         borderColor = 'border-[#8b2e2e]/30';
                         bgColor = 'bg-[#8b2e2e]/5';
+                    } else if (effect.type === 'trait_counter') {
+                        typeIcon = <Zap size={14} />;
+                        themeColor = 'text-emerald-800';
+                        borderColor = 'border-emerald-400/30';
+                        bgColor = 'bg-emerald-50/40';
                     }
 
                     return (
@@ -83,6 +88,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                             <option value="attribute_bonus" className="text-gray-900 bg-white">Bonus Attribut</option>
                                             <option value="xp_bonus" className="text-gray-900 bg-white">Bonus XP</option>
                                             <option value="free_skill_rank" className="text-gray-900 bg-white">Rang de Compétence Gratuit</option>
+                                            <option value="trait_counter" className="text-gray-900 bg-white">Compteur de Trait</option>
                                         </select>
                                         <ChevronDown size={12} className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${themeColor} opacity-50`} />
                                     </div>
@@ -146,6 +152,24 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                 value={effect.value}
                                                 onChange={(e) => onUpdate(effect.id, 'value', parseInt(e.target.value) || 0)}
                                             />
+                                        </div>
+                                    </div>
+                                ) : effect.type === 'trait_counter' ? (
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-start gap-2">
+                                            <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wide w-24 mt-1">Nom du Compteur :</span>
+                                            <div className="flex-grow">
+                                                <input
+                                                    type="text"
+                                                    className="w-full border border-emerald-400/30 rounded-sm px-2 py-1 text-sm focus:border-emerald-500 outline-none bg-white text-stone-800 font-bold shadow-sm"
+                                                    placeholder="Lier à un compteur ou taper pour en créer un..."
+                                                    value={effect.target || ''}
+                                                    onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
+                                                />
+                                                <p className="text-[9px] text-emerald-700/60 mt-1 italic">
+                                                    Si le compteur correspondant n'existe pas, il sera automatiquement créé (Max: 10, Coût XP: 0) avec l'affichage de cases vides.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 ) : (

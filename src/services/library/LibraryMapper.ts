@@ -96,6 +96,7 @@ export const LibraryMapper = {
         maxValue: (c as any).max_value ?? c.maxValue ?? 10,
         defaultValue: (c as any).default_value ?? c.defaultValue ?? 0,
         xpCost: (c as any).xp_cost ?? c.xpCost ?? 0,
+        appearance: c.appearance || null,
         defaultCategory: localDefaultCategory || c.defaultCategory || (c as any).default_category,
         isGlobal: c.setting_id == null,
         isActive: activeIds.has(c.id) || c.setting_id === sid

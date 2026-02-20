@@ -96,7 +96,8 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
             ...editingItem,
             maxValue: Number(editingItem.maxValue) || 10,
             defaultValue: Number(editingItem.defaultValue) || 0,
-            xpCost: Number(editingItem.xpCost) || 0
+            xpCost: Number(editingItem.xpCost) || 0,
+            appearance: (editingItem.appearance === 'squares_only' ? 'squares_only' : null) as 'squares_only' | null
         };
 
         const newList = list.some(c => c.id === editingItem.id)
@@ -119,7 +120,8 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
             max: safeItem.maxValue ?? newDefinitionsCounters[key]?.max ?? 10,
             value: safeItem.defaultValue ?? newDefinitionsCounters[key]?.value,
             defaultValue: safeItem.defaultValue ?? newDefinitionsCounters[key]?.defaultValue,
-            xpCost: safeItem.xpCost ?? newDefinitionsCounters[key]?.xpCost ?? 0
+            xpCost: safeItem.xpCost ?? newDefinitionsCounters[key]?.xpCost ?? 0,
+            appearance: safeItem.appearance === 'squares_only' ? 'squares_only' : undefined
         };
 
         onUpdate({
@@ -136,9 +138,23 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
 
     const handleBulkSelect = (active: boolean) => {
         const visibleIds = new Set(filteredList.map(item => item.id));
-        const newList = list.map(item =>
-            visibleIds.has(item.id) ? { ...item, isActive: active } : item
-        );
+        const newList = list.map(item => {
+            if (!visibleIds.has(item.id)) return item;
+
+            if (!active) {
+                const isPlaced = placedNames.has(item.name.trim().toLowerCase());
+                const isGloballyUsed = !!globalUsage[item.id];
+                const isUsedByTrait = rules.libraries.traits?.some(t =>
+                    (t.isActive || t.isGlobal) && t.effects?.some(e =>
+                        e.type === 'trait_counter' && (e.target === item.id || e.associatedCounterId === item.id)
+                    )
+                ) || false;
+
+                if (isPlaced || isGloballyUsed || isUsedByTrait) return item; // Cannot deactivate
+            }
+
+            return { ...item, isActive: active };
+        });
 
         // No need to update definitions.counters here since it's just isActive flag, 
         // the list remains the same, but wait! Are deactivated counters removed from the definitions map? No, definitions map just stores metadata, active list comes from libraries in the end.
@@ -208,7 +224,15 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                         {filteredList.map(item => {
                             const isPlaced = placedNames.has(item.name.trim().toLowerCase());
                             const isGloballyUsed = !!globalUsage[item.id];
-                            const isLocked = isPlaced || isGloballyUsed;
+
+                            // Check if any active trait uses this counter
+                            const isUsedByTrait = rules.libraries.traits?.some(t =>
+                                (t.isActive || t.isGlobal) && t.effects?.some(e =>
+                                    e.type === 'trait_counter' && (e.target === item.id || e.associatedCounterId === item.id)
+                                )
+                            ) || false;
+
+                            const isLocked = isPlaced || isGloballyUsed || isUsedByTrait;
 
                             return (
                                 <CounterLibraryItem
@@ -217,6 +241,8 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                     isPlaced={isPlaced}
                                     isLocked={isLocked}
                                     onToggleActive={(id, current) => {
+                                        // Prevents disabling globally locking trait or local locking trait effect from here, maybe show a toast instead
+                                        if (current && isLocked) return;
                                         const newList = list.map(c => c.id === id ? { ...c, isActive: !current } : c);
                                         onUpdate({ ...rules, libraries: { ...rules.libraries, counters: newList } });
                                     }}
@@ -315,6 +341,20 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                     onChange={(e) => setEditingItem({ ...editingItem, xpCost: Number(e.target.value) })}
                                 />
                             </div>
+                        </div>
+
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200 flex items-start gap-2">
+                            <input
+                                type="checkbox"
+                                id="counter-appearance"
+                                className="mt-1 accent-red-600 cursor-pointer"
+                                checked={editingItem.appearance === 'squares_only'}
+                                onChange={(e) => setEditingItem({ ...editingItem, appearance: e.target.checked ? 'squares_only' : null })}
+                            />
+                            <label htmlFor="counter-appearance" className="text-xs text-slate-600 cursor-pointer">
+                                <strong className="text-slate-800 block">Affichage : Carrés uniquement</strong>
+                                <span className="text-[10px] block mt-0.5">Masque la rangée de bulles rondes (Points d'origine). Utile pour les jauges dynamiques type compteurs de traits.</span>
+                            </label>
                         </div>
 
                         {error && (

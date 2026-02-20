@@ -1,8 +1,16 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.56.35)
+# Audit - État des Lieux & Roadmap (Synthèse v2.57.0)
 
-> **Dernière mise à jour** : 2026-02-19 — Version 2.56.35
+> **Dernière mise à jour** : 2026-02-21 — Version 2.57.0
 
 ## 1. Phases Complétées
+
+### ✅ Phase 25 : Intégration des Compteurs de Traits (v2.57.0)
+- [x] **Mécanique** : Création du type d'effet `trait_counter` reliant dynamiquement traits et compteurs.
+- [x] **Automatisation** : Création/Suppression automatique des compteurs associés sur la fiche lors de l'ajout/retrait de traits.
+- [x] **UI/UX** : Implémentation du mode d'affichage `squares_only` (cases à cocher uniquement) pour une interface compacte.
+- [x] **Administration** : Gestion automatisée de la bibliothèque (verrouillage des compteurs liés, création auto lors de l'édition de traits).
+- [x] **Typage & Schémas** : Mise à jour de `TraitEntrySchema` et des types `primitives.ts` pour supporter le lien persistant (`associatedCounterId`).
+- [x] **Qualité** : Validation complète du build et de la conformité TypeScript.
 
 ### ✅ Phase 1 à 10 : Infrastructures & Code Health (v2.49.2)
 *Voir historique pour le détail des implémentations CI/CD, Cloud Sync, et Typage.*

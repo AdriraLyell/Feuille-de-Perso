@@ -74,6 +74,7 @@ export interface RulesCounterDefinition {
     value?: number; // Starting value (Legacy compatibility)
     defaultValue?: number; // Starting value (New system)
     description?: string; // New: Description for tooltip
+    appearance?: 'squares_only'; // Utilisé pour masquer les bulles (ex: Compteurs de Traits)
 }
 
 export interface RulesData {
