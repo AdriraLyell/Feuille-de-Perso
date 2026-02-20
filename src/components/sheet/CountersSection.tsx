@@ -148,7 +148,9 @@ export const CountersSection = React.memo<CountersSectionProps>(({ data, updateC
                     })}
 
                     {/* Legacy Custom Counters array (if any) */}
-                    {(data.counters.custom || []).map(c => renderCounterItem(c, true))}
+                    {(data.counters.custom || [])
+                        .filter(c => c.name?.trim())
+                        .map(c => renderCounterItem(c, true))}
                 </div>
             </div>
         </div>

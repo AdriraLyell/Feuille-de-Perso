@@ -34,7 +34,7 @@ export const useTraitEditor = (
             const counterIndex = newCustomCounters.findIndex(c => c.id === counterIdToRemove);
             if (counterIndex !== -1) {
                 const oldCounter = newCustomCounters[counterIndex];
-                newCustomCounters[counterIndex] = { id: Math.random().toString(36).substr(2, 9), name: '', value: 0, max: 10, current: 0 };
+                newCustomCounters.splice(counterIndex, 1);
                 hasCounterChanges = true;
                 onAddLog(`Compteur Auto lié supprimé : ${oldCounter.name || 'Compteur Auto'}`, 'info', 'sheet');
             }
@@ -105,22 +105,27 @@ export const useTraitEditor = (
                         finalCounterName = variantName || entry.name;
                     }
 
-                    // Find an empty custom counter slot
+                    associatedCounterId = Math.random().toString(36).substring(2, 9);
+                    const newCounter = {
+                        id: associatedCounterId,
+                        name: finalCounterName,
+                        value: 0,
+                        max: 10,
+                        current: 0,
+                        creationValue: 0,
+                        variant: 'squares_only'
+                    };
+
+                    // Find an empty custom counter slot, or append
                     const emptyCounterIndex = newCustomCounters.findIndex(c => c.name.trim() === '');
                     if (emptyCounterIndex !== -1) {
-                        associatedCounterId = Math.random().toString(36).substring(2, 9);
-                        newCustomCounters[emptyCounterIndex] = {
-                            id: associatedCounterId,
-                            name: finalCounterName,
-                            value: 0,
-                            max: 10,
-                            current: 0,
-                            creationValue: 0,
-                            variant: 'squares_only'
-                        };
-                        hasCounterChanges = true;
-                        onAddLog(`Compteur ajouté : ${finalCounterName}`, 'info', 'sheet');
+                        newCustomCounters[emptyCounterIndex] = newCounter;
+                    } else {
+                        newCustomCounters.push(newCounter);
                     }
+
+                    hasCounterChanges = true;
+                    onAddLog(`Compteur ajouté : ${finalCounterName}`, 'info', 'sheet');
                 }
 
                 currentList[listIndex] = {

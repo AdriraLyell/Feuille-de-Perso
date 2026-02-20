@@ -51,6 +51,47 @@ const TraitCardItemVariants: React.FC<{ entry: LibraryEntry; hasVariants: boolea
     );
 };
 
+const TraitCardItemEffects: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+    const anchorRef = useRef<HTMLDivElement>(null);
+
+    const getEffectLabel = (eff: any) => {
+        switch (eff.type) {
+            case 'xp_bonus': return `Bonus XP : ${eff.value} ${eff.method === 'per_scenario' ? '/ session' : ''}`;
+            case 'free_skill_rank': return `Rang gratuit : ${eff.target || '?'} (+${eff.value})`;
+            case 'attribute_bonus': return `Bonus Attribut : ${eff.target || '?'} (+${eff.value})`;
+            case 'auto_counter': return `Compteur Auto${eff.target ? ` : ${eff.target}` : ''}`;
+            default: return 'Effet inconnu';
+        }
+    };
+
+    return (
+        <div
+            ref={anchorRef}
+            className="relative flex items-center justify-center cursor-help"
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+        >
+            <Zap size={14} className="text-amber-500 fill-amber-500" />
+
+            <PortalTooltip
+                anchorRef={anchorRef}
+                isOpen={showTooltip}
+                title="Effets mécaniques actifs"
+            >
+                <div className="flex flex-col gap-1 mt-1">
+                    {entry.effects?.map((eff, i) => (
+                        <div key={i} className="text-[10px] text-white/90 whitespace-nowrap flex items-center gap-1.5 font-bold">
+                            <span className="w-1 h-1 bg-amber-400 rounded-full inline-block"></span>
+                            {getEffectLabel(eff)}
+                        </div>
+                    ))}
+                </div>
+            </PortalTooltip>
+        </div>
+    );
+};
+
 const TraitCard: React.FC<TraitCardProps> = ({
     entry,
     isEditable,
@@ -94,7 +135,7 @@ const TraitCard: React.FC<TraitCardProps> = ({
             <div className="w-16 flex items-center gap-1 shrink-0">
                 {entry.isVariable && <TraitCardItemVariants entry={entry} hasVariants={!!hasVariants} />}
                 {source === 'official' && <div title="Trait Officiel"><Globe size={14} className="text-indigo-500" /></div>}
-                {entry.effects && entry.effects.length > 0 && <div title="Effets mécaniques"><Zap size={14} className="text-amber-500 fill-amber-500" /></div>}
+                {entry.effects && entry.effects.length > 0 && <TraitCardItemEffects entry={entry} />}
                 {isLocked && <div title="Trait utilisé"><Lock size={14} className="text-amber-600" /></div>}
             </div>
 
