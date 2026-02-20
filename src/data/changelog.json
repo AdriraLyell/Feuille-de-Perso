@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.74",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Amélioration UI (Historique Dépenses XP) : Remplacement de la catégorie globale 'Compétences' par un découpage thématique des compétences selon leur origine (ex: Talents (Orange), Connaissances (Bleu clair), Mêlée & Tir (Rouge), etc.) avec icônes et codes couleurs dédiés."
+    },
+    {
         "version": "2.56.73",
         "date": "2026-02-21",
         "type": "style",
@@ -112,11 +118,5 @@
         "date": "2026-02-20",
         "type": "style",
         "description": "Correction UI : Alignement de la barre latérale des spécialisations sous le bandeau de navigation principal pour éviter le masquage."
-    },
-    {
-        "version": "2.56.53",
-        "date": "2026-02-20",
-        "type": "feat",
-        "description": "Amélioration UI : Ajout d'une modale d'erreur explicite ('Promotion Impossible') si la compétence secondaire existe déjà."
     }
 ]

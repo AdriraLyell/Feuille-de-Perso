@@ -57,6 +57,7 @@ export interface ExperienceBreakdownItem {
   name: string;
   amount: number;
   count?: number;
+  category?: string;
 }
 
 export interface ExperienceBreakdown {

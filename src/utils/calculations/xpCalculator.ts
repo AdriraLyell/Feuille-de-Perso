@@ -225,7 +225,7 @@ function calculateSkillXP(
 
                 if (cost > 0) {
                     skillSpent += cost;
-                    breakdown.push({ name: skill.name || skill.id, amount: -cost });
+                    breakdown.push({ name: skill.name || skill.id, amount: -cost, category: cat.label || cat.id });
                 }
             });
         });
@@ -234,6 +234,21 @@ function calculateSkillXP(
         const skillFactor = data.xpCosts?.skillFactor ?? 1.0;
         const specFactor = data.xpCosts?.specializationFactor ?? 0.5;
         const bgCostBase = data.creationConfig?.backgroundCost ?? 2;
+
+        const legacyCategoryNames: Record<string, string> = {
+            'talents': 'Talents',
+            'competences': 'Compétences Principales',
+            'competences_col_2': 'Compétences Secondaires',
+            'connaissances': 'Connaissances',
+            'autres_competences': 'Autres Compétences',
+            'autres': 'Autres',
+            'Col_Comp_1': 'Talents',
+            'Col_Comp_2': 'Savoir-Faire',
+            'Col_Comp_3': 'Connaissances',
+            'Col_Comp_4': 'Langues',
+            'Col_Comp_5': 'Mêlée & Tir',
+            'Col_Comp_7': 'Autres'
+        };
 
         const standardCategories = ['talents', 'competences', 'competences_col_2', 'connaissances', 'autres_competences', 'autres', 'Col_Comp_1', 'Col_Comp_2', 'Col_Comp_3', 'Col_Comp_4', 'Col_Comp_5', 'Col_Comp_7'];
         standardCategories.forEach(key => {
@@ -245,7 +260,7 @@ function calculateSkillXP(
                     const cost = getXPCost(skill.value, effectiveCreationValue, skillFactor, true);
                     if (cost > 0) {
                         skillSpent += cost;
-                        breakdown.push({ name: skill.name || skill.id, amount: -cost });
+                        breakdown.push({ name: skill.name || skill.id, amount: -cost, category: legacyCategoryNames[key] || 'Compétences' });
                     }
                 });
             }
@@ -259,7 +274,7 @@ function calculateSkillXP(
                 const cost = getXPCost(skill.value, effectiveCreationValue, specFactor, true);
                 if (cost > 0) {
                     skillSpent += cost;
-                    breakdown.push({ name: skill.name || skill.id, amount: -cost });
+                    breakdown.push({ name: skill.name || skill.id, amount: -cost, category: 'Spécialisations' });
                 }
             });
         }
@@ -270,7 +285,7 @@ function calculateSkillXP(
                 const cost = getXPCost(skill.value, skill.creationValue || 0, bgCostBase, false);
                 if (cost > 0) {
                     skillSpent += cost;
-                    breakdown.push({ name: skill.name || skill.id, amount: -cost });
+                    breakdown.push({ name: skill.name || skill.id, amount: -cost, category: 'Arrière-Plans' });
                 }
             });
         }

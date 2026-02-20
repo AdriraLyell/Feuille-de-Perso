@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.53",
+        "date": "2026-02-20",
+        "type": "feat",
+        "description": "Amélioration UI : Ajout d'une modale d'erreur explicite ('Promotion Impossible') si la compétence secondaire existe déjà."
+    },
+    {
         "version": "2.56.51",
         "date": "2026-02-20",
         "type": "style",
@@ -821,17 +827,6 @@
             "🖋️ UI : Refonte visuelle des registres globaux (couleurs ambre/pierre et typographie serif)",
             "📜 Fiche : Restauration des colonnes de compétences manquantes (Col_Comp_4 et Col_Comp_8)",
             "🛡️ Fix : Robustesse accrue sur les filtres de catégories de compétences (insensibilité à la casse)"
-        ]
-    },
-    {
-        "version": "2.49.43",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🖥️ Admin : Expansion verticale massive de l'onglet Joueurs",
-            "📏 UI : Alignement des hauteurs de listes de personnages sur le système des bibliothèques (calc(100vh - 120px))",
-            "🔍 UX : Élargissement de la vue détaillée des personnages (max-w-7xl) pour une meilleure vision d'ensemble",
-            "📊 Global : La Master List des joueurs occupe désormais tout l'espace vertical disponible"
         ]
     }
 ]

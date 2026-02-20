@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.43] - 2026-02-15 [FEAT]
+
+- 🖥️ Admin : Expansion verticale massive de l'onglet Joueurs
+- 📏 UI : Alignement des hauteurs de listes de personnages sur le système des bibliothèques (calc(100vh - 120px))
+- 🔍 UX : Élargissement de la vue détaillée des personnages (max-w-7xl) pour une meilleure vision d'ensemble
+- 📊 Global : La Master List des joueurs occupe désormais tout l'espace vertical disponible
+
 ## [2.49.42] - 2026-02-15 [FEAT]
 
 - 📏 Admin : Augmentation de la hauteur verticale des vues de listes (Bibliothèques & Personnages)

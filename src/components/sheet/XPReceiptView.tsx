@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowUpRight, ArrowDownRight, RotateCcw, ChevronDown, Activity, BookOpen, User, Maximize2, Sparkles, Database } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, RotateCcw, ChevronDown, Activity, BookOpen, User, Maximize2, Sparkles, Database, Zap, Wrench, Shield, Swords, Bookmark } from 'lucide-react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { ExperienceBreakdown } from '../../types';
@@ -62,9 +62,43 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGa
             finalize('other_gain', 'Autres Gains', <Sparkles size={16} />, 'text-indigo-600', otherGains, 'earn')
         ].filter(c => c.entries.length > 0);
 
+        const skillGroupsMap = new Map<string, any[]>();
+        breakdown.skills.forEach(skill => {
+            const catName = skill.category || 'Autres Compétences';
+            if (!skillGroupsMap.has(catName)) {
+                skillGroupsMap.set(catName, []);
+            }
+            skillGroupsMap.get(catName)!.push(skill);
+        });
+
+        const skillGroupSpends = Array.from(skillGroupsMap.entries()).map(([catName, items], index) => {
+            let icon = <Activity size={16} />;
+            let colorClass = 'text-rose-600';
+
+            const lowerCat = catName.toLowerCase();
+            if (lowerCat.includes('talent')) {
+                icon = <Zap size={16} />;
+                colorClass = 'text-orange-600';
+            } else if (lowerCat.includes('connaissance') || lowerCat.includes('langue')) {
+                icon = <BookOpen size={16} />;
+                colorClass = 'text-sky-600';
+            } else if (lowerCat.includes('savoir-faire') || lowerCat.includes('artisanat')) {
+                icon = <Wrench size={16} />;
+                colorClass = 'text-stone-500';
+            } else if (lowerCat.includes('mêlée') || lowerCat.includes('combat') || lowerCat.includes('tir') || lowerCat.includes('arme')) {
+                icon = <Swords size={16} />;
+                colorClass = 'text-red-700';
+            } else if (lowerCat.includes('arrière-plan') || lowerCat.includes('spécialisation')) {
+                icon = <Bookmark size={16} />;
+                colorClass = 'text-stone-600';
+            }
+
+            return finalize(`skills-${index}`, catName, icon, colorClass, items, 'spend');
+        });
+
         const spends = [
             finalize('attributes', 'Attributs', <User size={16} />, 'text-amber-600', breakdown.attributes, 'spend'),
-            finalize('skills', 'Compétences', <Activity size={16} />, 'text-rose-600', breakdown.skills, 'spend'),
+            ...skillGroupSpends,
             finalize('traits_spend', 'Traits (Avantages)', <Database size={16} />, 'text-purple-600', breakdown.traits, 'spend'),
             finalize('counters', 'Compteurs', <Maximize2 size={16} />, 'text-cyan-600', breakdown.counters, 'spend'),
             finalize('mystic', 'Habilités Mystiques', <Sparkles size={16} />, 'text-indigo-600', breakdown.mystic || [], 'spend')
