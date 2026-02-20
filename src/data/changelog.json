@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.68",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Agrégation du Bilan XP : Épuration de la vue Recçu en supprimant les horodatages et en regroupant les transactions par sujet (ex: groupement des achats d'une même compétence). Tri automatique par importance d'investissement et mise à jour des infobulles pour le 'Top 5'."
+    },
+    {
         "version": "2.56.67",
         "date": "2026-02-21",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-19",
         "type": "feat",
         "description": "Ajout du bandeau 'Oracle' et d'une surbrillance pour guider la configuration des Habilités Mystiques en mode création."
-    },
-    {
-        "version": "2.56.46",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Nettoyage final du journal des modifications et validation de la structure JSON."
     }
 ]

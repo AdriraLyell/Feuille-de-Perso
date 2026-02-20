@@ -11,105 +11,120 @@ interface XPReceiptViewProps {
     totalRest: string;
 }
 
-type SortField = 'date' | 'name' | 'amount';
-type SortOrder = 'asc' | 'desc';
+interface AggregatedEntry {
+    name: string;
+    amount: number;
+    count: number;
+    type: 'earn' | 'spend' | 'refund';
+}
 
 interface GroupedTransaction {
     category: string;
     label: string;
     icon: React.ReactNode;
     colorClass: string;
-    transactions: XPTransaction[];
+    entries: AggregatedEntry[];
     total: number;
 }
 
 export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ transactions, totalGain, totalSpent, totalRest }) => {
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-    const [sortField, setSortField] = useState<SortField>('date');
-    const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
-    const updateSort = (field: SortField) => {
-        if (sortField === field) {
-            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortOrder(field === 'date' ? 'desc' : 'asc');
+    const cleanDescription = (desc: string): string => {
+        // Nettoie les descriptions type "Amélioration : Compétence (1 -> 2)"
+        // On cherche ce qu'il y a entre ":" et "("
+        const colonIndex = desc.indexOf(':');
+        const parenIndex = desc.indexOf('(');
+
+        if (colonIndex !== -1) {
+            let name = desc.substring(colonIndex + 1);
+            if (parenIndex !== -1 && parenIndex > colonIndex) {
+                name = desc.substring(colonIndex + 1, parenIndex);
+            }
+            return name.trim();
         }
+        return desc.trim();
     };
 
     const getCategorizedData = useMemo(() => {
-        const categories: Record<string, GroupedTransaction> = {
-            sessions: { category: 'sessions', label: 'Sessions & Scénarios', icon: <BookOpen size={16} />, colorClass: 'text-emerald-700', transactions: [], total: 0 },
-            traits_gain: { category: 'traits_gain', label: 'Traits (Désavantages)', icon: <Database size={16} />, colorClass: 'text-amber-600', transactions: [], total: 0 },
-            other_gain: { category: 'other_gain', label: 'Création & Autres Gains', icon: <Sparkles size={16} />, colorClass: 'text-indigo-600', transactions: [], total: 0 },
-            refunds: { category: 'refunds', label: 'Remboursements', icon: <RotateCcw size={16} />, colorClass: 'text-blue-600', transactions: [], total: 0 },
+        const categories: Record<string, { label: string, icon: React.ReactNode, colorClass: string, raw: Record<string, AggregatedEntry>, total: number }> = {
+            sessions: { label: 'Sessions & Scénarios', icon: <BookOpen size={16} />, colorClass: 'text-emerald-700', raw: {}, total: 0 },
+            traits_gain: { label: 'Traits (Désavantages)', icon: <Database size={16} />, colorClass: 'text-amber-600', raw: {}, total: 0 },
+            other_gain: { label: 'Création & Autres Gains', icon: <Sparkles size={16} />, colorClass: 'text-indigo-600', raw: {}, total: 0 },
+            refunds: { label: 'Remboursements', icon: <RotateCcw size={16} />, colorClass: 'text-blue-600', raw: {}, total: 0 },
 
-            attributes: { category: 'attributes', label: 'Attributs', icon: <User size={16} />, colorClass: 'text-amber-600', transactions: [], total: 0 },
-            skills: { category: 'skills', label: 'Compétences', icon: <Activity size={16} />, colorClass: 'text-rose-600', transactions: [], total: 0 },
-            traits_spend: { category: 'traits_spend', label: 'Traits (Avantages)', icon: <Database size={16} />, colorClass: 'text-purple-600', transactions: [], total: 0 },
-            counters: { category: 'counters', label: 'Compteurs', icon: <Maximize2 size={16} />, colorClass: 'text-cyan-600', transactions: [], total: 0 },
+            attributes: { label: 'Attributs', icon: <User size={16} />, colorClass: 'text-amber-600', raw: {}, total: 0 },
+            skills: { label: 'Compétences', icon: <Activity size={16} />, colorClass: 'text-rose-600', raw: {}, total: 0 },
+            traits_spend: { label: 'Traits (Avantages)', icon: <Database size={16} />, colorClass: 'text-purple-600', raw: {}, total: 0 },
+            counters: { label: 'Compteurs', icon: <Maximize2 size={16} />, colorClass: 'text-cyan-600', raw: {}, total: 0 },
         };
 
         transactions.forEach(t => {
+            let catKey = 'skills';
             if (t.type === 'earn') {
-                if (t.source === 'Session' || t.source === 'Scénario') {
-                    categories.sessions.transactions.push(t);
-                    categories.sessions.total += t.amount;
-                } else if (t.description.toLowerCase().includes('trait') || t.description.toLowerCase().includes('désavantage')) {
-                    categories.traits_gain.transactions.push(t);
-                    categories.traits_gain.total += t.amount;
-                } else {
-                    categories.other_gain.transactions.push(t);
-                    categories.other_gain.total += t.amount;
-                }
+                if (t.source === 'Session' || t.source === 'Scénario') catKey = 'sessions';
+                else if (t.description.toLowerCase().includes('trait') || t.description.toLowerCase().includes('désavantage')) catKey = 'traits_gain';
+                else catKey = 'other_gain';
             } else if (t.type === 'refund') {
-                categories.refunds.transactions.push(t);
-                categories.refunds.total += t.amount;
+                catKey = 'refunds';
             } else if (t.type === 'spend') {
                 const desc = t.description.toLowerCase();
-                if (desc.includes('attribut')) {
-                    categories.attributes.transactions.push(t);
-                    categories.attributes.total += t.amount;
-                } else if (desc.includes('trait') || desc.includes('avantage')) {
-                    categories.traits_spend.transactions.push(t);
-                    categories.traits_spend.total += t.amount;
-                } else if (desc.includes('compteur') || desc.includes('volonté') || desc.includes('confiance')) {
-                    categories.counters.transactions.push(t);
-                    categories.counters.total += t.amount;
-                } else {
-                    // Default to skills
-                    categories.skills.transactions.push(t);
-                    categories.skills.total += t.amount;
-                }
+                if (desc.includes('attribut')) catKey = 'attributes';
+                else if (desc.includes('trait') || desc.includes('avantage')) catKey = 'traits_spend';
+                else if (desc.includes('compteur') || desc.includes('volonté') || desc.includes('confiance')) catKey = 'counters';
             }
+
+            const name = cleanDescription(t.description);
+            const cat = categories[catKey];
+
+            if (!cat.raw[name]) {
+                cat.raw[name] = { name, amount: 0, count: 0, type: t.type };
+            }
+            cat.raw[name].amount += t.amount;
+            cat.raw[name].count += 1;
+            cat.total += t.amount;
         });
 
-        const gains = [categories.sessions, categories.traits_gain, categories.other_gain, categories.refunds].filter(c => c.total > 0 || c.transactions.length > 0);
-        const spends = [categories.attributes, categories.skills, categories.traits_spend, categories.counters].filter(c => c.total > 0 || c.transactions.length > 0);
+        const finalize = (key: string): GroupedTransaction => {
+            const cat = categories[key];
+            const entries = Object.values(cat.raw).sort((a, b) => b.amount - a.amount);
+            return {
+                category: key,
+                label: cat.label,
+                icon: cat.icon,
+                colorClass: cat.colorClass,
+                entries,
+                total: cat.total
+            };
+        };
+
+        const gains = ['sessions', 'traits_gain', 'other_gain', 'refunds'].map(finalize).filter(c => c.total > 0 || c.entries.length > 0);
+        const spends = ['attributes', 'skills', 'traits_spend', 'counters'].map(finalize).filter(c => c.total > 0 || c.entries.length > 0);
 
         return { gains, spends };
     }, [transactions]);
 
     const renderTooltipContent = (group: GroupedTransaction) => {
-        const recent = [...group.transactions].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5);
+        const topEntries = [...group.entries].slice(0, 5);
         return (
             <div className="p-2 min-w-64 max-w-sm">
-                <div className="font-bold border-b border-stone-600 pb-1 mb-2 text-stone-200">{group.label} (Dernières entrées)</div>
-                {recent.length === 0 ? <div className="text-stone-400 italic text-sm">Aucune transaction</div> : null}
+                <div className="font-bold border-b border-stone-600 pb-1 mb-2 text-stone-200">{group.label} (Top Investissements)</div>
+                {topEntries.length === 0 ? <div className="text-stone-400 italic text-sm">Aucune donnée</div> : null}
                 <ul className="space-y-1.5 text-sm">
-                    {recent.map(t => (
-                        <li key={t.id} className="flex justify-between items-start gap-3 text-stone-300">
-                            <span className="shrink-0 text-stone-400 font-mono text-xs mt-0.5">{new Date(t.timestamp).toLocaleDateString()}</span>
-                            <span className="grow line-clamp-2" title={t.description}>{t.description}</span>
-                            <span className={`shrink-0 font-bold ${t.type === 'spend' ? 'text-red-400' : t.type === 'refund' ? 'text-blue-400' : 'text-green-400'}`}>
-                                {t.type === 'spend' ? '-' : '+'}{t.amount}
+                    {topEntries.map((e, i) => (
+                        <li key={i} className="flex justify-between items-start gap-3 text-stone-300">
+                            <span className="grow line-clamp-2" title={e.name}>
+                                {e.name} {e.count > 1 && <span className="text-[10px] text-stone-500 font-normal"> (x{e.count})</span>}
+                            </span>
+                            <span className={`shrink-0 font-bold ${e.type === 'spend' ? 'text-red-400' : e.type === 'refund' ? 'text-blue-400' : 'text-green-400'}`}>
+                                {e.type === 'spend' ? '-' : '+'}{e.amount}
                             </span>
                         </li>
                     ))}
                 </ul>
-                {group.transactions.length > 5 && (
+                {group.entries.length > 5 && (
                     <div className="mt-2 pt-1 border-t border-stone-700 text-xs text-stone-400 text-center italic">
-                        + {group.transactions.length - 5} autres entrées... (cliquez pour voir)
+                        + {group.entries.length - 5} autres types de dépenses...
                     </div>
                 )}
             </div>
@@ -117,34 +132,21 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ transactions, tota
     };
 
     const renderExpandedTable = (group: GroupedTransaction) => {
-        const sorted = [...group.transactions].sort((a, b) => {
-            let comparison = 0;
-            if (sortField === 'date') {
-                comparison = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
-            } else if (sortField === 'name') {
-                comparison = a.description.localeCompare(b.description);
-            } else if (sortField === 'amount') {
-                comparison = a.amount - b.amount;
-            }
-            return sortOrder === 'asc' ? comparison : -comparison;
-        });
-
-        const colHeaderClass = "cursor-pointer hover:text-indigo-900 transition-colors py-1.5 select-none text-left";
-
         return (
             <div className="bg-stone-50 border-t border-stone-200 px-4 py-3 text-[13px] animate-in slide-in-from-top-2 duration-200">
-                <div className="grid grid-cols-[100px_1fr_80px] gap-4 mb-2 border-b border-stone-300 font-bold text-stone-500 uppercase tracking-wider text-[11px]">
-                    <button type="button" className={colHeaderClass} onClick={() => updateSort('date')}>Date {sortField === 'date' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}</button>
-                    <button type="button" className={colHeaderClass} onClick={() => updateSort('name')}>Description {sortField === 'name' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}</button>
-                    <button type="button" className={`text-right ${colHeaderClass}`} onClick={() => updateSort('amount')}>Montant {sortField === 'amount' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}</button>
+                <div className="grid grid-cols-[1fr_80px] gap-4 mb-2 border-b border-stone-300 font-bold text-stone-500 uppercase tracking-wider text-[11px] py-1.5">
+                    <div className="text-left">Sujet de l'Investissement</div>
+                    <div className="text-right">Total XP</div>
                 </div>
                 <div className="max-h-64 overflow-y-auto pr-2 space-y-1">
-                    {sorted.map(t => (
-                        <div key={t.id} className="grid grid-cols-[100px_1fr_80px] gap-4 py-1.5 border-b border-stone-100 last:border-0 hover:bg-stone-100/80 transition-colors">
-                            <div className="text-stone-500 font-mono text-xs flex items-center">{new Date(t.timestamp).toLocaleDateString()}</div>
-                            <div className="text-stone-800 font-medium truncate" title={t.description}>{t.description}</div>
-                            <div className={`font-mono font-bold text-right flex items-center justify-end ${t.type === 'spend' ? 'text-red-600' : t.type === 'refund' ? 'text-blue-600' : 'text-green-600'}`}>
-                                {t.type === 'spend' ? '-' : '+'}{t.amount}
+                    {group.entries.map((e, i) => (
+                        <div key={i} className="grid grid-cols-[1fr_80px] gap-4 py-2 border-b border-stone-100 last:border-0 hover:bg-stone-100/80 transition-colors">
+                            <div className="text-stone-800 font-medium truncate flex items-center gap-2" title={e.name}>
+                                {e.name}
+                                {e.count > 1 && <span className="bg-stone-200 text-stone-500 px-1.5 py-0.5 rounded text-[10px] font-bold">x{e.count}</span>}
+                            </div>
+                            <div className={`font-mono font-bold text-right flex items-center justify-end ${e.type === 'spend' ? 'text-red-600' : e.type === 'refund' ? 'text-blue-600' : 'text-green-600'}`}>
+                                {e.type === 'spend' ? '-' : '+'}{e.amount}
                             </div>
                         </div>
                     ))}
@@ -177,7 +179,7 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ transactions, tota
                             </div>
                             <div>
                                 <div className="font-bold text-stone-800 text-sm">{group.label}</div>
-                                <div className="text-[11px] text-stone-500">{group.transactions.length} transaction{group.transactions.length > 1 ? 's' : ''}</div>
+                                <div className="text-[11px] text-stone-500">{group.entries.length} élément{group.entries.length > 1 ? 's' : ''} distinct{group.entries.length > 1 ? 's' : ''}</div>
                             </div>
                         </div>
 

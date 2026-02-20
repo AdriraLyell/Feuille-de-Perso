@@ -273,6 +273,7 @@ export const getInitialCharacterData = (): CharacterSheetData => {
       isGlobal: true
     })),
     xpLogs: [],
+    xpTransactions: [],
     appLogs: [],
     campaignNotes: [],
     partyNotes: {

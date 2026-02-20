@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.46",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Nettoyage final du journal des modifications et validation de la structure JSON."
+    },
+    {
         "version": "2.56.45",
         "date": "2026-02-19",
         "type": "fix",
@@ -845,16 +851,6 @@
             "✨ UX : Ajout d'infobulles dynamiques listant les variantes au survol de l'icône dans la bibliothèque",
             "📚 Bibliothèques : Implémentation pour les Traits, Compétences et Arrière-plans",
             "🛡️ Stabilité : Gestion du repli (fallback) vers le titre classique si aucune variante n'est définie"
-        ]
-    },
-    {
-        "version": "2.49.37",
-        "date": "2026-02-15",
-        "type": "refactor",
-        "changes": [
-            "🛠️ Refactoring : Modularisation de RuleCalculationsService.ts",
-            "📏 Code Health : Extraction des calculs d'XP (xpCalculator.ts) et de Tarot (cardCalculator.ts)",
-            "🏗️ Architecture : Simplification du service central vers un pattern Façade"
         ]
     }
 ]

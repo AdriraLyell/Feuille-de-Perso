@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.37] - 2026-02-15 [REFACTOR]
+
+- 🛠️ Refactoring : Modularisation de RuleCalculationsService.ts
+- 📏 Code Health : Extraction des calculs d'XP (xpCalculator.ts) et de Tarot (cardCalculator.ts)
+- 🏗️ Architecture : Simplification du service central vers un pattern Façade
+
 ## [2.49.36] - 2026-02-15 [FIX]
 
 - 🐛 Fix : Correction d'un plantage dans le ColumnarEditor
