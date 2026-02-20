@@ -1,12 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { DotEntry, SkillCategoryKey, SuggestionEntry } from '../types';
-import { normalizeString } from '../utils/stringUtils';
 import { calculateCardValue } from '../utils/mechanics';
 import { canIncreaseMysticSkill, canLearnNewMysticSkill } from '../utils/mysticUtils';
 
 // Imports des sous-composants refactorisés
 import { AttributeBlock } from './sheet/AttributeBlock';
-import { SkillBlock } from './sheet/SkillBlock';
 import { CombatSection } from './sheet/CombatSection';
 import { CountersSection } from './sheet/CountersSection';
 import SheetHeader from './sheet/SheetHeader';
@@ -27,7 +24,7 @@ import { useVariableSkills } from '../hooks/sheet/useVariableSkills';
 
 import ThematicModal from './ui/ThematicModal';
 import VariantSelectionModal from './ui/VariantSelectionModal';
-import { Layers, Save, PencilLine, Check } from 'lucide-react';
+import { PencilLine, Check } from 'lucide-react';
 
 interface Props {
     isLandscape?: boolean;
@@ -35,7 +32,7 @@ interface Props {
 
 const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
     const data = useCharacterData();
-    const { updateData: onChange, addLog: onAddLog } = useCharacterActions();
+    const { updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacterActions();
 
     const {
         isEditMode,
@@ -87,7 +84,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         updateCombatWeapon,
         updateArmor,
         updateCounter
-    } = useCharacterSheetActions(data, onChange, onAddLog, rules);
+    } = useCharacterSheetActions(data, onChange, onAddLog, recordXPTransaction, rules);
 
     const {
         handleDefineVariant,

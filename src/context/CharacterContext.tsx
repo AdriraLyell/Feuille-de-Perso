@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
-import { CharacterSheetData, LogEntry } from '../types';
+import { CharacterSheetData, LogEntry, XPTransaction } from '../types';
 import { getInitialCharacterData, INITIAL_DATA } from '../data/initialState';
 import { migrateData } from '../utils/migrations';
 import { calculateExperienceResults } from '../utils/mechanics';
@@ -26,6 +26,7 @@ interface CharacterActionsContextType {
     resetData: () => void;
     importData: (newData: CharacterSheetData) => void;
     sync: (mode?: 'manual' | 'auto') => Promise<void>;
+    recordXPTransaction: (transaction: Omit<XPTransaction, 'id' | 'timestamp'>) => void;
 }
 
 const CharacterStateContext = createContext<CharacterStateContextType | undefined>(undefined);
@@ -156,6 +157,20 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
             };
 
             return { ...prev, appLogs: [newLog, ...logs] };
+        });
+    }, []);
+
+    const recordXPTransaction = useCallback((transaction: Omit<XPTransaction, 'id' | 'timestamp'>) => {
+        setData(prev => {
+            const newTransaction: XPTransaction = {
+                ...transaction,
+                id: Math.random().toString(36).substr(2, 9),
+                timestamp: new Date().toISOString()
+            };
+            return {
+                ...prev,
+                xpTransactions: [newTransaction, ...(prev.xpTransactions || [])]
+            };
         });
     }, []);
 
@@ -403,8 +418,9 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         addLog,
         resetData,
         importData,
-        sync
-    }), [updateData, addLog, resetData, importData, sync]);
+        sync,
+        recordXPTransaction
+    }), [updateData, addLog, resetData, importData, sync, recordXPTransaction]);
 
     return (
         <CharacterStateContext.Provider value={stateValue}>

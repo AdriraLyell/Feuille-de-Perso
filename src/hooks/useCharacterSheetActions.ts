@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { DotEntry, SuggestionEntry } from '../types';
+import { DotEntry, SuggestionEntry, XPTransaction } from '../types';
 import { normalizeString } from '../utils/stringUtils';
 import { generateId } from '../utils/factories';
 import { RulesData } from '../types/rules';
@@ -23,6 +23,7 @@ export const useCharacterSheetActions = (
     data: CharacterSheetData,
     onChange: (update: (prev: CharacterSheetData) => CharacterSheetData) => void,
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', deduplicationId?: string) => void,
+    recordXPTransaction: (transaction: Omit<XPTransaction, 'id' | 'timestamp'>) => void,
     rules: RulesData | null
 ) => {
 
@@ -41,6 +42,37 @@ export const useCharacterSheetActions = (
             const behavior = catDef?.behavior;
             const isBaseSkill = !behavior || behavior === 'Compétence' || behavior === 'Secondaire' || behavior === 'Arrière-plan';
 
+            const itemToUpdate = list.find(item => item.id === id);
+            if (!itemToUpdate) return prev;
+
+            // Recalculate cost if it's an XP purchase (not creation mode)
+            if (!isCreationMode && itemToUpdate.value !== value) {
+                const multiplier = catDef?.costConfig?.factor ?? 1.0;
+                const isTriangular = catDef?.costConfig?.type === 'triangular';
+                const isUpgrade = value > itemToUpdate.value;
+
+                // Helper to calculate XP difference
+                const triangular = (n: number) => (n * (n + 1)) / 2;
+                const getXPCost = (curr: number, creat: number) => {
+                    if (curr <= creat) return 0;
+                    return isTriangular ? (triangular(curr) - triangular(creat)) * multiplier : (curr - creat) * multiplier;
+                };
+
+                const oldCost = getXPCost(itemToUpdate.value, itemToUpdate.creationValue || 0);
+                const newCost = getXPCost(value, itemToUpdate.creationValue || 0);
+                const diff = Math.abs(newCost - oldCost);
+
+                if (diff !== 0) {
+                    recordXPTransaction({
+                        type: isUpgrade ? 'spend' : 'refund',
+                        description: `${isUpgrade ? 'Amélioration' : 'Réduction'} : ${itemToUpdate.name} (${itemToUpdate.value} → ${value})`,
+                        amount: diff,
+                        source: 'XP Libre',
+                        relatedId: id
+                    });
+                }
+            }
+
             const newList = list.map(item => {
                 if (item.id !== id) return item;
                 if (isCreationMode && isBaseSkill) {
@@ -49,7 +81,7 @@ export const useCharacterSheetActions = (
                 return { ...item, value };
             });
 
-            const itemName = list.find(item => item.id === id)?.name || 'Compétence';
+            const itemName = itemToUpdate.name || 'Compétence';
             onAddLog(`Modification ${String(itemName)} : ${value}`, 'info', 'sheet', `dot_${String(id)}`);
 
             const updatedState = {
@@ -166,7 +198,7 @@ export const useCharacterSheetActions = (
             const numValue = parseInt(value) || 0;
             const isCreationMode = prev.creationConfig && prev.creationConfig.active;
 
-            const updateInList = <T extends { id: string; name?: string;[key: string]: any }>(list: T[]) => {
+            const updateInList = <T extends { id: string; name?: string; val1?: string; val2?: string; val3?: string;[key: string]: any }>(list: T[]) => {
                 const idx = list.findIndex(item => item.id === id);
                 if (idx === -1) return null;
                 const newList = [...list];
@@ -175,6 +207,23 @@ export const useCharacterSheetActions = (
                 // Garde pour val1 hors mode création
                 if (field === 'val1' && !isCreationMode) {
                     return null;
+                }
+
+                if (!isCreationMode && field === 'val2' && item.val2 !== value) {
+                    const oldVal = parseInt(item.val2 || "0") || 0;
+                    const newVal = numValue;
+                    const diff = Math.abs(newVal - oldVal);
+                    const costPerPoint = prev.xpCosts?.attributeFactor ?? 6;
+
+                    if (diff !== 0) {
+                        recordXPTransaction({
+                            type: newVal > oldVal ? 'spend' : 'refund',
+                            description: `${newVal > oldVal ? 'Augmentation' : 'Réduction'} Attribut : ${item.name} (+${diff})`,
+                            amount: diff * costPerPoint,
+                            source: 'XP Libre',
+                            relatedId: id
+                        });
+                    }
                 }
 
                 const creationKey = `creation${field.charAt(0).toUpperCase() + field.slice(1)}`;
@@ -259,6 +308,19 @@ export const useCharacterSheetActions = (
 
                 const newItem = { ...current };
                 if (field === 'value') {
+                    if (!isCreationMode && current.value !== value) {
+                        const isUpgrade = value > current.value;
+                        const diff = Math.abs(value - current.value);
+                        if (xpCost > 0 && diff !== 0) {
+                            recordXPTransaction({
+                                type: isUpgrade ? 'spend' : 'refund',
+                                description: `${isUpgrade ? 'Augmentation' : 'Réduction'} Compteur : ${displayName}`,
+                                amount: diff * xpCost,
+                                source: 'XP Libre',
+                                relatedId: id
+                            });
+                        }
+                    }
                     newItem.value = value;
                     if ((newItem.current || 0) > value) newItem.current = value;
                 } else {

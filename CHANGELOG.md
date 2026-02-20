@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.35] - 2026-02-15 [REFACTOR]
+
+- 🛠️ Refactoring : Simplification de CampaignService.ts
+- 📏 Code Health : Extraction de la logique de réconciliation des règles dans campaignReconciler.ts
+- 🏗️ Architecture : Amélioration de la séparation des préoccupations entre les services de base de données et la logique métier
+
 ## [2.49.34] - 2026-02-15 [REFACTOR]
 
 - 🛠️ Refactoring : Éclatement du hook useAttributeEditor en modules spécialisés

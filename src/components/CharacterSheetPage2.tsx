@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { CharacterSheetData, TraitEntry, LibraryEntry, LibrarySkillEntry } from '../types';
-import { BookOpen, X, Edit, Trash2, Check, CheckSquare } from 'lucide-react';
+import { CharacterSheetData, TraitEntry, LibraryEntry } from '../types';
+import { BookOpen, X } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import { useCharacter } from '../context/CharacterContext';
 
@@ -23,14 +23,14 @@ interface Props {
 }
 
 const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
-    const { data, updateData: onChange, addLog: onAddLog } = useCharacter();
+    const { data, updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacter();
     const { rules } = useRules();
 
     const {
         multiSelectTarget, setMultiSelectTarget,
         removeTrait,
         handleMultiAdd
-    } = useTraitEditor(data, rules, onChange, onAddLog);
+    } = useTraitEditor(data, rules, onChange, onAddLog, recordXPTransaction);
 
     const {
         updateReputationEntry,
@@ -189,8 +189,41 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         if (!editingTrait) return;
 
         const { type, index } = editingTrait;
+        const oldTrait = data.page2[type][index];
         const newList = [...data.page2[type]];
         newList[index] = updatedTrait;
+
+        // Log XP if changed and post-creation
+        if (updatedTrait.isPostCreation && updatedTrait.value !== oldTrait.value) {
+            const oldVal = parseInt(oldTrait.value) || 0;
+            const newVal = parseInt(updatedTrait.value) || 0;
+            const traitCostFactor = rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
+            const diff = Math.abs(newVal - oldVal);
+
+            if (diff !== 0) {
+                recordXPTransaction({
+                    type: newVal > oldVal ? 'spend' : 'refund',
+                    description: `Modification Trait : ${updatedTrait.name} (${oldVal} → ${newVal})`,
+                    amount: diff * traitCostFactor,
+                    source: 'XP Libre'
+                });
+            }
+        } else if (type === 'desavantages' && oldTrait.creationValue !== undefined && updatedTrait.value !== oldTrait.value) {
+            // Special case: rachat de désavantage
+            const oldVal = parseInt(oldTrait.value) || 0;
+            const newVal = parseInt(updatedTrait.value) || 0;
+            const traitCostFactor = rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
+            const diff = Math.abs(newVal - oldVal);
+
+            if (diff !== 0) {
+                recordXPTransaction({
+                    type: newVal < oldVal ? 'spend' : 'refund', // Réduire un désavantage coûte de l'XP
+                    description: `Réduction Désavantage : ${updatedTrait.name} (${oldVal} → ${newVal})`,
+                    amount: diff * traitCostFactor,
+                    source: 'XP Libre'
+                });
+            }
+        }
 
         onChange({ ...data, page2: { ...data.page2, [type]: newList } });
         onAddLog(`Modification ${type === 'avantages' ? 'Avantage' : 'Désavantage'} : ${updatedTrait.name}`, 'info', 'sheet');

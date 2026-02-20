@@ -18,6 +18,7 @@ import {
   LibraryBackgroundEntry,
   LibraryCounterEntry,
   XPEntry,
+  XPTransaction,
   LogEntry,
   SuggestionEntry
 } from './system';
@@ -96,6 +97,7 @@ export interface CharacterSheetData {
   counterLibrary?: LibraryCounterEntry[]; // Catalogue de compteurs
   mysticAbilities?: LibrarySkillEntry[] | null; // Categories of mystic powers (Martial Arts, Magic, etc.)
   xpLogs: XPEntry[];
+  xpTransactions: XPTransaction[];
   appLogs: LogEntry[];
   campaignNotes: CampaignNoteEntry[];
   bookDocument?: BookDocument;

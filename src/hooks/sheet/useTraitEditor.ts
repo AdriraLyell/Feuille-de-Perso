@@ -1,18 +1,37 @@
 import { useState } from 'react';
-import { CharacterSheetData, LibraryEntry } from '../../types';
+import { CharacterSheetData, LibraryEntry, XPTransaction } from '../../types';
 import { RulesData } from '../../types/rules';
 
 export const useTraitEditor = (
     data: CharacterSheetData,
     _rules: RulesData | null,
     onChange: (newData: CharacterSheetData) => void,
-    onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', detail?: string) => void
+    onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', detail?: string) => void,
+    recordXPTransaction?: (transaction: Omit<XPTransaction, 'id' | 'timestamp'>) => void
 ) => {
     const [multiSelectTarget, setMultiSelectTarget] = useState<'avantages' | 'desavantages' | null>(null);
 
     const removeTrait = (type: 'avantages' | 'desavantages', index: number) => {
         const list = [...data.page2[type]];
-        const removedName = list[index].name;
+        const removedItem = list[index];
+        const removedName = removedItem.name;
+
+        // Record refund if it was a paid trait
+        if (recordXPTransaction && removedItem.name.trim()) {
+            const isPostCreation = removedItem.isPostCreation;
+            const points = parseInt(removedItem.value) || 0;
+            const traitCostFactor = _rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
+
+            if (isPostCreation && points > 0) {
+                recordXPTransaction({
+                    type: 'refund',
+                    description: `Suppression Trait : ${removedName}`,
+                    amount: points * traitCostFactor,
+                    source: 'XP Libre'
+                });
+            }
+        }
+
         list[index] = { name: '', value: '', variant: '', description: '', tag: '', definitionId: undefined };
         onChange({ ...data, page2: { ...data.page2, [type]: list } });
         if (removedName.trim()) {
@@ -63,6 +82,16 @@ export const useTraitEditor = (
 
             if (isPostCreation && totalXPCost > 0) {
                 onAddLog(`Achat de ${addedCount} trait(s) pour ${totalXPCost} XP.`, 'success', 'sheet');
+
+                if (recordXPTransaction) {
+                    const descriptions = instances.map(i => i.entry.name).join(', ');
+                    recordXPTransaction({
+                        type: 'spend',
+                        description: `Achat Traits : ${descriptions}`,
+                        amount: totalXPCost,
+                        source: 'XP Libre'
+                    });
+                }
             } else {
                 onAddLog(`Ajout de ${addedCount} trait(s).`, 'success', 'sheet');
             }

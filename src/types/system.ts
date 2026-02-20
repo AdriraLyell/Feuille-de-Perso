@@ -69,6 +69,17 @@ export interface XPEntry {
   countsAsScenario?: boolean;
 }
 
+export interface XPTransaction {
+  id: string;
+  timestamp: string; // ISO string with time
+  type: 'earn' | 'spend' | 'refund';
+  description: string;
+  amount: number;
+  source?: string;
+  relatedId?: string;
+}
+
+
 export interface LibraryEntry {
   id: string;
   type: 'avantage' | 'desavantage' | 'vertu' | 'defaut'; // Renamed from vertu/defaut but kept for legacy

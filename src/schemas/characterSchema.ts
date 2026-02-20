@@ -152,6 +152,17 @@ export const XPEntrySchema = z.object({
     countsAsScenario: z.boolean().optional()
 });
 
+export const XPTransactionSchema = z.object({
+    id: z.string(),
+    timestamp: z.string(), // ISO string with time
+    type: z.enum(['earn', 'spend', 'refund']),
+    description: z.string(),
+    amount: z.number(),
+    source: z.string().optional(),
+    relatedId: z.string().optional()
+});
+
+
 export const LibraryEntrySchema = z.object({
     id: z.string(),
     type: z.enum(['avantage', 'desavantage', 'vertu', 'defaut']), // Added legacy support
@@ -335,6 +346,7 @@ export const CharacterSheetDataSchema = z.object({
     backgroundLibrary: z.array(LibrarySkillEntrySchema).optional().default([]),
     counterLibrary: z.array(LibraryCounterEntrySchema).optional().default([]),
     xpLogs: z.array(XPEntrySchema).optional().default([]),
+    xpTransactions: z.array(XPTransactionSchema).optional().default([]),
     appLogs: z.array(LogEntrySchema).optional().default([]),
     campaignNotes: z.array(CampaignNoteEntrySchema).optional().default([]),
     bookDocument: BookDocumentSchema.optional(),

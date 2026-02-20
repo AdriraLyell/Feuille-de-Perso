@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.44",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Correction de l'affichage du Journal des Modifications : les descriptions de versions s'affichent désormais correctement dans l'interface."
+    },
+    {
         "version": "2.56.43",
         "date": "2026-02-19",
         "type": "fix",
@@ -852,16 +858,6 @@
         "changes": [
             "🐛 Fix : Correction d'un plantage dans le ColumnarEditor",
             "🛡️ Stabilité : Ajout d'une garde contre les accès nuls lors de l'initialisation de l'éditeur Tiptap"
-        ]
-    },
-    {
-        "version": "2.49.35",
-        "date": "2026-02-15",
-        "type": "refactor",
-        "changes": [
-            "🛠️ Refactoring : Simplification de CampaignService.ts",
-            "📏 Code Health : Extraction de la logique de réconciliation des règles dans campaignReconciler.ts",
-            "🏗️ Architecture : Amélioration de la séparation des préoccupations entre les services de base de données et la logique métier"
         ]
     }
 ]
