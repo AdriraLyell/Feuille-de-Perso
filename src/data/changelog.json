@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.64",
+        "date": "2026-02-21",
+        "type": "refactor",
+        "description": "Calcul XP unifié : Suppression des écritures manuelles dans l'historique d'expérience pour les traits. Le moteur calcule désormais les dépenses d'XP de manière dynamique uniquement via l'état des traits (flag post-création et valeur initiale), évitant ainsi les doubles comptes."
+    },
+    {
         "version": "2.56.63",
         "date": "2026-02-21",
         "type": "style",
@@ -112,11 +118,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Correction de l'affichage du Journal des Modifications : les descriptions de versions s'affichent désormais correctement dans l'interface."
-    },
-    {
-        "version": "2.56.43",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Stabilisation technique : Correction des erreurs de syntaxe JSON, suppression des doublons d'attributs JSX et rétablissement des imports React dans la modale de synchronisation."
     }
 ]

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.43",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Stabilisation technique : Correction des erreurs de syntaxe JSON, suppression des doublons d'attributs JSX et rétablissement des imports React dans la modale de synchronisation."
+    },
+    {
         "version": "2.56.39",
         "date": "2026-02-19",
         "type": "feat",
@@ -856,16 +862,6 @@
             "🛠️ Refactoring : Simplification de CampaignService.ts",
             "📏 Code Health : Extraction de la logique de réconciliation des règles dans campaignReconciler.ts",
             "🏗️ Architecture : Amélioration de la séparation des préoccupations entre les services de base de données et la logique métier"
-        ]
-    },
-    {
-        "version": "2.49.34",
-        "date": "2026-02-15",
-        "type": "refactor",
-        "changes": [
-            "🛠️ Refactoring : Éclatement du hook useAttributeEditor en modules spécialisés",
-            "📏 Code Health : Extraction de useAttributeStructure (gestion des catégories) et useAttributePresets (gestion des préréglages)",
-            "🏗️ Architecture : Amélioration de la modularité et réduction de la dette technique sur l'administration des attributs"
         ]
     }
 ]

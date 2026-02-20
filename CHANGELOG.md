@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.34] - 2026-02-15 [REFACTOR]
+
+- 🛠️ Refactoring : Éclatement du hook useAttributeEditor en modules spécialisés
+- 📏 Code Health : Extraction de useAttributeStructure (gestion des catégories) et useAttributePresets (gestion des préréglages)
+- 🏗️ Architecture : Amélioration de la modularité et réduction de la dette technique sur l'administration des attributs
+
 ## [2.49.33] - 2026-02-15 [REFACTOR]
 
 - 🛠️ Refactoring : Extraction de la logique de AdminTraitLibrary dans le hook useAdminTraitLibrary

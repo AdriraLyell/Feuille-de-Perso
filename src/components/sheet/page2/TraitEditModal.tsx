@@ -56,23 +56,9 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
             creationValue: editedTrait.creationValue ?? editedTrait.value // Store initial if not set
         };
 
-        const xpLog = {
-            id: crypto.randomUUID(),
-            date: new Date().toLocaleDateString(),
-            scenario: isFixedCost ? `Rachat : ${editedTrait.name}` : `Réduction : ${editedTrait.name}`,
-            spendingLocation: "Traits",
-            amount: -xpCost
-        };
-
-        const newData = {
-            ...data,
-            xpLogs: [xpLog, ...(data.xpLogs || [])]
-        };
-
         // If the trait reaches 0, its effects are already ignored by xpCalculator check if value === 0
         setEditedTrait(updatedTrait);
         onSave(updatedTrait);
-        onChange(newData);
         onAddLog(`${isFixedCost ? 'Rachat' : 'Réduction'} du trait ${editedTrait.name} pour ${xpCost} XP.`, 'success', 'sheet');
     };
 

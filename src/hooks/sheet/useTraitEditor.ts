@@ -61,16 +61,7 @@ export const useTraitEditor = (
         if (addedCount > 0) {
             const newData = { ...data, page2: { ...data.page2, [multiSelectTarget]: currentList } };
 
-            // Si post-création, on ajoute une ligne dans l'historique d'XP
             if (isPostCreation && totalXPCost > 0) {
-                const xpLog = {
-                    id: crypto.randomUUID(),
-                    date: new Date().toLocaleDateString(),
-                    scenario: "Achat de traits",
-                    spendingLocation: multiSelectTarget === 'avantages' ? "Avantages" : "Désavantages",
-                    amount: -totalXPCost
-                };
-                newData.xpLogs = [xpLog, ...(data.xpLogs || [])];
                 onAddLog(`Achat de ${addedCount} trait(s) pour ${totalXPCost} XP.`, 'success', 'sheet');
             } else {
                 onAddLog(`Ajout de ${addedCount} trait(s).`, 'success', 'sheet');
