@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { XPTransaction } from '../../types';
 import { ArrowUpRight, ArrowDownRight, RotateCcw, ChevronDown, Activity, BookOpen, User, Maximize2, Sparkles, Database } from 'lucide-react';
 import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css'; // optional
+import 'tippy.js/dist/tippy.css';
+import { ExperienceBreakdown } from '../../types';
 
 interface XPReceiptViewProps {
-    transactions: XPTransaction[];
+    breakdown?: ExperienceBreakdown;
     totalGain: string;
     totalSpent: string;
     totalRest: string;
@@ -14,7 +14,7 @@ interface XPReceiptViewProps {
 interface AggregatedEntry {
     name: string;
     amount: number;
-    count: number;
+    count?: number;
     type: 'earn' | 'spend' | 'refund';
 }
 
@@ -27,82 +27,44 @@ interface GroupedTransaction {
     total: number;
 }
 
-export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ transactions, totalGain, totalSpent, totalRest }) => {
+export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGain, totalSpent, totalRest }) => {
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
-    const cleanDescription = (desc: string): string => {
-        // Nettoie les descriptions type "Amélioration : Compétence (1 -> 2)"
-        // On cherche ce qu'il y a entre ":" et "("
-        const colonIndex = desc.indexOf(':');
-        const parenIndex = desc.indexOf('(');
-
-        if (colonIndex !== -1) {
-            let name = desc.substring(colonIndex + 1);
-            if (parenIndex !== -1 && parenIndex > colonIndex) {
-                name = desc.substring(colonIndex + 1, parenIndex);
-            }
-            return name.trim();
-        }
-        return desc.trim();
-    };
-
     const getCategorizedData = useMemo(() => {
-        const categories: Record<string, { label: string, icon: React.ReactNode, colorClass: string, raw: Record<string, AggregatedEntry>, total: number }> = {
-            sessions: { label: 'Sessions & Scénarios', icon: <BookOpen size={16} />, colorClass: 'text-emerald-700', raw: {}, total: 0 },
-            traits_gain: { label: 'Traits (Désavantages)', icon: <Database size={16} />, colorClass: 'text-amber-600', raw: {}, total: 0 },
-            other_gain: { label: 'Création & Autres Gains', icon: <Sparkles size={16} />, colorClass: 'text-indigo-600', raw: {}, total: 0 },
-            refunds: { label: 'Remboursements', icon: <RotateCcw size={16} />, colorClass: 'text-blue-600', raw: {}, total: 0 },
+        if (!breakdown) return { gains: [], spends: [] };
 
-            attributes: { label: 'Attributs', icon: <User size={16} />, colorClass: 'text-amber-600', raw: {}, total: 0 },
-            skills: { label: 'Compétences', icon: <Activity size={16} />, colorClass: 'text-rose-600', raw: {}, total: 0 },
-            traits_spend: { label: 'Traits (Avantages)', icon: <Database size={16} />, colorClass: 'text-purple-600', raw: {}, total: 0 },
-            counters: { label: 'Compteurs', icon: <Maximize2 size={16} />, colorClass: 'text-cyan-600', raw: {}, total: 0 },
-        };
+        const finalize = (key: string, label: string, icon: React.ReactNode, colorClass: string, items: any[] = [], type: 'earn' | 'spend' | 'refund'): GroupedTransaction => {
+            const entries: AggregatedEntry[] = items.map(item => ({
+                name: item.name,
+                amount: Math.abs(item.amount),
+                count: item.count,
+                type
+            })).sort((a, b) => b.amount - a.amount);
 
-        transactions.forEach(t => {
-            let catKey = 'skills';
-            if (t.type === 'earn') {
-                if (t.source === 'Session' || t.source === 'Scénario') catKey = 'sessions';
-                else if (t.description.toLowerCase().includes('trait') || t.description.toLowerCase().includes('désavantage')) catKey = 'traits_gain';
-                else catKey = 'other_gain';
-            } else if (t.type === 'refund') {
-                catKey = 'refunds';
-            } else if (t.type === 'spend') {
-                const desc = t.description.toLowerCase();
-                if (desc.includes('attribut')) catKey = 'attributes';
-                else if (desc.includes('trait') || desc.includes('avantage')) catKey = 'traits_spend';
-                else if (desc.includes('compteur') || desc.includes('volonté') || desc.includes('confiance')) catKey = 'counters';
-            }
-
-            const name = cleanDescription(t.description);
-            const cat = categories[catKey];
-
-            if (!cat.raw[name]) {
-                cat.raw[name] = { name, amount: 0, count: 0, type: t.type };
-            }
-            cat.raw[name].amount += t.amount;
-            cat.raw[name].count += 1;
-            cat.total += t.amount;
-        });
-
-        const finalize = (key: string): GroupedTransaction => {
-            const cat = categories[key];
-            const entries = Object.values(cat.raw).sort((a, b) => b.amount - a.amount);
             return {
                 category: key,
-                label: cat.label,
-                icon: cat.icon,
-                colorClass: cat.colorClass,
+                label,
+                icon,
+                colorClass,
                 entries,
-                total: cat.total
+                total: entries.reduce((sum, e) => sum + e.amount, 0)
             };
         };
 
-        const gains = ['sessions', 'traits_gain', 'other_gain', 'refunds'].map(finalize).filter(c => c.total > 0 || c.entries.length > 0);
-        const spends = ['attributes', 'skills', 'traits_spend', 'counters'].map(finalize).filter(c => c.total > 0 || c.entries.length > 0);
+        const gains = [
+            finalize('gains', 'Sessions, Bonus & Création', <BookOpen size={16} />, 'text-emerald-700', breakdown.gains, 'earn')
+        ].filter(c => c.entries.length > 0);
+
+        const spends = [
+            finalize('attributes', 'Attributs', <User size={16} />, 'text-amber-600', breakdown.attributes, 'spend'),
+            finalize('skills', 'Compétences', <Activity size={16} />, 'text-rose-600', breakdown.skills, 'spend'),
+            finalize('traits_spend', 'Traits (Avantages & Rerolls)', <Database size={16} />, 'text-purple-600', breakdown.traits, 'spend'),
+            finalize('counters', 'Compteurs', <Maximize2 size={16} />, 'text-cyan-600', breakdown.counters, 'spend'),
+            finalize('mystic', 'Habilités Mystiques', <Sparkles size={16} />, 'text-indigo-600', breakdown.mystic || [], 'spend')
+        ].filter(c => c.entries.length > 0);
 
         return { gains, spends };
-    }, [transactions]);
+    }, [breakdown]);
 
     const renderTooltipContent = (group: GroupedTransaction) => {
         const topEntries = [...group.entries].slice(0, 5);
@@ -114,7 +76,7 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ transactions, tota
                     {topEntries.map((e, i) => (
                         <li key={i} className="flex justify-between items-start gap-3 text-stone-300">
                             <span className="grow line-clamp-2" title={e.name}>
-                                {e.name} {e.count > 1 && <span className="text-[10px] text-stone-500 font-normal"> (x{e.count})</span>}
+                                {e.name} {e.count !== undefined && e.count > 1 && <span className="text-[10px] text-stone-500 font-normal"> (x{e.count})</span>}
                             </span>
                             <span className={`shrink-0 font-bold ${e.type === 'spend' ? 'text-red-400' : e.type === 'refund' ? 'text-blue-400' : 'text-green-400'}`}>
                                 {e.type === 'spend' ? '-' : '+'}{e.amount}
@@ -143,7 +105,7 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ transactions, tota
                         <div key={i} className="grid grid-cols-[1fr_80px] gap-4 py-2 border-b border-stone-100 last:border-0 hover:bg-stone-100/80 transition-colors">
                             <div className="text-stone-800 font-medium truncate flex items-center gap-2" title={e.name}>
                                 {e.name}
-                                {e.count > 1 && <span className="bg-stone-200 text-stone-500 px-1.5 py-0.5 rounded text-[10px] font-bold">x{e.count}</span>}
+                                {e.count !== undefined && e.count > 1 && <span className="bg-stone-200 text-stone-500 px-1.5 py-0.5 rounded text-[10px] font-bold">x{e.count}</span>}
                             </div>
                             <div className={`font-mono font-bold text-right flex items-center justify-end ${e.type === 'spend' ? 'text-red-600' : e.type === 'refund' ? 'text-blue-600' : 'text-green-600'}`}>
                                 {e.type === 'spend' ? '-' : '+'}{e.amount}

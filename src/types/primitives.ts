@@ -85,4 +85,5 @@ export interface TraitEffect {
   value: number; // Montant XP ou Rang Max Gratuit
   method?: 'fixed' | 'per_scenario';
   target?: string; // Nom de la compétence ciblée (pour free_skill_rank)
+  source?: string; // Nom du trait d'origine (optionnel)
 }

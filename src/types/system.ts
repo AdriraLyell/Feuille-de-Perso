@@ -52,11 +52,28 @@ export interface ThemeConfig {
   };
 }
 
+export interface ExperienceBreakdownItem {
+  id?: string;
+  name: string;
+  amount: number;
+  count?: number;
+}
+
+export interface ExperienceBreakdown {
+  gains: ExperienceBreakdownItem[];
+  attributes: ExperienceBreakdownItem[];
+  skills: ExperienceBreakdownItem[];
+  traits: ExperienceBreakdownItem[];
+  counters: ExperienceBreakdownItem[];
+  mystic?: ExperienceBreakdownItem[];
+}
+
 export interface ExperienceData {
   gain: string;
   gainTooltip?: string;
   spent: string;
   rest: string;
+  breakdown?: ExperienceBreakdown;
 }
 
 export interface XPEntry {

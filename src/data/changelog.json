@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.69",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Vue Distribution d'XP finale : Le bilan d'XP est désormais calculé en temps réel à partir de l'état actuel de la fiche personnage (Distribution d'état). Cette approche garantit une fiabilité totale en affichant l'investissement exact pour chaque compétence, attribut, trait et compteur, sans dépendre de l'intégrité de l'historique brut des transactions."
+    },
+    {
         "version": "2.56.68",
         "date": "2026-02-21",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-19",
         "type": "refactor",
         "description": "Refonte du 'Hub Cloud' : Fusion de la synchronisation (Push) et de la bibliothèque (Pull) dans une interface unifiée via le bouton Synchro. Le 'Grimoire de Sauvegarde' est désormais dédié exclusivement aux opérations locales (JSON)."
-    },
-    {
-        "version": "2.56.47",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Ajout du bandeau 'Oracle' et d'une surbrillance pour guider la configuration des Habilités Mystiques en mode création."
     }
 ]

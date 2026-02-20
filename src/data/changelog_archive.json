@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.47",
+        "date": "2026-02-19",
+        "type": "feat",
+        "description": "Ajout du bandeau 'Oracle' et d'une surbrillance pour guider la configuration des Habilités Mystiques en mode création."
+    },
+    {
         "version": "2.56.46",
         "date": "2026-02-19",
         "type": "fix",
@@ -841,16 +847,6 @@
         "changes": [
             "🐛 Fix : Correction d'une violation des règles des Hooks React (useState dans un .map)",
             "🏗️ Refactoring : Extraction des items de bibliothèque en sous-composants pour stabiliser le rendu"
-        ]
-    },
-    {
-        "version": "2.49.38",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "✨ UX : Ajout d'infobulles dynamiques listant les variantes au survol de l'icône dans la bibliothèque",
-            "📚 Bibliothèques : Implémentation pour les Traits, Compétences et Arrière-plans",
-            "🛡️ Stabilité : Gestion du repli (fallback) vers le titre classique si aucune variante n'est définie"
         ]
     }
 ]

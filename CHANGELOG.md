@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.38] - 2026-02-15 [FEAT]
+
+- ✨ UX : Ajout d'infobulles dynamiques listant les variantes au survol de l'icône dans la bibliothèque
+- 📚 Bibliothèques : Implémentation pour les Traits, Compétences et Arrière-plans
+- 🛡️ Stabilité : Gestion du repli (fallback) vers le titre classique si aucune variante n'est définie
+
 ## [2.49.37] - 2026-02-15 [REFACTOR]
 
 - 🛠️ Refactoring : Modularisation de RuleCalculationsService.ts

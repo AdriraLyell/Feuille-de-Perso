@@ -1,6 +1,7 @@
 import {
     CharacterSheetData,
     ExperienceData,
+    ExperienceBreakdownItem,
     TraitEffect,
     DotEntry,
     RulesData
@@ -61,9 +62,11 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
     const xpEffects = activeEffects.filter(e => e.type === 'xp_bonus');
 
     // Bonus Fixes
-    const fixedBonus = xpEffects
-        .filter(e => !e.method || e.method === 'fixed')
-        .reduce((sum, e) => sum + e.value, 0);
+    const fixedBonusBreakdown: ExperienceBreakdownItem[] = xpEffects
+        .filter(e => !e.method || e.method === 'fixed' && e.value !== 0)
+        .map(e => ({ name: `Bonus : ${e.source || 'Trait'}`, amount: e.value }));
+
+    const fixedBonus = fixedBonusBreakdown.reduce((sum, e) => sum + e.amount, 0);
 
     // Bonus par Scénario
     const scenarioLogs = (data.xpLogs || []).filter(log =>
@@ -73,43 +76,44 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
     );
     const scenarioCount = scenarioLogs.length;
 
-    const perScenarioBonus = xpEffects
-        .filter(e => e.method === 'per_scenario')
-        .reduce((sum, e) => sum + (e.value * scenarioCount), 0);
+    const scenarioBonusBreakdown: ExperienceBreakdownItem[] = xpEffects
+        .filter(e => e.method === 'per_scenario' && e.value !== 0)
+        .map(e => ({
+            name: `Bonus : ${e.source || 'Apprentissage'} (${scenarioCount} sessions)`,
+            amount: e.value * scenarioCount
+        }));
+
+    const perScenarioBonus = scenarioBonusBreakdown.reduce((sum, e) => sum + e.amount, 0);
 
     const totalTraitXP = fixedBonus + perScenarioBonus;
-    if (totalTraitXP !== 0) {
-        const sessionNames = scenarioLogs.map(l => l.scenario || `ID:${l.id.substring(0, 4)}`).join(', ');
-        logger.log(`[xpCalculator] Traits XP Bonus: ${totalTraitXP} (Fixed: ${fixedBonus}, PerScenario: ${perScenarioBonus}, Sessions: ${scenarioCount} [${sessionNames}])`);
-    }
 
-    // 2. Calcul de l'XP dépensée
-    let totalSpent = 0;
-    const handledCounters = new Set<string>();
+    // Gains de base (Log)
+    const baseGainsBreakdown: ExperienceBreakdownItem[] = (data.xpLogs || [])
+        .filter(entry => entry.amount !== 0)
+        .map(entry => ({
+            name: entry.scenario || (entry.date ? `Session ${entry.date}` : 'Gain divers'),
+            amount: entry.amount
+        }));
 
-    // A. Calcul des Compétences (Dynamique ou Legacy)
-    totalSpent += calculateSkillXP(data, rules, getFreeRankLimit, handledCounters);
-
-    // B. Compteurs (traitement des compteurs restant)
-    totalSpent += calculateCounterXP(data, rules, handledCounters);
-
-    // C. Attributs (Coût Linéaire)
-    totalSpent += calculateAttributeXP(data, getAttributeBonus);
-
-    // D. Traits (Avantages/Désavantages si coûtés en XP)
-    totalSpent += calculateTraitXP(data, rules);
-
-    // 3. Calcul du bilan final
-    const gainFromLogs = (data.xpLogs || []).reduce((sum, entry) => sum + (entry.amount || 0), 0);
+    const gainFromLogs = baseGainsBreakdown.reduce((sum, e) => sum + e.amount, 0);
     const totalGain = gainFromLogs + totalTraitXP;
 
-    // Construction de l'affichage détaillé
+    // 2. Calcul de l'XP dépensée
+    const handledCounters = new Set<string>();
+
+    const skillResult = calculateSkillXP(data, rules, getFreeRankLimit, handledCounters);
+    const counterResult = calculateCounterXP(data, rules, handledCounters);
+    const attributeResult = calculateAttributeXP(data);
+    const traitResult = calculateTraitXP(data, rules);
+
+    const totalSpent = skillResult.total + counterResult.total + attributeResult.total + traitResult.total;
+
+    // 3. Construction du bilan final
     let gainDisplay = totalGain.toString();
     let tooltip = `Total : ${totalGain} XP\n\nBase (Historique) : ${gainFromLogs}`;
 
     if (totalTraitXP > 0) {
         gainDisplay += ` (+${totalTraitXP})`;
-
         if (fixedBonus > 0) tooltip += `\nBonus Fixe : +${fixedBonus}`;
         if (perScenarioBonus > 0) tooltip += `\nBonus Scénarios (${scenarioCount} sessions) : +${perScenarioBonus}`;
     }
@@ -118,7 +122,14 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
         gain: gainDisplay,
         gainTooltip: tooltip,
         spent: totalSpent.toString(),
-        rest: (totalGain - totalSpent).toString()
+        rest: (totalGain - totalSpent).toString(),
+        breakdown: {
+            gains: [...baseGainsBreakdown, ...fixedBonusBreakdown, ...scenarioBonusBreakdown],
+            attributes: attributeResult.breakdown,
+            skills: skillResult.breakdown,
+            traits: traitResult.breakdown,
+            counters: counterResult.breakdown
+        }
     };
 };
 
@@ -140,7 +151,7 @@ function getActiveTraitEffects(data: CharacterSheetData, rules?: RulesData): Tra
         // 1. Recherche Local
         const localEntry = data.library?.find(l => normalizeString(l.name) === normalizedName);
         if (localEntry && localEntry.effects && localEntry.effects.length > 0) {
-            localEntry.effects.forEach(e => activeEffects.push(e));
+            localEntry.effects.forEach(e => activeEffects.push({ ...e, source: localEntry.name }));
             return;
         }
 
@@ -149,7 +160,7 @@ function getActiveTraitEffects(data: CharacterSheetData, rules?: RulesData): Tra
         if (globalEntry && globalEntry.effects && globalEntry.effects.length > 0) {
             // Log pour debug
             // logger.log(`[xpCalculator] Using global effects for trait "${traitName}"`);
-            globalEntry.effects.forEach(e => activeEffects.push(e));
+            globalEntry.effects.forEach(e => activeEffects.push({ ...e, source: globalEntry.name }));
         }
     };
 
@@ -166,8 +177,9 @@ function calculateSkillXP(
     rules: RulesData | undefined,
     getFreeRankLimit: (name: string) => number,
     handledCounters: Set<string>
-): number {
+): { total: number, breakdown: ExperienceBreakdownItem[] } {
     let skillSpent = 0;
+    const breakdown: ExperienceBreakdownItem[] = [];
     const categories = rules?.definitions?.skillCategories;
 
     if (categories && categories.length > 0) {
@@ -184,6 +196,7 @@ function calculateSkillXP(
                 const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
 
                 let baseFactor = multiplier;
+                let cost = 0;
 
                 if (behavior === 'Arrière-plan') {
                     const baseCost = data.creationConfig?.backgroundCost ?? 2;
@@ -205,9 +218,14 @@ function calculateSkillXP(
 
                     baseFactor = baseCost * multiplier;
                     handledCounters.add(skill.id);
-                    skillSpent += getXPCost(skill.value, effectiveBase, baseFactor, false);
+                    cost = getXPCost(skill.value, effectiveBase, baseFactor, false);
                 } else {
-                    skillSpent += getXPCost(skill.value, effectiveCreationValue, baseFactor, isTriangular);
+                    cost = getXPCost(skill.value, effectiveCreationValue, baseFactor, isTriangular);
+                }
+
+                if (cost > 0) {
+                    skillSpent += cost;
+                    breakdown.push({ name: skill.name || skill.id, amount: -cost });
                 }
             });
         });
@@ -224,7 +242,11 @@ function calculateSkillXP(
                 list.forEach(skill => {
                     const freeLimit = getFreeRankLimit(skill.name);
                     const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
-                    skillSpent += getXPCost(skill.value, effectiveCreationValue, skillFactor, true);
+                    const cost = getXPCost(skill.value, effectiveCreationValue, skillFactor, true);
+                    if (cost > 0) {
+                        skillSpent += cost;
+                        breakdown.push({ name: skill.name || skill.id, amount: -cost });
+                    }
                 });
             }
         });
@@ -234,18 +256,26 @@ function calculateSkillXP(
             secondSkills.forEach(skill => {
                 const freeLimit = getFreeRankLimit(skill.name);
                 const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
-                skillSpent += getXPCost(skill.value, effectiveCreationValue, specFactor, true);
+                const cost = getXPCost(skill.value, effectiveCreationValue, specFactor, true);
+                if (cost > 0) {
+                    skillSpent += cost;
+                    breakdown.push({ name: skill.name || skill.id, amount: -cost });
+                }
             });
         }
 
         const backgroundSkills = data.skills.arrieres_plans || data.skills.Col_Comp_8;
         if (Array.isArray(backgroundSkills)) {
             backgroundSkills.forEach(skill => {
-                skillSpent += getXPCost(skill.value, skill.creationValue || 0, bgCostBase, false);
+                const cost = getXPCost(skill.value, skill.creationValue || 0, bgCostBase, false);
+                if (cost > 0) {
+                    skillSpent += cost;
+                    breakdown.push({ name: skill.name || skill.id, amount: -cost });
+                }
             });
         }
     }
-    return skillSpent;
+    return { total: skillSpent, breakdown };
 }
 
 /**
@@ -255,9 +285,10 @@ function calculateCounterXP(
     data: CharacterSheetData,
     rules: RulesData | undefined,
     handledCounters: Set<string>
-): number {
+): { total: number, breakdown: ExperienceBreakdownItem[] } {
     let counterSpent = 0;
-    if (!data.counters) return 0;
+    const breakdown: ExperienceBreakdownItem[] = [];
+    if (!data.counters) return { total: 0, breakdown: [] };
 
     const rulesCounters = rules?.definitions?.counters || {};
     const libCounters = rules?.libraries?.counters || [];
@@ -286,7 +317,11 @@ function calculateCounterXP(
                 const cat = categories.find(c => c.id === catId);
                 if (cat) multiplier = cat.costConfig?.factor ?? 1.0;
             }
-            counterSpent += getXPCost(counterEntry.value, counterEntry.creationValue || 0, xpCost * multiplier, false);
+            const cost = getXPCost(counterEntry.value, counterEntry.creationValue || 0, xpCost * multiplier, false);
+            if (cost > 0) {
+                counterSpent += cost;
+                breakdown.push({ name: counterEntry.name, amount: -cost });
+            }
         }
     });
 
@@ -302,22 +337,26 @@ function calculateCounterXP(
             if (xpCost > 0) {
                 const modelDefault = libDef?.defaultValue != null ? libDef.defaultValue : (sysDef?.defaultValue ?? 0);
                 const creationValue = Math.max(counter.creationValue || 0, modelDefault);
-                counterSpent += getXPCost(counter.value, creationValue, xpCost, false);
+                const cost = getXPCost(counter.value, creationValue, xpCost, false);
+                if (cost > 0) {
+                    counterSpent += cost;
+                    breakdown.push({ name: counter.name, amount: -cost });
+                }
             }
         });
     }
-    return counterSpent;
+    return { total: counterSpent, breakdown };
 }
 
 /**
  * Calcule l'XP dépensée dans les attributs
  */
 function calculateAttributeXP(
-    data: CharacterSheetData,
-    getAttributeBonus: (name: string) => number
-): number {
+    data: CharacterSheetData
+): { total: number, breakdown: ExperienceBreakdownItem[] } {
     let attrSpent = 0;
-    if (!data.attributeSettings) return 0;
+    const breakdown: ExperienceBreakdownItem[] = [];
+    if (!data.attributeSettings) return { total: 0, breakdown: [] };
 
     data.attributeSettings.forEach(cat => {
         const attrs = data.attributes[cat.id];
@@ -330,21 +369,24 @@ function calculateAttributeXP(
                 const val2 = parseInt(attr.val2) || 0;
                 if (val2 > 0) {
                     const costPerPoint = data.xpCosts?.attributeFactor ?? 6;
-                    attrSpent += val2 * costPerPoint;
+                    const cost = val2 * costPerPoint;
+                    attrSpent += cost;
+                    breakdown.push({ name: attr.name, amount: -cost, count: val2 });
                 }
             });
         }
     });
-    return attrSpent;
+    return { total: attrSpent, breakdown };
 }
 
 /**
  * Calcule l'XP dépensée dans les traits (Avantages / Désavantages)
  */
-function calculateTraitXP(data: CharacterSheetData, rules: RulesData | undefined): number {
+function calculateTraitXP(data: CharacterSheetData, rules: RulesData | undefined): { total: number, breakdown: ExperienceBreakdownItem[] } {
     const traitCostFactor = rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
+    const breakdown: ExperienceBreakdownItem[] = [];
 
-    if (data.creationConfig?.active) return 0;
+    if (data.creationConfig?.active) return { total: 0, breakdown: [] };
 
     let traitSpent = 0;
 
@@ -352,7 +394,9 @@ function calculateTraitXP(data: CharacterSheetData, rules: RulesData | undefined
     data.page2.avantages?.forEach(trait => {
         if (trait.isPostCreation) {
             const val = parseInt(trait.value) || 0;
-            traitSpent += val * traitCostFactor;
+            const cost = val * traitCostFactor;
+            traitSpent += cost;
+            breakdown.push({ name: trait.name, amount: -cost });
         }
     });
 
@@ -362,9 +406,13 @@ function calculateTraitXP(data: CharacterSheetData, rules: RulesData | undefined
             const currentVal = parseInt(trait.value) || 0;
             const creationVal = parseInt(trait.creationValue) || 0;
             const diff = Math.max(0, creationVal - currentVal);
-            traitSpent += diff * traitCostFactor;
+            if (diff > 0) {
+                const cost = diff * traitCostFactor;
+                traitSpent += cost;
+                breakdown.push({ name: `Rachat : ${trait.name}`, amount: -cost });
+            }
         }
     });
 
-    return traitSpent;
+    return { total: traitSpent, breakdown };
 }
