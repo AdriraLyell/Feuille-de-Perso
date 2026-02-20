@@ -1,5 +1,5 @@
-import React from 'react';
-import { Plus, Minus, GripVertical, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Minus, GripVertical, Trash2, Coins, BarChart3, TrendingUp } from 'lucide-react';
 import { SkillCategoryConfig, SkillBehavior } from '../../../types/rules';
 
 interface SkillCategoryCardProps {
@@ -37,10 +37,14 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
     onDrop,
     draggedItemInfo
 }) => {
+    const [showCostConfig, setShowCostConfig] = useState(false);
+
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = "move";
     };
+
+    const costConfig = categoryConfig.costConfig ?? { type: 'triangular', factor: 1 };
 
     return (
         <div
@@ -58,6 +62,13 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
                         placeholder="Label de la catégorie"
                     />
                     <div className="flex gap-1 shrink-0">
+                        <button
+                            onClick={() => setShowCostConfig(prev => !prev)}
+                            className={`p-1.5 rounded-sm transition-colors shadow-sm border ${showCostConfig ? 'bg-amber-950/40 text-amber-500 border-amber-500/40' : 'bg-stone-800 text-stone-500 border-stone-700 hover:text-amber-500 hover:border-amber-500/30'}`}
+                            title="Configurer le coût XP"
+                        >
+                            <Coins size={14} />
+                        </button>
                         <button
                             onClick={() => onAddSkill(id, true)}
                             className="bg-stone-800 text-stone-400 p-1.5 rounded-sm hover:bg-stone-700 hover:text-stone-200 transition-colors shadow-sm border border-stone-700"
@@ -99,6 +110,45 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
                         className="w-full bg-stone-950 border border-stone-700 rounded-sm p-1.5 text-[10px] text-stone-300 outline-none resize-none h-12 shadow-inner focus:border-amber-500 transition-colors placeholder-stone-700"
                         placeholder="Texte de la bulle d'info..."
                     />
+                </div>
+
+                {/* Coût XP (collapsable) */}
+                <div
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${showCostConfig ? 'max-h-40 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}
+                >
+                    <div className="bg-stone-950/60 border border-stone-800 rounded-sm p-2 space-y-2">
+                        <div className="text-[9px] font-bold text-amber-500/70 uppercase tracking-widest flex items-center gap-1">
+                            <Coins size={10} /> Coût XP
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                            <div className="inline-flex bg-stone-900 p-0.5 rounded-sm gap-0.5 border border-stone-700">
+                                <button
+                                    onClick={() => onUpdateCategory({ costConfig: { ...costConfig, type: 'triangular' } })}
+                                    className={`px-2 py-1 rounded-sm text-[9px] font-bold transition-all flex items-center gap-1 ${costConfig.type === 'triangular' ? 'bg-stone-800 text-amber-500 ring-1 ring-amber-500/40' : 'text-stone-600 hover:text-stone-400'}`}
+                                    title="Somme triangulaire (1+2+3...)"
+                                >
+                                    <BarChart3 size={10} /> Triangulaire
+                                </button>
+                                <button
+                                    onClick={() => onUpdateCategory({ costConfig: { ...costConfig, type: 'linear' } })}
+                                    className={`px-2 py-1 rounded-sm text-[9px] font-bold transition-all flex items-center gap-1 ${costConfig.type === 'linear' ? 'bg-stone-800 text-emerald-500 ring-1 ring-emerald-500/40' : 'text-stone-600 hover:text-stone-400'}`}
+                                    title="Progression par palier fixe"
+                                >
+                                    <TrendingUp size={10} /> Linéaire
+                                </button>
+                            </div>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                                <span className="text-[9px] text-stone-600 font-bold">×</span>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    value={costConfig.factor}
+                                    onChange={(e) => onUpdateCategory({ costConfig: { ...costConfig, factor: parseFloat(e.target.value) || 0 } })}
+                                    className="w-14 p-1 border border-stone-700 rounded-sm text-center font-bold text-xs bg-stone-950 text-stone-300 focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500 outline-none transition-all"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

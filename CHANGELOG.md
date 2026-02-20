@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.49] - 2026-02-15 [FIX]
+
+- 🐛 Fix : Correction d'une erreur de référence sur ThematicModal dans la Master List des joueurs
+- 🛡️ Stabilité : Vérification des imports manquants suite à la mise à jour des signaux MJ
+
 ## [2.49.48] - 2026-02-15 [FEAT]
 
 - 🛡️ Synchronisation : Implémentation du '3-Way Hash Check' (Dirty Check) pour éviter d'écraser des modifications locales par mégarde

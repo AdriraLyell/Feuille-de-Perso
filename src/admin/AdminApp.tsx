@@ -5,7 +5,6 @@ import { RulesData } from '../types/rules';
 import AdminCreationEditor from './components/AdminCreationEditor';
 import AdminAttributesEditor from './components/AdminAttributesEditor';
 import AdminSkillsEditor from './components/AdminSkillsEditor';
-import AdminCostsEditor from './components/AdminCostsEditor';
 import ImportResultModal from './components/ImportResultModal';
 import ChangelogModal from '../components/ChangelogModal';
 import DeploymentMonitor from './components/DeploymentMonitor';
@@ -48,7 +47,7 @@ const AdminApp: React.FC = () => {
     } = useAdminRulesHandler();
 
     const [viewMode, setViewMode] = useState<'dashboard' | 'editor' | 'players'>('dashboard');
-    const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'costs' | 'libraries' | 'players'>('general');
+    const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'libraries' | 'players'>('general');
     const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters' | 'mystic'>('traits');
 
     const [showImportResult, setShowImportResult] = useState(false);
@@ -184,7 +183,6 @@ const AdminApp: React.FC = () => {
                         { id: 'general', label: 'Général & Création' },
                         { id: 'attributes', label: 'Attributs' },
                         { id: 'skills', label: 'Compétences' },
-                        { id: 'costs', label: 'Coûts & Limites' },
                         { id: 'libraries', label: <div className="flex items-center justify-center gap-2"><BookOpen size={16} /> Bibliothèques</div> },
                         { id: 'players', label: <div className="flex items-center justify-center gap-2"><Users size={16} /> Joueurs</div> }
                     ] as const).map(tab => (
@@ -210,7 +208,6 @@ const AdminApp: React.FC = () => {
                 )}
                 {activeTab === 'attributes' && <AdminAttributesEditor rules={rules} onUpdate={handleUpdateRules} />}
                 {activeTab === 'skills' && <AdminSkillsEditor rules={rules} onUpdate={handleUpdateRules} />}
-                {activeTab === 'costs' && <AdminCostsEditor rules={rules} onUpdate={handleUpdateRules} />}
                 {activeTab === 'libraries' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4">
                         <div className="flex gap-2 mb-6 bg-mystic-surface p-2 rounded-sm shadow-md border border-stone-700 w-fit mx-auto overflow-x-auto">

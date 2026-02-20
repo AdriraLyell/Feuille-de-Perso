@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.59",
+        "date": "2026-02-20",
+        "type": "fix",
+        "description": "Budget Création : Les traits (Avantages/Désavantages) sont désormais totalement gratuits en mode Points comme en mode Rangs, et n'impactent plus la Valeur Totale XP affichée dans le HUD."
+    },
+    {
         "version": "2.56.58",
         "date": "2026-02-20",
         "type": "fix",
@@ -795,15 +801,6 @@
             "🏛️ Admin : Restriction du signal de mise à jour MJ aux personnages liés à une campagne uniquement",
             "🧹 Clean : Retrait du bouton de mise à jour de la Master List globale pour éviter les actions hors contexte",
             "🛠️ Architecture : Ajout de la prop 'allowForceUpdate' au composant CharacterReadOnlyView pour un contrôle granulaire"
-        ]
-    },
-    {
-        "version": "2.49.49",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🐛 Fix : Correction d'une erreur de référence sur ThematicModal dans la Master List des joueurs",
-            "🛡️ Stabilité : Vérification des imports manquants suite à la mise à jour des signaux MJ"
         ]
     }
 ]

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.60.1",
+        "date": "2026-02-20",
+        "type": "refactor",
+        "description": "Admin : Déplacement des paramètres de coût XP (formule Triangulaire/Linéaire + multiplicateur) de l'onglet 'Coûts & Limites' vers une section collapsable dans chaque carte de catégorie de compétences. Suppression de l'onglet 'Coûts & Limites' devenu vide et du composant AdminCostsEditor."
+    },
+    {
         "version": "2.60.0",
         "date": "2026-02-21",
         "type": "refactor",
@@ -112,11 +118,5 @@
         "date": "2026-02-20",
         "type": "fix",
         "description": "Correction de la sauvegarde des compteurs : Les modifications (valeur max, coût XP) effectuées depuis la bibliothèque d'administration sont désormais correctement sauvegardées en base de données et appliquées aux fiches des joueurs."
-    },
-    {
-        "version": "2.56.59",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Budget Création : Les traits (Avantages/Désavantages) sont désormais totalement gratuits en mode Points comme en mode Rangs, et n'impactent plus la Valeur Totale XP affichée dans le HUD."
     }
 ]
