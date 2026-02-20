@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.29] - 2026-02-15 [FIX]
+
+- 🏛️ UI : Renommage de la sidebar 'Structure' en 'Chapitres' pour plus de clarté
+- 🐛 Fix : Correction du troncage des info-bulles (tooltips) dans la barre latérale en les déplaçant vers la gauche
+
 ## [2.49.28] - 2026-02-15 [FEAT]
 
 - 🖌️ Édition : Ajout d'une palette de surlignage 'Aquarelle' (5 couleurs immersives)

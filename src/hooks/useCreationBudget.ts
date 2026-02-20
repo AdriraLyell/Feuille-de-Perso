@@ -151,27 +151,8 @@ export function useCreationBudget(): CreationBudgetResult {
         });
 
         // Traits (Avantages & Désavantages)
-        const traitXPBase = rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
-        const calculateTraitsImpact = (list: any[]) => list.reduce((acc, item) => acc + (parseInt(item.value) || 0), 0);
-
-        const avantagesTotal = calculateTraitsImpact(data.page2.avantages);
-        const desavantagesTotal = calculateTraitsImpact(data.page2.desavantages);
-
-        // Les avantages coûtent, les désavantages rapportent (si valeur négative, ou on soustrait pour les désavantages)
-        // Généralement : Coût total = (Somme Avantages - Somme Désavantages) * traitXPBase
-        // Mais ici, les valeurs de trait sont souvent déjà signées (positif pour avantage, négatif pour désavantage)
-        // Vérifions characterSheetPage2.tsx : calculateTotal (list: TraitEntry[]) => list.reduce((acc, item) => acc + (parseInt(item.value) || 0), 0);
-        // On va suivre cette logique : Total Points * Coût
-        const traitsPointsTotal = avantagesTotal + desavantagesTotal;
-        const traitsXPCost = traitsPointsTotal * traitXPBase;
-
-        xpEquivalence += traitsXPCost;
-        if (mode === 'points') {
-            xpSpentTotal += traitsXPCost;
-        } else {
-            // En mode Rangs, on retire les traits de l'équivalence XP informative
-            xpEquivalence -= traitsXPCost;
-        }
+        // Les traits ne coûtent plus d'XP à la création (Mode Rangs ou Points)
+        // xpEquivalence reste inchangé ici concernant les traits
 
         return {
             xpSpentTotal,

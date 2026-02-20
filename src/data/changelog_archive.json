@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.35",
+        "date": "2026-02-19",
+        "type": "refactor",
+        "description": "Optimisation de la structure Admin : Découpage des bibliothèques (Compétences, Historiques, Habilités Mystiques, Compteurs) en sous-composants dédiés pour améliorer la maintenabilité et réduire la taille des fichiers sources (gain de ~150-200 lignes par fichier critique)."
+    },
+    {
         "version": "2.56.34",
         "date": "2026-02-19",
         "type": "chore",
@@ -876,16 +882,6 @@
             "📱 Responsive : Activation du défilement horizontal sur les petits écrans (suppression de 'no-scrollbar')",
             "📐 Layout : Ajustement des contraintes de largeur minimale pour éviter le troncage du grimoire",
             "📔 Chapitres : Finalisation du renommage de la sidebar et de l'alignement des info-bulles"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.29",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🏛️ UI : Renommage de la sidebar 'Structure' en 'Chapitres' pour plus de clarté",
-            "🐛 Fix : Correction du troncage des info-bulles (tooltips) dans la barre latérale en les déplaçant vers la gauche"
         ],
         "major": false
     }

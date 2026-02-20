@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.59",
+        "date": "2026-02-20",
+        "type": "fix",
+        "description": "Budget Création : Les traits (Avantages/Désavantages) sont désormais totalement gratuits en mode Points comme en mode Rangs, et n'impactent plus la Valeur Totale XP affichée dans le HUD."
+    },
+    {
         "version": "2.56.58",
         "date": "2026-02-20",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-19",
         "type": "chore",
         "description": "Maintenance Base de Données : Activation de la sécurité RLS sur les tables Mystiques, ajout des index manquants sur les clés étrangères pour la performance, et optimisation des requêtes de vérification des droits Admin."
-    },
-    {
-        "version": "2.56.35",
-        "date": "2026-02-19",
-        "type": "refactor",
-        "description": "Optimisation de la structure Admin : Découpage des bibliothèques (Compétences, Historiques, Habilités Mystiques, Compteurs) en sous-composants dédiés pour améliorer la maintenabilité et réduire la taille des fichiers sources (gain de ~150-200 lignes par fichier critique)."
     }
 ]
