@@ -1,5 +1,17 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.47] - 2026-02-15 [FEAT]
+
+- 🏛️ Admin : Allègement du Registre des Destins (retrait des colonnes Col 4 et Col 8)
+- ⚡ Performance : Restauration de la vue SQL simplifiée pour les résumés de personnages
+
+## [2.49.46] - 2026-02-15 [FEAT]
+
+- 🏛️ Admin : Intégration avancée de la Master List avec le thème 'Mystic' (texture cuir, glassmorphism)
+- 📊 Data : Ajout des colonnes de compétences prioritaires (Savoirs et Arrière-plans) directement dans le registre
+- ⚡ Performance : Optimisation de la vue SQL pour extraire les compétences sans charger toute la fiche
+- 🔍 UX : Amélioration de la recherche et des filtres orphelins avec retour visuel thématique
+
 ## [2.49.45] - 2026-02-15 [FEAT]
 
 - 🎨 Admin : Alignement parfait de la Master List avec le thème 'Mystic' (MotionCard et structure de table)

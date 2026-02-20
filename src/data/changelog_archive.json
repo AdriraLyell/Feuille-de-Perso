@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.56.57",
+        "date": "2026-02-20",
+        "type": "fix",
+        "description": "Correction Arrière-plans : Résolution du bug de couleur (noir au lieu de bleu) et de coût XP erroné en mode création. Les points d'arrière-plan sont désormais correctement identifiés comme acquis à la création."
+    },
+    {
+        "version": "2.56.56",
+        "date": "2026-02-20",
+        "type": "feat",
+        "description": "Recréation Administration : Ajout de l'option 'Ouverture Simple' permettant de renvoyer le joueur en mode création sans réinitialiser ni purger ses statistiques existantes."
+    },
+    {
         "version": "2.56.55",
         "date": "2026-02-20",
         "type": "feat",
@@ -797,26 +809,6 @@
             "💬 Admin : Possibilité pour le MJ d'envoyer un message personnalisé lors d'un signal de mise à jour",
             "🔔 UX : Affichage des notes du MJ et alerte de 'Version plus récente disponible' dans la modale de synchronisation du joueur",
             "⚙️ Service : Optimisation du CharacterSyncService pour gérer les messages et les signatures numériques (hashes)"
-        ]
-    },
-    {
-        "version": "2.49.47",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🏛️ Admin : Allègement du Registre des Destins (retrait des colonnes Col 4 et Col 8)",
-            "⚡ Performance : Restauration de la vue SQL simplifiée pour les résumés de personnages"
-        ]
-    },
-    {
-        "version": "2.49.46",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🏛️ Admin : Intégration avancée de la Master List avec le thème 'Mystic' (texture cuir, glassmorphism)",
-            "📊 Data : Ajout des colonnes de compétences prioritaires (Savoirs et Arrière-plans) directement dans le registre",
-            "⚡ Performance : Optimisation de la vue SQL pour extraire les compétences sans charger toute la fiche",
-            "🔍 UX : Amélioration de la recherche et des filtres orphelins avec retour visuel thématique"
         ]
     }
 ]

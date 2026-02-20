@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.59.0",
+        "date": "2026-02-21",
+        "type": "refactor",
+        "description": "Renommage sémantique : L'effet 'Compteur de Trait' devient 'Compteur Auto' pour refléter son usage polyvalent. Implémentation du nommage intelligent : le champ 'Nom de Base' devient optionnel dans l'éditeur d'effet. Si laissé vide, le compteur prendra automatiquement le nom de la variante (ou le nom du trait) lors de l'instanciation sur la fiche du Héro."
+    },
+    {
         "version": "2.58.0",
         "date": "2026-02-21",
         "type": "feat",
@@ -112,17 +118,5 @@
         "date": "2026-02-20",
         "type": "fix",
         "description": "Ajustement Budget Création (Mode Rangs) : Exclusion des traits du calcul d'équivalence XP et masquage de la limite de 450 XP (Starting XP) qui ne s'applique qu'au mode par points."
-    },
-    {
-        "version": "2.56.57",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction Arrière-plans : Résolution du bug de couleur (noir au lieu de bleu) et de coût XP erroné en mode création. Les points d'arrière-plan sont désormais correctement identifiés comme acquis à la création."
-    },
-    {
-        "version": "2.56.56",
-        "date": "2026-02-20",
-        "type": "feat",
-        "description": "Recréation Administration : Ajout de l'option 'Ouverture Simple' permettant de renvoyer le joueur en mode création sans réinitialiser ni purger ses statistiques existantes."
     }
 ]

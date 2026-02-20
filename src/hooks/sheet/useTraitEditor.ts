@@ -16,7 +16,7 @@ export const useTraitEditor = (
         const removedItem = list[index];
         const removedName = removedItem.name;
 
-        // Determine if this trait has a trait_counter effect and an associated counter
+        // Determine if this trait has a auto_counter effect and an associated counter
         let newCustomCounters = [...data.counters.custom];
         let hasCounterChanges = false;
         let counterIdToRemove = removedItem.associatedCounterId;
@@ -25,7 +25,7 @@ export const useTraitEditor = (
         if (!counterIdToRemove && removedItem.definitionId && _rules?.libraries?.traits) {
             const traitDef = _rules.libraries.traits.find(t => t.id === removedItem.definitionId);
             if (traitDef) {
-                const counterEffect = traitDef.effects?.find(e => e.type === 'trait_counter');
+                const counterEffect = traitDef.effects?.find(e => e.type === 'auto_counter');
                 counterIdToRemove = counterEffect?.target || counterEffect?.associatedCounterId;
             }
         }
@@ -36,7 +36,7 @@ export const useTraitEditor = (
                 const oldCounter = newCustomCounters[counterIndex];
                 newCustomCounters[counterIndex] = { id: Math.random().toString(36).substr(2, 9), name: '', value: 0, max: 10, current: 0 };
                 hasCounterChanges = true;
-                onAddLog(`Compteur lié supprimé : ${oldCounter.name || 'Compteur de Trait'}`, 'info', 'sheet');
+                onAddLog(`Compteur Auto lié supprimé : ${oldCounter.name || 'Compteur Auto'}`, 'info', 'sheet');
             }
         }
 
@@ -89,14 +89,21 @@ export const useTraitEditor = (
             }
 
             if (listIndex < currentList.length) {
-                // Determine if this trait has a trait_counter effect
+                // Determine if this trait has a auto_counter effect
                 let associatedCounterId: string | undefined = undefined;
-                const counterEffect = entry.effects?.find(e => e.type === 'trait_counter');
+                const counterEffect = entry.effects?.find(e => e.type === 'auto_counter');
 
-                if (counterEffect && counterEffect.target) {
-                    const baseCounterName = counterEffect.target.trim();
+                if (counterEffect) {
+                    const baseCounterName = counterEffect.target?.trim();
                     const variantName = instance.variant?.trim();
-                    const finalCounterName = variantName ? `${baseCounterName} (${variantName})` : baseCounterName;
+
+                    let finalCounterName = "";
+                    if (baseCounterName) {
+                        finalCounterName = variantName ? `${baseCounterName} (${variantName})` : baseCounterName;
+                    } else {
+                        // Option C: Fallback to variant or trait name
+                        finalCounterName = variantName || entry.name;
+                    }
 
                     // Find an empty custom counter slot
                     const emptyCounterIndex = newCustomCounters.findIndex(c => c.name.trim() === '');

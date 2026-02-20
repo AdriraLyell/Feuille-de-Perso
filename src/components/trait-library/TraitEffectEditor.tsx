@@ -63,7 +63,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                         themeColor = 'text-[#8b2e2e]';
                         borderColor = 'border-[#8b2e2e]/30';
                         bgColor = 'bg-[#8b2e2e]/5';
-                    } else if (effect.type === 'trait_counter') {
+                    } else if (effect.type === 'auto_counter') {
                         typeIcon = <Zap size={14} />;
                         themeColor = 'text-emerald-800';
                         borderColor = 'border-emerald-400/30';
@@ -88,7 +88,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                             <option value="attribute_bonus" className="text-gray-900 bg-white">Bonus Attribut</option>
                                             <option value="xp_bonus" className="text-gray-900 bg-white">Bonus XP</option>
                                             <option value="free_skill_rank" className="text-gray-900 bg-white">Rang de Compétence Gratuit</option>
-                                            <option value="trait_counter" className="text-gray-900 bg-white">Compteur de Trait</option>
+                                            <option value="auto_counter" className="text-gray-900 bg-white">Compteur Auto</option>
                                         </select>
                                         <ChevronDown size={12} className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${themeColor} opacity-50`} />
                                     </div>
@@ -154,7 +154,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                             />
                                         </div>
                                     </div>
-                                ) : effect.type === 'trait_counter' ? (
+                                ) : effect.type === 'auto_counter' ? (
                                     <div className="flex flex-col gap-2">
                                         <div className="flex items-start gap-2">
                                             <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wide w-24 mt-1">Nom de Base :</span>
@@ -162,12 +162,13 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                 <input
                                                     type="text"
                                                     className="w-full border border-emerald-400/30 rounded-sm px-2 py-1 text-sm focus:border-emerald-500 outline-none bg-white text-stone-800 font-bold shadow-sm"
-                                                    placeholder="Saisir l'étiquette (ex: Munitions, Dette de Sang)..."
+                                                    placeholder="Optionnel (ex: Munitions, Magie)..."
                                                     value={effect.target || ''}
                                                     onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
                                                 />
                                                 <p className="text-[9px] text-emerald-700/60 mt-1 italic leading-tight">
-                                                    Le compteur sera généré dynamiquement sur la fiche du joueur (Max 10).<br />Si le trait a une variante, elle sera ajoutée automatiquement au nom : <em>"Nom (Variante)"</em>.
+                                                    Si vide, utilise le <strong>Nom du Trait</strong> ou de la <strong>Variante</strong>.<br />
+                                                    Max 10. Automatiquement instancié sur la fiche du joueur.
                                                 </p>
                                             </div>
                                         </div>

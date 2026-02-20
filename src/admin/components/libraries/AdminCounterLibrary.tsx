@@ -144,11 +144,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
             if (!active) {
                 const isPlaced = placedNames.has(item.name.trim().toLowerCase());
                 const isGloballyUsed = !!globalUsage[item.id];
-                const isUsedByTrait = rules.libraries.traits?.some(t =>
-                    (t.isActive || t.isGlobal) && t.effects?.some(e =>
-                        e.type === 'trait_counter' && (e.target === item.id || e.associatedCounterId === item.id)
-                    )
-                ) || false;
+                const isUsedByTrait = false; // Obsolète : Les compteurs de traits sont instanciés à la volée sur la fiche.
 
                 if (isPlaced || isGloballyUsed || isUsedByTrait) return item; // Cannot deactivate
             }

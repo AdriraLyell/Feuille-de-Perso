@@ -1,8 +1,13 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.58.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.59.0)
 
-> **Dernière mise à jour** : 2026-02-21 — Version 2.58.0
+> **Dernière mise à jour** : 2026-02-21 — Version 2.59.0
 
 ## 1. Phases Complétées
+
+### ✅ Phase 27 : Compteur Auto & Nommage Intelligent (v2.59.0)
+- [x] **Renommage** : Migration sémantique de `trait_counter` vers `auto_counter` pour une meilleure généralisation.
+- [x] **Option C** : Le nom de base est désormais optionnel. Fallback automatique sur le nom du trait ou la variante si vide.
+- [x] **Refactoring** : Nettoyage final des références obsolètes dans l'interface d'administration.
 
 ### ✅ Phase 26 : Compteurs de Traits Dynamiques (v2.58.0)
 - [x] **Éphémère** : Les compteurs liés aux traits sont désormais instanciés uniquement sur la fiche du Héro.

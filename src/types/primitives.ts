@@ -78,7 +78,7 @@ export interface TraitEntry {
   creationValue?: string;
 }
 
-export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus' | 'trait_counter';
+export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus' | 'auto_counter';
 export interface TraitEffect {
   id: string;
   type: EffectType;
