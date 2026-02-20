@@ -1,9 +1,11 @@
 
 import React, { useState } from 'react';
 import { useCharacter } from '../context/CharacterContext';
+import { useRules } from '../context/RulesContext';
 import { XPEntry } from '../types';
 import { Plus, Trash2, Calendar, FileText, TrendingUp, User, MessageSquare } from 'lucide-react';
 import { XPReceiptView } from './sheet/XPReceiptView';
+import { calculateExperienceResults } from '../utils/mechanics';
 
 interface Props {
   isLandscape?: boolean;
@@ -11,7 +13,10 @@ interface Props {
 
 const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
   const { data, updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacter();
+  const { rules } = useRules();
   const [activeTab, setActiveTab] = useState<'sessions' | 'history'>('sessions');
+
+  const expResults = calculateExperienceResults(data, rules);
 
   const addRow = () => {
     const newEntry: XPEntry = {
@@ -73,11 +78,6 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
     onChange({ ...data, xpLogs: newLogs });
     onAddLog("Suppression d'une entrée XP", 'danger', 'sheet');
   };
-
-  const totalXP = (data.xpLogs || []).reduce((sum, entry) => sum + (entry.amount || 0), 0);
-  const totalSpent = (data.xpTransactions || [])
-    .filter(t => t.type === 'spend')
-    .reduce((sum, t) => sum + t.amount, 0);
 
   // Date: 110px, MJ: 0.5fr, Scenario: 1.5fr, Notes: 2fr, XP: 45px, Action: 40px, Session: 40px
   const sessionGridClass = "grid grid-cols-[110px_0.5fr_1.5fr_2fr_45px_40px_40px]";
@@ -210,9 +210,9 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
         ) : (
           <XPReceiptView
             transactions={data.xpTransactions || []}
-            totalGain={gain}
-            totalSpent={spent}
-            totalRest={rest}
+            totalGain={expResults.gain}
+            totalSpent={expResults.spent}
+            totalRest={expResults.rest}
           />
         )}
 
@@ -221,13 +221,13 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
           <div className="flex gap-4">
             <div className="bg-white px-4 py-2 rounded-lg border border-red-200 shadow-sm flex items-center gap-3">
               <span className="text-xs font-bold text-stone-400 uppercase tracking-tighter">Total Dépensé</span>
-              <span className="font-mono font-bold text-red-700 text-xl">-{totalSpent}</span>
+              <span className="font-mono font-bold text-red-700 text-xl">-{expResults.spent}</span>
             </div>
           </div>
           <div className="flex items-center gap-4 text-lg">
             <span className="font-bold text-stone-600 uppercase">Total XP Gagnés :</span>
             <span className="font-mono font-bold text-green-700 bg-white px-4 py-1 rounded border border-green-200 shadow-inner">
-              {totalXP}
+              {expResults.gain}
             </span>
           </div>
         </div>
