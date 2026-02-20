@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.60",
+        "date": "2026-02-20",
+        "type": "fix",
+        "description": "Correction de la sauvegarde des compteurs : Les modifications (valeur max, coût XP) effectuées depuis la bibliothèque d'administration sont désormais correctement sauvegardées en base de données et appliquées aux fiches des joueurs."
+    },
+    {
         "version": "2.56.59",
         "date": "2026-02-20",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Correction critique du calcul des bonus XP des traits (ex: Apprentissage Rapide). Le calculateur prend désormais en compte les définitions globales des traits (Base de Données) lorsque ceux-ci ne sont pas redéfinis localement, assurant l'application correcte des effets."
-    },
-    {
-        "version": "2.56.36",
-        "date": "2026-02-19",
-        "type": "chore",
-        "description": "Maintenance Base de Données : Activation de la sécurité RLS sur les tables Mystiques, ajout des index manquants sur les clés étrangères pour la performance, et optimisation des requêtes de vérification des droits Admin."
     }
 ]

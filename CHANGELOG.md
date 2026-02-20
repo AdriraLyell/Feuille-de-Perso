@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.30] - 2026-02-15 [FIX]
+
+- 📱 Responsive : Activation du défilement horizontal sur les petits écrans (suppression de 'no-scrollbar')
+- 📐 Layout : Ajustement des contraintes de largeur minimale pour éviter le troncage du grimoire
+- 📔 Chapitres : Finalisation du renommage de la sidebar et de l'alignement des info-bulles
+
 ## [2.49.29] - 2026-02-15 [FIX]
 
 - 🏛️ UI : Renommage de la sidebar 'Structure' en 'Chapitres' pour plus de clarté
