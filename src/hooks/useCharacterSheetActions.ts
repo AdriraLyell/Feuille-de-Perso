@@ -279,9 +279,11 @@ export const useCharacterSheetActions = (
                     if (field === 'value') {
                         newItem.value = value;
                         if (isCreationMode) newItem.creationValue = value;
-                        if ((newItem.current || 0) > value) newItem.current = value;
+                        const effectiveMax = newItem.variant === 'squares_only' ? (newItem.max || 10) : newItem.value;
+                        if ((newItem.current || 0) > effectiveMax) newItem.current = effectiveMax;
                     } else {
-                        newItem.current = Math.min(value, newItem.value);
+                        const effectiveMax = newItem.variant === 'squares_only' ? (newItem.max || 10) : newItem.value;
+                        newItem.current = Math.min(value, effectiveMax);
                     }
                     return newItem;
                 });
@@ -324,7 +326,8 @@ export const useCharacterSheetActions = (
                     newItem.value = value;
                     if ((newItem.current || 0) > value) newItem.current = value;
                 } else {
-                    newItem.current = Math.min(value, newItem.value);
+                    const effectiveMax = newItem.variant === 'squares_only' ? (newItem.max || 10) : newItem.value;
+                    newItem.current = Math.min(value, effectiveMax);
                 }
 
                 const updatedCounters = { ...prev.counters };
