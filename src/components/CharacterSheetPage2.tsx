@@ -16,6 +16,7 @@ import { Page2SectionHeader } from './sheet/page2/Page2Components';
 import { useTraitEditor } from '../hooks/sheet/useTraitEditor';
 import { useReputationManager } from '../hooks/sheet/useReputationManager';
 import MysticSkillWizard from './sheet/ui/MysticSkillWizard';
+import TraitEditModal from './sheet/page2/TraitEditModal';
 
 interface Props {
     isLandscape?: boolean;
@@ -43,8 +44,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         mysticAbilityName: ''
     });
 
-    // Wrapped handleMultiAdd to detect Mystic Ability link
-    // Wrapped handleMultiAdd to detect Mystic Ability link
+    const [editingTrait, setEditingTrait] = React.useState<{ type: 'avantages' | 'desavantages', index: number, trait: TraitEntry } | null>(null);
+
     // Wrapped handleMultiAdd to detect Mystic Ability link
     const handleMultiAddWrapper = (instances: { entry: LibraryEntry; variant?: string; cost?: string }[]) => {
         let mysticId: string | undefined;
@@ -184,6 +185,18 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         onAddLog(`Modification ${String(field)}`, 'info', 'sheet', `${String(field)}`);
     };
 
+    const handleSaveTrait = (updatedTrait: TraitEntry) => {
+        if (!editingTrait) return;
+
+        const { type, index } = editingTrait;
+        const newList = [...data.page2[type]];
+        newList[index] = updatedTrait;
+
+        onChange({ ...data, page2: { ...data.page2, [type]: newList } });
+        onAddLog(`Modification ${type === 'avantages' ? 'Avantage' : 'Désavantage'} : ${updatedTrait.name}`, 'info', 'sheet');
+        setEditingTrait(null);
+    };
+
     const updateCharacterImageId = (id: string) => {
         onChange({ ...data, page2: { ...data.page2, characterImageId: id, characterImage: '' } });
     };
@@ -198,7 +211,10 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     <TraitRow
                         key={i}
                         item={item}
-                        onClick={() => setMultiSelectTarget('avantages')}
+                        onClick={() => {
+                            if (!item.name.trim()) setMultiSelectTarget('avantages');
+                            else setEditingTrait({ type: 'avantages', index: i, trait: item });
+                        }}
                         onRemove={(e) => {
                             e.stopPropagation();
                             removeTrait('avantages', i);
@@ -227,7 +243,10 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     <TraitRow
                         key={i}
                         item={item}
-                        onClick={() => setMultiSelectTarget('desavantages')}
+                        onClick={() => {
+                            if (!item.name.trim()) setMultiSelectTarget('desavantages');
+                            else setEditingTrait({ type: 'desavantages', index: i, trait: item });
+                        }}
                         onRemove={(e) => {
                             e.stopPropagation();
                             removeTrait('desavantages', i);
@@ -333,6 +352,16 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     mysticAbilityName={wizardState.mysticAbilityName}
                     sheet={data}
                     rules={rules}
+                />
+            )}
+
+            {editingTrait && (
+                <TraitEditModal
+                    isOpen={!!editingTrait}
+                    onClose={() => setEditingTrait(null)}
+                    trait={editingTrait.trait}
+                    onSave={handleSaveTrait}
+                    type={editingTrait.type}
                 />
             )}
         </>
