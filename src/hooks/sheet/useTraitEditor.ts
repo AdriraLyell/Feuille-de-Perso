@@ -17,7 +17,7 @@ export const useTraitEditor = (
         const removedName = removedItem.name;
 
         // Determine if this trait has a auto_counter effect and an associated counter
-        let newCustomCounters = [...data.counters.custom];
+        const newCustomCounters = [...data.counters.custom];
         let hasCounterChanges = false;
         let counterIdToRemove = removedItem.associatedCounterId;
 
@@ -77,7 +77,7 @@ export const useTraitEditor = (
         const isPostCreation = !data.creationConfig?.active;
         const traitCostFactor = _rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
 
-        let newCustomCounters = [...data.counters.custom];
+        const newCustomCounters = [...data.counters.custom];
         let hasCounterChanges = false;
 
         instances.forEach(instance => {
