@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.55",
+        "date": "2026-02-20",
+        "type": "feat",
+        "description": "Ergonomie fiches de personnage : Cliquer sur un trait existant (Avantage/Désavantage) ouvre désormais un menu d'édition rapide au lieu de la bibliothèque de traits. Cliquer sur un emplacement vide continue d'ouvrir la bibliothèque pour ajouter un nouveau trait."
+    },
+    {
         "version": "2.56.54",
         "date": "2026-02-20",
         "type": "style",
@@ -811,17 +817,6 @@
             "📊 Data : Ajout des colonnes de compétences prioritaires (Savoirs et Arrière-plans) directement dans le registre",
             "⚡ Performance : Optimisation de la vue SQL pour extraire les compétences sans charger toute la fiche",
             "🔍 UX : Amélioration de la recherche et des filtres orphelins avec retour visuel thématique"
-        ]
-    },
-    {
-        "version": "2.49.45",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🎨 Admin : Alignement parfait de la Master List avec le thème 'Mystic' (MotionCard et structure de table)",
-            "🌑 UI : Correction du fond de page en vue globale (remplacement du gris par le noir pierre pierre)",
-            "🖋️ Typographie : Utilisation de polices Serif et gestion fine de l'espacement pour les registres",
-            "✨ UX : Intégration de MotionFade sur les lignes de tableaux pour une apparition fluide"
         ]
     }
 ]

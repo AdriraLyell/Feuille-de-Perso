@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.58.0",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Amélioration des Compteurs de Traits (Dynamic Counters) : Les compteurs liés aux traits ne polluent plus la bibliothèque d'administration. Ils sont désormais générés dynamiquement et uniquement sur la fiche du personnage. Support des Traits Variables : le compteur ajoute automatiquement le nom de la variante choisie au nom de base de l'effet."
+    },
+    {
         "version": "2.57.0",
         "date": "2026-02-21",
         "type": "feat",
@@ -118,11 +124,5 @@
         "date": "2026-02-20",
         "type": "feat",
         "description": "Recréation Administration : Ajout de l'option 'Ouverture Simple' permettant de renvoyer le joueur en mode création sans réinitialiser ni purger ses statistiques existantes."
-    },
-    {
-        "version": "2.56.55",
-        "date": "2026-02-20",
-        "type": "feat",
-        "description": "Ergonomie fiches de personnage : Cliquer sur un trait existant (Avantage/Désavantage) ouvre désormais un menu d'édition rapide au lieu de la bibliothèque de traits. Cliquer sur un emplacement vide continue d'ouvrir la bibliothèque pour ajouter un nouveau trait."
     }
 ]

@@ -157,17 +157,17 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                 ) : effect.type === 'trait_counter' ? (
                                     <div className="flex flex-col gap-2">
                                         <div className="flex items-start gap-2">
-                                            <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wide w-24 mt-1">Nom du Compteur :</span>
+                                            <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wide w-24 mt-1">Nom de Base :</span>
                                             <div className="flex-grow">
                                                 <input
                                                     type="text"
                                                     className="w-full border border-emerald-400/30 rounded-sm px-2 py-1 text-sm focus:border-emerald-500 outline-none bg-white text-stone-800 font-bold shadow-sm"
-                                                    placeholder="Lier à un compteur ou taper pour en créer un..."
+                                                    placeholder="Saisir l'étiquette (ex: Munitions, Dette de Sang)..."
                                                     value={effect.target || ''}
                                                     onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
                                                 />
-                                                <p className="text-[9px] text-emerald-700/60 mt-1 italic">
-                                                    Si le compteur correspondant n'existe pas, il sera automatiquement créé (Max: 10, Coût XP: 0) avec l'affichage de cases vides.
+                                                <p className="text-[9px] text-emerald-700/60 mt-1 italic leading-tight">
+                                                    Le compteur sera généré dynamiquement sur la fiche du joueur (Max 10).<br />Si le trait a une variante, elle sera ajoutée automatiquement au nom : <em>"Nom (Variante)"</em>.
                                                 </p>
                                             </div>
                                         </div>

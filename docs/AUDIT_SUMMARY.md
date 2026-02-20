@@ -1,8 +1,13 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.57.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.58.0)
 
-> **Dernière mise à jour** : 2026-02-21 — Version 2.57.0
+> **Dernière mise à jour** : 2026-02-21 — Version 2.58.0
 
 ## 1. Phases Complétées
+
+### ✅ Phase 26 : Compteurs de Traits Dynamiques (v2.58.0)
+- [x] **Éphémère** : Les compteurs liés aux traits sont désormais instanciés uniquement sur la fiche du Héro.
+- [x] **Traits Variables** : Le nom du compteur s'adapte automatiquement avec le format `[Nom de Base] ([Variante])`.
+- [x] **Propreté MJ** : Suppression de la pollution de la Bibliothèque de compteurs côté Administrateur.
 
 ### ✅ Phase 25 : Intégration des Compteurs de Traits (v2.57.0)
 - [x] **Mécanique** : Création du type d'effet `trait_counter` reliant dynamiquement traits et compteurs.

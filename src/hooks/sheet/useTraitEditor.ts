@@ -93,28 +93,26 @@ export const useTraitEditor = (
                 let associatedCounterId: string | undefined = undefined;
                 const counterEffect = entry.effects?.find(e => e.type === 'trait_counter');
 
-                if (counterEffect) {
-                    associatedCounterId = counterEffect.target || counterEffect.associatedCounterId;
+                if (counterEffect && counterEffect.target) {
+                    const baseCounterName = counterEffect.target.trim();
+                    const variantName = instance.variant?.trim();
+                    const finalCounterName = variantName ? `${baseCounterName} (${variantName})` : baseCounterName;
 
-                    if (associatedCounterId && _rules?.libraries?.counters) {
-                        const counterDef = _rules.libraries.counters.find(c => c.id === associatedCounterId);
-                        if (counterDef) {
-                            // Find an empty custom counter slot
-                            const emptyCounterIndex = newCustomCounters.findIndex(c => c.name.trim() === '');
-                            if (emptyCounterIndex !== -1) {
-                                newCustomCounters[emptyCounterIndex] = {
-                                    id: counterDef.id,
-                                    name: counterDef.name,
-                                    value: counterDef.defaultValue ?? 0,
-                                    max: counterDef.maxValue ?? 10,
-                                    current: counterDef.defaultValue ?? 0,
-                                    creationValue: counterDef.defaultValue ?? 0,
-                                    variant: counterDef.appearance === 'squares_only' ? 'squares_only' : undefined // We map appearance to variant for now or just wait we don't need 'variant' for appearance, we need to handle it. Actually the TraitEntry Schema didn't add associatedCounterId.
-                                };
-                                hasCounterChanges = true;
-                                onAddLog(`Compteur ajouté : ${counterDef.name}`, 'info', 'sheet');
-                            }
-                        }
+                    // Find an empty custom counter slot
+                    const emptyCounterIndex = newCustomCounters.findIndex(c => c.name.trim() === '');
+                    if (emptyCounterIndex !== -1) {
+                        associatedCounterId = Math.random().toString(36).substring(2, 9);
+                        newCustomCounters[emptyCounterIndex] = {
+                            id: associatedCounterId,
+                            name: finalCounterName,
+                            value: 0,
+                            max: 10,
+                            current: 0,
+                            creationValue: 0,
+                            variant: 'squares_only'
+                        };
+                        hasCounterChanges = true;
+                        onAddLog(`Compteur ajouté : ${finalCounterName}`, 'info', 'sheet');
                     }
                 }
 
@@ -128,9 +126,8 @@ export const useTraitEditor = (
                     mysticAbilityId: entry.mysticAbilityId || undefined,
                     isPostCreation: isPostCreation ? true : undefined,
                     creationValue: isPostCreation ? "0" : undefined,
+                    associatedCounterId: associatedCounterId
                 };
-
-                // Add associatedCounterId if available (Need to extend TraitEntrySchema later if we persist it directly on the trait)
 
                 if (isPostCreation) {
                     const points = parseInt(costValue) || 0;

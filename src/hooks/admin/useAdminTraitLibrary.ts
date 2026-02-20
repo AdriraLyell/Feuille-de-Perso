@@ -105,33 +105,15 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
     const confirmDelete = useCallback(() => {
         if (!showDeleteConfirm) return;
 
-        const traitToDelete = library.find(l => l.id === showDeleteConfirm);
-        let newCounters = [...(rules.libraries?.counters || [])];
-        let hasCounterChanges = false;
-
-        if (traitToDelete) {
-            for (const effect of traitToDelete.effects || []) {
-                if (effect.type === 'trait_counter' && effect.target) {
-                    const counterIdToRemove = effect.target;
-                    // Ensure we don't delete a counter used by ANOTHER trait
-                    const usedByOther = library.some(t => t.id !== showDeleteConfirm && t.effects?.some(e => e.type === 'trait_counter' && e.target === counterIdToRemove));
-                    if (!usedByOther) {
-                        newCounters = newCounters.filter(c => c.id !== counterIdToRemove);
-                        hasCounterChanges = true;
-                    }
-                }
-            }
-        }
-
         const newLibrary = library.filter(l => l.id !== showDeleteConfirm);
         onUpdate({
             ...rules,
             libraries: {
                 ...rules.libraries,
-                traits: newLibrary,
-                ...(hasCounterChanges ? { counters: newCounters } : {})
+                traits: newLibrary
             }
         });
+        setShowDeleteConfirm(null);
         setShowDeleteConfirm(null);
     }, [library, onUpdate, rules, showDeleteConfirm]);
 
@@ -147,54 +129,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         const duplicate = library.find(l => l.id !== traitToSave.id && l.name.trim().toLowerCase() === traitToSave.name.trim().toLowerCase());
         if (duplicate) { setError("Un trait avec ce nom existe déjà."); return; }
 
-        let newCounters = [...(rules.libraries?.counters || [])];
-        let hasNewCounters = false;
-
-        for (const effect of traitToSave.effects || []) {
-            if (effect.type === 'trait_counter') {
-                const targetName = (effect.target || 'Compteur Anonyme').trim();
-                let existingCounter = newCounters.find(c =>
-                    c.id === targetName || c.name.toLowerCase() === targetName.toLowerCase()
-                );
-
-                if (existingCounter) {
-                    effect.target = existingCounter.id;
-                } else {
-                    const newCounterId = crypto.randomUUID();
-                    newCounters.push({
-                        id: newCounterId,
-                        name: targetName,
-                        description: `Lié au trait ${traitToSave.name}`,
-                        maxValue: 10,
-                        defaultValue: 0,
-                        xpCost: 0,
-                        appearance: 'squares_only',
-                        isActive: true,
-                        isGlobal: traitToSave.isGlobal // Inherit global status
-                    });
-
-                    hasNewCounters = true;
-                    effect.target = newCounterId;
-                }
-            }
-        }
-
         const existingTrait = library.find(l => l.id === traitToSave.id);
-
-        if (existingTrait) {
-            const oldCounterEffects = (existingTrait.effects || []).filter(e => e.type === 'trait_counter' && e.target);
-            for (const oldEff of oldCounterEffects) {
-                const stillExists = (traitToSave.effects || []).some(e => e.type === 'trait_counter' && e.target === oldEff.target);
-                if (!stillExists) {
-                    const counterIdToRemove = oldEff.target as string;
-                    const usedByOther = library.some(t => t.id !== traitToSave.id && t.effects?.some(e => e.type === 'trait_counter' && e.target === counterIdToRemove));
-                    if (!usedByOther) {
-                        newCounters = newCounters.filter(c => c.id !== counterIdToRemove);
-                        hasNewCounters = true;
-                    }
-                }
-            }
-        }
 
         const newLibrary = existingTrait
             ? library.map(l => l.id === traitToSave.id ? traitToSave : l)
@@ -204,8 +139,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
             ...rules,
             libraries: {
                 ...rules.libraries,
-                traits: newLibrary,
-                ...(hasNewCounters ? { counters: newCounters } : {})
+                traits: newLibrary
             }
         });
         setIsModalOpen(false);

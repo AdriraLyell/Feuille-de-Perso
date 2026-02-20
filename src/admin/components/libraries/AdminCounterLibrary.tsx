@@ -226,11 +226,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                             const isGloballyUsed = !!globalUsage[item.id];
 
                             // Check if any active trait uses this counter
-                            const isUsedByTrait = rules.libraries.traits?.some(t =>
-                                (t.isActive || t.isGlobal) && t.effects?.some(e =>
-                                    e.type === 'trait_counter' && (e.target === item.id || e.associatedCounterId === item.id)
-                                )
-                            ) || false;
+                            const isUsedByTrait = false; // Obsolète : Les compteurs de traits sont instanciés à la volée sur la fiche et n'utilisent plus la bibliothèque Admin.
 
                             const isLocked = isPlaced || isGloballyUsed || isUsedByTrait;
 

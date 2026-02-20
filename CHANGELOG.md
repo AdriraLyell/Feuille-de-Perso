@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.45] - 2026-02-15 [FEAT]
+
+- 🎨 Admin : Alignement parfait de la Master List avec le thème 'Mystic' (MotionCard et structure de table)
+- 🌑 UI : Correction du fond de page en vue globale (remplacement du gris par le noir pierre pierre)
+- 🖋️ Typographie : Utilisation de polices Serif et gestion fine de l'espacement pour les registres
+- ✨ UX : Intégration de MotionFade sur les lignes de tableaux pour une apparition fluide
+
 ## [2.49.44] - 2026-02-15 [FEAT]
 
 - 🎨 Admin : Application du thème 'Mystic' à la Master List des Voyageurs
