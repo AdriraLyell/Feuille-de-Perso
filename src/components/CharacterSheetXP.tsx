@@ -47,8 +47,8 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
 
   const totalXP = (data.xpLogs || []).reduce((sum, entry) => sum + (entry.amount || 0), 0);
 
-  // Date: 110px, MJ: 0.5fr, Scenario: 1.5fr, Notes: 2fr, Sess: 40px, XP: 45px, Action: 40px
-  const gridClass = "grid grid-cols-[110px_0.5fr_1.5fr_2fr_40px_45px_40px]";
+  // Date: 110px, MJ: 0.5fr, Scenario: 1.5fr, Notes: 2fr, XP: 45px, Action: 40px, Session: 40px
+  const gridClass = "grid grid-cols-[110px_0.5fr_1.5fr_2fr_45px_40px_40px]";
 
   return (
     <div className={`sheet-container xp-sheet p-8 ${isLandscape ? 'landscape' : ''}`}>
@@ -75,9 +75,9 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
           <div className="flex items-center gap-2"><User size={14} /> MJ</div>
           <div className="flex items-center gap-2"><FileText size={14} /> Scénario</div>
           <div className="flex items-center gap-2"><MessageSquare size={14} /> Notes & Commentaires</div>
-          <div className="text-center" title="Compte comme un scénario pour les bonus">Sess.</div>
           <div className="text-center">XP</div>
           <div className="text-center"></div> {/* Empty Actions Header */}
+          <div className="text-center text-[10px]" title="Compte comme un scénario pour les bonus">Session</div>
         </div>
 
         {/* Table Body */}
@@ -130,16 +130,6 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
                   onChange={(e) => updateRow(entry.id, 'spendingLocation', e.target.value)}
                 />
               </div>
-              {/* Session Count Checkbox */}
-              <div className="border-l border-stone-200 px-2 flex justify-center">
-                <input
-                  type="checkbox"
-                  className="cursor-pointer"
-                  title="Cocher si cette entrée compte comme un scénario joué"
-                  checked={entry.countsAsScenario ?? (entry.amount > 0)}
-                  onChange={(e) => updateRow(entry.id, 'countsAsScenario', e.target.checked)}
-                />
-              </div>
               {/* XP Amount */}
               <div className="border-l border-stone-200 px-2">
                 <input
@@ -158,6 +148,16 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
                 >
                   <Trash2 size={16} />
                 </button>
+              </div>
+              {/* Session Count Checkbox */}
+              <div className="border-l border-stone-200 px-2 flex justify-center">
+                <input
+                  type="checkbox"
+                  className="cursor-pointer"
+                  title="Cocher si cette entrée compte comme un scénario joué"
+                  checked={entry.countsAsScenario ?? (entry.amount > 0)}
+                  onChange={(e) => updateRow(entry.id, 'countsAsScenario', e.target.checked)}
+                />
               </div>
             </div>
           ))}

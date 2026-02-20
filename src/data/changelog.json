@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.65",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Gestion XP : Déplacement de la colonne 'Session' en fin de tableau et renommage de 'SESS.' en 'Session' avec ajustement de la taille de police."
+    },
+    {
         "version": "2.56.64",
         "date": "2026-02-21",
         "type": "refactor",
@@ -112,11 +118,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Correction finale d'une erreur de syntaxe JSON dans le journal des modifications qui bloquait le serveur de développement."
-    },
-    {
-        "version": "2.56.44",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de l'affichage du Journal des Modifications : les descriptions de versions s'affichent désormais correctement dans l'interface."
     }
 ]
