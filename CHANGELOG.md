@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.48] - 2026-02-15 [FEAT]
+
+- 🛡️ Synchronisation : Implémentation du '3-Way Hash Check' (Dirty Check) pour éviter d'écraser des modifications locales par mégarde
+- 💬 Admin : Possibilité pour le MJ d'envoyer un message personnalisé lors d'un signal de mise à jour
+- 🔔 UX : Affichage des notes du MJ et alerte de 'Version plus récente disponible' dans la modale de synchronisation du joueur
+- ⚙️ Service : Optimisation du CharacterSyncService pour gérer les messages et les signatures numériques (hashes)
+
 ## [2.49.47] - 2026-02-15 [FEAT]
 
 - 🏛️ Admin : Allègement du Registre des Destins (retrait des colonnes Col 4 et Col 8)

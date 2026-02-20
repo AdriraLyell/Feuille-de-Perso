@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.60.0",
+        "date": "2026-02-21",
+        "type": "refactor",
+        "description": "Refactorisation majeure pour la maintenance : 1) Refonte de la modale de synchronisation en un 'Cloud Hub' unifié avec onglets (Push vs Library). 2) Décomposition des composants massifs (SyncModal, AttributesEditor, BookImageView, SpecializationLibraryView) en hooks personnalisés et sous-composants. 3) Modularisation du moteur de calcul d'XP (xpCalculator) en utilitaires spécialisés (Skills, Attributes, Traits, Counters)."
+    },
+    {
         "version": "2.59.0",
         "date": "2026-02-21",
         "type": "refactor",
@@ -112,11 +118,5 @@
         "date": "2026-02-20",
         "type": "fix",
         "description": "Budget Création : Les traits (Avantages/Désavantages) sont désormais totalement gratuits en mode Points comme en mode Rangs, et n'impactent plus la Valeur Totale XP affichée dans le HUD."
-    },
-    {
-        "version": "2.56.58",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Ajustement Budget Création (Mode Rangs) : Exclusion des traits du calcul d'équivalence XP et masquage de la limite de 450 XP (Starting XP) qui ne s'applique qu'au mode par points."
     }
 ]

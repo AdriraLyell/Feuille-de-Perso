@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.58",
+        "date": "2026-02-20",
+        "type": "fix",
+        "description": "Ajustement Budget Création (Mode Rangs) : Exclusion des traits du calcul d'équivalence XP et masquage de la limite de 450 XP (Starting XP) qui ne s'applique qu'au mode par points."
+    },
+    {
         "version": "2.56.57",
         "date": "2026-02-20",
         "type": "fix",
@@ -798,17 +804,6 @@
         "changes": [
             "🐛 Fix : Correction d'une erreur de référence sur ThematicModal dans la Master List des joueurs",
             "🛡️ Stabilité : Vérification des imports manquants suite à la mise à jour des signaux MJ"
-        ]
-    },
-    {
-        "version": "2.49.48",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🛡️ Synchronisation : Implémentation du '3-Way Hash Check' (Dirty Check) pour éviter d'écraser des modifications locales par mégarde",
-            "💬 Admin : Possibilité pour le MJ d'envoyer un message personnalisé lors d'un signal de mise à jour",
-            "🔔 UX : Affichage des notes du MJ et alerte de 'Version plus récente disponible' dans la modale de synchronisation du joueur",
-            "⚙️ Service : Optimisation du CharacterSyncService pour gérer les messages et les signatures numériques (hashes)"
         ]
     }
 ]
