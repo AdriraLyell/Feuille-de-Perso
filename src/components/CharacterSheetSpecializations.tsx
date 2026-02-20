@@ -58,15 +58,26 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
     const handlePromote = (skillId: string, index: number, specName: string) => {
         try {
+            if (!specName || specName.trim() === '') return;
+
             // 1. Identifier la catégorie cible "Secondaire"
             const secondaryCat = rules?.definitions?.skillCategories?.find((cat: any) => cat.behavior === 'Secondaire' || cat.label.toLowerCase().includes('secondaire'))?.id || 'competences_secondaires';
 
+            // 2. Vérifier si la compétence n'existe pas déjà
+            const existingSkills = data.skills[secondaryCat] || [];
+            const isDuplicate = existingSkills.some(s => s.name.trim().toLowerCase() === specName.trim().toLowerCase());
+
+            if (isDuplicate) {
+                onAddLog(`La compétence secondaire "${specName}" existe déjà.`, 'danger', 'sheet');
+                return;
+            }
+
             console.log(`[Promotion] Promouvoir "${specName}" vers ${secondaryCat} (Skill ID: ${skillId}, Index: ${index})`);
 
-            // 2. Créer la nouvelle compétence (valeur 0 comme demandé)
+            // 3. Créer la nouvelle compétence (valeur 0 comme demandé)
             const newSkill = createDotEntry(specName, 0);
 
-            // 3. Mettre à jour les données de manière fonctionnelle pour éviter tout souci de synchronisation
+            // 4. Mettre à jour les données de manière fonctionnelle pour éviter tout souci de synchronisation
             onChange((prev: CharacterSheetData) => {
                 const currentSpecs = prev.specializations[skillId] || [];
                 const newSpecs = [...currentSpecs];
