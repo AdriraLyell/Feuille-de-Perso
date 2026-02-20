@@ -19,27 +19,24 @@ export const useTraitEditor = (
         // Determine if this trait has a trait_counter effect and an associated counter
         let newCustomCounters = [...data.counters.custom];
         let hasCounterChanges = false;
+        let counterIdToRemove = removedItem.associatedCounterId;
 
-        // Either the trait has a definitionId with the counter, or it's just removed based on the name matching a counter
-        // The safest way is to find the definition from the library if we don't store it on the trait directly
-        if (removedItem.definitionId && _rules?.libraries?.traits) {
+        // If not found directly, try via definition
+        if (!counterIdToRemove && removedItem.definitionId && _rules?.libraries?.traits) {
             const traitDef = _rules.libraries.traits.find(t => t.id === removedItem.definitionId);
             if (traitDef) {
                 const counterEffect = traitDef.effects?.find(e => e.type === 'trait_counter');
-                const associatedCounterId = counterEffect?.target || counterEffect?.associatedCounterId;
+                counterIdToRemove = counterEffect?.target || counterEffect?.associatedCounterId;
+            }
+        }
 
-                if (associatedCounterId && _rules?.libraries?.counters) {
-                    const counterDef = _rules.libraries.counters.find(c => c.id === associatedCounterId);
-                    if (counterDef) {
-                        // Find this counter in custom counters
-                        const counterIndex = newCustomCounters.findIndex(c => c.id === counterDef.id);
-                        if (counterIndex !== -1) {
-                            newCustomCounters[counterIndex] = { id: Math.random().toString(36).substr(2, 9), name: '', value: 0, max: 10, current: 0 };
-                            hasCounterChanges = true;
-                            onAddLog(`Compteur lié supprimé : ${counterDef.name}`, 'info', 'sheet');
-                        }
-                    }
-                }
+        if (counterIdToRemove) {
+            const counterIndex = newCustomCounters.findIndex(c => c.id === counterIdToRemove);
+            if (counterIndex !== -1) {
+                const oldCounter = newCustomCounters[counterIndex];
+                newCustomCounters[counterIndex] = { id: Math.random().toString(36).substr(2, 9), name: '', value: 0, max: 10, current: 0 };
+                hasCounterChanges = true;
+                onAddLog(`Compteur lié supprimé : ${oldCounter.name || 'Compteur de Trait'}`, 'info', 'sheet');
             }
         }
 
