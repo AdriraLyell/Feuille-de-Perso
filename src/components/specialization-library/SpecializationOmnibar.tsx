@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Award, Plus, ArrowUpCircle } from 'lucide-react';
 import { useCharacterData } from '../../context/CharacterContext';
+import ConfirmationModal from '../ui/ConfirmationModal';
 import { LibrarySpecializationEntry } from '../../types';
 import { smartIncludes } from '../../utils/stringUtils';
 
@@ -33,6 +34,7 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
     const data = useCharacterData();
     const [isOpen, setIsOpen] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
+    const [showPromoteConfirm, setShowPromoteConfirm] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
     const library = data.specializationLibrary || [];
@@ -108,9 +110,7 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            if (window.confirm(`Promouvoir "${value}" en compétence secondaire ?`)) {
-                                onPromote(value);
-                            }
+                            setShowPromoteConfirm(true);
                         }}
                         className="opacity-0 group-hover/omnibar:opacity-100 transition-opacity p-0.5 text-amber-600 hover:text-amber-800"
                         title="Promouvoir en compétence secondaire"
@@ -141,6 +141,29 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
                     </div>
                 )}
             </div>
+
+            {/* Modal de confirmation de promotion */}
+            {showPromoteConfirm && (
+                <ConfirmationModal
+                    isOpen={showPromoteConfirm}
+                    onClose={() => setShowPromoteConfirm(false)}
+                    onConfirm={() => onPromote && onPromote(value)}
+                    title="Promouvoir la Spécialisation"
+                    message={
+                        <span>
+                            Souhaitez-vous promouvoir <strong>"{value}"</strong> en compétence secondaire ?
+                            <br /><br />
+                            <span className="text-[11px] opacity-80">
+                                Cela créera une nouvelle compétence avec une valeur de 0 et libérera l'emplacement de spécialisation actuel.
+                            </span>
+                        </span>
+                    }
+                    confirmLabel="Promouvoir"
+                    cancelLabel="Annuler"
+                    type="warning"
+                    scheme="paper"
+                />
+            )}
         </div>
     );
 };

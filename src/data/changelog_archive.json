@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.28",
+        "date": "2026-02-19",
+        "type": "fix",
+        "description": "Refonte majeure de la robustesse du schéma de données personnage (Zod) pour éliminer les erreurs de chargement au rafraîchissement. Ajout de logs de diagnostic pour le calcul des bonus XP des traits."
+    },
+    {
         "version": "2.56.27",
         "date": "2026-02-19",
         "type": "fix",
@@ -912,13 +918,6 @@
         "date": "2026-02-14",
         "type": "fix",
         "content": "🛡️ E2E Stability : Résolution des erreurs de connexion (ports) et gestion de l'écran de sélection des règles dans le CI. Migration des tests vers le nouveau Grimoire Numérique (TiPTap).",
-        "major": false
-    },
-    {
-        "version": "2.49.21",
-        "date": "2026-02-14",
-        "type": "chore",
-        "content": "⚡ Turbo CI : Fusion des jobs pour éviter les installations redondantes, ajout du cache pour les navigateurs Playwright (gain de ~3-5 min) et exécution des tests E2E sur le build de production.",
         "major": false
     }
 ]

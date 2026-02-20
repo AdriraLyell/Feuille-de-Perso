@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.51",
+        "date": "2026-02-20",
+        "type": "style",
+        "description": "Amélioration UI : Remplacement de la boîte de dialogue système 'confirm' par une modale thématique personnalisée pour confirmer la promotion d'une spécialisation en compétence secondaire."
+    },
+    {
         "version": "2.56.50",
         "date": "2026-02-20",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-20",
         "type": "fix",
         "description": "Correction d'un blocage de navigation après réinitialisation des paramètres. Ajout de la modale de confirmation d'abandon et amélioration de la détection des changements non enregistrés."
-    },
-    {
-        "version": "2.56.28",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Refonte majeure de la robustesse du schéma de données personnage (Zod) pour éliminer les erreurs de chargement au rafraîchissement. Ajout de logs de diagnostic pour le calcul des bonus XP des traits."
     }
 ]
