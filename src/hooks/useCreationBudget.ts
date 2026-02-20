@@ -168,6 +168,9 @@ export function useCreationBudget(): CreationBudgetResult {
         xpEquivalence += traitsXPCost;
         if (mode === 'points') {
             xpSpentTotal += traitsXPCost;
+        } else {
+            // En mode Rangs, on retire les traits de l'équivalence XP informative
+            xpEquivalence -= traitsXPCost;
         }
 
         return {

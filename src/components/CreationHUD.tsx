@@ -105,7 +105,7 @@ const CreationHUD: React.FC = () => {
                                 <div className={`relative px-8 py-3 rounded-lg border-2 bg-stone-800 shadow-inner min-w-[200px] text-center overflow-hidden ${xpRemainingGlobal < 0 ? 'border-red-600' : (xpRemainingGlobal === 0 ? 'border-green-600' : 'border-blue-600')}`}>
                                     <div className="text-xs uppercase text-stone-400 font-bold mb-1 tracking-widest relative z-10">XP Restants</div>
                                     <div className={`text-3xl font-mono font-black relative z-10 ${xpRemainingGlobal < 0 ? 'text-red-400' : (xpRemainingGlobal === 0 ? 'text-green-400' : 'text-blue-200')}`}>
-                                        {formatNumber(xpRemainingGlobal)} <span className="text-lg text-stone-500">/ {startingXP}</span>
+                                        {formatNumber(xpRemainingGlobal)} {mode === 'points' && <span className="text-lg text-stone-500">/ {startingXP}</span>}
                                     </div>
                                     {/* Background Progress Effect */}
                                     <div

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.58",
+        "date": "2026-02-20",
+        "type": "fix",
+        "description": "Ajustement Budget Création (Mode Rangs) : Exclusion des traits du calcul d'équivalence XP et masquage de la limite de 450 XP (Starting XP) qui ne s'applique qu'au mode par points."
+    },
+    {
         "version": "2.56.57",
         "date": "2026-02-20",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-19",
         "type": "refactor",
         "description": "Optimisation de la structure Admin : Découpage des bibliothèques (Compétences, Historiques, Habilités Mystiques, Compteurs) en sous-composants dédiés pour améliorer la maintenabilité et réduire la taille des fichiers sources (gain de ~150-200 lignes par fichier critique)."
-    },
-    {
-        "version": "2.56.34",
-        "date": "2026-02-19",
-        "type": "chore",
-        "description": "Opération 'Racine Propre' : Migration des scripts utilitaires vers le dossier dédié, archivage des fichiers SQL temporaires et nettoyage des logs. Migration systématique des derniers `console.log/warn/error` vers le logger applicatif pour une meilleure hygiène de production."
     }
 ]

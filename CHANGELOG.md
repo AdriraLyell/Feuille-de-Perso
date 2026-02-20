@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.28] - 2026-02-15 [FEAT]
+
+- 🖌️ Édition : Ajout d'une palette de surlignage 'Aquarelle' (5 couleurs immersives)
+- 🧹 Outils : Implémentation d'une gomme (Eraser) pour effacer instantanément toute la mise en forme du texte
+- ✨ UX : Activation du mode multicolore pour le surlignage Tiptap
+- 🛡️ Typage : Optimisation de la configuration des extensions du livre
+
 ## [2.49.27] - 2026-02-15 [FEAT]
 
 - 🏛️ UI : Réorganisation du journal de campagne avec une nouvelle barre latérale de structure

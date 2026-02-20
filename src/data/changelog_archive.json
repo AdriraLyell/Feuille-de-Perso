@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.34",
+        "date": "2026-02-19",
+        "type": "chore",
+        "description": "Opération 'Racine Propre' : Migration des scripts utilitaires vers le dossier dédié, archivage des fichiers SQL temporaires et nettoyage des logs. Migration systématique des derniers `console.log/warn/error` vers le logger applicatif pour une meilleure hygiène de production."
+    },
+    {
         "version": "2.56.33",
         "date": "2026-02-19",
         "type": "feat",
@@ -880,18 +886,6 @@
         "changes": [
             "🏛️ UI : Renommage de la sidebar 'Structure' en 'Chapitres' pour plus de clarté",
             "🐛 Fix : Correction du troncage des info-bulles (tooltips) dans la barre latérale en les déplaçant vers la gauche"
-        ],
-        "major": false
-    },
-    {
-        "version": "2.49.28",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🖌️ Édition : Ajout d'une palette de surlignage 'Aquarelle' (5 couleurs immersives)",
-            "🧹 Outils : Implémentation d'une gomme (Eraser) pour effacer instantanément toute la mise en forme du texte",
-            "✨ UX : Activation du mode multicolore pour le surlignage Tiptap",
-            "🛡️ Typage : Optimisation de la configuration des extensions du livre"
         ],
         "major": false
     }
