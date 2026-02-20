@@ -96,6 +96,7 @@ export interface RulesData {
         creation: RulesCreationConfig;
         xpCosts: RulesXPCosts;
         cards: RulesCardConfig;
+        calendar?: CalendarConfig;
     };
     definitions: {
         attributes: Record<string, string[]>;
@@ -115,6 +116,49 @@ export interface RulesData {
         mysticAbilities: LibrarySkillEntry[];
     };
 }
+// --- Calendar ---
+
+export interface CalendarEvent {
+    id: string;
+    date: string;         // ISO date ou index fictif (ex: "3-2-14" = année 3, mois 2, jour 14)
+    title: string;
+    description?: string;
+    color?: string;
+}
+
+export interface CalendarSeason {
+    id: string;
+    name: string;
+    monthIndices: number[];  // Index 0-based des mois de cette saison
+    color?: string;
+}
+
+export interface CalendarMonthDef {
+    name: string;
+    days: number;            // Nombre de jours dans ce mois (variable)
+}
+
+export interface CalendarConfigReal {
+    type: 'real';
+    startDate: string;       // ISO date (ex: "1800-01-01")
+    currentDate: string;     // ISO date courante
+    events: CalendarEvent[];
+}
+
+export interface CalendarConfigFictional {
+    type: 'fictional';
+    startYear: number;
+    currentYear: number;
+    currentMonthIndex: number; // 0-based
+    currentDay: number;        // 1-based
+    months: CalendarMonthDef[];
+    dayNames: string[];        // Noms des jours de la semaine
+    seasons: CalendarSeason[];
+    events: CalendarEvent[];
+}
+
+export type CalendarConfig = CalendarConfigReal | CalendarConfigFictional;
+
 export interface GameSettingSummary {
     id: string;
     name: string;

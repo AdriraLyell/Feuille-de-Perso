@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { ArrowLeft, LogOut, BookOpen, Users } from 'lucide-react';
+import { ArrowLeft, LogOut, BookOpen, Users, CalendarDays } from 'lucide-react';
 import { extractRulesFromCharacter } from './utils/templateImporter';
 import { RulesData } from '../types/rules';
 import AdminCreationEditor from './components/AdminCreationEditor';
@@ -16,6 +16,7 @@ import AdminBackgroundLibrary from './components/libraries/AdminBackgroundLibrar
 import AdminCounterLibrary from './components/libraries/AdminCounterLibrary';
 import AdminMysticLibrary from './components/libraries/AdminMysticLibrary';
 import AdminDashboard from './components/AdminDashboard';
+import AdminCalendarEditor from './components/AdminCalendarEditor';
 import CampaignCharactersView from './components/CampaignCharactersView';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
 import LoginScreen from './components/LoginScreen';
@@ -47,7 +48,7 @@ const AdminApp: React.FC = () => {
     } = useAdminRulesHandler();
 
     const [viewMode, setViewMode] = useState<'dashboard' | 'editor' | 'players'>('dashboard');
-    const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'libraries' | 'players'>('general');
+    const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'libraries' | 'calendar' | 'players'>('general');
     const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters' | 'mystic'>('traits');
 
     const [showImportResult, setShowImportResult] = useState(false);
@@ -184,6 +185,7 @@ const AdminApp: React.FC = () => {
                         { id: 'attributes', label: 'Attributs' },
                         { id: 'skills', label: 'Compétences' },
                         { id: 'libraries', label: <div className="flex items-center justify-center gap-2"><BookOpen size={16} /> Bibliothèques</div> },
+                        { id: 'calendar', label: <div className="flex items-center justify-center gap-2"><CalendarDays size={16} /> Calendrier</div> },
                         { id: 'players', label: <div className="flex items-center justify-center gap-2"><Users size={16} /> Joueurs</div> }
                     ] as const).map(tab => (
                         <button
@@ -236,6 +238,7 @@ const AdminApp: React.FC = () => {
                         {activeLibraryTab === 'specializations' && <AdminSpecializationLibrary rules={rules} onUpdate={handleUpdateRules} globalUsage={globalUsage} />}
                     </div>
                 )}
+                {activeTab === 'calendar' && <AdminCalendarEditor rules={rules} onUpdate={handleUpdateRules} />}
                 {activeTab === 'players' && currentSettingId && <CampaignCharactersView settingId={currentSettingId} onRefreshRules={refreshRules} />}
             </main>
 

@@ -61,27 +61,29 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
                         className="bg-stone-950 border border-stone-700 px-2 py-1 outline-none flex-grow text-stone-200 font-bold text-sm rounded-sm shadow-inner focus:border-amber-500 transition-colors font-serif tracking-wide"
                         placeholder="Label de la catégorie"
                     />
-                    <div className="flex gap-1 shrink-0">
+                    <div className="flex flex-col gap-1 shrink-0 items-end">
+                        <div className="flex gap-1">
+                            <button
+                                onClick={() => onAddSkill(id, true)}
+                                className="bg-stone-800 text-stone-400 p-1.5 rounded-sm hover:bg-stone-700 hover:text-stone-200 transition-colors shadow-sm border border-stone-700"
+                                title="Ajouter un espaceur"
+                            >
+                                <Minus size={14} />
+                            </button>
+                            <button
+                                onClick={() => onAddSkill(id, false)}
+                                className="bg-stone-800 text-amber-500 p-1.5 rounded-sm hover:bg-stone-700 hover:text-amber-400 transition-colors shadow-sm border border-stone-700 hover:border-amber-500/50"
+                                title="Ajouter une compétence"
+                            >
+                                <Plus size={14} />
+                            </button>
+                        </div>
                         <button
                             onClick={() => setShowCostConfig(prev => !prev)}
-                            className={`p-1.5 rounded-sm transition-colors shadow-sm border ${showCostConfig ? 'bg-amber-950/40 text-amber-500 border-amber-500/40' : 'bg-stone-800 text-stone-500 border-stone-700 hover:text-amber-500 hover:border-amber-500/30'}`}
+                            className={`w-full flex items-center justify-center p-1 rounded-sm transition-colors shadow-sm border ${showCostConfig ? 'bg-amber-950/40 text-amber-500 border-amber-500/40' : 'bg-stone-800 text-stone-500 border-stone-700 hover:text-amber-500 hover:border-amber-500/30'}`}
                             title="Configurer le coût XP"
                         >
-                            <Coins size={14} />
-                        </button>
-                        <button
-                            onClick={() => onAddSkill(id, true)}
-                            className="bg-stone-800 text-stone-400 p-1.5 rounded-sm hover:bg-stone-700 hover:text-stone-200 transition-colors shadow-sm border border-stone-700"
-                            title="Ajouter un espaceur"
-                        >
-                            <Minus size={14} />
-                        </button>
-                        <button
-                            onClick={() => onAddSkill(id, false)}
-                            className="bg-stone-800 text-amber-500 p-1.5 rounded-sm hover:bg-stone-700 hover:text-amber-400 transition-colors shadow-sm border border-stone-700 hover:border-amber-500/50"
-                            title="Ajouter une compétence"
-                        >
-                            <Plus size={14} />
+                            <Coins size={12} />
                         </button>
                     </div>
                 </div>

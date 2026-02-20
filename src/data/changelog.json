@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.61.0",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Nouvel onglet Calendrier dans l'administration. Deux modes : Calendrier Réel (date grégorienne avec jours de la semaine calculés, avance rapide) et Calendrier Fictif (mois avec jours variables, jours de semaine personnalisés, saisons avec assignation par mois et couleur). Gestion d'événements avec sélecteur de couleur dans les deux modes. Aperçu mensuel live et navigable. Configuration stockée dans les RulesData du setting."
+    },
+    {
         "version": "2.60.1",
         "date": "2026-02-20",
         "type": "refactor",
