@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.63",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Harmonisation UI : Alignement de la taille de tous les boutons du footer de la modale de trait en format compact (sm)."
+    },
+    {
         "version": "2.56.62",
         "date": "2026-02-21",
         "type": "style",
@@ -112,11 +118,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Stabilisation technique : Correction des erreurs de syntaxe JSON, suppression des doublons d'attributs JSX et rétablissement des imports React dans la modale de synchronisation."
-    },
-    {
-        "version": "2.56.39",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Ajout de l'interface de restauration des backups (SyncModal). Les joueurs peuvent désormais consulter leurs deux dernières versions historiques sur le cloud et les restaurer d'un clic."
     }
 ]

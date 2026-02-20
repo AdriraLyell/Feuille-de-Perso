@@ -107,10 +107,10 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
                         )}
                     </div>
                     <div className="flex gap-2">
-                        <ThematicButton onClick={onClose} variant="secondary" leftIcon={<X size={16} />}>
+                        <ThematicButton onClick={onClose} variant="secondary" size="sm" leftIcon={<X size={16} />}>
                             Annuler
                         </ThematicButton>
-                        <ThematicButton onClick={handleSave} variant="primary" leftIcon={<Save size={16} />}>
+                        <ThematicButton onClick={handleSave} variant="primary" size="sm" leftIcon={<Save size={16} />}>
                             Sauvegarder
                         </ThematicButton>
                     </div>

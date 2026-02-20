@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.39",
+        "date": "2026-02-19",
+        "type": "feat",
+        "description": "Ajout de l'interface de restauration des backups (SyncModal). Les joueurs peuvent désormais consulter leurs deux dernières versions historiques sur le cloud et les restaurer d'un clic."
+    },
+    {
         "version": "2.56.38",
         "date": "2026-02-19",
         "type": "feat",
@@ -860,15 +866,6 @@
             "🛠️ Refactoring : Éclatement du hook useAttributeEditor en modules spécialisés",
             "📏 Code Health : Extraction de useAttributeStructure (gestion des catégories) et useAttributePresets (gestion des préréglages)",
             "🏗️ Architecture : Amélioration de la modularité et réduction de la dette technique sur l'administration des attributs"
-        ]
-    },
-    {
-        "version": "2.49.33",
-        "date": "2026-02-15",
-        "type": "refactor",
-        "changes": [
-            "🛠️ Refactoring : Extraction de la logique de AdminTraitLibrary dans le hook useAdminTraitLibrary",
-            "📏 Code Health : Réduction de la taille de AdminTraitLibrary.tsx (517 -> 240 lignes)"
         ]
     }
 ]

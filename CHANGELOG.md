@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.33] - 2026-02-15 [REFACTOR]
+
+- 🛠️ Refactoring : Extraction de la logique de AdminTraitLibrary dans le hook useAdminTraitLibrary
+- 📏 Code Health : Réduction de la taille de AdminTraitLibrary.tsx (517 -> 240 lignes)
+
 ## [2.49.32] - 2026-02-15 [REFACTOR]
 
 - 🛠️ Refactoring : Extraction de la logique de ColumnarEditor dans des hooks spécialisés (Navigation, Dessin)
