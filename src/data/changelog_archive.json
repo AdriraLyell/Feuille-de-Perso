@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.30",
+        "date": "2026-02-20",
+        "type": "fix",
+        "description": "Sécurisation et typage strict des champs optionnels (mysticAbilityId, coûts, descriptions) à travers l'application. Harmonisation des Interfaces et Schémas Zod pour éliminer les erreurs de build et prévenir les plantages liés aux valeurs nulles."
+    },
+    {
         "version": "2.56.29",
         "date": "2026-02-20",
         "type": "fix",
@@ -910,13 +916,6 @@
             "📏 Grimoire : Ligne de séparation décorative (Horizontal Rule) avec icône ◈",
             "🛠️ UI : Barre d'outils réorganisée en groupes logiques et icônes affinées"
         ],
-        "major": false
-    },
-    {
-        "version": "2.49.23",
-        "date": "2026-02-14",
-        "type": "fix",
-        "content": "🛡️ E2E Pagination : Augmentation de la charge de texte (100 lignes) pour garantir le déclenchement des seuils de pagination dans les tests automatisés.",
         "major": false
     }
 ]

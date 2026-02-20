@@ -40,7 +40,7 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-y-0 right-0 w-80 bg-white shadow-2xl z-[200] border-l border-gray-200 flex flex-col animate-in slide-in-from-right duration-300">
+        <div className="fixed top-14 bottom-0 right-0 w-80 bg-white shadow-2xl z-[200] border-l border-gray-200 flex flex-col animate-in slide-in-from-right duration-300">
             {/* Header */}
             <div className="p-4 bg-amber-700 text-white flex justify-between items-center shrink-0">
                 <h3 className="font-bold flex items-center gap-2">

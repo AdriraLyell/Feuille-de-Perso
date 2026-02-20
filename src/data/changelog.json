@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.54",
+        "date": "2026-02-20",
+        "type": "style",
+        "description": "Correction UI : Alignement de la barre latérale des spécialisations sous le bandeau de navigation principal pour éviter le masquage."
+    },
+    {
         "version": "2.56.53",
         "date": "2026-02-20",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-20",
         "type": "fix",
         "description": "Correction du calcul du bonus d'XP par scénario (Traits). Les sessions sont désormais mieux détectées même si le montant est à 0 (détection via le nom du scénario). Amélioration des logs de diagnostic XP et fixation des erreurs de validation Zod lors du chargement initial."
-    },
-    {
-        "version": "2.56.30",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Sécurisation et typage strict des champs optionnels (mysticAbilityId, coûts, descriptions) à travers l'application. Harmonisation des Interfaces et Schémas Zod pour éliminer les erreurs de build et prévenir les plantages liés aux valeurs nulles."
     }
 ]
