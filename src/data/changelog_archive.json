@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.60",
+        "date": "2026-02-20",
+        "type": "fix",
+        "description": "Correction de la sauvegarde des compteurs : Les modifications (valeur max, coût XP) effectuées depuis la bibliothèque d'administration sont désormais correctement sauvegardées en base de données et appliquées aux fiches des joueurs."
+    },
+    {
         "version": "2.56.59",
         "date": "2026-02-20",
         "type": "fix",
@@ -791,16 +797,6 @@
             "🐛 Fix : Correction d'une erreur de syntaxe blockante (return manquant) dans CharacterReadOnlyView",
             "🛡️ Stabilité : Restauration de l'import RefreshCw manquant dans GlobalPlayersView",
             "🏷️ Typage : Ajout du type RulesData manquant sur le paramètre merged de CharacterReadOnlyView"
-        ]
-    },
-    {
-        "version": "2.49.50",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🏛️ Admin : Restriction du signal de mise à jour MJ aux personnages liés à une campagne uniquement",
-            "🧹 Clean : Retrait du bouton de mise à jour de la Master List globale pour éviter les actions hors contexte",
-            "🛠️ Architecture : Ajout de la prop 'allowForceUpdate' au composant CharacterReadOnlyView pour un contrôle granulaire"
         ]
     }
 ]

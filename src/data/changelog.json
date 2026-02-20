@@ -118,11 +118,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Système d'achat de Traits post-création : Les avantages peuvent désormais être acquis via XP hors création (fonds émeraude, icône ❇️). Les désavantages peuvent être rachetés (coût fixe) ou réduits (rang par rang) via une nouvelle interface dans la modale d'édition. Les déductions d'XP sont automatiques et tracées dans l'historique."
-    },
-    {
-        "version": "2.56.60",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction de la sauvegarde des compteurs : Les modifications (valeur max, coût XP) effectuées depuis la bibliothèque d'administration sont désormais correctement sauvegardées en base de données et appliquées aux fiches des joueurs."
     }
 ]

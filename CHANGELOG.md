@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.50] - 2026-02-15 [FEAT]
+
+- 🏛️ Admin : Restriction du signal de mise à jour MJ aux personnages liés à une campagne uniquement
+- 🧹 Clean : Retrait du bouton de mise à jour de la Master List globale pour éviter les actions hors contexte
+- 🛠️ Architecture : Ajout de la prop 'allowForceUpdate' au composant CharacterReadOnlyView pour un contrôle granulaire
+
 ## [2.49.49] - 2026-02-15 [FIX]
 
 - 🐛 Fix : Correction d'une erreur de référence sur ThematicModal dans la Master List des joueurs
