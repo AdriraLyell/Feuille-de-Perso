@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.72",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction UI : Alignement et centrage des valeurs dans le résumé d'expérience. Suppression des conteneurs flex imbriqués qui empêchaient le centrage correct du champ 'Gain' et application d'une largeur fixe avec marge automatique pour un alignement vertical parfait de toutes les statistiques d'expérience."
+    },
+    {
         "version": "2.56.71",
         "date": "2026-02-21",
         "type": "style",
@@ -112,11 +118,5 @@
         "date": "2026-02-20",
         "type": "style",
         "description": "Amélioration UI : Remplacement de la boîte de dialogue système 'confirm' par une modale thématique personnalisée pour confirmer la promotion d'une spécialisation en compétence secondaire."
-    },
-    {
-        "version": "2.56.50",
-        "date": "2026-02-20",
-        "type": "feat",
-        "description": "Promotion des spécialisations : Ajout d'une fonctionnalité permettant de convertir une spécialisation en compétence secondaire via un bouton d'action dans l'onglet Spécialisations. Cette action libère l'emplacement de spécialisation et crée une nouvelle compétence à 0 point dans la catégorie secondaire."
     }
 ]

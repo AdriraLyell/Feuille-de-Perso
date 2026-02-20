@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.50",
+        "date": "2026-02-20",
+        "type": "feat",
+        "description": "Promotion des spécialisations : Ajout d'une fonctionnalité permettant de convertir une spécialisation en compétence secondaire via un bouton d'action dans l'onglet Spécialisations. Cette action libère l'emplacement de spécialisation et crée une nouvelle compétence à 0 point dans la catégorie secondaire."
+    },
+    {
         "version": "2.56.49",
         "date": "2026-02-20",
         "type": "style",
@@ -830,16 +836,6 @@
             "📏 Admin : Augmentation de la hauteur verticale des vues de listes (Bibliothèques & Personnages)",
             "🖥️ UX : Utilisation optimisée de l'espace vertical pour une meilleure visibilité des données",
             "📜 Sync : Ajout d'une barre de défilement sur la liste des personnages de campagne"
-        ]
-    },
-    {
-        "version": "2.49.41",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🏛️ Admin : Harmonisation de la terminologie des Traits",
-            "🖋️ UI : Renommage de 'Éclats de Fortune' en 'Avantages' et 'Fardeaux de l'Ombre' en 'Désavantages' dans la vue ReadOnly",
-            "🛠️ Admin : Mise à jour des descriptifs de la bibliothèque de traits pour utiliser 'Désavantages' au lieu de 'Défauts'"
         ]
     }
 ]

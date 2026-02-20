@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.41] - 2026-02-15 [FEAT]
+
+- 🏛️ Admin : Harmonisation de la terminologie des Traits
+- 🖋️ UI : Renommage de 'Éclats de Fortune' en 'Avantages' et 'Fardeaux de l'Ombre' en 'Désavantages' dans la vue ReadOnly
+- 🛠️ Admin : Mise à jour des descriptifs de la bibliothèque de traits pour utiliser 'Désavantages' au lieu de 'Défauts'
+
 ## [2.49.40] - 2026-02-15 [FIX]
 
 - ✨ UI : Correction du tronquage des tooltips via React Portals
