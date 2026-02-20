@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.42] - 2026-02-15 [FEAT]
+
+- 📏 Admin : Augmentation de la hauteur verticale des vues de listes (Bibliothèques & Personnages)
+- 🖥️ UX : Utilisation optimisée de l'espace vertical pour une meilleure visibilité des données
+- 📜 Sync : Ajout d'une barre de défilement sur la liste des personnages de campagne
+
 ## [2.49.41] - 2026-02-15 [FEAT]
 
 - 🏛️ Admin : Harmonisation de la terminologie des Traits

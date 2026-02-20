@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.73",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Ajustement UI : L'onglet de Gestion de l'Expérience est de nouveau affiché au format A4 pour être cohérent avec le reste de la fiche de personnage (correction des classes CSS corrompues encadrant le conteneur)."
+    },
+    {
         "version": "2.56.72",
         "date": "2026-02-21",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-20",
         "type": "feat",
         "description": "Amélioration UI : Ajout d'une modale d'erreur explicite ('Promotion Impossible') si la compétence secondaire existe déjà."
-    },
-    {
-        "version": "2.56.51",
-        "date": "2026-02-20",
-        "type": "style",
-        "description": "Amélioration UI : Remplacement de la boîte de dialogue système 'confirm' par une modale thématique personnalisée pour confirmer la promotion d'une spécialisation en compétence secondaire."
     }
 ]

@@ -82,7 +82,7 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
   const sessionGridClass = "grid grid-cols-[110px_0.5fr_1.5fr_2fr_45px_40px_40px]";
 
   return (
-    <div className={`sheet - container xp - sheet p - 8 ${isLandscape ? 'landscape' : ''} `}>
+    <div className={`sheet-container xp-sheet p-8 ${isLandscape ? 'landscape' : ''}`}>
 
       {/* Title Header */}
       <div className="py-3 border-b-2 border-stone-800 mb-6 relative flex items-center justify-center bg-white">
