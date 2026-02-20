@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.71",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Ajustement UI : Centrage de la valeur du champ 'Gain' dans le résumé d'expérience pour une meilleure harmonie visuelle avec les autres champs de stats."
+    },
+    {
         "version": "2.56.70",
         "date": "2026-02-21",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-20",
         "type": "feat",
         "description": "Promotion des spécialisations : Ajout d'une fonctionnalité permettant de convertir une spécialisation en compétence secondaire via un bouton d'action dans l'onglet Spécialisations. Cette action libère l'emplacement de spécialisation et crée une nouvelle compétence à 0 point dans la catégorie secondaire."
-    },
-    {
-        "version": "2.56.49",
-        "date": "2026-02-20",
-        "type": "style",
-        "description": "Amélioration UX : Harmonisation de la taille du Hub Cloud. La modale de synchronisation utilise désormais une taille large unifiée pour les onglets 'Push' et 'Pull', évitant les sauts de redimensionnement lors de la navigation."
     }
 ]

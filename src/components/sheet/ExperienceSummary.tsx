@@ -22,7 +22,7 @@ const ExperienceSummary: React.FC<ExperienceSummaryProps> = ({ experience, cardV
                     <div className="flex-grow flex justify-end">
                         <input
                             readOnly
-                            className="w-full text-right border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting font-bold text-ink text-sm px-1"
+                            className="w-full text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting font-bold text-ink text-sm px-1"
                             value={experience.gain}
                             title={experience.gainTooltip || experience.gain}
                         />

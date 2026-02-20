@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.40] - 2026-02-15 [FIX]
+
+- ✨ UI : Correction du tronquage des tooltips via React Portals
+- 🧩 UX : Ajout du composant PortalTooltip pour les variantes (Traits, Compétences, Historiques)
+- 🏗️ Refactoring : Migration des listes de variantes vers le système de portail pour éviter le clipping overflow
+
 ## [2.49.39] - 2026-02-15 [FIX]
 
 - 🐛 Fix : Correction d'une violation des règles des Hooks React (useState dans un .map)

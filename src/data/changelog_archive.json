@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.49",
+        "date": "2026-02-20",
+        "type": "style",
+        "description": "Amélioration UX : Harmonisation de la taille du Hub Cloud. La modale de synchronisation utilise désormais une taille large unifiée pour les onglets 'Push' et 'Pull', évitant les sauts de redimensionnement lors de la navigation."
+    },
+    {
         "version": "2.56.48",
         "date": "2026-02-19",
         "type": "refactor",
@@ -834,16 +840,6 @@
             "🏛️ Admin : Harmonisation de la terminologie des Traits",
             "🖋️ UI : Renommage de 'Éclats de Fortune' en 'Avantages' et 'Fardeaux de l'Ombre' en 'Désavantages' dans la vue ReadOnly",
             "🛠️ Admin : Mise à jour des descriptifs de la bibliothèque de traits pour utiliser 'Désavantages' au lieu de 'Défauts'"
-        ]
-    },
-    {
-        "version": "2.49.40",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "✨ UI : Correction du tronquage des tooltips via React Portals",
-            "🧩 UX : Ajout du composant PortalTooltip pour les variantes (Traits, Compétences, Historiques)",
-            "🏗️ Refactoring : Migration des listes de variantes vers le système de portail pour éviter le clipping overflow"
         ]
     }
 ]
