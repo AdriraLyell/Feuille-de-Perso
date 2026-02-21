@@ -58,7 +58,7 @@ export const ConfigQuickSummary: React.FC<ConfigQuickSummaryProps> = ({
             </MotionFade>
 
             {/* Quick Toggle Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <MotionFade delay={0.2}>
                     <MotionCard className="p-6 h-full flex flex-col justify-between border border-stone-800/50 group" hoverEffect="glow">
                         <div className="flex items-start justify-between mb-4">
@@ -79,71 +79,78 @@ export const ConfigQuickSummary: React.FC<ConfigQuickSummaryProps> = ({
                     </MotionCard>
                 </MotionFade>
 
-                <MotionFade delay={0.25}>
-                    <MotionCard className="p-6 h-full flex flex-col justify-between border border-stone-800/50 group" hoverEffect="glow">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="p-3 bg-amber-900/10 text-amber-500 rounded-sm border border-amber-900/20 group-hover:scale-110 transition-transform">
-                                <Coins size={24} />
-                            </div>
-                            <div className="flex-grow">
-                                <h4 className="text-sm font-black text-stone-200 uppercase tracking-widest">Coût Arrière-Plans</h4>
-                                <p className="text-[10px] text-stone-500 font-bold italic">Base de calcul XP</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-3 bg-stone-950/40 p-2 rounded-sm border border-stone-800">
-                            <input
-                                type="number"
-                                value={config.backgroundCost ?? 2}
-                                onChange={(e) => updateCreationConfig('backgroundCost', parseInt(e.target.value) || 0)}
-                                className="w-full bg-transparent border-none text-right font-mono font-black text-amber-500 focus:outline-none text-lg"
-                            />
-                            <span className="text-[10px] font-black text-stone-600 uppercase tracking-tighter shrink-0 pr-2 border-l border-stone-800 pl-3">Points XP</span>
-                        </div>
-                    </MotionCard>
-                </MotionFade>
+                <MotionFade delay={0.25} className="lg:col-span-3">
+                    <MotionCard className="p-6 border border-amber-900/20 bg-amber-950/5 group" hoverEffect="glow">
+                        <h4 className="text-xs font-black text-amber-600 uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
+                            <Coins size={14} /> Facteurs de Coût (XP)
+                        </h4>
 
-                <MotionFade delay={0.3}>
-                    <MotionCard className="p-6 h-full flex flex-col justify-between border border-stone-800/50 group" hoverEffect="glow">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="p-3 bg-crimson-blood/10 text-rose-500 rounded-sm border border-rose-900/20 group-hover:scale-110 transition-transform">
-                                <Zap size={24} />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* background cost */}
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-amber-900/10 text-amber-500 rounded-sm border border-amber-900/20">
+                                        <Coins size={18} />
+                                    </div>
+                                    <div>
+                                        <h5 className="text-[10px] font-black text-stone-300 uppercase tracking-wider">Arrière-Plans</h5>
+                                        <p className="text-[9px] text-stone-500 font-bold italic">Base XP</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 bg-stone-950/60 p-2 rounded-sm border border-stone-800 focus-within:border-amber-500/30 transition-colors">
+                                    <input
+                                        type="number"
+                                        value={config.backgroundCost ?? 2}
+                                        onChange={(e) => updateCreationConfig('backgroundCost', parseInt(e.target.value) || 0)}
+                                        className="w-full bg-transparent border-none text-right font-mono font-black text-amber-500 focus:outline-none text-lg"
+                                    />
+                                    <span className="text-[8px] font-black text-stone-600 uppercase tracking-tighter shrink-0 pr-1 border-l border-stone-800 pl-2">XP</span>
+                                </div>
                             </div>
-                            <div className="flex-grow">
-                                <h4 className="text-sm font-black text-stone-200 uppercase tracking-widest">Coût Attributs</h4>
-                                <p className="text-[10px] text-stone-500 font-bold italic">Prix par rang</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-3 bg-stone-950/40 p-2 rounded-sm border border-stone-800">
-                            <input
-                                type="number"
-                                value={xpCosts.attributeFactor ?? 6}
-                                onChange={(e) => updateXPCost('attributeFactor', parseInt(e.target.value) || 0)}
-                                className="w-full bg-transparent border-none text-right font-mono font-black text-amber-500 focus:outline-none text-lg"
-                            />
-                            <span className="text-[10px] font-black text-stone-600 uppercase tracking-tighter shrink-0 pr-2 border-l border-stone-800 pl-3">Points XP</span>
-                        </div>
-                    </MotionCard>
-                </MotionFade>
 
-                <MotionFade delay={0.35}>
-                    <MotionCard className="p-6 h-full flex flex-col justify-between border border-stone-800/50 group" hoverEffect="glow">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="p-3 bg-emerald-900/10 text-emerald-500 rounded-sm border border-emerald-900/20 group-hover:scale-110 transition-transform">
-                                <Sparkles size={24} />
+                            {/* attributes cost */}
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-crimson-blood/10 text-rose-500 rounded-sm border border-rose-900/20">
+                                        <Zap size={18} />
+                                    </div>
+                                    <div>
+                                        <h5 className="text-[10px] font-black text-stone-300 uppercase tracking-wider">Attributs</h5>
+                                        <p className="text-[9px] text-stone-500 font-bold italic">Par rang</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 bg-stone-950/60 p-2 rounded-sm border border-stone-800 focus-within:border-amber-500/30 transition-colors">
+                                    <input
+                                        type="number"
+                                        value={xpCosts.attributeFactor ?? 6}
+                                        onChange={(e) => updateXPCost('attributeFactor', parseInt(e.target.value) || 0)}
+                                        className="w-full bg-transparent border-none text-right font-mono font-black text-amber-500 focus:outline-none text-lg"
+                                    />
+                                    <span className="text-[8px] font-black text-stone-600 uppercase tracking-tighter shrink-0 pr-1 border-l border-stone-800 pl-2">XP</span>
+                                </div>
                             </div>
-                            <div className="flex-grow">
-                                <h4 className="text-sm font-black text-stone-200 uppercase tracking-widest">Coût Traits</h4>
-                                <p className="text-[10px] text-stone-500 font-bold italic">Prix par point</p>
+
+                            {/* traits cost */}
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-emerald-900/10 text-emerald-500 rounded-sm border border-emerald-900/20">
+                                        <Sparkles size={18} />
+                                    </div>
+                                    <div>
+                                        <h5 className="text-[10px] font-black text-stone-300 uppercase tracking-wider">Traits</h5>
+                                        <p className="text-[9px] text-stone-500 font-bold italic">Par point</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 bg-stone-950/60 p-2 rounded-sm border border-stone-800 focus-within:border-amber-500/30 transition-colors">
+                                    <input
+                                        type="number"
+                                        value={xpCosts.traitCost ?? 5}
+                                        onChange={(e) => updateXPCost('traitCost', parseInt(e.target.value) || 0)}
+                                        className="w-full bg-transparent border-none text-right font-mono font-black text-amber-500 focus:outline-none text-lg"
+                                    />
+                                    <span className="text-[8px] font-black text-stone-600 uppercase tracking-tighter shrink-0 pr-1 border-l border-stone-800 pl-2">XP</span>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex items-center gap-3 bg-stone-950/40 p-2 rounded-sm border border-stone-800">
-                            <input
-                                type="number"
-                                value={xpCosts.traitCost ?? 5}
-                                onChange={(e) => updateXPCost('traitCost', parseInt(e.target.value) || 0)}
-                                className="w-full bg-transparent border-none text-right font-mono font-black text-amber-500 focus:outline-none text-lg"
-                            />
-                            <span className="text-[10px] font-black text-stone-600 uppercase tracking-tighter shrink-0 pr-2 border-l border-stone-800 pl-3">Points XP</span>
                         </div>
                     </MotionCard>
                 </MotionFade>

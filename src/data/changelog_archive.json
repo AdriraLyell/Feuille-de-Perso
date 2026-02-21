@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.60.1",
+        "date": "2026-02-20",
+        "type": "refactor",
+        "description": "Admin : Déplacement des paramètres de coût XP (formule Triangulaire/Linéaire + multiplicateur) de l'onglet 'Coûts & Limites' vers une section collapsable dans chaque carte de catégorie de compétences. Suppression de l'onglet 'Coûts & Limites' devenu vide et du composant AdminCostsEditor."
+    },
+    {
         "version": "2.60.0",
         "date": "2026-02-21",
         "type": "refactor",
@@ -721,16 +727,6 @@
             "📖 Journal : Fix de la conversion des dimensions d'images lors de la migration (px vers %)",
             "🖼️ UI : Ajout d'une limite de hauteur maximale (800px) pour les images du Grimoire",
             "📏 Migration : Correction du ratio d'aspect forcé à 'auto' pour les images importées"
-        ]
-    },
-    {
-        "version": "2.49.69",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "📂 Admin : Déplacement de la fonctionnalité de recréation vers les paramètres spécifiques de chaque campagne (Fiches des Destins)",
-            "🧩 Imports : Correction d'une erreur de référence sur l'icône RotateCcw",
-            "⏳ UX : Ajout d'états de chargement et verrouillage pendant le processus de recréation"
         ]
     }
 ]

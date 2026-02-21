@@ -1,5 +1,13 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.69] - 2026-02-16 [FIX]
+
+- 📂 Admin : Déplacement de la fonctionnalité de recréation vers les paramètres spécifiques de chaque campagne (Fiches des Destins)
+- 🧩 Imports : Correction d'une erreur de référence sur l'icône RotateCcw
+- ⏳ UX : Ajout d'états de chargement et verrouillage pendant le processus de recréation
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.49.68] - 2026-02-16 [FEAT]
 
 - 🔄 Recréation : Implémentation du système de 'Respec' pour les personnages (Admin)

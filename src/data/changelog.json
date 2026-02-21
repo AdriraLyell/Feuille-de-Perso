@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.65.1",
+        "date": "2026-02-21",
+        "type": "refactor",
+        "description": "Amélioration de l'interface admin : Regroupement des widgets de coût XP (Arrière-Plans, Attributs, Traits) dans un seul bloc 'Facteurs de Coût' pour une meilleure lisibilité et aération de la vue configuration."
+    },
+    {
         "version": "2.65.0",
         "date": "2026-02-21",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Nouvel onglet Calendrier dans l'administration. Deux modes : Calendrier Réel (date grégorienne avec jours de la semaine calculés, avance rapide) et Calendrier Fictif (mois avec jours variables, jours de semaine personnalisés, saisons avec assignation par mois et couleur). Gestion d'événements avec sélecteur de couleur dans les deux modes. Aperçu mensuel live et navigable. Configuration stockée dans les RulesData du setting."
-    },
-    {
-        "version": "2.60.1",
-        "date": "2026-02-20",
-        "type": "refactor",
-        "description": "Admin : Déplacement des paramètres de coût XP (formule Triangulaire/Linéaire + multiplicateur) de l'onglet 'Coûts & Limites' vers une section collapsable dans chaque carte de catégorie de compétences. Suppression de l'onglet 'Coûts & Limites' devenu vide et du composant AdminCostsEditor."
     }
 ]
