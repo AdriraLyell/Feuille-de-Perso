@@ -76,20 +76,6 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         }
     }, []);
 
-    const handleCalendarDateClick = useCallback((date: string) => {
-        if (pickingTarget) {
-            window.dispatchEvent(new CustomEvent('calendar-date-picked', {
-                detail: {
-                    date,
-                    nodeId: pickingTarget.nodeId,
-                    field: pickingTarget.field
-                }
-            }));
-            setPickingTarget(null);
-        } else {
-            scrollToDate(date);
-        }
-    }, [pickingTarget, scrollToDate]);
 
     // Event listener for external calendar toggling
     useEffect(() => {
@@ -223,6 +209,21 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
             }
         }
     }, [editor]);
+
+    const handleCalendarDateClick = useCallback((date: string) => {
+        if (pickingTarget) {
+            window.dispatchEvent(new CustomEvent('calendar-date-picked', {
+                detail: {
+                    date,
+                    nodeId: pickingTarget.nodeId,
+                    field: pickingTarget.field
+                }
+            }));
+            setPickingTarget(null);
+        } else {
+            scrollToDate(date);
+        }
+    }, [pickingTarget, scrollToDate]);
 
     // Initial Content Injection
     useEffect(() => {
