@@ -245,37 +245,37 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                                 >
                                     {day}
                                     {hasEvents && (
-                                        <span className={`absolute bottom-0.5 left-1/2 -translate-x-1/2 w-0.5 h-0.5 rounded-full ${isToday ? 'bg-stone-950' : 'bg-amber-500'}`} />
+                                        <span className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full ${isToday ? 'bg-stone-950' : 'bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.5)]'}`} />
                                     )}
                                     {isTraveling && !isToday && (
-                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-500/20" />
+                                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-amber-500/30" />
                                     )}
                                     {hasNotes && !isToday && (
-                                        <div className="absolute top-0.5 right-0.5">
+                                        <div className="absolute top-1 right-1">
                                             {WeatherIcon ? (
-                                                <WeatherIcon size={6} className={`${weatherColor} group-hover:opacity-100`} />
+                                                <WeatherIcon size={10} className={`${weatherColor} group-hover:opacity-100 transition-opacity drop-shadow-sm`} />
                                             ) : (
-                                                <PenLine size={6} className="text-amber-500/50 group-hover:text-amber-500" />
+                                                <PenLine size={10} className="text-amber-500 group-hover:text-amber-400 transition-colors drop-shadow-sm" />
                                             )}
                                         </div>
                                     )}
 
                                     {onNewChapter && (
-                                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-stone-900/95 flex items-center justify-around px-1 transition-opacity rounded-sm z-10 border border-amber-500/30">
+                                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-stone-950/90 backdrop-blur-[4px] flex items-center justify-center gap-2 transition-all duration-300 rounded-md z-10 border border-amber-500/50 shadow-2xl scale-95 group-hover:scale-100">
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr, true); }}
-                                                className="p-1.5 hover:bg-stone-800 rounded-md transition-colors text-amber-500 hover:text-amber-400 group/btn"
+                                                className="w-8 h-8 flex items-center justify-center bg-stone-900 border border-amber-500/20 hover:bg-amber-500 hover:text-stone-950 rounded-full transition-all text-amber-500 group/btn shadow-lg"
                                                 title="Insérer au curseur"
                                             >
-                                                <PlusCircle size={16} />
+                                                <PlusCircle size={16} strokeWidth={2.5} />
                                             </button>
-                                            <div className="w-px h-4 bg-stone-800" />
+                                            <div className="w-[1px] h-4 bg-amber-500/30" />
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr, false); }}
-                                                className="p-1.5 hover:bg-stone-800 rounded-md transition-colors text-amber-500 hover:text-amber-400 group/btn"
+                                                className="w-8 h-8 flex items-center justify-center bg-stone-900 border border-amber-500/20 hover:bg-amber-500 hover:text-stone-950 rounded-full transition-all text-amber-500 group/btn shadow-lg"
                                                 title="Ajouter à la fin du livre"
                                             >
-                                                <ArrowDownToLine size={16} />
+                                                <ArrowDownToLine size={16} strokeWidth={2.5} />
                                             </button>
                                         </div>
                                     )}
