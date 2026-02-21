@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.64.2",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction du pavé fantôme 'PAVE_ATTRIBUTS_4' après réinitialisation : (1) dans rulesAdapter, l'attributeSettings est désormais reconstruit depuis les clés des attributs primaires (et non secondaires), éliminant l'apparition erronée d'un 4ème pavé avec label brut. (2) Filtre défensif sur les secondaryAttributes pour ignorer les clés orphelines absentes de l'attributeSettings. (3) Nettoyage de l'état initial : suppression de la clé pave_attributs_4 superflue dans secondaryAttributes de getInitialCharacterData."
+    },
+    {
         "version": "2.64.1",
         "date": "2026-02-21",
         "type": "fix",

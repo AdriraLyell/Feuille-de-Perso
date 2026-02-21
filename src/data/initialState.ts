@@ -215,10 +215,6 @@ export const getInitialCharacterData = (): CharacterSheetData => {
       pave_attributs_3: [
         createAttributeEntry('Présence'),
         createAttributeEntry('Charme'),
-      ],
-      pave_attributs_4: [
-        createAttributeEntry('Aura'),
-        createAttributeEntry('Fascination'),
       ]
     },
     skills: skills,
