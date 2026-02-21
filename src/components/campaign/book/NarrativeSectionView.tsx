@@ -77,13 +77,13 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
             data-section-title={title || ""}
         >
             <div className="flex items-center justify-between mb-3 border-b border-current/10 pb-2">
-                <div className="flex items-center gap-2 font-serif italic tracking-wider h-6 flex-grow">
-                    <div className="flex items-center gap-1.5 opacity-80 shrink-0">
+                <div className="flex items-center gap-0 font-serif italic tracking-wider h-6 flex-grow">
+                    <div className="flex items-center gap-1 opacity-80 shrink-0">
                         {getIcon()}
                         <span className="text-[10px] font-bold uppercase">{getLabel()}</span>
                     </div>
 
-                    <div className="h-4 w-px bg-current/10 mx-1 shrink-0" />
+                    <div className="h-4 w-px bg-current/10 mx-3 shrink-0" />
 
                     {/* Champ de Titre pour le sommaire */}
                     <input
@@ -95,13 +95,13 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                     />
 
                     {(type === 'moment' || type === 'flashback' || type === 'voyage') && (
-                        <div className="h-4 w-px bg-current/10 mx-1 shrink-0" />
+                        <div className="h-4 w-px bg-current/10 mx-3 shrink-0" />
                     )}
 
                     {/* Time for Moments */}
                     {type === 'moment' && (
-                        <div className="flex items-center gap-1 font-normal lowercase opacity-70 pl-1 shrink-0">
-                            <Clock size={10} />
+                        <div className="flex items-center gap-1.5 font-normal lowercase opacity-70 shrink-0">
+                            <Clock size={10} className="translate-y-[0.5px]" />
                             <input
                                 type="text"
                                 placeholder="--:--"
@@ -114,11 +114,11 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
 
                     {/* Date for Flashback */}
                     {type === 'flashback' && (
-                        <div className="flex items-center gap-1 ml-2 font-normal lowercase opacity-70 border-l border-current/20 pl-2">
+                        <div className="flex items-center gap-1.5 font-normal lowercase opacity-70 border-l border-current/20 pl-3 ml-1">
                             <button
                                 type="button"
                                 onClick={() => handleCalendarClick('date')}
-                                className="hover:text-amber-500 transition-colors"
+                                className="hover:text-amber-500 transition-colors flex items-center"
                             >
                                 <Calendar size={10} />
                             </button>
@@ -134,11 +134,11 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
 
                     {/* Range for Voyage */}
                     {type === 'voyage' && (
-                        <div className="flex items-center gap-1 ml-2 font-normal lowercase opacity-70 border-l border-current/20 pl-2">
+                        <div className="flex items-center gap-1.5 ml-1 font-normal lowercase opacity-70 border-l border-current/20 pl-3">
                             <button
                                 type="button"
                                 onClick={() => handleCalendarClick('dateStart')}
-                                className="hover:text-amber-500 transition-colors"
+                                className="hover:text-amber-500 transition-colors flex items-center"
                             >
                                 <Calendar size={10} />
                             </button>
@@ -160,7 +160,7 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                             <button
                                 type="button"
                                 onClick={() => handleCalendarClick('dateEnd')}
-                                className="hover:text-amber-500 transition-colors"
+                                className="hover:text-amber-500 transition-colors flex items-center"
                             >
                                 <Calendar size={10} />
                             </button>
