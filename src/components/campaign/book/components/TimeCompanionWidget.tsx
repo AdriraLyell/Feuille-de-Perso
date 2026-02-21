@@ -184,12 +184,12 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
 
     return (
         <div
-            className="absolute z-50 p-4 bg-stone-900/95 border border-amber-600/30 rounded-xl shadow-2xl backdrop-blur-md animate-in slide-in-from-right-4 duration-500 w-[280px]"
+            className="absolute z-50 p-5 bg-stone-950 border border-amber-500/50 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] animate-in slide-in-from-right-4 duration-500 w-[340px]"
             style={{ right: '55px', top: '0px' }}
         >
             <div className="flex items-center gap-2 mb-3 border-b border-stone-800 pb-2">
                 <CalendarDays size={14} className="text-amber-500" />
-                <div className="text-[11px] font-serif font-bold text-stone-300 uppercase tracking-widest truncate flex-1">
+                <div className="text-[12px] font-serif font-bold text-amber-500 uppercase tracking-[0.2em] truncate flex-1">
                     Chroniqueur
                 </div>
                 <button
@@ -206,7 +206,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                         <button onClick={prevMonth} className="p-1 hover:text-amber-400 text-stone-600 transition-colors">
                             <ChevronLeft size={14} />
                         </button>
-                        <div className="text-[11px] font-bold text-amber-500/80 uppercase text-center truncate px-1 tracking-wider">
+                        <div className="text-[13px] font-bold text-stone-100 uppercase text-center truncate px-2 tracking-widest">
                             {monthName}
                         </div>
                         <button onClick={nextMonth} className="p-1 hover:text-amber-400 text-stone-600 transition-colors">
@@ -216,7 +216,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
 
                     <div className="grid gap-0.5 mb-1" style={{ gridTemplateColumns: `repeat(${dayNames.length}, minmax(0, 1fr))` }}>
                         {dayNames.map((d, i) => (
-                            <div key={i} className="text-center text-[10px] font-bold text-stone-600 uppercase">
+                            <div key={i} className="text-center text-[11px] font-bold text-stone-400 uppercase pb-1">
                                 {d}
                             </div>
                         ))}
@@ -239,9 +239,9 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                                 <div
                                     key={i}
                                     onClick={() => onDateClick?.(dateStr)}
-                                    className={`group relative text-center text-[11px] py-1.5 rounded transition-all
-                                        ${isToday ? 'bg-amber-500 text-stone-950 font-bold shadow-glow-gold/30' : 'text-stone-400 hover:bg-stone-800'}
-                                        ${onDateClick ? 'cursor-pointer hover:ring-1 hover:ring-amber-500/50' : 'cursor-default'}`}
+                                    className={`group relative text-center text-[13px] py-2.5 rounded transition-all font-medium
+                                        ${isToday ? 'bg-amber-500 text-stone-950 font-black shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'text-stone-300 hover:bg-stone-800 hover:text-white'}
+                                        ${onDateClick ? 'cursor-pointer hover:ring-2 hover:ring-amber-500' : 'cursor-default'}`}
                                 >
                                     {day}
                                     {hasEvents && (
@@ -266,7 +266,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                                             onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr); }}
                                             className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-stone-800/90 flex items-center justify-center transition-opacity rounded-sm"
                                         >
-                                            <PlusCircle size={14} className="text-amber-500" />
+                                            <PlusCircle size={18} className="text-amber-400 shadow-sm" />
                                         </button>
                                     )}
                                 </div>
