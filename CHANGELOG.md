@@ -1,5 +1,14 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.56] - 2026-02-15 [FEAT]
+
+- 🔮 Admin : Ajout de la bibliothèque des 'Habilités Mystiques'
+- 📚 Data : Configuration par défaut (Arts Martiaux, Magies, Psy, etc.)
+- 🛠️ Admin : Interface de gestion complète (CRUD) pour les habilités mystiques
+- 🔄 Migration : Initialisation automatique de la bibliothèque pour les campagnes existantes
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.49.55] - 2026-02-15 [FEAT]
 
 - ⚙️ Admin : Ajout d'un paramètre de configuration mondiale pour le coût en XP des traits

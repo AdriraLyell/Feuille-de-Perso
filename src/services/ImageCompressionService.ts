@@ -137,10 +137,15 @@ export const ImageCompressionService = {
             // Compress with pako (gzip)
             const compressed = pako.gzip(bytes);
 
+            // Process in chunks to avoid call stack overflow on large images
+            let binaryStr = '';
+            const chunkSize = 8192;
+            for (let i = 0; i < compressed.length; i += chunkSize) {
+                binaryStr += String.fromCharCode(...compressed.subarray(i, i + chunkSize));
+            }
+
             // Convert back to base64
-            const compressedBase64 = btoa(
-                String.fromCharCode.apply(null, Array.from(compressed))
-            );
+            const compressedBase64 = btoa(binaryStr);
 
             // Add marker to identify compressed data
             return `${GZIP_MARKER}${compressedBase64}`;
@@ -176,10 +181,15 @@ export const ImageCompressionService = {
             // Decompress with pako
             const decompressed = pako.ungzip(bytes);
 
+            // Process in chunks to avoid call stack overflow on large images
+            let binaryStr = '';
+            const chunkSize = 8192;
+            for (let i = 0; i < decompressed.length; i += chunkSize) {
+                binaryStr += String.fromCharCode(...decompressed.subarray(i, i + chunkSize));
+            }
+
             // Convert back to base64
-            const base64 = btoa(
-                String.fromCharCode.apply(null, Array.from(decompressed))
-            );
+            const base64 = btoa(binaryStr);
 
             // Ensure we return a valid Data URI for images. 
             // Since this is ImageCompressionService, we mostly deal with WebP.
