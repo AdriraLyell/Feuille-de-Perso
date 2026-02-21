@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.63",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Harmonisation UI : Alignement de la taille de tous les boutons du footer de la modale de trait en format compact (sm)."
+    },
+    {
         "version": "2.56.62",
         "date": "2026-02-21",
         "type": "style",
@@ -781,15 +787,6 @@
             "📝 Terminologie : Remplacement de 'Échelon' par 'Rang' dans tout le système d'administration",
             "🎨 UI : Retrait de la mention 'Niveau du Talent' dans la configuration des rangs",
             "🖋️ UI : Remplacement de 'Slots' par 'Rangs Disponibles' pour une meilleure clarté sémantique"
-        ]
-    },
-    {
-        "version": "2.49.53",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🌐 Admin : Traduction en français des onglets de bibliothèques (Skills, Backgrounds, Counters, Specializations)",
-            "🏗️ Refactoring : Amélioration de la structure des onglets de bibliothèques dans AdminApp.tsx"
         ]
     }
 ]

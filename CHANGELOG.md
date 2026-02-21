@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.53] - 2026-02-15 [FEAT]
+
+- 🌐 Admin : Traduction en français des onglets de bibliothèques (Skills, Backgrounds, Counters, Specializations)
+- 🏗️ Refactoring : Amélioration de la structure des onglets de bibliothèques dans AdminApp.tsx
+
 ## [2.49.52] - 2026-02-15 [DOCS]
 
 - 📝 Documentation : Création du guide complet sur la gestion des conflits et la synchronisation sécurisée (SYNC_CONFLICT_MANAGEMENT.md)

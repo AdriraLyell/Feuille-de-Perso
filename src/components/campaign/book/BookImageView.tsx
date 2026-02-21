@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { NodeViewWrapper } from '@tiptap/react';
 import { BookImageAttributes } from '../../../extensions/bookImage';
 import { Image as ImageIcon, Loader } from 'lucide-react';
@@ -46,6 +47,39 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
     });
     // hudTick is intentionally unused in render output — it triggers re-renders for the HUD display
     void hudTick;
+
+    const [imageRect, setImageRect] = useState<DOMRect | null>(null);
+
+    // Track image position for Portals (Toolbar & HUD)
+    useEffect(() => {
+        if (selected && containerRef.current) {
+            const update = () => {
+                if (containerRef.current) {
+                    setImageRect(containerRef.current.getBoundingClientRect());
+                }
+            };
+
+            update();
+
+            // The scroll container is the one with .overflow-x-auto in ColumnarEditor
+            const scroller = containerRef.current.closest('.overflow-x-auto');
+
+            scroller?.addEventListener('scroll', update, { passive: true });
+            window.addEventListener('resize', update, { passive: true });
+
+            // Also update when activeInteraction changes (during resize)
+            const obs = new ResizeObserver(update);
+            obs.observe(containerRef.current);
+
+            return () => {
+                scroller?.removeEventListener('scroll', update);
+                window.removeEventListener('resize', update);
+                obs.disconnect();
+            };
+        } else {
+            setImageRect(null);
+        }
+    }, [selected, activeInteraction]);
 
     useEffect(() => {
         let active = true;
@@ -127,7 +161,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                     setIsPanMode={setIsPanMode}
                     isEditingCaption={isEditingCaption}
                     setIsEditingCaption={setIsEditingCaption}
-                    hudBelow={hudBelow}
+                    imageRect={imageRect}
                 />
             )}
 
@@ -194,8 +228,15 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                     </div>
                 )}
 
-                {selected && activeInteraction && (
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-stone-800 text-white text-[9px] px-2 py-0.5 rounded shadow-xl flex gap-3 whitespace-nowrap z-[200] border border-stone-600 backdrop-blur-md">
+                {selected && activeInteraction && imageRect && createPortal(
+                    <div
+                        className="fixed z-[9999] bg-stone-800 text-white text-[9px] px-2 py-0.5 rounded shadow-xl flex gap-3 whitespace-nowrap border border-stone-600 backdrop-blur-md pointer-events-none"
+                        style={{
+                            left: imageRect.left + imageRect.width / 2,
+                            top: imageRect.top - 8,
+                            transform: 'translate(-50%, -100%)'
+                        }}
+                    >
                         {(activeInteraction.startsWith('resize')) && (() => {
                             const hasH = activeInteraction === 'resize-left' || activeInteraction === 'resize-right'
                                 || activeInteraction.includes('tl') || activeInteraction.includes('tr')
@@ -218,7 +259,8 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                                 <span>Pos Y: {Math.round(liveValues.current.posY ?? node.attrs.posY ?? 0)}%</span>
                             </>
                         )}
-                    </div>
+                    </div>,
+                    document.body
                 )}
             </div>
 

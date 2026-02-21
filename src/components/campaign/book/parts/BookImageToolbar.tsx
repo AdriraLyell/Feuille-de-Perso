@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import {
     AlignLeft, AlignCenter, AlignRight,
     Trash2, MoreHorizontal, Move,
@@ -17,7 +18,7 @@ interface BookImageToolbarProps {
     setIsPanMode: (mode: boolean) => void;
     isEditingCaption: boolean;
     setIsEditingCaption: (editing: boolean) => void;
-    hudBelow: boolean;
+    imageRect: DOMRect | null;
 }
 
 const BookImageToolbar: React.FC<BookImageToolbarProps> = ({
@@ -30,19 +31,41 @@ const BookImageToolbar: React.FC<BookImageToolbarProps> = ({
     setIsPanMode,
     isEditingCaption,
     setIsEditingCaption,
-    hudBelow
+    imageRect
 }) => {
     const isFree = node.attrs.align === 'free';
     const activeAlignClass = 'bg-indigo-50 border-indigo-300 text-indigo-700';
     const btnClass = 'hover:bg-indigo-50 p-1.5 rounded border border-stone-200 transition-colors';
 
-    return (
+    const toolbarStyle = React.useMemo(() => {
+        if (!imageRect) return { left: 0, top: 0, placement: 'below' as const };
+
+        const centerX = imageRect.left + imageRect.width / 2;
+        // Space needed for Level 1 + Level 2 approx 250px
+        const neededSpace = showAdvanced ? 280 : 60;
+
+        let top = imageRect.bottom + 4;
+        let placement: 'above' | 'below' = 'below';
+
+        // If not enough space below, put above
+        if (window.innerHeight - imageRect.bottom < neededSpace) {
+            top = imageRect.top - 4;
+            placement = 'above';
+        }
+
+        return { left: centerX, top, placement };
+    }, [imageRect, showAdvanced]);
+
+    if (!imageRect) return null;
+
+    return createPortal(
         <div
-            className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 content-ignore z-[250] pointer-events-auto"
-            style={hudBelow
-                ? { top: '100%', marginTop: '4px' }
-                : { bottom: '100%', marginBottom: '4px' }
-            }
+            className="fixed z-[9999] flex flex-col items-center gap-1 content-ignore pointer-events-auto"
+            style={{
+                left: toolbarStyle.left,
+                top: toolbarStyle.top,
+                transform: `translateX(-50%) ${toolbarStyle.placement === 'above' ? 'translateY(-100%)' : ''}`,
+            }}
             onMouseDown={(e) => e.stopPropagation()}
         >
             {/* === NIVEAU 1 : Contrôles essentiels === */}
@@ -203,7 +226,8 @@ const BookImageToolbar: React.FC<BookImageToolbarProps> = ({
                     </button>
                 </div>
             )}
-        </div>
+        </div>,
+        document.body
     );
 };
 
