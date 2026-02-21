@@ -1,11 +1,11 @@
 import React from 'react';
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react';
 import { NodeViewProps } from '@tiptap/core';
-import { Sun, Moon, Zap, Navigation, BookOpen, Coffee, Utensils, MoonStar, Calendar, Clock } from 'lucide-react';
+import { Sun, Moon, Zap, Navigation, BookOpen, Coffee, Utensils, MoonStar, Calendar, Clock, List } from 'lucide-react';
 import { useRules } from '../../../context/RulesContext';
 
 const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes }) => {
-    const { type, timeSlot, dateStart, dateEnd, time, date } = node.attrs;
+    const { type, timeSlot, dateStart, dateEnd, time, date, isSection } = node.attrs;
     const { rules } = useRules();
     const isReal = rules?.configurations?.calendar?.type === 'real';
 
@@ -42,7 +42,10 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
     };
 
     return (
-        <NodeViewWrapper className={`narrative-section my-6 p-4 rounded-xl border ${getColors()} relative group -mx-4`}>
+        <NodeViewWrapper
+            className={`narrative-section my-6 p-4 rounded-xl border ${getColors()} relative group -mx-4 narrative-section-container`}
+            data-is-section={isSection ? "true" : "false"}
+        >
             <div className="flex items-center justify-between mb-3 border-b border-current/10 pb-2">
                 <div className="flex items-center gap-2 font-serif font-bold italic text-xs uppercase tracking-wider h-6">
                     {getIcon()}
@@ -126,6 +129,14 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                             ))}
                         </>
                     )}
+                    <button
+                        type="button"
+                        onClick={() => updateAttributes({ isSection: !isSection })}
+                        className={`p-1 rounded transition-colors ${isSection ? 'bg-amber-600 text-white' : 'hover:bg-current/10'}`}
+                        title={isSection ? "Retirer du sommaire" : "Ajouter au sommaireSectionner"}
+                    >
+                        <List size={10} />
+                    </button>
                     <button
                         type="button"
                         onClick={() => {

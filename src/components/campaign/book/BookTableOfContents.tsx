@@ -28,9 +28,9 @@ export const BookTableOfContents: React.FC<BookTableOfContentsProps> = ({ entrie
                         <button
                             key={index}
                             onClick={() => onNavigate(entry.page)}
-                            className="group flex items-baseline gap-2 text-left hover:text-amber-700 transition-colors"
+                            className={`group flex items-baseline gap-2 text-left hover:text-amber-700 transition-colors ${entry.title.startsWith('•') ? 'pl-4 opacity-80' : ''}`}
                         >
-                            <span className="font-serif font-bold text-stone-800 group-hover:text-amber-700 whitespace-nowrap">
+                            <span className={`font-serif group-hover:text-amber-700 whitespace-nowrap ${entry.title.startsWith('•') ? 'text-sm text-stone-600' : 'font-bold text-stone-800'}`}>
                                 {entry.title}
                             </span>
                             <div className="flex-grow border-b border-dotted border-stone-300 mx-1 mb-1" />

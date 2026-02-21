@@ -13,24 +13,29 @@ export function useBookTableOfContents(
     const updateTOC = useCallback(() => {
         if (!contentRef.current) return;
 
-        const headers = contentRef.current.querySelectorAll('.chapter-header-wrapper');
+        const sections = contentRef.current.querySelectorAll('.chapter-header-wrapper, .narrative-section-container[data-is-section="true"]');
         const newEntries: TOCEntry[] = [];
         const stride = PAGE_WIDTH + 40;
 
-        headers.forEach((header) => {
-            const htmlHeader = header as HTMLElement;
-            // The title is in NodeViewContent, which renders as a div with font-serif
-            const titleElement = htmlHeader.querySelector('.font-serif.font-bold.text-3xl');
-            const dateElement = htmlHeader.querySelector('.text-xs.text-center');
+        sections.forEach((section) => {
+            const htmlSection = section as HTMLElement;
+            let title = 'Section sans titre';
+            let dateText = '';
 
-            const title = titleElement?.textContent || 'Chapitre sans titre';
-            const dateText = dateElement?.textContent || '';
+            if (htmlSection.classList.contains('chapter-header-wrapper')) {
+                const titleElement = htmlSection.querySelector('.font-serif.font-bold.text-3xl');
+                const dateElement = htmlSection.querySelector('.text-xs.text-center');
+                title = titleElement?.textContent || 'Chapitre sans titre';
+                dateText = dateElement?.textContent || '';
+            } else {
+                // It's a narrative section
+                // Try to find text content in the editor area
+                const contentElement = htmlSection.querySelector('.NodeViewContent');
+                const firstLine = contentElement?.textContent?.split('\n')[0]?.trim();
+                title = firstLine ? `• ${firstLine.slice(0, 30)}${firstLine.length > 30 ? '...' : ''}` : '• Section';
+            }
 
-            // Calculate page number
-            // offsetLeft is relative to the content container
-            // We add pageOffset (usually 1) because content starts after the TOC
-            // And we add 1 because page numbers are 1-based.
-            const left = htmlHeader.offsetLeft;
+            const left = htmlSection.offsetLeft;
             const pageIndex = Math.floor(left / stride) + pageOffset + 1;
 
             newEntries.push({

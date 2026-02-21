@@ -6,7 +6,7 @@ import NarrativeSectionView from '../components/campaign/book/NarrativeSectionVi
 declare module '@tiptap/core' {
     interface Commands<ReturnType> {
         narrativeSection: {
-            insertNarrativeSection: (attrs: { type: string, dateStart?: string, dateEnd?: string, timeSlot?: string, time?: string, date?: string }) => ReturnType;
+            insertNarrativeSection: (attrs: { type: string, dateStart?: string, dateEnd?: string, timeSlot?: string, time?: string, date?: string, isSection?: boolean }) => ReturnType;
         };
     }
 }
@@ -39,6 +39,9 @@ export const NarrativeSection = Node.create({
             },
             date: {
                 default: '', // date spécifique (ex: flashback)
+            },
+            isSection: {
+                default: false, // si vrai, apparaît dans le sommaire
             },
         };
     },
