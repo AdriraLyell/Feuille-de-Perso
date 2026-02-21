@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react';
 import { NodeViewProps } from '@tiptap/core';
 import { Sun, Moon, Zap, Navigation, BookOpen, Coffee, Utensils, MoonStar, Calendar, Clock, List } from 'lucide-react';
 import { useRules } from '../../../context/RulesContext';
 
 const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes }) => {
-    const { type, timeSlot, dateStart, dateEnd, time, date, isSection, title } = node.attrs;
+    const { type, timeSlot, dateStart, dateEnd, time, date, isSection, title, id } = node.attrs;
     const { rules } = useRules();
     const isReal = rules?.configurations?.calendar?.type === 'real';
 
@@ -37,9 +37,31 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
         return 'bg-stone-500/5 border-stone-800/10 text-stone-600';
     };
 
-    const handleCalendarClick = () => {
-        window.dispatchEvent(new CustomEvent('toggle-calendar', { detail: { visible: true } }));
+    const handleCalendarClick = (field: 'date' | 'dateStart' | 'dateEnd') => {
+        window.dispatchEvent(new CustomEvent('calendar-open-picker', {
+            detail: {
+                field,
+                nodeId: id
+            }
+        }));
     };
+
+    useEffect(() => {
+        if (!id) {
+            updateAttributes({ id: crypto.randomUUID() });
+        }
+    }, [id]);
+
+    useEffect(() => {
+        const handler = (e: any) => {
+            const { date, nodeId, field } = e.detail;
+            if (nodeId === id) {
+                updateAttributes({ [field]: date });
+            }
+        };
+        window.addEventListener('calendar-date-picked', handler);
+        return () => window.removeEventListener('calendar-date-picked', handler);
+    }, [id]);
 
     return (
         <NodeViewWrapper
@@ -88,7 +110,7 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                         <div className="flex items-center gap-1 ml-2 font-normal lowercase opacity-70 border-l border-current/20 pl-2">
                             <button
                                 type="button"
-                                onClick={handleCalendarClick}
+                                onClick={() => handleCalendarClick('date')}
                                 className="hover:text-amber-500 transition-colors"
                             >
                                 <Calendar size={10} />
@@ -108,7 +130,7 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                         <div className="flex items-center gap-1 ml-2 font-normal lowercase opacity-70 border-l border-current/20 pl-2">
                             <button
                                 type="button"
-                                onClick={handleCalendarClick}
+                                onClick={() => handleCalendarClick('dateStart')}
                                 className="hover:text-amber-500 transition-colors"
                             >
                                 <Calendar size={10} />
@@ -128,6 +150,13 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                                 onChange={(e) => updateAttributes({ dateEnd: e.target.value })}
                                 className="bg-transparent border-none p-0 w-[80px] text-[10px] focus:ring-0 cursor-pointer"
                             />
+                            <button
+                                type="button"
+                                onClick={() => handleCalendarClick('dateEnd')}
+                                className="hover:text-amber-500 transition-colors"
+                            >
+                                <Calendar size={10} />
+                            </button>
                         </div>
                     )}
                 </div>

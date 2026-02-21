@@ -6,7 +6,7 @@ import NarrativeSectionView from '../components/campaign/book/NarrativeSectionVi
 declare module '@tiptap/core' {
     interface Commands<ReturnType> {
         narrativeSection: {
-            insertNarrativeSection: (attrs: { type: string, dateStart?: string, dateEnd?: string, timeSlot?: string, time?: string, date?: string, isSection?: boolean, title?: string }) => ReturnType;
+            insertNarrativeSection: (attrs: { type: string, dateStart?: string, dateEnd?: string, timeSlot?: string, time?: string, date?: string, isSection?: boolean, title?: string, id?: string }) => ReturnType;
         };
     }
 }
@@ -46,6 +46,11 @@ export const NarrativeSection = Node.create({
             title: {
                 default: '', // titre personnalisé pour le sommaire
             },
+            id: {
+                default: null,
+                parseHTML: element => element.getAttribute('data-id'),
+                renderHTML: attributes => ({ 'data-id': attributes.id }),
+            }
         };
     },
 
@@ -66,10 +71,14 @@ export const NarrativeSection = Node.create({
             insertNarrativeSection:
                 (attrs) =>
                     ({ chain }: CommandProps) => {
+                        const finalAttrs = {
+                            ...attrs,
+                            id: attrs.id || crypto.randomUUID(),
+                        };
                         return chain()
                             .insertContent({
                                 type: this.name,
-                                attrs,
+                                attrs: finalAttrs,
                                 content: [{ type: 'paragraph' }],
                             })
                             .focus()

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.69.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Système de 'Date Picker' interactif pour le Journal : Cliquez sur les icônes calendrier des blocs narratifs pour sélectionner une date directement depuis le Chroniqueur sans créer de nouveau chapitre. Ajout de champs de titre personnalisés pour le sommaire automatique et réduction globale de la taille des labels pour une interface plus épurée."
+    },
+    {
         "version": "2.68.0",
         "date": "2026-02-23",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction de la persistance des suppressions dans la bibliothèque : Les éléments supprimés du catalogue d'une campagne sont désormais correctement nettoyés dans le dépôt global s'ils ne sont plus utilisés ailleurs. Amélioration de la gestion du statut d'activation (isActive) via les liens relationnels de la base de données pour garantir que les items désactivés mais non supprimés sont conservés de manière cohérente."
-    },
-    {
-        "version": "2.62.9",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Amélioration de la bibliothèque d'administration : Intégration de détails d'utilisation avancés. Désormais, survoler l'icône de cadenas d'un élément verrouillé (trait, compétence, historique, compteur, etc.) affiche précisément quelles campagnes ou quels personnages utilisent cet élément, facilitant la gestion de la bibliothèque globale."
     }
 ]

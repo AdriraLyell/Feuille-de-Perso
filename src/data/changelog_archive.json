@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.62.9",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Amélioration de la bibliothèque d'administration : Intégration de détails d'utilisation avancés. Désormais, survoler l'icône de cadenas d'un élément verrouillé (trait, compétence, historique, compteur, etc.) affiche précisément quelles campagnes ou quels personnages utilisent cet élément, facilitant la gestion de la bibliothèque globale."
+    },
+    {
         "version": "2.62.8",
         "date": "2026-02-21",
         "type": "fix",
@@ -681,18 +687,6 @@
             "🎨 Admin : Migration de la personnalisation des compétences vers la Réserve (sidebar)",
             "🧹 Admin : Restauration de l'UI épurée de la Bibliothèque globale (suppression édition/badges)",
             "🛡️ Système : Support complet des overrides de compétences par campagne via la sidebar"
-        ]
-    },
-    {
-        "version": "2.49.80",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🛠️ Admin : Implémentation du système de surcharge locale des compétences par campagne (overrides)",
-            "🛡️ Bibliothèque : Protection contre la suppression des compétences globales si elles sont personnalisées dans un setting",
-            "📂 Exports : Découplage des exports de compétences (génération d'un `skills_[campaign].json` spécifique)",
-            "📥 Imports : Support de l'import flexible des bibliothèques via JSON (détection automatique du format spécifique)",
-            "🎨 UI : Ajout d'un badge 'Custom' dans la réserve pour identifier les compétences modifiées localement"
         ]
     }
 ]

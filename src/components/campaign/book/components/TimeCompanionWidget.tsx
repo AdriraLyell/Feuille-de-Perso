@@ -238,10 +238,10 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                             return (
                                 <div
                                     key={i}
-                                    onClick={() => hasNotes && onDateClick?.(dateStr)}
+                                    onClick={() => onDateClick?.(dateStr)}
                                     className={`group relative text-center text-[9px] py-1 rounded-sm transition-all
                                         ${isToday ? 'bg-amber-500 text-stone-950 font-bold shadow-glow-gold/30' : 'text-stone-400 hover:bg-stone-800'}
-                                        ${hasNotes ? 'cursor-pointer hover:ring-1 hover:ring-amber-500/50' : 'cursor-default'}`}
+                                        ${onDateClick ? 'cursor-pointer hover:ring-1 hover:ring-amber-500/50' : 'cursor-default'}`}
                                 >
                                     {day}
                                     {hasEvents && (
@@ -261,7 +261,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                                     )}
 
                                     {/* Quick action: New Chapter */}
-                                    {!hasNotes && (
+                                    {!hasNotes && onNewChapter && (
                                         <button
                                             onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr); }}
                                             className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-stone-800/90 flex items-center justify-center transition-opacity rounded-sm"

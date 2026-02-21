@@ -50,6 +50,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     const [showHighlightPalette, setShowHighlightPalette] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
     const [isCalendarVisible, setIsCalendarVisible] = useState(true);
+    const [pickingTarget, setPickingTarget] = useState<{ nodeId: string, field: string } | null>(null);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -75,6 +76,21 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         }
     }, []);
 
+    const handleCalendarDateClick = useCallback((date: string) => {
+        if (pickingTarget) {
+            window.dispatchEvent(new CustomEvent('calendar-date-picked', {
+                detail: {
+                    date,
+                    nodeId: pickingTarget.nodeId,
+                    field: pickingTarget.field
+                }
+            }));
+            setPickingTarget(null);
+        } else {
+            scrollToDate(date);
+        }
+    }, [pickingTarget, scrollToDate]);
+
     // Event listener for external calendar toggling
     useEffect(() => {
         const handleToggle = (e: any) => {
@@ -84,8 +100,16 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                 setIsCalendarVisible(v => !v);
             }
         };
+        const handlePickRequest = (e: any) => {
+            setPickingTarget(e.detail);
+            setIsCalendarVisible(true);
+        };
         window.addEventListener('toggle-calendar', handleToggle);
-        return () => window.removeEventListener('toggle-calendar', handleToggle);
+        window.addEventListener('calendar-open-picker', handlePickRequest);
+        return () => {
+            window.removeEventListener('toggle-calendar', handleToggle);
+            window.removeEventListener('calendar-open-picker', handlePickRequest);
+        };
     }, []);
 
     // Flush on tab switch or page close
@@ -95,11 +119,16 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         };
         const handleBeforeUnload = () => flushSave();
 
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setPickingTarget(null);
+        };
         document.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('keydown', handleEscape);
         return () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('keydown', handleEscape);
         };
     }, [flushSave]);
 
@@ -293,8 +322,8 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                                 config={rules.configurations.calendar}
                                 notatedDates={notifiedDates}
                                 voyageRanges={voyageRanges}
-                                onDateClick={scrollToDate}
-                                onNewChapter={(date) => (editor.commands as any).insertChapterAtDate(date)}
+                                onDateClick={handleCalendarDateClick}
+                                onNewChapter={pickingTarget ? undefined : (date) => (editor.commands as any).insertChapterAtDate(date)}
                             />
                         )}
                     </BookChapterSidebar>

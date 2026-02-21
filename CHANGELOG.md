@@ -1,5 +1,13 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.80] - 2026-02-16 [FEAT]
+
+- 🛠️ Admin : Implémentation du système de surcharge locale des compétences par campagne (overrides)
+- 🛡️ Bibliothèque : Protection contre la suppression des compétences globales si elles sont personnalisées dans un setting
+- 📂 Exports : Découplage des exports de compétences (génération d'un `skills_[campaign].json` spécifique)
+- 📥 Imports : Support de l'import flexible des bibliothèques via JSON (détection automatique du format spécifique)
+- 🎨 UI : Ajout d'un badge 'Custom' dans la réserve pour identifier les compétences modifiées localement
+
 ## [2.49.79] - 2026-02-16 [FEAT]
 
 - 🎨 Admin : Optimisation visuelle des badges dans la réserve (icônes uniquement pour Variantes et Habilités Mystiques)
