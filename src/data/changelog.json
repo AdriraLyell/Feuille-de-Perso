@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.65.0",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Déploiement production : Intégration de l'effet Maître, corrections bugs reset et confiance, améliorations journal et synchronisation cloud."
+    },
+    {
         "version": "2.64.2",
         "date": "2026-02-21",
         "type": "fix",
@@ -112,17 +118,5 @@
         "date": "2026-02-20",
         "type": "refactor",
         "description": "Admin : Déplacement des paramètres de coût XP (formule Triangulaire/Linéaire + multiplicateur) de l'onglet 'Coûts & Limites' vers une section collapsable dans chaque carte de catégorie de compétences. Suppression de l'onglet 'Coûts & Limites' devenu vide et du composant AdminCostsEditor."
-    },
-    {
-        "version": "2.60.0",
-        "date": "2026-02-21",
-        "type": "refactor",
-        "description": "Refactorisation majeure pour la maintenance : 1) Refonte de la modale de synchronisation en un 'Cloud Hub' unifié avec onglets (Push vs Library). 2) Décomposition des composants massifs (SyncModal, AttributesEditor, BookImageView, SpecializationLibraryView) en hooks personnalisés et sous-composants. 3) Modularisation du moteur de calcul d'XP (xpCalculator) en utilitaires spécialisés (Skills, Attributes, Traits, Counters)."
-    },
-    {
-        "version": "2.59.0",
-        "date": "2026-02-21",
-        "type": "refactor",
-        "description": "Renommage sémantique : L'effet 'Compteur de Trait' devient 'Compteur Auto' pour refléter son usage polyvalent. Implémentation du nommage intelligent : le champ 'Nom de Base' devient optionnel dans l'éditeur d'effet. Si laissé vide, le compteur prendra automatiquement le nom de la variante (ou le nom du trait) lors de l'instanciation sur la fiche du Héro."
     }
 ]

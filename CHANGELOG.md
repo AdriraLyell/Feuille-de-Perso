@@ -1,5 +1,18 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.68] - 2026-02-16 [FEAT]
+
+- 🔄 Recréation : Implémentation du système de 'Respec' pour les personnages (Admin)
+- 💰 XP : Remboursement automatique de l'XP de progression (attributs, compétences, compteurs) lors d'une recréation
+- 🛡️ Mode Création : Réactivation du mode création avec injection du remboursement et redistribution auto
+- 🎨 UI : Nouvelle modale de confirmation 'Recréation Éthérée' avec bilan des gains d'XP et avertissements
+
+## [2.49.67] - 2026-02-16 [FEAT]
+
+- 🛡️ Attributs : Verrouillage de la valeur de création (val1) une fois le mode création validé
+- 📈 XP : Implémentation de l'achat d'attributs via la colonne val2 avec calcul auto de l'XP dépensée
+- 🎨 UI : Feedback visuel (opacité, curseur) sur les champs d'attributs verrouillés
+
 ## [2.49.66] - 2026-02-16 [FIX]
 
 - 🩹 Image : Correction du préfixe Data URI manquant lors de la décompression (fix 431 Request Header Too Large)
