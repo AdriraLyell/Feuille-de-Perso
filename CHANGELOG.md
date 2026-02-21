@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.66] - 2026-02-16 [FIX]
+
+- 🩹 Image : Correction du préfixe Data URI manquant lors de la décompression (fix 431 Request Header Too Large)
+- 🛡️ Stabilité : Détection automatique des schémas d'images corrompus dans les registres admin
+
 ## [2.49.65] - 2026-02-16 [FIX]
 
 - 🐛 Admin : Correction critique du chargement des portraits compressés (GZIP) dans la vue Admin

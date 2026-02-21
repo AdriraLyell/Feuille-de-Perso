@@ -1,8 +1,17 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.63.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.64.1)
 
-> **Dernière mise à jour** : 2026-02-21 — Version 2.63.0
+> **Dernière mise à jour** : 2026-02-21 — Version 2.64.1
 
 ## 1. Phases Complétées
+
+### ✅ Phase 31 : Correction du reset du compteur de Confiance (v2.64.1)
+- [x] **Bug Fix** : Nettoyage des doublons historiques et renforcement de l'unicité des clés de compteurs basées sur l'ID.
+- [x] **Robustesse** : Amélioration du `campaignReconciler` pour assurer une synchronisation stable même en cas de collisions de noms.
+
+### ✅ Phase 30 : Effet de trait 'Maître' (v2.64.0)
+- [x] **Mécanique** : Nouvel effet `master_skill` permettant de porter une compétence au rang 5 gratuitement.
+- [x] **UI** : Wizard de sélection de compétence et affichage thématique violet dans l'admin.
+- [x] **Moteur XP** : Adaptation de `xpCalculator` pour ignorer le coût des compétences maîtrisées.
 
 ### ✅ Phase 29 : Persistance et Nettoyage des Bibliothèques (v2.63.0)
 - [x] **Bug Fix** : Résolution du problème des compteurs/traits supprimés qui réapparaissaient au rafraîchissement.

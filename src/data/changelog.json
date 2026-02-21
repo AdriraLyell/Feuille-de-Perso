@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.64.1",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction de la réinitialisation du compteur de Confiance : (1) Nettoyage des doublons historiques (slugs au lieu d'UUIDs) dans les définitions de compteurs en base de données qui forçaient la valeur à 4. (2) Renforcement du mécanisme de synchronisation (campaignReconciler) pour assurer l'unicité des clés de compteurs basées sur leur ID, prévenant ainsi la réapparition de doublons causant des états asynchrones lors d'une réinitialisation."
+    },
+    {
         "version": "2.64.0",
         "date": "2026-02-22",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "refactor",
         "description": "Renommage sémantique : L'effet 'Compteur de Trait' devient 'Compteur Auto' pour refléter son usage polyvalent. Implémentation du nommage intelligent : le champ 'Nom de Base' devient optionnel dans l'éditeur d'effet. Si laissé vide, le compteur prendra automatiquement le nom de la variante (ou le nom du trait) lors de l'instanciation sur la fiche du Héro."
-    },
-    {
-        "version": "2.58.0",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Amélioration des Compteurs de Traits (Dynamic Counters) : Les compteurs liés aux traits ne polluent plus la bibliothèque d'administration. Ils sont désormais générés dynamiquement et uniquement sur la fiche du personnage. Support des Traits Variables : le compteur ajoute automatiquement le nom de la variante choisie au nom de base de l'effet."
     }
 ]

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.58.0",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Amélioration des Compteurs de Traits (Dynamic Counters) : Les compteurs liés aux traits ne polluent plus la bibliothèque d'administration. Ils sont désormais générés dynamiquement et uniquement sur la fiche du personnage. Support des Traits Variables : le compteur ajoute automatiquement le nom de la variante choisie au nom de base de l'effet."
+    },
+    {
         "version": "2.57.0",
         "date": "2026-02-21",
         "type": "feat",
@@ -734,15 +740,6 @@
             "🛡️ Attributs : Verrouillage de la valeur de création (val1) une fois le mode création validé",
             "📈 XP : Implémentation de l'achat d'attributs via la colonne val2 avec calcul auto de l'XP dépensée",
             "🎨 UI : Feedback visuel (opacité, curseur) sur les champs d'attributs verrouillés"
-        ]
-    },
-    {
-        "version": "2.49.66",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🩹 Image : Correction du préfixe Data URI manquant lors de la décompression (fix 431 Request Header Too Large)",
-            "🛡️ Stabilité : Détection automatique des schémas d'images corrompus dans les registres admin"
         ]
     }
 ]
