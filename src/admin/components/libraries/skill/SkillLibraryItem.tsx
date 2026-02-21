@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Layers, Sparkles, Lock, Globe, PencilLine, Edit2, Trash2 } from 'lucide-react';
 import { LibrarySkillEntry } from '../../../../types';
 import { PortalTooltip } from '../../../../components/ui/PortalTooltip';
+import { ItemUsageDetail } from '../../../../types/usageTypes';
+import { UsageLockedTooltip } from '../UsageLockedTooltip';
 
 interface SkillLibraryItemProps {
     skill: LibrarySkillEntry;
@@ -11,6 +13,8 @@ interface SkillLibraryItemProps {
     handleOpenEdit: (skill: LibrarySkillEntry) => void;
     handleDelete: (id: string) => void;
     availableCategories: { code: string; label: string }[];
+    usageDetails?: ItemUsageDetail;
+    onLoadUsageDetails?: (id: string) => void;
 }
 
 export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
@@ -20,11 +24,15 @@ export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
     toggleSkillActive,
     handleOpenEdit,
     handleDelete,
-    availableCategories
+    availableCategories,
+    usageDetails,
+    onLoadUsageDetails
 }) => {
     const hasVariants = skill.variants && skill.variants.length > 0;
     const [showVariantsTooltip, setShowVariantsTooltip] = useState(false);
+    const [showLockTooltip, setShowLockTooltip] = useState(false);
     const anchorRef = useRef<HTMLDivElement>(null);
+    const lockIconRef = useRef<HTMLDivElement>(null);
 
     return (
         <div className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${skill.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
@@ -86,7 +94,30 @@ export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
                             <Sparkles size={11} className="text-amber-500 shrink-0" />
                         </div>
                     )}
-                    {isLocked && <div className="text-amber-500 shrink-0" title={isPlaced ? "Utilisée dans cette campagne" : "Utilisée dans d'autres campagnes"}><Lock size={11} /></div>}
+                    {isLocked && (
+                        <div
+                            ref={lockIconRef}
+                            onMouseEnter={() => {
+                                if (isLocked && !isPlaced && !skill.isCustomized && onLoadUsageDetails) {
+                                    onLoadUsageDetails(skill.id);
+                                }
+                                setShowLockTooltip(true);
+                            }}
+                            onMouseLeave={() => setShowLockTooltip(false)}
+                            className="relative flex items-center shrink-0"
+                            title={isPlaced ? "Utilisée dans cette campagne" : undefined}
+                        >
+                            <Lock size={11} className="text-amber-500" />
+                            <UsageLockedTooltip
+                                anchorRef={lockIconRef}
+                                isOpen={showLockTooltip}
+                                isLocked={isLocked}
+                                isPlaced={isPlaced}
+                                isCustomized={skill.isCustomized}
+                                usageDetails={usageDetails}
+                            />
+                        </div>
+                    )}
 
                     {skill.defaultCategory && (
                         <span
@@ -105,7 +136,6 @@ export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
                 </div>
             </div>
 
-            {/* 4. Actions (Fixed width) */}
             <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                 <button
                     onClick={() => handleOpenEdit(skill)}
@@ -118,7 +148,7 @@ export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
                     onClick={() => handleDelete(skill.id)}
                     disabled={isLocked}
                     className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
-                    title={isLocked ? "Suppression bloquée : utilisée ou personnalisée" : "Supprimer définitivement du repository"}
+                    title={!isLocked ? "Supprimer" : undefined}
                 >
                     <Trash2 size={14} />
                 </button>

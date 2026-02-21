@@ -27,7 +27,7 @@ export const BookEditorToolbar: React.FC<BookEditorToolbarProps> = ({
     inkColors
 }) => {
     return (
-        <div className="flex items-center gap-1 p-1 bg-stone-900/95 border border-stone-700/50 rounded-lg shadow-2xl mb-2 sticky top-0 z-[60] backdrop-blur-md">
+        <div className="flex items-center flex-wrap gap-1 p-1 bg-stone-900/95 border border-stone-700/50 rounded-lg shadow-2xl mb-2 sticky top-[112px] z-[60] backdrop-blur-md">
             {/* Groupe 0: Undo / Redo */}
             <div className="flex items-center">
                 <button

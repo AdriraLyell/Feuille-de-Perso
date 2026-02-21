@@ -3,6 +3,8 @@ import { RulesData } from '../../../../types/rules';
 import { LibraryBackgroundEntry } from '../../../../types/system';
 import { Layers, Lock, Edit2, Trash2 } from 'lucide-react';
 import { PortalTooltip } from '../../../../components/ui/PortalTooltip';
+import { ItemUsageDetail } from '../../../../types/usageTypes';
+import { UsageLockedTooltip } from '../UsageLockedTooltip';
 
 interface BackgroundLibraryItemProps {
     item: LibraryBackgroundEntry;
@@ -12,6 +14,8 @@ interface BackgroundLibraryItemProps {
     handleOpenEdit: (item: LibraryBackgroundEntry) => void;
     handleDelete: (id: string) => void;
     rules: RulesData;
+    usageDetails?: ItemUsageDetail;
+    onLoadUsageDetails?: (id: string) => void;
 }
 
 export const BackgroundLibraryItem: React.FC<BackgroundLibraryItemProps> = ({
@@ -21,11 +25,15 @@ export const BackgroundLibraryItem: React.FC<BackgroundLibraryItemProps> = ({
     onToggleActive,
     handleOpenEdit,
     handleDelete,
-    rules
+    rules,
+    usageDetails,
+    onLoadUsageDetails
 }) => {
     const hasVariants = item.variants && item.variants.length > 0;
     const [showVariantsTooltip, setShowVariantsTooltip] = useState(false);
+    const [showLockTooltip, setShowLockTooltip] = useState(false);
     const anchorRef = useRef<HTMLDivElement>(null);
+    const lockIconRef = useRef<HTMLDivElement>(null);
 
     return (
         <div className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${item.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
@@ -76,7 +84,29 @@ export const BackgroundLibraryItem: React.FC<BackgroundLibraryItemProps> = ({
                             )}
                         </div>
                     )}
-                    {isLocked && <div className="text-amber-500 shrink-0" title={isPlaced ? "Utilisé dans cette campagne" : "Utilisé dans d'autres campagnes"}><Lock size={11} /></div>}
+                    {isLocked && (
+                        <div
+                            ref={lockIconRef}
+                            onMouseEnter={() => {
+                                if (isLocked && !isPlaced && onLoadUsageDetails) {
+                                    onLoadUsageDetails(item.id);
+                                }
+                                setShowLockTooltip(true);
+                            }}
+                            onMouseLeave={() => setShowLockTooltip(false)}
+                            className="relative flex items-center shrink-0"
+                            title={isPlaced ? "Utilisé dans cette campagne" : undefined}
+                        >
+                            <Lock size={11} className="text-amber-500" />
+                            <UsageLockedTooltip
+                                anchorRef={lockIconRef}
+                                isOpen={showLockTooltip}
+                                isLocked={isLocked}
+                                isPlaced={isPlaced}
+                                usageDetails={usageDetails}
+                            />
+                        </div>
+                    )}
 
                     {item.defaultCategory && (
                         <span
@@ -102,7 +132,7 @@ export const BackgroundLibraryItem: React.FC<BackgroundLibraryItemProps> = ({
                     onClick={() => handleDelete(item.id)}
                     disabled={isLocked}
                     className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
-                    title={isLocked ? "Suppression bloquée : utilisé" : "Supprimer définitivement"}
+                    title={!isLocked ? "Supprimer" : undefined}
                 >
                     <Trash2 size={14} />
                 </button>

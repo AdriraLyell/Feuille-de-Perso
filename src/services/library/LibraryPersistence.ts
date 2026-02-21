@@ -89,6 +89,10 @@ export const LibraryPersistence = {
         for (const typeCfg of LIBRARY_TYPE_CONFIG) {
             const currentItems = (rules.libraries as any)[typeCfg.key] || [];
 
+            // 0. Track current linked items to detect deletions
+            const { data: oldLinks } = await supabase.from(typeCfg.rel).select(typeCfg.idKey).eq('setting_id', settingId);
+            const oldIds = new Set<string>(oldLinks?.map((l: any) => l[typeCfg.idKey]) || []);
+
             // 1. UPSERT Global Repository items
             for (const item of currentItems) {
                 const payload: any = {
@@ -138,15 +142,14 @@ export const LibraryPersistence = {
                 await DatabaseService.upsert(typeCfg.table, payload, {}, `LibraryPersistence.sync.${typeCfg.key}.upsertGlobal`);
             }
 
-            // 2. Refresh RELATIONSHIPS (Active/Local Preference)
+            // 2. Refresh RELATIONSHIPS (Preserve all library items in linked state for this campaign)
             await DatabaseService.deleteBy(typeCfg.rel, 'setting_id', settingId, `LibraryPersistence.sync.${typeCfg.key}.deleteLinks`);
-            const activeItems = currentItems.filter((i: any) => i.isActive !== false);
-            if (activeItems.length > 0) {
-                const relPayload = activeItems.map((item: any) => {
+            if (currentItems.length > 0) {
+                const relPayload = currentItems.map((item: any) => {
                     const link: any = {
                         setting_id: settingId,
                         [typeCfg.idKey]: item.id,
-                        is_active: true
+                        is_active: item.isActive !== false
                     };
                     // Skills, backgrounds, counters and mystic abilities have default categories
                     if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters' || typeCfg.key === 'mysticAbilities') {
@@ -173,7 +176,6 @@ export const LibraryPersistence = {
                 await DatabaseService.deleteBy(variantsTable, 'setting_id', settingId, `LibraryPersistence.sync.${typeCfg.key}.deleteVariants`);
 
                 // B. Surgical cleanup for GLOBAL variants of the items we are processing
-                // This prevents duplicates and ensures the global repository is in sync
                 const globalItemIds = currentItems
                     .filter((i: any) => i.isGlobal && !i.isCustomized)
                     .map((i: any) => i.id);
@@ -203,6 +205,33 @@ export const LibraryPersistence = {
 
                 if (variantsPayload.length > 0) {
                     await DatabaseService.insert(variantsTable, variantsPayload, `LibraryPersistence.sync.${typeCfg.key}.insertVariants`);
+                }
+            }
+
+            // 4. CLEANUP ORPHANS (Items removed from this campaign that are no longer used anywhere)
+            const currentIds = new Set(currentItems.map((i: any) => i.id));
+            const removedIds = [...oldIds].filter(id => !currentIds.has(id));
+
+            if (removedIds.length > 0) {
+                for (const rid of removedIds) {
+                    // Check if still used by ANY other campaign
+                    const { count: relCount } = await supabase
+                        .from(typeCfg.rel)
+                        .select('*', { count: 'exact', head: true })
+                        .eq(typeCfg.idKey, rid);
+
+                    if (!relCount || relCount === 0) {
+                        // Additional check for mystic abilities (used as overrides or in master skill table)
+                        if (typeCfg.key === 'mysticAbilities') {
+                            const { count: skillLinkCount } = await supabase.from('libraries_skills').select('*', { count: 'exact', head: true }).eq('mystic_ability_id', rid);
+                            const { count: overrideLinkCount } = await supabase.from('rel_setting_skills').select('*', { count: 'exact', head: true }).eq('mystic_ability_id_override', rid);
+                            if (skillLinkCount === 0 && overrideLinkCount === 0) {
+                                await DatabaseService.delete(typeCfg.table, rid, `LibraryPersistence.sync.${typeCfg.key}.deleteOrphan`);
+                            }
+                        } else {
+                            await DatabaseService.delete(typeCfg.table, rid, `LibraryPersistence.sync.${typeCfg.key}.deleteOrphan`);
+                        }
+                    }
                 }
             }
         }

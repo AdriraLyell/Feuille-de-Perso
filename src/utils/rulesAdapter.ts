@@ -58,13 +58,26 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
             }));
         });
         newState.attributes = newAttributes;
+
+        // Rebuild attributeSettings from PRIMARY attributes keys (not secondary).
+        // Using secondary keys was the root cause of the phantom pave_attributs_4 bug.
+        newState.attributeSettings = Object.keys(ruleAttributes).map(cat => ({
+            id: cat,
+            label: (rules.definitions.labels && rules.definitions.labels[cat])
+                || cat.charAt(0).toUpperCase() + cat.slice(1)
+        }));
     }
 
     // 5. Update Secondary Attributes Definition (if any)
     const ruleSecAttributes = rules.definitions.secondaryAttributes;
     if (ruleSecAttributes) {
         const newSecAttributes: Record<string, AttributeEntry[]> = {};
+        // Defensive filter: only keep secondary entries for categories that exist in attributeSettings.
+        // This prevents orphan keys (e.g. a pave_attributs_4 defined in secondaryAttributes
+        // but absent from the primary attributes) from leaking into the rendered sheet.
+        const validCatIds = new Set(newState.attributeSettings.map(s => s.id));
         Object.keys(ruleSecAttributes).forEach(category => {
+            if (!validCatIds.has(category)) return; // Skip orphan keys
             const names = ruleSecAttributes[category];
             newSecAttributes[category] = names.map(name => ({
                 id: generateId(),
@@ -75,12 +88,6 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
             }));
         });
         newState.secondaryAttributes = newSecAttributes;
-
-        // Also update attributeSettings to match the keys
-        newState.attributeSettings = Object.keys(ruleSecAttributes).map(cat => ({
-            id: cat,
-            label: (rules.definitions.labels && rules.definitions.labels[cat]) || cat.charAt(0).toUpperCase() + cat.slice(1)
-        }));
 
         // Activate based on Configuration Flag
         newState.secondaryAttributesActive = !!rules.configurations.global.secondaryAttributes;

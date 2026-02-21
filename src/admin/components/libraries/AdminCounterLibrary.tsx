@@ -3,6 +3,7 @@ import { RulesData } from '../../../types/rules';
 import { LibraryCounterEntry } from '../../../types/system';
 import { Search, Plus, Save, AlertOctagon, Gauge, CheckCircle2, Circle } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
+import { useItemUsageDetails } from '../../../hooks/admin/useItemUsageDetails';
 import { smartIncludes } from '../../../utils/stringUtils';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 import { CounterLibraryItem } from './counter/CounterLibraryItem';
@@ -15,6 +16,7 @@ interface AdminCounterLibraryProps {
 
 const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
     const list = rules.libraries.counters;
+    const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'counter');
 
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -232,7 +234,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                     item={item}
                                     isPlaced={isPlaced}
                                     isLocked={isLocked}
-                                    onToggleActive={(id, current) => {
+                                    onToggleActive={(id: string, current: boolean) => {
                                         // Prevents disabling globally locking trait or local locking trait effect from here, maybe show a toast instead
                                         if (current && isLocked) return;
                                         const newList = list.map(c => c.id === id ? { ...c, isActive: !current } : c);
@@ -241,6 +243,8 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                     handleOpenEdit={handleOpenEdit}
                                     handleDelete={handleDelete}
                                     rules={rules}
+                                    usageDetails={usageDetailsCache.get(item.id)}
+                                    onLoadUsageDetails={loadDetails}
                                 />
                             );
                         })}

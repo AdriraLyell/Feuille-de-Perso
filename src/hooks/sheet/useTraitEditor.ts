@@ -7,7 +7,8 @@ export const useTraitEditor = (
     _rules: RulesData | null,
     onChange: (newData: CharacterSheetData) => void,
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', detail?: string) => void,
-    recordXPTransaction?: (transaction: Omit<XPTransaction, 'id' | 'timestamp'>) => void
+    recordXPTransaction?: (transaction: Omit<XPTransaction, 'id' | 'timestamp'>) => void,
+    onMasterSkillNeeded?: (traitName: string, pendingAdd: () => void) => void
 ) => {
     const [multiSelectTarget, setMultiSelectTarget] = useState<'avantages' | 'desavantages' | null>(null);
 
@@ -40,6 +41,26 @@ export const useTraitEditor = (
             }
         }
 
+        // Reset master_skill competence to 0 if applicable
+        let newSkills = { ...data.skills };
+        let hasSkillChanges = false;
+        if (removedItem.masterSkillTarget) {
+            const targetSkillName = removedItem.masterSkillTarget;
+            for (const catId of Object.keys(newSkills)) {
+                const list = newSkills[catId];
+                if (!Array.isArray(list)) continue;
+                const idx = list.findIndex(s => s.name === targetSkillName);
+                if (idx !== -1) {
+                    const updated = [...list];
+                    updated[idx] = { ...updated[idx], value: 0, creationValue: 0 };
+                    newSkills = { ...newSkills, [catId]: updated };
+                    hasSkillChanges = true;
+                    onAddLog(`Maîtrise retirée : ${targetSkillName} remis à 0`, 'info', 'sheet');
+                    break;
+                }
+            }
+        }
+
         // Record refund if it was a paid trait
         if (recordXPTransaction && removedItem.name.trim()) {
             const isPostCreation = removedItem.isPostCreation;
@@ -60,7 +81,8 @@ export const useTraitEditor = (
         const newData = {
             ...data,
             page2: { ...data.page2, [type]: list },
-            counters: hasCounterChanges ? { ...data.counters, custom: newCustomCounters } : data.counters
+            counters: hasCounterChanges ? { ...data.counters, custom: newCustomCounters } : data.counters,
+            skills: hasSkillChanges ? newSkills : data.skills
         };
         onChange(newData);
         if (removedName.trim()) {
@@ -79,6 +101,10 @@ export const useTraitEditor = (
 
         const newCustomCounters = [...data.counters.custom];
         let hasCounterChanges = false;
+
+        // Index of trait entries that need master_skill wizard
+        let masterSkillTraitIndex: number | null = null;
+        let masterSkillTraitName: string | null = null;
 
         instances.forEach(instance => {
             const entry = instance.entry;
@@ -128,6 +154,13 @@ export const useTraitEditor = (
                     onAddLog(`Compteur ajouté : ${finalCounterName}`, 'info', 'sheet');
                 }
 
+                // Detect master_skill effect — wizard will fill in masterSkillTarget later
+                const hasMasterSkill = entry.effects?.some(e => e.type === 'master_skill');
+                if (hasMasterSkill && masterSkillTraitIndex === null) {
+                    masterSkillTraitIndex = listIndex;
+                    masterSkillTraitName = entry.name;
+                }
+
                 currentList[listIndex] = {
                     name: entry.name,
                     value: costValue,
@@ -173,14 +206,63 @@ export const useTraitEditor = (
             }
 
             onChange(newData);
+
+            // Trigger master_skill wizard after state is committed
+            if (masterSkillTraitIndex !== null && masterSkillTraitName && onMasterSkillNeeded) {
+                const traitIdx = masterSkillTraitIndex;
+                const traitType = multiSelectTarget;
+                onMasterSkillNeeded(masterSkillTraitName, () => {
+                    // This callback is called with the chosen skill from the wizard
+                    // It will be replaced by applyMasterSkill in CharacterSheetPage2
+                    void traitIdx; void traitType;
+                });
+            }
         }
         setMultiSelectTarget(null);
+    };
+
+    /**
+     * Applique la maîtrise d'une compétence sur la fiche.
+     * Appelé depuis CharacterSheetPage2 après confirmation du wizard.
+     */
+    const applyMasterSkill = (
+        currentData: CharacterSheetData,
+        traitType: 'avantages' | 'desavantages',
+        traitName: string,
+        categoryId: string,
+        skillName: string
+    ): CharacterSheetData => {
+        // 1. Mettre la compétence au rang 5 avec creationValue = 5 (gratuit en XP)
+        const newSkills = { ...currentData.skills };
+        const catList = newSkills[categoryId];
+        if (Array.isArray(catList)) {
+            const skillIdx = catList.findIndex(s => s.name === skillName);
+            if (skillIdx !== -1) {
+                const updated = [...catList];
+                updated[skillIdx] = { ...updated[skillIdx], value: 5, creationValue: 5 };
+                newSkills[categoryId] = updated;
+            }
+        }
+
+        // 2. Stocker le nom dans le TraitEntry correspondant (masterSkillTarget)
+        const traitList = [...currentData.page2[traitType]];
+        const traitIdx = traitList.findIndex(t => t.name === traitName && !t.masterSkillTarget);
+        if (traitIdx !== -1) {
+            traitList[traitIdx] = { ...traitList[traitIdx], masterSkillTarget: skillName };
+        }
+
+        return {
+            ...currentData,
+            skills: newSkills,
+            page2: { ...currentData.page2, [traitType]: traitList }
+        };
     };
 
     return {
         multiSelectTarget,
         setMultiSelectTarget,
         removeTrait,
-        handleMultiAdd
+        handleMultiAdd,
+        applyMasterSkill
     };
 };

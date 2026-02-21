@@ -2,6 +2,8 @@ import React from 'react';
 import { RulesData } from '../../../../types/rules';
 import { LibrarySkillEntry } from '../../../../types/system';
 import { Lock, Edit2, Trash2 } from 'lucide-react';
+import { ItemUsageDetail } from '../../../../types/usageTypes';
+import { UsageLockedTooltip } from '../UsageLockedTooltip';
 
 interface MysticLibraryItemProps {
     item: LibrarySkillEntry;
@@ -10,6 +12,9 @@ interface MysticLibraryItemProps {
     handleOpenEdit: (item: LibrarySkillEntry) => void;
     handleDelete: (id: string) => void;
     rules: RulesData;
+    isPlaced?: boolean;
+    usageDetails?: ItemUsageDetail;
+    onLoadUsageDetails?: (id: string) => void;
 }
 
 export const MysticLibraryItem: React.FC<MysticLibraryItemProps> = ({
@@ -18,8 +23,14 @@ export const MysticLibraryItem: React.FC<MysticLibraryItemProps> = ({
     onToggleActive,
     handleOpenEdit,
     handleDelete,
-    rules
+    rules,
+    isPlaced = false,
+    usageDetails,
+    onLoadUsageDetails
 }) => {
+    const [showLockTooltip, React_useStateLock] = React.useState(false);
+    const lockIconRef = React.useRef<HTMLDivElement>(null);
+    const setShowLockTooltip = (val: boolean) => React_useStateLock(val);
     return (
         <div className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${item.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
             <div className="w-8 flex justify-center shrink-0">
@@ -39,7 +50,29 @@ export const MysticLibraryItem: React.FC<MysticLibraryItemProps> = ({
                     </div>
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                    {isLocked && <div className="text-amber-500 shrink-0" title="Utilisé dans une campagne"><Lock size={11} /></div>}
+                    {isLocked && (
+                        <div
+                            ref={lockIconRef}
+                            onMouseEnter={() => {
+                                if (isLocked && !isPlaced && onLoadUsageDetails) {
+                                    onLoadUsageDetails(item.id);
+                                }
+                                setShowLockTooltip(true);
+                            }}
+                            onMouseLeave={() => setShowLockTooltip(false)}
+                            className="relative flex items-center shrink-0"
+                            title={isPlaced ? "Utilisé dans cette campagne" : undefined}
+                        >
+                            <Lock size={11} className="text-amber-500" />
+                            <UsageLockedTooltip
+                                anchorRef={lockIconRef}
+                                isOpen={showLockTooltip}
+                                isLocked={isLocked}
+                                isPlaced={isPlaced}
+                                usageDetails={usageDetails}
+                            />
+                        </div>
+                    )}
 
                     {item.defaultCategory && (
                         <span
@@ -64,7 +97,7 @@ export const MysticLibraryItem: React.FC<MysticLibraryItemProps> = ({
                     onClick={() => handleDelete(item.id)}
                     disabled={isLocked}
                     className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
-                    title={isLocked ? "Suppression bloquée : utilisé" : "Supprimer définitivement"}
+                    title={!isLocked ? "Supprimer" : undefined}
                 >
                     <Trash2 size={14} />
                 </button>

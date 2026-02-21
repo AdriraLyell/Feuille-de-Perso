@@ -1,5 +1,73 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.68] - 2026-02-16 [FEAT]
+
+- 🔄 Recréation : Implémentation du système de 'Respec' pour les personnages (Admin)
+- 💰 XP : Remboursement automatique de l'XP de progression (attributs, compétences, compteurs) lors d'une recréation
+- 🛡️ Mode Création : Réactivation du mode création avec injection du remboursement et redistribution auto
+- 🎨 UI : Nouvelle modale de confirmation 'Recréation Éthérée' avec bilan des gains d'XP et avertissements
+
+## [2.49.67] - 2026-02-16 [FEAT]
+
+- 🛡️ Attributs : Verrouillage de la valeur de création (val1) une fois le mode création validé
+- 📈 XP : Implémentation de l'achat d'attributs via la colonne val2 avec calcul auto de l'XP dépensée
+- 🎨 UI : Feedback visuel (opacité, curseur) sur les champs d'attributs verrouillés
+
+## [2.49.66] - 2026-02-16 [FIX]
+
+- 🩹 Image : Correction du préfixe Data URI manquant lors de la décompression (fix 431 Request Header Too Large)
+- 🛡️ Stabilité : Détection automatique des schémas d'images corrompus dans les registres admin
+
+## [2.49.65] - 2026-02-16 [FIX]
+
+- 🐛 Admin : Correction critique du chargement des portraits compressés (GZIP) dans la vue Admin
+- 🖼️ UI : Amélioration de la gestion des erreurs d'image (fallback silhouette)
+
+## [2.49.64] - 2026-02-16 [FIX]
+
+- 🖼️ Admin : Correction du bug d'affichage des portraits manquants d'Ayame (Seigneurs des Mystères)
+- 🛡️ UI : Ajout d'un placeholder 'Silhouette' explicite en cas d'erreur de chargement d'image
+- 🐛 Fix : Gestion robuste des IDs d'images morts dans la vue Admin
+
+## [2.49.63] - 2026-02-16 [FIX]
+
+- 🛡️ Schema : Correction de la structure `mysticAbilities` dans le validateur Zod (LibrarySkillEntry vs DotEntry).
+- 🚀 Import : Résolution du bug empêchant l'import de fiches contenant des capacités mystiques.
+
+## [2.49.62] - 2026-02-15 [FIX]
+
+- 🩹 Personnage : Restauration manuelle des attributs d'Ayame (3,1,3,3...) dans le Cloud
+- 🛡️ Schema : Correction de la validation Zod (mysticAbilities) pour éviter les resets de fiche
+- 🔍 Sync : Information MJ ajoutée pour guider la joueuse lors de la prochaine synchro
+
+## [2.49.61] - 2026-02-15 [FIX]
+
+- 🐞 Sync : Correction des erreurs de typage bloquant le build
+- 🔍 Debug : Ajout de logs dans la console pour le suivi de la synchronisation cloud
+
+## [2.49.60] - 2026-02-15 [FEAT]
+
+- 🔔 Synchronisation : Notification automatique des mises à jour disponibles sur le Cloud
+- ✨ UI : Ajout d'un indicateur visuel (badge ambre pulsant) sur le bouton Sync
+- 🛡️ Sync : Préservation des métadonnées de synchronisation lors des mises à jour partielles
+
+## [2.49.59] - 2026-02-15 [FIX]
+
+- 💾 Admin : Correction ordre de sauvegarde (Habilités avant Compétences) pour garantir les liens
+
+## [2.49.58] - 2026-02-15 [FIX]
+
+- 🔍 Admin : Ajout d'un filtre 'Mystique' dans la réserve de compétences
+- 🐞 Admin : Correction de l'erreur d'import dans LibraryLoader
+
+## [2.49.57] - 2026-02-15 [FEAT]
+
+- 🔗 Admin : Possibilité de lier les compétences à des 'Habilités Mystiques'
+- 🎨 UI : Nouvelle option dans l'édition de compétence pour désigner une habilité mystique
+- 🗄️ BDD : Migration SQL pour supporter le lien entre compétences et habilités
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.49.56] - 2026-02-15 [FEAT]
 
 - 🔮 Admin : Ajout de la bibliothèque des 'Habilités Mystiques'

@@ -67,8 +67,16 @@ export const reconcileRulesWithLibraries = (rules: RulesData, libraries: RulesDa
         }
 
         activeCounters.forEach((libCounter: LibraryCounterEntry) => {
-            // Determine stable key: ID preferred for global, slug for local
-            const key = libCounter.id || libCounter.name
+            // Find existing key by ID to avoid duplicates (Slug vs UUID)
+            let existingKey: string | undefined;
+            if (rules.definitions.counters) {
+                existingKey = Object.keys(rules.definitions.counters).find(
+                    k => rules.definitions.counters![k].id === libCounter.id
+                );
+            }
+
+            // Determine stable key: existing key > ID > slug
+            const key = existingKey || libCounter.id || libCounter.name
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
                 .toLowerCase()

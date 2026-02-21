@@ -1,6 +1,8 @@
 import React from 'react';
 import { Edit2, Trash2, Globe, Lock } from 'lucide-react';
 import { LibrarySpecializationEntry } from '../../../../types';
+import { ItemUsageDetail } from '../../../../types/usageTypes';
+import { UsageLockedTooltip } from '../UsageLockedTooltip';
 
 interface SpecListItemProps {
     entry: LibrarySpecializationEntry;
@@ -9,6 +11,9 @@ interface SpecListItemProps {
     onEdit: (entry: LibrarySpecializationEntry) => void;
     onDelete: (id: string, name: string) => void;
     onToggle: (id: string, active: boolean) => void;
+    isPlaced?: boolean;
+    usageDetails?: ItemUsageDetail;
+    onLoadUsageDetails?: (id: string) => void;
 }
 
 export const SpecListItem: React.FC<SpecListItemProps> = ({
@@ -17,8 +22,14 @@ export const SpecListItem: React.FC<SpecListItemProps> = ({
     allSkills,
     onEdit,
     onDelete,
-    onToggle
+    onToggle,
+    isPlaced = false,
+    usageDetails,
+    onLoadUsageDetails
 }) => {
+    const [showLockTooltip, React_useStateLock] = React.useState(false);
+    const lockIconRef = React.useRef<HTMLDivElement>(null);
+    const setShowLockTooltip = (val: boolean) => React_useStateLock(val);
     return (
         <div className={`bg-white border rounded p-2 transition-shadow group ${entry.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
             <div className="flex items-center gap-2 mb-1.5">
@@ -37,8 +48,26 @@ export const SpecListItem: React.FC<SpecListItemProps> = ({
                 <div className="w-16 flex items-center gap-1 shrink-0">
                     {entry.isGlobal && <div title="Item Global"><Globe size={14} className="text-indigo-500" /></div>}
                     {isLocked && (
-                        <div className="text-amber-600" title="Utilisée dans d'autres campagnes">
-                            <Lock size={14} />
+                        <div
+                            ref={lockIconRef}
+                            onMouseEnter={() => {
+                                if (isLocked && !isPlaced && onLoadUsageDetails) {
+                                    onLoadUsageDetails(entry.id);
+                                }
+                                setShowLockTooltip(true);
+                            }}
+                            onMouseLeave={() => setShowLockTooltip(false)}
+                            className="relative flex items-center shrink-0"
+                            title={isPlaced ? "Utilisée dans cette campagne" : undefined}
+                        >
+                            <Lock size={14} className="text-amber-600" />
+                            <UsageLockedTooltip
+                                anchorRef={lockIconRef}
+                                isOpen={showLockTooltip}
+                                isLocked={isLocked}
+                                isPlaced={isPlaced}
+                                usageDetails={usageDetails}
+                            />
                         </div>
                     )}
                 </div>
@@ -57,7 +86,7 @@ export const SpecListItem: React.FC<SpecListItemProps> = ({
                         onClick={() => onDelete(entry.id, entry.name)}
                         disabled={isLocked}
                         className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
-                        title={isLocked ? "Suppression bloquée : utilisée" : "Supprimer définitivement"}
+                        title={!isLocked ? "Supprimer" : undefined}
                     >
                         <Trash2 size={14} />
                     </button>

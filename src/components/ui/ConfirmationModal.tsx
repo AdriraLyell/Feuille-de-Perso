@@ -88,9 +88,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             }
         >
             <div className="text-center">
-                <p className={messageClass}>
-                    {message}
-                </p>
+                {typeof message === 'string' ? (
+                    <p className={messageClass}>{message}</p>
+                ) : (
+                    <div className={messageClass}>{message}</div>
+                )}
             </div>
         </ThematicModal>
     );

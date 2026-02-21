@@ -58,21 +58,9 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
             try {
                 const blob = await getImage(imageId);
                 if (blob && active) {
-                    // Check if blob is a GZIP string
-                    const text = await new Response(blob).text();
-                    let finalUrl = "";
-
-                    if (text.startsWith(GZIP_MARKER)) {
-                        const decompressed = ImageCompressionService.decompressFull(text);
-                        finalUrl = decompressed;
-                    } else {
-                        finalUrl = URL.createObjectURL(blob);
-                    }
-
-                    if (active) {
-                        setImageUrl(finalUrl);
-                        cleanupUrl = finalUrl;
-                    }
+                    const finalUrl = URL.createObjectURL(blob);
+                    setImageUrl(finalUrl);
+                    cleanupUrl = finalUrl;
                 }
             } catch (e) {
                 ErrorService.handleError(e, { context: 'NoteImageZone.load', silent: true });

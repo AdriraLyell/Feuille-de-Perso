@@ -1,5 +1,77 @@
 [
     {
+        "version": "2.60.0",
+        "date": "2026-02-21",
+        "type": "refactor",
+        "description": "Refactorisation majeure pour la maintenance : 1) Refonte de la modale de synchronisation en un 'Cloud Hub' unifié avec onglets (Push vs Library). 2) Décomposition des composants massifs (SyncModal, AttributesEditor, BookImageView, SpecializationLibraryView) en hooks personnalisés et sous-composants. 3) Modularisation du moteur de calcul d'XP (xpCalculator) en utilitaires spécialisés (Skills, Attributes, Traits, Counters)."
+    },
+    {
+        "version": "2.59.0",
+        "date": "2026-02-21",
+        "type": "refactor",
+        "description": "Renommage sémantique : L'effet 'Compteur de Trait' devient 'Compteur Auto' pour refléter son usage polyvalent. Implémentation du nommage intelligent : le champ 'Nom de Base' devient optionnel dans l'éditeur d'effet. Si laissé vide, le compteur prendra automatiquement le nom de la variante (ou le nom du trait) lors de l'instanciation sur la fiche du Héro."
+    },
+    {
+        "version": "2.58.0",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Amélioration des Compteurs de Traits (Dynamic Counters) : Les compteurs liés aux traits ne polluent plus la bibliothèque d'administration. Ils sont désormais générés dynamiquement et uniquement sur la fiche du personnage. Support des Traits Variables : le compteur ajoute automatiquement le nom de la variante choisie au nom de base de l'effet."
+    },
+    {
+        "version": "2.57.0",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Intégration des Compteurs de Traits : Nouveau type d'effet 'trait_counter' permettant de lier l'acquisition d'un trait à la création automatique d'un compteur personnalisé (ex: Munitions, Magie, Stress). Inclus : mode d'affichage compact 'squares_only' (sans ligne Maxi), synchronisation bidirectionnelle entre traits et compteurs sur la fiche, et gestion automatisée dans la bibliothèque admin."
+    },
+    {
+        "version": "2.56.75",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Correction UI : Suppression de la hauteur fixe et de l'ascenseur interne dans le bilan d'XP, permettant au tableau de s'étendre naturellement sur toute la page A4."
+    },
+    {
+        "version": "2.56.74",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Amélioration UI (Historique Dépenses XP) : Remplacement de la catégorie globale 'Compétences' par un découpage thématique des compétences selon leur origine (ex: Talents (Orange), Connaissances (Bleu clair), Mêlée & Tir (Rouge), etc.) avec icônes et codes couleurs dédiés."
+    },
+    {
+        "version": "2.56.73",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Ajustement UI : L'onglet de Gestion de l'Expérience est de nouveau affiché au format A4 pour être cohérent avec le reste de la fiche de personnage (correction des classes CSS corrompues encadrant le conteneur)."
+    },
+    {
+        "version": "2.56.72",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction UI : Alignement et centrage des valeurs dans le résumé d'expérience. Suppression des conteneurs flex imbriqués qui empêchaient le centrage correct du champ 'Gain' et application d'une largeur fixe avec marge automatique pour un alignement vertical parfait de toutes les statistiques d'expérience."
+    },
+    {
+        "version": "2.56.71",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Ajustement UI : Centrage de la valeur du champ 'Gain' dans le résumé d'expérience pour une meilleure harmonie visuelle avec les autres champs de stats."
+    },
+    {
+        "version": "2.56.70",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Restauration UI & Mise en forme : Correction des classes CSS corrompues (espaces), retour aux libellés en majuscules pour les onglets et en-têtes de tableaux, et ajustement des dimensions du bilan d'XP (suppression du bloc solde redondant et retour à une granularité fine des gains) tout en conservant le moteur de calcul basé sur l'état."
+    },
+    {
+        "version": "2.56.69",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Vue Distribution d'XP finale : Le bilan d'XP est désormais calculé en temps réel à partir de l'état actuel de la fiche personnage (Distribution d'état). Cette approche garantit une fiabilité totale en affichant l'investissement exact pour chaque compétence, attribut, trait et compteur, sans dépendre de l'intégrité de l'historique brut des transactions."
+    },
+    {
+        "version": "2.56.68",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Agrégation du Bilan XP : Épuration de la vue Recçu en supprimant les horodatages et en regroupant les transactions par sujet (ex: groupement des achats d'une même compétence). Tri automatique par importance d'investissement et mise à jour des infobulles pour le 'Top 5'."
+    },
+    {
         "version": "2.56.67",
         "date": "2026-02-21",
         "type": "feat",
@@ -659,120 +731,6 @@
             "📂 Admin : Déplacement de la fonctionnalité de recréation vers les paramètres spécifiques de chaque campagne (Fiches des Destins)",
             "🧩 Imports : Correction d'une erreur de référence sur l'icône RotateCcw",
             "⏳ UX : Ajout d'états de chargement et verrouillage pendant le processus de recréation"
-        ]
-    },
-    {
-        "version": "2.49.68",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🔄 Recréation : Implémentation du système de 'Respec' pour les personnages (Admin)",
-            "💰 XP : Remboursement automatique de l'XP de progression (attributs, compétences, compteurs) lors d'une recréation",
-            "🛡️ Mode Création : Réactivation du mode création avec injection du remboursement et redistribution auto",
-            "🎨 UI : Nouvelle modale de confirmation 'Recréation Éthérée' avec bilan des gains d'XP et avertissements"
-        ]
-    },
-    {
-        "version": "2.49.67",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🛡️ Attributs : Verrouillage de la valeur de création (val1) une fois le mode création validé",
-            "📈 XP : Implémentation de l'achat d'attributs via la colonne val2 avec calcul auto de l'XP dépensée",
-            "🎨 UI : Feedback visuel (opacité, curseur) sur les champs d'attributs verrouillés"
-        ]
-    },
-    {
-        "version": "2.49.66",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🩹 Image : Correction du préfixe Data URI manquant lors de la décompression (fix 431 Request Header Too Large)",
-            "🛡️ Stabilité : Détection automatique des schémas d'images corrompus dans les registres admin"
-        ]
-    },
-    {
-        "version": "2.49.65",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🐛 Admin : Correction critique du chargement des portraits compressés (GZIP) dans la vue Admin",
-            "🖼️ UI : Amélioration de la gestion des erreurs d'image (fallback silhouette)"
-        ]
-    },
-    {
-        "version": "2.49.64",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🖼️ Admin : Correction du bug d'affichage des portraits manquants d'Ayame (Seigneurs des Mystères)",
-            "🛡️ UI : Ajout d'un placeholder 'Silhouette' explicite en cas d'erreur de chargement d'image",
-            "🐛 Fix : Gestion robuste des IDs d'images morts dans la vue Admin"
-        ]
-    },
-    {
-        "version": "2.49.63",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🛡️ Schema : Correction de la structure `mysticAbilities` dans le validateur Zod (LibrarySkillEntry vs DotEntry).",
-            "🚀 Import : Résolution du bug empêchant l'import de fiches contenant des capacités mystiques."
-        ]
-    },
-    {
-        "version": "2.49.62",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🩹 Personnage : Restauration manuelle des attributs d'Ayame (3,1,3,3...) dans le Cloud",
-            "🛡️ Schema : Correction de la validation Zod (mysticAbilities) pour éviter les resets de fiche",
-            "🔍 Sync : Information MJ ajoutée pour guider la joueuse lors de la prochaine synchro"
-        ]
-    },
-    {
-        "version": "2.49.61",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🐞 Sync : Correction des erreurs de typage bloquant le build",
-            "🔍 Debug : Ajout de logs dans la console pour le suivi de la synchronisation cloud"
-        ]
-    },
-    {
-        "version": "2.49.60",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🔔 Synchronisation : Notification automatique des mises à jour disponibles sur le Cloud",
-            "✨ UI : Ajout d'un indicateur visuel (badge ambre pulsant) sur le bouton Sync",
-            "🛡️ Sync : Préservation des métadonnées de synchronisation lors des mises à jour partielles"
-        ]
-    },
-    {
-        "version": "2.49.59",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "💾 Admin : Correction ordre de sauvegarde (Habilités avant Compétences) pour garantir les liens"
-        ]
-    },
-    {
-        "version": "2.49.58",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🔍 Admin : Ajout d'un filtre 'Mystique' dans la réserve de compétences",
-            "🐞 Admin : Correction de l'erreur d'import dans LibraryLoader"
-        ]
-    },
-    {
-        "version": "2.49.57",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🔗 Admin : Possibilité de lier les compétences à des 'Habilités Mystiques'",
-            "🎨 UI : Nouvelle option dans l'édition de compétence pour désigner une habilité mystique",
-            "🗄️ BDD : Migration SQL pour supporter le lien entre compétences et habilités"
         ]
     }
 ]

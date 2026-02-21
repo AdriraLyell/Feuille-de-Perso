@@ -191,7 +191,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     if (!editor) return null;
 
     return (
-        <div className="w-full animate-in fade-in duration-700 flex flex-col items-center justify-start relative overflow-visible gap-4">
+        <div className="w-full flex flex-col items-center justify-start relative overflow-visible gap-4">
 
             {/* Save Status Indicator */}
             {saveStatus === 'saved' && (

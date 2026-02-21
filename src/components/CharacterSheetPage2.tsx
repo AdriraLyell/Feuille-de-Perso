@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CharacterSheetData, TraitEntry, LibraryEntry } from '../types';
 import { BookOpen, X } from 'lucide-react';
@@ -16,6 +15,7 @@ import { Page2SectionHeader } from './sheet/page2/Page2Components';
 import { useTraitEditor } from '../hooks/sheet/useTraitEditor';
 import { useReputationManager } from '../hooks/sheet/useReputationManager';
 import MysticSkillWizard from './sheet/ui/MysticSkillWizard';
+import MasterSkillWizard from './sheet/ui/MasterSkillWizard';
 import TraitEditModal from './sheet/page2/TraitEditModal';
 
 interface Props {
@@ -26,11 +26,27 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
     const { data, updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacter();
     const { rules } = useRules();
 
+    // State déclaré avant useTraitEditor car le callback en a besoin
+    const [masterSkillWizard, setMasterSkillWizard] = React.useState<{ isOpen: boolean, traitName: string, traitType: 'avantages' | 'desavantages' } | null>(null);
+    // Ref pour capturer le type de cible avant que multiSelectTarget soit remis à null
+    const multiSelectTargetRef = React.useRef<'avantages' | 'desavantages' | null>(null);
+
     const {
         multiSelectTarget, setMultiSelectTarget,
         removeTrait,
-        handleMultiAdd
-    } = useTraitEditor(data, rules, onChange, onAddLog, recordXPTransaction);
+        handleMultiAdd,
+        applyMasterSkill
+    } = useTraitEditor(data, rules, onChange, onAddLog, recordXPTransaction, (traitName, _pendingAdd) => {
+        // Ouvrir le wizard master_skill après ajout du trait
+        setMasterSkillWizard({ isOpen: true, traitName, traitType: multiSelectTargetRef.current || 'avantages' });
+    });
+
+    // Synchroniser la ref avec l'état
+    React.useEffect(() => {
+        if (multiSelectTarget !== null) {
+            multiSelectTargetRef.current = multiSelectTarget;
+        }
+    }, [multiSelectTarget]);
 
     const {
         updateReputationEntry,
@@ -156,8 +172,10 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     creationValue: 0, // Initially learned at level 0
                     max: 5,
                     variant: skillDef.isVariable ? '' : undefined,
-                    description: skillDef.description || undefined
-                });
+                    description: skillDef.description || undefined,
+                    definitionId: skillDef.id, // Lien vers la bibliothèque pour l'enrichissement des couleurs
+                    mysticAbilityId: skillDef.mysticAbilityId || wizardState.mysticAbilityId || undefined
+                } as any);
 
                 // Add to local library if not present
                 if (!newLibrary.find(l => l.id === skillDef.id)) {
@@ -225,14 +243,54 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             }
         }
 
-        onChange({ ...data, page2: { ...data.page2, [type]: newList } });
+        // Mettre à jour le compteur auto si le variant a changé
+        let newCounters = data.counters;
+        if (
+            updatedTrait.associatedCounterId &&
+            updatedTrait.variant !== oldTrait.variant
+        ) {
+            const traitDef = rules?.libraries?.traits?.find(t => t.id === updatedTrait.definitionId);
+            const counterEffect = traitDef?.effects?.find(e => e.type === 'auto_counter');
+
+            const baseCounterName = counterEffect?.target?.trim();
+            const variantName = updatedTrait.variant?.trim();
+            let newCounterName = '';
+            if (baseCounterName) {
+                newCounterName = variantName ? `${baseCounterName} (${variantName})` : baseCounterName;
+            } else {
+                newCounterName = variantName || updatedTrait.name;
+            }
+
+            const customCounters = data.counters.custom.map(c =>
+                c.id === updatedTrait.associatedCounterId ? { ...c, name: newCounterName } : c
+            );
+            newCounters = { ...data.counters, custom: customCounters };
+            onAddLog(`Compteur mis à jour : ${newCounterName}`, 'info', 'sheet');
+        }
+
+        onChange({ ...data, page2: { ...data.page2, [type]: newList }, counters: newCounters });
         onAddLog(`Modification ${type === 'avantages' ? 'Avantage' : 'Désavantage'} : ${updatedTrait.name}`, 'info', 'sheet');
         setEditingTrait(null);
     };
 
-    const updateCharacterImageId = (id: string) => {
-        onChange({ ...data, page2: { ...data.page2, characterImageId: id, characterImage: '' } });
-    };
+    const handleImageLog = React.useCallback((msg: string, type: 'success' | 'danger') => {
+        onAddLog(msg, type, 'sheet');
+    }, [onAddLog]);
+
+    const handleMasterSkillConfirm = React.useCallback((categoryId: string, skillName: string) => {
+        if (!masterSkillWizard) return;
+        const updated = applyMasterSkill(data, masterSkillWizard.traitType, masterSkillWizard.traitName, categoryId, skillName);
+        onChange(updated);
+        onAddLog(`Maîtrise accordée : ${skillName} portée au rang 5 (via ${masterSkillWizard.traitName})`, 'success', 'sheet');
+        setMasterSkillWizard(null);
+    }, [masterSkillWizard, applyMasterSkill, data, onChange, onAddLog]);
+
+    const updateCharacterImageId = React.useCallback((id: string) => {
+        onChange((prev: CharacterSheetData) => ({
+            ...prev,
+            page2: { ...prev.page2, characterImageId: id, characterImage: '' }
+        }));
+    }, [onChange]);
 
     const calculateTotal = (list: TraitEntry[]) => list.reduce((acc, item) => acc + (parseInt(item.value) || 0), 0);
 
@@ -303,7 +361,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             {isLandscape ? (
                 <div className="sheet-container landscape flex flex-col overflow-hidden">
                     <div className="grid grid-cols-4 border-b-2 border-stone-800 h-[35%] overflow-hidden">
-                        <div className="border-r border-stone-400 p-0 flex flex-col h-full overflow-hidden bg-stone-50"><CharacterImageWidget imageId={data.page2.characterImageId} legacyImage={data.page2.characterImage} onImageUpdate={updateCharacterImageId} onAddLog={(msg, type) => onAddLog(msg, type, 'sheet')} /></div>
+                        <div className="border-r border-stone-400 p-0 flex flex-col h-full overflow-hidden bg-stone-50"><CharacterImageWidget imageId={data.page2.characterImageId} legacyImage={data.page2.characterImage} onImageUpdate={updateCharacterImageId} onAddLog={handleImageLog} /></div>
                         <div className="border-r border-stone-400 p-1.5 flex flex-col gap-2 h-full overflow-hidden">
                             <div className="flex-1 flex flex-col min-h-0 overflow-hidden"><Page2SectionHeader title="Lieux Importants" /><div className="flex-grow relative min-h-0"><NotebookInput value={data.page2.lieux_importants} onChange={(v) => updateStringField('lieux_importants', v)} /></div></div>
                             <div className="flex-1 flex flex-col min-h-0 overflow-hidden"><Page2SectionHeader title="Contacts" /><div className="flex-grow relative min-h-0"><NotebookInput value={data.page2.contacts} onChange={(v) => updateStringField('contacts', v)} /></div></div>
@@ -333,7 +391,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             ) : (
                 <div className="sheet-container flex flex-col">
                     <div className="flex border-b border-stone-400 h-[400px] shrink-0 overflow-hidden">
-                        <div className="w-[35%] border-r border-stone-400 bg-stone-50 p-0 flex flex-col overflow-hidden"><CharacterImageWidget imageId={data.page2.characterImageId} legacyImage={data.page2.characterImage} onImageUpdate={updateCharacterImageId} onAddLog={(msg, type) => onAddLog(msg, type, 'sheet')} /></div>
+                        <div className="w-[35%] border-r border-stone-400 bg-stone-50 p-0 flex flex-col overflow-hidden"><CharacterImageWidget imageId={data.page2.characterImageId} legacyImage={data.page2.characterImage} onImageUpdate={updateCharacterImageId} onAddLog={handleImageLog} /></div>
                         <div className="w-[65%] flex flex-col overflow-hidden">
                             <div className="h-1/3 flex border-b border-stone-400">
                                 <div className="w-1/2 border-r border-stone-400 p-1 flex flex-col"><Page2SectionHeader title="Lieux Importants" /><div className="flex-grow relative min-h-0 overflow-hidden"><NotebookInput value={data.page2.lieux_importants} onChange={(v) => updateStringField('lieux_importants', v)} /></div></div>
@@ -383,6 +441,17 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     onConfirm={handleWizardConfirm}
                     mysticAbilityId={wizardState.mysticAbilityId}
                     mysticAbilityName={wizardState.mysticAbilityName}
+                    sheet={data}
+                    rules={rules}
+                />
+            )}
+
+            {masterSkillWizard?.isOpen && (
+                <MasterSkillWizard
+                    isOpen={true}
+                    traitName={masterSkillWizard.traitName}
+                    onClose={() => setMasterSkillWizard(null)}
+                    onConfirm={handleMasterSkillConfirm}
                     sheet={data}
                     rules={rules}
                 />

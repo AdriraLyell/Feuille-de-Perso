@@ -19,38 +19,31 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    // Track the current blob URL in a ref so we can safely revoke the *previous* one
+    // when a new one is created, rather than revoking in cleanup (which runs before paint).
+    const currentBlobRef = useRef<string | null>(null);
+
     useEffect(() => {
         let active = true;
-        let cleanupUrl = "";
 
         const load = async () => {
-            if (imageId) {
-                try {
+            if (active) setLoading(true);
+
+            try {
+                if (imageId) {
                     const blob = await getImage(imageId);
                     if (blob && active) {
-                        // Check if blob is a GZIP string
-                        // Using new Response(blob).text() for better compatibility/types
-                        const text = await new Response(blob).text();
-                        let finalUrl = "";
-
-                        if (text.startsWith(GZIP_MARKER)) {
-                            const decompressed = ImageCompressionService.decompressFull(text);
-                            finalUrl = decompressed; // It's already a data URL
-                        } else {
-                            finalUrl = URL.createObjectURL(blob);
+                        const newUrl = URL.createObjectURL(blob);
+                        // Revoke previous blob URL only AFTER creating the new one
+                        if (currentBlobRef.current) {
+                            URL.revokeObjectURL(currentBlobRef.current);
                         }
-
-                        if (active) {
-                            setImageUrl(finalUrl);
-                            cleanupUrl = finalUrl;
-                        }
+                        currentBlobRef.current = newUrl;
+                        setImageUrl(newUrl);
+                    } else if (!blob && active) {
+                        setImageUrl(null);
                     }
-                } catch (e) {
-                    ErrorService.handleError(e, { context: 'CharacterImageWidget.load', silent: true });
-                }
-            } else if (legacyImage && legacyImage.length > 100) {
-                if (active) setLoading(true);
-                try {
+                } else if (legacyImage && legacyImage.length > 100) {
                     // If legacy image is gzipped, decompress for migration
                     const toMigrate = legacyImage.startsWith(GZIP_MARKER)
                         ? ImageCompressionService.decompressFull(legacyImage)
@@ -58,18 +51,26 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
 
                     const blob = await base64ToBlob(toMigrate);
                     const newId = await saveImage(blob);
+
                     if (active) {
                         onImageUpdate(newId);
                         onAddLog("Migration automatique de l'image.", 'success');
                     }
-                } catch (e) {
-                    ErrorService.handleError(e, { context: 'CharacterImageWidget.migrate', silent: true });
-                    if (active) setImageUrl(legacyImage);
-                } finally {
-                    if (active) setLoading(false);
+                } else {
+                    if (active) setImageUrl(null);
                 }
-            } else {
-                if (active) setImageUrl(null);
+            } catch (e) {
+                ErrorService.handleError(e, { context: 'CharacterImageWidget.load', silent: true });
+                if (active) {
+                    // Fallback to legacy if it's a direct base64
+                    if (legacyImage && !legacyImage.startsWith(GZIP_MARKER)) {
+                        setImageUrl(legacyImage);
+                    } else {
+                        setImageUrl(null);
+                    }
+                }
+            } finally {
+                if (active) setLoading(false);
             }
         };
 
@@ -77,11 +78,20 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
 
         return () => {
             active = false;
-            if (cleanupUrl.startsWith('blob:')) {
-                URL.revokeObjectURL(cleanupUrl);
+            // Do NOT revoke here — the image is still being displayed.
+            // It will be revoked on the next successful load or on unmount below.
+        };
+    }, [imageId, legacyImage, onImageUpdate, onAddLog]);
+
+    // Revoke the blob URL only when the component truly unmounts
+    useEffect(() => {
+        return () => {
+            if (currentBlobRef.current) {
+                URL.revokeObjectURL(currentBlobRef.current);
+                currentBlobRef.current = null;
             }
         };
-    }, [imageId, legacyImage, onImageUpdate]);
+    }, []);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

@@ -7,6 +7,7 @@ import TraitForm from '../../../components/trait-library/TraitForm';
 import TriStateChip from '../../../components/ui/TriStateChip';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 import { useAdminTraitLibrary } from '../../../hooks/admin/useAdminTraitLibrary';
+import { useItemUsageDetails } from '../../../hooks/admin/useItemUsageDetails';
 
 interface AdminTraitLibraryProps {
     rules: RulesData;
@@ -56,6 +57,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
         updateEffect,
         removeEffect
     } = useAdminTraitLibrary({ rules, onUpdate, globalUsage });
+    const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'trait');
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-120px)] flex flex-col">
@@ -209,6 +211,8 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
                                         showMultiSelect={false}
                                         source={entry.isGlobal ? 'official' : 'local'}
                                         isLocked={!!globalUsage[entry.id]}
+                                        usageDetails={usageDetailsCache.get(entry.id)}
+                                        onLoadUsageDetails={loadDetails}
                                     />
                                 </div>
                             </div>

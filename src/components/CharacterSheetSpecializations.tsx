@@ -285,7 +285,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                 <div className="space-y-0.5 overflow-auto">
                     {/* Dynamic Rendering from Rules */}
                     {rules?.definitions?.skillCategories
-                        ?.filter((cat: any) => cat.behavior === 'Compétence' || cat.behavior === 'Secondaire')
+                        ?.filter((cat: any) => cat.behavior === 'Compétence')
                         ?.map((cat: any) => (
                             <div key={cat.id}>
                                 {renderCategory(cat.label, cat.id as any)}

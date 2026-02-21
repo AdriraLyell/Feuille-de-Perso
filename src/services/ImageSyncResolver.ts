@@ -123,7 +123,8 @@ export const ImageSyncResolver = {
             // Case 1: Portrait (compressed string in characterImageId field)
             if (key === 'characterImageId' && typeof value === 'string' && value.startsWith(GZIP_MARKER)) {
                 try {
-                    const blob = await base64ToBlob(value);
+                    const decompressed = ImageCompressionService.decompressFull(value);
+                    const blob = await base64ToBlob(decompressed);
                     const newId = await saveImage(blob);
                     processed[key] = newId;
                 } catch (e) {
@@ -134,7 +135,8 @@ export const ImageSyncResolver = {
             // Case 1.1: Portrait Legacy (compressed string in characterImage field)
             else if (key === 'characterImage' && typeof value === 'string' && value.startsWith(GZIP_MARKER)) {
                 try {
-                    const blob = await base64ToBlob(value);
+                    const decompressed = ImageCompressionService.decompressFull(value);
+                    const blob = await base64ToBlob(decompressed);
                     const newId = await saveImage(blob);
                     processed.characterImageId = newId;
                     processed.characterImage = '';
@@ -148,7 +150,8 @@ export const ImageSyncResolver = {
                 try {
                     const attrs = obj.attrs as Record<string, any>;
                     const compressed = attrs.imageId;
-                    const blob = await base64ToBlob(compressed);
+                    const decompressed = ImageCompressionService.decompressFull(compressed);
+                    const blob = await base64ToBlob(decompressed);
                     const newId = await saveImage(blob);
 
                     processed.type = 'bookImage';
@@ -169,7 +172,8 @@ export const ImageSyncResolver = {
             // Case 3: Campaign Note Cover (base64Cover field)
             else if (key === 'base64Cover' && typeof value === 'string' && value.startsWith(GZIP_MARKER)) {
                 try {
-                    const blob = await base64ToBlob(value);
+                    const decompressed = ImageCompressionService.decompressFull(value);
+                    const blob = await base64ToBlob(decompressed);
                     const newId = await saveImage(blob);
                     processed.imageId = newId;
                     // We don't return here because we want to keep processing other fields in the note
@@ -182,7 +186,8 @@ export const ImageSyncResolver = {
             // Case 4: Campaign Note Gallery Image (base64Data field)
             else if (key === 'base64Data' && typeof value === 'string' && value.startsWith(GZIP_MARKER)) {
                 try {
-                    const blob = await base64ToBlob(value);
+                    const decompressed = ImageCompressionService.decompressFull(value);
+                    const blob = await base64ToBlob(decompressed);
                     const newId = await saveImage(blob);
                     processed.imageId = newId;
                 } catch (e) {

@@ -99,10 +99,16 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
             // Enrich items with metadata from rules (search in all relevant libraries)
             const enrichedItems = items.map(item => {
                 const targetId = item.definitionId || item.id;
-                // Search in skills AND mysticAbilities libraries
-                const def =
+                // 1. Lookup by ID (definitionId ou item.id)
+                let def =
                     rules?.libraries?.skills.find(s => s.id === targetId) ||
                     rules?.libraries?.mysticAbilities.find(s => s.id === targetId);
+
+                // 2. Fallback par nom pour compatibilité fiches existantes (pas de definitionId)
+                if (!def && item.name) {
+                    const nameLower = item.name.trim().toLowerCase();
+                    def = rules?.libraries?.skills.find(s => s.name.trim().toLowerCase() === nameLower);
+                }
 
                 if (def) {
                     return {
@@ -139,10 +145,18 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
                 const items = data.skills[cat.id] || [];
                 const enrichedItems = items.map(item => {
                     const targetId = item.definitionId || item.id;
-                    const def =
+                    // 1. Lookup par ID
+                    let def =
                         rules?.libraries?.skills.find(s => s.id === targetId) ||
                         rules?.libraries?.mysticAbilities.find(s => s.id === targetId) ||
                         rules?.libraries?.backgrounds.find(s => s.id === targetId);
+
+                    // 2. Fallback par nom pour rétrocompatibilité
+                    if (!def && item.name) {
+                        const nameLower = item.name.trim().toLowerCase();
+                        def = rules?.libraries?.skills.find(s => s.name.trim().toLowerCase() === nameLower)
+                            || rules?.libraries?.backgrounds.find(s => s.name.trim().toLowerCase() === nameLower);
+                    }
 
                     if (def) {
                         return {

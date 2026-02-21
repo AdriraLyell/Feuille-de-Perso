@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { LibraryEntry } from '../../types';
 import { Zap, Edit2, Trash2, Plus, CheckSquare, Square, Lock, Globe, Layers } from 'lucide-react';
 import { PortalTooltip } from '../ui/PortalTooltip';
+import { ItemUsageDetail } from '../../types/usageTypes';
+import { UsageLockedTooltip } from '../../admin/components/libraries/UsageLockedTooltip';
 
 interface TraitCardProps {
     entry: LibraryEntry;
@@ -14,7 +16,10 @@ interface TraitCardProps {
     showMultiSelect: boolean;
     source?: 'local' | 'official' | 'modified';
     isLocked?: boolean;
+    isPlaced?: boolean;
     isActive?: boolean;
+    usageDetails?: ItemUsageDetail;
+    onLoadUsageDetails?: (id: string) => void;
 }
 
 const TraitCardItemVariants: React.FC<{ entry: LibraryEntry; hasVariants: boolean }> = ({ entry, hasVariants }) => {
@@ -61,6 +66,7 @@ const TraitCardItemEffects: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
             case 'free_skill_rank': return `Rang gratuit : ${eff.target || '?'} (+${eff.value})`;
             case 'attribute_bonus': return `Bonus Attribut : ${eff.target || '?'} (+${eff.value})`;
             case 'auto_counter': return `Compteur Auto${eff.target ? ` : ${eff.target}` : ''}`;
+            case 'master_skill': return `Maître : compétence au rang 5 (choix joueur)`;
             default: return 'Effet inconnu';
         }
     };
@@ -103,8 +109,15 @@ const TraitCard: React.FC<TraitCardProps> = ({
     showMultiSelect,
     source = 'local',
     isLocked = false,
-    isActive = true
+    isPlaced = false,
+    isActive = true,
+    usageDetails,
+    onLoadUsageDetails
 }) => {
+    const [showDeleteTooltip, setShowDeleteTooltip] = useState(false);
+    const [showLockTooltip, setShowLockTooltip] = useState(false);
+    const deleteBtnRef = useRef<HTMLDivElement>(null);
+    const lockIconRef = useRef<HTMLDivElement>(null);
     if (!entry) return null;
 
     const hasVariants = entry.variants && entry.variants.length > 0;
@@ -136,7 +149,29 @@ const TraitCard: React.FC<TraitCardProps> = ({
                 {entry.isVariable && <TraitCardItemVariants entry={entry} hasVariants={!!hasVariants} />}
                 {source === 'official' && <div title="Trait Officiel"><Globe size={14} className="text-indigo-500" /></div>}
                 {entry.effects && entry.effects.length > 0 && <TraitCardItemEffects entry={entry} />}
-                {isLocked && <div title="Trait utilisé"><Lock size={14} className="text-amber-600" /></div>}
+                {isLocked && (
+                    <div
+                        ref={lockIconRef}
+                        onMouseEnter={() => {
+                            if (isLocked && !isPlaced && onLoadUsageDetails) {
+                                onLoadUsageDetails(entry.id);
+                            }
+                            setShowLockTooltip(true);
+                        }}
+                        onMouseLeave={() => setShowLockTooltip(false)}
+                        className="relative flex items-center"
+                        title={isPlaced ? "Utilisé dans cette campagne" : undefined}
+                    >
+                        <Lock size={14} className="text-amber-600" />
+                        <UsageLockedTooltip
+                            anchorRef={lockIconRef}
+                            isOpen={showLockTooltip}
+                            isLocked={isLocked}
+                            isPlaced={isPlaced}
+                            usageDetails={usageDetails}
+                        />
+                    </div>
+                )}
             </div>
 
             {/* 3. Content (Flexible) */}
@@ -181,7 +216,7 @@ const TraitCard: React.FC<TraitCardProps> = ({
                             onClick={(e) => { e.stopPropagation(); onDelete(entry.id); }}
                             disabled={isLocked}
                             className={`p-1 rounded ${isLocked ? 'text-stone-300' : 'text-red-600 hover:bg-red-50'}`}
-                            title={isLocked ? "Action impossible : trait utilisé" : "Supprimer"}
+                            title={!isLocked ? "Supprimer" : undefined}
                         >
                             <Trash2 size={14} />
                         </button>
