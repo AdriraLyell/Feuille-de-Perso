@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CharacterSheetData, TraitEntry, LibraryEntry } from '../types';
 import { BookOpen, X } from 'lucide-react';
@@ -16,6 +15,7 @@ import { Page2SectionHeader } from './sheet/page2/Page2Components';
 import { useTraitEditor } from '../hooks/sheet/useTraitEditor';
 import { useReputationManager } from '../hooks/sheet/useReputationManager';
 import MysticSkillWizard from './sheet/ui/MysticSkillWizard';
+import MasterSkillWizard from './sheet/ui/MasterSkillWizard';
 import TraitEditModal from './sheet/page2/TraitEditModal';
 
 interface Props {
@@ -26,11 +26,27 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
     const { data, updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacter();
     const { rules } = useRules();
 
+    // State déclaré avant useTraitEditor car le callback en a besoin
+    const [masterSkillWizard, setMasterSkillWizard] = React.useState<{ isOpen: boolean, traitName: string, traitType: 'avantages' | 'desavantages' } | null>(null);
+    // Ref pour capturer le type de cible avant que multiSelectTarget soit remis à null
+    const multiSelectTargetRef = React.useRef<'avantages' | 'desavantages' | null>(null);
+
     const {
         multiSelectTarget, setMultiSelectTarget,
         removeTrait,
-        handleMultiAdd
-    } = useTraitEditor(data, rules, onChange, onAddLog, recordXPTransaction);
+        handleMultiAdd,
+        applyMasterSkill
+    } = useTraitEditor(data, rules, onChange, onAddLog, recordXPTransaction, (traitName, _pendingAdd) => {
+        // Ouvrir le wizard master_skill après ajout du trait
+        setMasterSkillWizard({ isOpen: true, traitName, traitType: multiSelectTargetRef.current || 'avantages' });
+    });
+
+    // Synchroniser la ref avec l'état
+    React.useEffect(() => {
+        if (multiSelectTarget !== null) {
+            multiSelectTargetRef.current = multiSelectTarget;
+        }
+    }, [multiSelectTarget]);
 
     const {
         updateReputationEntry,
@@ -261,6 +277,14 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         onAddLog(msg, type, 'sheet');
     }, [onAddLog]);
 
+    const handleMasterSkillConfirm = React.useCallback((categoryId: string, skillName: string) => {
+        if (!masterSkillWizard) return;
+        const updated = applyMasterSkill(data, masterSkillWizard.traitType, masterSkillWizard.traitName, categoryId, skillName);
+        onChange(updated);
+        onAddLog(`Maîtrise accordée : ${skillName} portée au rang 5 (via ${masterSkillWizard.traitName})`, 'success', 'sheet');
+        setMasterSkillWizard(null);
+    }, [masterSkillWizard, applyMasterSkill, data, onChange, onAddLog]);
+
     const updateCharacterImageId = React.useCallback((id: string) => {
         onChange((prev: CharacterSheetData) => ({
             ...prev,
@@ -417,6 +441,17 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     onConfirm={handleWizardConfirm}
                     mysticAbilityId={wizardState.mysticAbilityId}
                     mysticAbilityName={wizardState.mysticAbilityName}
+                    sheet={data}
+                    rules={rules}
+                />
+            )}
+
+            {masterSkillWizard?.isOpen && (
+                <MasterSkillWizard
+                    isOpen={true}
+                    traitName={masterSkillWizard.traitName}
+                    onClose={() => setMasterSkillWizard(null)}
+                    onConfirm={handleMasterSkillConfirm}
                     sheet={data}
                     rules={rules}
                 />

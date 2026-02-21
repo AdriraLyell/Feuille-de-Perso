@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TraitEffect } from '../../types';
-import { Zap, X, Star, GraduationCap, Dumbbell, ChevronDown } from 'lucide-react';
+import { Zap, X, Star, GraduationCap, Dumbbell, ChevronDown, Trophy } from 'lucide-react';
 
 interface TraitEffectEditorProps {
     effects: TraitEffect[];
@@ -68,6 +68,11 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                         themeColor = 'text-emerald-800';
                         borderColor = 'border-emerald-400/30';
                         bgColor = 'bg-emerald-50/40';
+                    } else if (effect.type === 'master_skill') {
+                        typeIcon = <Trophy size={14} />;
+                        themeColor = 'text-purple-800';
+                        borderColor = 'border-purple-400/30';
+                        bgColor = 'bg-purple-50/40';
                     }
 
                     return (
@@ -89,6 +94,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                             <option value="xp_bonus" className="text-gray-900 bg-white">Bonus XP</option>
                                             <option value="free_skill_rank" className="text-gray-900 bg-white">Rang de Compétence Gratuit</option>
                                             <option value="auto_counter" className="text-gray-900 bg-white">Compteur Auto</option>
+                                            <option value="master_skill" className="text-gray-900 bg-white">Maître (Compétence rang 5)</option>
                                         </select>
                                         <ChevronDown size={12} className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${themeColor} opacity-50`} />
                                     </div>
@@ -171,6 +177,17 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                     Max 10. Automatiquement instancié sur la fiche du joueur.
                                                 </p>
                                             </div>
+                                        </div>
+                                    </div>
+                                ) : effect.type === 'master_skill' ? (
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-start gap-2">
+                                            <Trophy size={14} className="text-purple-600 mt-0.5 shrink-0" />
+                                            <p className="text-[10px] text-purple-800 leading-tight">
+                                                Quand le joueur ajoute ce trait, il choisit une <strong>compétence à rang 0</strong>.<br />
+                                                Celle-ci est automatiquement mise au <strong>rang 5</strong>, gratuitement (sans coût XP).<br />
+                                                La compétence revient à 0 si le trait est supprimé.
+                                            </p>
                                         </div>
                                     </div>
                                 ) : (

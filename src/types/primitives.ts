@@ -74,11 +74,12 @@ export interface TraitEntry {
   definitionId?: string; // ID de la définition parente
   mysticAbilityId?: string; // Link to Mystic Ability
   associatedCounterId?: string; // Link to a dynamically created trait counter
+  masterSkillTarget?: string; // Nom de compétence mise au rang 5 (effet master_skill)
   isPostCreation?: boolean;
   creationValue?: string;
 }
 
-export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus' | 'auto_counter';
+export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus' | 'auto_counter' | 'master_skill';
 export interface TraitEffect {
   id: string;
   type: EffectType;

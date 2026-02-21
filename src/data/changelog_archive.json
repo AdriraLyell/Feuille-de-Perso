@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.57.0",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Intégration des Compteurs de Traits : Nouveau type d'effet 'trait_counter' permettant de lier l'acquisition d'un trait à la création automatique d'un compteur personnalisé (ex: Munitions, Magie, Stress). Inclus : mode d'affichage compact 'squares_only' (sans ligne Maxi), synchronisation bidirectionnelle entre traits et compteurs sur la fiche, et gestion automatisée dans la bibliothèque admin."
+    },
+    {
         "version": "2.56.75",
         "date": "2026-02-21",
         "type": "style",
@@ -737,15 +743,6 @@
         "changes": [
             "🩹 Image : Correction du préfixe Data URI manquant lors de la décompression (fix 431 Request Header Too Large)",
             "🛡️ Stabilité : Détection automatique des schémas d'images corrompus dans les registres admin"
-        ]
-    },
-    {
-        "version": "2.49.65",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🐛 Admin : Correction critique du chargement des portraits compressés (GZIP) dans la vue Admin",
-            "🖼️ UI : Amélioration de la gestion des erreurs d'image (fallback silhouette)"
         ]
     }
 ]

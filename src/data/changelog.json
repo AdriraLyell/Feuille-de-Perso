@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.64.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Nouvel effet de trait 'Maître' (master_skill) : Quand un trait avec cet effet est ajouté, un wizard s'ouvre permettant au joueur de choisir une compétence primaire à rang 0. Celle-ci est automatiquement portée au rang 5 sans coût XP. Suppression du trait : la compétence revient au rang 0. L'xpCalculator reconnaît les compétences maîtrisées via masterSkillTarget et les traite comme entièrement gratuites jusqu'au rang 5. Interface admin : couleur violette + description informative."
+    },
+    {
         "version": "2.63.3",
         "date": "2026-02-21",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Amélioration des Compteurs de Traits (Dynamic Counters) : Les compteurs liés aux traits ne polluent plus la bibliothèque d'administration. Ils sont désormais générés dynamiquement et uniquement sur la fiche du personnage. Support des Traits Variables : le compteur ajoute automatiquement le nom de la variante choisie au nom de base de l'effet."
-    },
-    {
-        "version": "2.57.0",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Intégration des Compteurs de Traits : Nouveau type d'effet 'trait_counter' permettant de lier l'acquisition d'un trait à la création automatique d'un compteur personnalisé (ex: Munitions, Magie, Stress). Inclus : mode d'affichage compact 'squares_only' (sans ligne Maxi), synchronisation bidirectionnelle entre traits et compteurs sur la fiche, et gestion automatisée dans la bibliothèque admin."
     }
 ]

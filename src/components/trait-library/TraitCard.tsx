@@ -66,6 +66,7 @@ const TraitCardItemEffects: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
             case 'free_skill_rank': return `Rang gratuit : ${eff.target || '?'} (+${eff.value})`;
             case 'attribute_bonus': return `Bonus Attribut : ${eff.target || '?'} (+${eff.value})`;
             case 'auto_counter': return `Compteur Auto${eff.target ? ` : ${eff.target}` : ''}`;
+            case 'master_skill': return `Maître : compétence au rang 5 (choix joueur)`;
             default: return 'Effet inconnu';
         }
     };

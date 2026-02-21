@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.65] - 2026-02-16 [FIX]
+
+- 🐛 Admin : Correction critique du chargement des portraits compressés (GZIP) dans la vue Admin
+- 🖼️ UI : Amélioration de la gestion des erreurs d'image (fallback silhouette)
+
 ## [2.49.64] - 2026-02-16 [FIX]
 
 - 🖼️ Admin : Correction du bug d'affichage des portraits manquants d'Ayame (Seigneurs des Mystères)

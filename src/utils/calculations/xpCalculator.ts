@@ -22,12 +22,26 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 
     // 1. Helpers pour les bonus
     const getFreeRankLimit = (skillName: string) => {
+        // 1. Bonus via free_skill_rank trait effect
         const effect = activeEffects.find(e =>
             e.type === 'free_skill_rank' &&
             e.target &&
             skillName.trim().toLowerCase() === e.target.trim().toLowerCase()
         );
-        return effect ? effect.value : 0;
+        if (effect) return effect.value;
+
+        // 2. Compétence maîtrisée via master_skill : rang 5 entièrement gratuit
+        const normalizedSkillName = skillName.trim().toLowerCase();
+        const hasMasterEffect = [
+            ...(data.page2?.avantages || []),
+            ...(data.page2?.desavantages || [])
+        ].some(trait =>
+            trait.masterSkillTarget &&
+            trait.masterSkillTarget.trim().toLowerCase() === normalizedSkillName
+        );
+        if (hasMasterEffect) return 5;
+
+        return 0;
     };
 
     // Calcul des bonus XP (Fixe vs Par Scénario)
