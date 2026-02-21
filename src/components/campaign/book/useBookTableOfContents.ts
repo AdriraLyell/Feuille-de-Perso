@@ -29,10 +29,16 @@ export function useBookTableOfContents(
                 dateText = dateElement?.textContent || '';
             } else {
                 // It's a narrative section
-                // Try to find text content in the editor area
-                const contentElement = htmlSection.querySelector('.NodeViewContent');
-                const firstLine = contentElement?.textContent?.split('\n')[0]?.trim();
-                title = firstLine ? `• ${firstLine.slice(0, 30)}${firstLine.length > 30 ? '...' : ''}` : '• Section';
+                // Priority to the custom title attribute
+                const customTitle = htmlSection.getAttribute('data-section-title');
+                if (customTitle && customTitle.trim()) {
+                    title = `• ${customTitle}`;
+                } else {
+                    // Fallback to first line of content
+                    const contentElement = htmlSection.querySelector('.NodeViewContent');
+                    const firstLine = contentElement?.textContent?.split('\n')[0]?.trim();
+                    title = firstLine ? `• ${firstLine.slice(0, 30)}${firstLine.length > 30 ? '...' : ''}` : '• Section';
+                }
             }
 
             const left = htmlSection.offsetLeft;

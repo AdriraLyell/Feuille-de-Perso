@@ -5,21 +5,21 @@ import { Sun, Moon, Zap, Navigation, BookOpen, Coffee, Utensils, MoonStar, Calen
 import { useRules } from '../../../context/RulesContext';
 
 const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes }) => {
-    const { type, timeSlot, dateStart, dateEnd, time, date, isSection } = node.attrs;
+    const { type, timeSlot, dateStart, dateEnd, time, date, isSection, title } = node.attrs;
     const { rules } = useRules();
     const isReal = rules?.configurations?.calendar?.type === 'real';
 
     const getIcon = () => {
-        if (type === 'flashback') return <Zap size={16} />;
-        if (type === 'voyage') return <Navigation size={16} />;
-        if (type === 'summary') return <BookOpen size={16} />;
+        if (type === 'flashback') return <Zap size={14} />;
+        if (type === 'voyage') return <Navigation size={14} />;
+        if (type === 'summary') return <BookOpen size={14} />;
 
         switch (timeSlot) {
-            case 'matin': return <Coffee size={16} />;
-            case 'midi': return <Utensils size={16} />;
-            case 'soir': return <Moon size={16} />;
-            case 'nuit': return <MoonStar size={16} />;
-            default: return <Sun size={16} />;
+            case 'matin': return <Coffee size={14} />;
+            case 'midi': return <Utensils size={14} />;
+            case 'soir': return <Moon size={14} />;
+            case 'nuit': return <MoonStar size={14} />;
+            default: return <Sun size={14} />;
         }
     };
 
@@ -45,15 +45,33 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
         <NodeViewWrapper
             className={`narrative-section my-6 p-4 rounded-xl border ${getColors()} relative group -mx-4 narrative-section-container`}
             data-is-section={isSection ? "true" : "false"}
+            data-section-title={title || ""}
         >
             <div className="flex items-center justify-between mb-3 border-b border-current/10 pb-2">
-                <div className="flex items-center gap-2 font-serif font-bold italic text-xs uppercase tracking-wider h-6">
-                    {getIcon()}
-                    <span>{getLabel()}</span>
+                <div className="flex items-center gap-2 font-serif italic tracking-wider h-6 flex-grow">
+                    <div className="flex items-center gap-1.5 opacity-80 shrink-0">
+                        {getIcon()}
+                        <span className="text-[10px] font-bold uppercase">{getLabel()}</span>
+                    </div>
+
+                    <div className="h-4 w-px bg-current/10 mx-1 shrink-0" />
+
+                    {/* Champ de Titre pour le sommaire */}
+                    <input
+                        type="text"
+                        placeholder="Titre de la section..."
+                        value={title || ''}
+                        onChange={(e) => updateAttributes({ title: e.target.value })}
+                        className="bg-transparent border-none p-0 flex-grow text-[11px] font-bold focus:ring-0 placeholder:opacity-30 placeholder:italic min-w-[50px]"
+                    />
+
+                    {(type === 'moment' || type === 'flashback' || type === 'voyage') && (
+                        <div className="h-4 w-px bg-current/10 mx-1 shrink-0" />
+                    )}
 
                     {/* Time for Moments */}
                     {type === 'moment' && (
-                        <div className="flex items-center gap-1 ml-2 font-normal lowercase opacity-70 border-l border-current/20 pl-2">
+                        <div className="flex items-center gap-1 font-normal lowercase opacity-70 pl-1 shrink-0">
                             <Clock size={10} />
                             <input
                                 type="text"
