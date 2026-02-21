@@ -103,11 +103,10 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                         <div className="flex items-center gap-1.5 font-normal lowercase opacity-70 shrink-0">
                             <Clock size={10} className="translate-y-[0.5px]" />
                             <input
-                                type="text"
-                                placeholder="--:--"
+                                type="time"
                                 value={time || ''}
                                 onChange={(e) => updateAttributes({ time: e.target.value })}
-                                className="bg-transparent border-none p-0 w-[40px] text-[10px] focus:ring-0"
+                                className="bg-transparent border-none p-0 w-[55px] text-[10px] focus:ring-0 cursor-pointer"
                             />
                         </div>
                     )}
@@ -176,7 +175,7 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                                     key={t}
                                     type="button"
                                     onClick={() => updateAttributes({ timeSlot: t })}
-                                    className={`p-1 rounded text-[10px] uppercase font-bold ${timeSlot === t ? 'bg-current text-white' : 'hover:bg-current/10'}`}
+                                    className={`w-5 h-5 flex items-center justify-center rounded text-[10px] uppercase font-bold transition-colors ${timeSlot === t ? 'bg-stone-800 text-stone-50' : 'hover:bg-current/10'}`}
                                 >
                                     {t.slice(0, 1)}
                                 </button>
