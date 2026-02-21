@@ -2,6 +2,8 @@ import React from 'react';
 import { RulesData } from '../../../../types/rules';
 import { LibrarySkillEntry } from '../../../../types/system';
 import { Lock, Edit2, Trash2 } from 'lucide-react';
+import { ItemUsageDetail } from '../../../../types/usageTypes';
+import { UsageLockedTooltip } from '../UsageLockedTooltip';
 
 interface MysticLibraryItemProps {
     item: LibrarySkillEntry;
@@ -10,6 +12,9 @@ interface MysticLibraryItemProps {
     handleOpenEdit: (item: LibrarySkillEntry) => void;
     handleDelete: (id: string) => void;
     rules: RulesData;
+    isPlaced?: boolean;
+    usageDetails?: ItemUsageDetail;
+    onLoadUsageDetails?: (id: string) => void;
 }
 
 export const MysticLibraryItem: React.FC<MysticLibraryItemProps> = ({
@@ -18,8 +23,14 @@ export const MysticLibraryItem: React.FC<MysticLibraryItemProps> = ({
     onToggleActive,
     handleOpenEdit,
     handleDelete,
-    rules
+    rules,
+    isPlaced = false,
+    usageDetails,
+    onLoadUsageDetails
 }) => {
+    const [showDeleteTooltip, React_useState] = React.useState(false);
+    const deleteBtnRef = React.useRef<HTMLDivElement>(null);
+    const setShowDeleteTooltip = (val: boolean) => React_useState(val);
     return (
         <div className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${item.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
             <div className="w-8 flex justify-center shrink-0">
@@ -60,14 +71,33 @@ export const MysticLibraryItem: React.FC<MysticLibraryItemProps> = ({
 
             <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                 <button onClick={() => handleOpenEdit(item)} className="text-blue-600 hover:bg-blue-50 p-1 rounded" title="Modifier"><Edit2 size={14} /></button>
-                <button
-                    onClick={() => handleDelete(item.id)}
-                    disabled={isLocked}
-                    className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
-                    title={isLocked ? "Suppression bloquée : utilisé" : "Supprimer définitivement"}
+                <div
+                    ref={deleteBtnRef}
+                    onMouseEnter={() => {
+                        if (isLocked && !isPlaced && onLoadUsageDetails) {
+                            onLoadUsageDetails(item.id);
+                        }
+                        setShowDeleteTooltip(true);
+                    }}
+                    onMouseLeave={() => setShowDeleteTooltip(false)}
+                    className="relative flex items-center"
                 >
-                    <Trash2 size={14} />
-                </button>
+                    <button
+                        onClick={() => handleDelete(item.id)}
+                        disabled={isLocked}
+                        className={`p-1 rounded ${isLocked ? 'text-slate-300 cursor-help' : 'text-red-500 hover:bg-red-50'}`}
+                    >
+                        <Trash2 size={14} />
+                    </button>
+
+                    <UsageLockedTooltip
+                        anchorRef={deleteBtnRef}
+                        isOpen={showDeleteTooltip}
+                        isLocked={isLocked}
+                        isPlaced={isPlaced}
+                        usageDetails={usageDetails}
+                    />
+                </div>
             </div>
         </div>
     );

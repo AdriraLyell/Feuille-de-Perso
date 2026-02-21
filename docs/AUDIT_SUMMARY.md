@@ -1,8 +1,13 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.59.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.62.9)
 
-> **Dernière mise à jour** : 2026-02-21 — Version 2.59.0
+> **Dernière mise à jour** : 2026-02-21 — Version 2.62.9
 
 ## 1. Phases Complétées
+
+### ✅ Phase 28 : Détails d'usage avancés (v2.62.9)
+- [x] **Composant** : Création de `UsageLockedTooltip` pour afficher les campagnes et personnages verrouillant un item.
+- [x] **Optimisation** : Chargement à la demande (hover) via le hook `useItemUsageDetails`.
+- [x] **Intégration** : Déploiement sur toutes les bibliothèques MJ (Traits, Compétences, Historiques, Compteurs, Mysticisme, Spécialisations).
 
 ### ✅ Phase 27 : Compteur Auto & Nommage Intelligent (v2.59.0)
 - [x] **Renommage** : Migration sémantique de `trait_counter` vers `auto_counter` pour une meilleure généralisation.

@@ -4,6 +4,7 @@ import { LibrarySkillEntry } from '../../../types/system';
 import { Search, Plus, Sparkles, Save, AlertOctagon, CheckCircle2, Circle, Globe, Filter } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import TriStateChip from '../../../components/ui/TriStateChip';
+import { useItemUsageDetails } from '../../../hooks/admin/useItemUsageDetails';
 import { smartIncludes } from '../../../utils/stringUtils';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 import { MysticLibraryItem } from './mystic/MysticLibraryItem';
@@ -16,6 +17,7 @@ interface AdminMysticLibraryProps {
 
 const AdminMysticLibrary: React.FC<AdminMysticLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
     const list = rules.libraries.mysticAbilities || [];
+    const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'mystic');
 
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -255,13 +257,15 @@ const AdminMysticLibrary: React.FC<AdminMysticLibraryProps> = ({ rules, onUpdate
                                     key={item.id}
                                     item={item}
                                     isLocked={isLocked}
-                                    onToggleActive={(id, current) => {
+                                    onToggleActive={(id: string, current: boolean) => {
                                         const newList = list.map(b => b.id === id ? { ...b, isActive: !current } : b);
                                         onUpdate({ ...rules, libraries: { ...rules.libraries, mysticAbilities: newList } });
                                     }}
                                     handleOpenEdit={handleOpenEdit}
                                     handleDelete={handleDelete}
                                     rules={rules}
+                                    usageDetails={usageDetailsCache.get(item.id)}
+                                    onLoadUsageDetails={loadDetails}
                                 />
                             );
                         })}

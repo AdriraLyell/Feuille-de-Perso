@@ -6,6 +6,7 @@ import { smartIncludes } from '../../../utils/stringUtils';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import { useNotification } from '../../../context/NotificationContext';
 import { publishFileToGitHub } from '../../../services/githubService';
+import { useItemUsageDetails } from '../../../hooks/admin/useItemUsageDetails';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 
 // Sub components
@@ -20,6 +21,7 @@ interface AdminSpecializationLibraryProps {
 
 const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
     const addLog = useNotification();
+    const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'specialization');
 
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -289,6 +291,8 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                                 onEdit={handleOpenEdit}
                                 onDelete={handleDelete}
                                 onToggle={handleToggle}
+                                usageDetails={usageDetailsCache.get(entry.id)}
+                                onLoadUsageDetails={loadDetails}
                             />
                         ))}
                     </div>

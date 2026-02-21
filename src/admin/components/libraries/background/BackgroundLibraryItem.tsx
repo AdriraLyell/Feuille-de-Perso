@@ -3,6 +3,8 @@ import { RulesData } from '../../../../types/rules';
 import { LibraryBackgroundEntry } from '../../../../types/system';
 import { Layers, Lock, Edit2, Trash2 } from 'lucide-react';
 import { PortalTooltip } from '../../../../components/ui/PortalTooltip';
+import { ItemUsageDetail } from '../../../../types/usageTypes';
+import { UsageLockedTooltip } from '../UsageLockedTooltip';
 
 interface BackgroundLibraryItemProps {
     item: LibraryBackgroundEntry;
@@ -12,6 +14,8 @@ interface BackgroundLibraryItemProps {
     handleOpenEdit: (item: LibraryBackgroundEntry) => void;
     handleDelete: (id: string) => void;
     rules: RulesData;
+    usageDetails?: ItemUsageDetail;
+    onLoadUsageDetails?: (id: string) => void;
 }
 
 export const BackgroundLibraryItem: React.FC<BackgroundLibraryItemProps> = ({
@@ -21,11 +25,15 @@ export const BackgroundLibraryItem: React.FC<BackgroundLibraryItemProps> = ({
     onToggleActive,
     handleOpenEdit,
     handleDelete,
-    rules
+    rules,
+    usageDetails,
+    onLoadUsageDetails
 }) => {
     const hasVariants = item.variants && item.variants.length > 0;
     const [showVariantsTooltip, setShowVariantsTooltip] = useState(false);
+    const [showDeleteTooltip, setShowDeleteTooltip] = useState(false);
     const anchorRef = useRef<HTMLDivElement>(null);
+    const deleteBtnRef = useRef<HTMLDivElement>(null);
 
     return (
         <div className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${item.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
@@ -98,14 +106,33 @@ export const BackgroundLibraryItem: React.FC<BackgroundLibraryItemProps> = ({
             {/* 4. Actions */}
             <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                 <button onClick={() => handleOpenEdit(item)} className="text-blue-600 hover:bg-blue-50 p-1 rounded" title="Modifier"><Edit2 size={14} /></button>
-                <button
-                    onClick={() => handleDelete(item.id)}
-                    disabled={isLocked}
-                    className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
-                    title={isLocked ? "Suppression bloquée : utilisé" : "Supprimer définitivement"}
+                <div
+                    ref={deleteBtnRef}
+                    onMouseEnter={() => {
+                        if (isLocked && !isPlaced && onLoadUsageDetails) {
+                            onLoadUsageDetails(item.id);
+                        }
+                        setShowDeleteTooltip(true);
+                    }}
+                    onMouseLeave={() => setShowDeleteTooltip(false)}
+                    className="relative flex items-center"
                 >
-                    <Trash2 size={14} />
-                </button>
+                    <button
+                        onClick={() => handleDelete(item.id)}
+                        disabled={isLocked}
+                        className={`p-1 rounded ${isLocked ? 'text-slate-300 cursor-help' : 'text-red-500 hover:bg-red-50'}`}
+                    >
+                        <Trash2 size={14} />
+                    </button>
+
+                    <UsageLockedTooltip
+                        anchorRef={deleteBtnRef}
+                        isOpen={showDeleteTooltip}
+                        isLocked={isLocked}
+                        isPlaced={isPlaced}
+                        usageDetails={usageDetails}
+                    />
+                </div>
             </div>
         </div>
     );

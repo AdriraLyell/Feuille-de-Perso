@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.62.9",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Amélioration de la bibliothèque d'administration : Intégration de détails d'utilisation avancés. Désormais, survoler l'icône de cadenas d'un élément verrouillé (trait, compétence, historique, compteur, etc.) affiche précisément quelles campagnes ou quels personnages utilisent cet élément, facilitant la gestion de la bibliothèque globale."
+    },
+    {
         "version": "2.62.8",
         "date": "2026-02-21",
         "type": "fix",

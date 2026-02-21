@@ -4,6 +4,7 @@ import { LibraryBackgroundEntry } from '../../../types/system';
 import { Search, Plus, Users, Save, AlertOctagon, Layers, CheckCircle2, Circle, Globe, Filter } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import TriStateChip from '../../../components/ui/TriStateChip';
+import { useItemUsageDetails } from '../../../hooks/admin/useItemUsageDetails';
 import { smartIncludes } from '../../../utils/stringUtils';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 import { BackgroundLibraryItem } from './background/BackgroundLibraryItem';
@@ -16,6 +17,7 @@ interface AdminBackgroundLibraryProps {
 
 const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
     const list = rules.libraries.backgrounds;
+    const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'background');
 
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -235,13 +237,15 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                                     item={item}
                                     isPlaced={isPlaced}
                                     isLocked={isLocked}
-                                    onToggleActive={(id, current) => {
+                                    onToggleActive={(id: string, current: boolean) => {
                                         const newList = list.map(b => b.id === id ? { ...b, isActive: !current } : b);
                                         onUpdate({ ...rules, libraries: { ...rules.libraries, backgrounds: newList } });
                                     }}
                                     handleOpenEdit={handleOpenEdit}
                                     handleDelete={handleDelete}
                                     rules={rules}
+                                    usageDetails={usageDetailsCache.get(item.id)}
+                                    onLoadUsageDetails={loadDetails}
                                 />
                             );
                         })}

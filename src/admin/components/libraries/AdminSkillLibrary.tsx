@@ -4,6 +4,7 @@ import { Search, Plus, GraduationCap, Save, AlertOctagon, X, Layers, UploadCloud
 import ThematicModal from '../../../components/ui/ThematicModal';
 import TriStateChip from '../../../components/ui/TriStateChip';
 import { useAdminSkillLibrary } from '../../../hooks/admin/useAdminSkillLibrary';
+import { useItemUsageDetails } from '../../../hooks/admin/useItemUsageDetails';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 import { SkillLibraryItem } from './skill/SkillLibraryItem';
 
@@ -44,6 +45,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
         handlePublishClick,
         executePublish
     } = useAdminSkillLibrary(rules, onUpdate, globalUsage, 'global');
+    const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'skill');
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-120px)] flex flex-col">
@@ -179,6 +181,8 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                     handleOpenEdit={handleOpenEdit}
                                     handleDelete={handleDelete}
                                     availableCategories={availableCategories}
+                                    usageDetails={usageDetailsCache.get(skill.id)}
+                                    onLoadUsageDetails={loadDetails}
                                 />
                             );
                         })}
