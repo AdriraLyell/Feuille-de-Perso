@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NodeViewWrapper } from '@tiptap/react';
 import { BookImageAttributes } from '../../../extensions/bookImage';
 import { Image as ImageIcon, Loader } from 'lucide-react';
-import { getImage, deleteImage } from '../../../imageDB';
+import { deleteImage } from '../../../imageDB';
+import { getCachedImageUrl, invalidateCachedImage } from '../../../services/ImageCacheService';
 import { logger } from '../../../utils/logger';
 import { useBookImageInteraction } from './hooks/useBookImageInteraction';
 import BookImageToolbar from './parts/BookImageToolbar';
@@ -26,11 +27,13 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
     const [hudBelow] = useState(true);
 
     const containerRef = useRef<HTMLDivElement>(null);
-    const { activeInteraction, handleMouseDown, startRef } = useBookImageInteraction({
+    const { activeInteraction, handleMouseDown, startRef, liveValues, hudTick } = useBookImageInteraction({
         node,
         updateAttributes,
         containerRef
     });
+    // hudTick is intentionally unused in render output — it triggers re-renders for the HUD display
+    void hudTick;
 
     useEffect(() => {
         let active = true;
@@ -40,9 +43,8 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
 
             setLoading(true);
             try {
-                const blob = await getImage(node.attrs.imageId);
-                if (blob && active) {
-                    const url = URL.createObjectURL(blob);
+                const url = await getCachedImageUrl(node.attrs.imageId);
+                if (url && active) {
                     setImageSrc(url);
                 }
             } catch (e) {
@@ -65,6 +67,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
     const handleDelete = async () => {
         if (node.attrs.imageId) {
             try {
+                invalidateCachedImage(node.attrs.imageId);
                 await deleteImage(node.attrs.imageId);
             } catch {
                 // image may already be deleted
@@ -188,17 +191,19 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                             const hasV = activeInteraction === 'resize-top' || activeInteraction === 'resize-bottom'
                                 || activeInteraction.includes('tl') || activeInteraction.includes('tr')
                                 || activeInteraction.includes('bl') || activeInteraction.includes('br');
+                            const displayW = liveValues.current.width || node.attrs.width;
+                            const displayH = liveValues.current.height || node.attrs.height;
                             return (
                                 <>
-                                    {hasH && <span>W: {typeof node.attrs.width === 'string' && node.attrs.width.endsWith('%') ? node.attrs.width : Math.round(startRef.current?.w || 0) + 'px'}</span>}
-                                    {hasV && node.attrs.height !== 'auto' && <span>H: {node.attrs.height}</span>}
+                                    {hasH && <span>W: {typeof displayW === 'string' && displayW.endsWith('%') ? displayW : Math.round(startRef.current?.w || 0) + 'px'}</span>}
+                                    {hasV && displayH !== 'auto' && <span>H: {displayH}</span>}
                                 </>
                             );
                         })()}
                         {activeInteraction === 'pan' && (
                             <>
-                                <span>Pos X: {Math.round(node.attrs.posX || 0)}%</span>
-                                <span>Pos Y: {Math.round(node.attrs.posY || 0)}%</span>
+                                <span>Pos X: {Math.round(liveValues.current.posX ?? node.attrs.posX ?? 0)}%</span>
+                                <span>Pos Y: {Math.round(liveValues.current.posY ?? node.attrs.posY ?? 0)}%</span>
                             </>
                         )}
                     </div>

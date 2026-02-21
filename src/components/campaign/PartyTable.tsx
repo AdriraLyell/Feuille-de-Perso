@@ -2,6 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { CharacterSheetData, PartyColumn, PartyMemberEntry } from '../../types';
 import { Plus, X, Trash2 } from 'lucide-react';
+import ConfirmationModal from '../ui/ConfirmationModal';
 
 interface PartyTableProps {
     data: CharacterSheetData;
@@ -14,6 +15,8 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
     const members = data.partyNotes?.members || [];
     const staticWidths = data.partyNotes?.staticColWidths || { character: 200, player: 200 };
     const [newlyAddedColId, setNewlyAddedColId] = useState<string | null>(null);
+    const [pendingDeleteMember, setPendingDeleteMember] = useState<{ id: string; name: string } | null>(null);
+    const [pendingDeleteColumn, setPendingDeleteColumn] = useState<{ id: string; label: string } | null>(null);
     const resizingRef = useRef<{ colId: string | 'character' | 'player', startX: number, startWidth: number } | null>(null);
 
     // Calculate total minimum width required for the table based on column configs
@@ -169,8 +172,9 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
     };
 
     return (
-        <div className="w-full h-full flex flex-col p-4">
-            <style>{`
+        <>
+            <div className="w-full h-full flex flex-col p-4">
+                <style>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     height: 10px;
                     width: 10px;
@@ -187,81 +191,102 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
                     background: #a8a29e;
                 }
             `}</style>
-            <div className="flex-grow overflow-auto custom-scrollbar">
-                <table
-                    className="border-collapse table-fixed bg-[#fbf4e9] shadow-sm"
-                    style={{ minWidth: '100%', width: `${totalTableWidth}px` }}
-                >
-                    <thead className="sticky top-0 z-10 shadow-sm">
-                        <tr>
-                            <th className="border-b-2 border-stone-400 bg-[#fbf4e9] text-left p-2 font-serif text-stone-700 relative" style={{ width: staticWidths.character }}>
-                                <div className="truncate font-bold w-full" title="Personnage">Personnage</div>
-                                <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, 'character', staticWidths.character)} />
-                            </th>
-                            <th className="border-b-2 border-stone-400 bg-[#fbf4e9] text-left p-2 font-serif text-stone-700 border-l border-stone-300 relative" style={{ width: staticWidths.player }}>
-                                <div className="truncate font-bold w-full" title="Joueur">Joueur</div>
-                                <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, 'player', staticWidths.player)} />
-                            </th>
-                            {columns.map(col => (
-                                <th key={col.id} className="border-b-2 border-stone-400 bg-[#fbf4e9] text-left p-2 font-serif text-stone-700 border-l border-stone-300 group relative" style={{ width: col.width || 150 }}>
-                                    <input
-                                        id={`party-col-header-${col.id}`}
-                                        className="bg-transparent font-bold w-full outline-none focus:border-b border-indigo-500 pr-6 truncate"
-                                        value={col.label}
-                                        title={col.label}
-                                        onChange={(e) => updateColumnLabel(col.id, e.target.value)}
-                                    />
-                                    <button onClick={() => deleteColumn(col.id)} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10" title="Supprimer colonne">
-                                        <X size={14} />
-                                    </button>
-                                    <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, col.id, col.width || 150)} />
+                <div className="flex-grow overflow-auto custom-scrollbar">
+                    <table
+                        className="border-collapse table-fixed bg-[#fbf4e9] shadow-sm"
+                        style={{ minWidth: '100%', width: `${totalTableWidth}px` }}
+                    >
+                        <thead className="sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th className="border-b-2 border-stone-400 bg-[#fbf4e9] text-left p-2 font-serif text-stone-700 relative" style={{ width: staticWidths.character }}>
+                                    <div className="truncate font-bold w-full" title="Personnage">Personnage</div>
+                                    <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, 'character', staticWidths.character)} />
                                 </th>
-                            ))}
-                            <th className="border-b-2 border-stone-400 bg-[#fbf4e9] p-2 w-12 text-center align-middle">
-                                <button onClick={addColumn} className="text-stone-500 hover:text-indigo-600 transition-colors flex justify-center w-full" title="Ajouter une colonne">
-                                    <Plus size={20} />
-                                </button>
-                            </th>
-                            <th className="border-b-2 border-stone-400 bg-[#fbf4e9] w-12"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {members.map(member => (
-                            <tr key={member.id} className="hover:bg-stone-50 group">
-                                <td className="p-0 border-b border-stone-300 h-10 overflow-hidden">
-                                    <input className="w-full h-full bg-transparent px-2 font-handwriting text-lg text-ink outline-none" placeholder="Nom du perso..." value={member.name} onChange={(e) => updateMember(member.id, 'name', e.target.value)} />
-                                </td>
-                                <td className="p-0 border-b border-stone-300 h-10 border-l border-stone-200 overflow-hidden">
-                                    <input className="w-full h-full bg-transparent px-2 font-handwriting text-lg text-ink outline-none" placeholder="Nom du joueur..." value={member.player} onChange={(e) => updateMember(member.id, 'player', e.target.value)} />
-                                </td>
+                                <th className="border-b-2 border-stone-400 bg-[#fbf4e9] text-left p-2 font-serif text-stone-700 border-l border-stone-300 relative" style={{ width: staticWidths.player }}>
+                                    <div className="truncate font-bold w-full" title="Joueur">Joueur</div>
+                                    <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, 'player', staticWidths.player)} />
+                                </th>
                                 {columns.map(col => (
-                                    <td key={col.id} className="p-0 border-b border-stone-300 h-10 border-l border-stone-200 overflow-hidden">
-                                        <input className="w-full h-full bg-transparent px-2 font-handwriting text-lg text-stone-600 outline-none" value={member.data[col.id] || ''} onChange={(e) => updateMember(member.id, 'data', e.target.value, col.id)} />
-                                    </td>
+                                    <th key={col.id} className="border-b-2 border-stone-400 bg-[#fbf4e9] text-left p-2 font-serif text-stone-700 border-l border-stone-300 group relative" style={{ width: col.width || 150 }}>
+                                        <input
+                                            id={`party-col-header-${col.id}`}
+                                            className="bg-transparent font-bold w-full outline-none focus:border-b border-indigo-500 pr-6 truncate"
+                                            value={col.label}
+                                            title={col.label}
+                                            onChange={(e) => updateColumnLabel(col.id, e.target.value)}
+                                        />
+                                        <button onClick={() => setPendingDeleteColumn({ id: col.id, label: col.label })} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10" title="Supprimer colonne">
+                                            <X size={14} />
+                                        </button>
+                                        <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, col.id, col.width || 150)} />
+                                    </th>
                                 ))}
-                                <td colSpan={2} className="border-b border-stone-300 text-center w-24">
-                                    <button onClick={() => deleteMember(member.id)} className="text-stone-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-2">
-                                        <Trash2 size={16} />
+                                <th className="border-b-2 border-stone-400 bg-[#fbf4e9] p-2 w-12 text-center align-middle">
+                                    <button onClick={addColumn} className="text-stone-500 hover:text-indigo-600 transition-colors flex justify-center w-full" title="Ajouter une colonne">
+                                        <Plus size={20} />
+                                    </button>
+                                </th>
+                                <th className="border-b-2 border-stone-400 bg-[#fbf4e9] w-12"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {members.map(member => (
+                                <tr key={member.id} className="hover:bg-stone-50 group">
+                                    <td className="p-0 border-b border-stone-300 h-10 overflow-hidden">
+                                        <input className="w-full h-full bg-transparent px-2 font-handwriting text-lg text-ink outline-none" placeholder="Nom du perso..." value={member.name} onChange={(e) => updateMember(member.id, 'name', e.target.value)} />
+                                    </td>
+                                    <td className="p-0 border-b border-stone-300 h-10 border-l border-stone-200 overflow-hidden">
+                                        <input className="w-full h-full bg-transparent px-2 font-handwriting text-lg text-ink outline-none" placeholder="Nom du joueur..." value={member.player} onChange={(e) => updateMember(member.id, 'player', e.target.value)} />
+                                    </td>
+                                    {columns.map(col => (
+                                        <td key={col.id} className="p-0 border-b border-stone-300 h-10 border-l border-stone-200 overflow-hidden">
+                                            <input className="w-full h-full bg-transparent px-2 font-handwriting text-lg text-stone-600 outline-none" value={member.data[col.id] || ''} onChange={(e) => updateMember(member.id, 'data', e.target.value, col.id)} />
+                                        </td>
+                                    ))}
+                                    <td colSpan={2} className="border-b border-stone-300 text-center w-24">
+                                        <button onClick={() => setPendingDeleteMember({ id: member.id, name: member.name || 'Sans nom' })} className="text-stone-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 p-2">
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+
+                            {/* Button Row - Visible directly after entries or as first entry if empty */}
+                            <tr
+                                onClick={addMember}
+                                className="hover:bg-amber-900/5 transition-colors cursor-pointer group/add h-12 border-b border-dashed border-stone-300 bg-[#fbf4e9]"
+                            >
+                                <td colSpan={columns.length + 4} className="p-0 text-center align-middle">
+                                    <button className="flex items-center gap-2 text-stone-500 group-hover/add:text-amber-800 font-bold uppercase text-xs tracking-wider mx-auto transition-colors w-full h-full justify-center py-2">
+                                        <Plus size={16} /> Ajouter un Membre
                                     </button>
                                 </td>
                             </tr>
-                        ))}
-
-                        {/* Button Row - Visible directly after entries or as first entry if empty */}
-                        <tr
-                            onClick={addMember}
-                            className="hover:bg-amber-900/5 transition-colors cursor-pointer group/add h-12 border-b border-dashed border-stone-300 bg-[#fbf4e9]"
-                        >
-                            <td colSpan={columns.length + 4} className="p-0 text-center align-middle">
-                                <button className="flex items-center gap-2 text-stone-500 group-hover/add:text-amber-800 font-bold uppercase text-xs tracking-wider mx-auto transition-colors w-full h-full justify-center py-2">
-                                    <Plus size={16} /> Ajouter un Membre
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+
+            {/* Confirmation Modals */}
+            <ConfirmationModal
+                isOpen={!!pendingDeleteMember}
+                onClose={() => setPendingDeleteMember(null)}
+                onConfirm={() => { if (pendingDeleteMember) deleteMember(pendingDeleteMember.id); }}
+                title="Supprimer un membre"
+                message={`Supprimer le membre « ${pendingDeleteMember?.name ?? ''} » du groupe ?`}
+                confirmLabel="Supprimer"
+                type="danger"
+            />
+            <ConfirmationModal
+                isOpen={!!pendingDeleteColumn}
+                onClose={() => setPendingDeleteColumn(null)}
+                onConfirm={() => { if (pendingDeleteColumn) deleteColumn(pendingDeleteColumn.id); }}
+                title="Supprimer une colonne"
+                message={`Supprimer la colonne « ${pendingDeleteColumn?.label ?? ''} » ? Les données associées seront perdues.`}
+                confirmLabel="Supprimer"
+                type="danger"
+            />
+        </>
     );
 };
 

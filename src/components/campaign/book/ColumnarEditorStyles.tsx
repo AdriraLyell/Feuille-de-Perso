@@ -45,6 +45,36 @@ export const ColumnarEditorStyles = () => (
             max-width: 100%;
         }
 
+        /* Float wrapping: generous margin so text breathes around images */
+        .book-image-view[data-align="left"],
+        .book-image-view[data-align="right"],
+        .book-image-view[data-align="free"] {
+            shape-outside: margin-box;
+            shape-margin: 8px;
+        }
+
+        .book-image-view[data-align="left"] {
+            margin-right: 1.5rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .book-image-view[data-align="right"] {
+            margin-left: 1.5rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .book-image-view[data-align="free"] {
+            margin-bottom: 0.75rem !important;
+        }
+
+        /* Block elements after floated images must clear to avoid overlap */
+        .ProseMirror > [data-node-view-wrapper] + .chapter-header-wrapper,
+        .ProseMirror > [data-node-view-wrapper] + h1,
+        .ProseMirror > [data-node-view-wrapper] + h2,
+        .ProseMirror > [data-node-view-wrapper] + h3,
+        .ProseMirror blockquote,
+        .ProseMirror hr {
+            clear: both;
+        }
+
         /* Make TipTap node-view wrappers transparent for floated images
            so that float works properly (text wraps, images can be side-by-side) */
         .ProseMirror > [data-node-view-wrapper]:has(.book-image-view[data-align="left"]),

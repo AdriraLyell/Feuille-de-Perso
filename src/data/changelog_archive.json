@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.61",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Système d'achat de Traits post-création : Les avantages peuvent désormais être acquis via XP hors création (fonds émeraude, icône ❇️). Les désavantages peuvent être rachetés (coût fixe) ou réduits (rang par rang) via une nouvelle interface dans la modale d'édition. Les déductions d'XP sont automatiques et tracées dans l'historique."
+    },
+    {
         "version": "2.56.60",
         "date": "2026-02-20",
         "type": "fix",
@@ -787,16 +793,6 @@
         "changes": [
             "📝 Documentation : Création du guide complet sur la gestion des conflits et la synchronisation sécurisée (SYNC_CONFLICT_MANAGEMENT.md)",
             "🏗️ Architecture : Synthèse des scénarios de réconciliation (Ajout/Suppression MJ, Dirty Checking)"
-        ]
-    },
-    {
-        "version": "2.49.51",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🐛 Fix : Correction d'une erreur de syntaxe blockante (return manquant) dans CharacterReadOnlyView",
-            "🛡️ Stabilité : Restauration de l'import RefreshCw manquant dans GlobalPlayersView",
-            "🏷️ Typage : Ajout du type RulesData manquant sur le paramètre merged de CharacterReadOnlyView"
         ]
     }
 ]

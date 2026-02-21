@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.51] - 2026-02-15 [FIX]
+
+- 🐛 Fix : Correction d'une erreur de syntaxe blockante (return manquant) dans CharacterReadOnlyView
+- 🛡️ Stabilité : Restauration de l'import RefreshCw manquant dans GlobalPlayersView
+- 🏷️ Typage : Ajout du type RulesData manquant sur le paramètre merged de CharacterReadOnlyView
+
 ## [2.49.50] - 2026-02-15 [FEAT]
 
 - 🏛️ Admin : Restriction du signal de mise à jour MJ aux personnages liés à une campagne uniquement
