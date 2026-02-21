@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.60] - 2026-02-15 [FEAT]
+
+- 🔔 Synchronisation : Notification automatique des mises à jour disponibles sur le Cloud
+- ✨ UI : Ajout d'un indicateur visuel (badge ambre pulsant) sur le bouton Sync
+- 🛡️ Sync : Préservation des métadonnées de synchronisation lors des mises à jour partielles
+
 ## [2.49.59] - 2026-02-15 [FIX]
 
 - 💾 Admin : Correction ordre de sauvegarde (Habilités avant Compétences) pour garantir les liens

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.71",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Ajustement UI : Centrage de la valeur du champ 'Gain' dans le résumé d'expérience pour une meilleure harmonie visuelle avec les autres champs de stats."
+    },
+    {
         "version": "2.56.70",
         "date": "2026-02-21",
         "type": "fix",
@@ -754,16 +760,6 @@
         "changes": [
             "🐞 Sync : Correction des erreurs de typage bloquant le build",
             "🔍 Debug : Ajout de logs dans la console pour le suivi de la synchronisation cloud"
-        ]
-    },
-    {
-        "version": "2.49.60",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🔔 Synchronisation : Notification automatique des mises à jour disponibles sur le Cloud",
-            "✨ UI : Ajout d'un indicateur visuel (badge ambre pulsant) sur le bouton Sync",
-            "🛡️ Sync : Préservation des métadonnées de synchronisation lors des mises à jour partielles"
         ]
     }
 ]

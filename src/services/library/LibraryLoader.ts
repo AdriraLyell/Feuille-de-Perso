@@ -176,11 +176,16 @@ export const LibraryLoader = {
             if (!relTable) return { settings: [], characters: [] };
 
             // 2. Fetch campaign usage
-            const { data: settingsData, error: settingsError } = await supabase
+            let query = supabase
                 .from(relTable)
                 .select(`setting_id, game_settings!inner(name)`)
-                .eq(idColumn, itemId)
-                .neq('setting_id', currentSettingId);
+                .eq(idColumn, itemId);
+
+            if (currentSettingId && currentSettingId !== 'global') {
+                query = query.neq('setting_id', currentSettingId);
+            }
+
+            const { data: settingsData, error: settingsError } = await query;
 
             if (settingsError) throw settingsError;
 

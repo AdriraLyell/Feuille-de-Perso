@@ -114,7 +114,9 @@ const TraitCard: React.FC<TraitCardProps> = ({
     onLoadUsageDetails
 }) => {
     const [showDeleteTooltip, setShowDeleteTooltip] = useState(false);
+    const [showLockTooltip, setShowLockTooltip] = useState(false);
     const deleteBtnRef = useRef<HTMLDivElement>(null);
+    const lockIconRef = useRef<HTMLDivElement>(null);
     if (!entry) return null;
 
     const hasVariants = entry.variants && entry.variants.length > 0;
@@ -146,7 +148,29 @@ const TraitCard: React.FC<TraitCardProps> = ({
                 {entry.isVariable && <TraitCardItemVariants entry={entry} hasVariants={!!hasVariants} />}
                 {source === 'official' && <div title="Trait Officiel"><Globe size={14} className="text-indigo-500" /></div>}
                 {entry.effects && entry.effects.length > 0 && <TraitCardItemEffects entry={entry} />}
-                {isLocked && <div title={isPlaced ? "Utilisé dans cette campagne" : "Utilisé par d'autres campagnes ou personnages"}><Lock size={14} className="text-amber-600" /></div>}
+                {isLocked && (
+                    <div
+                        ref={lockIconRef}
+                        onMouseEnter={() => {
+                            if (isLocked && !isPlaced && onLoadUsageDetails) {
+                                onLoadUsageDetails(entry.id);
+                            }
+                            setShowLockTooltip(true);
+                        }}
+                        onMouseLeave={() => setShowLockTooltip(false)}
+                        className="relative flex items-center"
+                        title={isPlaced ? "Utilisé dans cette campagne" : undefined}
+                    >
+                        <Lock size={14} className="text-amber-600" />
+                        <UsageLockedTooltip
+                            anchorRef={lockIconRef}
+                            isOpen={showLockTooltip}
+                            isLocked={isLocked}
+                            isPlaced={isPlaced}
+                            usageDetails={usageDetails}
+                        />
+                    </div>
+                )}
             </div>
 
             {/* 3. Content (Flexible) */}
@@ -187,33 +211,14 @@ const TraitCard: React.FC<TraitCardProps> = ({
                         >
                             <Edit2 size={14} />
                         </button>
-                        <div
-                            ref={deleteBtnRef}
-                            onMouseEnter={() => {
-                                if (isLocked && !isPlaced && onLoadUsageDetails) {
-                                    onLoadUsageDetails(entry.id);
-                                }
-                                setShowDeleteTooltip(true);
-                            }}
-                            onMouseLeave={() => setShowDeleteTooltip(false)}
-                            className="relative flex items-center"
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onDelete(entry.id); }}
+                            disabled={isLocked}
+                            className={`p-1 rounded ${isLocked ? 'text-stone-300' : 'text-red-600 hover:bg-red-50'}`}
+                            title={!isLocked ? "Supprimer" : undefined}
                         >
-                            <button
-                                onClick={(e) => { e.stopPropagation(); onDelete(entry.id); }}
-                                disabled={isLocked}
-                                className={`p-1 rounded ${isLocked ? 'text-stone-300 cursor-help' : 'text-red-600 hover:bg-red-50'}`}
-                            >
-                                <Trash2 size={14} />
-                            </button>
-
-                            <UsageLockedTooltip
-                                anchorRef={deleteBtnRef}
-                                isOpen={showDeleteTooltip}
-                                isLocked={isLocked}
-                                isPlaced={isPlaced}
-                                usageDetails={usageDetails}
-                            />
-                        </div>
+                            <Trash2 size={14} />
+                        </button>
                     </>
                 )}
                 {onSelect && !showMultiSelect && (

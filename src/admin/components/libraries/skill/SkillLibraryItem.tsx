@@ -30,9 +30,9 @@ export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
 }) => {
     const hasVariants = skill.variants && skill.variants.length > 0;
     const [showVariantsTooltip, setShowVariantsTooltip] = useState(false);
-    const [showDeleteTooltip, setShowDeleteTooltip] = useState(false);
+    const [showLockTooltip, setShowLockTooltip] = useState(false);
     const anchorRef = useRef<HTMLDivElement>(null);
-    const deleteBtnRef = useRef<HTMLDivElement>(null);
+    const lockIconRef = useRef<HTMLDivElement>(null);
 
     return (
         <div className={`bg-white border rounded p-2 transition-shadow group flex items-center gap-2 ${skill.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
@@ -94,7 +94,30 @@ export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
                             <Sparkles size={11} className="text-amber-500 shrink-0" />
                         </div>
                     )}
-                    {isLocked && <div className="text-amber-500 shrink-0" title={isPlaced ? "Utilisée dans cette campagne" : "Utilisée dans d'autres campagnes"}><Lock size={11} /></div>}
+                    {isLocked && (
+                        <div
+                            ref={lockIconRef}
+                            onMouseEnter={() => {
+                                if (isLocked && !isPlaced && !skill.isCustomized && onLoadUsageDetails) {
+                                    onLoadUsageDetails(skill.id);
+                                }
+                                setShowLockTooltip(true);
+                            }}
+                            onMouseLeave={() => setShowLockTooltip(false)}
+                            className="relative flex items-center shrink-0"
+                            title={isPlaced ? "Utilisée dans cette campagne" : undefined}
+                        >
+                            <Lock size={11} className="text-amber-500" />
+                            <UsageLockedTooltip
+                                anchorRef={lockIconRef}
+                                isOpen={showLockTooltip}
+                                isLocked={isLocked}
+                                isPlaced={isPlaced}
+                                isCustomized={skill.isCustomized}
+                                usageDetails={usageDetails}
+                            />
+                        </div>
+                    )}
 
                     {skill.defaultCategory && (
                         <span
@@ -121,34 +144,14 @@ export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
                 >
                     <Edit2 size={14} />
                 </button>
-                <div
-                    ref={deleteBtnRef}
-                    onMouseEnter={() => {
-                        if (isLocked && !isPlaced && !skill.isCustomized && onLoadUsageDetails) {
-                            onLoadUsageDetails(skill.id);
-                        }
-                        setShowDeleteTooltip(true);
-                    }}
-                    onMouseLeave={() => setShowDeleteTooltip(false)}
-                    className="relative flex items-center"
+                <button
+                    onClick={() => handleDelete(skill.id)}
+                    disabled={isLocked}
+                    className={`p-1 rounded ${isLocked ? 'text-slate-300' : 'text-red-500 hover:bg-red-50'}`}
+                    title={!isLocked ? "Supprimer" : undefined}
                 >
-                    <button
-                        onClick={() => handleDelete(skill.id)}
-                        disabled={isLocked}
-                        className={`p-1 rounded ${isLocked ? 'text-slate-300 cursor-help' : 'text-red-500 hover:bg-red-50'}`}
-                    >
-                        <Trash2 size={14} />
-                    </button>
-
-                    <UsageLockedTooltip
-                        anchorRef={deleteBtnRef}
-                        isOpen={showDeleteTooltip}
-                        isLocked={isLocked}
-                        isPlaced={isPlaced}
-                        isCustomized={skill.isCustomized}
-                        usageDetails={usageDetails}
-                    />
-                </div>
+                    <Trash2 size={14} />
+                </button>
             </div>
         </div>
     );
