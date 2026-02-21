@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.69",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Vue Distribution d'XP finale : Le bilan d'XP est désormais calculé en temps réel à partir de l'état actuel de la fiche personnage (Distribution d'état). Cette approche garantit une fiabilité totale en affichant l'investissement exact pour chaque compétence, attribut, trait et compteur, sans dépendre de l'intégrité de l'historique brut des transactions."
+    },
+    {
         "version": "2.56.68",
         "date": "2026-02-21",
         "type": "feat",
@@ -760,15 +766,6 @@
         "type": "fix",
         "changes": [
             "💾 Admin : Correction ordre de sauvegarde (Habilités avant Compétences) pour garantir les liens"
-        ]
-    },
-    {
-        "version": "2.49.58",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🔍 Admin : Ajout d'un filtre 'Mystique' dans la réserve de compétences",
-            "🐞 Admin : Correction de l'erreur d'import dans LibraryLoader"
         ]
     }
 ]

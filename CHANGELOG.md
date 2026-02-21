@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.58] - 2026-02-15 [FIX]
+
+- 🔍 Admin : Ajout d'un filtre 'Mystique' dans la réserve de compétences
+- 🐞 Admin : Correction de l'erreur d'import dans LibraryLoader
+
 ## [2.49.57] - 2026-02-15 [FEAT]
 
 - 🔗 Admin : Possibilité de lier les compétences à des 'Habilités Mystiques'
