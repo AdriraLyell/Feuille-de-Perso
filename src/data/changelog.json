@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.69.1",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie : Mémorisation de la préférence d'affichage (mode portrait / paysage) dans le cache local (localStorage). Le mode choisi persiste désormais après rechargement de la page."
+    },
+    {
         "version": "2.69.0",
         "date": "2026-02-23",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction majeure de la visibilité des items supprimés : Restriction du chargement des bibliothèques MJ aux seuls items explicitement rattachés à la campagne ou créés pour elle. Cette modification garantit que les items supprimés (via l'icône corbeille) disparaissent définitivement de la vue MJ après un rafraîchissement, même s'ils subsistent dans le dépôt global pour d'autres campagnes."
-    },
-    {
-        "version": "2.63.0",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction de la persistance des suppressions dans la bibliothèque : Les éléments supprimés du catalogue d'une campagne sont désormais correctement nettoyés dans le dépôt global s'ils ne sont plus utilisés ailleurs. Amélioration de la gestion du statut d'activation (isActive) via les liens relationnels de la base de données pour garantir que les items désactivés mais non supprimés sont conservés de manière cohérente."
     }
 ]

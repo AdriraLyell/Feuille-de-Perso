@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.81] - 2026-02-16 [FEAT]
+
+- 🎨 Admin : Migration de la personnalisation des compétences vers la Réserve (sidebar)
+- 🧹 Admin : Restauration de l'UI épurée de la Bibliothèque globale (suppression édition/badges)
+- 🛡️ Système : Support complet des overrides de compétences par campagne via la sidebar
+
 ## [2.49.80] - 2026-02-16 [FEAT]
 
 - 🛠️ Admin : Implémentation du système de surcharge locale des compétences par campagne (overrides)

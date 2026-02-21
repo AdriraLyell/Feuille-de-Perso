@@ -52,7 +52,17 @@ const MainLayout: React.FC = () => {
     const { rules, updateRules } = useRules();
 
     // Custom Hooks
-    const [isLandscape, setIsLandscape] = useState(false);
+    const [isLandscape, setIsLandscape] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('rpg-landscape-mode');
+            return saved === 'true';
+        }
+        return false;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('rpg-landscape-mode', String(isLandscape));
+    }, [isLandscape]);
     const {
         mode, setMode,
         sheetTab, setSheetTab,
