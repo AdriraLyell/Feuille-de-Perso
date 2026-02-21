@@ -225,7 +225,32 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             }
         }
 
-        onChange({ ...data, page2: { ...data.page2, [type]: newList } });
+        // Mettre à jour le compteur auto si le variant a changé
+        let newCounters = data.counters;
+        if (
+            updatedTrait.associatedCounterId &&
+            updatedTrait.variant !== oldTrait.variant
+        ) {
+            const traitDef = rules?.libraries?.traits?.find(t => t.id === updatedTrait.definitionId);
+            const counterEffect = traitDef?.effects?.find(e => e.type === 'auto_counter');
+
+            const baseCounterName = counterEffect?.target?.trim();
+            const variantName = updatedTrait.variant?.trim();
+            let newCounterName = '';
+            if (baseCounterName) {
+                newCounterName = variantName ? `${baseCounterName} (${variantName})` : baseCounterName;
+            } else {
+                newCounterName = variantName || updatedTrait.name;
+            }
+
+            const customCounters = data.counters.custom.map(c =>
+                c.id === updatedTrait.associatedCounterId ? { ...c, name: newCounterName } : c
+            );
+            newCounters = { ...data.counters, custom: customCounters };
+            onAddLog(`Compteur mis à jour : ${newCounterName}`, 'info', 'sheet');
+        }
+
+        onChange({ ...data, page2: { ...data.page2, [type]: newList }, counters: newCounters });
         onAddLog(`Modification ${type === 'avantages' ? 'Avantage' : 'Désavantage'} : ${updatedTrait.name}`, 'info', 'sheet');
         setEditingTrait(null);
     };
