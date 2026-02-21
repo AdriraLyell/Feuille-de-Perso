@@ -156,8 +156,10 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     creationValue: 0, // Initially learned at level 0
                     max: 5,
                     variant: skillDef.isVariable ? '' : undefined,
-                    description: skillDef.description || undefined
-                });
+                    description: skillDef.description || undefined,
+                    definitionId: skillDef.id, // Lien vers la bibliothèque pour l'enrichissement des couleurs
+                    mysticAbilityId: skillDef.mysticAbilityId || wizardState.mysticAbilityId || undefined
+                } as any);
 
                 // Add to local library if not present
                 if (!newLibrary.find(l => l.id === skillDef.id)) {

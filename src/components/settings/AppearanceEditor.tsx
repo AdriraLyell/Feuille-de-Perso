@@ -163,11 +163,11 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                             <div className="flex items-center gap-3">
                                 <input
                                     type="color"
-                                    value={theme.skillColors?.variable || '#4a3b32'}
+                                    value={theme.skillColors?.variable || '#d97706'}
                                     onChange={(e) => updateSkillColor('variable', e.target.value)}
                                     className="w-10 h-10 border-none rounded-sm cursor-pointer bg-white shadow-sm ring-1 ring-[#bfae85]/30"
                                 />
-                                <span className="text-xs font-bold" style={{ color: theme.skillColors?.variable || '#4a3b32' }}>
+                                <span className="text-xs font-bold" style={{ color: theme.skillColors?.variable || '#d97706' }}>
                                     Exemple de Nom
                                 </span>
                             </div>
@@ -195,11 +195,11 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                             <div className="flex items-center gap-3">
                                 <input
                                     type="color"
-                                    value={theme.skillColors?.mysticDefault || '#b45309'}
+                                    value={theme.skillColors?.mysticDefault || '#8b5cf6'}
                                     onChange={(e) => updateSkillColor('mysticDefault', e.target.value)}
                                     className="w-10 h-10 border-none rounded-sm cursor-pointer bg-white shadow-sm ring-1 ring-[#bfae85]/30"
                                 />
-                                <span className="text-xs font-bold" style={{ color: theme.skillColors?.mysticDefault || '#b45309' }}>
+                                <span className="text-xs font-bold" style={{ color: theme.skillColors?.mysticDefault || '#8b5cf6' }}>
                                     Exemple de Pouvoir
                                 </span>
                             </div>
@@ -218,7 +218,7 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                                     const hasOverride = theme.skillColors?.mysticOverrides?.[ability.id];
                                     const currentColor = hasOverride
                                         || theme.skillColors?.mysticDefault
-                                        || '#b45309';
+                                        || '#8b5cf6';
 
                                     return (
                                         <div key={ability.id} className="flex items-center gap-2 bg-white/40 p-2 rounded border border-[#bfae85]/20">

@@ -1,5 +1,16 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.64] - 2026-02-16 [FIX]
+
+- 🖼️ Admin : Correction du bug d'affichage des portraits manquants d'Ayame (Seigneurs des Mystères)
+- 🛡️ UI : Ajout d'un placeholder 'Silhouette' explicite en cas d'erreur de chargement d'image
+- 🐛 Fix : Gestion robuste des IDs d'images morts dans la vue Admin
+
+## [2.49.63] - 2026-02-16 [FIX]
+
+- 🛡️ Schema : Correction de la structure `mysticAbilities` dans le validateur Zod (LibrarySkillEntry vs DotEntry).
+- 🚀 Import : Résolution du bug empêchant l'import de fiches contenant des capacités mystiques.
+
 ## [2.49.62] - 2026-02-15 [FIX]
 
 - 🩹 Personnage : Restauration manuelle des attributs d'Ayame (3,1,3,3...) dans le Cloud

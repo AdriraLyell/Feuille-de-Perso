@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.63.3",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction des couleurs des compétences Habiletés Mystiques : (1) Le wizard d'ajout de compétences mystiques stocke désormais `definitionId` et `mysticAbilityId` sur chaque DotEntry ajouté, permettant à useSheetLayout de les enrichir correctement. (2) Ajout d'un fallback par nom dans useSheetLayout pour rétrocompatibilité avec les fiches existantes. (3) Alignement des couleurs de fallback dans l'AppearanceEditor sur les valeurs de DEFAULT_THEME (#8b5cf6 mystique, #d97706 variable)."
+    },
+    {
         "version": "2.63.2",
         "date": "2026-02-21",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Intégration des Compteurs de Traits : Nouveau type d'effet 'trait_counter' permettant de lier l'acquisition d'un trait à la création automatique d'un compteur personnalisé (ex: Munitions, Magie, Stress). Inclus : mode d'affichage compact 'squares_only' (sans ligne Maxi), synchronisation bidirectionnelle entre traits et compteurs sur la fiche, et gestion automatisée dans la bibliothèque admin."
-    },
-    {
-        "version": "2.56.75",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Correction UI : Suppression de la hauteur fixe et de l'ascenseur interne dans le bilan d'XP, permettant au tableau de s'étendre naturellement sur toute la page A4."
     }
 ]

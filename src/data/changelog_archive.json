@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.56.75",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Correction UI : Suppression de la hauteur fixe et de l'ascenseur interne dans le bilan d'XP, permettant au tableau de s'étendre naturellement sur toute la page A4."
+    },
+    {
+        "version": "2.56.74",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Amélioration UI (Historique Dépenses XP) : Remplacement de la catégorie globale 'Compétences' par un découpage thématique des compétences selon leur origine (ex: Talents (Orange), Connaissances (Bleu clair), Mêlée & Tir (Rouge), etc.) avec icônes et codes couleurs dédiés."
+    },
+    {
         "version": "2.56.73",
         "date": "2026-02-21",
         "type": "style",
@@ -734,25 +746,6 @@
         "changes": [
             "🐛 Admin : Correction critique du chargement des portraits compressés (GZIP) dans la vue Admin",
             "🖼️ UI : Amélioration de la gestion des erreurs d'image (fallback silhouette)"
-        ]
-    },
-    {
-        "version": "2.49.64",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🖼️ Admin : Correction du bug d'affichage des portraits manquants d'Ayame (Seigneurs des Mystères)",
-            "🛡️ UI : Ajout d'un placeholder 'Silhouette' explicite en cas d'erreur de chargement d'image",
-            "🐛 Fix : Gestion robuste des IDs d'images morts dans la vue Admin"
-        ]
-    },
-    {
-        "version": "2.49.63",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🛡️ Schema : Correction de la structure `mysticAbilities` dans le validateur Zod (LibrarySkillEntry vs DotEntry).",
-            "🚀 Import : Résolution du bug empêchant l'import de fiches contenant des capacités mystiques."
         ]
     }
 ]
