@@ -27,10 +27,22 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
     const [hudBelow] = useState(true);
 
     const containerRef = useRef<HTMLDivElement>(null);
+    // wrapperRef pointe sur le NodeViewWrapper (.book-image-view) — résolu via DOM au montage.
+    // Utilisé pour le resize des images flottantes (L/R/free) afin d'appliquer la largeur
+    // sur l'élément qui porte le float CSS, pas sur le div interne.
+    const wrapperRef = useRef<HTMLElement | null>(null);
+    useEffect(() => {
+        if (containerRef.current) {
+            const wrapper = containerRef.current.closest('.book-image-view') as HTMLElement | null;
+            if (wrapper) wrapperRef.current = wrapper;
+        }
+    }, []);
+
     const { activeInteraction, handleMouseDown, startRef, liveValues, hudTick } = useBookImageInteraction({
         node,
         updateAttributes,
-        containerRef
+        containerRef,
+        wrapperRef: wrapperRef as React.RefObject<HTMLElement>,
     });
     // hudTick is intentionally unused in render output — it triggers re-renders for the HUD display
     void hudTick;

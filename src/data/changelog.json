@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.62.1",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Fix resize images latérales (L/R/free) : architecture dual-ref — le resize applique désormais la largeur sur le NodeViewWrapper flottant (non le div interne), la largeur de référence est calculée via getComputedStyle sur la colonne ProseMirror au mousedown (valeur runtime exacte), éliminant le saut visible au relâchement et le calcul erroné du cap 55%."
+    },
+    {
         "version": "2.62.0",
         "date": "2026-02-21",
         "type": "perf",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "style",
         "description": "Harmonisation UI : Alignement de la taille de tous les boutons du footer de la modale de trait en format compact (sm)."
-    },
-    {
-        "version": "2.56.62",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Peaufinage UI : Réduction de la taille du bouton de rachat de désavantage dans la modale d'édition pour une interface plus compacte."
     }
 ]

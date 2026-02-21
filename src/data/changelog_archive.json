@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.62",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Peaufinage UI : Réduction de la taille du bouton de rachat de désavantage dans la modale d'édition pour une interface plus compacte."
+    },
+    {
         "version": "2.56.61",
         "date": "2026-02-21",
         "type": "feat",
@@ -784,15 +790,6 @@
         "changes": [
             "🌐 Admin : Traduction en français des onglets de bibliothèques (Skills, Backgrounds, Counters, Specializations)",
             "🏗️ Refactoring : Amélioration de la structure des onglets de bibliothèques dans AdminApp.tsx"
-        ]
-    },
-    {
-        "version": "2.49.52",
-        "date": "2026-02-15",
-        "type": "docs",
-        "changes": [
-            "📝 Documentation : Création du guide complet sur la gestion des conflits et la synchronisation sécurisée (SYNC_CONFLICT_MANAGEMENT.md)",
-            "🏗️ Architecture : Synthèse des scénarios de réconciliation (Ajout/Suppression MJ, Dirty Checking)"
         ]
     }
 ]

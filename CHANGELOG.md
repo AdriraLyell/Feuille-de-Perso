@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.52] - 2026-02-15 [DOCS]
+
+- 📝 Documentation : Création du guide complet sur la gestion des conflits et la synchronisation sécurisée (SYNC_CONFLICT_MANAGEMENT.md)
+- 🏗️ Architecture : Synthèse des scénarios de réconciliation (Ajout/Suppression MJ, Dirty Checking)
+
 ## [2.49.51] - 2026-02-15 [FIX]
 
 - 🐛 Fix : Correction d'une erreur de syntaxe blockante (return manquant) dans CharacterReadOnlyView
