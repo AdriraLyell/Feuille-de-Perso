@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.62.5",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction des erreurs 401 Supabase (RLS) pour les fiches anonymes et fix du crash 'compressBase64' sur images volumineuses (passage en traitement par chunks de 8Ko). Réduction du bruit console en mode auto-sync."
+    },
+    {
         "version": "2.62.4",
         "date": "2026-02-21",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Agrégation du Bilan XP : Épuration de la vue Recçu en supprimant les horodatages et en regroupant les transactions par sujet (ex: groupement des achats d'une même compétence). Tri automatique par importance d'investissement et mise à jour des infobulles pour le 'Top 5'."
-    },
-    {
-        "version": "2.56.67",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Nouveau tableau de bord de Suivi d'XP (Concept B) : vue interactive et catégorisée (Gains et Investissements) remplaçant l'historique brut, avec infobulles contextuelles et tri par catégorie."
     }
 ]

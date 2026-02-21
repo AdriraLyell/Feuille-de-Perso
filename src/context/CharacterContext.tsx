@@ -268,12 +268,16 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
                     logger.log(`[CharacterContext] Auto-sync success (Hash: ${newHash})`);
                 }
             } else if (result.error) {
-                logger.warn("[CharacterContext] Sync failed:", result.error);
-                if (mode === 'manual') addLog(`Échec de la synchronisation : ${result.error}`, 'danger', 'settings', 'sync-failure');
+                if (mode === 'manual') {
+                    logger.warn("[CharacterContext] Sync failed:", result.error);
+                    addLog(`Échec de la synchronisation : ${result.error}`, 'danger', 'settings', 'sync-failure');
+                }
             }
         } catch (e) {
-            logger.error("[CharacterContext] Sync exception:", e);
-            if (mode === 'manual') addLog("Erreur critique lors de la synchronisation", 'danger', 'settings');
+            if (mode === 'manual') {
+                logger.error("[CharacterContext] Sync exception:", e);
+                addLog("Erreur critique lors de la synchronisation", 'danger', 'settings');
+            }
         } finally {
             setIsSyncing(false);
         }

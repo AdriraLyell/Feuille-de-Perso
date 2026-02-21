@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.67",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Nouveau tableau de bord de Suivi d'XP (Concept B) : vue interactive et catégorisée (Gains et Investissements) remplaçant l'historique brut, avec infobulles contextuelles et tri par catégorie."
+    },
+    {
         "version": "2.56.65",
         "date": "2026-02-21",
         "type": "style",
@@ -767,17 +773,6 @@
             "🔗 Admin : Possibilité de lier les compétences à des 'Habilités Mystiques'",
             "🎨 UI : Nouvelle option dans l'édition de compétence pour désigner une habilité mystique",
             "🗄️ BDD : Migration SQL pour supporter le lien entre compétences et habilités"
-        ]
-    },
-    {
-        "version": "2.49.56",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🔮 Admin : Ajout de la bibliothèque des 'Habilités Mystiques'",
-            "📚 Data : Configuration par défaut (Arts Martiaux, Magies, Psy, etc.)",
-            "🛠️ Admin : Interface de gestion complète (CRUD) pour les habilités mystiques",
-            "🔄 Migration : Initialisation automatique de la bibliothèque pour les campagnes existantes"
         ]
     }
 ]
