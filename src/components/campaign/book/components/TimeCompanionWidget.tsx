@@ -261,21 +261,21 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                                     )}
 
                                     {onNewChapter && (
-                                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-stone-950/90 backdrop-blur-[4px] flex items-center justify-center gap-2 transition-all duration-300 rounded-md z-10 border border-amber-500/50 shadow-2xl scale-95 group-hover:scale-100">
+                                        <div className="absolute inset-[-1px] opacity-0 group-hover:opacity-100 bg-stone-950 flex items-center justify-center gap-1.5 transition-all duration-200 rounded-md z-10 border-2 border-amber-500 shadow-2xl">
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr, true); }}
-                                                className="w-8 h-8 flex items-center justify-center bg-stone-900 border border-amber-500/20 hover:bg-amber-500 hover:text-stone-950 rounded-full transition-all text-amber-500 group/btn shadow-lg"
+                                                className="w-7 h-7 flex items-center justify-center hover:bg-amber-500 hover:text-stone-950 rounded-full transition-all text-amber-500 group/btn"
                                                 title="Insérer au curseur"
                                             >
-                                                <PlusCircle size={16} strokeWidth={2.5} />
+                                                <PlusCircle size={15} strokeWidth={2.5} />
                                             </button>
-                                            <div className="w-[1px] h-4 bg-amber-500/30" />
+                                            <div className="w-[1px] h-5 bg-amber-500/30" />
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr, false); }}
-                                                className="w-8 h-8 flex items-center justify-center bg-stone-900 border border-amber-500/20 hover:bg-amber-500 hover:text-stone-950 rounded-full transition-all text-amber-500 group/btn shadow-lg"
+                                                className="w-7 h-7 flex items-center justify-center hover:bg-amber-500 hover:text-stone-950 rounded-full transition-all text-amber-500 group/btn"
                                                 title="Ajouter à la fin du livre"
                                             >
-                                                <ArrowDownToLine size={16} strokeWidth={2.5} />
+                                                <ArrowDownToLine size={15} strokeWidth={2.5} />
                                             </button>
                                         </div>
                                     )}
