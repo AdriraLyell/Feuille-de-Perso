@@ -94,8 +94,8 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                                 <Calendar size={10} />
                             </button>
                             <input
-                                type={isReal ? "date" : "text"}
-                                placeholder={isReal ? "" : "aaaa-mm-jj"}
+                                type="text"
+                                placeholder={isReal ? "aaaa-mm-jj" : "date"}
                                 value={date || ''}
                                 onChange={(e) => updateAttributes({ date: e.target.value })}
                                 className="bg-transparent border-none p-0 w-[80px] text-[10px] focus:ring-0 cursor-pointer"
@@ -114,16 +114,16 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                                 <Calendar size={10} />
                             </button>
                             <input
-                                type={isReal ? "date" : "text"}
-                                placeholder={isReal ? "" : "début"}
+                                type="text"
+                                placeholder={isReal ? "aaaa-mm-jj" : "début"}
                                 value={dateStart || ''}
                                 onChange={(e) => updateAttributes({ dateStart: e.target.value })}
                                 className="bg-transparent border-none p-0 w-[80px] text-[10px] focus:ring-0 cursor-pointer"
                             />
                             <span>au</span>
                             <input
-                                type={isReal ? "date" : "text"}
-                                placeholder={isReal ? "" : "fin"}
+                                type="text"
+                                placeholder={isReal ? "aaaa-mm-jj" : "fin"}
                                 value={dateEnd || ''}
                                 onChange={(e) => updateAttributes({ dateEnd: e.target.value })}
                                 className="bg-transparent border-none p-0 w-[80px] text-[10px] focus:ring-0 cursor-pointer"
