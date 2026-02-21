@@ -4,6 +4,7 @@ export const ColumnarEditorStyles = () => (
     <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; }
 
         /* IMPORTANT: The container width is PAGE_WIDTH (722px). 
            The ProseMirror editor takes 100% of that WIDTH. 

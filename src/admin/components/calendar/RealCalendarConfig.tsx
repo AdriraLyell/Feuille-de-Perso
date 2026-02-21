@@ -11,11 +11,15 @@ interface Props {
 
 const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
     const advance = (unit: 'day' | 'week' | 'month') => {
-        const d = new Date(config.currentDate);
+        const d = new Date(config.currentDate || new Date().toISOString());
         if (unit === 'day') d.setDate(d.getDate() + 1);
         else if (unit === 'week') d.setDate(d.getDate() + 7);
         else d.setMonth(d.getMonth() + 1);
-        onUpdate({ ...config, currentDate: d.toISOString().split('T')[0] });
+
+        onUpdate({
+            ...config,
+            currentDate: d.toISOString().split('T')[0]
+        });
     };
 
     const currentDateObj = config.currentDate ? new Date(config.currentDate) : null;

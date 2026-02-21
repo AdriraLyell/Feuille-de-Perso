@@ -9,6 +9,7 @@ declare module '@tiptap/core' {
         chapterHeading: {
             setChapter: () => ReturnType;
             appendChapter: () => ReturnType;
+            insertChapterAtDate: (date: string) => ReturnType;
         };
     }
 }
@@ -29,6 +30,9 @@ export const ChapterHeading = Node.create({
             },
             level: {
                 default: 1,
+            },
+            weather: {
+                default: '',
             },
         };
     },
@@ -93,6 +97,26 @@ export const ChapterHeading = Node.create({
                                 }
                             ])
                             .focus(endPos + 1) // Hard focus on the new node
+                            .run();
+                    },
+
+            insertChapterAtDate:
+                (date: string) =>
+                    ({ chain, state }: CommandProps) => {
+                        const endPos = state.doc.content.size;
+                        return chain()
+                            .focus()
+                            .insertContentAt(endPos, [
+                                {
+                                    type: this.name,
+                                    attrs: { date },
+                                    content: [{ type: 'text', text: 'Nouveau Chapitre' }],
+                                },
+                                {
+                                    type: 'paragraph',
+                                }
+                            ])
+                            .focus(endPos + 1)
                             .run();
                     },
         } as RawCommands;

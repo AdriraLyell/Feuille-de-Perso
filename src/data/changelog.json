@@ -1,5 +1,47 @@
 [
     {
+        "version": "2.68.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Améliorations majeures des sections narratives et du Chroniqueur : (1) Possibilité de masquer/afficher le Chroniqueur depuis la barre latérale. (2) Ajout de champs d'heure pour les moments de journée. (3) Ajout de champs de date pour les flashbacks. (4) Support des calendriers fictifs pour les sélecteurs de date de voyage et flashbacks."
+    },
+    {
+        "version": "2.67.1",
+        "date": "2026-02-23",
+        "type": "chore",
+        "description": "Ajustements ergonomiques du Chroniqueur : renommage du widget, formatage des dates en JJ/MM/AAAA dans la Timeline, et déplacement des flèches de navigation vers le haut pour éviter les chevauchements."
+    },
+    {
+        "version": "2.67.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Fusion majeure du Compagnon Temporel et du Journal de Campagne : (1) Navigation chronologique par clic sur les dates. (2) Mode 'Timeline' synthétique. (3) Assistant de création de chapitre à date. (4) Indicateurs de météo et ambiances sur les chapitres et le calendrier. (5) Compte à rebours avant le prochain évènement majeur. (6) Nouveaux blocs narratifs flexibles (Moments de journée, Voyages)."
+    },
+    {
+        "version": "2.66.3",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Correction majeure de la visibilité du Compagnon Temporel : (1) Correction du chemin d'accès aux données (configurations.calendar). (2) Repositionnement du widget à gauche de la barre latérale pour éviter qu'il ne soit hors-écran sur les résolutions standards."
+    },
+    {
+        "version": "2.66.2",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ajustement du positionnement du Compagnon Temporel pour une meilleure visibilité dans le Grimoire et correction du filtrage des événements calendaires."
+    },
+    {
+        "version": "2.66.1",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Correction d'une erreur de référence sur BookChapterSidebar dans le journal de campagne."
+    },
+    {
+        "version": "2.66.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Intégration du calendrier dans le journal de campagne ('Compagnon Temporel') : Un nouveau widget interactif s'affiche dans la barre latérale du Grimoire, permettant de consulter la date actuelle et les événements planifiés sans quitter l'éditeur. Améliorations Admin : nouveau bouton '+1 Jour' pour le calendrier fictif avec passage automatique des mois et années, et optimisation de l'avance de date pour le calendrier réel."
+    },
+    {
         "version": "2.65.4",
         "date": "2026-02-21",
         "type": "fix",
@@ -76,47 +118,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Amélioration de la bibliothèque d'administration : Intégration de détails d'utilisation avancés. Désormais, survoler l'icône de cadenas d'un élément verrouillé (trait, compétence, historique, compteur, etc.) affiche précisément quelles campagnes ou quels personnages utilisent cet élément, facilitant la gestion de la bibliothèque globale."
-    },
-    {
-        "version": "2.62.8",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction de l'erreur 'net::ERR_FILE_NOT_FOUND' lors de la sauvegarde des réglages : Stabilisation des callbacks de mise à jour d'image et renforcement du cycle de vie des ObjectURLs dans le widget de portrait. Cette correction élimine les révocations prématurées d'URLs de blobs encore en cours d'utilisation lors des cycles de re-rendu de React."
-    },
-    {
-        "version": "2.62.7",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction de la visibilité de la barre d'outils du Journal de Campagne : Fix du positionnement sticky sur petit écran (ajustement du top à 112px pour éviter le chevauchement avec la navigation) et ajout du support flex-wrap pour éviter le débordement horizontal des icônes de mise en forme. Suppression des animations parents interférant avec le contexte sticky."
-    },
-    {
-        "version": "2.62.6",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction du transfert d'images entre PC : Centralisation de la décompression GZIP dans le service de synchronisation cloud. Les images synchronisées (Grimoire, Portraits, Notes) sont désormais décompressées directement lors de l'injection dans IndexedDB, garantissant un affichage immédiat et correct sur tous les supports sans logique de décompression locale redondante."
-    },
-    {
-        "version": "2.62.5",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction des erreurs 401 Supabase (RLS) pour les fiches anonymes et fix du crash 'compressBase64' sur images volumineuses (passage en traitement par chunks de 8Ko). Réduction du bruit console en mode auto-sync."
-    },
-    {
-        "version": "2.62.4",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction robuste de la duplication des images : désactivation du drag natif sur l'élément IMG et renforcement du guard via les types MIME ProseMirror pour distinguer les fichiers externes des déplacements internes."
-    },
-    {
-        "version": "2.62.3",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Fix duplication des images au drag-drop : le plugin de drop ignore désormais les fichiers si ProseMirror est déjà en train de gérer un déplacement de nœud interne."
-    },
-    {
-        "version": "2.62.2",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Fix clipping toolbar images : conversion en React Portal pour la barre d'outils et le HUD de resize. Le positionnement est désormais dynamique (fixed) basé sur le bounding rect de l'image, garantissant une visibilité complète même en bord de page ou à cheval sur les colonnes CSS."
     }
 ]

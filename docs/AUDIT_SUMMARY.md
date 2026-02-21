@@ -1,8 +1,19 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.65.4)
+# Audit - État des Lieux & Roadmap (Synthèse v2.68.0)
 
-> **Dernière mise à jour** : 2026-02-21 — Version 2.65.4
+> **Dernière mise à jour** : 2026-02-23 — Version 2.68.0
 
 ## 1. Phases Complétées
+
+### ✅ Phase 36 : Chroniqueur & Narrative Enhancements (v2.68.0)
+- [x] **UI Control** : Possibilité de masquer/afficher le Chroniqueur (widget temporaire) depuis la barre latérale pour libérer de l'espace visuel.
+- [x] **Narrative Sections** : Support des heures précises pour les blocs 'Moment' et des dates pour les 'Flashbacks'.
+- [x] **Navigation** : Interaction entre les blocs narratifs et le Chroniqueur (clic sur l'icône calendrier affiche le widget).
+- [x] **Flexibilité** : Adaptation automatique des sélecteurs de date selon le type de calendrier (Réel/Fiction).
+
+### ✅ Phase 35 : Fusion Chroniqueur & Journal (v2.67.1)
+- [x] **Renommage** : Le Compagnon Temporel devient le **Chroniqueur**.
+- [x] **Ergonomie** : Déplacement des flèches de navigation pour éviter les chevauchements et formatage des dates en JJ/MM/AAAA.
+- [x] **Intégration** : Synchronisation des dates du journal avec la timeline du calendrier.
 
 ### ✅ Phase 34 : Calcul d'âge flexible & Verrouillage Calendrier (v2.65.4)
 - [x] **Bug Fix** : Support des formats de date français (DD/MM/YYYY) et fictifs pour le calcul automatique de l'âge.
