@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { NodeViewWrapper } from '@tiptap/react';
 import { BookImageAttributes } from '../../../extensions/bookImage';
-import { Image as ImageIcon, Loader } from 'lucide-react';
-import { getImage, deleteImage } from '../../../imageDB';
+import { Image as ImageIcon, Loader, Move } from 'lucide-react';
+import { deleteImage } from '../../../imageDB';
+import { getCachedImageUrl, invalidateCachedImage } from '../../../services/ImageCacheService';
 import { logger } from '../../../utils/logger';
 import { useBookImageInteraction } from './hooks/useBookImageInteraction';
 import BookImageToolbar from './parts/BookImageToolbar';
@@ -26,11 +28,58 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
     const [hudBelow] = useState(true);
 
     const containerRef = useRef<HTMLDivElement>(null);
-    const { activeInteraction, handleMouseDown, startRef } = useBookImageInteraction({
+    // wrapperRef pointe sur le NodeViewWrapper (.book-image-view) — résolu via DOM au montage.
+    // Utilisé pour le resize des images flottantes (L/R/free) afin d'appliquer la largeur
+    // sur l'élément qui porte le float CSS, pas sur le div interne.
+    const wrapperRef = useRef<HTMLElement | null>(null);
+    useEffect(() => {
+        if (containerRef.current) {
+            const wrapper = containerRef.current.closest('.book-image-view') as HTMLElement | null;
+            if (wrapper) wrapperRef.current = wrapper;
+        }
+    }, []);
+
+    const { activeInteraction, handleMouseDown, startRef, liveValues, hudTick } = useBookImageInteraction({
         node,
         updateAttributes,
-        containerRef
+        containerRef,
+        wrapperRef: wrapperRef as React.RefObject<HTMLElement>,
     });
+    // hudTick is intentionally unused in render output — it triggers re-renders for the HUD display
+    void hudTick;
+
+    const [imageRect, setImageRect] = useState<DOMRect | null>(null);
+
+    // Track image position for Portals (Toolbar & HUD)
+    useEffect(() => {
+        if (selected && containerRef.current) {
+            const update = () => {
+                if (containerRef.current) {
+                    setImageRect(containerRef.current.getBoundingClientRect());
+                }
+            };
+
+            update();
+
+            // The scroll container is the one with .overflow-x-auto in ColumnarEditor
+            const scroller = containerRef.current.closest('.overflow-x-auto');
+
+            scroller?.addEventListener('scroll', update, { passive: true });
+            window.addEventListener('resize', update, { passive: true });
+
+            // Also update when activeInteraction changes (during resize)
+            const obs = new ResizeObserver(update);
+            obs.observe(containerRef.current);
+
+            return () => {
+                scroller?.removeEventListener('scroll', update);
+                window.removeEventListener('resize', update);
+                obs.disconnect();
+            };
+        } else {
+            setImageRect(null);
+        }
+    }, [selected, activeInteraction]);
 
     useEffect(() => {
         let active = true;
@@ -40,9 +89,8 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
 
             setLoading(true);
             try {
-                const blob = await getImage(node.attrs.imageId);
-                if (blob && active) {
-                    const url = URL.createObjectURL(blob);
+                const url = await getCachedImageUrl(node.attrs.imageId);
+                if (url && active) {
                     setImageSrc(url);
                 }
             } catch (e) {
@@ -65,6 +113,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
     const handleDelete = async () => {
         if (node.attrs.imageId) {
             try {
+                invalidateCachedImage(node.attrs.imageId);
                 await deleteImage(node.attrs.imageId);
             } catch {
                 // image may already be deleted
@@ -112,7 +161,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                     setIsPanMode={setIsPanMode}
                     isEditingCaption={isEditingCaption}
                     setIsEditingCaption={setIsEditingCaption}
-                    hudBelow={hudBelow}
+                    imageRect={imageRect}
                 />
             )}
 
@@ -135,9 +184,10 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                                 : activeInteraction === 'resize-tl' || activeInteraction === 'resize-br' ? 'nwse-resize'
                                     : activeInteraction === 'resize-tr' || activeInteraction === 'resize-bl' ? 'nesw-resize'
                                         : 'move')
-                        : (isPanMode ? 'move' : 'default')
+                        : (isPanMode ? 'move' : 'grab')
                 }}
                 onMouseDown={isPanMode ? (e) => handleMouseDown(e, 'pan') : undefined}
+                data-drag-handle={!isPanMode}
             >
                 {loading ? (
                     <div className="flex flex-col items-center gap-2 animate-pulse">
@@ -158,12 +208,20 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                                 : 'none',
                             pointerEvents: isPanMode ? 'none' : 'auto'
                         }}
-                        data-drag-handle={!isPanMode}
+                        draggable={false}
                     />
                 ) : (
                     <div className="flex flex-col items-center gap-2">
                         <ImageIcon size={32} />
                         <span className="text-xs">Image {node.attrs.imageId}</span>
+                    </div>
+                )}
+
+                {/* Drag Indicator (Visual feedback for Phase 1) */}
+                {!isPanMode && !activeInteraction && (
+                    <div className="absolute top-3 left-3 p-1.5 bg-white/95 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-[120] border border-indigo-200 transform -translate-y-1 group-hover:translate-y-0 flex items-center gap-2">
+                        <Move size={14} className="text-indigo-600" />
+                        <span className="text-[10px] font-medium text-stone-600 pr-1">Glisser pour déplacer</span>
                     </div>
                 )}
 
@@ -179,8 +237,15 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                     </div>
                 )}
 
-                {selected && activeInteraction && (
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-stone-800 text-white text-[9px] px-2 py-0.5 rounded shadow-xl flex gap-3 whitespace-nowrap z-[200] border border-stone-600 backdrop-blur-md">
+                {selected && activeInteraction && imageRect && createPortal(
+                    <div
+                        className="fixed z-[9999] bg-stone-800 text-white text-[9px] px-2 py-0.5 rounded shadow-xl flex gap-3 whitespace-nowrap border border-stone-600 backdrop-blur-md pointer-events-none"
+                        style={{
+                            left: imageRect.left + imageRect.width / 2,
+                            top: imageRect.top - 8,
+                            transform: 'translate(-50%, -100%)'
+                        }}
+                    >
                         {(activeInteraction.startsWith('resize')) && (() => {
                             const hasH = activeInteraction === 'resize-left' || activeInteraction === 'resize-right'
                                 || activeInteraction.includes('tl') || activeInteraction.includes('tr')
@@ -188,20 +253,23 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                             const hasV = activeInteraction === 'resize-top' || activeInteraction === 'resize-bottom'
                                 || activeInteraction.includes('tl') || activeInteraction.includes('tr')
                                 || activeInteraction.includes('bl') || activeInteraction.includes('br');
+                            const displayW = liveValues.current.width || node.attrs.width;
+                            const displayH = liveValues.current.height || node.attrs.height;
                             return (
                                 <>
-                                    {hasH && <span>W: {typeof node.attrs.width === 'string' && node.attrs.width.endsWith('%') ? node.attrs.width : Math.round(startRef.current?.w || 0) + 'px'}</span>}
-                                    {hasV && node.attrs.height !== 'auto' && <span>H: {node.attrs.height}</span>}
+                                    {hasH && <span>W: {typeof displayW === 'string' && displayW.endsWith('%') ? displayW : Math.round(startRef.current?.w || 0) + 'px'}</span>}
+                                    {hasV && displayH !== 'auto' && <span>H: {displayH}</span>}
                                 </>
                             );
                         })()}
                         {activeInteraction === 'pan' && (
                             <>
-                                <span>Pos X: {Math.round(node.attrs.posX || 0)}%</span>
-                                <span>Pos Y: {Math.round(node.attrs.posY || 0)}%</span>
+                                <span>Pos X: {Math.round(liveValues.current.posX ?? node.attrs.posX ?? 0)}%</span>
+                                <span>Pos Y: {Math.round(liveValues.current.posY ?? node.attrs.posY ?? 0)}%</span>
                             </>
                         )}
-                    </div>
+                    </div>,
+                    document.body
                 )}
             </div>
 

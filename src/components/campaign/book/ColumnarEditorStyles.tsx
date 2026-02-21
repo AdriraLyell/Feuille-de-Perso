@@ -45,6 +45,36 @@ export const ColumnarEditorStyles = () => (
             max-width: 100%;
         }
 
+        /* Float wrapping: generous margin so text breathes around images */
+        .book-image-view[data-align="left"],
+        .book-image-view[data-align="right"],
+        .book-image-view[data-align="free"] {
+            shape-outside: margin-box;
+            shape-margin: 8px;
+        }
+
+        .book-image-view[data-align="left"] {
+            margin-right: 1.5rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .book-image-view[data-align="right"] {
+            margin-left: 1.5rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .book-image-view[data-align="free"] {
+            margin-bottom: 0.75rem !important;
+        }
+
+        /* Block elements after floated images must clear to avoid overlap */
+        .ProseMirror > [data-node-view-wrapper] + .chapter-header-wrapper,
+        .ProseMirror > [data-node-view-wrapper] + h1,
+        .ProseMirror > [data-node-view-wrapper] + h2,
+        .ProseMirror > [data-node-view-wrapper] + h3,
+        .ProseMirror blockquote,
+        .ProseMirror hr {
+            clear: both;
+        }
+
         /* Make TipTap node-view wrappers transparent for floated images
            so that float works properly (text wraps, images can be side-by-side) */
         .ProseMirror > [data-node-view-wrapper]:has(.book-image-view[data-align="left"]),
@@ -136,6 +166,20 @@ export const ColumnarEditorStyles = () => (
             left: -1.2rem;
             color: #b45309;
             font-size: 1.2rem;
+        }
+
+        /* Premium Drop Cursor */
+        .ProseMirror-dropcursor {
+            border-left: 2px solid #6366f1 !important;
+            margin-left: -1px;
+            box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+            animation: pulse-drop-cursor 1.5s infinite;
+            z-index: 50;
+        }
+
+        @keyframes pulse-drop-cursor {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
     `}</style>
 );

@@ -1,5 +1,34 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.55] - 2026-02-15 [FEAT]
+
+- ⚙️ Admin : Ajout d'un paramètre de configuration mondiale pour le coût en XP des traits
+- 📊 Budget : Intégration du coût des traits dans le calcul du budget de création (Mode Points)
+- ⚖️ XP : Préparation du moteur de calcul d'XP pour supporter les traits achetés après création
+- 🛡️ Typage : Mise à jour du schéma de données et des réconciliateurs pour inclure le traitCost
+
+## [2.49.54] - 2026-02-15 [FEAT]
+
+- 📝 Terminologie : Remplacement de 'Échelon' par 'Rang' dans tout le système d'administration
+- 🎨 UI : Retrait de la mention 'Niveau du Talent' dans la configuration des rangs
+- 🖋️ UI : Remplacement de 'Slots' par 'Rangs Disponibles' pour une meilleure clarté sémantique
+
+## [2.49.53] - 2026-02-15 [FEAT]
+
+- 🌐 Admin : Traduction en français des onglets de bibliothèques (Skills, Backgrounds, Counters, Specializations)
+- 🏗️ Refactoring : Amélioration de la structure des onglets de bibliothèques dans AdminApp.tsx
+
+## [2.49.52] - 2026-02-15 [DOCS]
+
+- 📝 Documentation : Création du guide complet sur la gestion des conflits et la synchronisation sécurisée (SYNC_CONFLICT_MANAGEMENT.md)
+- 🏗️ Architecture : Synthèse des scénarios de réconciliation (Ajout/Suppression MJ, Dirty Checking)
+
+## [2.49.51] - 2026-02-15 [FIX]
+
+- 🐛 Fix : Correction d'une erreur de syntaxe blockante (return manquant) dans CharacterReadOnlyView
+- 🛡️ Stabilité : Restauration de l'import RefreshCw manquant dans GlobalPlayersView
+- 🏷️ Typage : Ajout du type RulesData manquant sur le paramètre merged de CharacterReadOnlyView
+
 ## [2.49.50] - 2026-02-15 [FEAT]
 
 - 🏛️ Admin : Restriction du signal de mise à jour MJ aux personnages liés à une campagne uniquement

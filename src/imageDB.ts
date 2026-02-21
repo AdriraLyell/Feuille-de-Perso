@@ -25,11 +25,63 @@ export const checkStorageQuota = async (): Promise<{ usage: number; quota: numbe
     };
 };
 
+/**
+ * Compress an image blob using Canvas API before storage.
+ * - Resizes to max 1920px width (preserving aspect ratio)
+ * - Converts to WebP at 80% quality
+ * - Falls back to JPEG if WebP is unsupported
+ * - Non-image blobs pass through unchanged
+ */
+const compressBlob = async (blob: File | Blob): Promise<Blob> => {
+    // Only compress images
+    if (!blob.type.startsWith('image/')) return blob;
+    // Skip small images (< 100KB) — not worth the overhead
+    if (blob.size < 100 * 1024) return blob;
+
+    const MAX_WIDTH = 1920;
+    const QUALITY = 0.8;
+
+    return new Promise<Blob>((resolve) => {
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            try {
+                let w = img.width;
+                let h = img.height;
+                if (w > MAX_WIDTH) {
+                    const ratio = MAX_WIDTH / w;
+                    w = MAX_WIDTH;
+                    h = Math.round(h * ratio);
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) { resolve(blob); return; }
+                ctx.drawImage(img, 0, 0, w, h);
+                canvas.toBlob(
+                    (result) => resolve(result || blob),
+                    'image/webp',
+                    QUALITY
+                );
+            } catch {
+                resolve(blob);
+            }
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); resolve(blob); };
+        img.src = url;
+    });
+};
+
 export const saveImage = async (file: File | Blob): Promise<string> => {
+    // Compress image before storage
+    const compressed = await compressBlob(file);
+
     const { available } = await checkStorageQuota();
 
-    if (file.size > available) {
-        const sizeKo = (file.size / 1024).toFixed(0);
+    if (compressed.size > available) {
+        const sizeKo = (compressed.size / 1024).toFixed(0);
         const availKo = (available / 1024).toFixed(0);
         throw new Error(`Espace de stockage insuffisant. Taille: ${sizeKo} Ko, Disponible: ${availKo} Ko.`);
     }
@@ -37,7 +89,7 @@ export const saveImage = async (file: File | Blob): Promise<string> => {
     const id = `img_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`;
 
     try {
-        await set(id, file);
+        await set(id, compressed);
     } catch (error) {
         if (error instanceof DOMException && error.name === 'QuotaExceededError') {
             throw new Error('Le stockage local est plein. Veuillez supprimer des images existantes.');

@@ -149,6 +149,14 @@ export const BookImage = Node.create({
                 key: new PluginKey('bookImageDropPaste'),
                 props: {
                     handleDrop(view, event) {
+                        // If ProseMirror is already handling a node drag (internal move), 
+                        // ignore the files to prevent duplication.
+                        const isInternalDrag = (view as any).dragging ||
+                            event.dataTransfer?.types.includes('application/x-prosemirror-nodes') ||
+                            event.dataTransfer?.types.includes('text/x-prosemirror-nodes');
+
+                        if (isInternalDrag) return false;
+
                         if (!event.dataTransfer?.files?.length) return false;
                         const file = Array.from(event.dataTransfer.files).find(f => f.type.startsWith('image/'));
                         if (!file) return false;

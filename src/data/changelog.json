@@ -1,5 +1,35 @@
 [
     {
+        "version": "2.62.4",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction robuste de la duplication des images : désactivation du drag natif sur l'élément IMG et renforcement du guard via les types MIME ProseMirror pour distinguer les fichiers externes des déplacements internes."
+    },
+    {
+        "version": "2.62.3",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Fix duplication des images au drag-drop : le plugin de drop ignore désormais les fichiers si ProseMirror est déjà en train de gérer un déplacement de nœud interne."
+    },
+    {
+        "version": "2.62.2",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Fix clipping toolbar images : conversion en React Portal pour la barre d'outils et le HUD de resize. Le positionnement est désormais dynamique (fixed) basé sur le bounding rect de l'image, garantissant une visibilité complète même en bord de page ou à cheval sur les colonnes CSS."
+    },
+    {
+        "version": "2.62.1",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Fix resize images latérales (L/R/free) : architecture dual-ref — le resize applique désormais la largeur sur le NodeViewWrapper flottant (non le div interne), la largeur de référence est calculée via getComputedStyle sur la colonne ProseMirror au mousedown (valeur runtime exacte), éliminant le saut visible au relâchement et le calcul erroné du cap 55%."
+    },
+    {
+        "version": "2.62.0",
+        "date": "2026-02-21",
+        "type": "perf",
+        "description": "Optimisation du Journal de Campagne : Cache LRU d'images (chargement instantané au retour sur une page), sauvegarde sécurisée (flush sur perte de focus + indicateur ✓), interactions image fluides à 60fps (rendu DOM direct pendant resize/pan), correction du wrapping texte-image (clear CSS + marges generatives). Ajout : indicateur de page (dots), boutons Annuler/Rétablir, confirmation de suppression dans le Tableau de Groupe, compression automatique des images (WebP 80%) à l'upload."
+    },
+    {
         "version": "2.61.0",
         "date": "2026-02-21",
         "type": "feat",
@@ -88,35 +118,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Nouveau tableau de bord de Suivi d'XP (Concept B) : vue interactive et catégorisée (Gains et Investissements) remplaçant l'historique brut, avec infobulles contextuelles et tri par catégorie."
-    },
-    {
-        "version": "2.56.65",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Gestion XP : Déplacement de la colonne 'Session' en fin de tableau et renommage de 'SESS.' en 'Session' avec ajustement de la taille de police."
-    },
-    {
-        "version": "2.56.64",
-        "date": "2026-02-21",
-        "type": "refactor",
-        "description": "Calcul XP unifié : Suppression des écritures manuelles dans l'historique d'expérience pour les traits. Le moteur calcule désormais les dépenses d'XP de manière dynamique uniquement via l'état des traits (flag post-création et valeur initiale), évitant ainsi les doubles comptes."
-    },
-    {
-        "version": "2.56.63",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Harmonisation UI : Alignement de la taille de tous les boutons du footer de la modale de trait en format compact (sm)."
-    },
-    {
-        "version": "2.56.62",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Peaufinage UI : Réduction de la taille du bouton de rachat de désavantage dans la modale d'édition pour une interface plus compacte."
-    },
-    {
-        "version": "2.56.61",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Système d'achat de Traits post-création : Les avantages peuvent désormais être acquis via XP hors création (fonds émeraude, icône ❇️). Les désavantages peuvent être rachetés (coût fixe) ou réduits (rang par rang) via une nouvelle interface dans la modale d'édition. Les déductions d'XP sont automatiques et tracées dans l'historique."
     }
 ]

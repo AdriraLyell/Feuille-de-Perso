@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import { Check } from 'lucide-react';
 import { useEditor, EditorContent, JSONContent, Editor } from '@tiptap/react';
 import { getBookExtensions } from './extensions/bookExtensions';
 import { PAGE_WIDTH, PAGE_HEIGHT } from '../constants';
@@ -11,6 +12,7 @@ import { ColumnarEditorStyles } from './ColumnarEditorStyles';
 import { BookEditorToolbar } from './components/BookEditorToolbar';
 import { BookPageBackground } from './components/BookPageBackground';
 import { BookChapterSidebar } from './components/BookChapterSidebar';
+import { BookPageIndicator } from './components/BookPageIndicator';
 
 const INK_COLORS = [
     { name: 'Noir Corbeau', color: '#1c1917' },
@@ -43,13 +45,46 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     const [isDrawingMode, setIsDrawingMode] = useState(false);
     const [showColorPalette, setShowColorPalette] = useState(false);
     const [showHighlightPalette, setShowHighlightPalette] = useState(false);
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
     const containerRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
 
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const saveIndicatorRef = useRef<NodeJS.Timeout | null>(null);
     const onUpdateRef = useRef(onUpdate);
     onUpdateRef.current = onUpdate;
+    const editorRef = useRef<Editor | null>(null);
+    const hasPendingChanges = useRef(false);
+
+    const flushSave = useCallback(() => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
+        if (hasPendingChanges.current && editorRef.current && !editorRef.current.isDestroyed && onUpdateRef.current) {
+            onUpdateRef.current(editorRef.current.getJSON());
+            hasPendingChanges.current = false;
+            setSaveStatus('saved');
+            if (saveIndicatorRef.current) clearTimeout(saveIndicatorRef.current);
+            saveIndicatorRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
+        }
+    }, []);
+
+    // Flush on tab switch or page close
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'hidden') flushSave();
+        };
+        const handleBeforeUnload = () => flushSave();
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [flushSave]);
 
     const editorOptions = useMemo(() => ({
         extensions: getBookExtensions(),
@@ -57,15 +92,21 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         immediatelyRender: false,
         onUpdate: ({ editor }: { editor: Editor }) => {
             if (onUpdateRef.current) {
+                hasPendingChanges.current = true;
                 if (timeoutRef.current) clearTimeout(timeoutRef.current);
                 timeoutRef.current = setTimeout(() => {
                     onUpdateRef.current?.(editor.getJSON());
-                }, 1000);
+                    hasPendingChanges.current = false;
+                    setSaveStatus('saved');
+                    if (saveIndicatorRef.current) clearTimeout(saveIndicatorRef.current);
+                    saveIndicatorRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
+                }, 500);
             }
         },
     }), [readOnly]);
 
     const editor = useEditor(editorOptions);
+    editorRef.current = editor;
 
     const {
         pageCount,
@@ -151,6 +192,14 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
 
     return (
         <div className="w-full animate-in fade-in duration-700 flex flex-col items-center justify-start relative overflow-visible gap-4">
+
+            {/* Save Status Indicator */}
+            {saveStatus === 'saved' && (
+                <div className="absolute top-2 right-4 z-[70] flex items-center gap-1.5 text-amber-500/70 text-[10px] font-serif italic animate-in fade-in slide-in-from-right-2 duration-300">
+                    <Check size={12} />
+                    Sauvé
+                </div>
+            )}
 
             {!readOnly && (
                 <BookEditorToolbar
@@ -283,6 +332,22 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                         <EditorContent editor={editor} className="w-full h-full" />
                     </div>
                 </div>
+
+                {/* Page Indicator */}
+                {pageCount > 2 && (
+                    <BookPageIndicator
+                        currentSpread={Math.max(0, Math.round(scrollPos / ((PAGE_WIDTH + 40) * 2)))}
+                        totalSpreads={Math.ceil(pageCount / 2)}
+                        onNavigate={(spreadIndex) => {
+                            if (containerRef.current) {
+                                containerRef.current.scrollTo({
+                                    left: spreadIndex * (PAGE_WIDTH + 40) * 2,
+                                    behavior: 'smooth'
+                                });
+                            }
+                        }}
+                    />
+                )}
             </div>
         </div>
     );

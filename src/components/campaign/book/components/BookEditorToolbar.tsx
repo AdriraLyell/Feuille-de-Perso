@@ -28,6 +28,28 @@ export const BookEditorToolbar: React.FC<BookEditorToolbarProps> = ({
 }) => {
     return (
         <div className="flex items-center gap-1 p-1 bg-stone-900/95 border border-stone-700/50 rounded-lg shadow-2xl mb-2 sticky top-0 z-[60] backdrop-blur-md">
+            {/* Groupe 0: Undo / Redo */}
+            <div className="flex items-center">
+                <button
+                    onClick={() => editor.chain().focus().undo().run()}
+                    disabled={!editor.can().undo()}
+                    className={`p-2 rounded transition-colors ${editor.can().undo() ? 'text-stone-300 hover:bg-stone-700' : 'text-stone-600 cursor-not-allowed'}`}
+                    title="Annuler (Ctrl+Z)"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6" /><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" /></svg>
+                </button>
+                <button
+                    onClick={() => editor.chain().focus().redo().run()}
+                    disabled={!editor.can().redo()}
+                    className={`p-2 rounded transition-colors ${editor.can().redo() ? 'text-stone-300 hover:bg-stone-700' : 'text-stone-600 cursor-not-allowed'}`}
+                    title="Rétablir (Ctrl+Y)"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 7v6h-6" /><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" /></svg>
+                </button>
+            </div>
+
+            <div className="w-px h-6 bg-stone-700/50 mx-1" />
+
             {/* Groupe 1: Texte */}
             <div className="flex items-center">
                 <button

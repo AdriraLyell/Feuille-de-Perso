@@ -29,6 +29,9 @@ export const PAGE_HEIGHT = 1000;
 export const PAGE_PADDING_X = 80;  // 5rem ≈ 80px
 export const PAGE_PADDING_Y = 60;  // 3.75rem ≈ 60px
 // Usable content area (total - padding*2) - used for BookPageSplitter measurements
-export const PAGE_CONTENT_WIDTH = PAGE_WIDTH - PAGE_PADDING_X * 2;   // 562px
+// NOTE: PAGE_CONTENT_WIDTH est basé sur PAGE_PADDING_X (80px) → mode "Book" statique.
+// Le ColumnarEditor utilise padding: 0 60px en CSS, ce qui donne 722 - 120 = 602px de contenu.
+// Pour les calculs de resize d'image, mesurer via getComputedStyle au runtime.
+export const PAGE_CONTENT_WIDTH = PAGE_WIDTH - PAGE_PADDING_X * 2;   // 562px (Book mode)
 export const PAGE_CONTENT_HEIGHT = PAGE_HEIGHT - PAGE_PADDING_Y * 2; // 880px
 export const CHAPTER_HEADER_HEIGHT = 62;
