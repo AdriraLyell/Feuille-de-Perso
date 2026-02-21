@@ -1,8 +1,13 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.64.1)
+# Audit - État des Lieux & Roadmap (Synthèse v2.65.0)
 
-> **Dernière mise à jour** : 2026-02-21 — Version 2.64.1
+> **Dernière mise à jour** : 2026-02-21 — Version 2.65.0
 
 ## 1. Phases Complétées
+
+### ✅ Phase 32 : Correction du pavé fantôme 'PAVE_ATTRIBUTS_4' (v2.64.2)
+- [x] **Bug Fix** : L'attributeSettings est désormais reconstruit proprement depuis les attributs primaires, éliminant l'apparition d'un 4ème pavé erroné lors d'un reset.
+- [x] **Sécurité** : Ajout d'un filtre défensif sur les attributs secondaires pour ignorer les données orphelines.
+- [x] **Nettoyage** : Suppression des clés superflues dans l'état initial des fiches.
 
 ### ✅ Phase 31 : Correction du reset du compteur de Confiance (v2.64.1)
 - [x] **Bug Fix** : Nettoyage des doublons historiques et renforcement de l'unicité des clés de compteurs basées sur l'ID.
