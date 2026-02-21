@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.62.4",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction robuste de la duplication des images : désactivation du drag natif sur l'élément IMG et renforcement du guard via les types MIME ProseMirror pour distinguer les fichiers externes des déplacements internes."
+    },
+    {
         "version": "2.62.3",
         "date": "2026-02-21",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Nouveau tableau de bord de Suivi d'XP (Concept B) : vue interactive et catégorisée (Gains et Investissements) remplaçant l'historique brut, avec infobulles contextuelles et tri par catégorie."
-    },
-    {
-        "version": "2.56.65",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Gestion XP : Déplacement de la colonne 'Session' en fin de tableau et renommage de 'SESS.' en 'Session' avec ajustement de la taille de police."
     }
 ]

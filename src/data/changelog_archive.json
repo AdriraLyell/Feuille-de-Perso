@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.65",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Gestion XP : Déplacement de la colonne 'Session' en fin de tableau et renommage de 'SESS.' en 'Session' avec ajustement de la taille de police."
+    },
+    {
         "version": "2.56.64",
         "date": "2026-02-21",
         "type": "refactor",
@@ -772,17 +778,6 @@
             "📚 Data : Configuration par défaut (Arts Martiaux, Magies, Psy, etc.)",
             "🛠️ Admin : Interface de gestion complète (CRUD) pour les habilités mystiques",
             "🔄 Migration : Initialisation automatique de la bibliothèque pour les campagnes existantes"
-        ]
-    },
-    {
-        "version": "2.49.55",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "⚙️ Admin : Ajout d'un paramètre de configuration mondiale pour le coût en XP des traits",
-            "📊 Budget : Intégration du coût des traits dans le calcul du budget de création (Mode Points)",
-            "⚖️ XP : Préparation du moteur de calcul d'XP pour supporter les traits achetés après création",
-            "🛡️ Typage : Mise à jour du schéma de données et des réconciliateurs pour inclure le traitCost"
         ]
     }
 ]

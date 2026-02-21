@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.55] - 2026-02-15 [FEAT]
+
+- ⚙️ Admin : Ajout d'un paramètre de configuration mondiale pour le coût en XP des traits
+- 📊 Budget : Intégration du coût des traits dans le calcul du budget de création (Mode Points)
+- ⚖️ XP : Préparation du moteur de calcul d'XP pour supporter les traits achetés après création
+- 🛡️ Typage : Mise à jour du schéma de données et des réconciliateurs pour inclure le traitCost
+
 ## [2.49.54] - 2026-02-15 [FEAT]
 
 - 📝 Terminologie : Remplacement de 'Échelon' par 'Rang' dans tout le système d'administration

@@ -208,6 +208,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                                 : 'none',
                             pointerEvents: isPanMode ? 'none' : 'auto'
                         }}
+                        draggable={false}
                     />
                 ) : (
                     <div className="flex flex-col items-center gap-2">
