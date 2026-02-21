@@ -4,9 +4,9 @@ import { Editor, NodeViewProps } from '@tiptap/core';
 import { Calendar, Sun, CloudRain, Swords, Moon, Snowflake, Cloud } from 'lucide-react';
 
 interface ChapterHeaderViewProps extends Omit<NodeViewProps, 'node' | 'editor'> {
-    node: NodeViewProps['node'] & { attrs: { date: string, weather: string } };
+    node: NodeViewProps['node'] & { attrs: { date: string, weather: string, realDate: string } };
     editor: Editor;
-    updateAttributes: (attrs: Partial<{ date: string, weather: string }>) => void;
+    updateAttributes: (attrs: Partial<{ date: string, weather: string, realDate: string }>) => void;
 }
 
 const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, getPos, updateAttributes }) => {
@@ -46,12 +46,16 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
         }
     }, []); // Run only once on mount
 
-    const formatDate = (dateStr: string) => {
-        if (!dateStr) return 'Date du récit...';
+    const formatDate = (dateStr: string, isReal: boolean = false) => {
+        if (!dateStr) return isReal ? '' : 'Date du récit...';
         try {
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return dateStr;
-            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+            return date.toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: isReal ? 'numeric' : 'long',
+                year: 'numeric'
+            });
         } catch {
             return dateStr;
         }
@@ -103,12 +107,17 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
                         onClick={(e) => e.stopPropagation()}
                     />
 
-                    <span
-                        className="text-xs text-center min-w-[100px] hover:bg-stone-800/5 rounded px-2 transition-colors cursor-pointer"
+                    <div
+                        className="text-xs text-center flex items-center gap-1.5 hover:bg-stone-800/5 rounded px-2 transition-colors cursor-pointer"
                         onClick={handleIconClick}
                     >
-                        {formatDate(node.attrs.date)}
-                    </span>
+                        <span className="font-bold">{formatDate(node.attrs.date)}</span>
+                        {node.attrs.realDate && node.attrs.realDate !== node.attrs.date && (
+                            <span className="opacity-40 text-[10px] lowercase font-sans not-italic">
+                                (le {formatDate(node.attrs.realDate, true)})
+                            </span>
+                        )}
+                    </div>
 
                     <div className="flex items-center gap-1 ml-4 border-l border-stone-200 pl-4 opacity-0 group-hover:opacity-100 transition-opacity">
                         {WEATHER_ICONS.map(({ id, icon: Icon, color }) => (

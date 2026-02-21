@@ -9,7 +9,7 @@ declare module '@tiptap/core' {
         chapterHeading: {
             setChapter: () => ReturnType;
             appendChapter: () => ReturnType;
-            insertChapterAtDate: (date: string) => ReturnType;
+            insertChapterAtDate: (date: string, realDate?: string) => ReturnType;
         };
     }
 }
@@ -32,6 +32,9 @@ export const ChapterHeading = Node.create({
                 default: 1,
             },
             weather: {
+                default: '',
+            },
+            realDate: {
                 default: '',
             },
         };
@@ -63,7 +66,10 @@ export const ChapterHeading = Node.create({
                                 .splitBlock()
                                 .insertContent({
                                     type: this.name,
-                                    attrs: { date: new Date().toISOString().split('T')[0] },
+                                    attrs: {
+                                        date: new Date().toISOString().split('T')[0],
+                                        realDate: new Date().toISOString().split('T')[0]
+                                    },
                                     content: [{ type: 'text', text: 'Nouveau Chapitre' }],
                                 })
                                 .focus()
@@ -74,7 +80,10 @@ export const ChapterHeading = Node.create({
                         return chain()
                             .insertContent({
                                 type: this.name,
-                                attrs: { date: new Date().toISOString().split('T')[0] },
+                                attrs: {
+                                    date: new Date().toISOString().split('T')[0],
+                                    realDate: new Date().toISOString().split('T')[0]
+                                },
                             })
                             .focus()
                             .run();
@@ -89,7 +98,10 @@ export const ChapterHeading = Node.create({
                             .insertContentAt(endPos, [
                                 {
                                     type: this.name,
-                                    attrs: { date: new Date().toISOString().split('T')[0] },
+                                    attrs: {
+                                        date: new Date().toISOString().split('T')[0],
+                                        realDate: new Date().toISOString().split('T')[0]
+                                    },
                                     content: [{ type: 'text', text: 'Nouveau Chapitre' }],
                                 },
                                 {
@@ -101,15 +113,19 @@ export const ChapterHeading = Node.create({
                     },
 
             insertChapterAtDate:
-                (date: string) =>
+                (date: string, realDate?: string) =>
                     ({ chain, state }: CommandProps) => {
                         const endPos = state.doc.content.size;
+                        const finalRealDate = realDate || new Date().toISOString().split('T')[0];
                         return chain()
                             .focus()
                             .insertContentAt(endPos, [
                                 {
                                     type: this.name,
-                                    attrs: { date },
+                                    attrs: {
+                                        date,
+                                        realDate: finalRealDate
+                                    },
                                     content: [{ type: 'text', text: 'Nouveau Chapitre' }],
                                 },
                                 {

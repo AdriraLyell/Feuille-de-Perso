@@ -184,12 +184,12 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
 
     return (
         <div
-            className="absolute z-50 p-3 bg-stone-900/95 border border-amber-600/30 rounded-xl shadow-2xl backdrop-blur-md animate-in slide-in-from-right-4 duration-500 w-[220px]"
+            className="absolute z-50 p-4 bg-stone-900/95 border border-amber-600/30 rounded-xl shadow-2xl backdrop-blur-md animate-in slide-in-from-right-4 duration-500 w-[280px]"
             style={{ right: '55px', top: '0px' }}
         >
             <div className="flex items-center gap-2 mb-3 border-b border-stone-800 pb-2">
                 <CalendarDays size={14} className="text-amber-500" />
-                <div className="text-[10px] font-serif font-bold text-stone-300 uppercase tracking-widest truncate flex-1">
+                <div className="text-[11px] font-serif font-bold text-stone-300 uppercase tracking-widest truncate flex-1">
                     Chroniqueur
                 </div>
                 <button
@@ -206,7 +206,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                         <button onClick={prevMonth} className="p-1 hover:text-amber-400 text-stone-600 transition-colors">
                             <ChevronLeft size={14} />
                         </button>
-                        <div className="text-[9px] font-bold text-amber-500/80 uppercase text-center truncate px-1">
+                        <div className="text-[11px] font-bold text-amber-500/80 uppercase text-center truncate px-1 tracking-wider">
                             {monthName}
                         </div>
                         <button onClick={nextMonth} className="p-1 hover:text-amber-400 text-stone-600 transition-colors">
@@ -216,7 +216,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
 
                     <div className="grid gap-0.5 mb-1" style={{ gridTemplateColumns: `repeat(${dayNames.length}, minmax(0, 1fr))` }}>
                         {dayNames.map((d, i) => (
-                            <div key={i} className="text-center text-[8px] font-bold text-stone-600 uppercase">
+                            <div key={i} className="text-center text-[10px] font-bold text-stone-600 uppercase">
                                 {d}
                             </div>
                         ))}
@@ -239,7 +239,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                                 <div
                                     key={i}
                                     onClick={() => onDateClick?.(dateStr)}
-                                    className={`group relative text-center text-[9px] py-1 rounded-sm transition-all
+                                    className={`group relative text-center text-[11px] py-1.5 rounded transition-all
                                         ${isToday ? 'bg-amber-500 text-stone-950 font-bold shadow-glow-gold/30' : 'text-stone-400 hover:bg-stone-800'}
                                         ${onDateClick ? 'cursor-pointer hover:ring-1 hover:ring-amber-500/50' : 'cursor-default'}`}
                                 >
@@ -266,7 +266,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                                             onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr); }}
                                             className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-stone-800/90 flex items-center justify-center transition-opacity rounded-sm"
                                         >
-                                            <PlusCircle size={10} className="text-amber-500" />
+                                            <PlusCircle size={14} className="text-amber-500" />
                                         </button>
                                     )}
                                 </div>
