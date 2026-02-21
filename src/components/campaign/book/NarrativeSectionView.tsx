@@ -56,12 +56,19 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
         const handler = (e: any) => {
             const { date, nodeId, field } = e.detail;
             if (nodeId === id) {
-                updateAttributes({ [field]: date });
+                let formattedDate = date;
+                if (isReal && date && date.includes('-')) {
+                    const parts = date.split('-');
+                    if (parts.length === 3) {
+                        formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    }
+                }
+                updateAttributes({ [field]: formattedDate });
             }
         };
         window.addEventListener('calendar-date-picked', handler);
         return () => window.removeEventListener('calendar-date-picked', handler);
-    }, [id]);
+    }, [id, isReal]);
 
     return (
         <NodeViewWrapper
@@ -117,10 +124,10 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                             </button>
                             <input
                                 type="text"
-                                placeholder={isReal ? "aaaa-mm-jj" : "date"}
+                                placeholder={isReal ? "jj/mm/aaaa" : "date"}
                                 value={date || ''}
                                 onChange={(e) => updateAttributes({ date: e.target.value })}
-                                className="bg-transparent border-none p-0 w-[80px] text-[10px] focus:ring-0 cursor-pointer"
+                                className="bg-transparent border-none p-0 w-[65px] text-[10px] focus:ring-0 cursor-pointer"
                             />
                         </div>
                     )}
@@ -137,18 +144,18 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                             </button>
                             <input
                                 type="text"
-                                placeholder={isReal ? "aaaa-mm-jj" : "début"}
+                                placeholder={isReal ? "jj/mm/aaaa" : "début"}
                                 value={dateStart || ''}
                                 onChange={(e) => updateAttributes({ dateStart: e.target.value })}
-                                className="bg-transparent border-none p-0 w-[80px] text-[10px] focus:ring-0 cursor-pointer"
+                                className="bg-transparent border-none p-0 w-[65px] text-[10px] focus:ring-0 cursor-pointer text-center"
                             />
-                            <span>au</span>
+                            <span className="text-[9px] italic opacity-50 px-1">au</span>
                             <input
                                 type="text"
-                                placeholder={isReal ? "aaaa-mm-jj" : "fin"}
+                                placeholder={isReal ? "jj/mm/aaaa" : "fin"}
                                 value={dateEnd || ''}
                                 onChange={(e) => updateAttributes({ dateEnd: e.target.value })}
-                                className="bg-transparent border-none p-0 w-[80px] text-[10px] focus:ring-0 cursor-pointer"
+                                className="bg-transparent border-none p-0 w-[65px] text-[10px] focus:ring-0 cursor-pointer text-center"
                             />
                             <button
                                 type="button"
