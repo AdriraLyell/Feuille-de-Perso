@@ -285,7 +285,6 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                         onInsertChapter={() => (editor.commands as any).setChapter()}
                         onAppendChapter={() => (editor.commands as any).appendChapter()}
                         onInsertMoment={() => (editor.commands as any).insertNarrativeSection({ type: 'moment', timeSlot: 'matin' })}
-                        onInsertTravel={() => (editor.commands as any).insertNarrativeSection({ type: 'voyage' })}
                         isCalendarVisible={isCalendarVisible}
                         onToggleCalendar={() => setIsCalendarVisible(!isCalendarVisible)}
                     >

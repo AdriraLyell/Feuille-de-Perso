@@ -5,7 +5,6 @@ interface BookChapterSidebarProps {
     onInsertChapter: () => void;
     onAppendChapter: () => void;
     onInsertMoment: () => void;
-    onInsertTravel: () => void;
     onToggleCalendar: () => void;
     isCalendarVisible: boolean;
     children?: React.ReactNode;
@@ -15,7 +14,6 @@ export const BookChapterSidebar: React.FC<BookChapterSidebarProps> = ({
     onInsertChapter,
     onAppendChapter,
     onInsertMoment,
-    onInsertTravel,
     onToggleCalendar,
     isCalendarVisible,
     children
@@ -73,17 +71,7 @@ export const BookChapterSidebar: React.FC<BookChapterSidebarProps> = ({
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8L21 10h-9l1-8z" /></svg>
                 <div className="absolute right-full mr-3 px-2 py-1 bg-stone-900 border border-stone-700 rounded text-[10px] text-stone-300 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-                    Insérer Moment
-                </div>
-            </button>
-
-            <button
-                onClick={onInsertTravel}
-                className="p-2.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700 hover:text-amber-400 transition-all border border-stone-700 hover:border-amber-600/50 shadow-lg group relative"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7V5c0-1.1.9-2 2-2h2" /><path d="M17 3h2a2 2 0 0 1 2 2v2" /><path d="M21 17v2a2 2 0 0 1-2 2h-2" /><path d="M7 21H5a2 2 0 0 1-2-2v-2" /><circle cx="12" cy="12" r="3" /><path d="m16 16-1.9-1.9" /></svg>
-                <div className="absolute right-full mr-3 px-2 py-1 bg-stone-900 border border-stone-700 rounded text-[10px] text-stone-300 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-                    Insérer Voyage
+                    Bloc Narratif
                 </div>
             </button>
         </div>
