@@ -171,6 +171,8 @@ export const getInitialCharacterData = (): CharacterSheetData => {
       player: '', born: '', height: '',
       chronicle: '', nature: '', hair: '',
       status: '', conduct: '', eyes: '',
+      campaignStartDate: '',
+      fictionCurrentDate: '',
     },
     syncInfo: {
       isAutoSyncEnabled: false

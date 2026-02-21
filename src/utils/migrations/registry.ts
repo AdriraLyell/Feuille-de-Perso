@@ -11,6 +11,7 @@ import { migrateSpecializations } from './migrateSpecializations';
 import { migrateSkills } from './migrateSkills';
 import { migrateDefaults } from './migrateDefaults';
 import { migrateCampaignNotes } from './migrateCampaignNotes';
+import { migrateHeaderDates } from './migrateHeaderDates';
 
 // Type for a migration function
 type MigrationFunction = (data: any) => void;
@@ -31,7 +32,10 @@ export const MIGRATIONS: Record<number, MigrationFunction[]> = {
     ],
     2: [
         migrateCampaignNotes
+    ],
+    3: [
+        migrateHeaderDates
     ]
 };
 
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;

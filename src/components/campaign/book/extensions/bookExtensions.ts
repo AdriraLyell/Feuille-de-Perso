@@ -4,6 +4,7 @@ import Underline from '@tiptap/extension-underline';
 import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
 import { ChapterHeading } from '../../../../extensions/chapterHeading';
+import { NarrativeSection } from '../../../../extensions/narrativeSection';
 import { BookImage } from '../../../../extensions/bookImage';
 import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
@@ -20,6 +21,7 @@ export const getBookExtensions = () => [
     }),
     BookImage,
     ChapterHeading,
+    NarrativeSection,
     TextStyle,
     Color,
     Underline,

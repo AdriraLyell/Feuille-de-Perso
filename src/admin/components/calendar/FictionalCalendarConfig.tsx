@@ -73,13 +73,36 @@ const FictionalCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
         updateSeason(seasonId, { monthIndices });
     };
 
+    // --- Navigation Temporelle ---
+    const advanceOneDay = () => {
+        let { currentDay, currentMonthIndex, currentYear } = config;
+        const currentMonthDays = config.months[currentMonthIndex]?.days ?? 30;
+
+        currentDay++;
+        if (currentDay > currentMonthDays) {
+            currentDay = 1;
+            currentMonthIndex++;
+            if (currentMonthIndex >= config.months.length) {
+                currentMonthIndex = 0;
+                currentYear++;
+            }
+        }
+
+        onUpdate({
+            ...config,
+            currentDay,
+            currentMonthIndex,
+            currentYear
+        });
+    };
+
     const inputCls = 'bg-stone-800 border border-stone-600 rounded-sm px-2 py-1 text-sm text-stone-200 focus:outline-none focus:border-amber-gold/60 transition-colors w-full';
     const labelCls = 'block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2';
 
     return (
         <div className="space-y-8">
             {/* Dates courantes */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 bg-mystic-deep/30 p-4 rounded-sm border border-stone-700/30">
                 <div>
                     <label className={labelCls}>Année de départ</label>
                     <input type="number" value={config.startYear} onChange={e => onUpdate({ ...config, startYear: Number(e.target.value) })} className={inputCls} />
@@ -96,14 +119,23 @@ const FictionalCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
                 </div>
                 <div>
                     <label className={labelCls}>Jour courant</label>
-                    <input
-                        type="number"
-                        min={1}
-                        max={config.months[config.currentMonthIndex]?.days ?? 30}
-                        value={config.currentDay}
-                        onChange={e => onUpdate({ ...config, currentDay: Number(e.target.value) })}
-                        className={inputCls}
-                    />
+                    <div className="flex gap-2">
+                        <input
+                            type="number"
+                            min={1}
+                            max={config.months[config.currentMonthIndex]?.days ?? 30}
+                            value={config.currentDay}
+                            onChange={e => onUpdate({ ...config, currentDay: Number(e.target.value) })}
+                            className={inputCls}
+                        />
+                        <button
+                            onClick={advanceOneDay}
+                            className="flex-shrink-0 px-3 flex items-center justify-center bg-amber-gold text-stone-900 rounded-sm hover:bg-amber-400 transition-colors shadow-glow-gold/20"
+                            title="Passer au jour suivant"
+                        >
+                            <span className="font-bold text-xs uppercase tracking-tighter transition-all">+1J</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 

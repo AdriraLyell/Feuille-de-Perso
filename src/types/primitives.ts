@@ -47,6 +47,8 @@ export interface HeaderInfo {
   status: string;
   conduct: string;
   eyes: string;
+  campaignStartDate?: string;
+  fictionCurrentDate?: string;
 }
 
 export interface CombatEntry {

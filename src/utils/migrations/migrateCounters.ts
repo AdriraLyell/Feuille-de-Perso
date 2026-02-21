@@ -14,21 +14,21 @@ export const migrateCounters = (parsed: any): void => {
     if (parsed.counters.volonte && !parsed.counters.volonte.id) {
         const oldVolonte = parsed.counters.volonte;
         const oldConfiance = parsed.counters.confiance;
-        
+
         // Update standard ones in place
         parsed.counters.volonte = { id: 'volonte', name: 'Volonté', value: oldVolonte.max || oldVolonte.value || 3, creationValue: 3, max: 10, current: 0 };
         parsed.counters.confiance = { id: 'confiance', name: 'Confiance', value: oldConfiance.max || oldConfiance.value || 3, creationValue: 3, max: 10, current: 0 };
-        
+
         if (!parsed.counters.custom) {
             parsed.counters.custom = INITIAL_DATA.counters.custom;
         }
     }
 
     // Ensure counters have 'current' property
-    if (typeof parsed.counters.volonte?.current === 'undefined') {
+    if (parsed.counters.volonte && typeof parsed.counters.volonte.current === 'undefined') {
         parsed.counters.volonte.current = 0;
     }
-    if (typeof parsed.counters.confiance?.current === 'undefined') {
+    if (parsed.counters.confiance && typeof parsed.counters.confiance.current === 'undefined') {
         parsed.counters.confiance.current = 0;
     }
     if (parsed.counters.custom) {

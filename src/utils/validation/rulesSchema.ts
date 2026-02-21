@@ -130,6 +130,52 @@ export const RulesCounterDefinitionSchema = z.object({
     description: z.string().optional(),
 });
 
+// --- Calendar ---
+
+export const CalendarEventSchema = z.object({
+    id: z.string(),
+    date: z.string(),
+    title: z.string(),
+    description: z.string().optional(),
+    color: z.string().optional(),
+});
+
+export const CalendarSeasonSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    monthIndices: z.array(z.number()),
+    color: z.string().optional(),
+});
+
+export const CalendarMonthDefSchema = z.object({
+    name: z.string(),
+    days: z.number(),
+});
+
+export const CalendarConfigRealSchema = z.object({
+    type: z.literal('real'),
+    startDate: z.string(),
+    currentDate: z.string(),
+    events: z.array(CalendarEventSchema),
+});
+
+export const CalendarConfigFictionalSchema = z.object({
+    type: z.literal('fictional'),
+    startYear: z.number(),
+    currentYear: z.number(),
+    currentMonthIndex: z.number(),
+    currentDay: z.number(),
+    months: z.array(CalendarMonthDefSchema),
+    dayNames: z.array(z.string()),
+    seasons: z.array(CalendarSeasonSchema),
+    events: z.array(CalendarEventSchema),
+});
+
+export const CalendarConfigSchema = z.discriminatedUnion('type', [
+    CalendarConfigRealSchema,
+    CalendarConfigFictionalSchema
+]);
+
 // --- Main Rules Data ---
 
 export const RulesDataSchema = z.object({
@@ -144,6 +190,7 @@ export const RulesDataSchema = z.object({
         creation: RulesCreationConfigSchema.passthrough(), // Allow extra props if any
         xpCosts: RulesXPCostsSchema,
         cards: RulesCardConfigSchema,
+        calendar: CalendarConfigSchema.optional(),
     }),
     definitions: z.object({
         attributes: z.record(z.string(), z.array(z.string())),

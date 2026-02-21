@@ -1,5 +1,83 @@
 [
     {
+        "version": "2.69.1",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie : Mémorisation de la préférence d'affichage (mode portrait / paysage) dans le cache local (localStorage). Le mode choisi persiste désormais après rechargement de la page."
+    },
+    {
+        "version": "2.69.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Système de 'Date Picker' interactif pour le Journal : Cliquez sur les icônes calendrier des blocs narratifs pour sélectionner une date directement depuis le Chroniqueur sans créer de nouveau chapitre. Ajout de champs de titre personnalisés pour le sommaire automatique et réduction globale de la taille des labels pour une interface plus épurée."
+    },
+    {
+        "version": "2.68.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Améliorations majeures des sections narratives et du Chroniqueur : (1) Possibilité de masquer/afficher le Chroniqueur depuis la barre latérale. (2) Ajout de champs d'heure pour les moments de journée. (3) Ajout de champs de date pour les flashbacks. (4) Support des calendriers fictifs pour les sélecteurs de date de voyage et flashbacks."
+    },
+    {
+        "version": "2.67.1",
+        "date": "2026-02-23",
+        "type": "chore",
+        "description": "Ajustements ergonomiques du Chroniqueur : renommage du widget, formatage des dates en JJ/MM/AAAA dans la Timeline, et déplacement des flèches de navigation vers le haut pour éviter les chevauchements."
+    },
+    {
+        "version": "2.67.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Fusion majeure du Compagnon Temporel et du Journal de Campagne : (1) Navigation chronologique par clic sur les dates. (2) Mode 'Timeline' synthétique. (3) Assistant de création de chapitre à date. (4) Indicateurs de météo et ambiances sur les chapitres et le calendrier. (5) Compte à rebours avant le prochain évènement majeur. (6) Nouveaux blocs narratifs flexibles (Moments de journée, Voyages)."
+    },
+    {
+        "version": "2.66.3",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Correction majeure de la visibilité du Compagnon Temporel : (1) Correction du chemin d'accès aux données (configurations.calendar). (2) Repositionnement du widget à gauche de la barre latérale pour éviter qu'il ne soit hors-écran sur les résolutions standards."
+    },
+    {
+        "version": "2.66.2",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ajustement du positionnement du Compagnon Temporel pour une meilleure visibilité dans le Grimoire et correction du filtrage des événements calendaires."
+    },
+    {
+        "version": "2.66.1",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Correction d'une erreur de référence sur BookChapterSidebar dans le journal de campagne."
+    },
+    {
+        "version": "2.66.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Intégration du calendrier dans le journal de campagne ('Compagnon Temporel') : Un nouveau widget interactif s'affiche dans la barre latérale du Grimoire, permettant de consulter la date actuelle et les événements planifiés sans quitter l'éditeur. Améliorations Admin : nouveau bouton '+1 Jour' pour le calendrier fictif avec passage automatique des mois et années, et optimisation de l'avance de date pour le calendrier réel."
+    },
+    {
+        "version": "2.65.4",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction du calcul d'âge pour supporter les formats de date flexibles (français et fictif). Verrouillage des champs 'Début' et 'Date Fiction' lorsqu'ils sont gérés par le calendrier de campagne du MJ."
+    },
+    {
+        "version": "2.65.3",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Synchronisation automatique des dates de l'en-tête (Début et Date Fiction) avec le calendrier de campagne défini dans les paramètres. Amélioration de la détection des mises à jour des règles pour refléter immédiatement les changements du MJ sur les fiches joueurs."
+    },
+    {
+        "version": "2.65.2",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Amélioration de l'en-tête de la fiche personnage : Intégration des champs 'Date de début de campagne' et 'Date courante (fiction)'. Implémentation du calcul automatique de l'âge basé sur la date de naissance et la date de la fiction, avec fallback en saisie manuelle si les données sont absentes."
+    },
+    {
+        "version": "2.65.1",
+        "date": "2026-02-21",
+        "type": "refactor",
+        "description": "Amélioration de l'interface admin : Regroupement des widgets de coût XP (Arrière-Plans, Attributs, Traits) dans un seul bloc 'Facteurs de Coût' pour une meilleure lisibilité et aération de la vue configuration."
+    },
+    {
         "version": "2.65.0",
         "date": "2026-02-21",
         "type": "feat",
@@ -40,83 +118,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction majeure de la visibilité des items supprimés : Restriction du chargement des bibliothèques MJ aux seuls items explicitement rattachés à la campagne ou créés pour elle. Cette modification garantit que les items supprimés (via l'icône corbeille) disparaissent définitivement de la vue MJ après un rafraîchissement, même s'ils subsistent dans le dépôt global pour d'autres campagnes."
-    },
-    {
-        "version": "2.63.0",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction de la persistance des suppressions dans la bibliothèque : Les éléments supprimés du catalogue d'une campagne sont désormais correctement nettoyés dans le dépôt global s'ils ne sont plus utilisés ailleurs. Amélioration de la gestion du statut d'activation (isActive) via les liens relationnels de la base de données pour garantir que les items désactivés mais non supprimés sont conservés de manière cohérente."
-    },
-    {
-        "version": "2.62.9",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Amélioration de la bibliothèque d'administration : Intégration de détails d'utilisation avancés. Désormais, survoler l'icône de cadenas d'un élément verrouillé (trait, compétence, historique, compteur, etc.) affiche précisément quelles campagnes ou quels personnages utilisent cet élément, facilitant la gestion de la bibliothèque globale."
-    },
-    {
-        "version": "2.62.8",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction de l'erreur 'net::ERR_FILE_NOT_FOUND' lors de la sauvegarde des réglages : Stabilisation des callbacks de mise à jour d'image et renforcement du cycle de vie des ObjectURLs dans le widget de portrait. Cette correction élimine les révocations prématurées d'URLs de blobs encore en cours d'utilisation lors des cycles de re-rendu de React."
-    },
-    {
-        "version": "2.62.7",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction de la visibilité de la barre d'outils du Journal de Campagne : Fix du positionnement sticky sur petit écran (ajustement du top à 112px pour éviter le chevauchement avec la navigation) et ajout du support flex-wrap pour éviter le débordement horizontal des icônes de mise en forme. Suppression des animations parents interférant avec le contexte sticky."
-    },
-    {
-        "version": "2.62.6",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction du transfert d'images entre PC : Centralisation de la décompression GZIP dans le service de synchronisation cloud. Les images synchronisées (Grimoire, Portraits, Notes) sont désormais décompressées directement lors de l'injection dans IndexedDB, garantissant un affichage immédiat et correct sur tous les supports sans logique de décompression locale redondante."
-    },
-    {
-        "version": "2.62.5",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction des erreurs 401 Supabase (RLS) pour les fiches anonymes et fix du crash 'compressBase64' sur images volumineuses (passage en traitement par chunks de 8Ko). Réduction du bruit console en mode auto-sync."
-    },
-    {
-        "version": "2.62.4",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction robuste de la duplication des images : désactivation du drag natif sur l'élément IMG et renforcement du guard via les types MIME ProseMirror pour distinguer les fichiers externes des déplacements internes."
-    },
-    {
-        "version": "2.62.3",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Fix duplication des images au drag-drop : le plugin de drop ignore désormais les fichiers si ProseMirror est déjà en train de gérer un déplacement de nœud interne."
-    },
-    {
-        "version": "2.62.2",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Fix clipping toolbar images : conversion en React Portal pour la barre d'outils et le HUD de resize. Le positionnement est désormais dynamique (fixed) basé sur le bounding rect de l'image, garantissant une visibilité complète même en bord de page ou à cheval sur les colonnes CSS."
-    },
-    {
-        "version": "2.62.1",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Fix resize images latérales (L/R/free) : architecture dual-ref — le resize applique désormais la largeur sur le NodeViewWrapper flottant (non le div interne), la largeur de référence est calculée via getComputedStyle sur la colonne ProseMirror au mousedown (valeur runtime exacte), éliminant le saut visible au relâchement et le calcul erroné du cap 55%."
-    },
-    {
-        "version": "2.62.0",
-        "date": "2026-02-21",
-        "type": "perf",
-        "description": "Optimisation du Journal de Campagne : Cache LRU d'images (chargement instantané au retour sur une page), sauvegarde sécurisée (flush sur perte de focus + indicateur ✓), interactions image fluides à 60fps (rendu DOM direct pendant resize/pan), correction du wrapping texte-image (clear CSS + marges generatives). Ajout : indicateur de page (dots), boutons Annuler/Rétablir, confirmation de suppression dans le Tableau de Groupe, compression automatique des images (WebP 80%) à l'upload."
-    },
-    {
-        "version": "2.61.0",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Nouvel onglet Calendrier dans l'administration. Deux modes : Calendrier Réel (date grégorienne avec jours de la semaine calculés, avance rapide) et Calendrier Fictif (mois avec jours variables, jours de semaine personnalisés, saisons avec assignation par mois et couleur). Gestion d'événements avec sélecteur de couleur dans les deux modes. Aperçu mensuel live et navigable. Configuration stockée dans les RulesData du setting."
-    },
-    {
-        "version": "2.60.1",
-        "date": "2026-02-20",
-        "type": "refactor",
-        "description": "Admin : Déplacement des paramètres de coût XP (formule Triangulaire/Linéaire + multiplicateur) de l'onglet 'Coûts & Limites' vers une section collapsable dans chaque carte de catégorie de compétences. Suppression de l'onglet 'Coûts & Limites' devenu vide et du composant AdminCostsEditor."
     }
 ]

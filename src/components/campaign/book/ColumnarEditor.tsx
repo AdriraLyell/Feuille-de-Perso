@@ -13,6 +13,8 @@ import { BookEditorToolbar } from './components/BookEditorToolbar';
 import { BookPageBackground } from './components/BookPageBackground';
 import { BookChapterSidebar } from './components/BookChapterSidebar';
 import { BookPageIndicator } from './components/BookPageIndicator';
+import { useRules } from '../../../context/RulesContext';
+import { TimeCompanionWidget } from './components/TimeCompanionWidget';
 
 const INK_COLORS = [
     { name: 'Noir Corbeau', color: '#1c1917' },
@@ -42,10 +44,13 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     onUpdate,
     readOnly = false
 }) => {
+    const { rules } = useRules();
     const [isDrawingMode, setIsDrawingMode] = useState(false);
     const [showColorPalette, setShowColorPalette] = useState(false);
     const [showHighlightPalette, setShowHighlightPalette] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+    const [isCalendarVisible, setIsCalendarVisible] = useState(true);
+    const [pickingTarget, setPickingTarget] = useState<{ nodeId: string, field: string } | null>(null);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -71,6 +76,28 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         }
     }, []);
 
+
+    // Event listener for external calendar toggling
+    useEffect(() => {
+        const handleToggle = (e: any) => {
+            if (e.detail?.visible !== undefined) {
+                setIsCalendarVisible(e.detail.visible);
+            } else {
+                setIsCalendarVisible(v => !v);
+            }
+        };
+        const handlePickRequest = (e: any) => {
+            setPickingTarget(e.detail);
+            setIsCalendarVisible(true);
+        };
+        window.addEventListener('toggle-calendar', handleToggle);
+        window.addEventListener('calendar-open-picker', handlePickRequest);
+        return () => {
+            window.removeEventListener('toggle-calendar', handleToggle);
+            window.removeEventListener('calendar-open-picker', handlePickRequest);
+        };
+    }, []);
+
     // Flush on tab switch or page close
     useEffect(() => {
         const handleVisibilityChange = () => {
@@ -78,11 +105,16 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         };
         const handleBeforeUnload = () => flushSave();
 
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setPickingTarget(null);
+        };
         document.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('keydown', handleEscape);
         return () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('keydown', handleEscape);
         };
     }, [flushSave]);
 
@@ -133,6 +165,65 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     });
 
     const { entries } = useBookTableOfContents(editor, contentRef);
+
+    // Filter dates that have notes and weather, and detect voyages
+    const { notifiedDates, voyageRanges } = useMemo(() => {
+        if (!editor) return { notifiedDates: new Map<string, string>(), voyageRanges: [] as { start: string, end: string }[] };
+        const dates = new Map<string, string>();
+        const ranges: { start: string, end: string }[] = [];
+
+        editor.state.doc.descendants((node) => {
+            if (node.type.name === 'chapterHeading' && node.attrs.date) {
+                dates.set(node.attrs.date, node.attrs.weather || '');
+            }
+            if (node.type.name === 'narrativeSection' && node.attrs.type === 'voyage' && node.attrs.dateStart && node.attrs.dateEnd) {
+                ranges.push({ start: node.attrs.dateStart, end: node.attrs.dateEnd });
+            }
+        });
+        return { notifiedDates: dates, voyageRanges: ranges };
+    }, [editor, editor?.state.doc]);
+
+    const scrollToDate = useCallback((date: string) => {
+        if (!editor || editor.isDestroyed || !containerRef.current) return;
+
+        let targetPos = -1;
+        editor.state.doc.descendants((node, pos) => {
+            if (node.type.name === 'chapterHeading' && node.attrs.date === date) {
+                targetPos = pos;
+                return false;
+            }
+            return true;
+        });
+
+        if (targetPos !== -1) {
+            const dom = editor.view.nodeDOM(targetPos) as HTMLElement;
+            if (dom && containerRef.current) {
+                const horizontalOffset = dom.offsetLeft;
+                const stride = PAGE_WIDTH + 40;
+                const spreadIndex = Math.floor(horizontalOffset / (stride * 2));
+
+                containerRef.current.scrollTo({
+                    left: spreadIndex * stride * 2,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    }, [editor]);
+
+    const handleCalendarDateClick = useCallback((date: string) => {
+        if (pickingTarget) {
+            window.dispatchEvent(new CustomEvent('calendar-date-picked', {
+                detail: {
+                    date,
+                    nodeId: pickingTarget.nodeId,
+                    field: pickingTarget.field
+                }
+            }));
+            setPickingTarget(null);
+        } else {
+            scrollToDate(date);
+        }
+    }, [pickingTarget, scrollToDate]);
 
     // Initial Content Injection
     useEffect(() => {
@@ -221,9 +312,20 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
 
                 {!readOnly && (
                     <BookChapterSidebar
-                        onInsertChapter={() => (editor.commands as any).setChapter()}
-                        onAppendChapter={() => (editor.commands as any).appendChapter()}
-                    />
+                        onInsertMoment={() => (editor.commands as any).insertNarrativeSection({ type: 'moment', timeSlot: 'matin' })}
+                        isCalendarVisible={isCalendarVisible}
+                        onToggleCalendar={() => setIsCalendarVisible(!isCalendarVisible)}
+                    >
+                        {rules?.configurations?.calendar && (
+                            <TimeCompanionWidget
+                                config={rules.configurations.calendar}
+                                notatedDates={notifiedDates}
+                                voyageRanges={voyageRanges}
+                                onDateClick={handleCalendarDateClick}
+                                onNewChapter={pickingTarget ? undefined : (date, atSelection) => (editor.commands as any).insertChapterAtDate(date, undefined, atSelection)}
+                            />
+                        )}
+                    </BookChapterSidebar>
                 )}
 
                 {/* Navigation Buttons */}
@@ -231,7 +333,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                     <button
                         onClick={scrollPrev}
                         className="absolute z-50 p-3 bg-stone-800 text-stone-200 rounded-full shadow-lg hover:bg-stone-700 transition-colors border border-stone-600 animate-in fade-in duration-300"
-                        style={{ left: '-60px', top: '500px', transform: 'translateY(-50%)' }}
+                        style={{ left: '-60px', top: '100px', transform: 'translateY(-50%)' }}
                         title="Page Précédente"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
@@ -242,7 +344,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                     <button
                         onClick={scrollNext}
                         className="absolute z-50 p-3 bg-stone-800 text-stone-200 rounded-full shadow-lg hover:bg-stone-700 transition-colors border border-stone-600 animate-in fade-in duration-300"
-                        style={{ right: '-60px', top: '500px', transform: 'translateY(-50%)' }}
+                        style={{ right: '-60px', top: '100px', transform: 'translateY(-50%)' }}
                         title="Page Suivante"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>

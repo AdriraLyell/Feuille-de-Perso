@@ -134,6 +134,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 onToggleCreationMode={handleToggleCreationMode}
                 editModeActive={isEditMode}
                 onToggleEditMode={handleToggleEditMode}
+                isDateLocked={!!rules?.configurations?.calendar}
             />
 
             {isEditMode && (

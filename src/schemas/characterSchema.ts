@@ -40,7 +40,9 @@ export const HeaderInfoSchema = z.object({
     hair: z.string(),
     status: z.string(),
     conduct: z.string(),
-    eyes: z.string()
+    eyes: z.string(),
+    campaignStartDate: z.string().optional(),
+    fictionCurrentDate: z.string().optional()
 });
 
 export const SyncInfoSchema = z.object({

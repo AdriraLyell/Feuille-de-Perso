@@ -1,5 +1,81 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.81] - 2026-02-16 [FEAT]
+
+- 🎨 Admin : Migration de la personnalisation des compétences vers la Réserve (sidebar)
+- 🧹 Admin : Restauration de l'UI épurée de la Bibliothèque globale (suppression édition/badges)
+- 🛡️ Système : Support complet des overrides de compétences par campagne via la sidebar
+
+## [2.49.80] - 2026-02-16 [FEAT]
+
+- 🛠️ Admin : Implémentation du système de surcharge locale des compétences par campagne (overrides)
+- 🛡️ Bibliothèque : Protection contre la suppression des compétences globales si elles sont personnalisées dans un setting
+- 📂 Exports : Découplage des exports de compétences (génération d'un `skills_[campaign].json` spécifique)
+- 📥 Imports : Support de l'import flexible des bibliothèques via JSON (détection automatique du format spécifique)
+- 🎨 UI : Ajout d'un badge 'Custom' dans la réserve pour identifier les compétences modifiées localement
+
+## [2.49.79] - 2026-02-16 [FEAT]
+
+- 🎨 Admin : Optimisation visuelle des badges dans la réserve (icônes uniquement pour Variantes et Habilités Mystiques)
+
+## [2.49.78] - 2026-02-16 [FEAT]
+
+- 🎨 Admin : Ajout de l'icône 'Habilité Mystique' (Sparkles) dans la réserve des compétences pour une identification rapide
+- 🛡️ Schéma : Intégration de `mysticAbilityId` dans le schéma de validation des compétences de la bibliothèque
+
+## [2.49.77] - 2026-02-16 [FIX]
+
+- 🔄 Recréation : Rétablissement du statut 'variable' (ex: Artisanat : ..., Langue : ...) pour les compétences le nécessitant
+- 🧹 Skills : Le nettoyage préserve désormais l'intention de spécialisation des compétences tout en effaçant le choix précédent
+
+## [2.49.76] - 2026-02-16 [FIX]
+
+- 🔄 Recréation : Nettoyage automatique des variantes et compétences personnalisées pour ne garder que le socle de la campagne
+- 🧹 Skills : Correction de la persistance des compétences vides ou hors-règles lors du reset forcé par le MJ
+
+## [2.49.75] - 2026-02-16 [FEAT]
+
+- 👤 Personnage : Clonage du personnage Ayame vers Nika pour le joueur Polo effectué avec succès
+
+## [2.49.74] - 2026-02-16 [FEAT]
+
+- 🔄 Recréation : Amélioration chirurgicale du processus de reset pour préserver l'Identité, le Social, l'Équipement et l'Image du personnage
+- 🛡️ Traits : Conservation des Avantages/Désavantages lors d'une recréation imposée par le MJ
+- 💰 XP : Simplification du remboursement basé sur l'intégralité de l'historique des logs de progression
+- 🎨 UI : Mise à jour de la modale de recréation pour clarifier les éléments préservés et réinitialisés
+
+## [2.49.73] - 2026-02-16 [FIX]
+
+- 🛡️ Sécurité : Suppression de l'attribution automatique de propriété dans DatabaseService pour éviter le verrouillage des fiches legacy
+- 👤 Personnage : Déverrouillage des fiches d'Ayame et Louise (reset created_by à NULL) pour restaurer l'accès public
+- 🔓 RLS : Mise à jour des politiques Supabase pour autoriser la lecture anonyme des fiches sans propriétaire
+
+## [2.49.72] - 2026-02-16 [DOCS]
+
+- 📝 Documentation : Mise à jour exhaustive du schéma de base de données (mystic_abilities, vues, relations)
+- 📝 Documentation : Ajout du guide de procédure pour le clonage de personnage via SQL
+- 👤 Personnage : Clonage de Ayame vers Akane pour le joueur Polo effectué avec succès
+
+## [2.49.71] - 2026-02-16 [FIX]
+
+- 🛡️ CI : Correction des erreurs de typage TypeScript bloquant le workflow (RecreationService)
+- 🧩 UI : Fix du typage missing onUpdate dans le composant AttributeBlock
+- 🧹 Lint : Suppression d'un double cast booléen redondant dans AdminSkillLibrary
+
+## [2.49.70] - 2026-02-16 [FIX]
+
+- 📖 Journal : Fix de la conversion des dimensions d'images lors de la migration (px vers %)
+- 🖼️ UI : Ajout d'une limite de hauteur maximale (800px) pour les images du Grimoire
+- 📏 Migration : Correction du ratio d'aspect forcé à 'auto' pour les images importées
+
+## [2.49.69] - 2026-02-16 [FIX]
+
+- 📂 Admin : Déplacement de la fonctionnalité de recréation vers les paramètres spécifiques de chaque campagne (Fiches des Destins)
+- 🧩 Imports : Correction d'une erreur de référence sur l'icône RotateCcw
+- ⏳ UX : Ajout d'états de chargement et verrouillage pendant le processus de recréation
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.49.68] - 2026-02-16 [FEAT]
 
 - 🔄 Recréation : Implémentation du système de 'Respec' pour les personnages (Admin)
