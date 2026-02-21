@@ -21,31 +21,49 @@ export const LibraryLoader = {
      * Load libraries for a specific setting and map them to RulesData format
      */
     async loadLibraries(settingId: string): Promise<RulesData['libraries']> {
-        const orFilter = `setting_id.eq.${settingId},setting_id.is.null`;
-
         try {
+            // 1. Fetch Relations first to identify what belongs to this campaign
             const [
-                traits, skills, specs,
-                relTraits, relSkills, relSpecs,
-                backgrounds, relBackgrounds, counters, relCounters,
-                traitVariants, skillVariants, bgVariants,
-                mysticAbilities, relMysticAbilities
+                relTraits, relSkills, relSpecs, relBackgrounds, relCounters, relMysticAbilities
             ] = await Promise.all([
-                DatabaseService.fetchAll<DBTrait>(TABLE_LIBRARIES_TRAITS, { or: orFilter }, 'LibraryLoader.loadTraits'),
-                DatabaseService.fetchAll<DBSkill>(TABLE_LIBRARIES_SKILLS, { or: orFilter }, 'LibraryLoader.loadSkills'),
-                DatabaseService.fetchAll<DBSpecialization>(TABLE_LIBRARIES_SPECIALIZATIONS, { or: orFilter }, 'LibraryLoader.loadSpecs'),
                 DatabaseService.fetchAll<RelSettingTrait>(TABLE_REL_SETTING_TRAITS, { eq: { setting_id: settingId } }, 'LibraryLoader.relTraits'),
                 DatabaseService.fetchAll<RelSettingSkill>(TABLE_REL_SETTING_SKILLS, { eq: { setting_id: settingId } }, 'LibraryLoader.relSkills'),
                 DatabaseService.fetchAll<RelSettingSpecialization>(TABLE_REL_SETTING_SPECIALIZATIONS, { eq: { setting_id: settingId } }, 'LibraryLoader.relSpecs'),
-                DatabaseService.fetchAll<DBBackground>(TABLE_LIBRARIES_BACKGROUNDS, { or: orFilter }, 'LibraryLoader.loadBackgrounds'),
                 DatabaseService.fetchAll<RelSettingBackground>(TABLE_REL_SETTING_BACKGROUNDS, { eq: { setting_id: settingId } }, 'LibraryLoader.relBackgrounds'),
-                DatabaseService.fetchAll<DBCounter>(TABLE_LIBRARIES_COUNTERS, { or: orFilter }, 'LibraryLoader.loadCounters'),
                 DatabaseService.fetchAll<RelSettingCounter>(TABLE_REL_SETTING_COUNTERS, { eq: { setting_id: settingId } }, 'LibraryLoader.relCounters'),
-                DatabaseService.fetchAll<DBTraitVariant>(TABLE_LIBRARIES_TRAITS_VARIANTS, { or: orFilter, select: 'trait_id, name' }, 'LibraryLoader.loadTraitsVariants'),
-                DatabaseService.fetchAll<DBSkillVariant>(TABLE_LIBRARIES_SKILLS_VARIANTS, { or: orFilter, select: 'skill_id, name' }, 'LibraryLoader.loadSkillsVariants'),
-                DatabaseService.fetchAll<DBBackgroundVariant>(TABLE_LIBRARIES_BACKGROUNDS_VARIANTS, { or: orFilter, select: 'background_id, name' }, 'LibraryLoader.loadBgVariants'),
-                DatabaseService.fetchAll<DBMysticAbility>(TABLE_LIBRARIES_MYSTIC_ABILITIES, { or: orFilter }, 'LibraryLoader.loadMystic'),
                 DatabaseService.fetchAll<RelSettingMysticAbility>(TABLE_REL_SETTING_MYSTIC_ABILITIES, { eq: { setting_id: settingId } }, 'LibraryLoader.relMystic')
+            ]);
+
+            const traitIds = relTraits.map(r => r.trait_id);
+            const skillIdsList = relSkills.map(r => r.skill_id);
+            const specIds = relSpecs.map(r => r.specialization_id);
+            const bgIds = relBackgrounds.map(r => r.background_id);
+            const counterIds = relCounters.map(r => r.counter_id);
+            const mysticIds = relMysticAbilities.map(r => r.mystic_ability_id);
+
+            // 2. Build filters for reference tables
+            // We load items that are linked OR explicitly belong to this setting (legacy/local bypass)
+            const buildFilter = (ids: string[]) => {
+                const parts = [`setting_id.eq.${settingId}`];
+                if (ids.length > 0) parts.push(`id.in.(${ids.join(',')})`);
+                return parts.join(',');
+            };
+
+            const [
+                traits, skills, specs,
+                backgrounds, counters,
+                traitVariants, skillVariants, bgVariants,
+                mysticAbilities
+            ] = await Promise.all([
+                DatabaseService.fetchAll<DBTrait>(TABLE_LIBRARIES_TRAITS, { or: buildFilter(traitIds) }, 'LibraryLoader.loadTraits'),
+                DatabaseService.fetchAll<DBSkill>(TABLE_LIBRARIES_SKILLS, { or: buildFilter(skillIdsList) }, 'LibraryLoader.loadSkills'),
+                DatabaseService.fetchAll<DBSpecialization>(TABLE_LIBRARIES_SPECIALIZATIONS, { or: buildFilter(specIds) }, 'LibraryLoader.loadSpecs'),
+                DatabaseService.fetchAll<DBBackground>(TABLE_LIBRARIES_BACKGROUNDS, { or: buildFilter(bgIds) }, 'LibraryLoader.loadBackgrounds'),
+                DatabaseService.fetchAll<DBCounter>(TABLE_LIBRARIES_COUNTERS, { or: buildFilter(counterIds) }, 'LibraryLoader.loadCounters'),
+                DatabaseService.fetchAll<DBTraitVariant>(TABLE_LIBRARIES_TRAITS_VARIANTS, { or: buildFilter(traitIds), select: 'trait_id, name' }, 'LibraryLoader.loadTraitsVariants'),
+                DatabaseService.fetchAll<DBSkillVariant>(TABLE_LIBRARIES_SKILLS_VARIANTS, { or: buildFilter(skillIdsList), select: 'skill_id, name' }, 'LibraryLoader.loadSkillsVariants'),
+                DatabaseService.fetchAll<DBBackgroundVariant>(TABLE_LIBRARIES_BACKGROUNDS_VARIANTS, { or: buildFilter(bgIds), select: 'background_id, name' }, 'LibraryLoader.loadBgVariants'),
+                DatabaseService.fetchAll<DBMysticAbility>(TABLE_LIBRARIES_MYSTIC_ABILITIES, { or: buildFilter(mysticIds) }, 'LibraryLoader.loadMystic')
             ]);
 
             const traitVarMap = new Map<string, string[]>();
