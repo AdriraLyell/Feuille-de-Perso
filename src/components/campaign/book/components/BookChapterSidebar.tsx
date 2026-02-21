@@ -29,18 +29,7 @@ export const BookChapterSidebar: React.FC<BookChapterSidebarProps> = ({
                     {isCalendarVisible ? "Masquer le Chroniqueur" : "Afficher le Chroniqueur"}
                 </div>
             </button>
-
-            <div className="w-8 h-px bg-stone-700/50 my-1" />
-
             {isCalendarVisible && children}
-            {isCalendarVisible && children && <div className="w-8 h-px bg-stone-700/50 my-1" />}
-
-            <div className="text-[9px] font-serif font-bold text-amber-500/50 uppercase tracking-widest vertical-text py-2">
-                Actions
-            </div>
-            <div className="w-8 h-px bg-stone-700/50" />
-
-            <div className="w-8 h-px bg-stone-700/50 my-1" />
 
             <button
                 onClick={onInsertMoment}
