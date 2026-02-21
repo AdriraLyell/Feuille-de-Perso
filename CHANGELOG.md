@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.54] - 2026-02-15 [FEAT]
+
+- 📝 Terminologie : Remplacement de 'Échelon' par 'Rang' dans tout le système d'administration
+- 🎨 UI : Retrait de la mention 'Niveau du Talent' dans la configuration des rangs
+- 🖋️ UI : Remplacement de 'Slots' par 'Rangs Disponibles' pour une meilleure clarté sémantique
+
 ## [2.49.53] - 2026-02-15 [FEAT]
 
 - 🌐 Admin : Traduction en français des onglets de bibliothèques (Skills, Backgrounds, Counters, Specializations)

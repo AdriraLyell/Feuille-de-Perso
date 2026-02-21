@@ -167,5 +167,19 @@ export const ColumnarEditorStyles = () => (
             color: #b45309;
             font-size: 1.2rem;
         }
+
+        /* Premium Drop Cursor */
+        .ProseMirror-dropcursor {
+            border-left: 2px solid #6366f1 !important;
+            margin-left: -1px;
+            box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+            animation: pulse-drop-cursor 1.5s infinite;
+            z-index: 50;
+        }
+
+        @keyframes pulse-drop-cursor {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
     `}</style>
 );

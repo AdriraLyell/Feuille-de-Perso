@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.64",
+        "date": "2026-02-21",
+        "type": "refactor",
+        "description": "Calcul XP unifié : Suppression des écritures manuelles dans l'historique d'expérience pour les traits. Le moteur calcule désormais les dépenses d'XP de manière dynamique uniquement via l'état des traits (flag post-création et valeur initiale), évitant ainsi les doubles comptes."
+    },
+    {
         "version": "2.56.63",
         "date": "2026-02-21",
         "type": "style",
@@ -777,16 +783,6 @@
             "📊 Budget : Intégration du coût des traits dans le calcul du budget de création (Mode Points)",
             "⚖️ XP : Préparation du moteur de calcul d'XP pour supporter les traits achetés après création",
             "🛡️ Typage : Mise à jour du schéma de données et des réconciliateurs pour inclure le traitCost"
-        ]
-    },
-    {
-        "version": "2.49.54",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "📝 Terminologie : Remplacement de 'Échelon' par 'Rang' dans tout le système d'administration",
-            "🎨 UI : Retrait de la mention 'Niveau du Talent' dans la configuration des rangs",
-            "🖋️ UI : Remplacement de 'Slots' par 'Rangs Disponibles' pour une meilleure clarté sémantique"
         ]
     }
 ]

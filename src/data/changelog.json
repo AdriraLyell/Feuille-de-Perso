@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.62.3",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Fix duplication des images au drag-drop : le plugin de drop ignore désormais les fichiers si ProseMirror est déjà en train de gérer un déplacement de nœud interne."
+    },
+    {
         "version": "2.62.2",
         "date": "2026-02-21",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "style",
         "description": "Gestion XP : Déplacement de la colonne 'Session' en fin de tableau et renommage de 'SESS.' en 'Session' avec ajustement de la taille de police."
-    },
-    {
-        "version": "2.56.64",
-        "date": "2026-02-21",
-        "type": "refactor",
-        "description": "Calcul XP unifié : Suppression des écritures manuelles dans l'historique d'expérience pour les traits. Le moteur calcule désormais les dépenses d'XP de manière dynamique uniquement via l'état des traits (flag post-création et valeur initiale), évitant ainsi les doubles comptes."
     }
 ]

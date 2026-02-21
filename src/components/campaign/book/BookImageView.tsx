@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { NodeViewWrapper } from '@tiptap/react';
 import { BookImageAttributes } from '../../../extensions/bookImage';
-import { Image as ImageIcon, Loader } from 'lucide-react';
+import { Image as ImageIcon, Loader, Move } from 'lucide-react';
 import { deleteImage } from '../../../imageDB';
 import { getCachedImageUrl, invalidateCachedImage } from '../../../services/ImageCacheService';
 import { logger } from '../../../utils/logger';
@@ -184,9 +184,10 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                                 : activeInteraction === 'resize-tl' || activeInteraction === 'resize-br' ? 'nwse-resize'
                                     : activeInteraction === 'resize-tr' || activeInteraction === 'resize-bl' ? 'nesw-resize'
                                         : 'move')
-                        : (isPanMode ? 'move' : 'default')
+                        : (isPanMode ? 'move' : 'grab')
                 }}
                 onMouseDown={isPanMode ? (e) => handleMouseDown(e, 'pan') : undefined}
+                data-drag-handle={!isPanMode}
             >
                 {loading ? (
                     <div className="flex flex-col items-center gap-2 animate-pulse">
@@ -207,12 +208,19 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                                 : 'none',
                             pointerEvents: isPanMode ? 'none' : 'auto'
                         }}
-                        data-drag-handle={!isPanMode}
                     />
                 ) : (
                     <div className="flex flex-col items-center gap-2">
                         <ImageIcon size={32} />
                         <span className="text-xs">Image {node.attrs.imageId}</span>
+                    </div>
+                )}
+
+                {/* Drag Indicator (Visual feedback for Phase 1) */}
+                {!isPanMode && !activeInteraction && (
+                    <div className="absolute top-3 left-3 p-1.5 bg-white/95 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-[120] border border-indigo-200 transform -translate-y-1 group-hover:translate-y-0 flex items-center gap-2">
+                        <Move size={14} className="text-indigo-600" />
+                        <span className="text-[10px] font-medium text-stone-600 pr-1">Glisser pour déplacer</span>
                     </div>
                 )}
 
