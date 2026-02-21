@@ -175,7 +175,7 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                     )}
                 </div>
 
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1 ml-4 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                     {type === 'moment' && (
                         <>
                             {['matin', 'midi', 'soir', 'nuit'].map(t => (
