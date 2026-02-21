@@ -1,5 +1,9 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.59] - 2026-02-15 [FIX]
+
+- 💾 Admin : Correction ordre de sauvegarde (Habilités avant Compétences) pour garantir les liens
+
 ## [2.49.58] - 2026-02-15 [FIX]
 
 - 🔍 Admin : Ajout d'un filtre 'Mystique' dans la réserve de compétences

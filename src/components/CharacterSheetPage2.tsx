@@ -230,9 +230,12 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         setEditingTrait(null);
     };
 
-    const updateCharacterImageId = (id: string) => {
-        onChange({ ...data, page2: { ...data.page2, characterImageId: id, characterImage: '' } });
-    };
+    const updateCharacterImageId = React.useCallback((id: string) => {
+        onChange((prev: CharacterSheetData) => ({
+            ...prev,
+            page2: { ...prev.page2, characterImageId: id, characterImage: '' }
+        }));
+    }, [onChange]);
 
     const calculateTotal = (list: TraitEntry[]) => list.reduce((acc, item) => acc + (parseInt(item.value) || 0), 0);
 

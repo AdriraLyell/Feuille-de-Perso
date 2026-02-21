@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.70",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Restauration UI & Mise en forme : Correction des classes CSS corrompues (espaces), retour aux libellés en majuscules pour les onglets et en-têtes de tableaux, et ajustement des dimensions du bilan d'XP (suppression du bloc solde redondant et retour à une granularité fine des gains) tout en conservant le moteur de calcul basé sur l'état."
+    },
+    {
         "version": "2.56.69",
         "date": "2026-02-21",
         "type": "feat",
@@ -758,14 +764,6 @@
             "🔔 Synchronisation : Notification automatique des mises à jour disponibles sur le Cloud",
             "✨ UI : Ajout d'un indicateur visuel (badge ambre pulsant) sur le bouton Sync",
             "🛡️ Sync : Préservation des métadonnées de synchronisation lors des mises à jour partielles"
-        ]
-    },
-    {
-        "version": "2.49.59",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "💾 Admin : Correction ordre de sauvegarde (Habilités avant Compétences) pour garantir les liens"
         ]
     }
 ]

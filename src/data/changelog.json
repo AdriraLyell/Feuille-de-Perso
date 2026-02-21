@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.62.8",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction de l'erreur 'net::ERR_FILE_NOT_FOUND' lors de la sauvegarde des réglages : Stabilisation des callbacks de mise à jour d'image et renforcement du cycle de vie des ObjectURLs dans le widget de portrait. Cette correction élimine les révocations prématurées d'URLs de blobs encore en cours d'utilisation lors des cycles de re-rendu de React."
+    },
+    {
         "version": "2.62.7",
         "date": "2026-02-21",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "style",
         "description": "Ajustement UI : Centrage de la valeur du champ 'Gain' dans le résumé d'expérience pour une meilleure harmonie visuelle avec les autres champs de stats."
-    },
-    {
-        "version": "2.56.70",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Restauration UI & Mise en forme : Correction des classes CSS corrompues (espaces), retour aux libellés en majuscules pour les onglets et en-têtes de tableaux, et ajustement des dimensions du bilan d'XP (suppression du bloc solde redondant et retour à une granularité fine des gains) tout en conservant le moteur de calcul basé sur l'état."
     }
 ]
