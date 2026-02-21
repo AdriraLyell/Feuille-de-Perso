@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.68",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Agrégation du Bilan XP : Épuration de la vue Recçu en supprimant les horodatages et en regroupant les transactions par sujet (ex: groupement des achats d'une même compétence). Tri automatique par importance d'investissement et mise à jour des infobulles pour le 'Top 5'."
+    },
+    {
         "version": "2.56.67",
         "date": "2026-02-21",
         "type": "feat",
@@ -763,16 +769,6 @@
         "changes": [
             "🔍 Admin : Ajout d'un filtre 'Mystique' dans la réserve de compétences",
             "🐞 Admin : Correction de l'erreur d'import dans LibraryLoader"
-        ]
-    },
-    {
-        "version": "2.49.57",
-        "date": "2026-02-15",
-        "type": "feat",
-        "changes": [
-            "🔗 Admin : Possibilité de lier les compétences à des 'Habilités Mystiques'",
-            "🎨 UI : Nouvelle option dans l'édition de compétence pour désigner une habilité mystique",
-            "🗄️ BDD : Migration SQL pour supporter le lien entre compétences et habilités"
         ]
     }
 ]

@@ -1,5 +1,13 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.57] - 2026-02-15 [FEAT]
+
+- 🔗 Admin : Possibilité de lier les compétences à des 'Habilités Mystiques'
+- 🎨 UI : Nouvelle option dans l'édition de compétence pour désigner une habilité mystique
+- 🗄️ BDD : Migration SQL pour supporter le lien entre compétences et habilités
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.49.56] - 2026-02-15 [FEAT]
 
 - 🔮 Admin : Ajout de la bibliothèque des 'Habilités Mystiques'

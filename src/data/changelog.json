@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.62.6",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction du transfert d'images entre PC : Centralisation de la décompression GZIP dans le service de synchronisation cloud. Les images synchronisées (Grimoire, Portraits, Notes) sont désormais décompressées directement lors de l'injection dans IndexedDB, garantissant un affichage immédiat et correct sur tous les supports sans logique de décompression locale redondante."
+    },
+    {
         "version": "2.62.5",
         "date": "2026-02-21",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Vue Distribution d'XP finale : Le bilan d'XP est désormais calculé en temps réel à partir de l'état actuel de la fiche personnage (Distribution d'état). Cette approche garantit une fiabilité totale en affichant l'investissement exact pour chaque compétence, attribut, trait et compteur, sans dépendre de l'intégrité de l'historique brut des transactions."
-    },
-    {
-        "version": "2.56.68",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Agrégation du Bilan XP : Épuration de la vue Recçu en supprimant les horodatages et en regroupant les transactions par sujet (ex: groupement des achats d'une même compétence). Tri automatique par importance d'investissement et mise à jour des infobulles pour le 'Top 5'."
     }
 ]

@@ -28,22 +28,9 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
                 try {
                     const blob = await getImage(imageId);
                     if (blob && active) {
-                        // Check if blob is a GZIP string
-                        // Using new Response(blob).text() for better compatibility/types
-                        const text = await new Response(blob).text();
-                        let finalUrl = "";
-
-                        if (text.startsWith(GZIP_MARKER)) {
-                            const decompressed = ImageCompressionService.decompressFull(text);
-                            finalUrl = decompressed; // It's already a data URL
-                        } else {
-                            finalUrl = URL.createObjectURL(blob);
-                        }
-
-                        if (active) {
-                            setImageUrl(finalUrl);
-                            cleanupUrl = finalUrl;
-                        }
+                        const finalUrl = URL.createObjectURL(blob);
+                        setImageUrl(finalUrl);
+                        cleanupUrl = finalUrl;
                     }
                 } catch (e) {
                     ErrorService.handleError(e, { context: 'CharacterImageWidget.load', silent: true });
