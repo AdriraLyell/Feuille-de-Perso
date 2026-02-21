@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, PenLine, List, Grid3X3, PlusCircle, Clock, Sun, CloudRain, Swords, Moon, Snowflake, Cloud } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, PenLine, List, Grid3X3, PlusCircle, Clock, Sun, CloudRain, Swords, Moon, Snowflake, Cloud, ArrowDownToLine } from 'lucide-react';
 import { CalendarConfig, CalendarEvent } from '../../../../types/rules';
 
 interface TimeCompanionWidgetProps {
@@ -7,7 +7,7 @@ interface TimeCompanionWidgetProps {
     notatedDates?: Map<string, string>;
     voyageRanges?: { start: string, end: string }[];
     onDateClick?: (date: string) => void;
-    onNewChapter?: (date: string) => void;
+    onNewChapter?: (date: string, atSelection: boolean) => void;
     onClose?: () => void;
 }
 
@@ -261,12 +261,23 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                                     )}
 
                                     {onNewChapter && (
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr); }}
-                                            className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-stone-800/90 flex items-center justify-center transition-opacity rounded-sm"
-                                        >
-                                            <PlusCircle size={18} className="text-amber-400 shadow-sm" />
-                                        </button>
+                                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-stone-900/95 flex items-center justify-around px-1 transition-opacity rounded-sm z-10 border border-amber-500/30">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr, true); }}
+                                                className="p-1.5 hover:bg-stone-800 rounded-md transition-colors text-amber-500 hover:text-amber-400 group/btn"
+                                                title="Insérer au curseur"
+                                            >
+                                                <PlusCircle size={16} />
+                                            </button>
+                                            <div className="w-px h-4 bg-stone-800" />
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr, false); }}
+                                                className="p-1.5 hover:bg-stone-800 rounded-md transition-colors text-amber-500 hover:text-amber-400 group/btn"
+                                                title="Ajouter à la fin du livre"
+                                            >
+                                                <ArrowDownToLine size={16} />
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
                             );

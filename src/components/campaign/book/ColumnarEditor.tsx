@@ -322,7 +322,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                                 notatedDates={notifiedDates}
                                 voyageRanges={voyageRanges}
                                 onDateClick={handleCalendarDateClick}
-                                onNewChapter={pickingTarget ? undefined : (date) => (editor.commands as any).insertChapterAtDate(date, undefined, true)}
+                                onNewChapter={pickingTarget ? undefined : (date, atSelection) => (editor.commands as any).insertChapterAtDate(date, undefined, atSelection)}
                             />
                         )}
                     </BookChapterSidebar>
