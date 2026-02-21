@@ -19,9 +19,12 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    // Track the current blob URL in a ref so we can safely revoke the *previous* one
+    // when a new one is created, rather than revoking in cleanup (which runs before paint).
+    const currentBlobRef = useRef<string | null>(null);
+
     useEffect(() => {
         let active = true;
-        let objectUrl: string | null = null;
 
         const load = async () => {
             if (active) setLoading(true);
@@ -30,8 +33,15 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
                 if (imageId) {
                     const blob = await getImage(imageId);
                     if (blob && active) {
-                        objectUrl = URL.createObjectURL(blob);
-                        setImageUrl(objectUrl);
+                        const newUrl = URL.createObjectURL(blob);
+                        // Revoke previous blob URL only AFTER creating the new one
+                        if (currentBlobRef.current) {
+                            URL.revokeObjectURL(currentBlobRef.current);
+                        }
+                        currentBlobRef.current = newUrl;
+                        setImageUrl(newUrl);
+                    } else if (!blob && active) {
+                        setImageUrl(null);
                     }
                 } else if (legacyImage && legacyImage.length > 100) {
                     // If legacy image is gzipped, decompress for migration
@@ -68,11 +78,20 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
 
         return () => {
             active = false;
-            if (objectUrl) {
-                URL.revokeObjectURL(objectUrl);
-            }
+            // Do NOT revoke here — the image is still being displayed.
+            // It will be revoked on the next successful load or on unmount below.
         };
     }, [imageId, legacyImage, onImageUpdate, onAddLog]);
+
+    // Revoke the blob URL only when the component truly unmounts
+    useEffect(() => {
+        return () => {
+            if (currentBlobRef.current) {
+                URL.revokeObjectURL(currentBlobRef.current);
+                currentBlobRef.current = null;
+            }
+        };
+    }, []);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

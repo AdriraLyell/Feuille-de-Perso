@@ -230,6 +230,10 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         setEditingTrait(null);
     };
 
+    const handleImageLog = React.useCallback((msg: string, type: 'success' | 'danger') => {
+        onAddLog(msg, type, 'sheet');
+    }, [onAddLog]);
+
     const updateCharacterImageId = React.useCallback((id: string) => {
         onChange((prev: CharacterSheetData) => ({
             ...prev,
@@ -306,7 +310,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             {isLandscape ? (
                 <div className="sheet-container landscape flex flex-col overflow-hidden">
                     <div className="grid grid-cols-4 border-b-2 border-stone-800 h-[35%] overflow-hidden">
-                        <div className="border-r border-stone-400 p-0 flex flex-col h-full overflow-hidden bg-stone-50"><CharacterImageWidget imageId={data.page2.characterImageId} legacyImage={data.page2.characterImage} onImageUpdate={updateCharacterImageId} onAddLog={(msg, type) => onAddLog(msg, type, 'sheet')} /></div>
+                        <div className="border-r border-stone-400 p-0 flex flex-col h-full overflow-hidden bg-stone-50"><CharacterImageWidget imageId={data.page2.characterImageId} legacyImage={data.page2.characterImage} onImageUpdate={updateCharacterImageId} onAddLog={handleImageLog} /></div>
                         <div className="border-r border-stone-400 p-1.5 flex flex-col gap-2 h-full overflow-hidden">
                             <div className="flex-1 flex flex-col min-h-0 overflow-hidden"><Page2SectionHeader title="Lieux Importants" /><div className="flex-grow relative min-h-0"><NotebookInput value={data.page2.lieux_importants} onChange={(v) => updateStringField('lieux_importants', v)} /></div></div>
                             <div className="flex-1 flex flex-col min-h-0 overflow-hidden"><Page2SectionHeader title="Contacts" /><div className="flex-grow relative min-h-0"><NotebookInput value={data.page2.contacts} onChange={(v) => updateStringField('contacts', v)} /></div></div>
@@ -336,7 +340,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             ) : (
                 <div className="sheet-container flex flex-col">
                     <div className="flex border-b border-stone-400 h-[400px] shrink-0 overflow-hidden">
-                        <div className="w-[35%] border-r border-stone-400 bg-stone-50 p-0 flex flex-col overflow-hidden"><CharacterImageWidget imageId={data.page2.characterImageId} legacyImage={data.page2.characterImage} onImageUpdate={updateCharacterImageId} onAddLog={(msg, type) => onAddLog(msg, type, 'sheet')} /></div>
+                        <div className="w-[35%] border-r border-stone-400 bg-stone-50 p-0 flex flex-col overflow-hidden"><CharacterImageWidget imageId={data.page2.characterImageId} legacyImage={data.page2.characterImage} onImageUpdate={updateCharacterImageId} onAddLog={handleImageLog} /></div>
                         <div className="w-[65%] flex flex-col overflow-hidden">
                             <div className="h-1/3 flex border-b border-stone-400">
                                 <div className="w-1/2 border-r border-stone-400 p-1 flex flex-col"><Page2SectionHeader title="Lieux Importants" /><div className="flex-grow relative min-h-0 overflow-hidden"><NotebookInput value={data.page2.lieux_importants} onChange={(v) => updateStringField('lieux_importants', v)} /></div></div>
