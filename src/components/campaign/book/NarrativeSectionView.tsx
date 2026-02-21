@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react';
 import { NodeViewProps } from '@tiptap/core';
 import { Sun, Moon, Zap, Navigation, BookOpen, Coffee, Utensils, MoonStar, Calendar, Clock, List } from 'lucide-react';
@@ -6,6 +6,7 @@ import { useRules } from '../../../context/RulesContext';
 
 const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes }) => {
     const { type, timeSlot, dateStart, dateEnd, time, date, isSection, title, id } = node.attrs;
+    const timeInputRef = useRef<HTMLInputElement>(null);
     const { rules } = useRules();
     const isReal = rules?.configurations?.calendar?.type === 'real';
 
@@ -100,13 +101,20 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
 
                     {/* Time for Moments */}
                     {type === 'moment' && (
-                        <div className="flex items-center gap-1.5 font-normal lowercase opacity-70 shrink-0">
-                            <Clock size={10} className="translate-y-[0.5px]" />
+                        <div className="flex items-center gap-1 font-normal lowercase opacity-70 shrink-0">
+                            <button
+                                type="button"
+                                onClick={() => timeInputRef.current?.showPicker?.()}
+                                className="hover:text-amber-500 transition-colors"
+                            >
+                                <Clock size={10} className="translate-y-[0.5px]" />
+                            </button>
                             <input
+                                ref={timeInputRef}
                                 type="time"
                                 value={time || ''}
                                 onChange={(e) => updateAttributes({ time: e.target.value })}
-                                className="bg-transparent border-none p-0 w-[55px] text-[10px] focus:ring-0 cursor-pointer"
+                                className="bg-transparent border-none p-0 w-[45px] text-[10px] focus:ring-0 cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden"
                             />
                         </div>
                     )}
@@ -133,7 +141,7 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
 
                     {/* Range for Voyage */}
                     {type === 'voyage' && (
-                        <div className="flex items-center gap-1.5 ml-1 font-normal lowercase opacity-70 border-l border-current/20 pl-3">
+                        <div className="flex items-center gap-1 ml-1 font-normal lowercase opacity-70 border-l border-current/20 pl-2">
                             <button
                                 type="button"
                                 onClick={() => handleCalendarClick('dateStart')}
@@ -146,15 +154,15 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
                                 placeholder={isReal ? "jj/mm/aaaa" : "début"}
                                 value={dateStart || ''}
                                 onChange={(e) => updateAttributes({ dateStart: e.target.value })}
-                                className="bg-transparent border-none p-0 w-[65px] text-[10px] focus:ring-0 cursor-pointer text-center"
+                                className="bg-transparent border-none p-0 w-[60px] text-[10px] focus:ring-0 cursor-pointer text-center"
                             />
-                            <span className="text-[9px] italic opacity-50 px-1">au</span>
+                            <span className="text-[9px] italic opacity-40">au</span>
                             <input
                                 type="text"
                                 placeholder={isReal ? "jj/mm/aaaa" : "fin"}
                                 value={dateEnd || ''}
                                 onChange={(e) => updateAttributes({ dateEnd: e.target.value })}
-                                className="bg-transparent border-none p-0 w-[65px] text-[10px] focus:ring-0 cursor-pointer text-center"
+                                className="bg-transparent border-none p-0 w-[60px] text-[10px] focus:ring-0 cursor-pointer text-center"
                             />
                             <button
                                 type="button"
