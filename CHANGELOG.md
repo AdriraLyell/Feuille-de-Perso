@@ -1,5 +1,23 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.72] - 2026-02-16 [DOCS]
+
+- 📝 Documentation : Mise à jour exhaustive du schéma de base de données (mystic_abilities, vues, relations)
+- 📝 Documentation : Ajout du guide de procédure pour le clonage de personnage via SQL
+- 👤 Personnage : Clonage de Ayame vers Akane pour le joueur Polo effectué avec succès
+
+## [2.49.71] - 2026-02-16 [FIX]
+
+- 🛡️ CI : Correction des erreurs de typage TypeScript bloquant le workflow (RecreationService)
+- 🧩 UI : Fix du typage missing onUpdate dans le composant AttributeBlock
+- 🧹 Lint : Suppression d'un double cast booléen redondant dans AdminSkillLibrary
+
+## [2.49.70] - 2026-02-16 [FIX]
+
+- 📖 Journal : Fix de la conversion des dimensions d'images lors de la migration (px vers %)
+- 🖼️ UI : Ajout d'une limite de hauteur maximale (800px) pour les images du Grimoire
+- 📏 Migration : Correction du ratio d'aspect forcé à 'auto' pour les images importées
+
 ## [2.49.69] - 2026-02-16 [FIX]
 
 - 📂 Admin : Déplacement de la fonctionnalité de recréation vers les paramètres spécifiques de chaque campagne (Fiches des Destins)

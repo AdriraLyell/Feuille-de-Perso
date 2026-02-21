@@ -343,23 +343,23 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         if (!rules) return;
 
         // Optimized Reconciliation:
-        // Only reconcile if the rules version in the character data is different from the loaded rules version.
-        // This prevents unnecessary re-renders and logic execution on every mount/update if rules haven't changed.
-        if (data._rulesVersion === rules.version) {
+        // Reconcile if either the version ID or the last updated timestamp has changed.
+        // This ensures updates are caught even if the semantic version string isn't manually bumped.
+        if (data._rulesVersion === rules.version && data._rulesLastUpdated === rules.lastUpdated) {
             return;
         }
 
         setData(currentData => {
-            // Double check inside the setter to ensure we are working with the latest state
-            if (currentData._rulesVersion === rules.version) {
+            if (currentData._rulesVersion === rules.version && currentData._rulesLastUpdated === rules.lastUpdated) {
                 return currentData;
             }
 
             try {
                 const skillsBefore = Object.values(currentData.skills).flat().filter(s => s.name).length;
-                logger.log(`[CharacterContext] Reconciling with rules v${rules.version} (was v${currentData._rulesVersion}). Skills before: ${skillsBefore}`);
+                logger.log(`[CharacterContext] Reconciling with rules v${rules.version} (last updated: ${rules.lastUpdated}). Skills before: ${skillsBefore}`);
 
                 const newData = reconcileRulesWithState(currentData, rules);
+                newData._rulesLastUpdated = rules.lastUpdated;
 
                 const skillsAfter = Object.values(newData.skills).flat().filter(s => s.name).length;
                 logger.log(`[CharacterContext] Reconciliation complete. Skills after: ${skillsAfter}`);

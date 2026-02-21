@@ -1,8 +1,17 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.65.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.65.4)
 
-> **Dernière mise à jour** : 2026-02-21 — Version 2.65.0
+> **Dernière mise à jour** : 2026-02-21 — Version 2.65.4
 
 ## 1. Phases Complétées
+
+### ✅ Phase 34 : Calcul d'âge flexible & Verrouillage Calendrier (v2.65.4)
+- [x] **Bug Fix** : Support des formats de date français (DD/MM/YYYY) et fictifs pour le calcul automatique de l'âge.
+- [x] **Data Integrity** : Verrouillage automatique des champs 'Début' et 'Date Fiction' sur la fiche personnage si un calendrier de campagne est actif (MJ-controlled).
+- [x] **Shared Components** : Amélioration de `HeaderInput` pour supporter l'état `readOnly` et les infobulles contextuelles.
+
+### ✅ Phase 33 : Synchronisation du Calendrier (v2.65.3)
+- [x] **Mécanique** : Réconciliation automatique des dates de l'en-tête avec les paramètres de campagne du MJ.
+- [x] **Robustesse** : Déclenchement de la réconciliation basé sur la version et le timestamp de mise à jour des règles.
 
 ### ✅ Phase 32 : Correction du pavé fantôme 'PAVE_ATTRIBUTS_4' (v2.64.2)
 - [x] **Bug Fix** : L'attributeSettings est désormais reconstruit proprement depuis les attributs primaires, éliminant l'apparition d'un 4ème pavé erroné lors d'un reset.

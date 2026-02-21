@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.62.1",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Fix resize images latérales (L/R/free) : architecture dual-ref — le resize applique désormais la largeur sur le NodeViewWrapper flottant (non le div interne), la largeur de référence est calculée via getComputedStyle sur la colonne ProseMirror au mousedown (valeur runtime exacte), éliminant le saut visible au relâchement et le calcul erroné du cap 55%."
+    },
+    {
+        "version": "2.62.0",
+        "date": "2026-02-21",
+        "type": "perf",
+        "description": "Optimisation du Journal de Campagne : Cache LRU d'images (chargement instantané au retour sur une page), sauvegarde sécurisée (flush sur perte de focus + indicateur ✓), interactions image fluides à 60fps (rendu DOM direct pendant resize/pan), correction du wrapping texte-image (clear CSS + marges generatives). Ajout : indicateur de page (dots), boutons Annuler/Rétablir, confirmation de suppression dans le Tableau de Groupe, compression automatique des images (WebP 80%) à l'upload."
+    },
+    {
+        "version": "2.61.0",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Nouvel onglet Calendrier dans l'administration. Deux modes : Calendrier Réel (date grégorienne avec jours de la semaine calculés, avance rapide) et Calendrier Fictif (mois avec jours variables, jours de semaine personnalisés, saisons avec assignation par mois et couleur). Gestion d'événements avec sélecteur de couleur dans les deux modes. Aperçu mensuel live et navigable. Configuration stockée dans les RulesData du setting."
+    },
+    {
         "version": "2.60.1",
         "date": "2026-02-20",
         "type": "refactor",
@@ -697,36 +715,6 @@
             "🛡️ Sécurité : Suppression de l'attribution automatique de propriété dans DatabaseService pour éviter le verrouillage des fiches legacy",
             "👤 Personnage : Déverrouillage des fiches d'Ayame et Louise (reset created_by à NULL) pour restaurer l'accès public",
             "🔓 RLS : Mise à jour des politiques Supabase pour autoriser la lecture anonyme des fiches sans propriétaire"
-        ]
-    },
-    {
-        "version": "2.49.72",
-        "date": "2026-02-16",
-        "type": "docs",
-        "changes": [
-            "📝 Documentation : Mise à jour exhaustive du schéma de base de données (mystic_abilities, vues, relations)",
-            "📝 Documentation : Ajout du guide de procédure pour le clonage de personnage via SQL",
-            "👤 Personnage : Clonage de Ayame vers Akane pour le joueur Polo effectué avec succès"
-        ]
-    },
-    {
-        "version": "2.49.71",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🛡️ CI : Correction des erreurs de typage TypeScript bloquant le workflow (RecreationService)",
-            "🧩 UI : Fix du typage missing onUpdate dans le composant AttributeBlock",
-            "🧹 Lint : Suppression d'un double cast booléen redondant dans AdminSkillLibrary"
-        ]
-    },
-    {
-        "version": "2.49.70",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "📖 Journal : Fix de la conversion des dimensions d'images lors de la migration (px vers %)",
-            "🖼️ UI : Ajout d'une limite de hauteur maximale (800px) pour les images du Grimoire",
-            "📏 Migration : Correction du ratio d'aspect forcé à 'auto' pour les images importées"
         ]
     }
 ]

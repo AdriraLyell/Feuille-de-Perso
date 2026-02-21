@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.65.4",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction du calcul d'âge pour supporter les formats de date flexibles (français et fictif). Verrouillage des champs 'Début' et 'Date Fiction' lorsqu'ils sont gérés par le calendrier de campagne du MJ."
+    },
+    {
+        "version": "2.65.3",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Synchronisation automatique des dates de l'en-tête (Début et Date Fiction) avec le calendrier de campagne défini dans les paramètres. Amélioration de la détection des mises à jour des règles pour refléter immédiatement les changements du MJ sur les fiches joueurs."
+    },
+    {
+        "version": "2.65.2",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Amélioration de l'en-tête de la fiche personnage : Intégration des champs 'Date de début de campagne' et 'Date courante (fiction)'. Implémentation du calcul automatique de l'âge basé sur la date de naissance et la date de la fiction, avec fallback en saisie manuelle si les données sont absentes."
+    },
+    {
         "version": "2.65.1",
         "date": "2026-02-21",
         "type": "refactor",
@@ -100,23 +118,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Fix clipping toolbar images : conversion en React Portal pour la barre d'outils et le HUD de resize. Le positionnement est désormais dynamique (fixed) basé sur le bounding rect de l'image, garantissant une visibilité complète même en bord de page ou à cheval sur les colonnes CSS."
-    },
-    {
-        "version": "2.62.1",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Fix resize images latérales (L/R/free) : architecture dual-ref — le resize applique désormais la largeur sur le NodeViewWrapper flottant (non le div interne), la largeur de référence est calculée via getComputedStyle sur la colonne ProseMirror au mousedown (valeur runtime exacte), éliminant le saut visible au relâchement et le calcul erroné du cap 55%."
-    },
-    {
-        "version": "2.62.0",
-        "date": "2026-02-21",
-        "type": "perf",
-        "description": "Optimisation du Journal de Campagne : Cache LRU d'images (chargement instantané au retour sur une page), sauvegarde sécurisée (flush sur perte de focus + indicateur ✓), interactions image fluides à 60fps (rendu DOM direct pendant resize/pan), correction du wrapping texte-image (clear CSS + marges generatives). Ajout : indicateur de page (dots), boutons Annuler/Rétablir, confirmation de suppression dans le Tableau de Groupe, compression automatique des images (WebP 80%) à l'upload."
-    },
-    {
-        "version": "2.61.0",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Nouvel onglet Calendrier dans l'administration. Deux modes : Calendrier Réel (date grégorienne avec jours de la semaine calculés, avance rapide) et Calendrier Fictif (mois avec jours variables, jours de semaine personnalisés, saisons avec assignation par mois et couleur). Gestion d'événements avec sélecteur de couleur dans les deux modes. Aperçu mensuel live et navigable. Configuration stockée dans les RulesData du setting."
     }
 ]
