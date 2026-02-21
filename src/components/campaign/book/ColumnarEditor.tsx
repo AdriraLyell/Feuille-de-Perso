@@ -312,8 +312,6 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
 
                 {!readOnly && (
                     <BookChapterSidebar
-                        onInsertChapter={() => (editor.commands as any).setChapter()}
-                        onAppendChapter={() => (editor.commands as any).appendChapter()}
                         onInsertMoment={() => (editor.commands as any).insertNarrativeSection({ type: 'moment', timeSlot: 'matin' })}
                         isCalendarVisible={isCalendarVisible}
                         onToggleCalendar={() => setIsCalendarVisible(!isCalendarVisible)}
@@ -324,7 +322,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                                 notatedDates={notifiedDates}
                                 voyageRanges={voyageRanges}
                                 onDateClick={handleCalendarDateClick}
-                                onNewChapter={pickingTarget ? undefined : (date) => (editor.commands as any).insertChapterAtDate(date)}
+                                onNewChapter={pickingTarget ? undefined : (date) => (editor.commands as any).insertChapterAtDate(date, undefined, true)}
                             />
                         )}
                     </BookChapterSidebar>

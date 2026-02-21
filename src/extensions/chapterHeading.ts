@@ -9,7 +9,7 @@ declare module '@tiptap/core' {
         chapterHeading: {
             setChapter: () => ReturnType;
             appendChapter: () => ReturnType;
-            insertChapterAtDate: (date: string, realDate?: string) => ReturnType;
+            insertChapterAtDate: (date: string, realDate?: string, atSelection?: boolean) => ReturnType;
         };
     }
 }
@@ -113,10 +113,27 @@ export const ChapterHeading = Node.create({
                     },
 
             insertChapterAtDate:
-                (date: string, realDate?: string) =>
+                (date: string, realDate?: string, atSelection?: boolean) =>
                     ({ chain, state }: CommandProps) => {
-                        const endPos = state.doc.content.size;
                         const finalRealDate = realDate || new Date().toISOString().split('T')[0];
+
+                        if (atSelection) {
+                            return chain()
+                                .focus()
+                                .splitBlock()
+                                .insertContent({
+                                    type: this.name,
+                                    attrs: {
+                                        date,
+                                        realDate: finalRealDate
+                                    },
+                                    content: [{ type: 'text', text: 'Nouveau Chapitre' }],
+                                })
+                                .insertContent({ type: 'paragraph' })
+                                .run();
+                        }
+
+                        const endPos = state.doc.content.size;
                         return chain()
                             .focus()
                             .insertContentAt(endPos, [

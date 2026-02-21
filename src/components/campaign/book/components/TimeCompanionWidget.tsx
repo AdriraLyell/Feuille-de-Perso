@@ -260,8 +260,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                                         </div>
                                     )}
 
-                                    {/* Quick action: New Chapter */}
-                                    {!hasNotes && onNewChapter && (
+                                    {onNewChapter && (
                                         <button
                                             onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr); }}
                                             className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-stone-800/90 flex items-center justify-center transition-opacity rounded-sm"
