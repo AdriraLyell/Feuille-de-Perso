@@ -1,8 +1,14 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.62.9)
+# Audit - État des Lieux & Roadmap (Synthèse v2.63.0)
 
-> **Dernière mise à jour** : 2026-02-21 — Version 2.62.9
+> **Dernière mise à jour** : 2026-02-21 — Version 2.63.0
 
 ## 1. Phases Complétées
+
+### ✅ Phase 29 : Persistance et Nettoyage des Bibliothèques (v2.63.0)
+- [x] **Bug Fix** : Résolution du problème des compteurs/traits supprimés qui réapparaissaient au rafraîchissement.
+- [x] **Mécanique** : Implémentation d'un nettoyage automatique des "items orphelins" dans les tables de référence globales lors de la synchronisation.
+- [x] **Robustesse** : Migration vers une gestion fine de `is_active` dans les tables de relations (rel_setting_...) pour préserver les items désactivés sans polluer le dépôt de référence.
+- [x] **Optimisation** : Détection ciblée des items désengagés pour minimiser les appels à la base de données.
 
 ### ✅ Phase 28 : Détails d'usage avancés (v2.62.9)
 - [x] **Composant** : Création de `UsageLockedTooltip` pour afficher les campagnes et personnages verrouillant un item.

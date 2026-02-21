@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.61] - 2026-02-15 [FIX]
+
+- 🐞 Sync : Correction des erreurs de typage bloquant le build
+- 🔍 Debug : Ajout de logs dans la console pour le suivi de la synchronisation cloud
+
 ## [2.49.60] - 2026-02-15 [FEAT]
 
 - 🔔 Synchronisation : Notification automatique des mises à jour disponibles sur le Cloud

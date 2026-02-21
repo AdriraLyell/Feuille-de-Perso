@@ -75,12 +75,12 @@ export const LibraryLoader = {
                 }
             });
 
-            const activeTraitIds = new Set<string>(relTraits.map((r: RelSettingTrait) => r.trait_id));
-            const activeSkillIds = new Set<string>(relSkills.map((r: RelSettingSkill) => r.skill_id));
-            const activeSpecIds = new Set<string>(relSpecs.map((r: RelSettingSpecialization) => r.specialization_id));
-            const activeBgIds = new Set<string>(relBackgrounds.map((r: RelSettingBackground) => r.background_id));
-            const activeCounterIds = new Set<string>(relCounters.map((r: RelSettingCounter) => r.counter_id));
-            const activeMysticIds = new Set<string>(relMysticAbilities.map((r: any) => r.mystic_ability_id));
+            const activeTraitIds = new Set<string>(relTraits.filter((r: RelSettingTrait) => r.is_active).map((r: RelSettingTrait) => r.trait_id));
+            const activeSkillIds = new Set<string>(relSkills.filter((r: RelSettingSkill) => r.is_active).map((r: RelSettingSkill) => r.skill_id));
+            const activeSpecIds = new Set<string>(relSpecs.filter((r: RelSettingSpecialization) => r.is_active).map((r: RelSettingSpecialization) => r.specialization_id));
+            const activeBgIds = new Set<string>(relBackgrounds.filter((r: RelSettingBackground) => r.is_active).map((r: RelSettingBackground) => r.background_id));
+            const activeCounterIds = new Set<string>(relCounters.filter((r: RelSettingCounter) => r.is_active).map((r: RelSettingCounter) => r.counter_id));
+            const activeMysticIds = new Set<string>(relMysticAbilities.filter((r: any) => r.is_active).map((r: any) => r.mystic_ability_id));
 
             const skillRelMap = new Map<string, RelSettingSkill>(relSkills.map((r: RelSettingSkill) => [r.skill_id, r]));
             const bgDefaultMap = new Map<string, string>(relBackgrounds.map((r: RelSettingBackground) => [r.background_id, r.default_category]));
@@ -200,7 +200,7 @@ export const LibraryLoader = {
                 const { data: charData, error: charError } = await supabase
                     .from('characters')
                     .select('character_name, player_name, game_settings(name)')
-                    .or(`data->page2->avantages->0->definitionId.eq."${itemId}",data->page2->desavantages->0->definitionId.eq."${itemId}"`);
+                    .or(`data->page2->avantages->0->>definitionId.eq.${itemId},data->page2->desavantages->0->>definitionId.eq.${itemId}`);
 
                 // Note: The above .or with JSONB arrow is a bit limited in Supabase JS (only checks first element).
                 // For a more robust solution in a real app, we would use .contains() but it requires the whole JSON path match.

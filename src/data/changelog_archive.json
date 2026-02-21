@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.72",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction UI : Alignement et centrage des valeurs dans le résumé d'expérience. Suppression des conteneurs flex imbriqués qui empêchaient le centrage correct du champ 'Gain' et application d'une largeur fixe avec marge automatique pour un alignement vertical parfait de toutes les statistiques d'expérience."
+    },
+    {
         "version": "2.56.71",
         "date": "2026-02-21",
         "type": "style",
@@ -751,15 +757,6 @@
             "🩹 Personnage : Restauration manuelle des attributs d'Ayame (3,1,3,3...) dans le Cloud",
             "🛡️ Schema : Correction de la validation Zod (mysticAbilities) pour éviter les resets de fiche",
             "🔍 Sync : Information MJ ajoutée pour guider la joueuse lors de la prochaine synchro"
-        ]
-    },
-    {
-        "version": "2.49.61",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🐞 Sync : Correction des erreurs de typage bloquant le build",
-            "🔍 Debug : Ajout de logs dans la console pour le suivi de la synchronisation cloud"
         ]
     }
 ]

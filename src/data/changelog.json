@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.63.0",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction de la persistance des suppressions dans la bibliothèque : Les éléments supprimés du catalogue d'une campagne sont désormais correctement nettoyés dans le dépôt global s'ils ne sont plus utilisés ailleurs. Amélioration de la gestion du statut d'activation (isActive) via les liens relationnels de la base de données pour garantir que les items désactivés mais non supprimés sont conservés de manière cohérente."
+    },
+    {
         "version": "2.62.9",
         "date": "2026-02-21",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "style",
         "description": "Ajustement UI : L'onglet de Gestion de l'Expérience est de nouveau affiché au format A4 pour être cohérent avec le reste de la fiche de personnage (correction des classes CSS corrompues encadrant le conteneur)."
-    },
-    {
-        "version": "2.56.72",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction UI : Alignement et centrage des valeurs dans le résumé d'expérience. Suppression des conteneurs flex imbriqués qui empêchaient le centrage correct du champ 'Gain' et application d'une largeur fixe avec marge automatique pour un alignement vertical parfait de toutes les statistiques d'expérience."
     }
 ]
