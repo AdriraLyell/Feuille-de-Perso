@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.62] - 2026-02-15 [FIX]
+
+- 🩹 Personnage : Restauration manuelle des attributs d'Ayame (3,1,3,3...) dans le Cloud
+- 🛡️ Schema : Correction de la validation Zod (mysticAbilities) pour éviter les resets de fiche
+- 🔍 Sync : Information MJ ajoutée pour guider la joueuse lors de la prochaine synchro
+
 ## [2.49.61] - 2026-02-15 [FIX]
 
 - 🐞 Sync : Correction des erreurs de typage bloquant le build

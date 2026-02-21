@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.63.1",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction majeure de la visibilité des items supprimés : Restriction du chargement des bibliothèques MJ aux seuls items explicitement rattachés à la campagne ou créés pour elle. Cette modification garantit que les items supprimés (via l'icône corbeille) disparaissent définitivement de la vue MJ après un rafraîchissement, même s'ils subsistent dans le dépôt global pour d'autres campagnes."
+    },
+    {
         "version": "2.63.0",
         "date": "2026-02-21",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Amélioration UI (Historique Dépenses XP) : Remplacement de la catégorie globale 'Compétences' par un découpage thématique des compétences selon leur origine (ex: Talents (Orange), Connaissances (Bleu clair), Mêlée & Tir (Rouge), etc.) avec icônes et codes couleurs dédiés."
-    },
-    {
-        "version": "2.56.73",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Ajustement UI : L'onglet de Gestion de l'Expérience est de nouveau affiché au format A4 pour être cohérent avec le reste de la fiche de personnage (correction des classes CSS corrompues encadrant le conteneur)."
     }
 ]

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.56.73",
+        "date": "2026-02-21",
+        "type": "style",
+        "description": "Ajustement UI : L'onglet de Gestion de l'Expérience est de nouveau affiché au format A4 pour être cohérent avec le reste de la fiche de personnage (correction des classes CSS corrompues encadrant le conteneur)."
+    },
+    {
         "version": "2.56.72",
         "date": "2026-02-21",
         "type": "fix",
@@ -747,16 +753,6 @@
         "changes": [
             "🛡️ Schema : Correction de la structure `mysticAbilities` dans le validateur Zod (LibrarySkillEntry vs DotEntry).",
             "🚀 Import : Résolution du bug empêchant l'import de fiches contenant des capacités mystiques."
-        ]
-    },
-    {
-        "version": "2.49.62",
-        "date": "2026-02-15",
-        "type": "fix",
-        "changes": [
-            "🩹 Personnage : Restauration manuelle des attributs d'Ayame (3,1,3,3...) dans le Cloud",
-            "🛡️ Schema : Correction de la validation Zod (mysticAbilities) pour éviter les resets de fiche",
-            "🔍 Sync : Information MJ ajoutée pour guider la joueuse lors de la prochaine synchro"
         ]
     }
 ]
