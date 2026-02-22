@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.69.3",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ergonomie : Ajout d'un curseur 'pointer' (main) sur les cartes de sélection des sources (Chroniques, Hors Ligne, Reprendre) pour indiquer clairement qu'elles sont interactives."
+    },
+    {
         "version": "2.69.2",
         "date": "2026-02-22",
         "type": "fix",

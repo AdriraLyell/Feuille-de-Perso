@@ -25,7 +25,7 @@ export const MotionCard: React.FC<MotionCardProps> = ({
 
     return (
         <motion.div
-            className={cn("bg-stone-900/40 border border-stone-700/50 rounded-sm shadow-sm backdrop-blur-sm", className)}
+            className={cn("bg-stone-900/40 border border-stone-700/50 rounded-sm shadow-sm backdrop-blur-sm cursor-pointer", className)}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={getHoverStyles()}
