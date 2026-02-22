@@ -13,13 +13,30 @@ const COLORS = [
     { name: 'Jaune', value: '#FEF08A' },
     { name: 'Bleu', value: '#BAE6FD' },
     { name: 'Rose', value: '#FECDD3' },
-    { name: 'Vert', value: '#BBF7D0' }
+    { name: 'Vert', value: '#BBF7D0' },
+    { name: 'Orange', value: '#FED7AA' },
+    { name: 'Violet', value: '#E9D5FF' },
+    { name: 'Gris', value: '#E5E7EB' },
+    { name: 'Rouge', value: '#FECACA' }
 ];
 
 export const PostItBoard: React.FC<PostItBoardProps> = ({ currentTab }) => {
     const { data, updateData } = useCharacter();
     const postIts = data.postIts || [];
     const activePostIts = postIts.filter((p: PostItData) => p.tabId === currentTab);
+
+    const [btnPos, setBtnPos] = React.useState(() => {
+        try {
+            const saved = localStorage.getItem('postit-btn-pos');
+            return saved ? JSON.parse(saved) : { x: 0, y: 0 };
+        } catch (e) { return { x: 0, y: 0 }; }
+    });
+
+    const handleBtnDragEnd = (e: any, info: any) => {
+        const newPos = { x: btnPos.x + info.offset.x, y: btnPos.y + info.offset.y };
+        setBtnPos(newPos);
+        localStorage.setItem('postit-btn-pos', JSON.stringify(newPos));
+    };
 
     const handleAddPostIt = () => {
         const newPostIt: PostItData = {
@@ -55,14 +72,23 @@ export const PostItBoard: React.FC<PostItBoardProps> = ({ currentTab }) => {
     return (
         <>
             {/* Floating Add Button */}
-            <button
-                onClick={handleAddPostIt}
-                className="fixed bottom-6 right-6 z-50 p-4 bg-amber-400 hover:bg-amber-500 text-amber-900 rounded-full shadow-lg transition-transform hover:scale-110 flex items-center justify-center no-print"
-                title="Ajouter un Post-it"
+            <motion.div
+                drag
+                dragMomentum={false}
+                onDragEnd={handleBtnDragEnd}
+                initial={btnPos}
+                animate={btnPos}
+                className="fixed bottom-6 right-6 z-50 flex items-center justify-center no-print"
             >
-                <StickyNote size={24} />
-                <Plus size={14} className="absolute bottom-3 right-3 bg-white rounded-full bg-opacity-70" />
-            </button>
+                <button
+                    onClick={handleAddPostIt}
+                    className="p-4 bg-amber-400 hover:bg-amber-500 text-amber-900 rounded-full shadow-lg transition-transform hover:scale-110 flex items-center justify-center cursor-grab active:cursor-grabbing"
+                    title="Ajouter un Post-it (Glissez pour déplacer le bouton)"
+                >
+                    <StickyNote size={24} />
+                    <Plus size={14} className="absolute bottom-3 right-3 bg-white rounded-full bg-opacity-70 pointer-events-none" />
+                </button>
+            </motion.div>
 
             {/* Render Post-its */}
             <div className="absolute inset-0 pointer-events-none z-40 overflow-hidden no-print">
@@ -97,10 +123,9 @@ const PostItNote: React.FC<PostItNoteProps> = ({ data, onUpdate, onDelete }) => 
             animate={{ x: data.x, y: data.y, opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             style={{
-                width: data.width,
-                height: data.height,
                 backgroundColor: data.color,
-                position: 'absolute'
+                position: 'absolute',
+                width: 'max-content'
             }}
             className="pointer-events-auto shadow-md border border-black/10 rounded-sm flex flex-col group"
         >
@@ -127,7 +152,16 @@ const PostItNote: React.FC<PostItNoteProps> = ({ data, onUpdate, onDelete }) => 
             <textarea
                 value={data.text}
                 onChange={(e) => onUpdate({ text: e.target.value })}
-                className="flex-1 w-full bg-transparent resize-none outline-none p-2 text-gray-800 font-sans text-sm leading-relaxed"
+                onMouseUp={(e) => {
+                    const el = e.currentTarget;
+                    const newWidth = el.offsetWidth;
+                    const newHeight = el.offsetHeight + 24; // 24px is height of the header (h-6)
+                    if (Math.abs(newWidth - data.width) > 2 || Math.abs(newHeight - data.height) > 2) {
+                        onUpdate({ width: newWidth, height: newHeight });
+                    }
+                }}
+                style={{ width: data.width || 200, height: Math.max(50, (data.height || 200) - 24) }}
+                className="bg-transparent resize outline-none p-2 text-gray-800 font-sans text-sm leading-relaxed"
                 placeholder="Nouvelle note..."
             />
         </motion.div>
