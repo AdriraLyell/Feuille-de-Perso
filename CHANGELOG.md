@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.87] - 2026-02-16 [FIX]
+
+- 🐞 Sidebar : Fix du bouton Reset qui pouvait échouer selon l'état des données
+- ⚠️ React : Correction de l'avertissement 'value prop on select should not be null'
+- 🔧 Système : Robustesse accrue de la gestion des états de personnalisation (isCustomized)
+
 ## [2.49.86] - 2026-02-16 [FEAT]
 
 - 🔓 Bibliothèque : Réactivation de l'édition globale pour les compétences personnalisées

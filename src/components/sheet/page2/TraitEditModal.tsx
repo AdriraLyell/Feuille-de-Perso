@@ -56,10 +56,25 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
             creationValue: editedTrait.creationValue ?? editedTrait.value // Store initial if not set
         };
 
-        // If the trait reaches 0, its effects are already ignored by xpCalculator check if value === 0
         setEditedTrait(updatedTrait);
         onSave(updatedTrait);
         onAddLog(`${isFixedCost ? 'Rachat' : 'Réduction'} du trait ${editedTrait.name} pour ${xpCost} XP.`, 'success', 'sheet');
+    };
+
+    const handleIncreaseTrait = () => {
+        if (!editedTrait || !isPostCreation) return;
+
+        const currentValue = parseInt(editedTrait.value) || 0;
+
+        const updatedTrait = {
+            ...editedTrait,
+            value: (currentValue + 1).toString(),
+            creationValue: editedTrait.creationValue ?? editedTrait.value // Preserve initial creation value
+        };
+
+        setEditedTrait(updatedTrait);
+        onSave(updatedTrait);
+        onAddLog(`Amélioration du trait ${editedTrait.name} pour ${traitCostFactor} XP.`, 'success', 'sheet');
     };
 
     if (!editedTrait) return null;
@@ -67,6 +82,7 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
     const currentValue = parseInt(editedTrait.value) || 0;
     const isFixedCost = editedTrait.value.toLowerCase().includes('pts') || !/^\d+$/.test(editedTrait.value.trim());
     const canReduce = isPostCreation && type === 'desavantages' && currentValue > 0;
+    const canIncrease = isPostCreation && type === 'avantages' && !isFixedCost && currentValue > 0;
 
     return (
         <ThematicModal
@@ -77,7 +93,7 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
             size="md"
             footer={
                 <div className="flex justify-between items-center w-full">
-                    <div>
+                    <div className="flex gap-2">
                         {canReduce && (
                             <ThematicButton
                                 onClick={handleReduceTrait}
@@ -89,6 +105,17 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
                                 {isFixedCost
                                     ? `Racheter totalement (${currentValue * traitCostFactor} XP)`
                                     : `Réduire d'un niveau (${traitCostFactor} XP)`}
+                            </ThematicButton>
+                        )}
+                        {canIncrease && (
+                            <ThematicButton
+                                onClick={handleIncreaseTrait}
+                                variant="primary"
+                                size="sm"
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                leftIcon={<Sparkles size={16} />}
+                            >
+                                Améliorer d'un niveau ({traitCostFactor} XP)
                             </ThematicButton>
                         )}
                     </div>
