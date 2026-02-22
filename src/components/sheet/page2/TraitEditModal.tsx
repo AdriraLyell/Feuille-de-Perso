@@ -81,8 +81,17 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
 
     const currentValue = parseInt(editedTrait.value) || 0;
     const isFixedCost = editedTrait.value.toLowerCase().includes('pts') || !/^\d+$/.test(editedTrait.value.trim());
+
+    // Check if the trait is variable in the library
+    const libEntry = data.library?.find(e => e.id === editedTrait.definitionId);
+    const isActuallyVariable = libEntry
+        ? (libEntry.isVariable || libEntry.isVariableCost || /[-,–—,;]/.test(libEntry.cost || '') || (libEntry.cost || '').includes('..'))
+        : !isFixedCost;
+
+    const isImproved = !editedTrait.isPostCreation && editedTrait.creationValue !== undefined && currentValue > (parseInt(editedTrait.creationValue) || 0);
+
     const canReduce = isPostCreation && type === 'desavantages' && currentValue > 0;
-    const canIncrease = isPostCreation && type === 'avantages' && !isFixedCost && currentValue > 0 && currentValue < 5;
+    const canIncrease = isPostCreation && type === 'avantages' && isActuallyVariable && currentValue > 0 && currentValue < 5;
 
     return (
         <ThematicModal
@@ -134,6 +143,11 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
                 {editedTrait.isPostCreation && (
                     <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-emerald-800 text-xs font-bold flex items-center gap-2">
                         <Sparkles size={14} /> Trait acquis post-création via XP
+                    </div>
+                )}
+                {isImproved && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-blue-800 text-xs font-bold flex items-center gap-2">
+                        <Sparkles size={14} /> Trait amélioré post-création via XP
                     </div>
                 )}
                 <div>
