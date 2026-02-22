@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.91] - 2026-02-17 [FIX]
+
+- 🎨 UI : Le cadre de sélection bleu suit désormais précisément les dimensions de l'image même en déplacement libre
+- 🛡️ Système : Désactivation intelligente du recadrage (Crop) sur les images à hauteur automatique
+- 📋 Audit : Réalisation d'un audit complet du système d'images pour prévenir les conflits d'options
+
 ## [2.49.90] - 2026-02-17 [FIX]
 
 - 🖼️ Grimoire : Ajustement automatique de la largeur lors du passage en mode libre pour un meilleur enroulement

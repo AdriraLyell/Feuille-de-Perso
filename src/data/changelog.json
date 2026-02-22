@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.71.4",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Système d'expérience : Distinction visuelle des traits. Utilisation de l'icône ⬆️ bleue pour les avantages améliorés et ❇️ verte pour les nouveaux traits acquis post-création."
+    },
+    {
         "version": "2.71.3",
         "date": "2026-02-22",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction du calcul d'âge pour supporter les formats de date flexibles (français et fictif). Verrouillage des champs 'Début' et 'Date Fiction' lorsqu'ils sont gérés par le calendrier de campagne du MJ."
-    },
-    {
-        "version": "2.65.3",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Synchronisation automatique des dates de l'en-tête (Début et Date Fiction) avec le calendrier de campagne défini dans les paramètres. Amélioration de la détection des mises à jour des règles pour refléter immédiatement les changements du MJ sur les fiches joueurs."
     }
 ]

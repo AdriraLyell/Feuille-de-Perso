@@ -35,7 +35,7 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove, onManageMy
                 } ${isResolved ? 'line-through opacity-50' : ''}`} style={{ fontSize: isEmpty ? '0.7rem' : '0.9rem' }}>
                 <span className="truncate w-full block" title={!isEmpty ? (item.variant ? `${item.name} : ${item.variant}` : item.name) : undefined}>
                     {item.isPostCreation && <span className="mr-1 text-emerald-600" title="Acquis avec XP">❇️</span>}
-                    {isImproved && <span className="mr-1 text-blue-500" title="Amélioré avec XP">❇️</span>}
+                    {isImproved && <span className="mr-1 text-blue-500" title="Amélioré avec XP">⬆️</span>}
                     {item.name || "Vide"}
                     {item.variant && <span className="font-bold ml-1 text-slate-600">: {item.variant}</span>}
                 </span>

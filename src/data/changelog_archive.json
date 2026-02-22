@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.65.3",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Synchronisation automatique des dates de l'en-tête (Début et Date Fiction) avec le calendrier de campagne défini dans les paramètres. Amélioration de la détection des mises à jour des règles pour refléter immédiatement les changements du MJ sur les fiches joueurs."
+    },
+    {
         "version": "2.65.2",
         "date": "2026-02-21",
         "type": "feat",
@@ -639,16 +645,6 @@
             "📊 UI : Ajout d'un HUD (Head-Up Display) affichant les coordonnées X/Y et la taille en temps réel",
             "🖼️ Grimoire : Guide de recadrage (Crop) ajusté pour exclure dynamiquement la bordure blanche",
             "🔧 UX : Amélioration de la réactivité des poignées de redimensionnement et de sélection"
-        ]
-    },
-    {
-        "version": "2.49.91",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🎨 UI : Le cadre de sélection bleu suit désormais précisément les dimensions de l'image même en déplacement libre",
-            "🛡️ Système : Désactivation intelligente du recadrage (Crop) sur les images à hauteur automatique",
-            "📋 Audit : Réalisation d'un audit complet du système d'images pour prévenir les conflits d'options"
         ]
     }
 ]
