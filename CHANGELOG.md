@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.89] - 2026-02-17 [FIX]
+
+- 🖱️ UX : Le mode déplacement libre ne s'active désormais que lorsque l'image est sélectionnée
+- 📖 Grimoire : Support de l'enroulement du texte (wrap) en mode déplacement libre
+
 ## [2.49.88] - 2026-02-17 [FEAT]
 
 - 🖼️ Grimoire : Ajout du mode 'Déplacement Libre' (F) pour les images

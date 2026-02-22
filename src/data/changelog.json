@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.71.2",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Système d'expérience : Précision des règles d'amélioration des avantages. Seuls les avantages à coût variable (vérification en bibliothèque) peuvent être augmentés. Uniformisation de l'icône visuelle : le symbole ❇️ (en bleu) identifie désormais les avantages améliorés, en cohérence avec l'icône d'acquisition post-création."
+    },
+    {
         "version": "2.71.1",
         "date": "2026-02-22",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Amélioration de l'en-tête de la fiche personnage : Intégration des champs 'Date de début de campagne' et 'Date courante (fiction)'. Implémentation du calcul automatique de l'âge basé sur la date de naissance et la date de la fiction, avec fallback en saisie manuelle si les données sont absentes."
-    },
-    {
-        "version": "2.65.1",
-        "date": "2026-02-21",
-        "type": "refactor",
-        "description": "Amélioration de l'interface admin : Regroupement des widgets de coût XP (Arrière-Plans, Attributs, Traits) dans un seul bloc 'Facteurs de Coût' pour une meilleure lisibilité et aération de la vue configuration."
     }
 ]

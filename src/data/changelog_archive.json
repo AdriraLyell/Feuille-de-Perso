@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.65.1",
+        "date": "2026-02-21",
+        "type": "refactor",
+        "description": "Amélioration de l'interface admin : Regroupement des widgets de coût XP (Arrière-Plans, Attributs, Traits) dans un seul bloc 'Facteurs de Coût' pour une meilleure lisibilité et aération de la vue configuration."
+    },
+    {
         "version": "2.65.0",
         "date": "2026-02-21",
         "type": "feat",
@@ -646,15 +652,6 @@
         "changes": [
             "🖼️ Grimoire : Ajustement automatique de la largeur lors du passage en mode libre pour un meilleur enroulement",
             "🎨 UI : Cadre de sélection plus serré (fit-content) sur les images libres"
-        ]
-    },
-    {
-        "version": "2.49.89",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🖱️ UX : Le mode déplacement libre ne s'active désormais que lorsque l'image est sélectionnée",
-            "📖 Grimoire : Support de l'enroulement du texte (wrap) en mode déplacement libre"
         ]
     }
 ]
