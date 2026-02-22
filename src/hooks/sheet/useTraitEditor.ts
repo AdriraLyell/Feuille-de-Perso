@@ -168,6 +168,7 @@ export const useTraitEditor = (
                     tag: entry.tags?.[0] || '',
                     variant: instance.variant || '',
                     definitionId: entry.id,
+                    type: multiSelectTarget === 'avantages' ? 'avantage' : 'desavantage',
                     mysticAbilityId: entry.mysticAbilityId || undefined,
                     isPostCreation: isPostCreation ? true : undefined,
                     creationValue: isPostCreation ? "0" : undefined,

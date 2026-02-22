@@ -79,6 +79,7 @@ export interface TraitEntry {
   masterSkillTarget?: string; // Nom de compétence mise au rang 5 (effet master_skill)
   isPostCreation?: boolean;
   creationValue?: string;
+  type?: 'avantage' | 'desavantage';
 }
 
 export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus' | 'auto_counter' | 'master_skill';

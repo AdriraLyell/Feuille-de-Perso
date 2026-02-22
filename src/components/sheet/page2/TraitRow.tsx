@@ -17,9 +17,10 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
 
     const isPostCreation = item.isPostCreation && !isResolved;
 
-    // Use type instead of unreliable tag search
-    const isDisadvantage = type === 'desavantages';
-    const isAdvantage = type === 'avantages';
+    // Use internal trait type if defined, otherwise fall back to the component prop
+    const internalTraitType = item.type;
+    const isDisadvantage = internalTraitType ? (internalTraitType === 'desavantage') : (type === 'desavantages');
+    const isAdvantage = internalTraitType ? (internalTraitType === 'avantage') : (type === 'avantages');
 
     const isImproved = !isPostCreation && item.creationValue !== undefined && parseInt(item.value) > parseInt(item.creationValue);
     const isReduced = !isPostCreation && item.creationValue !== undefined && parseInt(item.value) < parseInt(item.creationValue);
