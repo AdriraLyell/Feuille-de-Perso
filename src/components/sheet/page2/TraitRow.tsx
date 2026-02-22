@@ -14,13 +14,14 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove, onManageMy
     const isEmpty = !item.name.trim();
     const isResolved = item.value === '0' && item.creationValue !== undefined;
     const isPostCreationAdvantage = item.isPostCreation && !isResolved;
+    const isImproved = !item.isPostCreation && item.creationValue !== undefined && parseInt(item.value) > parseInt(item.creationValue);
 
     return (
         <div
             onClick={onClick}
             className={`flex gap-1 items-center h-[22px] px-1 transition-all rounded-sm cursor-pointer group select-none ${isEmpty
                 ? 'hover:bg-slate-50 border-b border-dotted border-stone-200'
-                : isPostCreationAdvantage
+                : (isPostCreationAdvantage || isImproved)
                     ? 'bg-emerald-50 hover:bg-emerald-100 border-b border-emerald-200 shadow-sm'
                     : 'hover:bg-blue-50 bg-white/50 border-b border-stone-300 shadow-sm'
                 }`}
@@ -34,6 +35,7 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove, onManageMy
                 } ${isResolved ? 'line-through opacity-50' : ''}`} style={{ fontSize: isEmpty ? '0.7rem' : '0.9rem' }}>
                 <span className="truncate w-full block" title={!isEmpty ? (item.variant ? `${item.name} : ${item.variant}` : item.name) : undefined}>
                     {item.isPostCreation && <span className="mr-1 text-emerald-600" title="Acquis avec XP">❇️</span>}
+                    {isImproved && <span className="mr-1 text-blue-500" title="Amélioré avec XP">⬆️</span>}
                     {item.name || "Vide"}
                     {item.variant && <span className="font-bold ml-1 text-slate-600">: {item.variant}</span>}
                 </span>

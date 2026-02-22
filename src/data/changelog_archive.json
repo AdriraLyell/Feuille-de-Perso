@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.65.0",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Déploiement production : Intégration de l'effet Maître, corrections bugs reset et confiance, améliorations journal et synchronisation cloud."
+    },
+    {
         "version": "2.64.2",
         "date": "2026-02-21",
         "type": "fix",
@@ -649,16 +655,6 @@
         "changes": [
             "🖱️ UX : Le mode déplacement libre ne s'active désormais que lorsque l'image est sélectionnée",
             "📖 Grimoire : Support de l'enroulement du texte (wrap) en mode déplacement libre"
-        ]
-    },
-    {
-        "version": "2.49.88",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "🖼️ Grimoire : Ajout du mode 'Déplacement Libre' (F) pour les images",
-            "🖱️ UX : Déplacement des images par Drag & Drop dans tout l'espace de la page",
-            "🔄 UI : Nouveau bouton de réinitialisation de la position et support des coordonnées persistantes"
         ]
     }
 ]

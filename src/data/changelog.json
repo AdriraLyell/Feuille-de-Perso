@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.71.1",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Système d'expérience : Limite maximale de l'amélioration des avantages fixée à 5. Ajout d'une icône ⬆️ distinctive dans la liste des traits pour repérer rapidement les avantages qui ont été améliorés post-création avec de l'XP."
+    },
+    {
         "version": "2.71.0",
         "date": "2026-02-22",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "refactor",
         "description": "Amélioration de l'interface admin : Regroupement des widgets de coût XP (Arrière-Plans, Attributs, Traits) dans un seul bloc 'Facteurs de Coût' pour une meilleure lisibilité et aération de la vue configuration."
-    },
-    {
-        "version": "2.65.0",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Déploiement production : Intégration de l'effet Maître, corrections bugs reset et confiance, améliorations journal et synchronisation cloud."
     }
 ]

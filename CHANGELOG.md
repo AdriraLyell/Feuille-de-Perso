@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.88] - 2026-02-17 [FEAT]
+
+- 🖼️ Grimoire : Ajout du mode 'Déplacement Libre' (F) pour les images
+- 🖱️ UX : Déplacement des images par Drag & Drop dans tout l'espace de la page
+- 🔄 UI : Nouveau bouton de réinitialisation de la position et support des coordonnées persistantes
+
 ## [2.49.87] - 2026-02-16 [FIX]
 
 - 🐞 Sidebar : Fix du bouton Reset qui pouvait échouer selon l'état des données

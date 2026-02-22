@@ -82,7 +82,7 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
     const currentValue = parseInt(editedTrait.value) || 0;
     const isFixedCost = editedTrait.value.toLowerCase().includes('pts') || !/^\d+$/.test(editedTrait.value.trim());
     const canReduce = isPostCreation && type === 'desavantages' && currentValue > 0;
-    const canIncrease = isPostCreation && type === 'avantages' && !isFixedCost && currentValue > 0;
+    const canIncrease = isPostCreation && type === 'avantages' && !isFixedCost && currentValue > 0 && currentValue < 5;
 
     return (
         <ThematicModal
