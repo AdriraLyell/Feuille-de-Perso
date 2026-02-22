@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.66.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Intégration du calendrier dans le journal de campagne ('Compagnon Temporel') : Un nouveau widget interactif s'affiche dans la barre latérale du Grimoire, permettant de consulter la date actuelle et les événements planifiés sans quitter l'éditeur. Améliorations Admin : nouveau bouton '+1 Jour' pour le calendrier fictif avec passage automatique des mois et années, et optimisation de l'avance de date pour le calendrier réel."
+    },
+    {
         "version": "2.65.4",
         "date": "2026-02-21",
         "type": "fix",
@@ -630,16 +636,6 @@
         "changes": [
             "🖱️ UX : Le bouton 'F' (Libre) permet désormais de basculer (toggle) entre le mode libre et le mode centré",
             "🔄 Système : La désactivation du mode libre réinitialise automatiquement la position de l'image (Reset Offsets)"
-        ]
-    },
-    {
-        "version": "2.49.93",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🛡️ UI : La barre d'outils suit désormais l'image dans ses déplacements libres (Flush Toolbar)",
-            "🔼 UX : La sélection d'une image la fait désormais passer au-dessus de tous les éléments (sommaire, menus) via un Z-index dynamique",
-            "🛠️ Système : Correction des problèmes d'images 'bloquées' derrière l'interface du grimoire"
         ]
     }
 ]

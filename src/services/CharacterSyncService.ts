@@ -178,6 +178,21 @@ export const CharacterSyncService = {
     },
 
     /**
+     * Get all FULL characters synced to a specific campaign (for Roster view).
+     */
+    async getFullCharactersBySettingId(settingId: string): Promise<SyncedCharacter[]> {
+        return await DatabaseService.fetchAll<SyncedCharacter>(
+            'characters',
+            {
+                select: '*',
+                eq: { setting_id: settingId },
+                order: { column: 'last_synced', ascending: false }
+            },
+            'CharacterSyncService.getFullCharactersBySettingId'
+        );
+    },
+
+    /**
      * Get a single character by ID (for Admin or Player detail view).
      */
     async getCharacterById(id: string): Promise<SyncedCharacter | null> {

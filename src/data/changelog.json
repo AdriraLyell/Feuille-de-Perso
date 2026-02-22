@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.72.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Création du Registre des Acteurs (Roster View). Ajout d'une nouvelle URL publique '?roster=uuid' permettant d'afficher une présentation tabulaire et détaillée de l'ensemble des personnages joueurs d'une chronique. Accessible via un nouveau bouton raccourci sur les cartes de campagne depuis le Tableau de Bord Admin."
+    },
+    {
         "version": "2.71.5",
         "date": "2026-02-22",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-22",
         "type": "fix",
         "description": "Correction d'une erreur de référence sur BookChapterSidebar dans le journal de campagne."
-    },
-    {
-        "version": "2.66.0",
-        "date": "2026-02-22",
-        "type": "feat",
-        "description": "Intégration du calendrier dans le journal de campagne ('Compagnon Temporel') : Un nouveau widget interactif s'affiche dans la barre latérale du Grimoire, permettant de consulter la date actuelle et les événements planifiés sans quitter l'éditeur. Améliorations Admin : nouveau bouton '+1 Jour' pour le calendrier fictif avec passage automatique des mois et années, et optimisation de l'avance de date pour le calendrier réel."
     }
 ]
