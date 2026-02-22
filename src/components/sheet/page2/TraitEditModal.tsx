@@ -82,16 +82,25 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
     const currentValue = parseInt(editedTrait.value) || 0;
     const isFixedCost = editedTrait.value.toLowerCase().includes('pts') || !/^\d+$/.test(editedTrait.value.trim());
 
-    // Check if the trait is variable in the library
+    // Extract max value from library cost strings (e.g., "1-3", "2 à 5", "1, 2, 3")
+    const extractMaxFromCost = (cost: string): number => {
+        const matches = cost.match(/\d+/g);
+        if (matches && matches.length >= 2) {
+            return Math.max(...matches.map(Number));
+        }
+        return 0; // Not a range
+    };
+
+    // Check if the trait is variable in the library and get its max
     const libEntry = data.library?.find(e => e.id === editedTrait.definitionId);
-    const isActuallyVariable = libEntry
-        ? (libEntry.isVariable || libEntry.isVariableCost || /[-,–—,;]/.test(libEntry.cost || '') || (libEntry.cost || '').includes('..'))
-        : !isFixedCost;
+    const libCost = libEntry?.pointsLabel || libEntry?.cost || '';
+    const maxValue = extractMaxFromCost(libCost);
+    const isActuallyVariable = maxValue > 0;
 
     const isImproved = !editedTrait.isPostCreation && editedTrait.creationValue !== undefined && currentValue > (parseInt(editedTrait.creationValue) || 0);
 
     const canReduce = isPostCreation && type === 'desavantages' && currentValue > 0;
-    const canIncrease = isPostCreation && type === 'avantages' && isActuallyVariable && currentValue > 0 && currentValue < 5;
+    const canIncrease = isPostCreation && type === 'avantages' && isActuallyVariable && currentValue > 0 && currentValue < maxValue;
 
     return (
         <ThematicModal

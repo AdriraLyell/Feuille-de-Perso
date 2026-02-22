@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.90] - 2026-02-17 [FIX]
+
+- 🖼️ Grimoire : Ajustement automatique de la largeur lors du passage en mode libre pour un meilleur enroulement
+- 🎨 UI : Cadre de sélection plus serré (fit-content) sur les images libres
+
 ## [2.49.89] - 2026-02-17 [FIX]
 
 - 🖱️ UX : Le mode déplacement libre ne s'active désormais que lorsque l'image est sélectionnée
