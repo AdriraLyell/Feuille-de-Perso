@@ -36,6 +36,9 @@ export const migrateDefaults = (parsed: any): void => {
     // Initialize appLogs
     if (!parsed.appLogs) {
         parsed.appLogs = [];
+    } else if (Array.isArray(parsed.appLogs) && parsed.appLogs.length > 50) {
+        // Purge old logs if the array has grown too large
+        parsed.appLogs = parsed.appLogs.slice(0, 50);
     }
 
     // Initialize creationConfig

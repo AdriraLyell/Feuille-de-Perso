@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.63.1",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction majeure de la visibilité des items supprimés : Restriction du chargement des bibliothèques MJ aux seuls items explicitement rattachés à la campagne ou créés pour elle. Cette modification garantit que les items supprimés (via l'icône corbeille) disparaissent définitivement de la vue MJ après un rafraîchissement, même s'ils subsistent dans le dépôt global pour d'autres campagnes."
+    },
+    {
         "version": "2.63.0",
         "date": "2026-02-21",
         "type": "fix",
@@ -673,16 +679,6 @@
             "🔍 Bibliothèques : Correction de la visibilité des compétences à variantes (Artisanat, etc.) en mode filtré",
             "🛠️ Système : Amélioration de la détection 'Global' pour le catalogue chargé depuis JSON",
             "🎨 UI : Ajustement de la visibilité des boutons d'édition dans les listes administratives"
-        ]
-    },
-    {
-        "version": "2.49.82",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🚀 Système : Utilisation d'un Portal React pour les modales (correction confinement UI)",
-            "🔄 Admin : Restauration du bouton 'Modifier' dans la bibliothèque globale de compétences",
-            "🎨 UI : Amélioration de la cohérence visuelle entre la bibliothèque et la réserve"
         ]
     }
 ]

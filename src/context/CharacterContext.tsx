@@ -144,7 +144,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
                     message,
                     timestamp: new Date().toLocaleTimeString()
                 };
-                return { ...prev, appLogs: [updatedLog, ...logs.slice(1)] };
+                return { ...prev, appLogs: [updatedLog, ...logs.slice(1)].slice(0, 50) };
             }
 
             const newLog: LogEntry = {
@@ -156,7 +156,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
                 deduplicationId
             };
 
-            return { ...prev, appLogs: [newLog, ...logs] };
+            return { ...prev, appLogs: [newLog, ...logs].slice(0, 50) };
         });
     }, []);
 

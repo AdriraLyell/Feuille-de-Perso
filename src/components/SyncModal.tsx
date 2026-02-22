@@ -222,7 +222,7 @@ const SyncModal: React.FC<SyncModalProps> = ({
                 </div>
             }
         >
-            <div className="flex flex-col h-[600px] gap-4">
+            <div className="flex flex-col h-[800px] max-h-[80vh] gap-4">
                 {/* Tabs */}
                 <div className="flex gap-2 border-b-2 border-[#bfae85]/50 pb-0 shrink-0">
                     <button
