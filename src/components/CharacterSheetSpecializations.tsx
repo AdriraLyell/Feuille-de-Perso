@@ -260,78 +260,80 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
     });
 
     return (
-        <div className={`sheet-container p-6 ${isLandscape ? 'landscape' : ''} ${isDrawerOpen ? 'mr-[340px]' : ''} transition-all duration-300`}>
+        <div className={`flex justify-center transition-all duration-300 ${isDrawerOpen ? 'pr-80' : ''}`}>
+            <div className={`sheet-container p-6 ${isLandscape ? 'landscape' : ''}`}>
 
-            <h1 className="text-3xl font-black text-center uppercase py-2 tracking-widest border-b-2 border-stone-800 mb-4 text-indigo-950 font-serif relative">
-                Spécialisations
-                <button
-                    onClick={() => setIsDrawerOpen(true)}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold py-1 px-3 rounded shadow-sm transition-colors flex items-center gap-1 uppercase"
-                >
-                    <Award size={14} /> Catalogue
-                </button>
-            </h1>
+                <h1 className="text-3xl font-black text-center uppercase py-2 tracking-widest border-b-2 border-stone-800 mb-4 text-indigo-950 font-serif relative">
+                    Spécialisations
+                    <button
+                        onClick={() => setIsDrawerOpen(true)}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold py-1 px-3 rounded shadow-sm transition-colors flex items-center gap-1 uppercase"
+                    >
+                        <Award size={14} /> Catalogue
+                    </button>
+                </h1>
 
-            <div className="flex-grow flex flex-col overflow-hidden">
-                {!hasAnySkill && (
-                    <div className="text-center text-stone-400 italic mt-20 flex-grow flex items-center justify-center">
-                        <div>
-                            <p className="mb-2 text-lg">Aucune compétence (principale) ne possède de point ou de spécialisation imposée.</p>
-                            <p className="text-sm">Ajoutez des points dans l'onglet "Personnage" pour voir apparaître les champs de spécialisation ici.</p>
-                        </div>
-                    </div>
-                )}
-
-                <div className="space-y-0.5 overflow-auto">
-                    {/* Dynamic Rendering from Rules */}
-                    {rules?.definitions?.skillCategories
-                        ?.filter((cat: any) => cat.behavior === 'Compétence')
-                        ?.map((cat: any) => (
-                            <div key={cat.id}>
-                                {renderCategory(cat.label, cat.id as any)}
+                <div className="flex-grow flex flex-col overflow-hidden">
+                    {!hasAnySkill && (
+                        <div className="text-center text-stone-400 italic mt-20 flex-grow flex items-center justify-center">
+                            <div>
+                                <p className="mb-2 text-lg">Aucune compétence (principale) ne possède de point ou de spécialisation imposée.</p>
+                                <p className="text-sm">Ajoutez des points dans l'onglet "Personnage" pour voir apparaître les champs de spécialisation ici.</p>
                             </div>
-                        ))}
-
-                    {/* Fallback Rendering if no rules / legacy keys */}
-                    {(!rules || !rules.definitions?.skillCategories) && (
-                        <>
-                            {renderCategory("Talents", "talents" as any)}
-                            {renderCategory("Compétences", "competences" as any)}
-                            {renderCategory("Compétences (Suite)", "competences_col_2" as any)}
-                            {renderCategory("Connaissances", "connaissances" as any)}
-                            {renderCategory("Autres Compétences", "autres_competences" as any)}
-                            {renderCategory("Autres", "autres" as any)}
-                        </>
+                        </div>
                     )}
+
+                    <div className="space-y-0.5 overflow-auto">
+                        {/* Dynamic Rendering from Rules */}
+                        {rules?.definitions?.skillCategories
+                            ?.filter((cat: any) => cat.behavior === 'Compétence')
+                            ?.map((cat: any) => (
+                                <div key={cat.id}>
+                                    {renderCategory(cat.label, cat.id as any)}
+                                </div>
+                            ))}
+
+                        {/* Fallback Rendering if no rules / legacy keys */}
+                        {(!rules || !rules.definitions?.skillCategories) && (
+                            <>
+                                {renderCategory("Talents", "talents" as any)}
+                                {renderCategory("Compétences", "competences" as any)}
+                                {renderCategory("Compétences (Suite)", "competences_col_2" as any)}
+                                {renderCategory("Connaissances", "connaissances" as any)}
+                                {renderCategory("Autres Compétences", "autres_competences" as any)}
+                                {renderCategory("Autres", "autres" as any)}
+                            </>
+                        )}
+                    </div>
                 </div>
-            </div>
 
-            <SpecializationLibraryDrawer
-                isOpen={isDrawerOpen}
-                onClose={() => setIsDrawerOpen(false)}
-            />
-
-            {duplicateErrorModal && (
-                <ConfirmationModal
-                    isOpen={!!duplicateErrorModal}
-                    onClose={() => setDuplicateErrorModal(null)}
-                    onConfirm={() => setDuplicateErrorModal(null)}
-                    title="Promotion Impossible"
-                    message={
-                        <span>
-                            La compétence secondaire <strong>"{duplicateErrorModal}"</strong> existe déjà.
-                            <br /><br />
-                            <span className="text-[11px] opacity-80">
-                                Veuillez supprimer la compétence existante ou choisir une autre spécialisation à promouvoir.
-                            </span>
-                        </span>
-                    }
-                    confirmLabel="Compris"
-                    cancelLabel=""
-                    type="danger"
-                    scheme="paper"
+                <SpecializationLibraryDrawer
+                    isOpen={isDrawerOpen}
+                    onClose={() => setIsDrawerOpen(false)}
                 />
-            )}
+
+                {duplicateErrorModal && (
+                    <ConfirmationModal
+                        isOpen={!!duplicateErrorModal}
+                        onClose={() => setDuplicateErrorModal(null)}
+                        onConfirm={() => setDuplicateErrorModal(null)}
+                        title="Promotion Impossible"
+                        message={
+                            <span>
+                                La compétence secondaire <strong>"{duplicateErrorModal}"</strong> existe déjà.
+                                <br /><br />
+                                <span className="text-[11px] opacity-80">
+                                    Veuillez supprimer la compétence existante ou choisir une autre spécialisation à promouvoir.
+                                </span>
+                            </span>
+                        }
+                        confirmLabel="Compris"
+                        cancelLabel=""
+                        type="danger"
+                        scheme="paper"
+                    />
+                )}
+            </div>
         </div>
     );
 };

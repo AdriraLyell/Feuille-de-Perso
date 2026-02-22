@@ -125,153 +125,155 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
     }, [data, rules, creationActive]);
 
     return (
-        <div className={`sheet-container ${isLandscape ? 'landscape' : ''} ${isEditMode ? 'mr-[340px]' : ''} transition-all duration-300`}>
+        <div className={`flex justify-center transition-all duration-300 ${isEditMode ? 'pr-80' : ''}`}>
+            <div className={`sheet-container ${isLandscape ? 'landscape' : ''}`}>
 
-            <SheetHeader
-                headerData={data.header}
-                creationActive={!!creationActive}
-                onUpdateHeader={updateHeader}
-                onToggleCreationMode={handleToggleCreationMode}
-                editModeActive={isEditMode}
-                onToggleEditMode={handleToggleEditMode}
-                isDateLocked={!!rules?.configurations?.calendar}
-            />
-
-            {isEditMode && (
-                <div className="bg-amber-600 text-white py-2 px-4 flex justify-between items-center shadow-md animate-in slide-in-from-top duration-300 no-print">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-white/20 p-1.5 rounded-full">
-                            <PencilLine size={18} />
-                        </div>
-                        <div>
-                            <p className="font-bold text-sm">Mode Édition Actif</p>
-                            <p className="text-[10px] opacity-90">Glissez-déposez pour réorganiser ou supprimer. Vos changements sont enregistrés localement.</p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => setIsEditMode(false)}
-                        className="bg-white text-amber-700 px-4 py-1.5 rounded-sm font-black text-xs uppercase hover:bg-amber-50 transition-colors shadow-sm flex items-center gap-2"
-                    >
-                        <Check size={14} /> Valider mes changements
-                    </button>
-                </div>
-            )}
-
-            {isEditMode && <EditionSidebar onClose={() => setIsEditMode(false)} />}
-
-            {/* Attributes Section */}
-            <div className="grid grid-cols-12 border-b-2 border-stone-800">
-                <div className={`col-span-10 grid ${getAttributesGridClass()}`}>
-                    {attributeCategories.map(cat => (
-                        <AttributeBlock
-                            key={cat.id}
-                            title={cat.label}
-                            items={data.attributes[cat.id] || []}
-                            secondaryItems={data.secondaryAttributesActive ? data.secondaryAttributes[cat.id] : undefined}
-                            cat={cat.id}
-                            onUpdate={updateAttribute}
-                            bonuses={attributeBonuses}
-                            isCreationMode={!!creationActive}
-                        />
-                    ))}
-                </div>
-                <ExperienceSummary experience={data.experience} cardValue={cardValue} />
-            </div>
-
-            <CharacterSheetGrid
-                columns={columns}
-                backgrounds={backgrounds}
-                isLandscape={isLandscape}
-                isEditMode={isEditMode}
-                allowExtendedSkills={allowExtendedSkills}
-                theme={data.theme}
-                rules={rules}
-                specializations={data.specializations}
-                imposedSpecializations={data.imposedSpecializations}
-                onUpdateDot={updateDot}
-                onDefineVariant={handleDefineVariant}
-                onDropItem={handleDropItem}
-                onRemoveItem={handleRemoveItem}
-                validateSkillIncrease={validateSkillIncrease}
-                renderExtraColumn={() => (
-                    <>
-                        <div className="flex-none border-b border-stone-400 overflow-hidden">
-                            <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
-                        </div>
-                        <div className="flex-grow overflow-hidden">
-                            <CountersSection data={data} updateCounter={updateCounter} isLandscape={isLandscape} />
-                        </div>
-                    </>
-                )}
-                renderBottomSection={() => (
-                    <div className="grid grid-cols-2">
-                        <div className="border-r-2 border-stone-800 flex flex-col">
-                            <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
-                        </div>
-                        <div className="flex flex-col">
-                            <CountersSection data={data} updateCounter={updateCounter} isLandscape={isLandscape} />
-                        </div>
-                    </div>
-                )}
-            />
-
-            {showEditWarning && (
-                <ThematicModal
-                    isOpen={showEditWarning}
-                    onClose={() => setShowEditWarning(false)}
-                    title="Activer le Mode Édition ?"
-                    icon={<PencilLine size={24} />}
-                    size="md"
-                    footer={
-                        <>
-                            <button
-                                onClick={() => setShowEditWarning(false)}
-                                className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold"
-                            >
-                                Annuler
-                            </button>
-                            <button
-                                onClick={executeEditModeActivation}
-                                className="px-6 py-2 bg-amber-600 text-white rounded-sm font-bold shadow-md hover:bg-amber-700 flex items-center gap-2"
-                            >
-                                <Check size={16} /> Compris, j'active
-                            </button>
-                        </>
-                    }
-                >
-                    <div className="flex flex-col gap-4 py-2">
-                        <div className="bg-amber-50 border border-amber-200 p-4 rounded-sm text-sm text-[#5c4d41] leading-relaxed">
-                            <p className="font-bold mb-2">Qu'est-ce que le Mode Édition ?</p>
-                            <ul className="list-disc list-inside space-y-2 text-xs">
-                                <li><strong>Ajout direct</strong> : Glissez des compétences depuis la barre latérale.</li>
-                                <li><strong>Réorganisation</strong> : Déplacez vos compétences d'un bloc à l'autre.</li>
-                                <li><strong>Nettoyage</strong> : Supprimez des éléments inutiles via l'icône poubelle.</li>
-                                <li><strong>Suggestions</strong> : Les nouveaux éléments sont suggérés au MJ.</li>
-                            </ul>
-                            <p className="mt-4 text-[10px] italic opacity-70">Note : Ce mode est réservé aux ajustements de structure. Pour remplir vos points, utilisez le mode standard ou le mode création.</p>
-                        </div>
-                    </div>
-                </ThematicModal>
-            )}
-
-            {/* Creation Mode Activation Warning Modal */}
-            {showCreationWarning && (
-                <CreationModeModal
-                    data={data}
-                    onClose={() => setShowCreationWarning(false)}
-                    onConfirm={executeCreationActivation}
+                <SheetHeader
+                    headerData={data.header}
+                    creationActive={!!creationActive}
+                    onUpdateHeader={updateHeader}
+                    onToggleCreationMode={handleToggleCreationMode}
+                    editModeActive={isEditMode}
+                    onToggleEditMode={handleToggleEditMode}
+                    isDateLocked={!!rules?.configurations?.calendar}
                 />
-            )}
 
-            {/* Variable Skill Definition Modal */}
-            {/* Variable Skill Definition Modal */}
-            <VariantSelectionModal
-                isOpen={variantModalState.isOpen}
-                onClose={() => setVariantModalState(prev => ({ ...prev, isOpen: false }))}
-                onConfirm={finalizeVariantDefinition}
-                skillName={variantModalState.skillName}
-                variants={variantModalState.variants}
-            />
+                {isEditMode && (
+                    <div className="bg-amber-600 text-white py-2 px-4 flex justify-between items-center shadow-md animate-in slide-in-from-top duration-300 no-print">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-white/20 p-1.5 rounded-full">
+                                <PencilLine size={18} />
+                            </div>
+                            <div>
+                                <p className="font-bold text-sm">Mode Édition Actif</p>
+                                <p className="text-[10px] opacity-90">Glissez-déposez pour réorganiser ou supprimer. Vos changements sont enregistrés localement.</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setIsEditMode(false)}
+                            className="bg-white text-amber-700 px-4 py-1.5 rounded-sm font-black text-xs uppercase hover:bg-amber-50 transition-colors shadow-sm flex items-center gap-2"
+                        >
+                            <Check size={14} /> Valider mes changements
+                        </button>
+                    </div>
+                )}
+
+                {isEditMode && <EditionSidebar onClose={() => setIsEditMode(false)} />}
+
+                {/* Attributes Section */}
+                <div className="grid grid-cols-12 border-b-2 border-stone-800">
+                    <div className={`col-span-10 grid ${getAttributesGridClass()}`}>
+                        {attributeCategories.map(cat => (
+                            <AttributeBlock
+                                key={cat.id}
+                                title={cat.label}
+                                items={data.attributes[cat.id] || []}
+                                secondaryItems={data.secondaryAttributesActive ? data.secondaryAttributes[cat.id] : undefined}
+                                cat={cat.id}
+                                onUpdate={updateAttribute}
+                                bonuses={attributeBonuses}
+                                isCreationMode={!!creationActive}
+                            />
+                        ))}
+                    </div>
+                    <ExperienceSummary experience={data.experience} cardValue={cardValue} />
+                </div>
+
+                <CharacterSheetGrid
+                    columns={columns}
+                    backgrounds={backgrounds}
+                    isLandscape={isLandscape}
+                    isEditMode={isEditMode}
+                    allowExtendedSkills={allowExtendedSkills}
+                    theme={data.theme}
+                    rules={rules}
+                    specializations={data.specializations}
+                    imposedSpecializations={data.imposedSpecializations}
+                    onUpdateDot={updateDot}
+                    onDefineVariant={handleDefineVariant}
+                    onDropItem={handleDropItem}
+                    onRemoveItem={handleRemoveItem}
+                    validateSkillIncrease={validateSkillIncrease}
+                    renderExtraColumn={() => (
+                        <>
+                            <div className="flex-none border-b border-stone-400 overflow-hidden">
+                                <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
+                            </div>
+                            <div className="flex-grow overflow-hidden">
+                                <CountersSection data={data} updateCounter={updateCounter} isLandscape={isLandscape} />
+                            </div>
+                        </>
+                    )}
+                    renderBottomSection={() => (
+                        <div className="grid grid-cols-2">
+                            <div className="border-r-2 border-stone-800 flex flex-col">
+                                <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
+                            </div>
+                            <div className="flex flex-col">
+                                <CountersSection data={data} updateCounter={updateCounter} isLandscape={isLandscape} />
+                            </div>
+                        </div>
+                    )}
+                />
+
+                {showEditWarning && (
+                    <ThematicModal
+                        isOpen={showEditWarning}
+                        onClose={() => setShowEditWarning(false)}
+                        title="Activer le Mode Édition ?"
+                        icon={<PencilLine size={24} />}
+                        size="md"
+                        footer={
+                            <>
+                                <button
+                                    onClick={() => setShowEditWarning(false)}
+                                    className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold"
+                                >
+                                    Annuler
+                                </button>
+                                <button
+                                    onClick={executeEditModeActivation}
+                                    className="px-6 py-2 bg-amber-600 text-white rounded-sm font-bold shadow-md hover:bg-amber-700 flex items-center gap-2"
+                                >
+                                    <Check size={16} /> Compris, j'active
+                                </button>
+                            </>
+                        }
+                    >
+                        <div className="flex flex-col gap-4 py-2">
+                            <div className="bg-amber-50 border border-amber-200 p-4 rounded-sm text-sm text-[#5c4d41] leading-relaxed">
+                                <p className="font-bold mb-2">Qu'est-ce que le Mode Édition ?</p>
+                                <ul className="list-disc list-inside space-y-2 text-xs">
+                                    <li><strong>Ajout direct</strong> : Glissez des compétences depuis la barre latérale.</li>
+                                    <li><strong>Réorganisation</strong> : Déplacez vos compétences d'un bloc à l'autre.</li>
+                                    <li><strong>Nettoyage</strong> : Supprimez des éléments inutiles via l'icône poubelle.</li>
+                                    <li><strong>Suggestions</strong> : Les nouveaux éléments sont suggérés au MJ.</li>
+                                </ul>
+                                <p className="mt-4 text-[10px] italic opacity-70">Note : Ce mode est réservé aux ajustements de structure. Pour remplir vos points, utilisez le mode standard ou le mode création.</p>
+                            </div>
+                        </div>
+                    </ThematicModal>
+                )}
+
+                {/* Creation Mode Activation Warning Modal */}
+                {showCreationWarning && (
+                    <CreationModeModal
+                        data={data}
+                        onClose={() => setShowCreationWarning(false)}
+                        onConfirm={executeCreationActivation}
+                    />
+                )}
+
+                {/* Variable Skill Definition Modal */}
+                {/* Variable Skill Definition Modal */}
+                <VariantSelectionModal
+                    isOpen={variantModalState.isOpen}
+                    onClose={() => setVariantModalState(prev => ({ ...prev, isOpen: false }))}
+                    onConfirm={finalizeVariantDefinition}
+                    skillName={variantModalState.skillName}
+                    variants={variantModalState.variants}
+                />
+            </div>
         </div>
     );
 };
