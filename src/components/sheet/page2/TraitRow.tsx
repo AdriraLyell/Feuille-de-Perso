@@ -50,11 +50,11 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
             <div className={`flex-grow h-full flex items-center px-1 font-handwriting min-w-0 ${isEmpty ? 'text-stone-300 italic text-[10px]' : 'text-ink'
                 } ${isResolved ? 'line-through opacity-50' : ''}`} style={{ fontSize: isEmpty ? '0.7rem' : '0.9rem' }}>
                 <span className="truncate w-full block" title={!isEmpty ? (item.variant ? `${item.name} : ${item.variant}` : item.name) : undefined}>
-                    <span className="inline-flex items-center gap-1 mr-1 text-[12px] leading-none">
-                        {isPostCreationAdvantage && <span className="text-emerald-600" title="Acquis avec XP">❇️</span>}
-                        {isPostCreationDisadvantage && <span className="text-red-500" title="Nouveau Désavantage (Gain XP)">❇️</span>}
-                        {isImproved && <span className="text-blue-500" title="Amélioré avec XP">⬆️</span>}
-                        {isReduced && <span className="text-amber-500" title="Racheté avec XP">⬇️</span>}
+                    <span className="inline-flex items-center gap-1 mr-1.5 leading-none">
+                        {isPostCreationAdvantage && <span title="Acquis avec XP"><Sparkles size={11} className="text-emerald-600 fill-emerald-600/20" strokeWidth={2.5} /></span>}
+                        {isPostCreationDisadvantage && <span title="Nouveau Désavantage (Gain XP)"><Sparkles size={11} className="text-red-500 fill-red-500/20" strokeWidth={2.5} /></span>}
+                        {isImproved && <span title="Amélioré avec XP"><ArrowUp size={11} className="text-blue-600" strokeWidth={3} /></span>}
+                        {isReduced && <span title="Racheté avec XP"><ArrowDown size={11} className="text-orange-600" strokeWidth={3} /></span>}
                     </span>
                     {item.name || "Vide"}
                     {item.variant && <span className="font-bold ml-1 text-slate-600">: {item.variant}</span>}
