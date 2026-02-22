@@ -26,7 +26,11 @@
       "Bash(done)",
       "Bash(git -C \"d:/Projet JdR/feuille-de-perso\" show b43627b~1:src/components/campaign/JournalPage.tsx)",
       "Bash(git -C \"d:/Projet JdR/feuille-de-perso\" show b43627b~1:src/hooks/useJournal.ts)",
-      "Bash(git -C \"d:/Projet JdR/feuille-de-perso\" show b43627b~1:src/hooks/useJournalImages.ts)"
+      "Bash(git -C \"d:/Projet JdR/feuille-de-perso\" show b43627b~1:src/hooks/useJournalImages.ts)",
+      "mcp__supabase__list_projects",
+      "mcp__supabase__search_docs",
+      "mcp__supabase__execute_sql",
+      "mcp__supabase__list_tables"
     ]
   },
   "enableAllProjectMcpServers": true,

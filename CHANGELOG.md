@@ -1,5 +1,13 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.82] - 2026-02-16 [FEAT]
+
+- 🚀 Système : Utilisation d'un Portal React pour les modales (correction confinement UI)
+- 🔄 Admin : Restauration du bouton 'Modifier' dans la bibliothèque globale de compétences
+- 🎨 UI : Amélioration de la cohérence visuelle entre la bibliothèque et la réserve
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.49.81] - 2026-02-16 [FEAT]
 
 - 🎨 Admin : Migration de la personnalisation des compétences vers la Réserve (sidebar)
