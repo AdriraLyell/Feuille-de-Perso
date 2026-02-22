@@ -302,6 +302,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     <TraitRow
                         key={i}
                         item={item}
+                        type="avantages"
                         onClick={() => {
                             if (!item.name.trim()) setMultiSelectTarget('avantages');
                             else setEditingTrait({ type: 'avantages', index: i, trait: item });
@@ -334,6 +335,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     <TraitRow
                         key={i}
                         item={item}
+                        type="desavantages"
                         onClick={() => {
                             if (!item.name.trim()) setMultiSelectTarget('desavantages');
                             else setEditingTrait({ type: 'desavantages', index: i, trait: item });

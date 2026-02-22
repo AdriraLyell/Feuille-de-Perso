@@ -1,24 +1,25 @@
 
 import React from 'react';
 import { TraitEntry } from '../../../types';
-import { Edit, Trash2, Wand2 } from 'lucide-react';
+import { Edit, Trash2, Wand2, Sparkles, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface TraitRowProps {
     item: TraitEntry;
+    type: 'avantages' | 'desavantages';
     onClick: () => void;
     onRemove: (e: React.MouseEvent) => void;
     onManageMystic?: (e: React.MouseEvent) => void;
 }
 
-const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove, onManageMystic }) => {
+const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onManageMystic }) => {
     const isEmpty = !item.name.trim();
     const isResolved = item.value === '0' && item.creationValue !== undefined;
 
     const isPostCreation = item.isPostCreation && !isResolved;
 
-    // Use tag to determine type as 'type' property is not on TraitEntry interface
-    const isDisadvantage = item.tag?.toLowerCase().includes('desavantage') || item.tag?.toLowerCase().includes('défaut');
-    const isAdvantage = !isDisadvantage && !isEmpty;
+    // Use type instead of unreliable tag search
+    const isDisadvantage = type === 'desavantages';
+    const isAdvantage = type === 'avantages';
 
     const isImproved = !isPostCreation && item.creationValue !== undefined && parseInt(item.value) > parseInt(item.creationValue);
     const isReduced = !isPostCreation && item.creationValue !== undefined && parseInt(item.value) < parseInt(item.creationValue);
@@ -48,10 +49,12 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove, onManageMy
             <div className={`flex-grow h-full flex items-center px-1 font-handwriting min-w-0 ${isEmpty ? 'text-stone-300 italic text-[10px]' : 'text-ink'
                 } ${isResolved ? 'line-through opacity-50' : ''}`} style={{ fontSize: isEmpty ? '0.7rem' : '0.9rem' }}>
                 <span className="truncate w-full block" title={!isEmpty ? (item.variant ? `${item.name} : ${item.variant}` : item.name) : undefined}>
-                    {isPostCreationAdvantage && <span className="mr-1 text-emerald-600" title="Acquis avec XP">❇️</span>}
-                    {isPostCreationDisadvantage && <span className="mr-1 text-red-500" title="Nouveau Désavantage (Gain XP)">❇️</span>}
-                    {isImproved && <span className="mr-1 text-blue-500" title="Amélioré avec XP">⬆️</span>}
-                    {isReduced && <span className="mr-1 text-amber-500" title="Racheté avec XP">⬇️</span>}
+                    <span className="inline-flex items-center gap-1 mr-1">
+                        {isPostCreationAdvantage && <span title="Acquis avec XP"><Sparkles size={12} className="text-emerald-600" /></span>}
+                        {isPostCreationDisadvantage && <span title="Nouveau Désavantage (Gain XP)"><Sparkles size={12} className="text-red-500" /></span>}
+                        {isImproved && <span title="Amélioré avec XP"><ArrowUp size={12} className="text-blue-500" /></span>}
+                        {isReduced && <span title="Racheté avec XP"><ArrowDown size={12} className="text-amber-500" /></span>}
+                    </span>
                     {item.name || "Vide"}
                     {item.variant && <span className="font-bold ml-1 text-slate-600">: {item.variant}</span>}
                 </span>
