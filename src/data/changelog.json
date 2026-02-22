@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.69.4",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ergonomie : Persistance de l'état ouvert/fermé du Chroniqueur (calendrier) dans les notes de campagne. Le calendrier conserve désormais son état même après avoir changé d'onglet ou rechargé la page."
+    },
+    {
         "version": "2.69.3",
         "date": "2026-02-22",
         "type": "fix",
@@ -112,17 +118,5 @@
         "date": "2026-02-22",
         "type": "feat",
         "description": "Nouvel effet de trait 'Maître' (master_skill) : Quand un trait avec cet effet est ajouté, un wizard s'ouvre permettant au joueur de choisir une compétence primaire à rang 0. Celle-ci est automatiquement portée au rang 5 sans coût XP. Suppression du trait : la compétence revient au rang 0. L'xpCalculator reconnaît les compétences maîtrisées via masterSkillTarget et les traite comme entièrement gratuites jusqu'au rang 5. Interface admin : couleur violette + description informative."
-    },
-    {
-        "version": "2.63.3",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction des couleurs des compétences Habiletés Mystiques : (1) Le wizard d'ajout de compétences mystiques stocke désormais `definitionId` et `mysticAbilityId` sur chaque DotEntry ajouté, permettant à useSheetLayout de les enrichir correctement. (2) Ajout d'un fallback par nom dans useSheetLayout pour rétrocompatibilité avec les fiches existantes. (3) Alignement des couleurs de fallback dans l'AppearanceEditor sur les valeurs de DEFAULT_THEME (#8b5cf6 mystique, #d97706 variable)."
-    },
-    {
-        "version": "2.63.2",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction du nom du compteur auto lors de l'édition d'un trait avec variant : quand le variant d'un trait 'Compteur Auto' est modifié via le modal d'édition, le nom du compteur associé est désormais recalculé et mis à jour en conséquence (ex: 'Munitions (Pistolet)' → 'Munitions (Fusil)')."
     }
 ]

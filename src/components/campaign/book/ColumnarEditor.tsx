@@ -49,7 +49,10 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     const [showColorPalette, setShowColorPalette] = useState(false);
     const [showHighlightPalette, setShowHighlightPalette] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
-    const [isCalendarVisible, setIsCalendarVisible] = useState(true);
+    const [isCalendarVisible, setIsCalendarVisible] = useState(() => {
+        const saved = localStorage.getItem('book-calendar-visible');
+        return saved === null ? true : saved === 'true';
+    });
     const [pickingTarget, setPickingTarget] = useState<{ nodeId: string, field: string } | null>(null);
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -76,6 +79,10 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         }
     }, []);
 
+
+    useEffect(() => {
+        localStorage.setItem('book-calendar-visible', String(isCalendarVisible));
+    }, [isCalendarVisible]);
 
     // Event listener for external calendar toggling
     useEffect(() => {

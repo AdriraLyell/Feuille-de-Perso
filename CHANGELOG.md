@@ -1,5 +1,19 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.84] - 2026-02-16 [FEAT]
+
+- 🧠 Admin : Distinction claire entre édition de la Bibliothèque Globale et Personnalisation de Campagne
+- 🛡️ Système : La modification via l'onglet Bibliothèque met désormais à jour la base master pour tous les réglages
+- 🖋️ UI : Titres de modales explicites selon le contexte d'édition (Base Globale vs Campagne)
+
+## [2.49.83] - 2026-02-16 [FIX]
+
+- 🔍 Bibliothèques : Correction de la visibilité des compétences à variantes (Artisanat, etc.) en mode filtré
+- 🛠️ Système : Amélioration de la détection 'Global' pour le catalogue chargé depuis JSON
+- 🎨 UI : Ajustement de la visibilité des boutons d'édition dans les listes administratives
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.49.82] - 2026-02-16 [FEAT]
 
 - 🚀 Système : Utilisation d'un Portal React pour les modales (correction confinement UI)

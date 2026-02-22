@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.63.3",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction des couleurs des compétences Habiletés Mystiques : (1) Le wizard d'ajout de compétences mystiques stocke désormais `definitionId` et `mysticAbilityId` sur chaque DotEntry ajouté, permettant à useSheetLayout de les enrichir correctement. (2) Ajout d'un fallback par nom dans useSheetLayout pour rétrocompatibilité avec les fiches existantes. (3) Alignement des couleurs de fallback dans l'AppearanceEditor sur les valeurs de DEFAULT_THEME (#8b5cf6 mystique, #d97706 variable)."
+    },
+    {
+        "version": "2.63.2",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction du nom du compteur auto lors de l'édition d'un trait avec variant : quand le variant d'un trait 'Compteur Auto' est modifié via le modal d'édition, le nom du compteur associé est désormais recalculé et mis à jour en conséquence (ex: 'Munitions (Pistolet)' → 'Munitions (Fusil)')."
+    },
+    {
         "version": "2.63.1",
         "date": "2026-02-21",
         "type": "fix",
@@ -659,26 +671,6 @@
             "🔒 Bibliothèque : Verrouillage de l'édition globale si une compétence est personnalisée localement",
             "🔄 Réserve : Nouveau bouton 'Reset' pour restaurer instantanément une compétence à son état d'origine",
             "🏗️ Système : Stockage de la définition master pour permettre la réinitialisation sans perte de données"
-        ]
-    },
-    {
-        "version": "2.49.84",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🧠 Admin : Distinction claire entre édition de la Bibliothèque Globale et Personnalisation de Campagne",
-            "🛡️ Système : La modification via l'onglet Bibliothèque met désormais à jour la base master pour tous les réglages",
-            "🖋️ UI : Titres de modales explicites selon le contexte d'édition (Base Globale vs Campagne)"
-        ]
-    },
-    {
-        "version": "2.49.83",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🔍 Bibliothèques : Correction de la visibilité des compétences à variantes (Artisanat, etc.) en mode filtré",
-            "🛠️ Système : Amélioration de la détection 'Global' pour le catalogue chargé depuis JSON",
-            "🎨 UI : Ajustement de la visibilité des boutons d'édition dans les listes administratives"
         ]
     }
 ]
