@@ -125,7 +125,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
     }, [data, rules, creationActive]);
 
     return (
-        <div className={`sheet-container ${isLandscape ? 'landscape' : ''}`}>
+        <div className={`sheet-container ${isLandscape ? 'landscape' : ''} ${isEditMode ? 'pr-[340px]' : ''} transition-[padding] duration-300`}>
 
             <SheetHeader
                 headerData={data.header}

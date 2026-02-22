@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.69.5",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "UI : Ajout d'une marge dynamique sur les onglets Personnage et Spécialisations pour éviter que les barres latérales (Édition et Catalogue) ne chevauchent le contenu de la fiche."
+    },
+    {
         "version": "2.69.4",
         "date": "2026-02-22",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction de la réinitialisation du compteur de Confiance : (1) Nettoyage des doublons historiques (slugs au lieu d'UUIDs) dans les définitions de compteurs en base de données qui forçaient la valeur à 4. (2) Renforcement du mécanisme de synchronisation (campaignReconciler) pour assurer l'unicité des clés de compteurs basées sur leur ID, prévenant ainsi la réapparition de doublons causant des états asynchrones lors d'une réinitialisation."
-    },
-    {
-        "version": "2.64.0",
-        "date": "2026-02-22",
-        "type": "feat",
-        "description": "Nouvel effet de trait 'Maître' (master_skill) : Quand un trait avec cet effet est ajouté, un wizard s'ouvre permettant au joueur de choisir une compétence primaire à rang 0. Celle-ci est automatiquement portée au rang 5 sans coût XP. Suppression du trait : la compétence revient au rang 0. L'xpCalculator reconnaît les compétences maîtrisées via masterSkillTarget et les traite comme entièrement gratuites jusqu'au rang 5. Interface admin : couleur violette + description informative."
     }
 ]

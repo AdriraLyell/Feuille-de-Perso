@@ -260,7 +260,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
     });
 
     return (
-        <div className={`sheet-container p-6 ${isLandscape ? 'landscape' : ''}`}>
+        <div className={`sheet-container p-6 ${isLandscape ? 'landscape' : ''} ${isDrawerOpen ? 'pr-[340px]' : ''} transition-[padding] duration-300`}>
 
             <h1 className="text-3xl font-black text-center uppercase py-2 tracking-widest border-b-2 border-stone-800 mb-4 text-indigo-950 font-serif relative">
                 Spécialisations

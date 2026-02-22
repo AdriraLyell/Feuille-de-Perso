@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.64.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Nouvel effet de trait 'Maître' (master_skill) : Quand un trait avec cet effet est ajouté, un wizard s'ouvre permettant au joueur de choisir une compétence primaire à rang 0. Celle-ci est automatiquement portée au rang 5 sans coût XP. Suppression du trait : la compétence revient au rang 0. L'xpCalculator reconnaît les compétences maîtrisées via masterSkillTarget et les traite comme entièrement gratuites jusqu'au rang 5. Interface admin : couleur violette + description informative."
+    },
+    {
         "version": "2.63.3",
         "date": "2026-02-21",
         "type": "fix",
@@ -661,16 +667,6 @@
             "🔓 Bibliothèque : Réactivation de l'édition globale pour les compétences personnalisées",
             "🛡️ Système : Verrouillage strict de la suppression pour les compétences surchargées localement",
             "🎨 UI : Harmonisation visuelle avec une icône de surcharge Cyan unifiée (Bibliothèque & Réserve)"
-        ]
-    },
-    {
-        "version": "2.49.85",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🔒 Bibliothèque : Verrouillage de l'édition globale si une compétence est personnalisée localement",
-            "🔄 Réserve : Nouveau bouton 'Reset' pour restaurer instantanément une compétence à son état d'origine",
-            "🏗️ Système : Stockage de la définition master pour permettre la réinitialisation sans perte de données"
         ]
     }
 ]

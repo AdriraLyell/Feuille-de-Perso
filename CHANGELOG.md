@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.85] - 2026-02-16 [FEAT]
+
+- 🔒 Bibliothèque : Verrouillage de l'édition globale si une compétence est personnalisée localement
+- 🔄 Réserve : Nouveau bouton 'Reset' pour restaurer instantanément une compétence à son état d'origine
+- 🏗️ Système : Stockage de la définition master pour permettre la réinitialisation sans perte de données
+
 ## [2.49.84] - 2026-02-16 [FEAT]
 
 - 🧠 Admin : Distinction claire entre édition de la Bibliothèque Globale et Personnalisation de Campagne
