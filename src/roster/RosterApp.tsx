@@ -216,8 +216,9 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                                     <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black">Avantages</div>
                                                     <div className="space-y-1">
                                                         {data.page2.avantages.filter(t => t.name).map((trait, i) => (
-                                                            <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-emerald-950/20 text-emerald-400 border-emerald-900/20 truncate">
-                                                                <span className="font-bold">{trait.name}</span>
+                                                            <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-emerald-950/20 text-emerald-400 border-emerald-900/20 truncate flex justify-between items-center">
+                                                                <span className="font-bold truncate" title={trait.name}>{trait.name}</span>
+                                                                {trait.value && <span className="font-mono text-[10px] opacity-80 shrink-0 ml-2">{trait.value}</span>}
                                                             </div>
                                                         ))}
                                                     </div>
@@ -230,8 +231,9 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                                     <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black">Désavantages</div>
                                                     <div className="space-y-1">
                                                         {data.page2.desavantages.filter(t => t.name).map((trait, i) => (
-                                                            <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-rose-950/20 text-rose-400 border-rose-900/20 truncate">
-                                                                <span className="font-bold">{trait.name}</span>
+                                                            <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-rose-950/20 text-rose-400 border-rose-900/20 truncate flex justify-between items-center">
+                                                                <span className="font-bold truncate" title={trait.name}>{trait.name}</span>
+                                                                {trait.value && <span className="font-mono text-[10px] opacity-80 shrink-0 ml-2">{trait.value}</span>}
                                                             </div>
                                                         ))}
                                                     </div>
