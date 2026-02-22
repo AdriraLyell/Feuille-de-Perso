@@ -13,8 +13,18 @@ interface TraitRowProps {
 const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove, onManageMystic }) => {
     const isEmpty = !item.name.trim();
     const isResolved = item.value === '0' && item.creationValue !== undefined;
-    const isPostCreationAdvantage = item.isPostCreation && !isResolved;
-    const isImproved = !item.isPostCreation && item.creationValue !== undefined && parseInt(item.value) > parseInt(item.creationValue);
+
+    const isPostCreation = item.isPostCreation && !isResolved;
+
+    // Use tag to determine type as 'type' property is not on TraitEntry interface
+    const isDisadvantage = item.tag?.toLowerCase().includes('desavantage') || item.tag?.toLowerCase().includes('défaut');
+    const isAdvantage = !isDisadvantage && !isEmpty;
+
+    const isImproved = !isPostCreation && item.creationValue !== undefined && parseInt(item.value) > parseInt(item.creationValue);
+    const isReduced = !isPostCreation && item.creationValue !== undefined && parseInt(item.value) < parseInt(item.creationValue);
+
+    const isPostCreationAdvantage = isPostCreation && isAdvantage;
+    const isPostCreationDisadvantage = isPostCreation && isDisadvantage;
 
     return (
         <div
@@ -23,7 +33,11 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove, onManageMy
                 ? 'hover:bg-slate-50 border-b border-dotted border-stone-200'
                 : (isPostCreationAdvantage || isImproved)
                     ? 'bg-emerald-50 hover:bg-emerald-100 border-b border-emerald-200 shadow-sm'
-                    : 'hover:bg-blue-50 bg-white/50 border-b border-stone-300 shadow-sm'
+                    : (isPostCreationDisadvantage)
+                        ? 'bg-red-50 hover:bg-red-100 border-b border-red-200 shadow-sm'
+                        : (isReduced)
+                            ? 'bg-amber-50 hover:bg-amber-100 border-b border-amber-200 shadow-sm'
+                            : 'hover:bg-blue-50 bg-white/50 border-b border-stone-300 shadow-sm'
                 }`}
         >
             <div className={`w-8 shrink-0 text-center font-bold text-xs h-full flex items-center justify-center border-r border-stone-300 ${isEmpty ? 'text-stone-300' : 'text-stone-800 font-handwriting bg-white'
@@ -34,8 +48,10 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, onClick, onRemove, onManageMy
             <div className={`flex-grow h-full flex items-center px-1 font-handwriting min-w-0 ${isEmpty ? 'text-stone-300 italic text-[10px]' : 'text-ink'
                 } ${isResolved ? 'line-through opacity-50' : ''}`} style={{ fontSize: isEmpty ? '0.7rem' : '0.9rem' }}>
                 <span className="truncate w-full block" title={!isEmpty ? (item.variant ? `${item.name} : ${item.variant}` : item.name) : undefined}>
-                    {item.isPostCreation && <span className="mr-1 text-emerald-600" title="Acquis avec XP">❇️</span>}
+                    {isPostCreationAdvantage && <span className="mr-1 text-emerald-600" title="Acquis avec XP">❇️</span>}
+                    {isPostCreationDisadvantage && <span className="mr-1 text-red-500" title="Nouveau Désavantage (Gain XP)">❇️</span>}
                     {isImproved && <span className="mr-1 text-blue-500" title="Amélioré avec XP">⬆️</span>}
+                    {isReduced && <span className="mr-1 text-amber-500" title="Racheté avec XP">⬇️</span>}
                     {item.name || "Vide"}
                     {item.variant && <span className="font-bold ml-1 text-slate-600">: {item.variant}</span>}
                 </span>
