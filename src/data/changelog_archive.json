@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.64.1",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction de la réinitialisation du compteur de Confiance : (1) Nettoyage des doublons historiques (slugs au lieu d'UUIDs) dans les définitions de compteurs en base de données qui forçaient la valeur à 4. (2) Renforcement du mécanisme de synchronisation (campaignReconciler) pour assurer l'unicité des clés de compteurs basées sur leur ID, prévenant ainsi la réapparition de doublons causant des états asynchrones lors d'une réinitialisation."
+    },
+    {
         "version": "2.64.0",
         "date": "2026-02-22",
         "type": "feat",
@@ -657,16 +663,6 @@
             "🐞 Sidebar : Fix du bouton Reset qui pouvait échouer selon l'état des données",
             "⚠️ React : Correction de l'avertissement 'value prop on select should not be null'",
             "🔧 Système : Robustesse accrue de la gestion des états de personnalisation (isCustomized)"
-        ]
-    },
-    {
-        "version": "2.49.86",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🔓 Bibliothèque : Réactivation de l'édition globale pour les compétences personnalisées",
-            "🛡️ Système : Verrouillage strict de la suppression pour les compétences surchargées localement",
-            "🎨 UI : Harmonisation visuelle avec une icône de surcharge Cyan unifiée (Bibliothèque & Réserve)"
         ]
     }
 ]

@@ -6,7 +6,8 @@ import {
   HeaderInfo,
   CombatEntry,
   ReputationEntry,
-  TraitEntry
+  TraitEntry,
+  PostItData
 } from './primitives';
 import {
   CreationConfig,
@@ -49,6 +50,7 @@ export interface CharacterSheetData {
   creationConfig: CreationConfig;
   theme: ThemeConfig; // New Theme Config
   header: HeaderInfo;
+  postIts?: PostItData[]; // Les notes visuelles
 
   // Dynamic Attributes Structure
   attributes: Record<string, AttributeEntry[]>;

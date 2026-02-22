@@ -91,3 +91,15 @@ export interface TraitEffect {
   source?: string; // Nom du trait d'origine (optionnel)
   associatedCounterId?: string; // Rétrocompatibilité ou option alternative
 }
+
+export interface PostItData {
+  id: string;
+  text: string;
+  color: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  tabId: string; // The tab they are placed on ('p1', 'p2', 'specs', 'xp', 'notes', etc)
+}
+

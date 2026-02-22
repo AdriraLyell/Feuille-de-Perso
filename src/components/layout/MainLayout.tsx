@@ -43,6 +43,7 @@ import { exportCharacterAsJSON } from '../../utils/importExportUtils';
 import { useNavigationState } from '../../hooks/layout/useNavigationState';
 import { usePrintManager } from '../../hooks/layout/usePrintManager';
 import { useRulesSync } from '../../hooks/layout/useRulesSync';
+import PostItBoard from '../ui/PostItBoard';
 
 // Icons
 import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, TrendingUp, History, Clock, X, Trash2, Save, Book, LogOut, Menu, Upload } from 'lucide-react';
@@ -326,6 +327,7 @@ const MainLayout: React.FC = () => {
                                     </div>
 
                                     {data.creationConfig?.active && (<CreationHUD />)}
+                                    <PostItBoard currentTab={sheetTab} />
                                 </>
                             ) : (
                                 <SettingsView

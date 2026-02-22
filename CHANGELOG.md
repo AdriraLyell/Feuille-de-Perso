@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.86] - 2026-02-16 [FEAT]
+
+- 🔓 Bibliothèque : Réactivation de l'édition globale pour les compétences personnalisées
+- 🛡️ Système : Verrouillage strict de la suppression pour les compétences surchargées localement
+- 🎨 UI : Harmonisation visuelle avec une icône de surcharge Cyan unifiée (Bibliothèque & Réserve)
+
 ## [2.49.85] - 2026-02-16 [FEAT]
 
 - 🔒 Bibliothèque : Verrouillage de l'édition globale si une compétence est personnalisée localement
