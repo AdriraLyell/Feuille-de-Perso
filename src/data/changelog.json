@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.71.5",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Amélioration visuelle de l'interface des Habilités Mystiques. Lorsqu'un personnage a un accès sans limite (niveau 5+) aux compétences liées, le compteur par défaut (999) est remplacé par un symbole 'Infini' et un texte plus immersif ('SANS LIMITE' & 'Vous avez un accès illimité')."
+    },
+    {
         "version": "2.71.4",
         "date": "2026-02-22",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-22",
         "type": "feat",
         "description": "Intégration du calendrier dans le journal de campagne ('Compagnon Temporel') : Un nouveau widget interactif s'affiche dans la barre latérale du Grimoire, permettant de consulter la date actuelle et les événements planifiés sans quitter l'éditeur. Améliorations Admin : nouveau bouton '+1 Jour' pour le calendrier fictif avec passage automatique des mois et années, et optimisation de l'avance de date pour le calendrier réel."
-    },
-    {
-        "version": "2.65.4",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction du calcul d'âge pour supporter les formats de date flexibles (français et fictif). Verrouillage des champs 'Début' et 'Date Fiction' lorsqu'ils sont gérés par le calendrier de campagne du MJ."
     }
 ]

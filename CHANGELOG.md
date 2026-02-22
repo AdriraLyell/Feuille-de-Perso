@@ -1,5 +1,12 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.92] - 2026-02-17 [FEAT]
+
+- 🖱️ UX : Double sens d'enroulement (Float L/R) désormais disponible en mode déplacement libre
+- 📊 UI : Ajout d'un HUD (Head-Up Display) affichant les coordonnées X/Y et la taille en temps réel
+- 🖼️ Grimoire : Guide de recadrage (Crop) ajusté pour exclure dynamiquement la bordure blanche
+- 🔧 UX : Amélioration de la réactivité des poignées de redimensionnement et de sélection
+
 ## [2.49.91] - 2026-02-17 [FIX]
 
 - 🎨 UI : Le cadre de sélection bleu suit désormais précisément les dimensions de l'image même en déplacement libre

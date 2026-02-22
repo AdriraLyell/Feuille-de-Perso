@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.65.4",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction du calcul d'âge pour supporter les formats de date flexibles (français et fictif). Verrouillage des champs 'Début' et 'Date Fiction' lorsqu'ils sont gérés par le calendrier de campagne du MJ."
+    },
+    {
         "version": "2.65.3",
         "date": "2026-02-21",
         "type": "fix",
@@ -634,17 +640,6 @@
             "🛡️ UI : La barre d'outils suit désormais l'image dans ses déplacements libres (Flush Toolbar)",
             "🔼 UX : La sélection d'une image la fait désormais passer au-dessus de tous les éléments (sommaire, menus) via un Z-index dynamique",
             "🛠️ Système : Correction des problèmes d'images 'bloquées' derrière l'interface du grimoire"
-        ]
-    },
-    {
-        "version": "2.49.92",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "🖱️ UX : Double sens d'enroulement (Float L/R) désormais disponible en mode déplacement libre",
-            "📊 UI : Ajout d'un HUD (Head-Up Display) affichant les coordonnées X/Y et la taille en temps réel",
-            "🖼️ Grimoire : Guide de recadrage (Crop) ajusté pour exclure dynamiquement la bordure blanche",
-            "🔧 UX : Amélioration de la réactivité des poignées de redimensionnement et de sélection"
         ]
     }
 ]
