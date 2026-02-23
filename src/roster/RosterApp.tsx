@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CharacterSyncService, SyncedCharacter } from '../services/CharacterSyncService';
 import { CampaignService, RulesData } from '../services/CampaignService';
-import { Loader2, Users, AlertCircle, Heart, Shield, Droplets } from 'lucide-react';
+import { Loader2, Users, AlertCircle, Heart, Shield, Droplets, Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { MotionFade } from '../components/ui/motion/MotionFade';
 import { CharacterSheetData } from '../types';
 
@@ -14,6 +14,8 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
     const [rules, setRules] = useState<RulesData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
         loadData();
@@ -66,6 +68,56 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
             cat.forEach(attr => allAttributes.push(attr.name));
         });
     }
+
+    interface SkillRow {
+        name: string;
+        scores: number[];
+        maxScore: number;
+    }
+
+    const skillMatrix: Record<string, SkillRow[]> = {};
+    if (characters.length > 0) {
+        const allCats = Object.keys(characters[0].data.skills || {});
+        allCats.forEach(catName => {
+            const uniqueSkills = new Set<string>();
+            characters.forEach(c => {
+                const charData = c.data as CharacterSheetData;
+                (charData.skills?.[catName] || []).forEach(s => uniqueSkills.add(s.name));
+            });
+            
+            const rows: SkillRow[] = [];
+            uniqueSkills.forEach(skillName => {
+                const scores = characters.map(c => {
+                    const charData = c.data as CharacterSheetData;
+                    const skillNode = (charData.skills?.[catName] || []).find(s => s.name === skillName);
+                    return skillNode?.value || 0;
+                });
+                const maxScore = Math.max(...scores);
+                if (maxScore > 0) {
+                    rows.push({ name: skillName, scores, maxScore });
+                }
+            });
+            
+            if (rows.length > 0) {
+                rows.sort((a,b) => a.name.localeCompare(b.name));
+                skillMatrix[catName] = rows;
+            }
+        });
+    }
+
+    const isSearching = searchQuery.trim().length > 0;
+    const lowerSearch = searchQuery.toLowerCase();
+    const filteredMatrix: Record<string, SkillRow[]> = {};
+    Object.entries(skillMatrix).forEach(([catName, rows]) => {
+        const matchingRows = isSearching ? rows.filter(r => r.name.toLowerCase().includes(lowerSearch)) : rows;
+        if (matchingRows.length > 0) {
+            filteredMatrix[catName] = matchingRows;
+        }
+    });
+
+    const toggleCategory = (catName: string) => {
+        setOpenCategories(prev => ({ ...prev, [catName]: !prev[catName] }));
+    };
 
     return (
         <div className="min-h-screen bg-stone-950 text-stone-300 p-8 font-sans selection:bg-amber-900/50">
@@ -168,22 +220,92 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                         </table>
                     </div>
 
+                    {/* SECTION MILIEU : MATRICE DES COMPÉTENCES */}
+                    <div className="bg-stone-900/40 border border-stone-800 rounded-sm overflow-hidden shadow-glass-dark">
+                        <div className="p-4 border-b border-stone-800 bg-stone-950 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <h2 className="font-serif font-bold text-lg text-amber-500 uppercase tracking-widest flex items-center gap-2">
+                                Matrice des Compétences
+                            </h2>
+                            <div className="relative w-full sm:w-64">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Search size={14} className="text-stone-500" />
+                                </div>
+                                <input 
+                                    type="text" 
+                                    className="w-full bg-stone-900 border border-stone-700 text-stone-300 text-sm rounded-sm focus:ring-amber-500 focus:border-amber-500 block pl-9 p-2 transition-colors" 
+                                    placeholder="Chercher une compétence..." 
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="divide-y divide-stone-800/50">
+                            {Object.keys(filteredMatrix).length === 0 ? (
+                                <div className="p-8 text-center text-stone-500 italic font-serif">Aucune compétence trouvée.</div>
+                            ) : (
+                                Object.entries(filteredMatrix).map(([catName, rows]) => {
+                                    const isOpen = isSearching || openCategories[catName];
+                                    return (
+                                        <div key={catName} className="flex flex-col">
+                                            <button 
+                                                onClick={() => toggleCategory(catName)}
+                                                className="w-full text-left p-3 hover:bg-stone-800 flex items-center gap-2 font-bold text-amber-600/80 uppercase tracking-widest text-xs transition-colors"
+                                                style={{ backgroundColor: isOpen ? 'rgba(28, 25, 23, 0.8)' : 'rgba(28, 25, 23, 0.4)' }}
+                                            >
+                                                {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                                                {catName}
+                                            </button>
+                                            {isOpen && (
+                                                <div className="overflow-x-auto bg-stone-900/20">
+                                                    <table className="w-full text-left text-sm whitespace-nowrap min-w-max">
+                                                        <thead className="bg-[#12100e] border-y border-stone-800/50">
+                                                            <tr>
+                                                                <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] w-48 sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
+                                                                    Compétence
+                                                                </th>
+                                                                {characters.map(c => (
+                                                                    <th key={c.id} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30">
+                                                                        {c.character_name.substring(0, 10)}{c.character_name.length > 10 ? '.' : ''}
+                                                                    </th>
+                                                                ))}
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-stone-800/30">
+                                                            {rows.map(row => (
+                                                                <tr key={row.name} className="hover:bg-amber-900/10 transition-colors">
+                                                                    <td className="p-3 font-medium text-stone-300 sticky left-0 bg-[#161412] z-10 w-48 border-r border-stone-800/30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
+                                                                        {row.name}
+                                                                    </td>
+                                                                    {row.scores.map((score, idx) => {
+                                                                        const isBest = score > 0 && score === row.maxScore;
+                                                                        return (
+                                                                            <td key={idx} className={`p-3 text-center font-mono border-l border-stone-800/30 ${isBest ? 'bg-amber-900/20' : ''}`}>
+                                                                                {score > 0 ? (
+                                                                                    <span className={isBest ? 'text-amber-400 font-bold' : 'text-stone-400'}>{score}</span>
+                                                                                ) : (
+                                                                                    <span className="text-stone-700">-</span>
+                                                                                )}
+                                                                            </td>
+                                                                        );
+                                                                    })}
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </div>
+
                     {/* SECTION BAS : GRILLE DE DOSSIERS */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {characters.map((char, index) => {
                             const data = char.data as CharacterSheetData;
-
-                            // Top compétences (les 6 meilleures > 0)
-                            const allSkills: { name: string, value: number }[] = [];
-                            Object.values(data.skills || {}).forEach(cat => {
-                                cat.forEach(skill => {
-                                    if (skill.value && skill.value > 0) allSkills.push(skill);
-                                })
-                            });
-
-                            const topSkills = allSkills
-                                .sort((a, b) => b.value - a.value)
-                                .slice(0, 6);
 
                             const hasTraitsAdvs = data.page2?.avantages && data.page2.avantages.filter(t => t.name).length > 0;
                             const hasTraitsDesadvs = data.page2?.desavantages && data.page2.desavantages.filter(t => t.name).length > 0;
@@ -196,20 +318,6 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                         </h3>
 
                                         <div className="mt-4 space-y-4 flex-grow">
-                                            {/* Compétences */}
-                                            {topSkills.length > 0 && (
-                                                <div>
-                                                    <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black">Top Compétences</div>
-                                                    <div className="flex flex-wrap gap-1.5">
-                                                        {topSkills.map((skill, i) => (
-                                                            <span key={i} className="text-[10px] font-bold bg-stone-950 text-stone-300 px-2 py-1 rounded-sm border border-stone-800 shadow-sm">
-                                                                {skill.name} <span className="text-amber-500 ml-1">{skill.value}</span>
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-
                                             {/* Traits (Avantages) */}
                                             {hasTraitsAdvs && (
                                                 <div>
