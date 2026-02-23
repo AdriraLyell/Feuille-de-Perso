@@ -116,8 +116,16 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                     const cleanName = s.name.trim();
                     const lowerName = cleanName.toLowerCase();
 
-                    // On prend la catégorie officielle, sinon un fallback "Custom"
-                    const masterCatId = officialSkillMap.get(lowerName) || "Col_Comp_Custom";
+                    // Extraire le nom racine pour les compétences paramétrables comme "Arts Martiaux (Karaté)"
+                    let rootName = lowerName;
+                    if (rootName.includes('(')) {
+                        rootName = rootName.split('(')[0].trim();
+                    } else if (rootName.includes(':')) {
+                        rootName = rootName.split(':')[0].trim();
+                    }
+
+                    // On prend la catégorie officielle (par match exact ou par nom racine), sinon un fallback "Custom"
+                    const masterCatId = officialSkillMap.get(lowerName) || officialSkillMap.get(rootName) || "Col_Comp_Custom";
 
                     if (!masterCategoriesMap.has(masterCatId)) {
                         masterCategoriesMap.set(masterCatId, new Set());
