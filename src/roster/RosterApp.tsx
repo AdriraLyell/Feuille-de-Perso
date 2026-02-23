@@ -89,15 +89,19 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
 
     const skillMatrix: Record<string, SkillRow[]> = {};
     if (characters.length > 0 && rules) {
-        // 1. Dictionnaire "Référentiel Central", nom -> catId
+        // Dictionnaire "Référentiel Central", nom -> catId
         const officialSkillMap = new Map<string, string>();
 
         const addToMap = (lib: any[] | undefined, overrideCategory?: string) => {
             lib?.forEach(s => {
+                const lowerName = s.name.trim().toLowerCase();
                 if (overrideCategory) {
-                    officialSkillMap.set(s.name.trim().toLowerCase(), overrideCategory);
+                    officialSkillMap.set(lowerName, overrideCategory);
+                } else if (s.mysticAbilityId) {
+                    // Si la compétence est liée à une habileté (ex: Sort de soin lié à Magie Blanche)
+                    officialSkillMap.set(lowerName, "Col_Comp_Mystic");
                 } else if (s.defaultCategory) {
-                    officialSkillMap.set(s.name.trim().toLowerCase(), s.defaultCategory);
+                    officialSkillMap.set(lowerName, s.defaultCategory);
                 }
             });
         };
@@ -124,8 +128,17 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                         rootName = rootName.split(':')[0].trim();
                     }
 
-                    // On prend la catégorie officielle (par match exact ou par nom racine), sinon un fallback "Custom"
-                    const masterCatId = officialSkillMap.get(lowerName) || officialSkillMap.get(rootName) || "Col_Comp_Custom";
+                    // On prend la catégorie officielle (par match exact ou par nom racine)
+                    let masterCatId = officialSkillMap.get(lowerName) || officialSkillMap.get(rootName);
+
+                    // Si non trouvé dans le référentiel, on check si l'instance porte un tag mystique (custom skills liés)
+                    if (!masterCatId) {
+                        if ((s as any).mysticAbilityId) {
+                            masterCatId = "Col_Comp_Mystic";
+                        } else {
+                            masterCatId = "Col_Comp_Custom";
+                        }
+                    }
 
                     if (!masterCategoriesMap.has(masterCatId)) {
                         masterCategoriesMap.set(masterCatId, new Set());
