@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.51.0] - 2026-02-17 [FEAT]
+
+- 🔍 UI : Ajout d'une vue détaillée des changements dans l'assistant d'importation (Nouveaux items et Conflits)
+- 📋 Import : Comparaison précise des propriétés des items (coût, description, effets, etc.) avec visualisation Ancien vs Nouveau
+- 🔠 Système : Détection inteligente ignorant la casse pour éviter les doublons tout en permettant la normalisation
+
 ## [2.50.1] - 2026-02-17 [FEAT]
 
 - 📥 Système : Support de l'import de fichiers JSON partiels (ex: uniquement les traits ou compétences)

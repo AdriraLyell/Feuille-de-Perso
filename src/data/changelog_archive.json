@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.69.2",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ergonomie : Augmentation de la hauteur de la fenêtre de synchronisation (modal) pour permettre une meilleure visibilité de l'historique des sauvegardes sans défilement excessif."
+    },
+    {
         "version": "2.69.1",
         "date": "2026-02-23",
         "type": "feat",
@@ -599,16 +605,6 @@
             "✅ Import : Sélection individuelle des items (nouveaux et conflits) via des cases à cocher",
             "🎭 UI : Feedback dynamique des badges (Ignoré, Remplacé, Doublon, Exclu) en fonction de la stratégie",
             "🛠️ Core : Support technique de l'exclusion via IDs uniques dans le moteur de fusion"
-        ]
-    },
-    {
-        "version": "2.51.0",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "🔍 UI : Ajout d'une vue détaillée des changements dans l'assistant d'importation (Nouveaux items et Conflits)",
-            "📋 Import : Comparaison précise des propriétés des items (coût, description, effets, etc.) avec visualisation Ancien vs Nouveau",
-            "🔠 Système : Détection inteligente ignorant la casse pour éviter les doublons tout en permettant la normalisation"
         ]
     }
 ]

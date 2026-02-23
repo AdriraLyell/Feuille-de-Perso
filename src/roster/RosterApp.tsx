@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CharacterSyncService, SyncedCharacter } from '../services/CharacterSyncService';
 import { CampaignService, RulesData } from '../services/CampaignService';
-import { Loader2, Users, AlertCircle, Heart, Shield, Droplets, Search, ChevronDown, ChevronRight } from 'lucide-react';
+import { Loader2, Users, AlertCircle, Heart, Shield, Droplets, Search, ChevronDown, ChevronRight, CalendarDays, Clock } from 'lucide-react';
 import { MotionFade } from '../components/ui/motion/MotionFade';
 import { CharacterSheetData } from '../types';
 
@@ -19,6 +19,7 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
     const [showAttributes, setShowAttributes] = useState(true);
     const [showSkills, setShowSkills] = useState(true);
     const [showTraits, setShowTraits] = useState(true);
+    const [showTimeManagement, setShowTimeManagement] = useState(true);
 
     useEffect(() => {
         loadData();
@@ -219,6 +220,84 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
         setOpenCategories(prev => ({ ...prev, [catName]: !prev[catName] }));
     };
 
+    const formatCurrentDate = () => {
+        if (!rules?.configurations?.calendar) return "Non configuré";
+        const cal = rules.configurations.calendar;
+        if (cal.type === 'fictional') {
+            const m = cal.months?.[cal.currentMonthIndex]?.name ?? `Mois ${cal.currentMonthIndex + 1}`;
+            return `Jour ${cal.currentDay}, ${m}, An ${cal.currentYear}`;
+        } else {
+            if (!cal.currentDate) return "Date indéfinie";
+            const d = new Date(cal.currentDate);
+            if (isNaN(d.getTime())) return cal.currentDate;
+            return d.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+    };
+
+    const handleAdvanceTime = async (amount: 'day' | 'week' | 'month') => {
+        if (!rules || !rules.configurations.calendar) return;
+        const calendar = rules.configurations.calendar;
+        let newCalendar = { ...calendar };
+
+        if (calendar.type === 'fictional') {
+            let { currentDay, currentMonthIndex, currentYear } = calendar;
+
+            const incrementDay = () => {
+                let currentMonthDays = calendar.months[currentMonthIndex]?.days ?? 30;
+                currentDay++;
+                if (currentDay > currentMonthDays) {
+                    currentDay = 1;
+                    currentMonthIndex++;
+                    if (currentMonthIndex >= calendar.months.length) {
+                        currentMonthIndex = 0;
+                        currentYear++;
+                    }
+                }
+            };
+
+            if (amount === 'day') {
+                incrementDay();
+            } else if (amount === 'week') {
+                for (let i = 0; i < 7; i++) incrementDay();
+            } else if (amount === 'month') {
+                currentMonthIndex++;
+                if (currentMonthIndex >= calendar.months.length) {
+                    currentMonthIndex = 0;
+                    currentYear++;
+                }
+                const monthDays = calendar.months[currentMonthIndex]?.days ?? 30;
+                currentDay = Math.min(currentDay, monthDays);
+            }
+
+            newCalendar = { ...calendar, currentDay, currentMonthIndex, currentYear };
+
+        } else if (calendar.type === 'real') {
+            if (!calendar.currentDate) return;
+            const date = new Date(calendar.currentDate);
+            if (isNaN(date.getTime())) return;
+
+            if (amount === 'day') {
+                date.setDate(date.getDate() + 1);
+            } else if (amount === 'week') {
+                date.setDate(date.getDate() + 7);
+            } else if (amount === 'month') {
+                date.setMonth(date.getMonth() + 1);
+            }
+            newCalendar = { ...calendar, currentDate: date.toISOString().split('T')[0] };
+        }
+
+        const newRules = {
+            ...rules,
+            configurations: {
+                ...rules.configurations,
+                calendar: newCalendar
+            }
+        };
+
+        setRules(newRules);
+        await CampaignService.saveSetting(settingId, newRules);
+    };
+
     return (
         <div className="min-h-screen bg-stone-950 text-stone-300 p-8 font-sans selection:bg-amber-900/50">
             {/* Header */}
@@ -245,14 +324,61 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                 </div>
             ) : (
                 <main className="max-w-7xl mx-auto space-y-12">
-                    {/* SECTION HAUT : LE TABLEAU STRICT (Vitals & Attributs) */}
+                    {/* SECTION GESTION TEMPORELLE */}
+                    <div className="bg-stone-900/40 border border-stone-800 rounded-sm overflow-hidden shadow-glass-dark mb-12">
+                        <button
+                            onClick={() => setShowTimeManagement(!showTimeManagement)}
+                            className="w-full p-4 flex justify-between items-center bg-stone-950 border-b border-stone-800 hover:bg-stone-900 transition-colors"
+                        >
+                            <h2 className="font-serif font-bold text-lg text-amber-500 uppercase tracking-widest flex items-center gap-2">
+                                <Clock size={20} className="text-amber-600" /> Gestion Temporelle
+                            </h2>
+                            {showTimeManagement ? <ChevronDown size={18} className="text-amber-600" /> : <ChevronRight size={18} className="text-amber-600" />}
+                        </button>
+
+                        {showTimeManagement && (
+                            <div className="p-6 bg-stone-900/20 flex flex-col items-center gap-6">
+                                <div className="text-center">
+                                    <div className="text-[10px] text-stone-500 uppercase tracking-[0.2em] font-bold mb-2">
+                                        Date Courante de la Chronique
+                                    </div>
+                                    <div className="text-2xl font-serif font-black text-amber-400 capitalize bg-stone-950 border border-stone-800 px-6 py-3 rounded-sm shadow-glass-dark">
+                                        {formatCurrentDate()}
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-wrap justify-center gap-4">
+                                    <button
+                                        onClick={() => handleAdvanceTime('day')}
+                                        className="flex items-center gap-2 px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-sm font-bold text-sm uppercase tracking-wider border border-stone-700 hover:border-amber-500/50 transition-colors"
+                                    >
+                                        <CalendarDays size={16} className="text-amber-600" /> +1 Jour
+                                    </button>
+                                    <button
+                                        onClick={() => handleAdvanceTime('week')}
+                                        className="flex items-center gap-2 px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-sm font-bold text-sm uppercase tracking-wider border border-stone-700 hover:border-amber-500/50 transition-colors"
+                                    >
+                                        <CalendarDays size={16} className="text-amber-600" /> +1 Semaine
+                                    </button>
+                                    <button
+                                        onClick={() => handleAdvanceTime('month')}
+                                        className="flex items-center gap-2 px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-sm font-bold text-sm uppercase tracking-wider border border-stone-700 hover:border-amber-500/50 transition-colors"
+                                    >
+                                        <CalendarDays size={16} className="text-amber-600" /> +1 Mois
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* SECTION HAUT : LE TABLEAU STRICT */}
                     <div className="bg-stone-900/40 border border-stone-800 rounded-sm overflow-hidden shadow-glass-dark mb-12">
                         <button
                             onClick={() => setShowAttributes(!showAttributes)}
                             className="w-full p-4 flex justify-between items-center bg-stone-950 border-b border-stone-800 hover:bg-stone-900 transition-colors"
                         >
                             <h2 className="font-serif font-bold text-lg text-amber-500 uppercase tracking-widest flex items-center gap-2">
-                                Tableau Strict (Vitals & Attributs)
+                                Tableau Strict (Attributs)
                             </h2>
                             {showAttributes ? <ChevronDown size={18} className="text-amber-600" /> : <ChevronRight size={18} className="text-amber-600" />}
                         </button>

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.75.6",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Registre : Ajout d'une section 'Gestion Temporelle' permettant d'afficher la date actuelle de la chronique et d'avancer le temps (+1 Jour, +1 Semaine, +1 Mois) directement depuis l'interface."
+    },
+    {
         "version": "2.75.5",
         "date": "2026-02-23",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-22",
         "type": "fix",
         "description": "Ergonomie : Ajout d'un curseur 'pointer' (main) sur les cartes de sélection des sources (Chroniques, Hors Ligne, Reprendre) pour indiquer clairement qu'elles sont interactives."
-    },
-    {
-        "version": "2.69.2",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Ergonomie : Augmentation de la hauteur de la fenêtre de synchronisation (modal) pour permettre une meilleure visibilité de l'historique des sauvegardes sans défilement excessif."
     }
 ]
