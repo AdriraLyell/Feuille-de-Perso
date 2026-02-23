@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.50.1] - 2026-02-17 [FEAT]
+
+- 📥 Système : Support de l'import de fichiers JSON partiels (ex: uniquement les traits ou compétences)
+- 🛡️ Validation : Renforcement du schéma de données pour inclure toutes les bibliothèques dans les exports de fiches
+
 ## [2.50.0] - 2026-02-17 [FEAT]
 
 - 🛡️ Admin : Renforcement de la détection des conflits lors de l'import (ID + Nom)

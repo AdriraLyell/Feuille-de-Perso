@@ -17,6 +17,8 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
     const [showAttributes, setShowAttributes] = useState(true);
+    const [showSkills, setShowSkills] = useState(true);
+    const [showTraits, setShowTraits] = useState(true);
 
     useEffect(() => {
         loadData();
@@ -310,140 +312,170 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
 
                     {/* SECTION MILIEU : MATRICE DES COMPÉTENCES */}
                     <div className="bg-stone-900/40 border border-stone-800 rounded-sm overflow-hidden shadow-glass-dark">
-                        <div className="p-4 border-b border-stone-800 bg-stone-950 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <button
+                            onClick={() => setShowSkills(!showSkills)}
+                            className="w-full p-4 flex justify-between items-center bg-stone-950 border-b border-stone-800 hover:bg-stone-900 transition-colors"
+                        >
                             <h2 className="font-serif font-bold text-lg text-amber-500 uppercase tracking-widest flex items-center gap-2">
                                 Matrice des Compétences
                             </h2>
-                            <div className="relative w-full sm:w-64">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Search size={14} className="text-stone-500" />
-                                </div>
-                                <input
-                                    type="text"
-                                    className="w-full bg-stone-900 border border-stone-700 text-stone-300 text-sm rounded-sm focus:ring-amber-500 focus:border-amber-500 block pl-9 p-2 transition-colors"
-                                    placeholder="Chercher une compétence..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                            </div>
-                        </div>
+                            {showSkills ? <ChevronDown size={18} className="text-amber-600" /> : <ChevronRight size={18} className="text-amber-600" />}
+                        </button>
 
-                        <div className="divide-y divide-stone-800/50">
-                            {Object.keys(filteredMatrix).length === 0 ? (
-                                <div className="p-8 text-center text-stone-500 italic font-serif">Aucune compétence trouvée.</div>
-                            ) : (
-                                Object.entries(filteredMatrix).map(([catName, rows]) => {
-                                    const isOpen = isSearching || openCategories[catName];
-                                    return (
-                                        <div key={catName} className="flex flex-col">
-                                            <button
-                                                onClick={() => toggleCategory(catName)}
-                                                className="w-full text-left p-3 hover:bg-stone-800 flex items-center gap-2 font-bold text-amber-600/80 uppercase tracking-widest text-xs transition-colors"
-                                                style={{ backgroundColor: isOpen ? 'rgba(28, 25, 23, 0.8)' : 'rgba(28, 25, 23, 0.4)' }}
-                                            >
-                                                {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                                                {catName}
-                                            </button>
-                                            {isOpen && (
-                                                <div className="overflow-x-auto bg-stone-900/20">
-                                                    <table className="w-full text-left text-sm whitespace-nowrap min-w-max">
-                                                        <thead className="bg-[#12100e] border-y border-stone-800/50">
-                                                            <tr>
-                                                                <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] w-48 sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
-                                                                    Compétence
-                                                                </th>
-                                                                {characters.map(c => (
-                                                                    <th key={c.id} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30" title={c.character_name}>
-                                                                        {c.character_name.split(' ')[0]}
-                                                                    </th>
-                                                                ))}
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody className="divide-y divide-stone-800/30">
-                                                            {rows.map(row => (
-                                                                <tr key={row.name} className="hover:bg-amber-900/10 transition-colors">
-                                                                    <td className="p-3 font-medium text-stone-300 sticky left-0 bg-[#161412] z-10 w-48 border-r border-stone-800/30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] truncate overflow-hidden max-w-[200px]" title={row.name}>
-                                                                        {row.name}
-                                                                    </td>
-                                                                    {row.scores.map((score, idx) => {
-                                                                        const isBest = score > 0 && score === row.maxScore;
-                                                                        return (
-                                                                            <td key={idx} className={`p-3 text-center font-mono border-l border-stone-800/30 ${isBest ? 'bg-amber-900/20' : ''}`}>
-                                                                                {score > 0 ? (
-                                                                                    <span className={isBest ? 'text-amber-400 font-bold' : 'text-stone-400'}>{score}</span>
-                                                                                ) : (
-                                                                                    <span className="text-stone-700">-</span>
-                                                                                )}
-                                                                            </td>
-                                                                        );
-                                                                    })}
-                                                                </tr>
-                                                            ))}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            )}
+                        {showSkills && (
+                            <>
+                                <div className="p-4 border-b border-stone-800 bg-stone-950/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                    <div className="text-[10px] text-stone-500 uppercase tracking-[0.2em] font-bold">
+                                        Vue d'ensemble des savoir-faire
+                                    </div>
+                                    <div className="relative w-full sm:w-64">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <Search size={14} className="text-stone-500" />
                                         </div>
-                                    );
-                                })
-                            )}
-                        </div>
+                                        <input
+                                            type="text"
+                                            className="w-full bg-stone-900 border border-stone-700 text-stone-300 text-sm rounded-sm focus:ring-amber-500 focus:border-amber-500 block pl-9 p-2 transition-colors"
+                                            placeholder="Chercher une compétence..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="divide-y divide-stone-800/50">
+                                    {Object.keys(filteredMatrix).length === 0 ? (
+                                        <div className="p-8 text-center text-stone-500 italic font-serif">Aucune compétence trouvée.</div>
+                                    ) : (
+                                        Object.entries(filteredMatrix).map(([catName, rows]) => {
+                                            const isOpen = isSearching || openCategories[catName];
+                                            return (
+                                                <div key={catName} className="flex flex-col">
+                                                    <button
+                                                        onClick={() => toggleCategory(catName)}
+                                                        className="w-full text-left p-3 hover:bg-stone-800 flex items-center gap-2 font-bold text-amber-600/80 uppercase tracking-widest text-xs transition-colors"
+                                                        style={{ backgroundColor: isOpen ? 'rgba(28, 25, 23, 0.8)' : 'rgba(28, 25, 23, 0.4)' }}
+                                                    >
+                                                        {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                                                        {catName}
+                                                    </button>
+                                                    {isOpen && (
+                                                        <div className="overflow-x-auto bg-stone-900/20">
+                                                            <table className="w-full text-left text-sm whitespace-nowrap min-w-max">
+                                                                <thead className="bg-[#12100e] border-y border-stone-800/50">
+                                                                    <tr>
+                                                                        <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] w-48 sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
+                                                                            Compétence
+                                                                        </th>
+                                                                        {characters.map(c => (
+                                                                            <th key={c.id} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30" title={c.character_name}>
+                                                                                {c.character_name.split(' ')[0]}
+                                                                            </th>
+                                                                        ))}
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody className="divide-y divide-stone-800/30">
+                                                                    {rows.map(row => (
+                                                                        <tr key={row.name} className="hover:bg-amber-900/10 transition-colors">
+                                                                            <td className="p-3 font-medium text-stone-300 sticky left-0 bg-[#161412] z-10 w-48 border-r border-stone-800/30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] truncate overflow-hidden max-w-[200px]" title={row.name}>
+                                                                                {row.name}
+                                                                            </td>
+                                                                            {row.scores.map((score, idx) => {
+                                                                                const isBest = score > 0 && score === row.maxScore;
+                                                                                return (
+                                                                                    <td key={idx} className={`p-3 text-center font-mono border-l border-stone-800/30 ${isBest ? 'bg-amber-900/20' : ''}`}>
+                                                                                        {score > 0 ? (
+                                                                                            <span className={isBest ? 'text-amber-400 font-bold' : 'text-stone-400'}>{score}</span>
+                                                                                        ) : (
+                                                                                            <span className="text-stone-700">-</span>
+                                                                                        )}
+                                                                                    </td>
+                                                                                );
+                                                                            })}
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })
+                                    )}
+                                </div>
+                            </>
+                        )}
                     </div>
 
-                    {/* SECTION BAS : GRILLE DE DOSSIERS */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {characters.map((char, index) => {
-                            const data = char.data as CharacterSheetData;
+                    {/* SECTION BAS : GRILLE DE DOSSIERS (Traits) */}
+                    <div className="bg-stone-900/40 border border-stone-800 rounded-sm overflow-hidden shadow-glass-dark">
+                        <button
+                            onClick={() => setShowTraits(!showTraits)}
+                            className="w-full p-4 flex justify-between items-center bg-stone-950 border-b border-stone-800 hover:bg-stone-900 transition-colors"
+                        >
+                            <h2 className="font-serif font-bold text-lg text-amber-500 uppercase tracking-widest flex items-center gap-2">
+                                Profils & Traits
+                            </h2>
+                            {showTraits ? <ChevronDown size={18} className="text-amber-600" /> : <ChevronRight size={18} className="text-amber-600" />}
+                        </button>
 
-                            const hasTraitsAdvs = data.page2?.avantages && data.page2.avantages.filter(t => t.name).length > 0;
-                            const hasTraitsDesadvs = data.page2?.desavantages && data.page2.desavantages.filter(t => t.name).length > 0;
+                        {showTraits && (
+                            <div className="p-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {characters.map((char, index) => {
+                                        const data = char.data as CharacterSheetData;
 
-                            return (
-                                <MotionFade key={char.id} delay={0.1 * index}>
-                                    <div className="h-full bg-stone-900/30 border border-stone-800 rounded-sm p-5 flex flex-col hover:border-amber-900/50 transition-colors shadow-glass-dark">
-                                        <h3 className="font-serif font-bold text-xl text-amber-400 mb-1 border-b border-stone-800 pb-2">
-                                            {char.character_name}
-                                        </h3>
+                                        const hasTraitsAdvs = data.page2?.avantages && data.page2.avantages.filter(t => t.name).length > 0;
+                                        const hasTraitsDesadvs = data.page2?.desavantages && data.page2.desavantages.filter(t => t.name).length > 0;
 
-                                        <div className="mt-4 grid grid-cols-2 gap-4 flex-grow items-start">
-                                            {/* Traits (Avantages) */}
-                                            <div className="flex flex-col w-full h-full">
-                                                {hasTraitsAdvs && (
-                                                    <>
-                                                        <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black text-center border-b border-amber-900/30 pb-1">Avantages</div>
-                                                        <div className="space-y-1">
-                                                            {data.page2.avantages.filter(t => t.name).map((trait, i) => (
-                                                                <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-emerald-950/20 text-emerald-400 border-emerald-900/20 truncate flex justify-between items-center w-full">
-                                                                    <span className="font-bold truncate" title={trait.name}>{trait.name}</span>
-                                                                    {trait.value && <span className="font-mono text-[10px] opacity-80 shrink-0 ml-1">{trait.value}</span>}
-                                                                </div>
-                                                            ))}
+                                        return (
+                                            <MotionFade key={char.id} delay={0.1 * index}>
+                                                <div className="h-full bg-stone-900/30 border border-stone-800 rounded-sm p-5 flex flex-col hover:border-amber-900/50 transition-colors shadow-glass-dark">
+                                                    <h3 className="font-serif font-bold text-xl text-amber-400 mb-1 border-b border-stone-800 pb-2">
+                                                        {char.character_name}
+                                                    </h3>
+
+                                                    <div className="mt-4 grid grid-cols-2 gap-4 flex-grow items-start">
+                                                        {/* Traits (Avantages) */}
+                                                        <div className="flex flex-col w-full h-full">
+                                                            {hasTraitsAdvs && (
+                                                                <>
+                                                                    <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black text-center border-b border-amber-900/30 pb-1">Avantages</div>
+                                                                    <div className="space-y-1">
+                                                                        {data.page2.avantages.filter(t => t.name).map((trait, i) => (
+                                                                            <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-emerald-950/20 text-emerald-400 border-emerald-900/20 truncate flex justify-between items-center w-full">
+                                                                                <span className="font-bold truncate" title={trait.name}>{trait.name}</span>
+                                                                                {trait.value && <span className="font-mono text-[10px] opacity-80 shrink-0 ml-1">{trait.value}</span>}
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </>
+                                                            )}
                                                         </div>
-                                                    </>
-                                                )}
-                                            </div>
 
-                                            {/* Traits (Désavantages) */}
-                                            <div className="flex flex-col w-full h-full border-l border-stone-800/50 pl-4">
-                                                {hasTraitsDesadvs && (
-                                                    <>
-                                                        <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black text-center border-b border-amber-900/30 pb-1">Désavantages</div>
-                                                        <div className="space-y-1">
-                                                            {data.page2.desavantages.filter(t => t.name).map((trait, i) => (
-                                                                <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-rose-950/20 text-rose-400 border-rose-900/20 truncate flex justify-between items-center w-full">
-                                                                    <span className="font-bold truncate" title={trait.name}>{trait.name}</span>
-                                                                    {trait.value && <span className="font-mono text-[10px] opacity-80 shrink-0 ml-1">{trait.value}</span>}
-                                                                </div>
-                                                            ))}
+                                                        {/* Traits (Désavantages) */}
+                                                        <div className="flex flex-col w-full h-full border-l border-stone-800/50 pl-4">
+                                                            {hasTraitsDesadvs && (
+                                                                <>
+                                                                    <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black text-center border-b border-amber-900/30 pb-1">Désavantages</div>
+                                                                    <div className="space-y-1">
+                                                                        {data.page2.desavantages.filter(t => t.name).map((trait, i) => (
+                                                                            <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-rose-950/20 text-rose-400 border-rose-900/20 truncate flex justify-between items-center w-full">
+                                                                                <span className="font-bold truncate" title={trait.name}>{trait.name}</span>
+                                                                                {trait.value && <span className="font-mono text-[10px] opacity-80 shrink-0 ml-1">{trait.value}</span>}
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </>
+                                                            )}
                                                         </div>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </MotionFade>
-                            );
-                        })}
+                                                    </div>
+                                                </div>
+                                            </MotionFade>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </main>
             )}

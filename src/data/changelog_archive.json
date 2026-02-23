@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.69.1",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie : Mémorisation de la préférence d'affichage (mode portrait / paysage) dans le cache local (localStorage). Le mode choisi persiste désormais après rechargement de la page."
+    },
+    {
         "version": "2.69.0",
         "date": "2026-02-23",
         "type": "feat",
@@ -603,15 +609,6 @@
             "🔍 UI : Ajout d'une vue détaillée des changements dans l'assistant d'importation (Nouveaux items et Conflits)",
             "📋 Import : Comparaison précise des propriétés des items (coût, description, effets, etc.) avec visualisation Ancien vs Nouveau",
             "🔠 Système : Détection inteligente ignorant la casse pour éviter les doublons tout en permettant la normalisation"
-        ]
-    },
-    {
-        "version": "2.50.1",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "📥 Système : Support de l'import de fichiers JSON partiels (ex: uniquement les traits ou compétences)",
-            "🛡️ Validation : Renforcement du schéma de données pour inclure toutes les bibliothèques dans les exports de fiches"
         ]
     }
 ]
