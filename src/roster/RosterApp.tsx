@@ -145,6 +145,7 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                     if (!masterCategoriesMap.has(masterCatId)) {
                         masterCategoriesMap.set(masterCatId, new Set());
                     }
+                    // On ajoute le nom complet (cleanName) au Set pour distinguer les variantes
                     masterCategoriesMap.get(masterCatId)!.add(cleanName);
                 });
             });
