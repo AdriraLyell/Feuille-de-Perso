@@ -91,11 +91,18 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
     if (characters.length > 0 && rules) {
         // 1. Dictionnaire "Référentiel Central", nom -> catId
         const officialSkillMap = new Map<string, string>();
-        rules?.libraries?.skills?.forEach(s => {
-            if (s.defaultCategory) {
-                officialSkillMap.set(s.name.trim().toLowerCase(), s.defaultCategory);
-            }
-        });
+
+        const addToMap = (lib: any[] | undefined) => {
+            lib?.forEach(s => {
+                if (s.defaultCategory) {
+                    officialSkillMap.set(s.name.trim().toLowerCase(), s.defaultCategory);
+                }
+            });
+        };
+
+        addToMap(rules?.libraries?.skills);
+        addToMap(rules?.libraries?.backgrounds);
+        addToMap(rules?.libraries?.mysticAbilities);
 
         // 2. Récolter TOUTES les compétences uniques et leur attribuer une "catégorie maître"
         const masterCategoriesMap = new Map<string, Set<string>>();
