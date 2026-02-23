@@ -68,7 +68,7 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
     }
 
     // Récupérer la liste des attributs pour l'en-tête (en fusionnant toutes les catégories)
-    let allAttributes: { name: string, category: string }[] = [];
+    const allAttributes: { name: string, category: string }[] = [];
     if (characters.length > 0) {
         Object.entries(characters[0].data.attributes || {}).forEach(([catName, attrs]) => {
             (attrs as any[]).forEach(attr => {
@@ -253,7 +253,7 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
             let { currentDay, currentMonthIndex, currentYear } = calendar;
 
             const incrementDay = () => {
-                let currentMonthDays = calendar.months[currentMonthIndex]?.days ?? 30;
+                const currentMonthDays = calendar.months[currentMonthIndex]?.days ?? 30;
                 currentDay++;
                 if (currentDay > currentMonthDays) {
                     currentDay = 1;

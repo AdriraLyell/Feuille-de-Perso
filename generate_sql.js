@@ -1,3 +1,4 @@
+/* eslint-disable */
 const fs = require('fs');
 // Path to the file containing the previous SQL output with the JSON data
 const inputPath = 'C:/Users/raist/.gemini/antigravity/brain/c0af7de1-a836-4eea-af5f-387c36dc9825/.system_generated/steps/381/output.txt';

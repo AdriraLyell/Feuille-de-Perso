@@ -56,7 +56,6 @@ export const useRealtimeSync = ({
             if (settingDebounceRef.current) clearTimeout(settingDebounceRef.current);
             RealtimeService.unsubscribeAll();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [settingId, isOnlineMode]);
 
     useEffect(() => {
@@ -83,6 +82,5 @@ export const useRealtimeSync = ({
         return () => {
             if (characterDebounceRef.current) clearTimeout(characterDebounceRef.current);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [characterId, isOnlineMode]);
 };

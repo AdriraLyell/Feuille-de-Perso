@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { CharacterSheetData, LibrarySkillEntry } from '../../../types';
 import { RulesData } from '../../../types/rules';
-import { Sparkles, CheckCircle2, ChevronRight, AlertCircle, Infinity } from 'lucide-react';
+import { Sparkles, CheckCircle2, ChevronRight, AlertCircle, Infinity as InfinityIcon } from 'lucide-react';
 import { getMysticCapacity } from '../../../utils/mysticUtils';
 import ThematicModal from '../../ui/ThematicModal';
 
@@ -109,7 +109,7 @@ const MysticSkillWizard: React.FC<MysticSkillWizardProps> = ({
                     <div className="text-right">
                         {allowed === 999 ? (
                             <>
-                                <div className="text-purple-400 flex justify-end mb-1"><Infinity size={32} /></div>
+                                <div className="text-purple-400 flex justify-end mb-1"><InfinityIcon size={32} /></div>
                                 <div className="text-[10px] uppercase tracking-wider text-purple-500 font-bold">SANS LIMITE</div>
                             </>
                         ) : (
