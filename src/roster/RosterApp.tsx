@@ -175,7 +175,12 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
 
                     // Parcours de n'importe quel dossier de compétences pour trouver "skillName"
                     for (const [, catSkills] of Object.entries(charData.skills || {})) {
-                        const found = catSkills.find(s => s.name.trim() === skillName);
+                        const found = catSkills.find(s => {
+                            const b = s.name.trim();
+                            const v = s.variant?.trim();
+                            const cn = v ? `${b} : ${v}` : b;
+                            return cn === skillName;
+                        });
                         if (found) {
                             foundValue = found.value || 0;
                             break; // On a trouvé la compétence, pas besoin de chercher dans les autres dossiers
