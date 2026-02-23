@@ -89,25 +89,62 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
 
     const skillMatrix: Record<string, SkillRow[]> = {};
     if (characters.length > 0 && rules) {
-        const allCats = Object.keys(characters[0].data.skills || {});
-        allCats.forEach(catId => {
-            // Trouver le label lisible pour cet ID (Col_Comp_1 -> "Combat" par ex)
-            const catConfig = rules.definitions.skillCategories?.find(c => c.id === catId);
-            const catLabel = catConfig?.label || catId;
+        // 1. Dictionnaire "Référentiel Central", nom -> catId
+        const officialSkillMap = new Map<string, string>();
+        rules?.libraries?.skills?.forEach(s => {
+            if (s.defaultCategory) {
+                officialSkillMap.set(s.name.trim().toLowerCase(), s.defaultCategory);
+            }
+        });
 
-            const uniqueSkills = new Set<string>();
-            characters.forEach(c => {
-                const charData = c.data as CharacterSheetData;
-                (charData.skills?.[catId] || []).forEach(s => uniqueSkills.add(s.name));
+        // 2. Récolter TOUTES les compétences uniques et leur attribuer une "catégorie maître"
+        const masterCategoriesMap = new Map<string, Set<string>>();
+
+        characters.forEach(c => {
+            const charData = c.data as CharacterSheetData;
+            Object.entries(charData.skills || {}).forEach(([_, skillList]) => {
+                skillList.forEach(s => {
+                    const cleanName = s.name.trim();
+                    const lowerName = cleanName.toLowerCase();
+
+                    // On prend la catégorie officielle, sinon un fallback "Custom"
+                    const masterCatId = officialSkillMap.get(lowerName) || "Col_Comp_Custom";
+
+                    if (!masterCategoriesMap.has(masterCatId)) {
+                        masterCategoriesMap.set(masterCatId, new Set());
+                    }
+                    masterCategoriesMap.get(masterCatId)!.add(cleanName);
+                });
             });
+        });
+
+        // 3. Calculer les lignes de scores pour chaque catégorie
+        masterCategoriesMap.forEach((uniqueSkills, catId) => {
+            // Déterminer le nom lisible
+            let catLabel = "Autres (Hors Référentiel)";
+            if (catId !== "Col_Comp_Custom") {
+                const catConfig = rules.definitions.skillCategories?.find(c => c.id === catId);
+                catLabel = catConfig?.label || catId;
+            }
 
             const rows: SkillRow[] = [];
             uniqueSkills.forEach(skillName => {
+                // Pour chaque perso, on cherche la compétence dans TOUS ses dossiers, puisqu'on a ignoré son rangement initial
                 const scores = characters.map(c => {
                     const charData = c.data as CharacterSheetData;
-                    const skillNode = (charData.skills?.[catId] || []).find(s => s.name === skillName);
-                    return skillNode?.value || 0;
+                    let foundValue = 0;
+
+                    // Parcours de n'importe quel dossier de compétences pour trouver "skillName"
+                    for (const [, catSkills] of Object.entries(charData.skills || {})) {
+                        const found = catSkills.find(s => s.name.trim() === skillName);
+                        if (found) {
+                            foundValue = found.value || 0;
+                            break; // On a trouvé la compétence, pas besoin de chercher dans les autres dossiers
+                        }
+                    }
+                    return foundValue;
                 });
+
                 const maxScore = Math.max(...scores);
                 if (maxScore > 0) {
                     rows.push({ name: skillName, scores, maxScore });
