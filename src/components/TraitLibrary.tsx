@@ -159,14 +159,29 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
 
                 <div className="flex items-center gap-2 text-xs border-t border-[#bfae85]/20 pt-2">
                     <span className="font-bold text-[#5c4d41]/70 uppercase tracking-wide">Trier par :</span>
-                    <button onClick={() => handleSortChange('name')} className={`flex items-center gap-1 px-2 py-1 rounded-sm border transition-colors ${sortBy === 'name' ? 'bg-amber-50/50 border-amber-200/50 text-amber-800' : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41] hover:bg-stone-50'}`}>
-                        {sortBy === 'name' && (sortOrder === 'asc' ? <ArrowDownAZ size={14} /> : <ArrowUpAZ size={14} />)} Nom
+                    <button
+                        onClick={() => handleSortChange('name')}
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded-sm border transition-all ${sortBy === 'name' ? 'bg-amber-100/50 border-amber-300 text-amber-900 font-bold' : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41] hover:bg-stone-50'}`}
+                        title="Trier par ordre alphabétique"
+                    >
+                        {sortBy === 'name' ? (sortOrder === 'asc' ? <ArrowDownAZ size={14} /> : <ArrowUpAZ size={14} />) : <ArrowDownAZ size={14} className="opacity-40" />}
+                        Nom
                     </button>
-                    <button onClick={() => handleSortChange('cost')} className={`flex items-center gap-1 px-2 py-1 rounded-sm border transition-colors ${sortBy === 'cost' ? 'bg-amber-50/50 border-amber-200/50 text-amber-800' : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41] hover:bg-stone-50'}`}>
-                        <Coins size={14} /> Coût {sortBy === 'cost' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    <button
+                        onClick={() => handleSortChange('cost')}
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded-sm border transition-all ${sortBy === 'cost' ? 'bg-amber-100/50 border-amber-300 text-amber-900 font-bold' : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41] hover:bg-stone-50'}`}
+                        title="Trier par coût en points"
+                    >
+                        <Coins size={14} className={sortBy === 'cost' ? 'text-amber-600' : 'opacity-40'} />
+                        Coût {sortBy === 'cost' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </button>
-                    <button onClick={() => handleSortChange('type')} className={`flex items-center gap-1 px-2 py-1 rounded-sm border transition-colors ${sortBy === 'type' ? 'bg-amber-50/50 border-amber-200/50 text-amber-800' : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41] hover:bg-stone-50'}`}>
-                        <Layers size={14} /> Type {sortBy === 'type' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    <button
+                        onClick={() => handleSortChange('type')}
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded-sm border transition-all ${sortBy === 'type' ? 'bg-amber-100/50 border-amber-300 text-amber-900 font-bold' : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41] hover:bg-stone-50'}`}
+                        title="Trier par type (Avantage/Désavantage)"
+                    >
+                        <Layers size={14} className={sortBy === 'type' ? 'text-blue-600' : 'opacity-40'} />
+                        Type {sortBy === 'type' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </button>
                 </div>
 

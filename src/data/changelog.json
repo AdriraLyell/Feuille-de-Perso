@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.75.14",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Registre (Roster) : Ajout d'options de tri global pour les avantages et désavantages dans la section Profils. Permet de trier les traits par nom ou par coût pour tous les personnages simultanément."
+    },
+    {
+        "version": "2.75.13",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Bibliothèque de Traits : Amélioration des options de tri. Ajout de boutons explicites pour le tri par ordre alphabétique et par coût, avec retour visuel amélioré et icônes directionnelles."
+    },
+    {
+        "version": "2.75.12",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Interface (Registre) : Refonte de la mise en page des attributs pour regrouper les colonnes par 'pavés' (Physique, Mental, Social). Ajout de séparateurs visuels forts et d'un fond coloré subtil par catégorie pour une lecture plus structurée."
+    },
+    {
         "version": "2.75.11",
         "date": "2026-02-23",
         "type": "feat",
@@ -100,23 +118,5 @@
         "date": "2026-02-22",
         "type": "fix",
         "description": "Système d'expérience : Distinction visuelle des traits. Utilisation de l'icône ⬆️ bleue pour les avantages améliorés et ❇️ verte pour les nouveaux traits acquis post-création."
-    },
-    {
-        "version": "2.71.3",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Système d'expérience : Les limites d'amélioration des avantages sont désormais dynamiquement extraites des plages de coûts définies en bibliothèque (ex: un avantage coûtant '1-3' sera bridé au niveau 3)."
-    },
-    {
-        "version": "2.71.2",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Système d'expérience : Précision des règles d'amélioration des avantages. Seuls les avantages à coût variable (vérification en bibliothèque) peuvent être augmentés. Uniformisation de l'icône visuelle : le symbole ❇️ (en bleu) identifie désormais les avantages améliorés, en cohérence avec l'icône d'acquisition post-création."
-    },
-    {
-        "version": "2.71.1",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Système d'expérience : Limite maximale de l'amélioration des avantages fixée à 5. Ajout d'une icône ⬆️ distinctive dans la liste des traits pour repérer rapidement les avantages qui ont été améliorés post-création avec de l'XP."
     }
 ]

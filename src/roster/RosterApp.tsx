@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CharacterSyncService, SyncedCharacter } from '../services/CharacterSyncService';
 import { CampaignService, RulesData } from '../services/CampaignService';
-import { Loader2, Users, AlertCircle, Heart, Shield, Droplets, Search, ChevronDown, ChevronRight, CalendarDays, Clock, X } from 'lucide-react';
+import { Loader2, Users, AlertCircle, Heart, Shield, Droplets, Search, ChevronDown, ChevronRight, CalendarDays, Clock, X, ArrowDownAZ, ArrowUpAZ, Coins } from 'lucide-react';
 import { MotionFade } from '../components/ui/motion/MotionFade';
 import { CharacterSheetData } from '../types';
 
@@ -20,6 +20,8 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
     const [showSkills, setShowSkills] = useState(true);
     const [showTraits, setShowTraits] = useState(true);
     const [showTimeManagement, setShowTimeManagement] = useState(true);
+    const [traitSortBy, setTraitSortBy] = useState<'name' | 'cost'>('name');
+    const [traitSortOrder, setTraitSortOrder] = useState<'asc' | 'desc'>('asc');
 
     useEffect(() => {
         loadData();
@@ -83,6 +85,14 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
         if (lower.includes('mental')) return '#38bdf8';   // sky-400
         if (lower.includes('social')) return '#34d399';   // emerald-400
         return '#d97706'; // amber-600
+    };
+
+    const getCategoryBgColor = (catName: string) => {
+        const lower = catName.toLowerCase();
+        if (lower.includes('physique')) return 'rgba(251, 146, 60, 0.03)'; // orange-400 @ 3%
+        if (lower.includes('mental')) return 'rgba(56, 189, 248, 0.03)';   // sky-400 @ 3%
+        if (lower.includes('social')) return 'rgba(52, 211, 153, 0.03)';   // emerald-400 @ 3%
+        return 'rgba(217, 119, 6, 0.03)'; // amber-600 @ 3%
     };
 
     interface SkillRow {
@@ -395,12 +405,22 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                 <table className="w-full text-left border-collapse min-w-max">
                                     <thead className="bg-[#12100e] border-y border-stone-800/50">
                                         <tr>
-                                            <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">Identité</th>
-                                            {allAttributes.map(attr => (
-                                                <th key={attr.name} className="p-3 font-bold uppercase tracking-widest text-[9px] text-center border-l border-stone-800/20" style={{ color: getCategoryColor(attr.category) }}>
-                                                    {attr.name}
-                                                </th>
-                                            ))}
+                                            <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] sticky left-0 bg-[#12100e] z-30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] border-r border-stone-800/50">Identité</th>
+                                            {allAttributes.map((attr, idx) => {
+                                                const isFirstInCategory = idx === 0 || attr.category !== allAttributes[idx - 1].category;
+                                                return (
+                                                    <th
+                                                        key={attr.name}
+                                                        className={`p-3 font-bold uppercase tracking-widest text-[9px] text-center border-stone-800/20 ${isFirstInCategory && idx !== 0 ? 'border-l-4 border-stone-950' : 'border-l'}`}
+                                                        style={{
+                                                            color: getCategoryColor(attr.category),
+                                                            backgroundColor: getCategoryBgColor(attr.category)
+                                                        }}
+                                                    >
+                                                        {attr.name}
+                                                    </th>
+                                                );
+                                            })}
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-stone-800/50">
@@ -420,14 +440,19 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                                         <div className="text-[10px] uppercase tracking-widest text-stone-500">{char.player_name}</div>
                                                         <div className="text-xs text-stone-400 italic mt-1 truncate max-w-[150px]">{data.header?.nature || ""}</div>
                                                     </td>
-                                                    {allAttributes.map(attr => {
+                                                    {allAttributes.map((attr, idx) => {
                                                         const val = charAttrs[attr.name] || 0;
                                                         const isExcep = val >= 3;
                                                         const isNegative = val < 0;
                                                         const isZero = val === 0;
+                                                        const isFirstInCategory = idx === 0 || attr.category !== allAttributes[idx - 1].category;
 
                                                         return (
-                                                            <td key={attr.name} className="p-3 text-center border-l border-stone-800/10">
+                                                            <td
+                                                                key={attr.name}
+                                                                className={`p-3 text-center border-stone-800/10 ${isFirstInCategory && idx !== 0 ? 'border-l-4 border-stone-950' : 'border-l'}`}
+                                                                style={{ backgroundColor: getCategoryBgColor(attr.category) }}
+                                                            >
                                                                 <span className={`font-mono text-lg font-medium ${isZero ? 'opacity-30' : ''} ${isExcep ? 'text-amber-400 font-black scale-125 inline-block' : 'text-stone-300'} ${isNegative ? 'text-rose-500 font-bold' : ''}`}>
                                                                     {val}
                                                                 </span>
@@ -549,15 +574,48 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
 
                     {/* SECTION BAS : GRILLE DE DOSSIERS (Traits) */}
                     <div className="bg-stone-900/40 border border-stone-800 rounded-sm overflow-hidden shadow-glass-dark">
-                        <button
-                            onClick={() => setShowTraits(!showTraits)}
-                            className="w-full p-4 flex justify-between items-center bg-stone-950 border-b border-stone-800 hover:bg-stone-900 transition-colors"
-                        >
-                            <h2 className="font-serif font-bold text-lg text-amber-500 uppercase tracking-widest flex items-center gap-2">
-                                Profils & Traits
-                            </h2>
-                            {showTraits ? <ChevronDown size={18} className="text-amber-600" /> : <ChevronRight size={18} className="text-amber-600" />}
-                        </button>
+                        <div className="flex justify-between items-center bg-stone-950 border-b border-stone-800 pr-4">
+                            <button
+                                onClick={() => setShowTraits(!showTraits)}
+                                className="flex-grow p-4 flex justify-between items-center hover:bg-stone-900 transition-colors"
+                            >
+                                <h2 className="font-serif font-bold text-lg text-amber-500 uppercase tracking-widest flex items-center gap-2">
+                                    Profils & Traits
+                                </h2>
+                                {showTraits ? <ChevronDown size={18} className="text-amber-600" /> : <ChevronRight size={18} className="text-amber-600" />}
+                            </button>
+
+                            {showTraits && (
+                                <div className="flex items-center gap-4 border-l border-stone-800 pl-4 h-10">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-stone-500 hidden sm:block">Trier :</span>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => {
+                                                if (traitSortBy === 'name') setTraitSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+                                                else { setTraitSortBy('name'); setTraitSortOrder('asc'); }
+                                            }}
+                                            className={`p-1.5 rounded-sm border transition-all flex items-center gap-1.5 ${traitSortBy === 'name' ? 'bg-amber-900/30 border-amber-600 text-amber-400' : 'bg-stone-900 border-stone-700 text-stone-500 hover:text-stone-300'}`}
+                                            title="Trier par nom"
+                                        >
+                                            {traitSortBy === 'name' ? (traitSortOrder === 'asc' ? <ArrowDownAZ size={14} /> : <ArrowUpAZ size={14} />) : <ArrowDownAZ size={14} className="opacity-40" />}
+                                            <span className="text-[10px] font-bold uppercase tracking-tight hidden md:block">Nom</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (traitSortBy === 'cost') setTraitSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+                                                else { setTraitSortBy('cost'); setTraitSortOrder('asc'); }
+                                            }}
+                                            className={`p-1.5 rounded-sm border transition-all flex items-center gap-1.5 ${traitSortBy === 'cost' ? 'bg-amber-900/30 border-amber-600 text-amber-400' : 'bg-stone-900 border-stone-700 text-stone-500 hover:text-stone-300'}`}
+                                            title="Trier par coût"
+                                        >
+                                            <Coins size={14} className={traitSortBy === 'cost' ? 'text-amber-500' : 'opacity-40'} />
+                                            <span className="text-[10px] font-bold uppercase tracking-tight hidden md:block">Coût</span>
+                                            {traitSortBy === 'cost' && <span className="text-[10px] font-mono">{traitSortOrder === 'asc' ? '↑' : '↓'}</span>}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
 
                         {showTraits && (
                             <div className="p-6">
@@ -565,8 +623,26 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                     {characters.map((char, index) => {
                                         const data = char.data as CharacterSheetData;
 
-                                        const hasTraitsAdvs = data.page2?.avantages && data.page2.avantages.filter(t => t.name).length > 0;
-                                        const hasTraitsDesadvs = data.page2?.desavantages && data.page2.desavantages.filter(t => t.name).length > 0;
+                                        const getSortedTraits = (traits: any[]) => {
+                                            const filtered = (traits || []).filter(t => t.name);
+                                            return [...filtered].sort((a, b) => {
+                                                let comparison = 0;
+                                                if (traitSortBy === 'name') {
+                                                    comparison = a.name.localeCompare(b.name);
+                                                } else if (traitSortBy === 'cost') {
+                                                    const costA = parseInt(a.value) || 0;
+                                                    const costB = parseInt(b.value) || 0;
+                                                    comparison = costA - costB;
+                                                }
+                                                return traitSortOrder === 'asc' ? comparison : -comparison;
+                                            });
+                                        };
+
+                                        const sortedAdvs = getSortedTraits(data.page2?.avantages || []);
+                                        const sortedDesadvs = getSortedTraits(data.page2?.desavantages || []);
+
+                                        const hasTraitsAdvs = sortedAdvs.length > 0;
+                                        const hasTraitsDesadvs = sortedDesadvs.length > 0;
 
                                         return (
                                             <MotionFade key={char.id} delay={0.1 * index}>
@@ -582,7 +658,7 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                                                 <>
                                                                     <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black text-center border-b border-amber-900/30 pb-1">Avantages</div>
                                                                     <div className="space-y-1">
-                                                                        {data.page2.avantages.filter(t => t.name).map((trait, i) => (
+                                                                        {sortedAdvs.map((trait, i) => (
                                                                             <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-emerald-950/20 text-emerald-400 border-emerald-900/20 truncate flex justify-between items-center w-full">
                                                                                 <span className="font-bold truncate" title={trait.name}>{trait.name}</span>
                                                                                 {trait.value && <span className="font-mono text-[10px] opacity-80 shrink-0 ml-1">{trait.value}</span>}
@@ -599,7 +675,7 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                                                 <>
                                                                     <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black text-center border-b border-amber-900/30 pb-1">Désavantages</div>
                                                                     <div className="space-y-1">
-                                                                        {data.page2.desavantages.filter(t => t.name).map((trait, i) => (
+                                                                        {sortedDesadvs.map((trait, i) => (
                                                                             <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-rose-950/20 text-rose-400 border-rose-900/20 truncate flex justify-between items-center w-full">
                                                                                 <span className="font-bold truncate" title={trait.name}>{trait.name}</span>
                                                                                 {trait.value && <span className="font-mono text-[10px] opacity-80 shrink-0 ml-1">{trait.value}</span>}
