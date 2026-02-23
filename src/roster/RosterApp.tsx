@@ -195,7 +195,9 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                     return (
                                         <tr key={char.id} className="hover:bg-amber-900/5 transition-colors">
                                             <td className="p-4 sticky left-0 bg-[#161412] z-10 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] border-r border-stone-800/50">
-                                                <div className="font-serif font-bold text-lg text-amber-50">{char.character_name}</div>
+                                                <div className="font-serif font-bold text-lg text-amber-50" title={char.character_name}>
+                                                    {char.character_name.split(' ')[0]}
+                                                </div>
                                                 <div className="text-[10px] uppercase tracking-widest text-stone-500">{char.player_name}</div>
                                                 <div className="text-xs text-stone-400 italic mt-1">{data.header?.nature || ""}</div>
                                             </td>
@@ -265,8 +267,8 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                                                     Compétence
                                                                 </th>
                                                                 {characters.map(c => (
-                                                                    <th key={c.id} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30">
-                                                                        {c.character_name.substring(0, 10)}{c.character_name.length > 10 ? '.' : ''}
+                                                                    <th key={c.id} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30" title={c.character_name}>
+                                                                        {c.character_name.split(' ')[0]}
                                                                     </th>
                                                                 ))}
                                                             </tr>
