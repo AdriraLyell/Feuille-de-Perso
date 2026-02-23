@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.69.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Système de 'Date Picker' interactif pour le Journal : Cliquez sur les icônes calendrier des blocs narratifs pour sélectionner une date directement depuis le Chroniqueur sans créer de nouveau chapitre. Ajout de champs de titre personnalisés pour le sommaire automatique et réduction globale de la taille des labels pour une interface plus épurée."
+    },
+    {
         "version": "2.68.0",
         "date": "2026-02-23",
         "type": "feat",
@@ -606,16 +612,6 @@
         "changes": [
             "📥 Système : Support de l'import de fichiers JSON partiels (ex: uniquement les traits ou compétences)",
             "🛡️ Validation : Renforcement du schéma de données pour inclure toutes les bibliothèques dans les exports de fiches"
-        ]
-    },
-    {
-        "version": "2.50.0",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "🛡️ Admin : Renforcement de la détection des conflits lors de l'import (ID + Nom)",
-            "🧹 Bibliothèque : Prévention de la pollution par doublons visuels lors de l'import de fiches personnages",
-            "📥 Système : Amélioration de la robustesse de l'Assistant d'Importation pour tous les types de contenu (Traits, Skills, Backgrounds, Counters)"
         ]
     }
 ]

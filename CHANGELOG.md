@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.50.0] - 2026-02-17 [FEAT]
+
+- 🛡️ Admin : Renforcement de la détection des conflits lors de l'import (ID + Nom)
+- 🧹 Bibliothèque : Prévention de la pollution par doublons visuels lors de l'import de fiches personnages
+- 📥 Système : Amélioration de la robustesse de l'Assistant d'Importation pour tous les types de contenu (Traits, Skills, Backgrounds, Counters)
+
 ## [2.49.99] - 2026-02-17 [FEAT]
 
 - 🛠️ Admin : Correction du bug de réinitialisation des coûts des traits (mismatch SQL points/cost)

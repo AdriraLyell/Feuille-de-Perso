@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.75.4",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Registre : Suppression du sélecteur de format portrait/paysage pour revenir à l'affichage standard (Attributs en lignes, Compétences en lignes) tout en conservant l'accordéon et le nouvel alignement des traits."
+    },
+    {
         "version": "2.75.3",
         "date": "2026-02-23",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-23",
         "type": "feat",
         "description": "Ergonomie : Mémorisation de la préférence d'affichage (mode portrait / paysage) dans le cache local (localStorage). Le mode choisi persiste désormais après rechargement de la page."
-    },
-    {
-        "version": "2.69.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Système de 'Date Picker' interactif pour le Journal : Cliquez sur les icônes calendrier des blocs narratifs pour sélectionner une date directement depuis le Chroniqueur sans créer de nouveau chapitre. Ajout de champs de titre personnalisés pour le sommaire automatique et réduction globale de la taille des labels pour une interface plus épurée."
     }
 ]

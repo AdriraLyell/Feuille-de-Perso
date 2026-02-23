@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CharacterSyncService, SyncedCharacter } from '../services/CharacterSyncService';
 import { CampaignService, RulesData } from '../services/CampaignService';
-import { Loader2, Users, AlertCircle, Heart, Shield, Droplets, Search, ChevronDown, ChevronRight, LayoutTemplate, LayoutList } from 'lucide-react';
+import { Loader2, Users, AlertCircle, Heart, Shield, Droplets, Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { MotionFade } from '../components/ui/motion/MotionFade';
 import { CharacterSheetData } from '../types';
 
@@ -17,7 +17,6 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
     const [showAttributes, setShowAttributes] = useState(true);
-    const [layoutFormat, setLayoutFormat] = useState<'landscape' | 'portrait'>('landscape');
 
     useEffect(() => {
         loadData();
@@ -232,22 +231,6 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                     </p>
                 </div>
                 <div className="flex items-center gap-6">
-                    <div className="flex bg-stone-900/50 border border-stone-800 rounded-sm overflow-hidden text-[10px] font-bold uppercase tracking-widest shadow-glass-dark">
-                        <button
-                            onClick={() => setLayoutFormat('landscape')}
-                            className={`px-4 py-2 transition-colors flex items-center gap-2 ${layoutFormat === 'landscape' ? 'bg-amber-600/90 text-stone-950' : 'text-stone-500 hover:text-amber-400 hover:bg-stone-800'}`}
-                            title="Format Paysage (Personnages en Lignes)"
-                        >
-                            <LayoutTemplate size={14} /> Paysage
-                        </button>
-                        <button
-                            onClick={() => setLayoutFormat('portrait')}
-                            className={`px-4 py-2 transition-colors flex items-center gap-2 border-l border-stone-800 ${layoutFormat === 'portrait' ? 'bg-amber-600/90 text-stone-950' : 'text-stone-500 hover:text-amber-400 hover:bg-stone-800'}`}
-                            title="Format Portrait (Personnages en Colonnes)"
-                        >
-                            <LayoutList size={14} /> Portrait
-                        </button>
-                    </div>
                     <div className="text-stone-500 text-sm font-mono bg-stone-900/50 px-4 py-2 rounded-sm border border-stone-800 shadow-glass-dark flex items-center gap-2">
                         <span className="text-amber-600 font-bold">{characters.length}</span> <span className="uppercase text-[10px] tracking-widest">Âmes</span>
                     </div>
@@ -277,29 +260,16 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                 <table className="w-full text-left border-collapse min-w-max">
                                     <thead className="bg-[#12100e] border-y border-stone-800/50">
                                         <tr>
-                                            {layoutFormat === 'landscape' ? (
-                                                <>
-                                                    <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">Identité</th>
-                                                    {allAttributes.map(attr => (
-                                                        <th key={attr.name} className="p-3 font-bold uppercase tracking-widest text-[9px] text-center border-l border-stone-800/20" style={{ color: getCategoryColor(attr.category) }}>
-                                                            {attr.name}
-                                                        </th>
-                                                    ))}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] w-48 sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">Attribut</th>
-                                                    {characters.map(c => (
-                                                        <th key={c.id} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30" title={c.character_name}>
-                                                            {c.character_name.split(' ')[0]}
-                                                        </th>
-                                                    ))}
-                                                </>
-                                            )}
+                                            <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">Identité</th>
+                                            {allAttributes.map(attr => (
+                                                <th key={attr.name} className="p-3 font-bold uppercase tracking-widest text-[9px] text-center border-l border-stone-800/20" style={{ color: getCategoryColor(attr.category) }}>
+                                                    {attr.name}
+                                                </th>
+                                            ))}
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-stone-800/50">
-                                        {layoutFormat === 'landscape' ? characters.map(char => {
+                                        {characters.map(char => {
                                             const data = char.data as CharacterSheetData;
                                             const charAttrs: Record<string, number> = {};
                                             Object.values(data.attributes || {}).forEach(cat => {
@@ -331,31 +301,7 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                                     })}
                                                 </tr>
                                             );
-                                        }) : allAttributes.map(attr => (
-                                            <tr key={attr.name} className="hover:bg-amber-900/5 transition-colors">
-                                                <td className="p-3 font-medium sticky left-0 bg-[#161412] z-10 w-48 border-r border-stone-800/30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] uppercase tracking-widest text-[10px]" style={{ color: getCategoryColor(attr.category) }}>
-                                                    {attr.name}
-                                                </td>
-                                                {characters.map(char => {
-                                                    const data = char.data as CharacterSheetData;
-                                                    let val = 0;
-                                                    Object.values(data.attributes || {}).forEach(cat => {
-                                                        cat.forEach(a => { if (a.name === attr.name) val = parseInt(a.val1 || "0", 10); });
-                                                    });
-                                                    const isExcep = val >= 3;
-                                                    const isNegative = val < 0;
-                                                    const isZero = val === 0;
-
-                                                    return (
-                                                        <td key={char.id} className="p-3 text-center border-l border-stone-800/10">
-                                                            <span className={`font-mono text-sm ${isZero ? 'opacity-20' : ''} ${isExcep ? 'text-amber-400 font-bold scale-110 inline-block' : 'text-stone-300'} ${isNegative ? 'text-rose-500' : ''}`}>
-                                                                {val}
-                                                            </span>
-                                                        </td>
-                                                    );
-                                                })}
-                                            </tr>
-                                        ))}
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
@@ -403,52 +349,18 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                                     <table className="w-full text-left text-sm whitespace-nowrap min-w-max">
                                                         <thead className="bg-[#12100e] border-y border-stone-800/50">
                                                             <tr>
-                                                                {layoutFormat === 'landscape' ? (
-                                                                    <>
-                                                                        <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] w-48 sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
-                                                                            Identité
-                                                                        </th>
-                                                                        {rows.map(row => (
-                                                                            <th key={row.name} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30 whitespace-normal min-w-[80px]" title={row.name}>
-                                                                                {row.name}
-                                                                            </th>
-                                                                        ))}
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] w-48 sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
-                                                                            Compétence
-                                                                        </th>
-                                                                        {characters.map(c => (
-                                                                            <th key={c.id} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30" title={c.character_name}>
-                                                                                {c.character_name.split(' ')[0]}
-                                                                            </th>
-                                                                        ))}
-                                                                    </>
-                                                                )}
+                                                                <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] w-48 sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
+                                                                    Compétence
+                                                                </th>
+                                                                {characters.map(c => (
+                                                                    <th key={c.id} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30" title={c.character_name}>
+                                                                        {c.character_name.split(' ')[0]}
+                                                                    </th>
+                                                                ))}
                                                             </tr>
                                                         </thead>
                                                         <tbody className="divide-y divide-stone-800/30">
-                                                            {layoutFormat === 'landscape' ? characters.map((c, cIdx) => (
-                                                                <tr key={c.id} className="hover:bg-amber-900/10 transition-colors">
-                                                                    <td className="p-3 font-medium text-amber-50 sticky left-0 bg-[#161412] z-10 w-48 border-r border-stone-800/30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
-                                                                        <div className="font-serif font-bold truncate">{c.character_name.split(' ')[0]}</div>
-                                                                    </td>
-                                                                    {rows.map((row, rIdx) => {
-                                                                        const score = row.scores[cIdx];
-                                                                        const isBest = score > 0 && score === row.maxScore;
-                                                                        return (
-                                                                            <td key={rIdx} className={`p-3 text-center font-mono border-l border-stone-800/30 ${isBest ? 'bg-amber-900/20' : ''}`}>
-                                                                                {score > 0 ? (
-                                                                                    <span className={isBest ? 'text-amber-400 font-bold' : 'text-stone-400'}>{score}</span>
-                                                                                ) : (
-                                                                                    <span className="text-stone-700">-</span>
-                                                                                )}
-                                                                            </td>
-                                                                        );
-                                                                    })}
-                                                                </tr>
-                                                            )) : rows.map(row => (
+                                                            {rows.map(row => (
                                                                 <tr key={row.name} className="hover:bg-amber-900/10 transition-colors">
                                                                     <td className="p-3 font-medium text-stone-300 sticky left-0 bg-[#161412] z-10 w-48 border-r border-stone-800/30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] truncate overflow-hidden max-w-[200px]" title={row.name}>
                                                                         {row.name}
