@@ -90,11 +90,19 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
                 <div className="relative flex-grow max-w-sm">
                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
-                        className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded focus:border-blue-500 outline-none"
+                        className="w-full pl-9 pr-9 py-2 text-sm border border-slate-300 rounded focus:border-blue-500 outline-none"
                         placeholder="Rechercher..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
+                    {searchTerm && (
+                        <button
+                            onClick={() => setSearchTerm('')}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
+                        >
+                            <X size={14} />
+                        </button>
+                    )}
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">

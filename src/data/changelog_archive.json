@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.71.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Système d'expérience : Il est désormais possible de dépenser de l'XP post-création pour augmenter le niveau d'un avantage (trait) que le personnage possède déjà. L'intégration calcule automatiquement la différence de coût pour un suivi précis de l'expérience dépensée."
+    },
+    {
         "version": "2.70.0",
         "date": "2026-02-22",
         "type": "feat",
@@ -592,11 +598,5 @@
         "date": "2026-02-19",
         "type": "feat",
         "description": "Restauration des sélecteurs de catégorie dans les bibliothèques Admin (Skills, BG, Compteurs, Mystique) avec sécurisation du système de Reset (masterDefinition). Ajout du placement mystique configurable dans les paramètres de création."
-    },
-    {
-        "version": "2.56.13",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de la logique de placement : Seules les Habilités Mystiques utilisent désormais le placement de secours (Col 7 pour l'Art Martial, Col 5 pour le reste)."
     }
 ]

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.75.11",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie : Généralisation du bouton de suppression (croix) dans tous les champs de recherche de l'application (Bibliothèques Joueur, Registre, Vues Admin, etc.) pour une expérience utilisateur cohérente."
+    },
+    {
         "version": "2.75.10",
         "date": "2026-02-23",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-22",
         "type": "fix",
         "description": "Système d'expérience : Limite maximale de l'amélioration des avantages fixée à 5. Ajout d'une icône ⬆️ distinctive dans la liste des traits pour repérer rapidement les avantages qui ont été améliorés post-création avec de l'XP."
-    },
-    {
-        "version": "2.71.0",
-        "date": "2026-02-22",
-        "type": "feat",
-        "description": "Système d'expérience : Il est désormais possible de dépenser de l'XP post-création pour augmenter le niveau d'un avantage (trait) que le personnage possède déjà. L'intégration calcule automatiquement la différence de coût pour un suivi précis de l'expérience dépensée."
     }
 ]
