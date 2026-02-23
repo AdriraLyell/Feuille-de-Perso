@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.75.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Notifications temps réel admin → joueur via Supabase Realtime (WebSocket). Les modifications apportées par le Maître de Jeu (calendrier, règles, données de fiche) sont désormais propagées instantanément à tous les joueurs connectés, sans rechargement de page. Une notification apparaît automatiquement dans l'historique des actions."
+    },
+    {
         "version": "2.74.0",
         "date": "2026-02-23",
         "type": "feat",

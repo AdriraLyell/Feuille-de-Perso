@@ -15,6 +15,7 @@ import { INITIAL_DATA } from '../../data/initialState';
 import { logger } from '../../utils/logger';
 import { useCloudSyncCheck } from '../../hooks/useCloudSyncCheck';
 import { useAutoSave } from '../../hooks/useAutoSave';
+import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 
 // Static Components
 import DiegeticNavigation from './DiegeticNavigation';
@@ -50,7 +51,7 @@ import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, Tre
 
 const MainLayout: React.FC = () => {
     const { data, updateData: setData, addLog, importData, isSyncing, sync } = useCharacter();
-    const { rules, updateRules } = useRules();
+    const { rules, updateRules, isOnlineMode, reloadRules } = useRules();
 
     // Custom Hooks
     const [isLandscape, setIsLandscape] = useState(() => {
@@ -88,6 +89,15 @@ const MainLayout: React.FC = () => {
     } = useRulesSync(data, rules, setData, updateRules, addLog);
 
     const { hasUpdate, mjMessage } = useCloudSyncCheck(data);
+
+    // Notifications temps réel : admin → joueur
+    useRealtimeSync({
+        settingId: rules?.settingId,
+        characterId: data?.syncInfo?.syncId,
+        isOnlineMode,
+        reloadRules,
+        addLog,
+    });
 
     // Auto-Save Logic
     const { countdown } = useAutoSave(data, false, (mode) => sync(mode));
