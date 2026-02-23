@@ -330,9 +330,16 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                             onClick={() => setShowTimeManagement(!showTimeManagement)}
                             className="w-full p-4 flex justify-between items-center bg-stone-950 border-b border-stone-800 hover:bg-stone-900 transition-colors"
                         >
-                            <h2 className="font-serif font-bold text-lg text-amber-500 uppercase tracking-widest flex items-center gap-2">
-                                <Clock size={20} className="text-amber-600" /> Gestion Temporelle
-                            </h2>
+                            <div className="flex items-center gap-4">
+                                <h2 className="font-serif font-bold text-lg text-amber-500 uppercase tracking-widest flex items-center gap-2">
+                                    <Clock size={20} className="text-amber-600" /> Gestion Temporelle
+                                </h2>
+                                {!showTimeManagement && (
+                                    <span className="text-[13px] font-serif font-bold text-amber-400 capitalize px-3 py-1 mt-0.5 rounded-sm border border-stone-800 bg-stone-900/50 shadow-glass-dark">
+                                        {formatCurrentDate()}
+                                    </span>
+                                )}
+                            </div>
                             {showTimeManagement ? <ChevronDown size={18} className="text-amber-600" /> : <ChevronRight size={18} className="text-amber-600" />}
                         </button>
 

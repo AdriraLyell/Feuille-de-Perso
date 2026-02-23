@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.53.0] - 2026-02-17 [FIX]
+
+- 🛠️ Admin : Correction de l'erreur 400 lors de la sauvegarde des traits (alignement SQL cost/points)
+- 🛡️ Système : Amélioration de la détection d'erreurs en cascade pour garantir que la modale 'Sauvegarde Réussie' ne s'affiche qu'en cas de succès réel
+- 📊 Bibliothèque : Support complet des coûts textuels (ex: '1-3', 'Variable') dans la couche de persistance
+
 ## [2.52.0] - 2026-02-17 [FEAT]
 
 - ✅ Import : Sélection individuelle des items (nouveaux et conflits) via des cases à cocher

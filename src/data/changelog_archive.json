@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.69.4",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ergonomie : Persistance de l'état ouvert/fermé du Chroniqueur (calendrier) dans les notes de campagne. Le calendrier conserve désormais son état même après avoir changé d'onglet ou rechargé la page."
+    },
+    {
         "version": "2.69.3",
         "date": "2026-02-22",
         "type": "fix",
@@ -592,15 +598,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Initialisation des compétences Wizard au niveau 0 pour permettre le nettoyage facile et documentation des règles de placement."
-    },
-    {
-        "version": "2.53.0",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🛠️ Admin : Correction de l'erreur 400 lors de la sauvegarde des traits (alignement SQL cost/points)",
-            "🛡️ Système : Amélioration de la détection d'erreurs en cascade pour garantir que la modale 'Sauvegarde Réussie' ne s'affiche qu'en cas de succès réel",
-            "📊 Bibliothèque : Support complet des coûts textuels (ex: '1-3', 'Variable') dans la couche de persistance"
-        ]
     }
 ]
