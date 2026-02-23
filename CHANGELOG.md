@@ -1,5 +1,9 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.56.11] - 2026-02-19 [FIX]
+
+
+
 ## [2.53.0] - 2026-02-17 [FIX]
 
 - 🛠️ Admin : Correction de l'erreur 400 lors de la sauvegarde des traits (alignement SQL cost/points)

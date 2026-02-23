@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.69.5",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "UI : Ajout d'une marge dynamique sur les onglets Personnage et Spécialisations pour éviter que les barres latérales (Édition et Catalogue) ne chevauchent le contenu de la fiche."
+    },
+    {
         "version": "2.69.4",
         "date": "2026-02-22",
         "type": "fix",
@@ -592,11 +598,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Logique de placement de secours pour les compétences Wizard : Arts Martiaux en Col_Comp_7, autres en Col_Comp_5."
-    },
-    {
-        "version": "2.56.11",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Initialisation des compétences Wizard au niveau 0 pour permettre le nettoyage facile et documentation des règles de placement."
     }
 ]

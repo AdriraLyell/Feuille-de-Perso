@@ -428,7 +428,7 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
 
                                                         return (
                                                             <td key={attr.name} className="p-3 text-center border-l border-stone-800/10">
-                                                                <span className={`font-mono text-sm ${isZero ? 'opacity-20' : ''} ${isExcep ? 'text-amber-400 font-bold scale-110 inline-block' : 'text-stone-300'} ${isNegative ? 'text-rose-500' : ''}`}>
+                                                                <span className={`font-mono text-lg font-medium ${isZero ? 'opacity-30' : ''} ${isExcep ? 'text-amber-400 font-black scale-125 inline-block' : 'text-stone-300'} ${isNegative ? 'text-rose-500 font-bold' : ''}`}>
                                                                     {val}
                                                                 </span>
                                                             </td>
