@@ -1,8 +1,16 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.68.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.75.0)
 
-> **Dernière mise à jour** : 2026-02-23 — Version 2.68.0
+> **Dernière mise à jour** : 2026-02-23 — Version 2.75.0
 
 ## 1. Phases Complétées
+
+### ✅ Phase 37 : Notifications Temps Réel (v2.75.0)
+- [x] **Infrastructure** : Activation de `supabase_realtime` sur les tables `game_settings` et `characters`.
+- [x] **Client Engine** : Création de `RealtimeService` pour la gestion des abonnements WebSocket isolés.
+- [x] **React Integration** : Création du hook `useRealtimeSync` avec protection offline et debounce de 500ms.
+- [x] **Featurability** : Propagation instantanée des changements de calendrier (MJ) et des mises à jour de fiches (MJ → Joueur) sans refresh.
+- [x] **Feedback** : Notifications automatiques via le système `addLog` existant.
+
 
 ### ✅ Phase 36 : Chroniqueur & Narrative Enhancements (v2.68.0)
 - [x] **UI Control** : Possibilité de masquer/afficher le Chroniqueur (widget temporaire) depuis la barre latérale pour libérer de l'espace visuel.
