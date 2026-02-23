@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CharacterSyncService, SyncedCharacter } from '../services/CharacterSyncService';
 import { CampaignService, RulesData } from '../services/CampaignService';
-import { Loader2, Users, AlertCircle, Heart, Shield, Droplets, Search, ChevronDown, ChevronRight } from 'lucide-react';
+import { Loader2, Users, AlertCircle, Heart, Shield, Droplets, Search, ChevronDown, ChevronRight, LayoutTemplate, LayoutList } from 'lucide-react';
 import { MotionFade } from '../components/ui/motion/MotionFade';
 import { CharacterSheetData } from '../types';
 
@@ -16,6 +16,8 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
+    const [showAttributes, setShowAttributes] = useState(true);
+    const [layoutFormat, setLayoutFormat] = useState<'landscape' | 'portrait'>('landscape');
 
     useEffect(() => {
         loadData();
@@ -229,78 +231,135 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                         Matrice comparative des investigateurs
                     </p>
                 </div>
-                <div className="text-stone-500 text-sm font-mono bg-stone-900/50 px-4 py-2 rounded-sm border border-stone-800">
-                    <span className="text-amber-600 font-bold">{characters.length}</span> Âmes recensées
+                <div className="flex items-center gap-6">
+                    <div className="flex bg-stone-900/50 border border-stone-800 rounded-sm overflow-hidden text-[10px] font-bold uppercase tracking-widest shadow-glass-dark">
+                        <button
+                            onClick={() => setLayoutFormat('landscape')}
+                            className={`px-4 py-2 transition-colors flex items-center gap-2 ${layoutFormat === 'landscape' ? 'bg-amber-600/90 text-stone-950' : 'text-stone-500 hover:text-amber-400 hover:bg-stone-800'}`}
+                            title="Format Paysage (Personnages en Lignes)"
+                        >
+                            <LayoutTemplate size={14} /> Paysage
+                        </button>
+                        <button
+                            onClick={() => setLayoutFormat('portrait')}
+                            className={`px-4 py-2 transition-colors flex items-center gap-2 border-l border-stone-800 ${layoutFormat === 'portrait' ? 'bg-amber-600/90 text-stone-950' : 'text-stone-500 hover:text-amber-400 hover:bg-stone-800'}`}
+                            title="Format Portrait (Personnages en Colonnes)"
+                        >
+                            <LayoutList size={14} /> Portrait
+                        </button>
+                    </div>
+                    <div className="text-stone-500 text-sm font-mono bg-stone-900/50 px-4 py-2 rounded-sm border border-stone-800 shadow-glass-dark flex items-center gap-2">
+                        <span className="text-amber-600 font-bold">{characters.length}</span> <span className="uppercase text-[10px] tracking-widest">Âmes</span>
+                    </div>
                 </div>
             </header>
 
             {characters.length === 0 ? (
-                <div className="max-w-7xl mx-auto text-center py-32 bg-stone-950/50 rounded-lg border border-stone-800/50">
+                <div className="max-w-7xl mx-auto text-center py-32 bg-stone-950/50 rounded-lg border border-stone-800/50 shadow-glass-dark">
                     <p className="text-stone-500 font-serif italic text-2xl">Le registre est vide pour cette chronique.</p>
                 </div>
             ) : (
                 <main className="max-w-7xl mx-auto space-y-12">
                     {/* SECTION HAUT : LE TABLEAU STRICT (Vitals & Attributs) */}
-                    <div className="overflow-x-auto rounded-sm border border-stone-800 shadow-glass-dark bg-stone-900/20">
-                        <table className="w-full text-left border-collapse min-w-max">
-                            <thead className="bg-stone-950 border-b border-stone-800">
-                                <tr>
-                                    <th className="p-4 font-black uppercase tracking-widest text-amber-700/80 text-[10px] sticky left-0 bg-stone-950 z-30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">Identité</th>
-                                    {allAttributes.map(attr => (
-                                        <th key={attr.name} className="p-4 font-black uppercase tracking-widest text-[9px] text-center border-l border-stone-800/20" style={{ color: getCategoryColor(attr.category) }}>
-                                            {attr.name}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-stone-800/50">
-                                {characters.map(char => {
-                                    const data = char.data as CharacterSheetData;
+                    <div className="bg-stone-900/40 border border-stone-800 rounded-sm overflow-hidden shadow-glass-dark mb-12">
+                        <button
+                            onClick={() => setShowAttributes(!showAttributes)}
+                            className="w-full p-4 flex justify-between items-center bg-stone-950 border-b border-stone-800 hover:bg-stone-900 transition-colors"
+                        >
+                            <h2 className="font-serif font-bold text-lg text-amber-500 uppercase tracking-widest flex items-center gap-2">
+                                Tableau Strict (Vitals & Attributs)
+                            </h2>
+                            {showAttributes ? <ChevronDown size={18} className="text-amber-600" /> : <ChevronRight size={18} className="text-amber-600" />}
+                        </button>
 
-                                    // Extraction linéaire de tous les attributs du perso
-                                    const charAttrs: Record<string, number> = {};
-                                    Object.values(data.attributes || {}).forEach(cat => {
-                                        cat.forEach(attr => { charAttrs[attr.name] = parseInt(attr.val1 || "0", 10); });
-                                    });
-
-                                    // Extraction des compteurs (Volonté, etc) et custom
-                                    const vitalCounters = [];
-                                    if (data.counters.volonte && !Array.isArray(data.counters.volonte)) {
-                                        vitalCounters.push(data.counters.volonte);
-                                    }
-                                    if (data.counters.confiance && !Array.isArray(data.counters.confiance)) {
-                                        vitalCounters.push(data.counters.confiance);
-                                    }
-                                    const customCounters = data.counters.custom || [];
-
-                                    return (
-                                        <tr key={char.id} className="hover:bg-amber-900/5 transition-colors">
-                                            <td className="p-4 sticky left-0 bg-[#161412] z-10 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] border-r border-stone-800/50">
-                                                <div className="font-serif font-bold text-lg text-amber-50" title={char.character_name}>
-                                                    {char.character_name.split(' ')[0]}
-                                                </div>
-                                                <div className="text-[10px] uppercase tracking-widest text-stone-500">{char.player_name}</div>
-                                                <div className="text-xs text-stone-400 italic mt-1">{data.header?.nature || ""}</div>
-                                            </td>
-                                            {allAttributes.map(attr => {
-                                                const val = charAttrs[attr.name] || 0;
-                                                const isExcep = val >= 3;
-                                                const isNegative = val < 0;
-                                                const isZero = val === 0;
-
-                                                return (
-                                                    <td key={attr.name} className="p-4 text-center border-l border-stone-800/10">
-                                                        <span className={`font-mono text-sm ${isZero ? 'opacity-20' : ''} ${isExcep ? 'text-amber-400 font-bold scale-110 inline-block' : 'text-stone-300'} ${isNegative ? 'text-rose-500' : ''}`}>
-                                                            {val}
-                                                        </span>
-                                                    </td>
-                                                );
-                                            })}
+                        {showAttributes && (
+                            <div className="overflow-x-auto bg-stone-900/20">
+                                <table className="w-full text-left border-collapse min-w-max">
+                                    <thead className="bg-[#12100e] border-y border-stone-800/50">
+                                        <tr>
+                                            {layoutFormat === 'landscape' ? (
+                                                <>
+                                                    <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">Identité</th>
+                                                    {allAttributes.map(attr => (
+                                                        <th key={attr.name} className="p-3 font-bold uppercase tracking-widest text-[9px] text-center border-l border-stone-800/20" style={{ color: getCategoryColor(attr.category) }}>
+                                                            {attr.name}
+                                                        </th>
+                                                    ))}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] w-48 sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">Attribut</th>
+                                                    {characters.map(c => (
+                                                        <th key={c.id} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30" title={c.character_name}>
+                                                            {c.character_name.split(' ')[0]}
+                                                        </th>
+                                                    ))}
+                                                </>
+                                            )}
                                         </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-stone-800/50">
+                                        {layoutFormat === 'landscape' ? characters.map(char => {
+                                            const data = char.data as CharacterSheetData;
+                                            const charAttrs: Record<string, number> = {};
+                                            Object.values(data.attributes || {}).forEach(cat => {
+                                                cat.forEach(attr => { charAttrs[attr.name] = parseInt(attr.val1 || "0", 10); });
+                                            });
+
+                                            return (
+                                                <tr key={char.id} className="hover:bg-amber-900/5 transition-colors">
+                                                    <td className="p-3 sticky left-0 bg-[#161412] z-10 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] border-r border-stone-800/50">
+                                                        <div className="font-serif font-bold text-lg text-amber-50" title={char.character_name}>
+                                                            {char.character_name.split(' ')[0]}
+                                                        </div>
+                                                        <div className="text-[10px] uppercase tracking-widest text-stone-500">{char.player_name}</div>
+                                                        <div className="text-xs text-stone-400 italic mt-1 truncate max-w-[150px]">{data.header?.nature || ""}</div>
+                                                    </td>
+                                                    {allAttributes.map(attr => {
+                                                        const val = charAttrs[attr.name] || 0;
+                                                        const isExcep = val >= 3;
+                                                        const isNegative = val < 0;
+                                                        const isZero = val === 0;
+
+                                                        return (
+                                                            <td key={attr.name} className="p-3 text-center border-l border-stone-800/10">
+                                                                <span className={`font-mono text-sm ${isZero ? 'opacity-20' : ''} ${isExcep ? 'text-amber-400 font-bold scale-110 inline-block' : 'text-stone-300'} ${isNegative ? 'text-rose-500' : ''}`}>
+                                                                    {val}
+                                                                </span>
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </tr>
+                                            );
+                                        }) : allAttributes.map(attr => (
+                                            <tr key={attr.name} className="hover:bg-amber-900/5 transition-colors">
+                                                <td className="p-3 font-medium sticky left-0 bg-[#161412] z-10 w-48 border-r border-stone-800/30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] uppercase tracking-widest text-[10px]" style={{ color: getCategoryColor(attr.category) }}>
+                                                    {attr.name}
+                                                </td>
+                                                {characters.map(char => {
+                                                    const data = char.data as CharacterSheetData;
+                                                    let val = 0;
+                                                    Object.values(data.attributes || {}).forEach(cat => {
+                                                        cat.forEach(a => { if (a.name === attr.name) val = parseInt(a.val1 || "0", 10); });
+                                                    });
+                                                    const isExcep = val >= 3;
+                                                    const isNegative = val < 0;
+                                                    const isZero = val === 0;
+
+                                                    return (
+                                                        <td key={char.id} className="p-3 text-center border-l border-stone-800/10">
+                                                            <span className={`font-mono text-sm ${isZero ? 'opacity-20' : ''} ${isExcep ? 'text-amber-400 font-bold scale-110 inline-block' : 'text-stone-300'} ${isNegative ? 'text-rose-500' : ''}`}>
+                                                                {val}
+                                                            </span>
+                                                        </td>
+                                                    );
+                                                })}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
 
                     {/* SECTION MILIEU : MATRICE DES COMPÉTENCES */}
@@ -344,20 +403,54 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                                     <table className="w-full text-left text-sm whitespace-nowrap min-w-max">
                                                         <thead className="bg-[#12100e] border-y border-stone-800/50">
                                                             <tr>
-                                                                <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] w-48 sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
-                                                                    Compétence
-                                                                </th>
-                                                                {characters.map(c => (
-                                                                    <th key={c.id} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30" title={c.character_name}>
-                                                                        {c.character_name.split(' ')[0]}
-                                                                    </th>
-                                                                ))}
+                                                                {layoutFormat === 'landscape' ? (
+                                                                    <>
+                                                                        <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] w-48 sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
+                                                                            Identité
+                                                                        </th>
+                                                                        {rows.map(row => (
+                                                                            <th key={row.name} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30 whitespace-normal min-w-[80px]" title={row.name}>
+                                                                                {row.name}
+                                                                            </th>
+                                                                        ))}
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <th className="p-3 text-stone-500 font-bold uppercase tracking-widest text-[10px] w-48 sticky left-0 bg-[#12100e] z-20 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
+                                                                            Compétence
+                                                                        </th>
+                                                                        {characters.map(c => (
+                                                                            <th key={c.id} className="p-3 text-center text-[10px] uppercase font-bold text-stone-500 border-l border-stone-800/30" title={c.character_name}>
+                                                                                {c.character_name.split(' ')[0]}
+                                                                            </th>
+                                                                        ))}
+                                                                    </>
+                                                                )}
                                                             </tr>
                                                         </thead>
                                                         <tbody className="divide-y divide-stone-800/30">
-                                                            {rows.map(row => (
+                                                            {layoutFormat === 'landscape' ? characters.map((c, cIdx) => (
+                                                                <tr key={c.id} className="hover:bg-amber-900/10 transition-colors">
+                                                                    <td className="p-3 font-medium text-amber-50 sticky left-0 bg-[#161412] z-10 w-48 border-r border-stone-800/30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
+                                                                        <div className="font-serif font-bold truncate">{c.character_name.split(' ')[0]}</div>
+                                                                    </td>
+                                                                    {rows.map((row, rIdx) => {
+                                                                        const score = row.scores[cIdx];
+                                                                        const isBest = score > 0 && score === row.maxScore;
+                                                                        return (
+                                                                            <td key={rIdx} className={`p-3 text-center font-mono border-l border-stone-800/30 ${isBest ? 'bg-amber-900/20' : ''}`}>
+                                                                                {score > 0 ? (
+                                                                                    <span className={isBest ? 'text-amber-400 font-bold' : 'text-stone-400'}>{score}</span>
+                                                                                ) : (
+                                                                                    <span className="text-stone-700">-</span>
+                                                                                )}
+                                                                            </td>
+                                                                        );
+                                                                    })}
+                                                                </tr>
+                                                            )) : rows.map(row => (
                                                                 <tr key={row.name} className="hover:bg-amber-900/10 transition-colors">
-                                                                    <td className="p-3 font-medium text-stone-300 sticky left-0 bg-[#161412] z-10 w-48 border-r border-stone-800/30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">
+                                                                    <td className="p-3 font-medium text-stone-300 sticky left-0 bg-[#161412] z-10 w-48 border-r border-stone-800/30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] truncate overflow-hidden max-w-[200px]" title={row.name}>
                                                                         {row.name}
                                                                     </td>
                                                                     {row.scores.map((score, idx) => {
@@ -400,36 +493,40 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                             {char.character_name}
                                         </h3>
 
-                                        <div className="mt-4 space-y-4 flex-grow">
+                                        <div className="mt-4 grid grid-cols-2 gap-4 flex-grow items-start">
                                             {/* Traits (Avantages) */}
-                                            {hasTraitsAdvs && (
-                                                <div>
-                                                    <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black">Avantages</div>
-                                                    <div className="space-y-1">
-                                                        {data.page2.avantages.filter(t => t.name).map((trait, i) => (
-                                                            <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-emerald-950/20 text-emerald-400 border-emerald-900/20 truncate flex justify-between items-center">
-                                                                <span className="font-bold truncate" title={trait.name}>{trait.name}</span>
-                                                                {trait.value && <span className="font-mono text-[10px] opacity-80 shrink-0 ml-2">{trait.value}</span>}
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
+                                            <div className="flex flex-col w-full h-full">
+                                                {hasTraitsAdvs && (
+                                                    <>
+                                                        <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black text-center border-b border-amber-900/30 pb-1">Avantages</div>
+                                                        <div className="space-y-1">
+                                                            {data.page2.avantages.filter(t => t.name).map((trait, i) => (
+                                                                <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-emerald-950/20 text-emerald-400 border-emerald-900/20 truncate flex justify-between items-center w-full">
+                                                                    <span className="font-bold truncate" title={trait.name}>{trait.name}</span>
+                                                                    {trait.value && <span className="font-mono text-[10px] opacity-80 shrink-0 ml-1">{trait.value}</span>}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
 
                                             {/* Traits (Désavantages) */}
-                                            {hasTraitsDesadvs && (
-                                                <div>
-                                                    <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black">Désavantages</div>
-                                                    <div className="space-y-1">
-                                                        {data.page2.desavantages.filter(t => t.name).map((trait, i) => (
-                                                            <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-rose-950/20 text-rose-400 border-rose-900/20 truncate flex justify-between items-center">
-                                                                <span className="font-bold truncate" title={trait.name}>{trait.name}</span>
-                                                                {trait.value && <span className="font-mono text-[10px] opacity-80 shrink-0 ml-2">{trait.value}</span>}
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
+                                            <div className="flex flex-col w-full h-full border-l border-stone-800/50 pl-4">
+                                                {hasTraitsDesadvs && (
+                                                    <>
+                                                        <div className="text-[9px] uppercase tracking-widest text-amber-700/80 mb-2 font-black text-center border-b border-amber-900/30 pb-1">Désavantages</div>
+                                                        <div className="space-y-1">
+                                                            {data.page2.desavantages.filter(t => t.name).map((trait, i) => (
+                                                                <div key={i} className="text-[11px] leading-tight px-2 py-1 rounded-sm border bg-rose-950/20 text-rose-400 border-rose-900/20 truncate flex justify-between items-center w-full">
+                                                                    <span className="font-bold truncate" title={trait.name}>{trait.name}</span>
+                                                                    {trait.value && <span className="font-mono text-[10px] opacity-80 shrink-0 ml-1">{trait.value}</span>}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </MotionFade>

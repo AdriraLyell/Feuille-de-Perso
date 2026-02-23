@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.99] - 2026-02-17 [FEAT]
+
+- 🛠️ Admin : Correction du bug de réinitialisation des coûts des traits (mismatch SQL points/cost)
+- 📊 Bibliothèque : Implémentation des coûts variables et multiples (ex: 1-5, 1/3/5) avec libellés personnalisables
+- 💾 Persistance : Ajout des colonnes points_label et is_variable_cost pour une gestion robuste des coûts en BDD
+
 ## [2.49.98] - 2026-02-17 [FEAT]
 
 - ✨ Bibliothèque : Ajout de l'icône 'Habilités Mystiques' (Sparkles) dans la réserve de la fiche personnage
