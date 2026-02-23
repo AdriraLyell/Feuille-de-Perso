@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.52.0] - 2026-02-17 [FEAT]
+
+- ✅ Import : Sélection individuelle des items (nouveaux et conflits) via des cases à cocher
+- 🎭 UI : Feedback dynamique des badges (Ignoré, Remplacé, Doublon, Exclu) en fonction de la stratégie
+- 🛠️ Core : Support technique de l'exclusion via IDs uniques dans le moteur de fusion
+
 ## [2.51.0] - 2026-02-17 [FEAT]
 
 - 🔍 UI : Ajout d'une vue détaillée des changements dans l'assistant d'importation (Nouveaux items et Conflits)

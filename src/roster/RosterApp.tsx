@@ -337,17 +337,17 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                         </button>
 
                         {showTimeManagement && (
-                            <div className="p-6 bg-stone-900/20 flex flex-col items-center gap-6">
-                                <div className="text-center">
-                                    <div className="text-[10px] text-stone-500 uppercase tracking-[0.2em] font-bold mb-2">
-                                        Date Courante de la Chronique
+                            <div className="p-5 bg-stone-900/20 flex flex-col md:flex-row items-center justify-center gap-8">
+                                <div className="flex items-center gap-4">
+                                    <div className="text-[10px] text-stone-500 uppercase tracking-[0.2em] font-bold hidden md:block">
+                                        Date Courante :
                                     </div>
-                                    <div className="text-2xl font-serif font-black text-amber-400 capitalize bg-stone-950 border border-stone-800 px-6 py-3 rounded-sm shadow-glass-dark">
+                                    <div className="text-xl font-serif font-black text-amber-400 capitalize bg-stone-950 border border-stone-800 px-6 py-2 rounded-sm shadow-glass-dark mt-0">
                                         {formatCurrentDate()}
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap justify-center gap-4">
+                                <div className="flex flex-wrap justify-center gap-3">
                                     <button
                                         onClick={() => handleAdvanceTime('day')}
                                         className="flex items-center gap-2 px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-sm font-bold text-sm uppercase tracking-wider border border-stone-700 hover:border-amber-500/50 transition-colors"
