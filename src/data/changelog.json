@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.74.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Amélioration du Roster : Séparation des habiletés mystiques par catégorie parente. Chaque type d'habileté (Magie, Arts Martiaux, etc.) dispose désormais de son propre tiroir dans la matrice des compétences pour une meilleure clarté."
+    },
+    {
         "version": "2.73.0",
         "date": "2026-02-23",
         "type": "feat",
@@ -7,118 +13,110 @@
     },
     {
         "version": "2.72.0",
-        {
-            "version": "2.71.5",
-            "date": "2026-02-22",
-            "type": "feat",
-            "description": "Amélioration visuelle de l'interface des Habilités Mystiques. Lorsqu'un personnage a un accès sans limite (niveau 5+) aux compétences liées, le compteur par défaut (999) est remplacé par un symbole 'Infini' et un texte plus immersif ('SANS LIMITE' & 'Vous avez un accès illimité')."
-        },
-        {
-            "version": "2.71.4",
-            "date": "2026-02-22",
-            "type": "fix",
-            "description": "Système d'expérience : Distinction visuelle des traits. Utilisation de l'icône ⬆️ bleue pour les avantages améliorés et ❇️ verte pour les nouveaux traits acquis post-création."
-        },
-        {
-            "version": "2.71.3",
-            "date": "2026-02-22",
-            "type": "fix",
-            "description": "Système d'expérience : Les limites d'amélioration des avantages sont désormais dynamiquement extraites des plages de coûts définies en bibliothèque (ex: un avantage coûtant '1-3' sera bridé au niveau 3)."
-        },
-        {
-            "version": "2.71.2",
-            "date": "2026-02-22",
-            "type": "fix",
-            "description": "Système d'expérience : Précision des règles d'amélioration des avantages. Seuls les avantages à coût variable (vérification en bibliothèque) peuvent être augmentés. Uniformisation de l'icône visuelle : le symbole ❇️ (en bleu) identifie désormais les avantages améliorés, en cohérence avec l'icône d'acquisition post-création."
-        },
-        {
-            "version": "2.71.1",
-            "date": "2026-02-22",
-            "type": "fix",
-            "description": "Système d'expérience : Limite maximale de l'amélioration des avantages fixée à 5. Ajout d'une icône ⬆️ distinctive dans la liste des traits pour repérer rapidement les avantages qui ont été améliorés post-création avec de l'XP."
-        },
-        {
-            "version": "2.71.0",
-            "date": "2026-02-22",
-            "type": "feat",
-            "description": "Système d'expérience : Il est désormais possible de dépenser de l'XP post-création pour augmenter le niveau d'un avantage (trait) que le personnage possède déjà. L'intégration calcule automatiquement la différence de coût pour un suivi précis de l'expérience dépensée."
-        },
-        {
-            "version": "2.70.0",
-            "date": "2026-02-22",
-            "type": "feat",
-            "description": "Nouveau système de Post-its : Vous pouvez désormais créer des notes visuelles colorées sur chaque onglet de la fiche de personnage. Ces Post-its peuvent être déplacés librement à l'écran, modifiés, redimensionnés et sont sauvegardés avec votre personnage."
-        },
-        {
-            "version": "2.69.5",
-            "date": "2026-02-22",
-            "type": "fix",
-            "description": "UI : Ajout d'une marge dynamique sur les onglets Personnage et Spécialisations pour éviter que les barres latérales (Édition et Catalogue) ne chevauchent le contenu de la fiche."
-        },
-        {
-            "version": "2.69.4",
-            "date": "2026-02-22",
-            "type": "fix",
-            "description": "Ergonomie : Persistance de l'état ouvert/fermé du Chroniqueur (calendrier) dans les notes de campagne. Le calendrier conserve désormais son état même après avoir changé d'onglet ou rechargé la page."
-        },
-        {
-            "version": "2.69.3",
-            "date": "2026-02-22",
-            "type": "fix",
-            "description": "Ergonomie : Ajout d'un curseur 'pointer' (main) sur les cartes de sélection des sources (Chroniques, Hors Ligne, Reprendre) pour indiquer clairement qu'elles sont interactives."
-        },
-        {
-            "version": "2.69.2",
-            "date": "2026-02-22",
-            "type": "fix",
-            "description": "Ergonomie : Augmentation de la hauteur de la fenêtre de synchronisation (modal) pour permettre une meilleure visibilité de l'historique des sauvegardes sans défilement excessif."
-        },
-        {
-            "version": "2.69.1",
-            "date": "2026-02-23",
-            "type": "feat",
-            "description": "Ergonomie : Mémorisation de la préférence d'affichage (mode portrait / paysage) dans le cache local (localStorage). Le mode choisi persiste désormais après rechargement de la page."
-        },
-        {
-            "version": "2.69.0",
-            "date": "2026-02-23",
-            "type": "feat",
-            "description": "Système de 'Date Picker' interactif pour le Journal : Cliquez sur les icônes calendrier des blocs narratifs pour sélectionner une date directement depuis le Chroniqueur sans créer de nouveau chapitre. Ajout de champs de titre personnalisés pour le sommaire automatique et réduction globale de la taille des labels pour une interface plus épurée."
-        },
-        {
-            "version": "2.68.0",
-            "date": "2026-02-23",
-            "type": "feat",
-            "description": "Améliorations majeures des sections narratives et du Chroniqueur : (1) Possibilité de masquer/afficher le Chroniqueur depuis la barre latérale. (2) Ajout de champs d'heure pour les moments de journée. (3) Ajout de champs de date pour les flashbacks. (4) Support des calendriers fictifs pour les sélecteurs de date de voyage et flashbacks."
-        },
-        {
-            "version": "2.67.1",
-            "date": "2026-02-23",
-            "type": "chore",
-            "description": "Ajustements ergonomiques du Chroniqueur : renommage du widget, formatage des dates en JJ/MM/AAAA dans la Timeline, et déplacement des flèches de navigation vers le haut pour éviter les chevauchements."
-        },
-        {
-            "version": "2.67.0",
-            "date": "2026-02-23",
-            "type": "feat",
-            "description": "Fusion majeure du Compagnon Temporel et du Journal de Campagne : (1) Navigation chronologique par clic sur les dates. (2) Mode 'Timeline' synthétique. (3) Assistant de création de chapitre à date. (4) Indicateurs de météo et ambiances sur les chapitres et le calendrier. (5) Compte à rebours avant le prochain évènement majeur. (6) Nouveaux blocs narratifs flexibles (Moments de journée, Voyages)."
-        },
-        {
-            "version": "2.66.3",
-            "date": "2026-02-22",
-            "type": "fix",
-            "description": "Correction majeure de la visibilité du Compagnon Temporel : (1) Correction du chemin d'accès aux données (configurations.calendar). (2) Repositionnement du widget à gauche de la barre latérale pour éviter qu'il ne soit hors-écran sur les résolutions standards."
-        },
-        {
-            "version": "2.66.2",
-            "date": "2026-02-22",
-            "type": "fix",
-            "description": "Ajustement du positionnement du Compagnon Temporel pour une meilleure visibilité dans le Grimoire et correction du filtrage des événements calendaires."
-        },
-        {
-            "version": "2.66.1",
-            "date": "2026-02-22",
-            "type": "fix",
-            "description": "Correction d'une erreur de référence sur BookChapterSidebar dans le journal de campagne."
-        }
-    ]
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Création du Registre des Acteurs (Roster View). Ajout d'une nouvelle URL publique '?roster=uuid' permettant d'afficher une présentation tabulaire et détaillée de l'ensemble des personnages joueurs d'une chronique. Accessible via un nouveau bouton raccourci sur les cartes de campagne depuis le Tableau de Bord Admin."
+    },
+    {
+        "version": "2.71.5",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Amélioration visuelle de l'interface des Habilités Mystiques. Lorsqu'un personnage a un accès sans limite (niveau 5+) aux compétences liées, le compteur par défaut (999) est remplacé par un symbole 'Infini' et un texte plus immersif ('SANS LIMITE' & 'Vous avez un accès illimité')."
+    },
+    {
+        "version": "2.71.4",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Système d'expérience : Distinction visuelle des traits. Utilisation de l'icône ⬆️ bleue pour les avantages améliorés et ❇️ verte pour les nouveaux traits acquis post-création."
+    },
+    {
+        "version": "2.71.3",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Système d'expérience : Les limites d'amélioration des avantages sont désormais dynamiquement extraites des plages de coûts définies en bibliothèque (ex: un avantage coûtant '1-3' sera bridé au niveau 3)."
+    },
+    {
+        "version": "2.71.2",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Système d'expérience : Précision des règles d'amélioration des avantages. Seuls les avantages à coût variable (vérification en bibliothèque) peuvent être augmentés. Uniformisation de l'icône visuelle : le symbole ❇️ (en bleu) identifie désormais les avantages améliorés, en cohérence avec l'icône d'acquisition post-création."
+    },
+    {
+        "version": "2.71.1",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Système d'expérience : Limite maximale de l'amélioration des avantages fixée à 5. Ajout d'une icône ⬆️ distinctive dans la liste des traits pour repérer rapidement les avantages qui ont été améliorés post-création avec de l'XP."
+    },
+    {
+        "version": "2.71.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Système d'expérience : Il est désormais possible de dépenser de l'XP post-création pour augmenter le niveau d'un avantage (trait) que le personnage possède déjà. L'intégration calcule automatiquement la différence de coût pour un suivi précis de l'expérience dépensée."
+    },
+    {
+        "version": "2.70.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Nouveau système de Post-its : Vous pouvez désormais créer des notes visuelles colorées sur chaque onglet de la fiche de personnage. Ces Post-its peuvent être déplacés librement à l'écran, modifiés, redimensionnés et sont sauvegardés avec votre personnage."
+    },
+    {
+        "version": "2.69.5",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "UI : Ajout d'une marge dynamique sur les onglets Personnage et Spécialisations pour éviter que les barres latérales (Édition et Catalogue) ne chevauchent le contenu de la fiche."
+    },
+    {
+        "version": "2.69.4",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ergonomie : Persistance de l'état ouvert/fermé du Chroniqueur (calendrier) dans les notes de campagne. Le calendrier conserve désormais son état même après avoir changé d'onglet ou rechargé la page."
+    },
+    {
+        "version": "2.69.3",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ergonomie : Ajout d'un curseur 'pointer' (main) sur les cartes de sélection des sources (Chroniques, Hors Ligne, Reprendre) pour indiquer clairement qu'elles sont interactives."
+    },
+    {
+        "version": "2.69.2",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ergonomie : Augmentation de la hauteur de la fenêtre de synchronisation (modal) pour permettre une meilleure visibilité de l'historique des sauvegardes sans défilement excessif."
+    },
+    {
+        "version": "2.69.1",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie : Mémorisation de la préférence d'affichage (mode portrait / paysage) dans le cache local (localStorage). Le mode choisi persiste désormais après rechargement de la page."
+    },
+    {
+        "version": "2.69.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Système de 'Date Picker' interactif pour le Journal : Cliquez sur les icônes calendrier des blocs narratifs pour sélectionner une date directement depuis le Chroniqueur sans créer de nouveau chapitre. Ajout de champs de titre personnalisés pour le sommaire automatique et réduction globale de la taille des labels pour une interface plus épurée."
+    },
+    {
+        "version": "2.68.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Améliorations majeures des sections narratives et du Chroniqueur : (1) Possibilité de masquer/afficher le Chroniqueur depuis la barre latérale. (2) Ajout de champs d'heure pour les moments de journée. (3) Ajout de champs de date pour les flashbacks. (4) Support des calendriers fictifs pour les sélecteurs de date de voyage et flashbacks."
+    },
+    {
+        "version": "2.67.1",
+        "date": "2026-02-23",
+        "type": "chore",
+        "description": "Ajustements ergonomiques du Chroniqueur : renommage du widget, formatage des dates en JJ/MM/AAAA dans la Timeline, et déplacement des flèches de navigation vers le haut pour éviter les chevauchements."
+    },
+    {
+        "version": "2.67.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Fusion majeure du Compagnon Temporel et du Journal de Campagne : (1) Navigation chronologique par clic sur les dates. (2) Mode 'Timeline' synthétique. (3) Assistant de création de chapitre à date. (4) Indicateurs de météo et ambiances sur les chapitres et le calendrier. (5) Compte à rebours avant le prochain évènement majeur. (6) Nouveaux blocs narratifs flexibles (Moments de journée, Voyages)."
+    },
+    {
+        "version": "2.66.3",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Correction majeure de la visibilité du Compagnon Temporel : (1) Correction du chemin d'accès aux données (configurations.calendar). (2) Repositionnement du widget à gauche de la barre latérale pour éviter qu'il ne soit hors-écran sur les résolutions standards."
+    }
+]

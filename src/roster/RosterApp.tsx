@@ -92,14 +92,11 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
         // Dictionnaire "Référentiel Central", nom -> catId
         const officialSkillMap = new Map<string, string>();
 
-        const addToMap = (lib: any[] | undefined, overrideCategory?: string) => {
+        const addToMap = (lib: any[] | undefined) => {
             lib?.forEach(s => {
                 const lowerName = s.name.trim().toLowerCase();
-                if (overrideCategory) {
-                    officialSkillMap.set(lowerName, overrideCategory);
-                } else if (s.mysticAbilityId) {
-                    // Si la compétence est liée à une habileté (ex: Sort de soin lié à Magie Blanche)
-                    officialSkillMap.set(lowerName, "Col_Comp_Mystic");
+                if (s.mysticAbilityId) {
+                    officialSkillMap.set(lowerName, `MYSTIC_${s.mysticAbilityId}`);
                 } else if (s.defaultCategory) {
                     officialSkillMap.set(lowerName, s.defaultCategory);
                 }
@@ -108,7 +105,11 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
 
         addToMap(rules?.libraries?.skills);
         addToMap(rules?.libraries?.backgrounds);
-        addToMap(rules?.libraries?.mysticAbilities, "Col_Comp_Mystic");
+
+        // Ajouter les habiletés elles-mêmes au cas où elles seraient saisies comme compétences
+        rules?.libraries?.mysticAbilities?.forEach(s => {
+            officialSkillMap.set(s.name.trim().toLowerCase(), `MYSTIC_${s.id}`);
+        });
 
         // 2. Récolter TOUTES les compétences uniques et leur attribuer une "catégorie maître"
         const masterCategoriesMap = new Map<string, Set<string>>();
@@ -133,8 +134,9 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
 
                     // Si non trouvé dans le référentiel, on check si l'instance porte un tag mystique (custom skills liés)
                     if (!masterCatId) {
-                        if ((s as any).mysticAbilityId) {
-                            masterCatId = "Col_Comp_Mystic";
+                        const mId = (s as any).mysticAbilityId;
+                        if (mId) {
+                            masterCatId = `MYSTIC_${mId}`;
                         } else {
                             masterCatId = "Col_Comp_Custom";
                         }
@@ -152,8 +154,10 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
         masterCategoriesMap.forEach((uniqueSkills, catId) => {
             // Déterminer le nom lisible
             let catLabel = "Autres (Hors Référentiel)";
-            if (catId === "Col_Comp_Mystic") {
-                catLabel = "Habiletés Mystiques";
+            if (catId.startsWith("MYSTIC_")) {
+                const mId = catId.replace("MYSTIC_", "");
+                const mysticDef = rules.libraries.mysticAbilities?.find(m => m.id === mId);
+                catLabel = mysticDef?.name ? mysticDef.name.toUpperCase() : "HABILETÉS MYSTIQUES";
             } else if (catId !== "Col_Comp_Custom") {
                 const catConfig = rules.definitions.skillCategories?.find(c => c.id === catId);
                 catLabel = catConfig?.label || catId;
