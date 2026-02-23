@@ -76,20 +76,24 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
     }
 
     const skillMatrix: Record<string, SkillRow[]> = {};
-    if (characters.length > 0) {
+    if (characters.length > 0 && rules) {
         const allCats = Object.keys(characters[0].data.skills || {});
-        allCats.forEach(catName => {
+        allCats.forEach(catId => {
+            // Trouver le label lisible pour cet ID (Col_Comp_1 -> "Combat" par ex)
+            const catConfig = rules.definitions.skillCategories?.find(c => c.id === catId);
+            const catLabel = catConfig?.label || catId;
+
             const uniqueSkills = new Set<string>();
             characters.forEach(c => {
                 const charData = c.data as CharacterSheetData;
-                (charData.skills?.[catName] || []).forEach(s => uniqueSkills.add(s.name));
+                (charData.skills?.[catId] || []).forEach(s => uniqueSkills.add(s.name));
             });
-            
+
             const rows: SkillRow[] = [];
             uniqueSkills.forEach(skillName => {
                 const scores = characters.map(c => {
                     const charData = c.data as CharacterSheetData;
-                    const skillNode = (charData.skills?.[catName] || []).find(s => s.name === skillName);
+                    const skillNode = (charData.skills?.[catId] || []).find(s => s.name === skillName);
                     return skillNode?.value || 0;
                 });
                 const maxScore = Math.max(...scores);
@@ -97,10 +101,10 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                     rows.push({ name: skillName, scores, maxScore });
                 }
             });
-            
+
             if (rows.length > 0) {
-                rows.sort((a,b) => a.name.localeCompare(b.name));
-                skillMatrix[catName] = rows;
+                rows.sort((a, b) => a.name.localeCompare(b.name));
+                skillMatrix[catLabel] = rows;
             }
         });
     }
@@ -230,10 +234,10 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <Search size={14} className="text-stone-500" />
                                 </div>
-                                <input 
-                                    type="text" 
-                                    className="w-full bg-stone-900 border border-stone-700 text-stone-300 text-sm rounded-sm focus:ring-amber-500 focus:border-amber-500 block pl-9 p-2 transition-colors" 
-                                    placeholder="Chercher une compétence..." 
+                                <input
+                                    type="text"
+                                    className="w-full bg-stone-900 border border-stone-700 text-stone-300 text-sm rounded-sm focus:ring-amber-500 focus:border-amber-500 block pl-9 p-2 transition-colors"
+                                    placeholder="Chercher une compétence..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
@@ -248,7 +252,7 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                     const isOpen = isSearching || openCategories[catName];
                                     return (
                                         <div key={catName} className="flex flex-col">
-                                            <button 
+                                            <button
                                                 onClick={() => toggleCategory(catName)}
                                                 className="w-full text-left p-3 hover:bg-stone-800 flex items-center gap-2 font-bold text-amber-600/80 uppercase tracking-widest text-xs transition-colors"
                                                 style={{ backgroundColor: isOpen ? 'rgba(28, 25, 23, 0.8)' : 'rgba(28, 25, 23, 0.4)' }}
