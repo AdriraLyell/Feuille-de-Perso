@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.75.10",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie (Registre) : Ajout d'un bouton de suppression (croix) dans le champ de recherche des compétences pour vider rapidement la saisie."
+    },
+    {
         "version": "2.75.9",
         "date": "2026-02-23",
         "type": "fix",
@@ -112,11 +118,5 @@
         "date": "2026-02-22",
         "type": "feat",
         "description": "Système d'expérience : Il est désormais possible de dépenser de l'XP post-création pour augmenter le niveau d'un avantage (trait) que le personnage possède déjà. L'intégration calcule automatiquement la différence de coût pour un suivi précis de l'expérience dépensée."
-    },
-    {
-        "version": "2.70.0",
-        "date": "2026-02-22",
-        "type": "feat",
-        "description": "Nouveau système de Post-its : Vous pouvez désormais créer des notes visuelles colorées sur chaque onglet de la fiche de personnage. Ces Post-its peuvent être déplacés librement à l'écran, modifiés, redimensionnés et sont sauvegardés avec votre personnage."
     }
 ]

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.70.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Nouveau système de Post-its : Vous pouvez désormais créer des notes visuelles colorées sur chaque onglet de la fiche de personnage. Ces Post-its peuvent être déplacés librement à l'écran, modifiés, redimensionnés et sont sauvegardés avec votre personnage."
+    },
+    {
         "version": "2.69.5",
         "date": "2026-02-22",
         "type": "fix",
@@ -592,11 +598,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Correction de la logique de placement : Seules les Habilités Mystiques utilisent désormais le placement de secours (Col 7 pour l'Art Martial, Col 5 pour le reste)."
-    },
-    {
-        "version": "2.56.12",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Logique de placement de secours pour les compétences Wizard : Arts Martiaux en Col_Comp_7, autres en Col_Comp_5."
     }
 ]

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CharacterSyncService, SyncedCharacter } from '../services/CharacterSyncService';
 import { CampaignService, RulesData } from '../services/CampaignService';
-import { Loader2, Users, AlertCircle, Heart, Shield, Droplets, Search, ChevronDown, ChevronRight, CalendarDays, Clock } from 'lucide-react';
+import { Loader2, Users, AlertCircle, Heart, Shield, Droplets, Search, ChevronDown, ChevronRight, CalendarDays, Clock, X } from 'lucide-react';
 import { MotionFade } from '../components/ui/motion/MotionFade';
 import { CharacterSheetData } from '../types';
 
@@ -467,11 +467,19 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                                         </div>
                                         <input
                                             type="text"
-                                            className="w-full bg-stone-900 border border-stone-700 text-stone-300 text-sm rounded-sm focus:ring-amber-500 focus:border-amber-500 block pl-9 p-2 transition-colors"
+                                            className="w-full bg-stone-900 border border-stone-700 text-stone-300 text-sm rounded-sm focus:ring-amber-500 focus:border-amber-500 block pl-9 pr-9 p-2 transition-colors"
                                             placeholder="Chercher une compétence..."
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                         />
+                                        {searchQuery && (
+                                            <button
+                                                onClick={() => setSearchQuery("")}
+                                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-stone-500 hover:text-amber-500 transition-colors"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
