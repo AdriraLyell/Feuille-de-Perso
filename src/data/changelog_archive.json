@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.67.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Fusion majeure du Compagnon Temporel et du Journal de Campagne : (1) Navigation chronologique par clic sur les dates. (2) Mode 'Timeline' synthétique. (3) Assistant de création de chapitre à date. (4) Indicateurs de météo et ambiances sur les chapitres et le calendrier. (5) Compte à rebours avant le prochain évènement majeur. (6) Nouveaux blocs narratifs flexibles (Moments de journée, Voyages)."
+    },
+    {
+        "version": "2.66.3",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Correction majeure de la visibilité du Compagnon Temporel : (1) Correction du chemin d'accès aux données (configurations.calendar). (2) Repositionnement du widget à gauche de la barre latérale pour éviter qu'il ne soit hors-écran sur les résolutions standards."
+    },
+    {
         "version": "2.66.2",
         "date": "2026-02-22",
         "type": "fix",
@@ -611,24 +623,6 @@
         "changes": [
             "✨ Bibliothèque : Ajout de l'icône 'Habilités Mystiques' (Sparkles) dans la réserve de la fiche personnage",
             "📊 UI : Implémentation d'une légende complète des icônes dans la réserve de compétences et la bibliothèque de traits"
-        ]
-    },
-    {
-        "version": "2.49.97",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "📝 Grimoire : Amélioration de la réactivité de l'enroulement (Wrap) par suppression des délais d'animation pendant le drag",
-            "🖼️ UX : Système de collision solide pour les images en mode libre, forçant le recalcul du flux dans les colonnes CSS"
-        ]
-    },
-    {
-        "version": "2.49.96",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "📝 Grimoire : Correction définitive de l'enroulement (Wrap) globale. Le texte est désormais physique poussé par l'image via un système de marges 4D (Haut/Bas/Gauche/Droite)",
-            "🖼️ Layout : Suppression des transformations visuelles (fantômes) pour garantir que le texte ne se cache plus jamais derrière une image"
         ]
     }
 ]

@@ -1,5 +1,15 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.97] - 2026-02-17 [FIX]
+
+- 📝 Grimoire : Amélioration de la réactivité de l'enroulement (Wrap) par suppression des délais d'animation pendant le drag
+- 🖼️ UX : Système de collision solide pour les images en mode libre, forçant le recalcul du flux dans les colonnes CSS
+
+## [2.49.96] - 2026-02-17 [FIX]
+
+- 📝 Grimoire : Correction définitive de l'enroulement (Wrap) globale. Le texte est désormais physique poussé par l'image via un système de marges 4D (Haut/Bas/Gauche/Droite)
+- 🖼️ Layout : Suppression des transformations visuelles (fantômes) pour garantir que le texte ne se cache plus jamais derrière une image
+
 ## [2.49.95] - 2026-02-17 [FIX]
 
 - 📝 Grimoire : L'enroulement du texte (Wrap) suit désormais le décalage vertical des images grâce à un système de marges dynamiques

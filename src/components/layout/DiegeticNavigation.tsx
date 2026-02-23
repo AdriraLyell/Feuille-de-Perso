@@ -155,6 +155,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                                 className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all flex items-center gap-2 relative ${currentMode === 'settings'
                                     ? 'bg-blue-600 text-white shadow-sm'
                                     : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
+                                title="Réglages"
                             >
                                 <div className="relative">
                                     <Settings size={16} />
@@ -165,7 +166,6 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                                         </div>
                                     )}
                                 </div>
-                                Réglages
                                 {stats?.isCritical && (
                                     <AlertTriangle size={14} className="text-red-400 animate-pulse ml-0.5" />
                                 )}

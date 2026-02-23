@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.75.1",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Ergonomie : Suppression du label textuel 'Réglages' dans la barre de navigation pour un design plus épuré, conservant uniquement l'icône avec une info-bulle d'aide."
+    },
+    {
         "version": "2.75.0",
         "date": "2026-02-23",
         "type": "feat",
@@ -112,17 +118,5 @@
         "date": "2026-02-23",
         "type": "chore",
         "description": "Ajustements ergonomiques du Chroniqueur : renommage du widget, formatage des dates en JJ/MM/AAAA dans la Timeline, et déplacement des flèches de navigation vers le haut pour éviter les chevauchements."
-    },
-    {
-        "version": "2.67.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Fusion majeure du Compagnon Temporel et du Journal de Campagne : (1) Navigation chronologique par clic sur les dates. (2) Mode 'Timeline' synthétique. (3) Assistant de création de chapitre à date. (4) Indicateurs de météo et ambiances sur les chapitres et le calendrier. (5) Compte à rebours avant le prochain évènement majeur. (6) Nouveaux blocs narratifs flexibles (Moments de journée, Voyages)."
-    },
-    {
-        "version": "2.66.3",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Correction majeure de la visibilité du Compagnon Temporel : (1) Correction du chemin d'accès aux données (configurations.calendar). (2) Repositionnement du widget à gauche de la barre latérale pour éviter qu'il ne soit hors-écran sur les résolutions standards."
     }
 ]
