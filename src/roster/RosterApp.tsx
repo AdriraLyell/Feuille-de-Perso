@@ -118,11 +118,13 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
             const charData = c.data as CharacterSheetData;
             Object.entries(charData.skills || {}).forEach(([_, skillList]) => {
                 skillList.forEach(s => {
-                    const cleanName = s.name.trim();
+                    const baseName = s.name.trim();
+                    const variantName = s.variant?.trim();
+                    const cleanName = variantName ? `${baseName} : ${variantName}` : baseName;
                     const lowerName = cleanName.toLowerCase();
 
-                    // Extraire le nom racine pour les compétences paramétrables comme "Arts Martiaux (Karaté)"
-                    let rootName = lowerName;
+                    // Extraire le nom racine (soit depuis baseName, soit via le nettoyage habituel pour les cas hybrides)
+                    let rootName = baseName.toLowerCase();
                     if (rootName.includes('(')) {
                         rootName = rootName.split('(')[0].trim();
                     } else if (rootName.includes(':')) {
