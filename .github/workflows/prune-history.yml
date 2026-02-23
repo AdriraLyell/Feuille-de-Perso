@@ -28,7 +28,7 @@ jobs:
 
           # 2. Récupérer les runs, ignorer les (MIN_KEPT_RUNS) premiers, filtrer par date
           # gh run list retourne par défaut du plus récent au plus ancien
-          RUNS_TO_DELETE=$(gh run list --limit 300 --json databaseId,createdAt --jq "
+          RUNS_TO_DELETE=$(gh run list --repo ${{ github.repository }} --limit 300 --json databaseId,createdAt --jq "
             .[$MIN_KEPT_RUNS:] | .[] | select(.createdAt < \"$CUTOFF\") | .databaseId
           ")
 
@@ -41,7 +41,7 @@ jobs:
             
             for run_id in $RUNS_TO_DELETE; do
               echo "Deleting run $run_id..."
-              gh run delete "$run_id" || echo "⚠️ Failed to delete $run_id"
+              gh run delete --repo ${{ github.repository }} "$run_id" || echo "⚠️ Failed to delete $run_id"
             done
             echo "✅ Cleanup complete."
           fi

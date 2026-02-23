@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.75.15",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "CI : Correction du workflow de nettoyage des anciens runs (prune-history). Ajout du contexte explicite du dépôt aux commandes GitHub CLI pour éviter les erreurs d'exécution en environnement sans dossier .git."
+    },
+    {
         "version": "2.75.14",
         "date": "2026-02-23",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-22",
         "type": "feat",
         "description": "Amélioration visuelle de l'interface des Habilités Mystiques. Lorsqu'un personnage a un accès sans limite (niveau 5+) aux compétences liées, le compteur par défaut (999) est remplacé par un symbole 'Infini' et un texte plus immersif ('SANS LIMITE' & 'Vous avez un accès illimité')."
-    },
-    {
-        "version": "2.71.4",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Système d'expérience : Distinction visuelle des traits. Utilisation de l'icône ⬆️ bleue pour les avantages améliorés et ❇️ verte pour les nouveaux traits acquis post-création."
     }
 ]
