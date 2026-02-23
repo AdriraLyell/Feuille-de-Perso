@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.93] - 2026-02-17 [FIX]
+
+- 🛡️ UI : La barre d'outils suit désormais l'image dans ses déplacements libres (Flush Toolbar)
+- 🔼 UX : La sélection d'une image la fait désormais passer au-dessus de tous les éléments (sommaire, menus) via un Z-index dynamique
+- 🛠️ Système : Correction des problèmes d'images 'bloquées' derrière l'interface du grimoire
+
 ## [2.49.92] - 2026-02-17 [FEAT]
 
 - 🖱️ UX : Double sens d'enroulement (Float L/R) désormais disponible en mode déplacement libre
