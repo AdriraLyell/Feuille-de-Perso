@@ -1,5 +1,10 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.98] - 2026-02-17 [FEAT]
+
+- ✨ Bibliothèque : Ajout de l'icône 'Habilités Mystiques' (Sparkles) dans la réserve de la fiche personnage
+- 📊 UI : Implémentation d'une légende complète des icônes dans la réserve de compétences et la bibliothèque de traits
+
 ## [2.49.97] - 2026-02-17 [FIX]
 
 - 📝 Grimoire : Amélioration de la réactivité de l'enroulement (Wrap) par suppression des délais d'animation pendant le drag

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.67.1",
+        "date": "2026-02-23",
+        "type": "chore",
+        "description": "Ajustements ergonomiques du Chroniqueur : renommage du widget, formatage des dates en JJ/MM/AAAA dans la Timeline, et déplacement des flèches de navigation vers le haut pour éviter les chevauchements."
+    },
+    {
         "version": "2.67.0",
         "date": "2026-02-23",
         "type": "feat",
@@ -614,15 +620,6 @@
             "🛠️ Admin : Correction du bug de réinitialisation des coûts des traits (mismatch SQL points/cost)",
             "📊 Bibliothèque : Implémentation des coûts variables et multiples (ex: 1-5, 1/3/5) avec libellés personnalisables",
             "💾 Persistance : Ajout des colonnes points_label et is_variable_cost pour une gestion robuste des coûts en BDD"
-        ]
-    },
-    {
-        "version": "2.49.98",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "✨ Bibliothèque : Ajout de l'icône 'Habilités Mystiques' (Sparkles) dans la réserve de la fiche personnage",
-            "📊 UI : Implémentation d'une légende complète des icônes dans la réserve de compétences et la bibliothèque de traits"
         ]
     }
 ]
