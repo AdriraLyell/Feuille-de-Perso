@@ -62,12 +62,24 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
     }
 
     // Récupérer la liste des attributs pour l'en-tête (en fusionnant toutes les catégories)
-    let allAttributes: string[] = [];
+    let allAttributes: { name: string, category: string }[] = [];
     if (characters.length > 0) {
-        Object.values(characters[0].data.attributes || {}).forEach(cat => {
-            cat.forEach(attr => allAttributes.push(attr.name));
+        Object.entries(characters[0].data.attributes || {}).forEach(([catName, attrs]) => {
+            (attrs as any[]).forEach(attr => {
+                if (!allAttributes.find(a => a.name === attr.name)) {
+                    allAttributes.push({ name: attr.name, category: catName });
+                }
+            });
         });
     }
+
+    const getCategoryColor = (catName: string) => {
+        const lower = catName.toLowerCase();
+        if (lower.includes('physique')) return '#fb923c'; // orange-400
+        if (lower.includes('mental')) return '#38bdf8';   // sky-400
+        if (lower.includes('social')) return '#34d399';   // emerald-400
+        return '#d97706'; // amber-600
+    };
 
     interface SkillRow {
         name: string;
@@ -152,14 +164,12 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                         <table className="w-full text-left border-collapse min-w-max">
                             <thead className="bg-stone-950 border-b border-stone-800">
                                 <tr>
-                                    <th className="p-4 font-black uppercase tracking-widest text-amber-700/80 text-[10px]">Identité</th>
-                                    <th className="p-4 font-black uppercase tracking-widest text-amber-700/80 text-[10px] text-center">Jauges & Cpt</th>
+                                    <th className="p-4 font-black uppercase tracking-widest text-amber-700/80 text-[10px] sticky left-0 bg-stone-950 z-30 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)]">Identité</th>
                                     {allAttributes.map(attr => (
-                                        <th key={attr} className="p-4 font-black uppercase tracking-widest text-amber-700/80 text-[10px] text-center" title={attr}>
-                                            {attr.substring(0, 3)}
+                                        <th key={attr.name} className="p-4 font-black uppercase tracking-widest text-[9px] text-center border-l border-stone-800/20" style={{ color: getCategoryColor(attr.category) }}>
+                                            {attr.name}
                                         </th>
                                     ))}
-                                    <th className="p-4 font-black uppercase tracking-widest text-amber-700/80 text-[10px] text-right">XP</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-stone-800/50">
@@ -184,39 +194,25 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
 
                                     return (
                                         <tr key={char.id} className="hover:bg-amber-900/5 transition-colors">
-                                            <td className="p-4">
+                                            <td className="p-4 sticky left-0 bg-[#161412] z-10 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] border-r border-stone-800/50">
                                                 <div className="font-serif font-bold text-lg text-amber-50">{char.character_name}</div>
                                                 <div className="text-[10px] uppercase tracking-widest text-stone-500">{char.player_name}</div>
                                                 <div className="text-xs text-stone-400 italic mt-1">{data.header?.nature || ""}</div>
                                             </td>
-                                            <td className="p-4 text-center">
-                                                <div className="flex flex-col items-center gap-1 font-mono text-xs">
-                                                    {/* Standard Counters */}
-                                                    {vitalCounters.map(c => (
-                                                        <span key={c.id} className="px-2 py-0.5 rounded-sm bg-blue-950/30 text-blue-400" title={c.name}>
-                                                            {c.name.substring(0, 3).toUpperCase()}: {c.value} {c.max ? `/ ${c.max}` : ''}
+                                            {allAttributes.map(attr => {
+                                                const val = charAttrs[attr.name] || 0;
+                                                const isExcep = val >= 3;
+                                                const isNegative = val < 0;
+                                                const isZero = val === 0;
+
+                                                return (
+                                                    <td key={attr.name} className="p-4 text-center border-l border-stone-800/10">
+                                                        <span className={`font-mono text-sm ${isZero ? 'opacity-20' : ''} ${isExcep ? 'text-amber-400 font-bold scale-110 inline-block' : 'text-stone-300'} ${isNegative ? 'text-rose-500' : ''}`}>
+                                                            {val}
                                                         </span>
-                                                    ))}
-                                                    {/* Custom Counters (usually Santé, etc) */}
-                                                    {customCounters.slice(0, 2).map(c => (
-                                                        <span key={c.id} className="px-2 py-0.5 rounded-sm bg-rose-950/30 text-rose-400" title={c.name}>
-                                                            {c.name.substring(0, 3).toUpperCase()}: {c.value} {c.max ? `/ ${c.max}` : ''}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </td>
-                                            {allAttributes.map(attr => (
-                                                <td key={attr} className="p-4 text-center">
-                                                    <span className="font-mono text-sm text-stone-300">
-                                                        {charAttrs[attr] || 0}
-                                                    </span>
-                                                </td>
-                                            ))}
-                                            <td className="p-4 text-right">
-                                                <span className="font-mono text-amber-500 bg-amber-950/30 px-2 py-1 rounded-sm text-sm" title={`Reste: ${data.experience?.rest}`}>
-                                                    {data.experience?.rest || 0} rst
-                                                </span>
-                                            </td>
+                                                    </td>
+                                                );
+                                            })}
                                         </tr>
                                     );
                                 })}
