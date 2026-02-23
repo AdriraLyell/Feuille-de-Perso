@@ -1,5 +1,16 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.49.95] - 2026-02-17 [FIX]
+
+- 📝 Grimoire : L'enroulement du texte (Wrap) suit désormais le décalage vertical des images grâce à un système de marges dynamiques
+- 🖱️ UX : Le bouton 'F' restaure désormais l'alignement latéral précédent (L/R) au lieu de forcer le centré
+- 🖼️ Layout : Correction des chevauchements de texte en mode déplacement libre
+
+## [2.49.94] - 2026-02-17 [FIX]
+
+- 🖱️ UX : Le bouton 'F' (Libre) permet désormais de basculer (toggle) entre le mode libre et le mode centré
+- 🔄 Système : La désactivation du mode libre réinitialise automatiquement la position de l'image (Reset Offsets)
+
 ## [2.49.93] - 2026-02-17 [FIX]
 
 - 🛡️ UI : La barre d'outils suit désormais l'image dans ses déplacements libres (Flush Toolbar)

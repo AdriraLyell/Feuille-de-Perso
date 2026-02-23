@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.66.2",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ajustement du positionnement du Compagnon Temporel pour une meilleure visibilité dans le Grimoire et correction du filtrage des événements calendaires."
+    },
+    {
+        "version": "2.66.1",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Correction d'une erreur de référence sur BookChapterSidebar dans le journal de campagne."
+    },
+    {
         "version": "2.66.0",
         "date": "2026-02-22",
         "type": "feat",
@@ -617,25 +629,6 @@
         "changes": [
             "📝 Grimoire : Correction définitive de l'enroulement (Wrap) globale. Le texte est désormais physique poussé par l'image via un système de marges 4D (Haut/Bas/Gauche/Droite)",
             "🖼️ Layout : Suppression des transformations visuelles (fantômes) pour garantir que le texte ne se cache plus jamais derrière une image"
-        ]
-    },
-    {
-        "version": "2.49.95",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "📝 Grimoire : L'enroulement du texte (Wrap) suit désormais le décalage vertical des images grâce à un système de marges dynamiques",
-            "🖱️ UX : Le bouton 'F' restaure désormais l'alignement latéral précédent (L/R) au lieu de forcer le centré",
-            "🖼️ Layout : Correction des chevauchements de texte en mode déplacement libre"
-        ]
-    },
-    {
-        "version": "2.49.94",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🖱️ UX : Le bouton 'F' (Libre) permet désormais de basculer (toggle) entre le mode libre et le mode centré",
-            "🔄 Système : La désactivation du mode libre réinitialise automatiquement la position de l'image (Reset Offsets)"
         ]
     }
 ]
