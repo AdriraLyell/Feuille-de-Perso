@@ -17,7 +17,8 @@ import LibrarySidebar from './settings/LibrarySidebar';
 import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
 import LibraryView from './LibraryView';
 import AdminSuggestions from './settings/AdminSuggestions'; // NEW
-import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Lock, UploadCloud, Lightbulb } from 'lucide-react';
+import FormulasEditor from './settings/FormulasEditor'; // NEW
+import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Lock, UploadCloud, Lightbulb, Calculator } from 'lucide-react';
 
 // Rules Integration
 import { useRules } from '../context/RulesContext';
@@ -124,6 +125,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
                 <button onClick={() => setActiveTab('skills')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'skills' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><List size={16} /> Compétences</button>
                 <button onClick={() => setActiveTab('specializations')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'specializations' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><Tag size={16} /> Spécialisations</button>
                 <button onClick={() => setActiveTab('creation')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'creation' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><UserPlus size={16} /> Paramètres</button>
+                <button onClick={() => setActiveTab('formulas')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'formulas' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}><Calculator size={16} /> Formules</button>
                 <button onClick={() => setActiveTab('suggestions')} className={`px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === 'suggestions' ? 'bg-[#8b2e2e] text-white shadow-md ring-2 ring-[#8b2e2e]/20' : 'text-[#5c4d41] hover:bg-[#bfae85]/10'}`}>
                   <Lightbulb size={16} /> Suggestions {localData.suggestions && localData.suggestions.length > 0 ? `(${localData.suggestions.length})` : ''}
                 </button>
@@ -207,6 +209,14 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
 
           {activeTab === 'creation' && (
             <CreationConfigEditor
+              data={localData}
+              onUpdate={handleLocalUpdate}
+              onAddLog={onAddLog}
+            />
+          )}
+
+          {activeTab === 'formulas' && (
+            <FormulasEditor
               data={localData}
               onUpdate={handleLocalUpdate}
               onAddLog={onAddLog}

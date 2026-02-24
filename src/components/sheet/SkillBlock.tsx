@@ -11,7 +11,7 @@ import { useNotification } from '../../context/NotificationContext';
 const DotRow: React.FC<{
     entry: DotEntry;
     category: string;
-    onUpdate: (category: string, id: string, value: number) => void;
+    onUpdate: (section: 'skills', category: string, id: string, value: number) => void;
     specializations?: string[];
     theme?: { creationColor: string, xpColor: string, dotSymbol?: string, skillColors?: { variable?: string, mysticDefault?: string, mysticOverrides?: Record<string, string> } };
     imposedSpecs?: { name: string, minLevel: number }[];

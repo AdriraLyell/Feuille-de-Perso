@@ -6,7 +6,7 @@ import { TraitEntry, LibraryEntry } from '../types';
 describe('useCharacterBonuses Hook', () => {
     it('should return empty bonuses when no traits are provided', () => {
         const { result } = renderHook(() => useCharacterBonuses([], [], []));
-        expect(result.current).toEqual({});
+        expect(result.current.attributeBonuses).toEqual({});
     });
 
     it('should calculate bonuses from library effects', () => {
@@ -23,9 +23,9 @@ describe('useCharacterBonuses Hook', () => {
 
         const { result } = renderHook(() => useCharacterBonuses(avantages, [], library));
 
-        expect(result.current['constitution']).toBeDefined();
-        expect(result.current['constitution'].value).toBe(1);
-        expect(result.current['constitution'].sources).toContain('Robuste (+1)');
+        expect(result.current.attributeBonuses['constitution']).toBeDefined();
+        expect(result.current.attributeBonuses['constitution'].value).toBe(1);
+        expect(result.current.attributeBonuses['constitution'].sources).toContain('Robuste (+1)');
     });
 
     it('should handle multiple traits affecting the same attribute', () => {
@@ -56,7 +56,7 @@ describe('useCharacterBonuses Hook', () => {
 
         const { result } = renderHook(() => useCharacterBonuses(avantages, [], library));
 
-        expect(result.current['dexterity'].value).toBe(2);
-        expect(result.current['dexterity'].sources).toHaveLength(2);
+        expect(result.current.attributeBonuses['dexterity'].value).toBe(2);
+        expect(result.current.attributeBonuses['dexterity'].sources).toHaveLength(2);
     });
 });

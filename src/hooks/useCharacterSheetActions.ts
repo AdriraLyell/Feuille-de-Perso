@@ -5,6 +5,7 @@ import { generateId } from '../utils/factories';
 import { RulesData } from '../types/rules';
 import { CharacterSheetData } from '../types/character';
 import { getSkillCategory, getCounter, setCounter } from '../utils/stateAccessors';
+import { evaluateFormula } from '../utils/formulaEvaluator';
 
 interface DropPayload {
     type: string;
@@ -282,7 +283,8 @@ export const useCharacterSheetActions = (
                         const effectiveMax = newItem.variant === 'squares_only' ? (newItem.max || 10) : newItem.value;
                         if ((newItem.current || 0) > effectiveMax) newItem.current = effectiveMax;
                     } else {
-                        const effectiveMax = newItem.variant === 'squares_only' ? (newItem.max || 10) : newItem.value;
+                        const libEntry = prev.counterLibrary?.find(l => l.isNumeric && l.name === c.name);
+                        const effectiveMax = libEntry ? evaluateFormula(libEntry.formula || '', prev) : (newItem.variant === 'squares_only' ? (newItem.max || 10) : newItem.value);
                         newItem.current = Math.min(value, effectiveMax);
                     }
                     return newItem;

@@ -187,6 +187,41 @@ export const useTraitActions = (
         return attrs.sort((a, b) => a.name.localeCompare(b.name));
     }, [data.attributes]);
 
+    const allCounters = useMemo(() => {
+        if (!data || !data.counters) return [];
+        const counters: { id: string, name: string }[] = [];
+
+        // System counters
+        Object.keys(data.counters).forEach(key => {
+            if (key !== 'custom' && !Array.isArray(data.counters[key])) {
+                const c = data.counters[key] as import('../types').DotEntry;
+                if (c && c.name && c.name.trim() !== '') {
+                    counters.push({ id: c.id || key, name: c.name });
+                }
+            }
+        });
+
+        // Custom counters
+        if (data.counters.custom && Array.isArray(data.counters.custom)) {
+            data.counters.custom.forEach(c => {
+                if (c && c.name && c.name.trim() !== '') {
+                    counters.push({ id: c.id, name: c.name });
+                }
+            });
+        }
+
+        // Also look at counterLibrary
+        if (data.counterLibrary && Array.isArray(data.counterLibrary)) {
+            data.counterLibrary.forEach(c => {
+                if (c && c.name && c.name.trim() !== '' && !counters.some(ex => ex.name === c.name)) {
+                    counters.push({ id: c.id, name: c.name });
+                }
+            });
+        }
+
+        return counters.sort((a, b) => a.name.localeCompare(b.name));
+    }, [data.counters, data.counterLibrary]);
+
     return {
         isModalOpen,
         setIsModalOpen,
@@ -214,6 +249,7 @@ export const useTraitActions = (
         updateEffect,
         removeEffect,
         allSkills,
-        allAttributes
+        allAttributes,
+        allCounters
     };
 };

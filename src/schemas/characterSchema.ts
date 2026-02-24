@@ -219,7 +219,9 @@ export const LibraryCounterEntrySchema = z.object({
     xpCost: z.number().nullable().optional(),
     isGlobal: z.boolean().optional(),
     isActive: z.boolean().optional(),
-    defaultCategory: z.string().nullable().optional()
+    defaultCategory: z.string().nullable().optional(),
+    isNumeric: z.boolean().optional(),
+    formula: z.string().optional()
 });
 
 export const LibraryBackgroundEntrySchema = LibrarySkillEntrySchema;
@@ -287,6 +289,25 @@ export const PartyMemberEntrySchema = z.object({
 export const ImposedSpecializationSchema = z.object({
     name: z.string(),
     minLevel: z.number()
+});
+
+// --- Formulas ---
+
+export const FormulaMacroSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    formula: z.string(),
+    description: z.string().optional()
+});
+
+export const FormulaVariableSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    operation: z.enum(['sum', 'count', 'highest', 'average']),
+    target: z.enum(['skills', 'attributes', 'traits', 'specializations', 'mysticAbilities']),
+    filterTarget: z.string().optional(), // 'category', 'tag', 'name'
+    filterValue: z.string().optional(),  // e.g. "Habiletés Mystiques" or "Artisanat"
+    description: z.string().optional()
 });
 
 // --- Main Schema ---
@@ -365,6 +386,8 @@ export const CharacterSheetDataSchema = z.object({
     appVersion: z.string().optional(),
     syncInfo: SyncInfoSchema.optional(),
     mysticAbilities: z.array(LibrarySkillEntrySchema).optional().nullable().default([]),
+    formulaMacros: z.array(FormulaMacroSchema).optional().default([]),
+    formulaVariables: z.array(FormulaVariableSchema).optional().default([]),
     suggestions: z.array(z.any()).optional().default([]),
     _rulesVersion: z.string().optional(),
     _schemaVersion: z.number().optional()

@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.75.3",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Amélioration du Roster : Ajout d'un accordéon pour masquer les attributs, d'un commutateur de format (Paysage/Portrait) pour basculer l'orientation des matrices, et alignement structuré des avantages et désavantages dans les cartes de personnages."
+    },
+    {
+        "version": "2.75.2",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Ergonomie : Déplacement du sélecteur de Thème (icône palette) vers la section des contrôles de vue (à côté du switch Portrait/Paysage) et suppression de son label textuel pour plus de cohérence visuelle."
+    },
+    {
+        "version": "2.75.1",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Ergonomie : Suppression du label textuel 'Réglages' dans la barre de navigation pour un design plus épuré, conservant uniquement l'icône avec une info-bulle d'aide."
+    },
+    {
         "version": "2.75.0",
         "date": "2026-02-23",
         "type": "feat",
@@ -580,23 +598,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Correction de la persistance du mode de calcul des bonus XP (Fixe vs Par Scénario) dans les bibliothèques Admin."
-    },
-    {
-        "version": "2.56.25",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de l'avertissement React sur les clés manquantes dans l'éditeur d'effets de traits (TraitEffectEditor) et garantie des IDs uniques lors de l'édition."
-    },
-    {
-        "version": "2.56.24",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de la sauvegarde des effets mécaniques des traits dans la bibliothèque Admin (évite les réinitialisations). Synchronisation automatique des bibliothèques (traits, compétences) sur la feuille lors de la mise à jour des règles, assurant la transmission correcte des effets."
-    },
-    {
-        "version": "2.56.23",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Amélioration de l'affichage de l'expérience (Total XP incluant les bonus + infobulle de détail). Ajout d'une case à cocher 'Session' dans l'historique d'XP pour contrôler explicitement quelles entrées comptent pour le bonus par scénario, résolvant les problèmes de détection automatique."
     }
 ]

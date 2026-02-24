@@ -168,6 +168,8 @@ export interface LibraryCounterEntry {
   isActive?: boolean;
   isLocked?: boolean;
   globalUsage?: number;
+  isNumeric?: boolean;
+  formula?: string;
 }
 
 export interface LogEntry {

@@ -74,7 +74,8 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
         updateEffect,
         removeEffect,
         allSkills,
-        allAttributes
+        allAttributes,
+        allCounters
     } = useTraitActions(data, onUpdate, filterType === 'all' ? 'avantage' : filterType);
 
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -290,6 +291,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                         library={[]}
                         allSkills={allSkills}
                         allAttributes={allAttributes}
+                        allCounters={allCounters}
                         tagInput={tagInput}
                         error={error}
                         setEditForm={setEditForm}

@@ -14,7 +14,7 @@ export const useSettingsManager = (
     onDirtyChange?: (isDirty: boolean) => void
 ) => {
     const [localData, setLocalData] = useState<CharacterSheetData>(initialData);
-    const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'specializations' | 'creation' | 'library' | 'cloud' | 'suggestions'>('library');
+    const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'specializations' | 'creation' | 'library' | 'cloud' | 'suggestions' | 'formulas'>('library');
     const [isDirty, setIsDirty] = useState(false);
     const [showResetConfirm, setShowResetConfirm] = useState(false);
     const [showExpertWarning, setShowExpertWarning] = useState(false);
@@ -46,7 +46,7 @@ export const useSettingsManager = (
 
     // Force Tab to Library if entering Online Mode without Expert Mode
     useEffect(() => {
-        const advancedTabs = ['attributes', 'skills', 'specializations', 'creation'];
+        const advancedTabs = ['attributes', 'skills', 'specializations', 'creation', 'formulas'];
         if (isOnlineMode && !expertMode && advancedTabs.includes(activeTab)) {
             setActiveTab('library');
         }
