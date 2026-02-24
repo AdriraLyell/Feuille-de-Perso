@@ -50,10 +50,13 @@ export const useCharacterBonuses = (
                     // Counter Bonuses
                     if (effect.type === 'counter_max_bonus' && effect.target) {
                         const targetName = normalizeString(effect.target);
+                        const traitValue = parseInt(trait.value?.toString() || '1') || 1;
+                        const totalBonus = effect.value * traitValue;
+
                         if (trait.isPostCreation) {
-                            counterXPBonuses[targetName] = (counterXPBonuses[targetName] || 0) + effect.value;
+                            counterXPBonuses[targetName] = (counterXPBonuses[targetName] || 0) + totalBonus;
                         } else {
-                            counterCreationBonuses[targetName] = (counterCreationBonuses[targetName] || 0) + effect.value;
+                            counterCreationBonuses[targetName] = (counterCreationBonuses[targetName] || 0) + totalBonus;
                         }
                     }
                 });
