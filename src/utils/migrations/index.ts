@@ -7,6 +7,7 @@ import { logger } from '../logger';
 import { MIGRATIONS, CURRENT_SCHEMA_VERSION } from './registry';
 import { LEGACY_SKILL_MAP } from './migrateSkills';
 import { migrateAttributeId } from './migrateAttributes';
+import { migrateFormulas } from './migrateFormulas';
 
 /**
  * Main migration function for character sheet data.
@@ -234,6 +235,11 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
                 xpCost: c.xpCost
             };
         });
+    }
+
+    // 7. Migrate formulas in traits mapping attribute_bonus to formula
+    if (rules.libraries.traits) {
+        migrateFormulas({ library: rules.libraries.traits });
     }
 
     return rules as RulesData;

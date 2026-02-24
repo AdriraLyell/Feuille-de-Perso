@@ -194,7 +194,7 @@ export const useTraitActions = (
         // System counters
         Object.keys(data.counters).forEach(key => {
             if (key !== 'custom' && !Array.isArray(data.counters[key])) {
-                const c = data.counters[key] as import('../types').DotEntry;
+                const c = data.counters[key] as any;
                 if (c && c.name && c.name.trim() !== '') {
                     counters.push({ id: c.id || key, name: c.name });
                 }
@@ -221,6 +221,8 @@ export const useTraitActions = (
 
         return counters.sort((a, b) => a.name.localeCompare(b.name));
     }, [data.counters, data.counterLibrary]);
+
+    const allFormulas = rules?.libraries?.formulas || [];
 
     return {
         isModalOpen,
@@ -250,6 +252,7 @@ export const useTraitActions = (
         removeEffect,
         allSkills,
         allAttributes,
-        allCounters
+        allCounters,
+        allFormulas
     };
 };

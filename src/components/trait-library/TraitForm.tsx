@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LibraryEntry, TraitEffect } from '../../types';
+import { LibraryEntry, TraitEffect, LibraryFormulaEntry } from '../../types';
 import { Edit2, Plus, X, AlignLeft, Save, AlertCircle, Coins, Info } from 'lucide-react';
 import TraitEffectEditor from './TraitEffectEditor';
 import ThematicModal from '../ui/ThematicModal';
@@ -11,6 +11,7 @@ interface TraitFormProps {
     allSkills: { id: string, name: string }[];
     allAttributes: { id: string, name: string }[];
     allCounters: { id: string, name: string }[];
+    allFormulas?: LibraryFormulaEntry[];
     tagInput: string;
     error: string | null;
     setEditForm: (entry: LibraryEntry | null) => void;
@@ -31,6 +32,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
     allSkills,
     allAttributes,
     allCounters,
+    allFormulas,
     tagInput,
     error,
     setEditForm,
@@ -259,6 +261,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
                         allSkills={allSkills}
                         allAttributes={allAttributes}
                         allCounters={allCounters}
+                        allFormulas={allFormulas}
                         onAdd={addEffect}
                         onUpdate={updateEffect}
                         onRemove={removeEffect}

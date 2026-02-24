@@ -4,10 +4,10 @@ import { normalizeString } from '../utils/stringUtils';
 import { logger } from '../utils/logger';
 import { evaluateFormula } from '../utils/formulaEvaluator';
 import { useCharacter } from '../context/CharacterContext';
+import { useRules } from '../context/RulesContext';
 
 /**
  * Hook chirurgical pour extraire la logique de calcul des bonus d'attributs.
- * Cette logique était auparavant située dans CharacterSheet.tsx.
  */
 export const useCharacterBonuses = (
     avantages: TraitEntry[] = [],
@@ -16,12 +16,14 @@ export const useCharacterBonuses = (
     rulesTraits: LibraryEntry[] = []
 ) => {
     const { data: characterData } = useCharacter();
+    const { rules } = useRules();
 
     return useMemo(() => {
         const attributeBonuses: Record<string, BonusInfo> = {};
         const blockedSkills: Record<string, { isBlocked: boolean, sourceName: string }> = {};
         const counterCreationBonuses: Record<string, number> = {};
         const counterXPBonuses: Record<string, number> = {};
+        const activeReserves: Set<string> = new Set();
         const allTraits = [...(avantages || []), ...(desavantages || [])];
 
         allTraits.forEach(trait => {
@@ -32,7 +34,20 @@ export const useCharacterBonuses = (
 
             if (libEntry && libEntry.effects) {
                 libEntry.effects.forEach(effect => {
-                    // Attribute Bonuses - OBSOLETE (Now handled by 'formula')
+                    // Try to resolve formula from global library if formulaId is present
+                    let formulaString = effect.formula;
+                    let isReserve = false;
+
+                    if (effect.formulaId && rules?.libraries?.formulas) {
+                        const globalFormula = rules.libraries.formulas.find(f => f.id === effect.formulaId);
+                        if (globalFormula) {
+                            formulaString = globalFormula.formula;
+                            if (globalFormula.type === 'reserve') {
+                                isReserve = true;
+                                activeReserves.add(globalFormula.id);
+                            }
+                        }
+                    }
 
                     // Skill Blocking
                     if (effect.type === 'block_skill_increase' && effect.target) {
@@ -43,9 +58,14 @@ export const useCharacterBonuses = (
                         };
                     }
 
-                    // Counter Bonuses - OBSOLETE (Now handled by 'formula')
-                    if (effect.type === 'formula' && effect.target && effect.formula && characterData) {
-                        const targetName = normalizeString(effect.target);
+                    // Formula Evaluation
+                    if (effect.type === 'formula' && formulaString && characterData) {
+                        // Skip evaluation for raw reserves (they don't target/modify existing stats, they ARE stats)
+                        if (isReserve) return;
+
+                        const targetName = normalizeString(effect.target || "");
+                        if (!targetName) return;
+
                         const traitValue = parseInt(trait.value?.toString() || '1') || 1;
 
                         // Define TRAIT_LEVEL variable for the formula
@@ -58,7 +78,7 @@ export const useCharacterBonuses = (
                         };
 
                         try {
-                            const result = evaluateFormula(effect.formula, localDataForEval);
+                            const result = evaluateFormula(formulaString, localDataForEval);
 
                             // Ignore formulas targeting XP (Handled by xpCalculator)
                             if (targetName === 'xp') return;
@@ -89,6 +109,6 @@ export const useCharacterBonuses = (
                 });
             }
         });
-        return { attributeBonuses, blockedSkills, counterCreationBonuses, counterXPBonuses };
-    }, [avantages, desavantages, library, rulesTraits, characterData]);
+        return { attributeBonuses, blockedSkills, counterCreationBonuses, counterXPBonuses, activeReserves: Array.from(activeReserves) };
+    }, [avantages, desavantages, library, rulesTraits, characterData, rules]);
 };

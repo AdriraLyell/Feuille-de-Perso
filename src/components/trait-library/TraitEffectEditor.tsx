@@ -1,13 +1,14 @@
 
 import React from 'react';
-import { TraitEffect } from '../../types';
-import { Zap, X, Star, GraduationCap, Dumbbell, ChevronDown, Trophy, PlusCircle, TrendingUp, Calculator } from 'lucide-react';
+import { TraitEffect, LibraryFormulaEntry } from '../../types';
+import { Zap, X, Star, GraduationCap, Dumbbell, ChevronDown, Trophy, PlusCircle, TrendingUp, Calculator, Info } from 'lucide-react';
 
 interface TraitEffectEditorProps {
     effects: TraitEffect[];
     allSkills: { id: string, name: string }[];
     allAttributes: { id: string, name: string }[];
     allCounters: { id: string, name: string }[];
+    allFormulas?: LibraryFormulaEntry[];
     onAdd: () => void;
     onUpdate: <K extends keyof TraitEffect>(id: string, field: K, value: TraitEffect[K]) => void;
     onRemove: (id: string) => void;
@@ -18,6 +19,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
     allSkills,
     allAttributes,
     allCounters,
+    allFormulas = [],
     onAdd,
     onUpdate,
     onRemove
@@ -76,6 +78,10 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                         borderColor = 'border-orange-400/30';
                         bgColor = 'bg-orange-50/40';
                     }
+
+                    // Find current formula entry
+                    const selectedFormulaEntry = allFormulas.find(f => f.id === effect.formulaId);
+                    const isReserve = selectedFormulaEntry?.type === 'reserve';
 
                     return (
                         <div key={effect.id || `effect-${index}`} className={`rounded-lg border ${borderColor} ${bgColor} shadow-sm overflow-hidden group`}>
@@ -204,57 +210,66 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                     <div className="flex flex-col gap-3">
                                         <div className="flex flex-col">
                                             <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest flex justify-between items-center">
-                                                <span>Cible du Calcul</span>
-                                                <span className="text-[8px] font-normal normal-case opacity-70 italic">Attribut, Compteur, Variables...</span>
+                                                <span>Choisir la Formule Globale</span>
+                                                <span className="text-[8px] font-normal normal-case opacity-70 italic">Dictionnaire MJ</span>
                                             </label>
                                             <div className="relative">
                                                 <select
                                                     className="w-full text-xs border border-indigo-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-indigo-500 outline-none bg-white font-bold text-stone-800 shadow-sm"
-                                                    value={effect.target || ''}
-                                                    onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
+                                                    value={effect.formulaId || ''}
+                                                    onChange={(e) => {
+                                                        const fid = e.target.value;
+                                                        onUpdate(effect.id, 'formulaId', fid);
+                                                        // Fallback for legacy display (optional)
+                                                        const entry = allFormulas.find(f => f.id === fid);
+                                                        if (entry) onUpdate(effect.id, 'formula', entry.formula);
+                                                    }}
                                                 >
-                                                    <option value="" className="italic text-stone-500">Choisir une cible existante ou l'écrire...</option>
-
-                                                    <optgroup label="Attributs">
-                                                        {allAttributes.map(a => <option key={a.id} value={a.name}>{a.name}</option>)}
-                                                    </optgroup>
-
-                                                    <optgroup label="Compteurs / Réserves">
-                                                        {allCounters.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                                                    </optgroup>
+                                                    <option value="" className="italic text-stone-500">-- Choisir une mécanique globale --</option>
+                                                    {allFormulas.map(f => (
+                                                        <option key={f.id} value={f.id}>
+                                                            {f.type === 'reserve' ? '⭐ ' : '⚙️ '}{f.name} ({f.formula})
+                                                        </option>
+                                                    ))}
                                                 </select>
                                                 <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-800/40" />
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-col">
-                                            <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest flex justify-between items-center">
-                                                <span>Équation (Formule Mathématique)</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="w-full text-sm border border-indigo-400/30 rounded-sm px-3 py-2 bg-white text-stone-800 font-mono shadow-inner outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-bold tracking-wide"
-                                                placeholder="ex: +2, ou (Volonté/2) * TRAIT_LEVEL"
-                                                value={effect.formula || ''}
-                                                onChange={(e) => onUpdate(effect.id, 'formula', e.target.value)}
-                                                spellCheck={false}
-                                            />
-                                            <div className="mt-1 flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
-                                                <button
-                                                    onClick={() => onUpdate(effect.id, 'formula', (effect.formula || '') + 'TRAIT_LEVEL')}
-                                                    className="shrink-0 text-[9px] px-1.5 py-0.5 rounded border border-indigo-200 bg-indigo-50 text-indigo-800 hover:bg-indigo-100 font-mono font-bold transition-colors"
-                                                    title="Permet de démultiplier le bonus par le niveau (coût) du trait"
-                                                >
-                                                    + Var: TRAIT_LEVEL
-                                                </button>
-                                                <button
-                                                    onClick={() => onUpdate(effect.id, 'formula', (effect.formula || '') + 'TOTAL_XP')}
-                                                    className="shrink-0 text-[9px] px-1.5 py-0.5 rounded border border-indigo-200 bg-indigo-50 text-indigo-800 hover:bg-indigo-100 font-mono font-bold transition-colors"
-                                                >
-                                                    + Var: TOTAL_XP
-                                                </button>
+                                        {!isReserve && (
+                                            <div className="flex flex-col animate-in fade-in duration-300">
+                                                <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest flex justify-between items-center">
+                                                    <span>Cible de l'Effet (Attribute, XP...)</span>
+                                                </label>
+                                                <div className="relative">
+                                                    <select
+                                                        className="w-full text-xs border border-indigo-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-indigo-500 outline-none bg-white font-bold text-stone-800 shadow-sm"
+                                                        value={effect.target || ''}
+                                                        onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
+                                                    >
+                                                        <option value="" className="italic text-stone-500">-- Choisir la cible à modifier --</option>
+                                                        <option value="XP">Points d'Expérience (Gains)</option>
+                                                        <optgroup label="Attributs">
+                                                            {allAttributes.map(a => <option key={a.id} value={a.name}>{a.name}</option>)}
+                                                        </optgroup>
+                                                        <optgroup label="Compteurs / Réserves">
+                                                            {allCounters.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                                                        </optgroup>
+                                                    </select>
+                                                    <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-800/40" />
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
+
+                                        {isReserve && (
+                                            <div className="bg-amber-100/30 p-2 rounded border border-amber-200/50 flex items-start gap-2">
+                                                <Info size={14} className="text-amber-700 shrink-0 mt-0.5" />
+                                                <p className="text-[9px] text-amber-800 leading-tight">
+                                                    Cette formule étant de type <strong>Réserve Joueur</strong>, elle s'affichera automatiquement comme une jauge sur la fiche.
+                                                    Pas de cible spécifique requise.
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-3 gap-3">

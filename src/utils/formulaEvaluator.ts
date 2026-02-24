@@ -1,4 +1,7 @@
+import { Parser } from 'expr-eval';
 import { CharacterSheetData } from '../types';
+
+const parser = new Parser();
 
 /**
  * Extracts a map of variable names to their values from the character sheet.
@@ -55,34 +58,23 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
  */
 export const evaluateFormula = (formula: string, data: CharacterSheetData & { variables?: Record<string, number> }): number => {
     if (!formula) return 0;
-    let computedFormula = formula;
-
-    const sheetVars = getSheetVariables(data);
-
-    // Sort variable names by length descending so that "Armes de jet" is matched before "Armes"
-    const sortedKeys = Object.keys(sheetVars).sort((a, b) => b.length - a.length);
-
-    for (const key of sortedKeys) {
-        // Skip empty keys
-        if (!key.trim()) continue;
-
-        // Escape regex special characters from the key
-        const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        // Match whole word, case insensitive
-        const regex = new RegExp(`\\b${escapedKey}\\b`, 'gi');
-
-        if (regex.test(computedFormula)) {
-            computedFormula = computedFormula.replace(regex, sheetVars[key].toString());
-        }
-    }
 
     try {
-        // Safe evaluation
-        // eslint-disable-next-line no-new-func
-        const result = new Function(`return ${computedFormula}`)();
-        return isNaN(result) ? 0 : Math.floor(result);
+        const sheetVars = getSheetVariables(data);
+
+        // Use expr-eval parser
+        const expr = parser.parse(formula);
+
+        // Evaluate with variables
+        // expr-eval handles missing variables by setting them to undefined (which might result in NaN or error)
+        // We'll provide the sheetVars as context.
+        const result = expr.evaluate(sheetVars);
+
+        return isNaN(result) ? 0 : Math.floor(Number(result));
     } catch (e) {
-        console.warn(`Formula evaluation failed for "${formula}" -> "${computedFormula}"`);
+        // Fallback for rough editing - if it fails to parse because user is currently typing
+        // or using unknown symbols/variables
+        console.warn(`expr-eval failed for "${formula}":`, e);
         return 0;
     }
 };

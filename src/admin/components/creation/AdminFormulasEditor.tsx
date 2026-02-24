@@ -3,12 +3,28 @@ import { RulesData } from '../../../types/rules';
 import { LibraryFormulaEntry } from '../../../types';
 import { generateId } from '../../../utils/factories';
 import { evaluateFormula } from '../../../utils/formulaEvaluator';
-import { Trash2, Plus, Calculator, Info, Check } from 'lucide-react';
+import { Trash2, Plus, Calculator, Info, Check, Wand2, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { MotionCard } from '../../../components/ui/motion/MotionCard';
 
 const DUMMY_PREVIEW_DATA: any = {
     experience: { total: 25, gain: "25" },
-    attributes: { Physiologie: [{ name: 'Physique', val2: '3' }], Mental: [{ name: 'Volonté', val2: '4' }] },
+    attributes: {
+        Physiologie: [
+            { name: 'Physique', val2: '3' },
+            { name: 'Vigueur', val2: '2' },
+            { name: 'Agilité', val2: '3' }
+        ],
+        Mental: [
+            { name: 'Volonté', val2: '4' },
+            { name: 'Intelligence', val2: '3' },
+            { name: 'Perception', val2: '2' }
+        ],
+        Social: [
+            { name: 'Charisme', val2: '3' },
+            { name: 'Empathie', val2: '2' },
+            { name: 'Manipulation', val2: '1' }
+        ]
+    },
     skills: {
         col1: [{ name: 'Arts Martiaux', value: 3 }, { name: 'Athlétisme', value: 2 }],
         col2: [{ name: 'Savoir Mystique', value: 2 }]
@@ -26,6 +42,15 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
 
     const [editingId, setEditingId] = useState<string | null>(null);
     const [previewValue, setPreviewValue] = useState<number | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const allVariables = [
+        'XP_TOTAL',
+        'SUM_MYSTIC',
+        ...Object.values(rules.definitions.attributes).flat(),
+        ...Object.values(rules.definitions.secondaryAttributes || {}).flat(),
+        ...(rules.libraries.skills || []).map(s => s.name)
+    ].filter((v, i, a) => a.indexOf(v) === i); // Unique values
 
     const handleUpdate = (newLib: LibraryFormulaEntry[]) => {
         onUpdate({
@@ -68,6 +93,102 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
     const removeCounter = (id: string) => {
         if (!confirm("Voulez-vous vraiment supprimer cette formule ?")) return;
         handleUpdate(lib.filter(c => c.id !== id));
+    };
+
+    // Migration Logic
+    const orphanCount = (rules.libraries.traits || []).reduce((acc, trait) => {
+        return acc + (trait.effects?.filter(e =>
+            (e.type === 'formula' && !e.formulaId) ||
+            ['attribute_bonus', 'counter_max_bonus', 'xp_bonus'].includes(e.type as string)
+        ).length || 0);
+    }, 0);
+
+    const autoMigrateFormulas = () => {
+        let currentFormulas = [...lib];
+        let traitsUpdated = 0;
+        let formulasCreated = 0;
+
+        const newTraits = (rules.libraries.traits || []).map(trait => {
+            let traitChanged = false;
+            const newEffects = (trait.effects || []).map(effect => {
+                const isLegacy = ['attribute_bonus', 'counter_max_bonus', 'xp_bonus'].includes(effect.type as string);
+                const isOrphanFormula = effect.type === 'formula' && !effect.formulaId && effect.formula;
+
+                if (isLegacy || isOrphanFormula) {
+                    let formulaString = effect.formula || '';
+                    let target = effect.target;
+
+                    if (isLegacy) {
+                        const legacyEffect = effect as any;
+                        if (legacyEffect.type === 'attribute_bonus') {
+                            formulaString = legacyEffect.value?.toString() || '0';
+                        } else if (legacyEffect.type === 'counter_max_bonus') {
+                            formulaString = `${legacyEffect.value || 0} * TRAIT_LEVEL`;
+                        } else if (legacyEffect.type === 'xp_bonus') {
+                            target = 'XP';
+                            if (legacyEffect.method === 'per_scenario') {
+                                formulaString = `${legacyEffect.value || 0} * SCENARIOS_COUNT`;
+                            } else {
+                                formulaString = legacyEffect.value?.toString() || '0';
+                            }
+                        }
+                    }
+
+                    if (!formulaString) return effect;
+
+                    // Try to find a global formula with EXACTLY the same formula string
+                    let existing = currentFormulas.find(f => f.formula === formulaString);
+
+                    if (!existing) {
+                        // Create one
+                        existing = {
+                            id: generateId(),
+                            name: `Mécanique: ${trait.name}`,
+                            type: 'effect',
+                            formula: formulaString,
+                            isActive: true,
+                            isGlobal: true,
+                            description: `Importé depuis le trait ${trait.name}`
+                        };
+                        currentFormulas.push(existing);
+                        formulasCreated++;
+                    }
+
+                    traitChanged = true;
+                    // Return as the new 'formula' type
+                    return {
+                        ...effect,
+                        type: 'formula',
+                        formula: formulaString,
+                        formulaId: existing.id,
+                        target: target,
+                        value: undefined, // Clear legacy fields
+                        method: undefined // Clear legacy fields
+                    } as any;
+                }
+                return effect;
+            });
+
+            if (traitChanged) {
+                traitsUpdated++;
+                return { ...trait, effects: newEffects };
+            }
+            return trait;
+        });
+
+        if (traitsUpdated > 0) {
+            onUpdate({
+                ...rules,
+                libraries: {
+                    ...rules.libraries,
+                    traits: newTraits,
+                    formulas: currentFormulas
+                }
+            });
+            alert(`${traitsUpdated} traits mis à jour. ${formulasCreated} nouvelles formules créées dans le dictionnaire.`);
+        } else {
+            alert("Aucune formule orpheline trouvée.");
+        }
     };
 
     return (
@@ -176,21 +297,65 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
 
                                     <div>
                                         <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Équation Mathématique</label>
-                                        <div className="flex gap-2">
+                                        <div className="relative">
                                             <input
                                                 type="text"
                                                 value={counter.formula}
-                                                onChange={e => updateCounter(counter.id, 'formula', e.target.value)}
-                                                className="flex-grow p-3 bg-stone-950 border border-stone-700 text-stone-300 rounded font-mono text-sm focus:border-amber-500 outline-none shadow-inner"
+                                                onChange={e => {
+                                                    const val = e.target.value;
+                                                    updateCounter(counter.id, 'formula', val);
+
+                                                    // Get the word under cursor or last word
+                                                    const words = val.split(/[\s+\-*/()]/);
+                                                    const lastWord = words[words.length - 1];
+                                                    setSearchQuery(lastWord.length > 1 ? lastWord : '');
+                                                }}
+                                                className="w-full p-3 bg-stone-950 border border-stone-700 text-stone-300 rounded font-mono text-sm focus:border-amber-500 outline-none shadow-inner"
                                                 placeholder="ex: 10 + Constitution + Volonté"
                                             />
+
+                                            {searchQuery && (
+                                                <div className="absolute z-10 top-full left-0 w-full mt-1 bg-stone-900 border border-amber-500/30 rounded shadow-2xl max-h-40 overflow-y-auto">
+                                                    {allVariables
+                                                        .filter(v => v.toLowerCase().includes(searchQuery.toLowerCase()) && v !== searchQuery)
+                                                        .slice(0, 10)
+                                                        .map(v => (
+                                                            <button
+                                                                key={v}
+                                                                onClick={() => {
+                                                                    const parts = counter.formula.split(/([\s+\-*/()])/);
+                                                                    parts[parts.length - 1] = v;
+                                                                    updateCounter(counter.id, 'formula', parts.join(''));
+                                                                    setSearchQuery('');
+                                                                }}
+                                                                className="w-full text-left p-2 hover:bg-amber-600 hover:text-stone-950 text-stone-300 text-xs border-b border-stone-800 last:border-0 transition-colors"
+                                                            >
+                                                                {v}
+                                                            </button>
+                                                        ))}
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className="mt-2 flex flex-wrap gap-2">
-                                            <span className="text-[10px] text-stone-500 flex items-center gap-1 uppercase tracking-widest font-bold"><Info size={12} /> Variables courantes :</span>
-                                            <button onClick={() => updateCounter(counter.id, 'formula', counter.formula + ' + XP_TOTAL')} className="text-[10px] px-2 py-0.5 bg-stone-800 hover:bg-stone-700 border border-stone-700 rounded font-mono text-stone-400">XP_TOTAL</button>
-                                            <button onClick={() => updateCounter(counter.id, 'formula', counter.formula + ' + SUM_MYSTIC')} className="text-[10px] px-2 py-0.5 bg-stone-800 hover:bg-stone-700 border border-stone-700 rounded font-mono text-stone-400">SUM_MYSTIC</button>
-                                            <button onClick={() => updateCounter(counter.id, 'formula', counter.formula + ' + Volonté')} className="text-[10px] px-2 py-0.5 bg-stone-800 hover:bg-stone-700 border border-stone-700 rounded font-mono text-stone-400">Volonté</button>
-                                            <button onClick={() => updateCounter(counter.id, 'formula', counter.formula + ' + Physique')} className="text-[10px] px-2 py-0.5 bg-stone-800 hover:bg-stone-700 border border-stone-700 rounded font-mono text-stone-400">Physique</button>
+
+                                        <div className="mt-3">
+                                            <span className="text-[10px] text-stone-500 flex items-center gap-1 uppercase tracking-widest font-bold mb-2">
+                                                <Info size={12} /> Suggestions rapides (cliquez pour ajouter) :
+                                            </span>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {allVariables
+                                                    .filter(v => ['XP_TOTAL', 'SUM_MYSTIC', 'Physique', 'Volonté', 'Constitution', 'Empathie', 'Intelligence'].includes(v))
+                                                    .map(v => (
+                                                        <button
+                                                            key={v}
+                                                            onClick={() => updateCounter(counter.id, 'formula', (counter.formula.trim() ? counter.formula + ' + ' : '') + v)}
+                                                            className="text-[10px] px-2 py-1 bg-stone-800 hover:bg-stone-700 border border-stone-700 rounded font-mono text-stone-400 transition-all hover:text-amber-400"
+                                                        >
+                                                            {v}
+                                                        </button>
+                                                    ))
+                                                }
+                                                <span className="text-stone-700 text-[10px] self-center ml-2 italic">Tapez pour chercher d'autres variables...</span>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -216,6 +381,38 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                     </div>
                 )}
             </div>
+
+            {/* Maintenance & Unification Tool */}
+            {orphanCount > 0 && (
+                <div className="mt-12 p-6 border-2 border-amber-600/30 bg-amber-600/5 rounded-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex flex-col md:flex-row gap-6 items-center">
+                        <div className="bg-amber-600/20 p-4 rounded-full text-amber-500">
+                            <Wand2 size={32} />
+                        </div>
+                        <div className="flex-grow text-center md:text-left">
+                            <h3 className="text-xl font-bold text-amber-500 flex items-center gap-2 justify-center md:justify-start">
+                                <AlertTriangle size={20} className="animate-pulse" />
+                                Unification du Système ({orphanCount})
+                            </h3>
+                            <p className="text-stone-400 text-sm mt-2 max-w-2xl">
+                                Il reste des traits utilisant des formules "orphelines" (définies directement dans le trait).
+                                Pour une meilleure gestion, nous recommandons de les migrer vers ce dictionnaire central.
+                            </p>
+                            <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
+                                <button
+                                    onClick={autoMigrateFormulas}
+                                    className="flex items-center gap-2 px-6 py-2 bg-amber-600 text-stone-950 rounded-sm font-black uppercase text-xs tracking-widest hover:bg-amber-500 transition-all shadow-glow-gold hover:scale-105 active:scale-95"
+                                >
+                                    <ShieldCheck size={16} /> Centraliser tout maintenant
+                                </button>
+                                <span className="text-[10px] text-stone-500 italic self-center">
+                                    Cette action crée automatiquement des entrées globales et lie les traits concernés.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </MotionCard>
     );
 };

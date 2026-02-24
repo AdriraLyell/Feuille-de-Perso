@@ -18,6 +18,7 @@ interface CountersSectionProps {
     isLandscape: boolean;
     creationBonuses?: Record<string, number>;
     xpBonuses?: Record<string, number>;
+    activeReserves?: string[];
 }
 
 export const CountersSection = React.memo<CountersSectionProps>(({
@@ -25,7 +26,8 @@ export const CountersSection = React.memo<CountersSectionProps>(({
     updateCounter,
     isLandscape,
     creationBonuses = {},
-    xpBonuses = {}
+    xpBonuses = {},
+    activeReserves = []
 }) => {
     const { rules } = useRules();
 
@@ -229,6 +231,27 @@ export const CountersSection = React.memo<CountersSectionProps>(({
                     {customCounters
                         .filter(c => c.name?.trim())
                         .map(c => renderCounterItem(c, true))}
+
+                    {/* Global Reserves from Formulas Dictionary */}
+                    {activeReserves.map(formulaId => {
+                        const formulaEntry = rules?.libraries?.formulas?.find(f => f.id === formulaId);
+                        if (!formulaEntry) return null;
+
+                        // Mock a counter entry for the renderer if it doesn't exist in data
+                        // This allows dynamic reserves to show up just by having the trait
+                        const existingCustom = customCounters.find(c => normalizeString(c.name) === normalizeString(formulaEntry.name));
+                        const counterToRender: DotEntry = existingCustom || {
+                            id: formulaId,
+                            name: formulaEntry.name,
+                            value: 0,
+                            creationValue: 0,
+                            current: 0,
+                            max: 0,
+                            description: formulaEntry.description
+                        };
+
+                        return renderNumericCounterItem(counterToRender, formulaEntry);
+                    })}
                 </div>
             </div>
         </div>

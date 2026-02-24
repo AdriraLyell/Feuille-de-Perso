@@ -62,7 +62,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
     const { rules } = useRules();
 
     // --- Hooks logic ---
-    const { attributeBonuses, blockedSkills, counterCreationBonuses, counterXPBonuses } = useCharacterBonuses(
+    const { attributeBonuses, blockedSkills, counterCreationBonuses, counterXPBonuses, activeReserves } = useCharacterBonuses(
         data.page2.avantages,
         data.page2.desavantages,
         data.library,
@@ -218,6 +218,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                     isLandscape={isLandscape}
                                     creationBonuses={counterCreationBonuses}
                                     xpBonuses={counterXPBonuses}
+                                    activeReserves={activeReserves}
                                 />
                             </div>
                         </>
@@ -234,6 +235,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                     isLandscape={isLandscape}
                                     creationBonuses={counterCreationBonuses}
                                     xpBonuses={counterXPBonuses}
+                                    activeReserves={activeReserves}
                                 />
                             </div>
                         </div>

@@ -85,6 +85,8 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         return counters.sort((a, b) => a.name.localeCompare(b.name));
     }, [rules.definitions.counters]);
 
+    const allFormulas = rules.libraries?.formulas || [];
+
     // Helpers
     const handleOpenNew = useCallback(() => {
         setError(null);
@@ -332,6 +334,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         allSkills,
         allAttributes,
         allCounters,
+        allFormulas,
 
         // Handlers
         handleOpenNew,

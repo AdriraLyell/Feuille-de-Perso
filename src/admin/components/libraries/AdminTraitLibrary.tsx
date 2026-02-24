@@ -41,6 +41,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
         allSkills,
         allAttributes,
         allCounters,
+        allFormulas,
 
         // Handlers
         handleOpenNew,
@@ -239,6 +240,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
                         allSkills={allSkills}
                         allAttributes={allAttributes}
                         allCounters={allCounters}
+                        allFormulas={allFormulas}
                         tagInput={tagInput}
                         error={error}
                         setEditForm={setEditForm}

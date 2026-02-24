@@ -1,8 +1,15 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.75.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.80.0)
 
-> **Dernière mise à jour** : 2026-02-23 — Version 2.75.0
+> **Dernière mise à jour** : 2026-02-24 — Version 2.80.0
 
 ## 1. Phases Complétées
+
+### ✅ Phase 38 : Unification des Mécaniques par Formules (v2.80.0)
+- [x] **Dictionnaire Central** : Intégration du `AdminFormulasEditor` pour gérer les formules globales (Bonus & Réserves).
+- [x] **Injection Admin** : Support du `formulaId` dans l'éditeur de traits avec sélection via dropdown.
+- [x] **Réserves Dynamiques** : Support des formules de type 'reserve' qui s'injectent automatiquement dans la `CountersSection` de la fiche personnage.
+- [x] **XP Engine Corrigé** : Mise à jour de `xpCalculator` pour résoudre les formules globales via leur ID.
+- [x] **Maintenance** : Création d'un outil de migration "One-Click" dans l'admin pour centraliser les formules orphelines.
 
 ### ✅ Phase 37 : Notifications Temps Réel (v2.75.0)
 - [x] **Infrastructure** : Activation de `supabase_realtime` sur les tables `game_settings` et `characters`.

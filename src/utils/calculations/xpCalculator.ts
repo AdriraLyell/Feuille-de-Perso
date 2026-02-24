@@ -65,7 +65,17 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
     const formulaBonusBreakdown: ExperienceBreakdownItem[] = [];
 
     xpFormulaEffects.forEach(e => {
-        if (!e.formula) return;
+        // Resolve formula string: favor formulaId if present in rules
+        let formulaString = e.formula;
+        if (e.formulaId && rules?.libraries?.formulas) {
+            const globalFormula = rules.libraries.formulas.find(f => f.id === e.formulaId);
+            if (globalFormula) {
+                formulaString = globalFormula.formula;
+            }
+        }
+
+        if (!formulaString) return;
+
         const dataForEval = {
             ...data,
             variables: {
@@ -75,7 +85,7 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
             }
         };
         try {
-            const result = evaluateFormula(e.formula, dataForEval);
+            const result = evaluateFormula(formulaString, dataForEval);
             if (result !== 0) {
                 totalTraitXP += result;
                 formulaBonusBreakdown.push({
