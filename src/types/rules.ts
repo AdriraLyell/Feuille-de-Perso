@@ -1,4 +1,4 @@
-import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry } from './system';
+import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry, LibraryFormulaEntry } from './system';
 
 export interface RulesCreationConfig {
     mode: 'points' | 'rangs';
@@ -114,6 +114,7 @@ export interface RulesData {
         counters: LibraryCounterEntry[]; // Unified Counters
         specializations: LibrarySpecializationEntry[];
         mysticAbilities: LibrarySkillEntry[];
+        formulas?: LibraryFormulaEntry[]; // Dictionnaire central des formules
     };
 }
 // --- Calendar ---

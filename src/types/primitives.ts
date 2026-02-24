@@ -91,7 +91,8 @@ export interface TraitEffect {
   target?: string; // Nom de la compétence ciblée (pour free_skill_rank) ou cible de la formule
   source?: string; // Nom du trait d'origine (optionnel)
   associatedCounterId?: string; // Rétrocompatibilité ou option alternative
-  formula?: string; // La formule à évaluer (ex: "+2", "Volonté / 2")
+  formula?: string; // (Legacy/Transitoire) La formule à évaluer (ex: "+2", "Volonté / 2")
+  formulaId?: string; // NEW: Le lien vers la formule globale du Dictionnaire
 }
 
 export interface PostItData {

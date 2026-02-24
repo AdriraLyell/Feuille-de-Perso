@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { RulesData } from '../../../types/rules';
-import { LibraryCounterEntry } from '../../../types';
+import { LibraryFormulaEntry } from '../../../types';
 import { generateId } from '../../../utils/factories';
 import { evaluateFormula } from '../../../utils/formulaEvaluator';
 import { Trash2, Plus, Calculator, Info, Check } from 'lucide-react';
@@ -21,27 +21,27 @@ interface AdminFormulasEditorProps {
 }
 
 const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpdate }) => {
-    const lib = rules.libraries?.counters || [];
-    const formulaCounters = lib.filter(c => c.isNumeric);
+    const lib = rules.libraries?.formulas || [];
+    const formulaCounters = lib; // Now it contains all formulas
 
     const [editingId, setEditingId] = useState<string | null>(null);
     const [previewValue, setPreviewValue] = useState<number | null>(null);
 
-    const handleUpdate = (newLib: LibraryCounterEntry[]) => {
+    const handleUpdate = (newLib: LibraryFormulaEntry[]) => {
         onUpdate({
             ...rules,
             libraries: {
                 ...rules.libraries,
-                counters: newLib
+                formulas: newLib
             }
         });
     };
 
     const addCounter = () => {
-        const newCounter: LibraryCounterEntry = {
+        const newCounter: LibraryFormulaEntry = {
             id: generateId(),
-            name: "Nouveau Compteur",
-            isNumeric: true,
+            name: "Nouvelle Formule",
+            type: 'effect',
             formula: "10",
             isActive: true,
             isGlobal: true,
@@ -52,7 +52,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
         setPreviewValue(evaluateFormula("10", DUMMY_PREVIEW_DATA));
     };
 
-    const updateCounter = (id: string, field: keyof LibraryCounterEntry, value: any) => {
+    const updateCounter = (id: string, field: keyof LibraryFormulaEntry, value: any) => {
         const newLib = lib.map(c => c.id === id ? { ...c, [field]: value } : c);
         handleUpdate(newLib);
 
@@ -85,7 +85,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                     onClick={addCounter}
                     className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-stone-950 rounded-sm font-bold shadow-glow-gold hover:bg-amber-500 transition-colors"
                 >
-                    <Plus size={16} /> Nouvelle Résèrve
+                    <Plus size={16} /> Nouvelle Formule
                 </button>
             </div>
 
@@ -137,7 +137,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                 <div className="p-4 border-t border-stone-700/50 bg-stone-900 flex flex-col gap-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Nom de la réserve</label>
+                                            <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Nom (ex: Calcul du Mana)</label>
                                             <input
                                                 type="text"
                                                 value={counter.name}
@@ -157,7 +157,25 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                     </div>
 
                                     <div>
-                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Formule de Max calculé</label>
+                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Type de Formule</label>
+                                        <div className="flex gap-2 p-1 bg-stone-950 rounded border border-stone-700/50 w-fit">
+                                            <button
+                                                onClick={() => updateCounter(counter.id, 'type', 'effect')}
+                                                className={`px-3 py-1 text-xs font-bold rounded ${counter.type === 'effect' ? 'bg-amber-600 text-stone-900' : 'text-stone-400 hover:text-stone-300'}`}
+                                            >
+                                                Effet Invisible
+                                            </button>
+                                            <button
+                                                onClick={() => updateCounter(counter.id, 'type', 'reserve')}
+                                                className={`px-3 py-1 text-xs font-bold rounded ${counter.type === 'reserve' ? 'bg-amber-600 text-stone-900' : 'text-stone-400 hover:text-stone-300'}`}
+                                            >
+                                                Réserve Joueur (Jauge)
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Équation Mathématique</label>
                                         <div className="flex gap-2">
                                             <input
                                                 type="text"
@@ -181,7 +199,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                             onClick={() => removeCounter(counter.id)}
                                             className="flex items-center gap-2 px-3 py-1.5 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded text-xs font-bold transition-colors"
                                         >
-                                            <Trash2 size={14} /> Supprimer la réserve
+                                            <Trash2 size={14} /> Supprimer
                                         </button>
                                     </div>
                                 </div>
@@ -194,7 +212,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                     <div className="text-center p-12 bg-stone-900/40 rounded-sm border-2 border-dashed border-stone-800/50 text-stone-500">
                         <Calculator size={48} className="mx-auto mb-4 opacity-50" />
                         <h3 className="text-lg font-bold font-serif mb-1 text-stone-400">Aucune Formule créée</h3>
-                        <p className="text-sm">Cliquez sur "Nouvelle Résèrve" pour créer un compteur dynamique commun à tous les personnages.</p>
+                        <p className="text-sm">Cliquez sur "Nouvelle Formule" pour créer un calcul partagé.</p>
                     </div>
                 )}
             </div>

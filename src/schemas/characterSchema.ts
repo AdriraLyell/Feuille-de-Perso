@@ -92,7 +92,11 @@ export const TraitEffectSchema = z.object({
     type: z.enum(['free_skill_rank', 'auto_counter', 'master_skill', 'block_skill_increase', 'xp_upgradeable', 'formula']),
     value: z.number(),
     method: z.enum(['fixed', 'per_scenario']).optional(),
-    target: z.string().optional()
+    target: z.string().optional(),
+    source: z.string().optional(),
+    associatedCounterId: z.string().optional(),
+    formula: z.string().optional(),
+    formulaId: z.string().optional()
 });
 
 // --- System ---

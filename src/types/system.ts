@@ -172,6 +172,16 @@ export interface LibraryCounterEntry {
   formula?: string;
 }
 
+export interface LibraryFormulaEntry {
+  id: string;
+  name: string;
+  formula: string;
+  type: 'effect' | 'reserve'; // 'effect' = Bonus mécanique (ex: +1 Force), 'reserve' = Compteur dynamique (ex: Mana)
+  description?: string;
+  isGlobal?: boolean;
+  isActive?: boolean;
+}
+
 export interface LogEntry {
   id: string;
   timestamp: string;
