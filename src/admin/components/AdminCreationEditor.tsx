@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sliders, Settings } from 'lucide-react';
+import { Sliders, Settings, Calculator } from 'lucide-react';
 import { RulesData } from '../../types/rules';
 import CreationGeneralSettings from './creation/CreationGeneralSettings';
 import RankSlotsConfig from './creation/RankSlotsConfig';
@@ -12,6 +12,7 @@ import { ConfigQuickSummary } from './creation/ConfigQuickSummary';
 import CreationMysticSettings from './creation/CreationMysticSettings';
 import { XPCostConfig } from './creation/XPCostConfig';
 import { RankExtensionConfig } from './creation/RankExtensionConfig';
+import AdminFormulasEditor from './creation/AdminFormulasEditor';
 
 interface AdminCreationEditorProps {
     rules: RulesData;
@@ -22,7 +23,7 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
     const config = rules.configurations.creation;
     const cardConfig = rules.configurations.cards;
 
-    const [activeTab, setActiveTab] = React.useState<'creation' | 'settings'>('creation');
+    const [activeTab, setActiveTab] = React.useState<'creation' | 'settings' | 'formulas'>('creation');
 
     const {
         updateCreationConfig,
@@ -37,7 +38,8 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
 
     const tabs = [
         { id: 'creation', label: 'Création', icon: <Sliders size={16} /> },
-        { id: 'settings', label: 'Paramètres', icon: <Settings size={16} /> }
+        { id: 'settings', label: 'Paramètres', icon: <Settings size={16} /> },
+        { id: 'formulas', label: 'Formules', icon: <Calculator size={16} /> }
     ] as const;
 
     return (
@@ -145,6 +147,15 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
                                 onSync={syncMysticTraits}
                             />
                         </div>
+                    </MotionFade>
+                )}
+
+                {activeTab === 'formulas' && (
+                    <MotionFade key="formulas-tab" className="h-full">
+                        <AdminFormulasEditor
+                            rules={rules}
+                            onUpdate={onUpdate}
+                        />
                     </MotionFade>
                 )}
             </div>

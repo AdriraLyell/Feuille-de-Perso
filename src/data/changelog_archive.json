@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.75.4",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Registre : Suppression du sélecteur de format portrait/paysage pour revenir à l'affichage standard (Attributs en lignes, Compétences en lignes) tout en conservant l'accordéon et le nouvel alignement des traits."
+    },
+    {
         "version": "2.75.3",
         "date": "2026-02-23",
         "type": "feat",
@@ -592,11 +598,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Correction d'une erreur de validation (Zod) au chargement du personnage liée aux nouveaux IDs d'effets de traits."
-    },
-    {
-        "version": "2.56.26",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de la persistance du mode de calcul des bonus XP (Fixe vs Par Scénario) dans les bibliothèques Admin."
     }
 ]

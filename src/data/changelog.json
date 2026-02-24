@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.76.5",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Système de Formules : L'onglet Formules a été déplacé du panneau des Paramètres Joueur (Rouage de la fiche) vers l'interface d'Administration (Général et création > Formules). Les formules sont désormais des paramètres globaux injectés directement aux fiches par le MJ."
+    },
+    {
         "version": "2.76.4",
         "date": "2026-02-24",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-23",
         "type": "feat",
         "description": "Ergonomie : Ajout de menus accordéons pour les sections 'Compétences' et 'Traits' dans le Registre, permettant de réduire l'encombrement visuel lors de la consultation."
-    },
-    {
-        "version": "2.75.4",
-        "date": "2026-02-23",
-        "type": "fix",
-        "description": "Registre : Suppression du sélecteur de format portrait/paysage pour revenir à l'affichage standard (Attributs en lignes, Compétences en lignes) tout en conservant l'accordéon et le nouvel alignement des traits."
     }
 ]
