@@ -98,6 +98,7 @@ export interface CharacterSheetData {
   backgroundLibrary?: LibraryBackgroundEntry[]; // Catalogue d'arrière-plans
   counterLibrary?: LibraryCounterEntry[]; // Catalogue de compteurs
   mysticAbilities?: LibrarySkillEntry[] | null; // Categories of mystic powers (Martial Arts, Magic, etc.)
+  variables?: Record<string, number>; // Variables pour les formules (ex: CONSTANTES MJ)
   xpLogs: XPEntry[];
   xpTransactions: XPTransaction[];
   appLogs: LogEntry[];

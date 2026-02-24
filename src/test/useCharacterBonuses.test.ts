@@ -18,7 +18,7 @@ describe('useCharacterBonuses Hook', () => {
             cost: '1',
             pointsLabel: '1',
             description: '',
-            effects: [{ id: 'e1', type: 'attribute_bonus', target: 'constitution', value: 1 }]
+            effects: [{ id: 'e1', type: 'formula', formula: '1', target: 'constitution', value: 0 }]
         }];
 
         const { result } = renderHook(() => useCharacterBonuses(avantages, [], library));
@@ -41,7 +41,7 @@ describe('useCharacterBonuses Hook', () => {
                 cost: '1',
                 pointsLabel: '1',
                 description: '',
-                effects: [{ id: 'e1', type: 'attribute_bonus', target: 'dexterity', value: 1 }]
+                effects: [{ id: 'e1', type: 'formula', formula: '1', target: 'dexterity', value: 0 }]
             },
             {
                 id: '2',
@@ -50,7 +50,7 @@ describe('useCharacterBonuses Hook', () => {
                 cost: '1',
                 pointsLabel: '1',
                 description: '',
-                effects: [{ id: 'e2', type: 'attribute_bonus', target: 'dexterity', value: 1 }]
+                effects: [{ id: 'e2', type: 'formula', formula: '1', target: 'dexterity', value: 0 }]
             }
         ];
 

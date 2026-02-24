@@ -62,12 +62,10 @@ const TraitCardItemEffects: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
 
     const getEffectLabel = (eff: any) => {
         switch (eff.type) {
-            case 'xp_bonus': return `Bonus XP : ${eff.value} ${eff.method === 'per_scenario' ? '/ session' : ''}`;
+            case 'formula': return `Calcul Formule : ${eff.target || '?'} = ${eff.formula}`;
             case 'free_skill_rank': return `Rang gratuit : ${eff.target || '?'} (+${eff.value})`;
-            case 'attribute_bonus': return `Bonus Attribut : ${eff.target || '?'} (+${eff.value})`;
             case 'auto_counter': return `Compteur Auto${eff.target ? ` : ${eff.target}` : ''}`;
             case 'master_skill': return `Maître : compétence au rang 5 (choix joueur)`;
-            case 'counter_max_bonus': return `Bonus Max ${eff.target || 'Compteur'} (+${eff.value})`;
             case 'xp_upgradeable': return `Améliorable via XP`;
             default: return 'Effet inconnu';
         }

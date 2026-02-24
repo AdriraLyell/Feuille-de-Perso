@@ -261,7 +261,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
 
     const addEffect = useCallback(() => {
         if (!editForm) return;
-        const newEffect: TraitEffect = { id: crypto.randomUUID(), type: 'xp_bonus', value: 0 };
+        const newEffect: TraitEffect = { id: crypto.randomUUID(), type: 'formula', value: 0 };
         setEditForm({ ...editForm, effects: [...(editForm.effects || []), newEffect] });
     }, [editForm]);
 

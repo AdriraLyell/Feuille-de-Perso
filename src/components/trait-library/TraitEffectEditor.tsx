@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TraitEffect } from '../../types';
-import { Zap, X, Star, GraduationCap, Dumbbell, ChevronDown, Trophy, PlusCircle, TrendingUp } from 'lucide-react';
+import { Zap, X, Star, GraduationCap, Dumbbell, ChevronDown, Trophy, PlusCircle, TrendingUp, Calculator } from 'lucide-react';
 
 interface TraitEffectEditorProps {
     effects: TraitEffect[];
@@ -50,21 +50,16 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                     let borderColor = 'border-amber-200';
                     let bgColor = 'bg-white';
 
-                    if (effect.type === 'xp_bonus') {
-                        typeIcon = <Star size={14} />;
-                        themeColor = 'text-amber-800';
-                        borderColor = 'border-amber-400/30';
-                        bgColor = 'bg-amber-50/40';
+                    if (effect.type === 'formula') {
+                        typeIcon = <Calculator size={14} />;
+                        themeColor = 'text-indigo-800';
+                        borderColor = 'border-indigo-400/30';
+                        bgColor = 'bg-indigo-50/40';
                     } else if (effect.type === 'free_skill_rank') {
                         typeIcon = <GraduationCap size={14} />;
                         themeColor = 'text-blue-800';
                         borderColor = 'border-blue-400/30';
                         bgColor = 'bg-blue-50/40';
-                    } else if (effect.type === 'attribute_bonus') {
-                        typeIcon = <Dumbbell size={14} />;
-                        themeColor = 'text-[#8b2e2e]';
-                        borderColor = 'border-[#8b2e2e]/30';
-                        bgColor = 'bg-[#8b2e2e]/5';
                     } else if (effect.type === 'auto_counter') {
                         typeIcon = <Zap size={14} />;
                         themeColor = 'text-emerald-800';
@@ -75,11 +70,6 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                         themeColor = 'text-purple-800';
                         borderColor = 'border-purple-400/30';
                         bgColor = 'bg-purple-50/40';
-                    } else if (effect.type === 'counter_max_bonus') {
-                        typeIcon = <PlusCircle size={14} />;
-                        themeColor = 'text-cyan-800';
-                        borderColor = 'border-cyan-400/30';
-                        bgColor = 'bg-cyan-50/40';
                     } else if (effect.type === 'xp_upgradeable') {
                         typeIcon = <TrendingUp size={14} />;
                         themeColor = 'text-orange-800';
@@ -102,13 +92,12 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                             value={effect.type}
                                             onChange={(e) => onUpdate(effect.id, 'type', e.target.value as any)}
                                         >
-                                            <option value="attribute_bonus" className="text-gray-900 bg-white">Bonus d'Attribut (Stats)</option>
-                                            <option value="xp_bonus" className="text-gray-900 bg-white">Bonus d'XP (Scénarios)</option>
-                                            <option value="free_skill_rank" className="text-gray-900 bg-white">Rang de Compétence Offert</option>
+                                            <option value="formula" className="text-gray-900 bg-white font-bold bg-indigo-50">Calcul par Formule</option>
+
+                                            <option value="free_skill_rank" className="text-gray-900 bg-white border-t border-gray-200 mt-1">Rang de Compétence Offert</option>
                                             <option value="auto_counter" className="text-gray-900 bg-white">Compteur Automatique (Magie, etc.)</option>
                                             <option value="master_skill" className="text-gray-900 bg-white">Maîtrise (Rang 5 direct)</option>
                                             <option value="block_skill_increase" className="text-gray-900 bg-white">Bloquer une Progression</option>
-                                            <option value="counter_max_bonus" className="text-gray-900 bg-white">Confiance / Volonté (+ Max)</option>
                                             <option value="xp_upgradeable" className="text-gray-900 bg-white">Trait Améliorable (XP)</option>
                                         </select>
                                         <ChevronDown size={12} className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${themeColor} opacity-50`} />
@@ -121,33 +110,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
 
                             {/* Content Row: Specific Inputs */}
                             <div className="p-3">
-                                {effect.type === 'xp_bonus' ? (
-                                    <div className="flex flex-col gap-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[10px] font-bold text-[#5c4d41] uppercase tracking-wide w-24">Type de Bonus :</span>
-                                            <select
-                                                className="flex-grow text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1 focus:border-amber-500 outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm cursor-pointer"
-                                                value={effect.method || 'fixed'}
-                                                onChange={(e) => onUpdate(effect.id, 'method', e.target.value as any)}
-                                            >
-                                                <option value="fixed">Montant Fixe</option>
-                                                <option value="per_scenario">Par Scénario Joué</option>
-                                            </select>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[10px] font-bold text-[#5c4d41] uppercase tracking-wide w-24">
-                                                {effect.method === 'per_scenario' ? 'XP / Scénario :' : 'Montant XP :'}
-                                            </span>
-                                            <input
-                                                type="number"
-                                                className="flex-grow border border-[#bfae85]/30 rounded-sm px-2 py-1 text-sm font-mono text-center focus:border-amber-500 outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm"
-                                                placeholder="0"
-                                                value={effect.value}
-                                                onChange={(e) => onUpdate(effect.id, 'value', parseInt(e.target.value) || 0)}
-                                            />
-                                        </div>
-                                    </div>
-                                ) : effect.type === 'free_skill_rank' ? (
+                                {effect.type === 'free_skill_rank' ? (
                                     <div className="grid grid-cols-3 gap-3">
                                         <div className="col-span-2">
                                             <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest">Compétence</label>
@@ -216,34 +179,6 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                             </div>
                                         </div>
                                     </div>
-                                ) : effect.type === 'counter_max_bonus' ? (
-                                    <div className="flex flex-col gap-2">
-                                        <div className="flex flex-col">
-                                            <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest text-emerald-800">Cible (Compteur)</label>
-                                            <div className="relative">
-                                                <select
-                                                    className="w-full text-xs border border-emerald-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-emerald-500 outline-none bg-white font-bold"
-                                                    value={effect.target || ''}
-                                                    onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
-                                                >
-                                                    <option value="">-- Choisir un compteur --</option>
-                                                    {allCounters.map(c => (
-                                                        <option key={c.id} value={c.name}>{c.name}</option>
-                                                    ))}
-                                                </select>
-                                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-800/40" />
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest text-emerald-800">Bonus au Max (+)</label>
-                                            <input
-                                                type="number"
-                                                className="w-full text-xs border border-emerald-400/30 rounded-sm px-2 py-1.5 text-center focus:border-emerald-500 outline-none bg-white font-mono font-bold"
-                                                value={effect.value}
-                                                onChange={(e) => onUpdate(effect.id, 'value', parseInt(e.target.value) || 0)}
-                                            />
-                                        </div>
-                                    </div>
                                 ) : effect.type === 'xp_upgradeable' ? (
                                     <div className="flex flex-col gap-1 p-1 bg-orange-50/50 rounded border border-orange-200/50">
                                         <div className="flex items-center gap-2">
@@ -263,6 +198,62 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                 Celle-ci est automatiquement mise au <strong>rang 5</strong>, gratuitement (sans coût XP).<br />
                                                 La compétence revient à 0 si le trait est supprimé.
                                             </p>
+                                        </div>
+                                    </div>
+                                ) : effect.type === 'formula' ? (
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex flex-col">
+                                            <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest flex justify-between items-center">
+                                                <span>Cible du Calcul</span>
+                                                <span className="text-[8px] font-normal normal-case opacity-70 italic">Attribut, Compteur, Variables...</span>
+                                            </label>
+                                            <div className="relative">
+                                                <select
+                                                    className="w-full text-xs border border-indigo-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-indigo-500 outline-none bg-white font-bold text-stone-800 shadow-sm"
+                                                    value={effect.target || ''}
+                                                    onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
+                                                >
+                                                    <option value="" className="italic text-stone-500">Choisir une cible existante ou l'écrire...</option>
+
+                                                    <optgroup label="Attributs">
+                                                        {allAttributes.map(a => <option key={a.id} value={a.name}>{a.name}</option>)}
+                                                    </optgroup>
+
+                                                    <optgroup label="Compteurs / Réserves">
+                                                        {allCounters.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                                                    </optgroup>
+                                                </select>
+                                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-800/40" />
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col">
+                                            <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest flex justify-between items-center">
+                                                <span>Équation (Formule Mathématique)</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className="w-full text-sm border border-indigo-400/30 rounded-sm px-3 py-2 bg-white text-stone-800 font-mono shadow-inner outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-bold tracking-wide"
+                                                placeholder="ex: +2, ou (Volonté/2) * TRAIT_LEVEL"
+                                                value={effect.formula || ''}
+                                                onChange={(e) => onUpdate(effect.id, 'formula', e.target.value)}
+                                                spellCheck={false}
+                                            />
+                                            <div className="mt-1 flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
+                                                <button
+                                                    onClick={() => onUpdate(effect.id, 'formula', (effect.formula || '') + 'TRAIT_LEVEL')}
+                                                    className="shrink-0 text-[9px] px-1.5 py-0.5 rounded border border-indigo-200 bg-indigo-50 text-indigo-800 hover:bg-indigo-100 font-mono font-bold transition-colors"
+                                                    title="Permet de démultiplier le bonus par le niveau (coût) du trait"
+                                                >
+                                                    + Var: TRAIT_LEVEL
+                                                </button>
+                                                <button
+                                                    onClick={() => onUpdate(effect.id, 'formula', (effect.formula || '') + 'TOTAL_XP')}
+                                                    className="shrink-0 text-[9px] px-1.5 py-0.5 rounded border border-indigo-200 bg-indigo-50 text-indigo-800 hover:bg-indigo-100 font-mono font-bold transition-colors"
+                                                >
+                                                    + Var: TOTAL_XP
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 ) : (
@@ -299,7 +290,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                     );
                 })}
             </div>
-        </div>
+        </div >
     );
 };
 

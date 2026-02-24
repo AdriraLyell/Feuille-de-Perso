@@ -10,15 +10,20 @@ import { calculateAttributeXP } from './xp/attributeXP';
 import { calculateTraitXP } from './xp/traitXP';
 import { calculateCounterXP } from './xp/counterXP';
 import { calculateSkillXP } from './xp/skillXP';
+import { evaluateFormula } from '../formulaEvaluator';
 
 export { triangular, getXPCost } from './xp/xpCore';
+
+interface ActiveEffect extends TraitEffect {
+    traitLevel: number;
+}
 
 /**
  * Calcule le bilan d'XP complet pour un personnage
  */
 export const calculateExperienceResults = (data: CharacterSheetData, rules?: RulesData): ExperienceData => {
     // 0. Extraction des effets actifs des traits
-    const activeEffects = getActiveTraitEffects(data, rules);
+    const activeEffects: ActiveEffect[] = getActiveTraitEffects(data, rules);
 
     // 1. Helpers pour les bonus
     const getFreeRankLimit = (skillName: string) => {
@@ -44,17 +49,11 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
         return 0;
     };
 
-    // Calcul des bonus XP (Fixe vs Par Scénario)
-    const xpEffects = activeEffects.filter(e => e.type === 'xp_bonus');
+    // Calcul des bonus XP via Formules
+    const xpFormulaEffects = activeEffects.filter(e =>
+        e.type === 'formula' && e.target && e.target.trim().toUpperCase() === 'XP'
+    );
 
-    // Bonus Fixes
-    const fixedBonusBreakdown: ExperienceBreakdownItem[] = xpEffects
-        .filter(e => !e.method || e.method === 'fixed' && e.value !== 0)
-        .map(e => ({ name: `Bonus : ${e.source || 'Trait'}`, amount: e.value }));
-
-    const fixedBonus = fixedBonusBreakdown.reduce((sum, e) => sum + e.amount, 0);
-
-    // Bonus par Scénario
     const scenarioLogs = (data.xpLogs || []).filter(log =>
         log.countsAsScenario !== undefined
             ? log.countsAsScenario
@@ -62,16 +61,32 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
     );
     const scenarioCount = scenarioLogs.length;
 
-    const scenarioBonusBreakdown: ExperienceBreakdownItem[] = xpEffects
-        .filter(e => e.method === 'per_scenario' && e.value !== 0)
-        .map(e => ({
-            name: `Bonus : ${e.source || 'Apprentissage'} (${scenarioCount} sessions)`,
-            amount: e.value * scenarioCount
-        }));
+    let totalTraitXP = 0;
+    const formulaBonusBreakdown: ExperienceBreakdownItem[] = [];
 
-    const perScenarioBonus = scenarioBonusBreakdown.reduce((sum, e) => sum + e.amount, 0);
-
-    const totalTraitXP = fixedBonus + perScenarioBonus;
+    xpFormulaEffects.forEach(e => {
+        if (!e.formula) return;
+        const dataForEval = {
+            ...data,
+            variables: {
+                ...(data.variables || {}),
+                TRAIT_LEVEL: e.traitLevel,
+                SCENARIOS_COUNT: scenarioCount
+            }
+        };
+        try {
+            const result = evaluateFormula(e.formula, dataForEval);
+            if (result !== 0) {
+                totalTraitXP += result;
+                formulaBonusBreakdown.push({
+                    name: `Bonus : ${e.source || 'Trait'}`,
+                    amount: result
+                });
+            }
+        } catch (err) {
+            console.error(`Error calculating XP formula for trait ${e.source}:`, err);
+        }
+    });
 
     // Gains de base (Log)
     const baseGainsBreakdown: ExperienceBreakdownItem[] = (data.xpLogs || [])
@@ -100,8 +115,6 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 
     if (totalTraitXP > 0) {
         gainDisplay += ` (+${totalTraitXP})`;
-        if (fixedBonus > 0) tooltip += `\nBonus Fixe : +${fixedBonus}`;
-        if (perScenarioBonus > 0) tooltip += `\nBonus Scénarios (${scenarioCount} sessions) : +${perScenarioBonus}`;
     }
 
     return {
@@ -110,7 +123,7 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
         spent: totalSpent.toString(),
         rest: (totalGain - totalSpent).toString(),
         breakdown: {
-            gains: [...baseGainsBreakdown, ...fixedBonusBreakdown, ...scenarioBonusBreakdown],
+            gains: [...baseGainsBreakdown, ...formulaBonusBreakdown],
             attributes: attributeResult.breakdown,
             skills: skillResult.breakdown,
             traits: traitResult.breakdown,
@@ -123,31 +136,31 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
  * Extrait tous les effets de traits actifs du personnage
  * Recherche d'abord dans la bibliothèque locale, puis dans les règles globales
  */
-function getActiveTraitEffects(data: CharacterSheetData, rules?: RulesData): TraitEffect[] {
-    const activeEffects: TraitEffect[] = [];
+function getActiveTraitEffects(data: CharacterSheetData, rules?: RulesData): ActiveEffect[] {
+    const activeEffects: ActiveEffect[] = [];
 
     const globalTraits = rules?.libraries?.traits || [];
     const globalTraitMap = new Map(globalTraits.map(t => [normalizeString(t.name), t]));
 
-    const findEffects = (traitName: string) => {
+    const findEffects = (traitName: string, traitLevel: number) => {
         if (!traitName) return;
         const normalizedName = normalizeString(traitName);
 
         // 1. Recherche Local
         const localEntry = data.library?.find(l => normalizeString(l.name) === normalizedName);
         if (localEntry && localEntry.effects && localEntry.effects.length > 0) {
-            localEntry.effects.forEach(e => activeEffects.push({ ...e, source: localEntry.name }));
+            localEntry.effects.forEach(e => activeEffects.push({ ...e, source: localEntry.name, traitLevel }));
             return;
         }
 
         // 2. Recherche Global
         const globalEntry = globalTraitMap.get(normalizedName);
         if (globalEntry && globalEntry.effects && globalEntry.effects.length > 0) {
-            globalEntry.effects.forEach(e => activeEffects.push({ ...e, source: globalEntry.name }));
+            globalEntry.effects.forEach(e => activeEffects.push({ ...e, source: globalEntry.name, traitLevel }));
         }
     };
 
-    data.page2?.avantages?.forEach(t => findEffects(t.name));
-    data.page2?.desavantages?.forEach(t => findEffects(t.name));
+    data.page2?.avantages?.forEach(t => findEffects(t.name, parseInt(t.value?.toString() || '1') || 1));
+    data.page2?.desavantages?.forEach(t => findEffects(t.name, parseInt(t.value?.toString() || '1') || 1));
     return activeEffects;
 }

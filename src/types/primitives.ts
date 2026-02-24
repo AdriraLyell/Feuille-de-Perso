@@ -82,15 +82,16 @@ export interface TraitEntry {
   type?: 'avantage' | 'desavantage';
 }
 
-export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus' | 'auto_counter' | 'master_skill' | 'block_skill_increase' | 'counter_max_bonus' | 'xp_upgradeable';
+export type EffectType = 'free_skill_rank' | 'auto_counter' | 'master_skill' | 'block_skill_increase' | 'xp_upgradeable' | 'formula';
 export interface TraitEffect {
   id: string;
   type: EffectType;
   value: number; // Montant XP ou Rang Max Gratuit
   method?: 'fixed' | 'per_scenario';
-  target?: string; // Nom de la compétence ciblée (pour free_skill_rank)
+  target?: string; // Nom de la compétence ciblée (pour free_skill_rank) ou cible de la formule
   source?: string; // Nom du trait d'origine (optionnel)
   associatedCounterId?: string; // Rétrocompatibilité ou option alternative
+  formula?: string; // La formule à évaluer (ex: "+2", "Volonté / 2")
 }
 
 export interface PostItData {

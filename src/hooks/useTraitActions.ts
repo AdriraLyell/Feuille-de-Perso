@@ -142,7 +142,7 @@ export const useTraitActions = (
 
     const addEffect = useCallback(() => {
         if (!editForm) return;
-        const newEffect: TraitEffect = { id: Math.random().toString(36).substr(2, 9), type: 'xp_bonus', value: 0 };
+        const newEffect: TraitEffect = { id: Math.random().toString(36).substr(2, 9), type: 'formula', value: 0 };
         setEditForm({ ...editForm, effects: [...(editForm.effects || []), newEffect] });
     }, [editForm]);
 

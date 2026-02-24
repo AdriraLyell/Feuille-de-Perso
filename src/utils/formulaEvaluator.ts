@@ -3,8 +3,13 @@ import { CharacterSheetData } from '../types';
 /**
  * Extracts a map of variable names to their values from the character sheet.
  */
-export const getSheetVariables = (data: CharacterSheetData): Record<string, number> => {
+export const getSheetVariables = (data: CharacterSheetData & { variables?: Record<string, number> }): Record<string, number> => {
     const vars: Record<string, number> = {};
+
+    // 0. Explicit variables passed in (e.g., TRAIT_LEVEL)
+    if (data.variables) {
+        Object.assign(vars, data.variables);
+    }
 
     // 1. Special Variables
     vars['XP_TOTAL'] = parseFloat(data.experience?.gain || "0") || 0;
@@ -48,7 +53,7 @@ export const getSheetVariables = (data: CharacterSheetData): Record<string, numb
 /**
  * Evaluates a given formula against a character's state.
  */
-export const evaluateFormula = (formula: string, data: CharacterSheetData): number => {
+export const evaluateFormula = (formula: string, data: CharacterSheetData & { variables?: Record<string, number> }): number => {
     if (!formula) return 0;
     let computedFormula = formula;
 

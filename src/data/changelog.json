@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.78.0",
+        "date": "2026-02-24",
+        "description": "Migration des données et Nettoyage de Code : Script de migration (v4) pour convertir tous les anciens effets quantitatifs (attribute_bonus, xp_bonus, counter_max_bonus) vers le nouveau système de formules. Suppression complète des anciennes mentions de ces effets du code source."
+    },
+    {
+        "version": "2.77.0",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Système de Formules : Refonte des anciens modificateurs quantitatifs (+Attributs, +XP, +Comptoirs). Le créateur de trait (MJ) peut désormais utiliser l'option de calcul par Formule permettant de démultiplier les effets de n'importe quel attribut ou compteur à l'aide de données d'XP ou du Niveau de Trait."
+    },
+    {
         "version": "2.76.5",
         "date": "2026-02-24",
         "type": "feat",
@@ -106,17 +117,5 @@
         "date": "2026-02-23",
         "type": "fix",
         "description": "Ergonomie (Registre) : Alignement sur une seule ligne des contrôles de gestion de date et des boutons d'avancée du temps pour minimiser l'encombrement."
-    },
-    {
-        "version": "2.75.6",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Registre : Ajout d'une section 'Gestion Temporelle' permettant d'afficher la date actuelle de la chronique et d'avancer le temps (+1 Jour, +1 Semaine, +1 Mois) directement depuis l'interface."
-    },
-    {
-        "version": "2.75.5",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Ergonomie : Ajout de menus accordéons pour les sections 'Compétences' et 'Traits' dans le Registre, permettant de réduire l'encombrement visuel lors de la consultation."
     }
 ]
