@@ -59,6 +59,8 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         variants: []
     });
 
+    const { rules } = useRules();
+
     // --- Hooks logic ---
     const { attributeBonuses, blockedSkills, counterMaxBonuses } = useCharacterBonuses(
         data.page2.avantages,
@@ -73,8 +75,6 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         executeCreationActivation,
         setShowCreationWarning
     } = useCreationMode(data, onChange, onAddLog);
-
-    const { rules } = useRules();
 
     const {
         updateHeader,
