@@ -117,11 +117,5 @@
         "date": "2026-02-23",
         "type": "fix",
         "description": "Ergonomie (Registre) : Agrandissement de la taille du texte des valeurs dans le tableau des attributs pour améliorer la lisibilité."
-    },
-    {
-        "version": "2.75.8",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Ergonomie (Registre) : Affichage discret de la date courante de la chronique dans l'en-tête de la section 'Gestion Temporelle' lorsque celle-ci est repliée."
     }
 ]

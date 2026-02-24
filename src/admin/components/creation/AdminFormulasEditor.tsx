@@ -383,36 +383,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
             </div>
 
             {/* Maintenance & Unification Tool */}
-            {orphanCount > 0 && (
-                <div className="mt-12 p-6 border-2 border-amber-600/30 bg-amber-600/5 rounded-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex flex-col md:flex-row gap-6 items-center">
-                        <div className="bg-amber-600/20 p-4 rounded-full text-amber-500">
-                            <Wand2 size={32} />
-                        </div>
-                        <div className="flex-grow text-center md:text-left">
-                            <h3 className="text-xl font-bold text-amber-500 flex items-center gap-2 justify-center md:justify-start">
-                                <AlertTriangle size={20} className="animate-pulse" />
-                                Unification du Système ({orphanCount})
-                            </h3>
-                            <p className="text-stone-400 text-sm mt-2 max-w-2xl">
-                                Il reste des traits utilisant des formules "orphelines" (définies directement dans le trait).
-                                Pour une meilleure gestion, nous recommandons de les migrer vers ce dictionnaire central.
-                            </p>
-                            <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
-                                <button
-                                    onClick={autoMigrateFormulas}
-                                    className="flex items-center gap-2 px-6 py-2 bg-amber-600 text-stone-950 rounded-sm font-black uppercase text-xs tracking-widest hover:bg-amber-500 transition-all shadow-glow-gold hover:scale-105 active:scale-95"
-                                >
-                                    <ShieldCheck size={16} /> Centraliser tout maintenant
-                                </button>
-                                <span className="text-[10px] text-stone-500 italic self-center">
-                                    Cette action crée automatiquement des entrées globales et lie les traits concernés.
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Removed: Auto-migration is now handled transparently on campaign load */}
         </MotionCard>
     );
 };

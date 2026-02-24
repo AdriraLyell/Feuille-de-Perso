@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.75.8",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie (Registre) : Affichage discret de la date courante de la chronique dans l'en-tête de la section 'Gestion Temporelle' lorsque celle-ci est repliée."
+    },
+    {
         "version": "2.75.7",
         "date": "2026-02-23",
         "type": "fix",
@@ -592,11 +598,5 @@
         "date": "2026-02-20",
         "type": "fix",
         "description": "Correction du calcul du bonus d'XP par scénario (Traits). Les sessions sont désormais mieux détectées même si le montant est à 0 (détection via le nom du scénario). Amélioration des logs de diagnostic XP et fixation des erreurs de validation Zod lors du chargement initial."
-    },
-    {
-        "version": "2.56.30",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Sécurisation et typage strict des champs optionnels (mysticAbilityId, coûts, descriptions) à travers l'application. Harmonisation des Interfaces et Schémas Zod pour éliminer les erreurs de build et prévenir les plantages liés aux valeurs nulles."
     }
 ]
