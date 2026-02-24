@@ -62,7 +62,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
     const { rules } = useRules();
 
     // --- Hooks logic ---
-    const { attributeBonuses, blockedSkills, counterMaxBonuses } = useCharacterBonuses(
+    const { attributeBonuses, blockedSkills, counterCreationBonuses, counterXPBonuses } = useCharacterBonuses(
         data.page2.avantages,
         data.page2.desavantages,
         data.library,
@@ -212,7 +212,13 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                 <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
                             </div>
                             <div className="flex-grow overflow-hidden">
-                                <CountersSection data={data} updateCounter={updateCounter} isLandscape={isLandscape} bonuses={counterMaxBonuses} />
+                                <CountersSection
+                                    data={data}
+                                    updateCounter={updateCounter}
+                                    isLandscape={isLandscape}
+                                    creationBonuses={counterCreationBonuses}
+                                    xpBonuses={counterXPBonuses}
+                                />
                             </div>
                         </>
                     )}
@@ -221,8 +227,14 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                             <div className="border-r-2 border-stone-800 flex flex-col">
                                 <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
                             </div>
-                            <div className="flex flex-col">
-                                <CountersSection data={data} updateCounter={updateCounter} isLandscape={isLandscape} bonuses={counterMaxBonuses} />
+                            <div className="flex-col overflow-hidden">
+                                <CountersSection
+                                    data={data}
+                                    updateCounter={updateCounter}
+                                    isLandscape={isLandscape}
+                                    creationBonuses={counterCreationBonuses}
+                                    xpBonuses={counterXPBonuses}
+                                />
                             </div>
                         </div>
                     )}

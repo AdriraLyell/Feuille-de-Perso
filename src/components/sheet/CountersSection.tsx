@@ -7,24 +7,36 @@ import { useRules } from '../../context/RulesContext';
 import { useCharacter } from '../../context/CharacterContext';
 import { normalizeString } from '../../utils/stringUtils';
 import { TraitEffect } from '../../types';
+import { logger } from '../../utils/logger';
 
 interface CountersSectionProps {
     data: CharacterSheetData;
     updateCounter: (id: string, value: number, isCustom: boolean, field: 'value' | 'current') => void;
     isLandscape: boolean;
-    bonuses?: Record<string, number>;
+    creationBonuses?: Record<string, number>;
+    xpBonuses?: Record<string, number>;
 }
 
-export const CountersSection = React.memo<CountersSectionProps>(({ data, updateCounter, isLandscape, bonuses = {} }) => {
+export const CountersSection = React.memo<CountersSectionProps>(({
+    data,
+    updateCounter,
+    isLandscape,
+    creationBonuses = {},
+    xpBonuses = {}
+}) => {
     const { rules } = useRules();
-    const { data: charData } = useCharacter();
 
     const renderCounterItem = (counter: DotEntry, isCustom: boolean) => {
         const isSquaresOnly = counter.variant === 'squares_only';
+        const nameKey = normalizeString(counter.name);
 
-        // Apply counter_max_bonus effects from bonuses prop
-        const bonus = bonuses[normalizeString(counter.name)] || 0;
-        const effectiveMaxDotted = (counter.max || 10) + bonus;
+        const creationBonus = creationBonuses[nameKey] || 0;
+        const xpBonus = xpBonuses[nameKey] || 0;
+
+        // Final values for DotRating
+        const effectiveValue = counter.value + creationBonus + xpBonus;
+        const effectiveCreationValue = (counter.creationValue || 0) + creationBonus;
+        const effectiveMax = counter.max || 10;
 
         return (
             <div key={counter.id} className="col-span-1 border border-stone-300 bg-white rounded-sm shadow-sm flex items-center p-1 overflow-hidden h-9">
@@ -44,10 +56,14 @@ export const CountersSection = React.memo<CountersSectionProps>(({ data, updateC
                             <div className="relative w-[142px] h-3">
                                 <div className="absolute right-0 top-1/2 -translate-y-1/2 scale-[0.9] origin-right">
                                     <DotRating
-                                        value={counter.value}
-                                        creationValue={counter.creationValue}
-                                        max={effectiveMaxDotted}
-                                        onChange={(v) => updateCounter(counter.id, v, isCustom, 'value')}
+                                        value={effectiveValue}
+                                        creationValue={effectiveCreationValue}
+                                        max={effectiveMax}
+                                        onChange={(v) => {
+                                            // Subtract bonuses before updating base value
+                                            const newBaseValue = Math.max(0, v - creationBonus - xpBonus);
+                                            updateCounter(counter.id, newBaseValue, isCustom, 'value');
+                                        }}
                                         creationColor={data.theme?.creationColor}
                                         xpColor={data.theme?.xpColor}
                                         symbol={data.theme?.dotSymbol}
@@ -61,23 +77,10 @@ export const CountersSection = React.memo<CountersSectionProps>(({ data, updateC
                     <div className="flex items-center justify-end h-3 pr-1 gap-2 mt-0.5">
                         <div className="relative w-[142px] h-3">
                             <div className="absolute right-0 top-1/2 -translate-y-1/2 scale-[0.9] origin-right flex items-center space-x-1">
-                                {Array.from({ length: effectiveMaxDotted }).map((_, i) => {
-                                    // If squares_only, counter.value dictates how many squares are shown as "max active"
-                                    // Normally counter.value was max, but if it has a max=10, we could just show i < counter.max.
-                                    // Let's rely on counter.max for the full length, or counter.value if squares_only needs to be restricted.
-                                    // The user said: "seul les cases (squares) sont affichées, cachant la ligne de bulle inutilisée"
-                                    // so we show squares up to counter.max, and only the active ones are filled.
-                                    // Wait, if we hide the bubbles (Maxi), how do we set the maximum for squares_only?
-                                    // The "Maxi" line is what allows the player to INCREASE the length of the used counter if they spend XP. 
-                                    // So for squares_only, the max length might be fixed at counter.max, but what if they can increase it?
-                                    // Let's assume the max is static. No wait, in squares_only, the squares themselves represent the tracker. 
-                                    // We show squares up to counter.max.
-                                    if (i >= effectiveMaxDotted) {
-                                        return null;
-                                    }
+                                {Array.from({ length: effectiveMax }).map((_, i) => {
+                                    if (i >= effectiveMax) return null;
 
-                                    // If squares_only, we don't limit by counter.value if we don't want to track it, but we should always show them.
-                                    if (!isSquaresOnly && i >= counter.value) {
+                                    if (!isSquaresOnly && i >= effectiveValue) {
                                         return <div key={i} className="w-3 h-3" />;
                                     }
 
