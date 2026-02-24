@@ -1,5 +1,35 @@
 [
     {
+        "version": "2.75.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Notifications temps réel admin → joueur via Supabase Realtime (WebSocket). Les modifications apportées par le Maître de Jeu (calendrier, règles, données de fiche) sont désormais propagées instantanément à tous les joueurs connectés, sans rechargement de page. Une notification apparaît automatiquement dans l'historique des actions."
+    },
+    {
+        "version": "2.74.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Amélioration du Roster : Séparation des habiletés mystiques par catégorie parente. Chaque type d'habileté (Magie, Arts Martiaux, etc.) dispose désormais de son propre tiroir dans la matrice des compétences pour une meilleure clarté."
+    },
+    {
+        "version": "2.73.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Fusion et consolidation globale des compétences dans le Registre des Acteurs (Roster). Les compétences sont désormais classées selon le référentiel maître de la chronique, ignorant les classements individuels pour éviter les doublons. Ajout d'une gestion intelligente des variantes et regroupement automatique des capacités liées aux Habiletés Mystiques."
+    },
+    {
+        "version": "2.72.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Création du Registre des Acteurs (Roster View). Ajout d'une nouvelle URL publique '?roster=uuid' permettant d'afficher une présentation tabulaire et détaillée de l'ensemble des personnages joueurs d'une chronique. Accessible via un nouveau bouton raccourci sur les cartes de campagne depuis le Tableau de Bord Admin."
+    },
+    {
+        "version": "2.71.5",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Amélioration visuelle de l'interface des Habilités Mystiques. Lorsqu'un personnage a un accès sans limite (niveau 5+) aux compétences liées, le compteur par défaut (999) est remplacé par un symbole 'Infini' et un texte plus immersif ('SANS LIMITE' & 'Vous avez un accès illimité')."
+    },
+    {
         "version": "2.71.4",
         "date": "2026-02-22",
         "type": "fix",
@@ -568,35 +598,5 @@
         "date": "2026-02-19",
         "type": "feat",
         "description": "Amélioration de l'affichage de l'expérience (Total XP incluant les bonus + infobulle de détail). Ajout d'une case à cocher 'Session' dans l'historique d'XP pour contrôler explicitement quelles entrées comptent pour le bonus par scénario, résolvant les problèmes de détection automatique."
-    },
-    {
-        "version": "2.56.22",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Ajout de la possibilité de définir des bonus d'XP par scénario dans les effets de traits. L'XP totale est calculée dynamiquement en fonction du nombre de scénarios joués (entrées dans l'historique)."
-    },
-    {
-        "version": "2.56.21",
-        "date": "2026-02-19",
-        "type": "ui",
-        "description": "Amélioration du layout des bibliothèques Admin (Arrière-plans, Habilités Mystiques, Compétences) : le badge de catégorie de placement a été déplacé sous le nom de l'item, sur la même ligne que les icônes de statut, pour clarifier l'interface."
-    },
-    {
-        "version": "2.56.20",
-        "date": "2026-02-19",
-        "type": "refactor",
-        "description": "Refactorisation majeure de l'éditeur du grimoire (ColumnarEditor.tsx). Extraction de la barre d'outils, du fond de page et de la barre latérale des chapitres en composants distincts. Migration des styles CSS vers un fichier externe. Amélioration de la maintenabilité et réduction du bruit dans le fichier principal."
-    },
-    {
-        "version": "2.56.19",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Amélioration du placement automatique des compétences mystiques (Art Martial/Martiaux). Les compétences héritent désormais de la catégorie de placement de leur habilité parente si aucune n'est définie. Correction de la détection de la casse et du pluriel pour les Arts Martiaux."
-    },
-    {
-        "version": "2.56.18",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de la persistance de la catégorie de placement (localisation) pour les habilités mystiques en base de données (ajout des colonnes manquantes et mise à jour des services de synchronisation)."
     }
 ]

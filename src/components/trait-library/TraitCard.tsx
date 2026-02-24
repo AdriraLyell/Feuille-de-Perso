@@ -67,6 +67,8 @@ const TraitCardItemEffects: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
             case 'attribute_bonus': return `Bonus Attribut : ${eff.target || '?'} (+${eff.value})`;
             case 'auto_counter': return `Compteur Auto${eff.target ? ` : ${eff.target}` : ''}`;
             case 'master_skill': return `Maître : compétence au rang 5 (choix joueur)`;
+            case 'counter_max_bonus': return `Bonus Max ${eff.target || 'Compteur'} (+${eff.value})`;
+            case 'xp_upgradeable': return `Améliorable via XP`;
             default: return 'Effet inconnu';
         }
     };

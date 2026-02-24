@@ -60,10 +60,11 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
     });
 
     // --- Hooks logic ---
-    const attributeBonuses = useCharacterBonuses(
+    const { attributeBonuses, blockedSkills, counterMaxBonuses } = useCharacterBonuses(
         data.page2.avantages,
         data.page2.desavantages,
-        data.library
+        data.library,
+        rules?.libraries?.traits || []
     );
 
     const {
@@ -111,6 +112,16 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         const skill = allSkills.find(s => s.id === id);
         if (!skill) return { allowed: true };
 
+        // 0. Check for trait-based blocking
+        const normalizedName = skill.name.trim().toLowerCase();
+        const blockInfo = blockedSkills[normalizedName];
+        if (blockInfo && newValue > skill.value) {
+            return {
+                allowed: false,
+                reason: `L'augmentation de cette compétence est bloquée par le trait : ${blockInfo.sourceName}`
+            };
+        }
+
         // 1. Check Learning (0 -> 1)
         if (skill.value === 0 && newValue > 0) {
             return canLearnNewMysticSkill(data, skill.name, rules, !!creationActive);
@@ -122,7 +133,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         }
 
         return { allowed: true };
-    }, [data, rules, creationActive]);
+    }, [data, rules, creationActive, blockedSkills]);
 
     return (
         <div className={`flex justify-center transition-all duration-300 ${isEditMode ? 'pr-80' : ''}`}>
@@ -194,13 +205,14 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                     onDropItem={handleDropItem}
                     onRemoveItem={handleRemoveItem}
                     validateSkillIncrease={validateSkillIncrease}
+                    blockedSkills={blockedSkills}
                     renderExtraColumn={() => (
                         <>
                             <div className="flex-none border-b border-stone-400 overflow-hidden">
                                 <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
                             </div>
                             <div className="flex-grow overflow-hidden">
-                                <CountersSection data={data} updateCounter={updateCounter} isLandscape={isLandscape} />
+                                <CountersSection data={data} updateCounter={updateCounter} isLandscape={isLandscape} bonuses={counterMaxBonuses} />
                             </div>
                         </>
                     )}
@@ -210,7 +222,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                                 <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
                             </div>
                             <div className="flex flex-col">
-                                <CountersSection data={data} updateCounter={updateCounter} isLandscape={isLandscape} />
+                                <CountersSection data={data} updateCounter={updateCounter} isLandscape={isLandscape} bonuses={counterMaxBonuses} />
                             </div>
                         </div>
                     )}

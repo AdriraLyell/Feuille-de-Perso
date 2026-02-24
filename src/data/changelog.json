@@ -1,5 +1,35 @@
 [
     {
+        "version": "2.76.1",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Mécaniques : Correction d'un bug empêchant l'application des bonus de maximum de compteur (counter_max_bonus). Centralisation du calcul des bonus dans useCharacterBonuses et renforcement de la détection par normalisation des noms (accents/casse) et vérification systématique de la bibliothèque globale."
+    },
+    {
+        "version": "2.76.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Mécaniques : Implémentation du système de 'Confiance' et des effets complexes pour les traits. Introduction de l'effet 'counter_max_bonus' permettant d'augmenter dynamiquement le maximum d'un compteur (ex: +1 Confiance par rang de trait) et de l'effet 'xp_upgradeable' autorisant la montée en niveau de certains traits spécifiques via la dépense d'XP post-création. Mise à jour de l'éditeur de traits admin pour supporter ces nouveaux effets."
+    },
+    {
+        "version": "2.75.18",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Interface (Fiche) : Agrandissement de la zone de texte des noms de compteurs (Confiance, Volonté, etc.) pour une meilleure lisibilité et éviter les coupures de mots."
+    },
+    {
+        "version": "2.75.17",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Interface (Fiche) : Suppression des libellés 'MAXI' et 'UTILISÉ' (ou 'Cases') dans la section des compteurs pour un design plus épuré, conformément aux retours utilisateur."
+    },
+    {
+        "version": "2.75.16",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Mécaniques : Implémentation du blocage d'augmentation de compétence par les traits. Un trait peut désormais être configuré pour empêcher le joueur d'augmenter le niveau d'une compétence spécifique. Visualisation immédiate par le nom barré et la disparition des bulles de progression futures, avec retour d'erreur (toast) en cas de tentative d'augmentation."
+    },
+    {
         "version": "2.75.15",
         "date": "2026-02-23",
         "type": "fix",
@@ -88,35 +118,5 @@
         "date": "2026-02-23",
         "type": "fix",
         "description": "Ergonomie : Suppression du label textuel 'Réglages' dans la barre de navigation pour un design plus épuré, conservant uniquement l'icône avec une info-bulle d'aide."
-    },
-    {
-        "version": "2.75.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Notifications temps réel admin → joueur via Supabase Realtime (WebSocket). Les modifications apportées par le Maître de Jeu (calendrier, règles, données de fiche) sont désormais propagées instantanément à tous les joueurs connectés, sans rechargement de page. Une notification apparaît automatiquement dans l'historique des actions."
-    },
-    {
-        "version": "2.74.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Amélioration du Roster : Séparation des habiletés mystiques par catégorie parente. Chaque type d'habileté (Magie, Arts Martiaux, etc.) dispose désormais de son propre tiroir dans la matrice des compétences pour une meilleure clarté."
-    },
-    {
-        "version": "2.73.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Fusion et consolidation globale des compétences dans le Registre des Acteurs (Roster). Les compétences sont désormais classées selon le référentiel maître de la chronique, ignorant les classements individuels pour éviter les doublons. Ajout d'une gestion intelligente des variantes et regroupement automatique des capacités liées aux Habiletés Mystiques."
-    },
-    {
-        "version": "2.72.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Création du Registre des Acteurs (Roster View). Ajout d'une nouvelle URL publique '?roster=uuid' permettant d'afficher une présentation tabulaire et détaillée de l'ensemble des personnages joueurs d'une chronique. Accessible via un nouveau bouton raccourci sur les cartes de campagne depuis le Tableau de Bord Admin."
-    },
-    {
-        "version": "2.71.5",
-        "date": "2026-02-22",
-        "type": "feat",
-        "description": "Amélioration visuelle de l'interface des Habilités Mystiques. Lorsqu'un personnage a un accès sans limite (niveau 5+) aux compétences liées, le compteur par défaut (999) est remplacé par un symbole 'Infini' et un texte plus immersif ('SANS LIMITE' & 'Vous avez un accès illimité')."
     }
 ]

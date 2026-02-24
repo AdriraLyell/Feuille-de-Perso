@@ -1,12 +1,13 @@
 
 import React from 'react';
 import { TraitEffect } from '../../types';
-import { Zap, X, Star, GraduationCap, Dumbbell, ChevronDown, Trophy } from 'lucide-react';
+import { Zap, X, Star, GraduationCap, Dumbbell, ChevronDown, Trophy, PlusCircle, TrendingUp } from 'lucide-react';
 
 interface TraitEffectEditorProps {
     effects: TraitEffect[];
     allSkills: { id: string, name: string }[];
     allAttributes: { id: string, name: string }[];
+    allCounters: { id: string, name: string }[];
     onAdd: () => void;
     onUpdate: <K extends keyof TraitEffect>(id: string, field: K, value: TraitEffect[K]) => void;
     onRemove: (id: string) => void;
@@ -16,6 +17,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
     effects,
     allSkills,
     allAttributes,
+    allCounters,
     onAdd,
     onUpdate,
     onRemove
@@ -73,6 +75,16 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                         themeColor = 'text-purple-800';
                         borderColor = 'border-purple-400/30';
                         bgColor = 'bg-purple-50/40';
+                    } else if (effect.type === 'counter_max_bonus') {
+                        typeIcon = <PlusCircle size={14} />;
+                        themeColor = 'text-cyan-800';
+                        borderColor = 'border-cyan-400/30';
+                        bgColor = 'bg-cyan-50/40';
+                    } else if (effect.type === 'xp_upgradeable') {
+                        typeIcon = <TrendingUp size={14} />;
+                        themeColor = 'text-orange-800';
+                        borderColor = 'border-orange-400/30';
+                        bgColor = 'bg-orange-50/40';
                     }
 
                     return (
@@ -90,11 +102,14 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                             value={effect.type}
                                             onChange={(e) => onUpdate(effect.id, 'type', e.target.value as any)}
                                         >
-                                            <option value="attribute_bonus" className="text-gray-900 bg-white">Bonus Attribut</option>
-                                            <option value="xp_bonus" className="text-gray-900 bg-white">Bonus XP</option>
-                                            <option value="free_skill_rank" className="text-gray-900 bg-white">Rang de Compétence Gratuit</option>
-                                            <option value="auto_counter" className="text-gray-900 bg-white">Compteur Auto</option>
-                                            <option value="master_skill" className="text-gray-900 bg-white">Maître (Compétence rang 5)</option>
+                                            <option value="attribute_bonus" className="text-gray-900 bg-white">Bonus d'Attribut (Stats)</option>
+                                            <option value="xp_bonus" className="text-gray-900 bg-white">Bonus d'XP (Scénarios)</option>
+                                            <option value="free_skill_rank" className="text-gray-900 bg-white">Rang de Compétence Offert</option>
+                                            <option value="auto_counter" className="text-gray-900 bg-white">Compteur Automatique (Magie, etc.)</option>
+                                            <option value="master_skill" className="text-gray-900 bg-white">Maîtrise (Rang 5 direct)</option>
+                                            <option value="block_skill_increase" className="text-gray-900 bg-white">Bloquer une Progression</option>
+                                            <option value="counter_max_bonus" className="text-gray-900 bg-white">Confiance / Volonté (+ Max)</option>
+                                            <option value="xp_upgradeable" className="text-gray-900 bg-white">Trait Améliorable (XP)</option>
                                         </select>
                                         <ChevronDown size={12} className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${themeColor} opacity-50`} />
                                     </div>
@@ -160,6 +175,28 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                             />
                                         </div>
                                     </div>
+                                ) : effect.type === 'block_skill_increase' ? (
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex flex-col">
+                                            <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest">Compétence à bloquer</label>
+                                            <div className="relative">
+                                                <select
+                                                    className="w-full text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1.5 appearance-none focus:border-red-500 outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm"
+                                                    value={effect.target || ''}
+                                                    onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
+                                                >
+                                                    <option value="" className="text-stone-300">-- Choisir --</option>
+                                                    {allSkills.map((s, si) => (
+                                                        <option key={s.id || `skill-${si}`} value={s.name}>{s.name}</option>
+                                                    ))}
+                                                </select>
+                                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-red-800/40" />
+                                            </div>
+                                            <p className="text-[9px] text-[#8b2e2e]/60 mt-1 italic leading-tight">
+                                                Cette compétence ne pourra plus être augmentée par le joueur. Les points futurs seront masqués et le nom barré.
+                                            </p>
+                                        </div>
+                                    </div>
                                 ) : effect.type === 'auto_counter' ? (
                                     <div className="flex flex-col gap-2">
                                         <div className="flex items-start gap-2">
@@ -178,6 +215,44 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                 </p>
                                             </div>
                                         </div>
+                                    </div>
+                                ) : effect.type === 'counter_max_bonus' ? (
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex flex-col">
+                                            <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest text-emerald-800">Cible (Compteur)</label>
+                                            <div className="relative">
+                                                <select
+                                                    className="w-full text-xs border border-emerald-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-emerald-500 outline-none bg-white font-bold"
+                                                    value={effect.target || ''}
+                                                    onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
+                                                >
+                                                    <option value="">-- Choisir un compteur --</option>
+                                                    {allCounters.map(c => (
+                                                        <option key={c.id} value={c.name}>{c.name}</option>
+                                                    ))}
+                                                </select>
+                                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-800/40" />
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest text-emerald-800">Bonus au Max (+)</label>
+                                            <input
+                                                type="number"
+                                                className="w-full text-xs border border-emerald-400/30 rounded-sm px-2 py-1.5 text-center focus:border-emerald-500 outline-none bg-white font-mono font-bold"
+                                                value={effect.value}
+                                                onChange={(e) => onUpdate(effect.id, 'value', parseInt(e.target.value) || 0)}
+                                            />
+                                        </div>
+                                    </div>
+                                ) : effect.type === 'xp_upgradeable' ? (
+                                    <div className="flex flex-col gap-1 p-1 bg-orange-50/50 rounded border border-orange-200/50">
+                                        <div className="flex items-center gap-2">
+                                            <TrendingUp size={14} className="text-orange-600" />
+                                            <span className="text-[10px] font-bold text-orange-900 uppercase">Clé de Progression XP</span>
+                                        </div>
+                                        <p className="text-[9px] text-orange-800/70 italic leading-tight">
+                                            En ajoutant cet effet, les joueurs pourront dépenser de l'XP sur ce trait pour l'augmenter, déclenchant le coût de progression système.
+                                        </p>
                                     </div>
                                 ) : effect.type === 'master_skill' ? (
                                     <div className="flex flex-col gap-2">

@@ -82,7 +82,7 @@ export interface TraitEntry {
   type?: 'avantage' | 'desavantage';
 }
 
-export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus' | 'auto_counter' | 'master_skill';
+export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus' | 'auto_counter' | 'master_skill' | 'block_skill_increase';
 export interface TraitEffect {
   id: string;
   type: EffectType;

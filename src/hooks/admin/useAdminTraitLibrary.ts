@@ -73,6 +73,18 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         return attrs.sort((a, b) => a.name.localeCompare(b.name));
     }, [rules.definitions.attributes, rules.configurations.global.secondaryAttributes, rules.definitions.secondaryAttributes]);
 
+    const allCounters = useMemo(() => {
+        const counters: { id: string, name: string }[] = [];
+        if (!rules.definitions.counters) return counters;
+
+        Object.values(rules.definitions.counters).forEach(c => {
+            if (c.name && c.name.trim() !== '') {
+                counters.push({ id: c.id, name: c.name });
+            }
+        });
+        return counters.sort((a, b) => a.name.localeCompare(b.name));
+    }, [rules.definitions.counters]);
+
     // Helpers
     const handleOpenNew = useCallback(() => {
         setError(null);
@@ -319,6 +331,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         allAvailableTags,
         allSkills,
         allAttributes,
+        allCounters,
 
         // Handlers
         handleOpenNew,

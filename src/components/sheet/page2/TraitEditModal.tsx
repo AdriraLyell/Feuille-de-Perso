@@ -5,6 +5,7 @@ import { TraitEntry } from '../../../types';
 import { Save, X, Edit, Sparkles } from 'lucide-react';
 import { useCharacter } from '../../../context/CharacterContext';
 import { useRules } from '../../../context/RulesContext';
+import { normalizeString } from '../../../utils/stringUtils';
 
 interface TraitEditModalProps {
     isOpen: boolean;
@@ -99,8 +100,12 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
 
     const isImproved = !editedTrait.isPostCreation && editedTrait.creationValue !== undefined && currentValue > (parseInt(editedTrait.creationValue) || 0);
 
+    // Check if upgradeable via effect
+    const isUpgradeable = !!libEntry?.effects?.some(e => e.type === 'xp_upgradeable') ||
+        !!rules?.libraries?.traits?.find(t => normalizeString(t.name) === normalizeString(editedTrait.name))?.effects?.some(e => e.type === 'xp_upgradeable');
+
     const canReduce = isPostCreation && type === 'desavantages' && currentValue > 0;
-    const canIncrease = isPostCreation && type === 'avantages' && isActuallyVariable && currentValue > 0 && currentValue < maxValue;
+    const canIncrease = isPostCreation && type === 'avantages' && (isActuallyVariable || isUpgradeable) && currentValue > 0;
 
     return (
         <ThematicModal

@@ -10,6 +10,7 @@ interface TraitFormProps {
     library: LibraryEntry[];
     allSkills: { id: string, name: string }[];
     allAttributes: { id: string, name: string }[];
+    allCounters: { id: string, name: string }[];
     tagInput: string;
     error: string | null;
     setEditForm: (entry: LibraryEntry | null) => void;
@@ -29,6 +30,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
     library,
     allSkills,
     allAttributes,
+    allCounters,
     tagInput,
     error,
     setEditForm,
@@ -256,6 +258,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
                         effects={editForm.effects || []}
                         allSkills={allSkills}
                         allAttributes={allAttributes}
+                        allCounters={allCounters}
                         onAdd={addEffect}
                         onUpdate={updateEffect}
                         onRemove={removeEffect}
