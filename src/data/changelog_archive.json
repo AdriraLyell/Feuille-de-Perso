@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.76.1",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Mécaniques : Correction d'un bug empêchant l'application des bonus de maximum de compteur (counter_max_bonus). Centralisation du calcul des bonus dans useCharacterBonuses et renforcement de la détection par normalisation des noms (accents/casse) et vérification systématique de la bibliothèque globale."
+    },
+    {
         "version": "2.76.0",
         "date": "2026-02-23",
         "type": "feat",
@@ -592,11 +598,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Nettoyage final du journal des modifications et validation de la structure JSON."
-    },
-    {
-        "version": "2.56.45",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction finale d'une erreur de syntaxe JSON dans le journal des modifications qui bloquait le serveur de développement."
     }
 ]
