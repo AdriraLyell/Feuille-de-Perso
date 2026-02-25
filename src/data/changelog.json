@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.81.5",
+        "date": "2026-02-25",
+        "type": "fix",
+        "description": "CI : Renforcement du workflow 'prune-history' avec l'ajout systématique de l'étape 'actions/checkout' pour prévenir les erreurs de contexte git, garantissant le nettoyage automatique des anciens runs d'actions."
+    },
+    {
         "version": "2.81.4",
         "date": "2026-02-25",
         "type": "docs",
