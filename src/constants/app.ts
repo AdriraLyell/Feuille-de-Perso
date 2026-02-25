@@ -1,5 +1,5 @@
 
-export const APP_VERSION = '2.81.4';
+export const APP_VERSION = '2.82.3';
 
 export const REPO_OWNER = 'AdriraLyell';
 export const REPO_NAME = 'Feuille-de-Perso';
@@ -17,6 +17,21 @@ export const SKILL_COLUMNS = {
     COL_7: 'Col_Comp_7', COL_8: 'Col_Comp_8', COL_9: 'Col_Comp_9',
     COL_10: 'Col_Comp_10',
 } as const;
+
+/**
+ * Help data for skill categories.
+ * Centralized from legacy src/data/constants.ts
+ */
+export const CATEGORY_HELP = [
+    { code: SKILL_COLUMNS.COL_1, label: "Talents", loc: "Colonne Gauche (Haut)" },
+    { code: SKILL_COLUMNS.COL_2, label: "Compétences", loc: "Colonne Centrale (Haut 1)" },
+    { code: SKILL_COLUMNS.COL_3, label: "Compétences (Suite)", loc: "Colonne Centrale (Haut 2)" },
+    { code: SKILL_COLUMNS.COL_4, label: "Connaissances", loc: "Colonne Droite (Haut)" },
+    { code: SKILL_COLUMNS.COL_5, label: "Autres Compétences", loc: "Colonne Centrale (Bas)" },
+    { code: SKILL_COLUMNS.COL_6, label: "Secondaire", loc: "Petit bloc (Bas)" },
+    { code: SKILL_COLUMNS.COL_7, label: "Autres", loc: "Colonne Droite (Bas)" },
+    { code: SKILL_COLUMNS.COL_8, label: "Arrière-plans", loc: "Section Historique" }
+];
 
 /**
  * Default column for background skills if not specified.

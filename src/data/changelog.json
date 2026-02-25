@@ -1,5 +1,29 @@
 [
     {
+        "version": "2.82.3",
+        "date": "2026-02-25",
+        "type": "docs",
+        "description": "Mise à jour des règles de l'agent : Intégration de l'agent de codage (Aider) comme outil privilégié pour la chirurgie du code dans .agent/rules/regle.md."
+    },
+    {
+        "version": "2.82.2",
+        "date": "2026-02-25",
+        "type": "refactor",
+        "description": "Refactorisation majeure de l'architecture : Décomposition de `RosterApp.tsx`, `CharacterSheetPage2.tsx`, `ColumnarEditor.tsx` et `AdminSkillLibrarySidebar.tsx` en composants et hooks spécialisés pour améliorer la maintenance et la lisibilité du code."
+    },
+    {
+        "version": "2.82.1",
+        "date": "2026-02-25",
+        "type": "docs",
+        "description": "Maintenance : Audit de la taille des fichiers sources. Identification de `RosterApp.tsx` comme candidat à la refactorisation (~700 lignes) et confirmation de la conformité des autres fichiers critiques (< 450 lignes) avant la migration des formules."
+    },
+    {
+        "version": "2.82.0",
+        "date": "2026-02-25",
+        "type": "refactor",
+        "description": "Harmonisation des données : Suppression des fichiers fantômes (default_rules.json), migration des services d'images de la racine de src/ vers src/services/imageDB.ts, centralisation des constantes dans app.ts, et synchronisation de initialState.ts avec defaultRules.ts."
+    },
+    {
         "version": "2.81.5",
         "date": "2026-02-25",
         "type": "fix",
@@ -93,35 +117,5 @@
         "date": "2026-02-23",
         "type": "feat",
         "description": "Mécaniques : Implémentation du système de 'Confiance' et des effets complexes pour les traits. Introduction de l'effet 'counter_max_bonus' permettant d'augmenter dynamiquement le maximum d'un compteur (ex: +1 Confiance par rang de trait) et de l'effet 'xp_upgradeable' autorisant la montée en niveau de certains traits spécifiques via la dépense d'XP post-création. Mise à jour de l'éditeur de traits admin pour supporter ces nouveaux effets."
-    },
-    {
-        "version": "2.75.18",
-        "date": "2026-02-23",
-        "type": "fix",
-        "description": "Interface (Fiche) : Agrandissement de la zone de texte des noms de compteurs (Confiance, Volonté, etc.) pour une meilleure lisibilité et éviter les coupures de mots."
-    },
-    {
-        "version": "2.75.17",
-        "date": "2026-02-23",
-        "type": "fix",
-        "description": "Interface (Fiche) : Suppression des libellés 'MAXI' et 'UTILISÉ' (ou 'Cases') dans la section des compteurs pour un design plus épuré, conformément aux retours utilisateur."
-    },
-    {
-        "version": "2.75.16",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Mécaniques : Implémentation du blocage d'augmentation de compétence par les traits. Un trait peut désormais être configuré pour empêcher le joueur d'augmenter le niveau d'une compétence spécifique. Visualisation immédiate par le nom barré et la disparition des bulles de progression futures, avec retour d'erreur (toast) en cas de tentative d'augmentation."
-    },
-    {
-        "version": "2.75.15",
-        "date": "2026-02-23",
-        "type": "fix",
-        "description": "CI : Correction du workflow de nettoyage des anciens runs (prune-history). Ajout du contexte explicite du dépôt aux commandes GitHub CLI pour éviter les erreurs d'exécution en environnement sans dossier .git."
-    },
-    {
-        "version": "2.75.14",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Registre (Roster) : Ajout d'options de tri global pour les avantages et désavantages dans la section Profils. Permet de trier les traits par nom ou par coût pour tous les personnages simultanément."
     }
 ]

@@ -9,8 +9,8 @@ Ces règles sont la source de vérité pour le comportement de l'agent dans ce w
 Privilégier le Francais dans les docs/rapports/plans
 
 ## 1. ARCHITECTURE & PRINCIPES
-- **Hybrid Database Engine** : Supabase est maître. L'app est "Online First", mais doit TOUJOURS fonctionner Offline (via `default_rules.json`).
-- **Chirurgie du Code** : Modifications minimales et précises. Ne jamais réécrire un fichier complet inutilement.
+- **Hybrid Database Engine** : Supabase est maître. L'app est "Online First", mais doit TOUJOURS fonctionner Offline (via `src/data/defaultRules.ts`).
+- **Chirurgie du Code** : Modifications minimales et précises via l'agent de codage (**Aider** / `replace_file_content`). Ne jamais réécrire un fichier complet inutilement pour préserver l'historique et limiter l'usage de tokens.
 - **Typage Strict** : Éviter `any` et `@ts-ignore`. Préférer les structures Zod et les types inférés.
 - **UX Premium** : Interfaces vivantes, micro-animations, feedback visuel immédiat.
 - **Outil de Navigation (Playwright)** : Utiliser le `browser_subagent` pour valider visuellement les changements complexes (ex: pagination, overflow, responsive) lorsque les logs ne suffisent pas.

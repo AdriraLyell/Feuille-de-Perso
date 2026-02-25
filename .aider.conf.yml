@@ -1,0 +1,51 @@
+# Configuration d'Aider pour le projet Feuille de Perso
+
+#########################
+# Connexion LM Studio
+#########################
+openai-api-base: http://localhost:1234/v1
+openai-api-key: sk-no-key-required
+
+#########################
+# Modèle par défaut
+#########################
+# Commenté pour utiliser la détection automatique du script aider-local.ps1
+# model: openai/qwen/qwen3-coder-30b
+
+#########################
+# Paramètres du modèle
+#########################
+# Format d'édition : 'whole' est souvent plus stable pour les modèles locaux
+# 'diff' est plus rapide mais demande un modèle très précis
+edit-format: whole
+
+# Taille de la carte du dépôt (tokens)
+map-tokens: 1024
+
+#########################
+# Préférences de l'Agent
+#########################
+# Langue globale pour les instructions
+chat-language: fr
+
+# Ne pas commiter automatiquement (te laisse vérifier avant)
+auto-commits: false
+
+# Toujours accepter l'ajout de fichiers au chat
+yes-always: true
+
+# Désactiver les avertissements de modèle inconnu
+show-model-warnings: false
+
+# Ne pas suggérer de commandes shell (évite les exécutions surprises)
+suggest-shell-commands: false
+
+# Qualité du code
+#########################
+# Lance automatiquement le linter après les modifications
+lint: true
+lint-command: npx eslint --fix
+
+# Commande de test pour l'auto-guérison (Self-healing)
+# Utiliser avec /test ou quand spécifié
+test-command: npm run test -- --run

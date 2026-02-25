@@ -1,7 +1,7 @@
 {
   "name": "rpg-sheet-manager",
   "private": true,
-  "version": "2.81.5",
+  "version": "2.82.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,9 @@
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
     "sync-version": "node scripts/sync-version.js",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "aider": "powershell -File ./scripts/aider-local.ps1",
+    "verify": "powershell -File ./scripts/verify-agent.ps1"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.1",
