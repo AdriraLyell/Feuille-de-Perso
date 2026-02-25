@@ -3,7 +3,7 @@ import { RulesData } from '../../../types/rules';
 import { LibraryFormulaEntry } from '../../../types';
 import { generateId } from '../../../utils/factories';
 import { evaluateFormula } from '../../../utils/formulaEvaluator';
-import { Trash2, Plus, Calculator, Info, Check, Wand2, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { Trash2, Plus, Calculator, Info, Check } from 'lucide-react';
 import { MotionCard } from '../../../components/ui/motion/MotionCard';
 
 const DUMMY_PREVIEW_DATA: any = {
@@ -95,16 +95,17 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
         handleUpdate(lib.filter(c => c.id !== id));
     };
 
-    // Migration Logic
-    const orphanCount = (rules.libraries.traits || []).reduce((acc, trait) => {
+    /* 
+    // Migration Logic - Kept for reference or future button
+    const _orphanCount = (rules.libraries.traits || []).reduce((acc, trait) => {
         return acc + (trait.effects?.filter(e =>
             (e.type === 'formula' && !e.formulaId) ||
             ['attribute_bonus', 'counter_max_bonus', 'xp_bonus'].includes(e.type as string)
         ).length || 0);
     }, 0);
 
-    const autoMigrateFormulas = () => {
-        let currentFormulas = [...lib];
+    const _autoMigrateFormulas = () => {
+        const currentFormulas = [...lib];
         let traitsUpdated = 0;
         let formulasCreated = 0;
 
@@ -190,6 +191,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
             alert("Aucune formule orpheline trouvée.");
         }
     };
+    */
 
     return (
         <MotionCard className="p-6 h-full" hoverEffect="glow">

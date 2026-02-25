@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.76.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Mécaniques : Implémentation du système de 'Confiance' et des effets complexes pour les traits. Introduction de l'effet 'counter_max_bonus' permettant d'augmenter dynamiquement le maximum d'un compteur (ex: +1 Confiance par rang de trait) et de l'effet 'xp_upgradeable' autorisant la montée en niveau de certains traits spécifiques via la dépense d'XP post-création. Mise à jour de l'éditeur de traits admin pour supporter ces nouveaux effets."
+    },
+    {
         "version": "2.75.18",
         "date": "2026-02-23",
         "type": "fix",
@@ -592,11 +598,5 @@
         "date": "2026-02-19",
         "type": "fix",
         "description": "Correction finale d'une erreur de syntaxe JSON dans le journal des modifications qui bloquait le serveur de développement."
-    },
-    {
-        "version": "2.56.44",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de l'affichage du Journal des Modifications : les descriptions de versions s'affichent désormais correctement dans l'interface."
     }
 ]

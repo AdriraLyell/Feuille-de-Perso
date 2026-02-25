@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.82.4",
+        "date": "2026-02-25",
+        "type": "fix",
+        "description": "Correction des erreurs ESLint bloquantes (prefer-const) dans l'éditeur de formules pour débloquer la CI GitHub."
+    },
+    {
         "version": "2.82.3",
         "date": "2026-02-25",
         "type": "docs",
@@ -111,11 +117,5 @@
         "date": "2026-02-23",
         "type": "fix",
         "description": "Mécaniques : Correction d'un bug empêchant l'application des bonus de maximum de compteur (counter_max_bonus). Centralisation du calcul des bonus dans useCharacterBonuses et renforcement de la détection par normalisation des noms (accents/casse) et vérification systématique de la bibliothèque globale."
-    },
-    {
-        "version": "2.76.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Mécaniques : Implémentation du système de 'Confiance' et des effets complexes pour les traits. Introduction de l'effet 'counter_max_bonus' permettant d'augmenter dynamiquement le maximum d'un compteur (ex: +1 Confiance par rang de trait) et de l'effet 'xp_upgradeable' autorisant la montée en niveau de certains traits spécifiques via la dépense d'XP post-création. Mise à jour de l'éditeur de traits admin pour supporter ces nouveaux effets."
     }
 ]
