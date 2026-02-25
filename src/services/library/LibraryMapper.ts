@@ -1,5 +1,5 @@
-import { LibraryBackgroundEntry, LibraryCounterEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryEntry as LibraryTraitEntry } from '../../types/system';
-import { DBTrait, DBSkill, DBSpecialization, DBBackground, DBCounter, DBMysticAbility } from '../../types/database';
+import { LibraryBackgroundEntry, LibraryCounterEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryFormulaEntry, LibraryEntry as LibraryTraitEntry } from '../../types/system';
+import { DBTrait, DBSkill, DBSpecialization, DBBackground, DBCounter, DBMysticAbility, DBFormula } from '../../types/database';
 
 
 const legacySkillMap: Record<string, string> = {
@@ -100,5 +100,14 @@ export const LibraryMapper = {
         defaultCategory: localDefaultCategory || c.defaultCategory || (c as any).default_category,
         isGlobal: c.setting_id == null,
         isActive: activeIds.has(c.id) || c.setting_id === sid
+    }),
+    mapFormula: (f: DBFormula, activeIds: Set<string>, sid: string): LibraryFormulaEntry => ({
+        id: f.id,
+        name: f.name,
+        formula: f.formula,
+        type: f.type,
+        description: f.description || '',
+        isGlobal: f.setting_id == null,
+        isActive: activeIds.has(f.id) || f.setting_id === sid
     })
 };

@@ -1,8 +1,14 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.80.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.81.4)
 
-> **Dernière mise à jour** : 2026-02-24 — Version 2.80.0
+> **Dernière mise à jour** : 2026-02-25 — Version 2.81.4
 
 ## 1. Phases Complétées
+
+### ✅ Phase 39 : Planification de la Migration "Tout Formule" (v2.81.4)
+- [x] **Audit Technique** : Identification des effets sémantiques codés en dur (`free_skill_rank`, `master_skill`, etc.).
+- [x] **Conception Visionnaire** : Élaboration du concept de "Dictionnaire MJ" et de formules "Auto-Portantes" (incluant leur propre cible).
+- [x] **Validation de Faisabilité** : Confirmation que 100% des mécaniques actuelles sont migrables sans perte de données.
+- [x] **Plan de Route** : Création de `docs/PLAN_MIGRATION_FORMULES.md` détaillant les étapes A à D.
 
 ### ✅ Phase 38 : Unification des Mécaniques par Formules (v2.80.0)
 - [x] **Dictionnaire Central** : Intégration du `AdminFormulasEditor` pour gérer les formules globales (Bonus & Réserves).

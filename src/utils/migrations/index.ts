@@ -8,6 +8,7 @@ import { MIGRATIONS, CURRENT_SCHEMA_VERSION } from './registry';
 import { LEGACY_SKILL_MAP } from './migrateSkills';
 import { migrateAttributeId } from './migrateAttributes';
 import { migrateFormulas } from './migrateFormulas';
+import { generateId } from '../factories';
 
 /**
  * Main migration function for character sheet data.
@@ -275,7 +276,7 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
                         if (!existing) {
                             // Create one
                             existing = {
-                                id: crypto.randomUUID(), // Need UUID generation
+                                id: generateId(),
                                 name: `Mécanique: ${trait.name}`,
                                 type: 'effect',
                                 formula: formulaString,

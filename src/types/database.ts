@@ -163,6 +163,23 @@ export interface RelSettingMysticAbility {
     default_category?: string;
 }
 
+export interface DBFormula {
+    id: string;
+    setting_id: string | null;
+    name: string;
+    formula: string;
+    type: 'effect' | 'reserve';
+    description?: string;
+    is_active?: boolean;
+    created_at?: string;
+}
+
+export interface RelSettingFormula {
+    setting_id: string;
+    formula_id: string;
+    is_active: boolean;
+}
+
 /**
  * Trait variant names (aliases)
  */

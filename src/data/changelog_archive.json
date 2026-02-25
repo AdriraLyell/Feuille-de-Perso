@@ -1,5 +1,35 @@
 [
     {
+        "version": "2.75.13",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Bibliothèque de Traits : Amélioration des options de tri. Ajout de boutons explicites pour le tri par ordre alphabétique et par coût, avec retour visuel amélioré et icônes directionnelles."
+    },
+    {
+        "version": "2.75.12",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Interface (Registre) : Refonte de la mise en page des attributs pour regrouper les colonnes par 'pavés' (Physique, Mental, Social). Ajout de séparateurs visuels forts et d'un fond coloré subtil par catégorie pour une lecture plus structurée."
+    },
+    {
+        "version": "2.75.11",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie : Généralisation du bouton de suppression (croix) dans tous les champs de recherche de l'application (Bibliothèques Joueur, Registre, Vues Admin, etc.) pour une expérience utilisateur cohérente."
+    },
+    {
+        "version": "2.75.10",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie (Registre) : Ajout d'un bouton de suppression (croix) dans le champ de recherche des compétences pour vider rapidement la saisie."
+    },
+    {
+        "version": "2.75.9",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Ergonomie (Registre) : Agrandissement de la taille du texte des valeurs dans le tableau des attributs pour améliorer la lisibilité."
+    },
+    {
         "version": "2.75.8",
         "date": "2026-02-23",
         "type": "feat",
@@ -568,35 +598,5 @@
         "date": "2026-02-19",
         "type": "chore",
         "description": "Maintenance Base de Données : Activation de la sécurité RLS sur les tables Mystiques, ajout des index manquants sur les clés étrangères pour la performance, et optimisation des requêtes de vérification des droits Admin."
-    },
-    {
-        "version": "2.56.35",
-        "date": "2026-02-19",
-        "type": "refactor",
-        "description": "Optimisation de la structure Admin : Découpage des bibliothèques (Compétences, Historiques, Habilités Mystiques, Compteurs) en sous-composants dédiés pour améliorer la maintenabilité et réduire la taille des fichiers sources (gain de ~150-200 lignes par fichier critique)."
-    },
-    {
-        "version": "2.56.34",
-        "date": "2026-02-19",
-        "type": "chore",
-        "description": "Opération 'Racine Propre' : Migration des scripts utilitaires vers le dossier dédié, archivage des fichiers SQL temporaires et nettoyage des logs. Migration systématique des derniers `console.log/warn/error` vers le logger applicatif pour une meilleure hygiène de production."
-    },
-    {
-        "version": "2.56.33",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Amélioration de la persistance des données portables : Synchronisation complète des images du Grimoire et des couvertures de Notes de Campagne. Persistance des paramètres locaux (Mode Expert, Source des Règles) dans le JSON exporté pour une expérience sans couture entre appareils. Sécurisation de la compression d'images (idempotence WebP/Gzip)."
-    },
-    {
-        "version": "2.56.32",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Implémentation de la 'Purge Profonde' séparée de la réinitialisation de fiche. Ajout d'un bouton de purge dans l'onglet Cloud (Moniteur de Stockage) permettant de vider complètement l'IndexedDB (images, règles) et le LocalStorage en cas de blocage majeur, avec redémarrage automatique."
-    },
-    {
-        "version": "2.56.31",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction du calcul du bonus d'XP par scénario (Traits). Les sessions sont désormais mieux détectées même si le montant est à 0 (détection via le nom du scénario). Amélioration des logs de diagnostic XP et fixation des erreurs de validation Zod lors du chargement initial."
     }
 ]

@@ -66,6 +66,9 @@ export const LibraryPersistence = {
                     } else if (typeCfg.key === 'specializations') {
                         payload.skill_ids = item.skillIds;
                         payload.default_min_level = item.defaultMinLevel;
+                    } else if (typeCfg.key === 'formulas') {
+                        payload.formula = item.formula;
+                        payload.type = item.type;
                     }
 
                     toCreate.push(payload);
@@ -136,6 +139,9 @@ export const LibraryPersistence = {
                 } else if (typeCfg.key === 'specializations') {
                     payload.skill_ids = item.skillIds;
                     payload.default_min_level = item.defaultMinLevel;
+                } else if (typeCfg.key === 'formulas') {
+                    payload.formula = item.formula;
+                    payload.type = item.type;
                 }
 
                 // Use UPSERT instead of update to handle newly created items from the UI

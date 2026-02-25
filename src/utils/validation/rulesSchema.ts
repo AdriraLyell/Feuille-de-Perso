@@ -9,6 +9,8 @@ export const TraitEffectSchema = z.object({
     value: z.any().optional(),
     target: z.string().optional(),
     conditions: z.any().optional(),
+    formula: z.string().optional(),
+    formulaId: z.string().optional(),
 });
 
 // --- System Libraries ---
@@ -59,6 +61,16 @@ export const LibraryCounterEntrySchema = z.object({
     maxValue: z.number().nullable().optional(),
     defaultValue: z.number().nullable().optional(),
     xpCost: z.number().nullable().optional(),
+    isGlobal: z.boolean().nullable().optional(),
+    isActive: z.boolean().nullable().optional(),
+});
+
+export const LibraryFormulaEntrySchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    formula: z.string(),
+    type: z.enum(['effect', 'reserve']),
+    description: z.string().nullable().optional(),
     isGlobal: z.boolean().nullable().optional(),
     isActive: z.boolean().nullable().optional(),
 });
@@ -208,6 +220,7 @@ export const RulesDataSchema = z.object({
         counters: z.array(LibraryCounterEntrySchema),
         specializations: z.array(LibrarySpecializationEntrySchema),
         mysticAbilities: z.array(LibrarySkillEntrySchema).optional().default([]),
+        formulas: z.array(LibraryFormulaEntrySchema).optional().default([]),
     }),
 });
 

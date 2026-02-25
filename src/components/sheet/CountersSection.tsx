@@ -49,68 +49,64 @@ export const CountersSection = React.memo<CountersSectionProps>(({
         const effectiveMax = counter.max || 10;
 
         return (
-            <div key={counter.id} className="col-span-2 md:col-span-2 border border-stone-300 bg-white rounded-sm shadow-sm flex items-center p-1 overflow-hidden h-9">
+            <div key={counter.id} className="col-span-1 border border-stone-300 bg-white rounded-sm shadow-sm flex items-center p-1 overflow-hidden h-10">
                 {/* Title on the left */}
                 <div
-                    className="w-24 shrink-0 font-bold text-[10px] uppercase tracking-tighter text-stone-800 border-r border-stone-200 mr-1 pr-1 h-full flex items-center break-words leading-none justify-center text-center cursor-help"
+                    className="w-16 shrink-0 font-bold text-[8px] leading-tight uppercase tracking-tighter text-stone-800 border-r border-stone-200 mr-1 pr-1 h-full flex items-center justify-center text-center cursor-help"
                     title={counter.description || counter.name}
                 >
                     {counter.name}
                 </div>
 
-                {/* Right side stacks */}
-                <div className="flex flex-col gap-0.5 flex-grow justify-center w-full">
+                {/* Right side stacks (shifted right as in the image) */}
+                <div className="flex flex-col gap-0.5 flex-grow justify-center items-end pr-1 overflow-hidden">
                     {!isSquaresOnly && (
-                        /* Maxi */
-                        <div className="flex items-center justify-end h-3 pr-1 gap-2">
-                            <div className="relative w-[142px] h-3">
-                                <div className="absolute right-0 top-1/2 -translate-y-1/2 scale-[0.9] origin-right">
-                                    <DotRating
-                                        value={effectiveValue}
-                                        creationValue={effectiveCreationValue}
-                                        max={effectiveMax}
-                                        onChange={(v) => {
-                                            // Subtract bonuses before updating base value
-                                            const newBaseValue = Math.max(0, v - creationBonus - xpBonus);
-                                            updateCounter(counter.id, newBaseValue, isCustom, 'value');
-                                        }}
-                                        creationColor={data.theme?.creationColor}
-                                        xpColor={data.theme?.xpColor}
-                                        symbol={data.theme?.dotSymbol}
-                                    />
-                                </div>
+                        /* Dots (Maxi) */
+                        <div className="flex items-center h-3.5">
+                            <div className="scale-[0.85] origin-right">
+                                <DotRating
+                                    value={effectiveValue}
+                                    creationValue={effectiveCreationValue}
+                                    max={effectiveMax}
+                                    onChange={(v) => {
+                                        // Subtract bonuses before updating base value
+                                        const newBaseValue = Math.max(0, v - creationBonus - xpBonus);
+                                        updateCounter(counter.id, newBaseValue, isCustom, 'value');
+                                    }}
+                                    creationColor={data.theme?.creationColor}
+                                    xpColor={data.theme?.xpColor}
+                                    symbol={data.theme?.dotSymbol}
+                                />
                             </div>
                         </div>
                     )}
 
-                    {/* Utilisé (ou Cases) */}
-                    <div className="flex items-center justify-end h-3 pr-1 gap-2 mt-0.5">
-                        <div className="relative w-[142px] h-3">
-                            <div className="absolute right-0 top-1/2 -translate-y-1/2 scale-[0.9] origin-right flex items-center space-x-1">
-                                {Array.from({ length: effectiveMax }).map((_, i) => {
-                                    if (i >= effectiveMax) return null;
+                    {/* Squares (Utilisé) */}
+                    <div className="flex items-center h-3.5">
+                        <div className="scale-[0.85] origin-right flex items-center space-x-1">
+                            {Array.from({ length: effectiveMax }).map((_, i) => {
+                                if (i >= effectiveMax) return null;
 
-                                    if (!isSquaresOnly && i >= effectiveValue) {
-                                        return <div key={i} className="w-3 h-3" />;
-                                    }
+                                if (!isSquaresOnly && i >= effectiveValue) {
+                                    return <div key={i} className="w-3 h-3" />;
+                                }
 
-                                    const isChecked = i < (counter.current || 0);
+                                const isChecked = i < (counter.current || 0);
 
-                                    return (
-                                        <button
-                                            key={i}
-                                            type="button"
-                                            onClick={() => {
-                                                const newVal = i + 1;
-                                                const currentVal = counter.current || 0;
-                                                updateCounter(counter.id, newVal === currentVal ? newVal - 1 : newVal, isCustom, 'current');
-                                            }}
-                                            className={`w-3 h-3 border border-stone-600 transition-colors ${isChecked ? 'bg-ink' : 'bg-white hover:bg-stone-100'}`}
-                                            title="Point utilisé"
-                                        />
-                                    );
-                                })}
-                            </div>
+                                return (
+                                    <button
+                                        key={i}
+                                        type="button"
+                                        onClick={() => {
+                                            const newVal = i + 1;
+                                            const currentVal = counter.current || 0;
+                                            updateCounter(counter.id, newVal === currentVal ? newVal - 1 : newVal, isCustom, 'current');
+                                        }}
+                                        className={`w-3 h-3 border border-stone-600 transition-colors ${isChecked ? 'bg-ink' : 'bg-white hover:bg-stone-100'}`}
+                                        title="Point utilisé"
+                                    />
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
