@@ -1,7 +1,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { Upload, Trash2, Image as ImageIcon } from 'lucide-react';
-import { saveImage, getImage, deleteImage, base64ToBlob } from '../../imageDB';
+import { saveImage, getImage, deleteImage, base64ToBlob } from '../../services/imageDB';
 import ConfirmationModal from '../ui/ConfirmationModal';
 import { ImageCompressionService, GZIP_MARKER } from '../../services/ImageCompressionService';
 import { ErrorService } from '../../services/ErrorService';

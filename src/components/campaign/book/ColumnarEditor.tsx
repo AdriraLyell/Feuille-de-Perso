@@ -7,14 +7,17 @@ import { BookTableOfContents } from './BookTableOfContents';
 import { useBookTableOfContents } from './useBookTableOfContents';
 import { useColumnarNavigation } from './hooks/useColumnarNavigation';
 import { useColumnarDrawing } from './hooks/useColumnarDrawing';
-import { saveImage } from '../../../imageDB';
+import { saveImage } from '../../../services/imageDB';
 import { ColumnarEditorStyles } from './ColumnarEditorStyles';
 import { BookEditorToolbar } from './components/BookEditorToolbar';
 import { BookPageBackground } from './components/BookPageBackground';
 import { BookChapterSidebar } from './components/BookChapterSidebar';
-import { BookPageIndicator } from './components/BookPageIndicator';
 import { useRules } from '../../../context/RulesContext';
 import { TimeCompanionWidget } from './components/TimeCompanionWidget';
+
+// Nouveaux hooks extraits
+import { useColumnarPersistence } from './hooks/useColumnarPersistence';
+import { useColumnarCalendarSync } from './hooks/useColumnarCalendarSync';
 
 const INK_COLORS = [
     { name: 'Noir Corbeau', color: '#1c1917' },
@@ -48,104 +51,41 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     const [isDrawingMode, setIsDrawingMode] = useState(false);
     const [showColorPalette, setShowColorPalette] = useState(false);
     const [showHighlightPalette, setShowHighlightPalette] = useState(false);
-    const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
-    const [isCalendarVisible, setIsCalendarVisible] = useState(() => {
-        const saved = localStorage.getItem('book-calendar-visible');
-        return saved === null ? true : saved === 'true';
-    });
-    const [pickingTarget, setPickingTarget] = useState<{ nodeId: string, field: string } | null>(null);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
 
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const saveIndicatorRef = useRef<NodeJS.Timeout | null>(null);
-    const onUpdateRef = useRef(onUpdate);
-    onUpdateRef.current = onUpdate;
-    const editorRef = useRef<Editor | null>(null);
-    const hasPendingChanges = useRef(false);
-
-    const flushSave = useCallback(() => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-        }
-        if (hasPendingChanges.current && editorRef.current && !editorRef.current.isDestroyed && onUpdateRef.current) {
-            onUpdateRef.current(editorRef.current.getJSON());
-            hasPendingChanges.current = false;
-            setSaveStatus('saved');
-            if (saveIndicatorRef.current) clearTimeout(saveIndicatorRef.current);
-            saveIndicatorRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
-        }
-    }, []);
-
-
-    useEffect(() => {
-        localStorage.setItem('book-calendar-visible', String(isCalendarVisible));
-    }, [isCalendarVisible]);
-
-    // Event listener for external calendar toggling
-    useEffect(() => {
-        const handleToggle = (e: any) => {
-            if (e.detail?.visible !== undefined) {
-                setIsCalendarVisible(e.detail.visible);
-            } else {
-                setIsCalendarVisible(v => !v);
-            }
-        };
-        const handlePickRequest = (e: any) => {
-            setPickingTarget(e.detail);
-            setIsCalendarVisible(true);
-        };
-        window.addEventListener('toggle-calendar', handleToggle);
-        window.addEventListener('calendar-open-picker', handlePickRequest);
-        return () => {
-            window.removeEventListener('toggle-calendar', handleToggle);
-            window.removeEventListener('calendar-open-picker', handlePickRequest);
-        };
-    }, []);
-
-    // Flush on tab switch or page close
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'hidden') flushSave();
-        };
-        const handleBeforeUnload = () => flushSave();
-
-        const handleEscape = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') setPickingTarget(null);
-        };
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        window.addEventListener('beforeunload', handleBeforeUnload);
-        window.addEventListener('keydown', handleEscape);
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-            window.removeEventListener('keydown', handleEscape);
-        };
-    }, [flushSave]);
+    const {
+        saveStatus,
+        handleUpdate,
+        setEditor
+    } = useColumnarPersistence({ onUpdate });
 
     const editorOptions = useMemo(() => ({
         extensions: getBookExtensions(),
         editable: !readOnly,
         immediatelyRender: false,
-        onUpdate: ({ editor }: { editor: Editor }) => {
-            if (onUpdateRef.current) {
-                hasPendingChanges.current = true;
-                if (timeoutRef.current) clearTimeout(timeoutRef.current);
-                timeoutRef.current = setTimeout(() => {
-                    onUpdateRef.current?.(editor.getJSON());
-                    hasPendingChanges.current = false;
-                    setSaveStatus('saved');
-                    if (saveIndicatorRef.current) clearTimeout(saveIndicatorRef.current);
-                    saveIndicatorRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
-                }, 500);
-            }
-        },
-    }), [readOnly]);
+        onUpdate: handleUpdate,
+    }), [readOnly, handleUpdate]);
 
     const editor = useEditor(editorOptions);
-    editorRef.current = editor;
+
+    useEffect(() => {
+        setEditor(editor);
+    }, [editor, setEditor]);
+
+    const {
+        isCalendarVisible,
+        setIsCalendarVisible,
+        pickingTarget,
+        setPickingTarget,
+        notifiedDates,
+        voyageRanges,
+        handleCalendarDateClick
+    } = useColumnarCalendarSync({
+        editor,
+        containerRef
+    });
 
     const {
         pageCount,
@@ -173,65 +113,6 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
 
     const { entries } = useBookTableOfContents(editor, contentRef);
 
-    // Filter dates that have notes and weather, and detect voyages
-    const { notifiedDates, voyageRanges } = useMemo(() => {
-        if (!editor) return { notifiedDates: new Map<string, string>(), voyageRanges: [] as { start: string, end: string }[] };
-        const dates = new Map<string, string>();
-        const ranges: { start: string, end: string }[] = [];
-
-        editor.state.doc.descendants((node) => {
-            if (node.type.name === 'chapterHeading' && node.attrs.date) {
-                dates.set(node.attrs.date, node.attrs.weather || '');
-            }
-            if (node.type.name === 'narrativeSection' && node.attrs.type === 'voyage' && node.attrs.dateStart && node.attrs.dateEnd) {
-                ranges.push({ start: node.attrs.dateStart, end: node.attrs.dateEnd });
-            }
-        });
-        return { notifiedDates: dates, voyageRanges: ranges };
-    }, [editor, editor?.state.doc]);
-
-    const scrollToDate = useCallback((date: string) => {
-        if (!editor || editor.isDestroyed || !containerRef.current) return;
-
-        let targetPos = -1;
-        editor.state.doc.descendants((node, pos) => {
-            if (node.type.name === 'chapterHeading' && node.attrs.date === date) {
-                targetPos = pos;
-                return false;
-            }
-            return true;
-        });
-
-        if (targetPos !== -1) {
-            const dom = editor.view.nodeDOM(targetPos) as HTMLElement;
-            if (dom && containerRef.current) {
-                const horizontalOffset = dom.offsetLeft;
-                const stride = PAGE_WIDTH + 40;
-                const spreadIndex = Math.floor(horizontalOffset / (stride * 2));
-
-                containerRef.current.scrollTo({
-                    left: spreadIndex * stride * 2,
-                    behavior: 'smooth'
-                });
-            }
-        }
-    }, [editor]);
-
-    const handleCalendarDateClick = useCallback((date: string) => {
-        if (pickingTarget) {
-            window.dispatchEvent(new CustomEvent('calendar-date-picked', {
-                detail: {
-                    date,
-                    nodeId: pickingTarget.nodeId,
-                    field: pickingTarget.field
-                }
-            }));
-            setPickingTarget(null);
-        } else {
-            scrollToDate(date);
-        }
-    }, [pickingTarget, scrollToDate]);
-
     // Initial Content Injection
     useEffect(() => {
         if (editor && initialContent && !editor.isDestroyed) {
@@ -241,7 +122,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                 }
             });
         }
-    }, [editor]);
+    }, [editor, initialContent]);
 
     // Sync content if initialContent changes
     useEffect(() => {
@@ -254,15 +135,6 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
             }
         }
     }, [initialContent, editor]);
-
-    const [isMounted, setIsMounted] = useState(false);
-    useEffect(() => {
-        const frame = requestAnimationFrame(() => {
-            const timer = setTimeout(() => setIsMounted(true), 50);
-            return () => clearTimeout(timer);
-        });
-        return () => cancelAnimationFrame(frame);
-    }, []);
 
     const handleQuickInsertImage = useCallback(() => {
         if (!editor) return;
@@ -290,6 +162,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
 
     return (
         <div className="w-full flex flex-col items-center justify-start relative overflow-visible gap-4">
+            <ColumnarEditorStyles />
 
             {/* Save Status Indicator */}
             {saveStatus === 'saved' && (
@@ -421,42 +294,21 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                         </div>
                     )}
 
-                    <div
+                    <EditorContent
                         ref={contentRef}
-                        className="text-stone-900 box-border relative z-10 no-scrollbar max-w-none"
+                        editor={editor}
+                        className="prose-custom relative z-10"
                         style={{
-                            position: 'absolute',
-                            top: '60px',
-                            left: `${PAGE_WIDTH + 40}px`, // Shift content to Page 2
-                            height: `${PAGE_HEIGHT - 60 - 50}px`,
+                            width: `${(Math.ceil(pageCount / 2) * 2) * (PAGE_WIDTH + 40)}px`,
+                            height: '100%',
                             columnWidth: `${PAGE_WIDTH}px`,
                             columnGap: '40px',
                             columnFill: 'auto',
-                            width: 'fit-content',
-                            minWidth: `${PAGE_WIDTH}px`,
-                            overflow: 'visible',
-                        }}
-                    >
-                        <ColumnarEditorStyles />
-                        <EditorContent editor={editor} className="w-full h-full" />
-                    </div>
-                </div>
-
-                {/* Page Indicator */}
-                {pageCount > 2 && (
-                    <BookPageIndicator
-                        currentSpread={Math.max(0, Math.round(scrollPos / ((PAGE_WIDTH + 40) * 2)))}
-                        totalSpreads={Math.ceil(pageCount / 2)}
-                        onNavigate={(spreadIndex) => {
-                            if (containerRef.current) {
-                                containerRef.current.scrollTo({
-                                    left: spreadIndex * (PAGE_WIDTH + 40) * 2,
-                                    behavior: 'smooth'
-                                });
-                            }
+                            padding: '60px 20px',
+                            pointerEvents: isDrawingMode ? 'none' : 'auto'
                         }}
                     />
-                )}
+                </div>
             </div>
         </div>
     );

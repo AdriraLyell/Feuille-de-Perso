@@ -11,6 +11,7 @@ import { calculateTraitXP } from './xp/traitXP';
 import { calculateCounterXP } from './xp/counterXP';
 import { calculateSkillXP } from './xp/skillXP';
 import { evaluateFormula } from '../formulaEvaluator';
+import { logger } from '../../utils/logger';
 
 export { triangular, getXPCost } from './xp/xpCore';
 
@@ -94,7 +95,7 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
                 });
             }
         } catch (err) {
-            console.error(`Error calculating XP formula for trait ${e.source}:`, err);
+            logger.error(`Error calculating XP formula for trait ${e.source}:`, err);
         }
     });
 
@@ -121,7 +122,7 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 
     // 3. Construction du bilan final
     let gainDisplay = totalGain.toString();
-    let tooltip = `Total : ${totalGain} XP\n\nBase (Historique) : ${gainFromLogs}`;
+    const tooltip = `Total : ${totalGain} XP\n\nBase (Historique) : ${gainFromLogs}`;
 
     if (totalTraitXP > 0) {
         gainDisplay += ` (+${totalTraitXP})`;

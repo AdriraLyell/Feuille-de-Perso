@@ -7,6 +7,7 @@ import ConfirmationModal from './ui/ConfirmationModal';
 import { Award, Book, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useRules } from '../context/RulesContext';
+import { logger } from '../utils/logger';
 import { ErrorService } from '../services/ErrorService';
 import { createDotEntry } from '../utils/factories';
 
@@ -75,7 +76,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                 return;
             }
 
-            console.log(`[Promotion] Promouvoir "${specName}" vers ${secondaryCat} (Skill ID: ${skillId}, Index: ${index})`);
+            logger.info(`[Promotion] Promouvoir "${specName}" vers ${secondaryCat} (Skill ID: ${skillId}, Index: ${index})`);
 
             // 3. Créer la nouvelle compétence (valeur 0 comme demandé)
             const newSkill = createDotEntry(specName, 0);
@@ -103,7 +104,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
             onAddLog(`Spécialisation "${specName}" promue en compétence secondaire.`, 'success', 'sheet');
         } catch (err) {
-            console.error(`[Promotion] Error:`, err);
+            logger.error(`[Promotion] Error:`, err);
             ErrorService.handleError(err, { context: 'CharacterSheetSpecializations.handlePromote' });
         }
     };
@@ -267,7 +268,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                     Spécialisations
                     <button
                         onClick={() => setIsDrawerOpen(true)}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold py-1 px-3 rounded shadow-sm transition-colors flex items-center gap-1 uppercase"
+                        className="absolute right-0 top-1/2 -translate-y-1/2 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold py-1 px-3 rounded shadow-sm transition-colors flex items-center gap-1 uppercase cursor-pointer"
                     >
                         <Award size={14} /> Catalogue
                     </button>

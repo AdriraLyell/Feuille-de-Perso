@@ -4,7 +4,7 @@ import { CharacterSheetData } from '../../types';
 import { Download, User, Shield, LayoutTemplate, Layers, BookOpen, GraduationCap, Award } from 'lucide-react';
 import { APP_VERSION } from '../../constants/app';
 import { createTemplateFromData } from '../../utils/importExportUtils';
-import { getImage, blobToBase64 } from '../../imageDB';
+import { getImage, blobToBase64 } from '../../services/imageDB';
 import { useNotification } from '../../context/NotificationContext';
 import { ImageCompressionService } from '../../services/ImageCompressionService';
 import { ImageSyncResolver } from '../../services/ImageSyncResolver';

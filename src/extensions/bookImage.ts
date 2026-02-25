@@ -3,7 +3,7 @@ import type { RawCommands } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import BookImageView from '../components/campaign/book/BookImageView';
-import { saveImage } from '../imageDB';
+import { saveImage } from '../services/imageDB';
 
 export interface BookImageAttributes {
     imageId: string; // Reference to IndexedDB
@@ -107,7 +107,7 @@ export const BookImage = Node.create({
                         const { selection } = state;
                         const node = state.doc.nodeAt(selection.from);
                         if (node?.type.name === 'bookImage' && node.attrs.imageId) {
-                            import('../imageDB').then(({ deleteImage }) => {
+                            import('../services/imageDB').then(({ deleteImage }) => {
                                 deleteImage(node.attrs.imageId);
                             });
                         }

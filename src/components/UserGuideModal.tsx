@@ -102,7 +102,7 @@ const UserGuideModal: React.FC<UserGuideModalProps> = ({ isOpen, onClose }) => {
                                 </GuideSection>
 
                                 <GuideSection title="Mode Hors Ligne" icon={<WifiOff size={18} className="text-slate-500" />}>
-                                    <p>En cas de coupure réseau, l'application utilise un fichier de règles local (`default_rules.json`) et le cache de votre navigateur.</p>
+                                    <p>En cas de coupure réseau, l'application utilise la <strong>Configuration par défaut intégrée</strong> et le cache de votre navigateur.</p>
                                     <p className="mt-2 text-xs italic">La synchronisation reprendra dès le retour de la connexion.</p>
                                 </GuideSection>
 
