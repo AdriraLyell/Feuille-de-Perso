@@ -1,8 +1,12 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.81.4)
+# Audit - État des Lieux & Roadmap (Synthèse v2.81.5)
 
-> **Dernière mise à jour** : 2026-02-25 — Version 2.81.4
+> **Dernière mise à jour** : 2026-02-25 — Version 2.81.5
 
 ## 1. Phases Complétées
+ 
+### ✅ Phase 40 : Stabilisation CI & Workflow Prune (v2.81.5)
+- [x] **Correctif Workflow** : Ajout de `actions/checkout` et `--repo` au workflow `prune-history`.
+- [x] **Validation** : Run manuel réussi sur la branche `develop`.
 
 ### ✅ Phase 39 : Planification de la Migration "Tout Formule" (v2.81.4)
 - [x] **Audit Technique** : Identification des effets sémantiques codés en dur (`free_skill_rank`, `master_skill`, etc.).
