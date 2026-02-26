@@ -33,14 +33,24 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
     // 2. Attributes
     if (data.attributes) {
         Object.values(data.attributes).flat().forEach(attr => {
-            if (attr.name) vars[attr.name] = parseInt(attr.val2 || "0") || 0;
+            if (attr.name) {
+                const v1 = parseInt(attr.val1) || 0;
+                const v2 = parseInt(attr.val2) || 0;
+                const v3 = parseInt(attr.val3) || 0;
+                vars[attr.name] = v1 + v2 + v3;
+            }
         });
     }
 
     // 3. Secondary Attributes
     if (data.secondaryAttributes) {
         Object.values(data.secondaryAttributes).flat().forEach(attr => {
-            if (attr.name) vars[attr.name] = parseInt(attr.val2 || "0") || 0;
+            if (attr.name) {
+                const v1 = parseInt(attr.val1) || 0;
+                const v2 = parseInt(attr.val2) || 0;
+                const v3 = parseInt(attr.val3) || 0;
+                vars[attr.name] = v1 + v2 + v3;
+            }
         });
     }
 
@@ -51,30 +61,30 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
         });
     }
 
-    // 5. Aggregate Formula Variables (SUM, COUNT, etc.)
-    if (data.formulaVariables && Array.isArray(data.formulaVariables)) {
-        data.formulaVariables.forEach((fVar: any) => {
-            if (!fVar.name) return;
-            vars[fVar.name] = calculateAggregate(data, fVar);
-        });
-    }
-
-    // 6. MJ Variables (from formulaLibrary)
-    // We do multiple passes to resolve dependencies
+    // 5. MJ Variables (from formulaLibrary)
+    // We do multiple passes to resolve dependencies between variables
     if (data.formulaLibrary && Array.isArray(data.formulaLibrary)) {
-        const formulaEntries = data.formulaLibrary.filter(f => f.type === 'effect');
+        // Variables specifically marked as 'variable' are used as building blocks
+        const variableEntries = data.formulaLibrary.filter(f => f.type === 'variable');
         const memo = new Map<string, number>();
         const visiting = new Set<string>();
 
         const resolveGlobal = (name: string): number => {
             if (memo.has(name)) return memo.get(name)!;
-            const entry = formulaEntries.find(f => f.name === name);
+            const entry = variableEntries.find(f => (f.code && f.code === name) || f.name === name);
             if (!entry || visiting.has(name)) return vars[name] || 0;
 
             visiting.add(name);
             try {
-                // Pass the CURRENT vars (including aggregates) but avoid infinite recursion of getSheetVariables
-                const result = evaluateWithContext(entry.formula, { ...vars, ...Object.fromEntries(memo) }, resolveGlobal);
+                let result = 0;
+                if (entry.aggregateConfig) {
+                    // Aggregate Variable
+                    result = calculateAggregate(data, entry.aggregateConfig);
+                } else if (entry.formula) {
+                    // Equation Variable
+                    // Pass the CURRENT vars (including aggregates found so far)
+                    result = evaluateWithContext(entry.formula, { ...vars, ...Object.fromEntries(memo) }, resolveGlobal);
+                }
                 memo.set(name, result);
                 return result;
             } catch {
@@ -84,10 +94,19 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
             }
         };
 
-        formulaEntries.forEach(f => {
-            if (f.name && !memo.has(f.name)) {
-                vars[f.name] = resolveGlobal(f.name);
+        variableEntries.forEach(f => {
+            const varName = f.code || f.name;
+            if (varName && !memo.has(varName)) {
+                vars[varName] = resolveGlobal(varName);
             }
+        });
+    }
+
+    // 6. Legacy Formula Variables (Support fallback for temporary structures)
+    if ((data as any).formulaVariables && Array.isArray((data as any).formulaVariables)) {
+        (data as any).formulaVariables.forEach((fVar: any) => {
+            if (!fVar.name) return;
+            vars[fVar.name] = calculateAggregate(data, fVar);
         });
     }
 
@@ -121,17 +140,47 @@ const evaluateWithContext = (formula: string, context: Record<string, number>, r
 /**
  * Helper to calculate aggregate values (Sum of Skills, Max Attribute, etc.)
  */
-const calculateAggregate = (data: any, fVar: any): number => {
+export const calculateAggregate = (data: any, config: any): number => {
     let baseList: any[] = [];
-    switch (fVar.target) {
+    const targetType = config.targetType || config.target; // Support both names
+
+    switch (targetType) {
         case 'skills':
-            baseList = Object.values(data.skills || {}).flat();
+            // Inject category/tag metadata from the map keys and definitions
+            if (data.skills) {
+                Object.entries(data.skills).forEach(([catId, skills]) => {
+                    (skills as any[]).forEach(skill => {
+                        let tagFallback = skill.tag || catId;
+
+                        // 1. Direct check on the skill object (historical/migrated data)
+                        if (skill.mysticAbilityId) {
+                            tagFallback += ' Mystique';
+                        }
+                        // 2. Cross-reference with definitions to inject specialized tags (like Mystique)
+                        else if (data.skillLibrary) {
+                            const def = data.skillLibrary.find((d: any) => d.id === skill.definitionId);
+                            if (def && def.mysticAbilityId) {
+                                tagFallback += ' Mystique';
+                            }
+                        }
+
+                        baseList.push({
+                            ...skill,
+                            category: catId,
+                            tag: tagFallback
+                        });
+                    });
+                });
+            }
             break;
         case 'attributes':
             baseList = Object.values(data.attributes || {}).flat();
             break;
         case 'secondaryAttributes':
             baseList = Object.values(data.secondaryAttributes || {}).flat();
+            break;
+        case 'traits':
+            baseList = data.traits || [];
             break;
         case 'mysticAbilities':
             baseList = (data.mysticAbilities || []).filter((s: any) => typeof s !== 'string');
@@ -141,29 +190,37 @@ const calculateAggregate = (data: any, fVar: any): number => {
 
     // Apply filtering
     let filteredList = baseList;
-    if (fVar.filterTarget && fVar.filterValue) {
-        const val = fVar.filterValue.toLowerCase();
-        if (fVar.filterTarget === 'tag') {
-            filteredList = baseList.filter(item => item.tag && item.tag.toLowerCase().includes(val));
-        } else if (fVar.filterTarget === 'category') {
-            // Need to know category for skills... this is tricky in flattened list
-            // For now, assume it's filtered elsewhere or skip
+    if (config.filterTarget && config.filterValue) {
+        const val = config.filterValue.toLowerCase();
+        if (config.filterTarget === 'tag') {
+            // For skills/general: match tag OR category ID (allows matching "Mystique" if category key contains it)
+            filteredList = baseList.filter(item =>
+                (item.tag && item.tag.toLowerCase().includes(val)) ||
+                (item.category && item.category.toLowerCase().includes(val))
+            );
+        } else if (config.filterTarget === 'category') {
+            filteredList = baseList.filter(item => item.category && item.category.toLowerCase().includes(val));
+        } else if (config.filterTarget === 'name') {
+            filteredList = baseList.filter(item => item.name && item.name.toLowerCase().includes(val));
         }
     }
 
     // Perform operation
     const values = filteredList.map(item => {
         if (typeof item.value === 'number') return item.value;
-        if (typeof item.val2 === 'string') return parseInt(item.val2) || 0;
+        if (typeof item.val2 === 'string') return parseInt(item.val2) || 0; // Attributes
+        if (typeof item.level === 'number') return item.level; // Traits
         return 0;
     });
 
     if (values.length === 0) return 0;
 
-    switch (fVar.operation) {
+    switch (config.operation) {
         case 'sum': return values.reduce((a, b) => a + b, 0);
         case 'count': return values.filter(v => v > 0).length;
+        case 'max':
         case 'highest': return Math.max(...values);
+        case 'avg':
         case 'average': return values.reduce((a, b) => a + b, 0) / values.length;
         default: return 0;
     }
@@ -172,25 +229,32 @@ const calculateAggregate = (data: any, fVar: any): number => {
 /**
  * Evaluates a given formula against a character's state.
  */
-export const evaluateFormula = (formula: string, data: CharacterSheetData & { variables?: Record<string, number> }): number => {
+export const evaluateFormula = (formula: string, data: CharacterSheetData & { variables?: Record<string, number> }, entry?: any): number => {
+    // If it's an aggregate formula, calculate it directly
+    if (entry?.aggregateConfig) {
+        return calculateAggregate(data, entry.aggregateConfig);
+    }
+
     if (!formula) return 0;
 
     try {
         const sheetVars = getSheetVariables(data);
+        const context = { ...sheetVars };
 
         // Use expr-eval parser
         const expr = parser.parse(formula);
 
-        // Evaluate with variables
-        // expr-eval handles missing variables by setting them to undefined (which might result in NaN or error)
-        // We'll provide the sheetVars as context.
-        const result = expr.evaluate(sheetVars);
+        // Map undefined variables to 0 to prevent evaluation errors
+        expr.variables().forEach(v => {
+            if (context[v] === undefined) context[v] = 0;
+        });
+
+        // Evaluate with safe context
+        const result = expr.evaluate(context);
 
         return isNaN(result) ? 0 : Math.floor(Number(result));
     } catch (e) {
-        // Fallback for rough editing - if it fails to parse because user is currently typing
-        // or using unknown symbols/variables
-        console.warn(`expr-eval failed for "${formula}":`, e);
+        // Fallback for rough editing
         return 0;
     }
 };

@@ -225,7 +225,8 @@ export const LibraryCounterEntrySchema = z.object({
     isActive: z.boolean().optional(),
     defaultCategory: z.string().nullable().optional(),
     isNumeric: z.boolean().optional(),
-    formula: z.string().optional()
+    formula: z.string().optional(),
+    formulaId: z.string().optional() // ID de la formule globale à utiliser pour le Max
 });
 
 export const LibraryBackgroundEntrySchema = LibrarySkillEntrySchema;
@@ -318,12 +319,18 @@ export const LibraryFormulaEntrySchema = z.object({
     id: z.string(),
     name: z.string(),
     formula: z.string(),
-    type: z.enum(['effect', 'reserve']),
+    type: z.enum(['modifier', 'variable']), // 'modifier' = Affecte une carac, 'variable' = Calcul pur
     target: z.string().optional(),
     effectType: z.string().optional(),
     description: z.string().optional(),
     isGlobal: z.boolean().optional(),
-    isActive: z.boolean().optional()
+    isActive: z.boolean().optional(),
+    aggregateConfig: z.object({
+        operation: z.enum(['sum', 'count', 'max', 'avg']),
+        targetType: z.enum(['skills', 'attributes', 'traits']),
+        filterTarget: z.enum(['category', 'tag', 'name']),
+        filterValue: z.string()
+    }).optional()
 });
 
 // --- Main Schema ---

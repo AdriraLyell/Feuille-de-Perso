@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryFormulaEntry } from '../../../types';
 import { generateId } from '../../../utils/factories';
 import { evaluateFormula } from '../../../utils/formulaEvaluator';
-import { Trash2, Plus, Calculator, Info, Check } from 'lucide-react';
+import { Trash2, Plus, Calculator, Info, Check, Filter, Sigma, Code2, AlertCircle } from 'lucide-react';
 import { MotionCard } from '../../../components/ui/motion/MotionCard';
 
 const DUMMY_PREVIEW_DATA: any = {
@@ -26,8 +26,16 @@ const DUMMY_PREVIEW_DATA: any = {
         ]
     },
     skills: {
-        col1: [{ name: 'Arts Martiaux', value: 3 }, { name: 'Athlétisme', value: 2 }],
-        col2: [{ name: 'Savoir Mystique', value: 2 }]
+        Col_Comp_1: [{ name: 'Arts Martiaux', value: 3 }, { name: 'Athlétisme', value: 2 }],
+        Col_Comp_5: [{ name: 'Savoir Mystique', value: 2 }, { name: 'Occultisme', value: 4 }]
+    },
+    traits: [
+        { name: 'Avantage 1', level: 1, category: 'Avantages', tag: 'Social' },
+        { name: 'Désavantage 1', level: 2, category: 'Désavantages', tag: 'Physique' }
+    ],
+    variables: {
+        SCENARIOS_COUNT: 5,
+        TRAIT_LEVEL: 3
     }
 };
 
@@ -35,6 +43,53 @@ interface AdminFormulasEditorProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
 }
+
+/**
+ * Specialized input to avoid cursor jumping when performing transformations like toUpperCase()
+ */
+const CodeInput: React.FC<{
+    value: string;
+    onChange: (val: string) => void;
+    placeholder?: string;
+    className?: string;
+}> = ({ value, onChange, placeholder, className }) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [localValue, setLocalValue] = useState(value);
+
+    useEffect(() => {
+        if (value !== localValue) {
+            setLocalValue(value);
+        }
+    }, [value]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const input = e.target;
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        const val = input.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
+
+        setLocalValue(val);
+        onChange(val);
+
+        // Restore cursor after state update/re-render
+        requestAnimationFrame(() => {
+            if (inputRef.current) {
+                inputRef.current.setSelectionRange(start, end);
+            }
+        });
+    };
+
+    return (
+        <input
+            ref={inputRef}
+            type="text"
+            value={localValue}
+            onChange={handleChange}
+            placeholder={placeholder}
+            className={className}
+        />
+    );
+};
 
 const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpdate }) => {
     const lib = rules.libraries?.formulas || [];
@@ -47,10 +102,13 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
     const allVariables = [
         'XP_TOTAL',
         'SUM_MYSTIC',
+        'TRAIT_LEVEL',
+        'SCENARIOS_COUNT',
+        ...lib.map(f => f.code).filter(Boolean), // Codes des autres formules
         ...Object.values(rules.definitions.attributes).flat(),
         ...Object.values(rules.definitions.secondaryAttributes || {}).flat(),
         ...(rules.libraries.skills || []).map(s => s.name)
-    ].filter((v, i, a) => a.indexOf(v) === i); // Unique values
+    ].filter((v, i, a) => a && v && a.indexOf(v) === i) as string[]; // Unique values
 
     const handleUpdate = (newLib: LibraryFormulaEntry[]) => {
         onUpdate({
@@ -65,8 +123,9 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
     const addCounter = () => {
         const newCounter: LibraryFormulaEntry = {
             id: generateId(),
-            name: "Nouvelle Formule",
-            type: 'effect',
+            name: "Nouvelle Variable",
+            code: "VAR_" + generateId().substring(0, 4).toUpperCase(),
+            type: 'variable',
             formula: "10",
             isActive: true,
             isGlobal: true,
@@ -78,16 +137,30 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
     };
 
     const updateCounter = (id: string, field: keyof LibraryFormulaEntry, value: any) => {
-        const newLib = lib.map(c => c.id === id ? { ...c, [field]: value } : c);
-        handleUpdate(newLib);
+        const oldEntry = lib.find(c => c.id === id);
+        const oldCode = oldEntry?.code;
+        const isCodeChange = field === 'code' && oldCode && oldCode !== value;
 
-        if (field === 'formula') {
-            try {
-                setPreviewValue(evaluateFormula(value, DUMMY_PREVIEW_DATA));
-            } catch {
-                setPreviewValue(0);
+        const newLib = lib.map(c => {
+            if (c.id === id) {
+                const updated = { ...c, [field]: value };
+                // Re-evaluate preview if formula or aggregate config changed
+                if (field === 'formula' || field === 'aggregateConfig' || field === 'type') {
+                    setPreviewValue(evaluateFormula(updated.formula || '', DUMMY_PREVIEW_DATA, updated));
+                }
+                return updated as any;
             }
-        }
+
+            // CASCADE: If code changed, update occurrences in other formulas
+            if (isCodeChange && c.formula && c.formula.includes(oldCode)) {
+                // Regex for exact word replacement to avoid partial matches (ex: VAR vs VAR_2)
+                const regex = new RegExp(`\\b${oldCode}\\b`, 'g');
+                return { ...c, formula: c.formula.replace(regex, value) };
+            }
+
+            return c;
+        });
+        handleUpdate(newLib);
     };
 
     const removeCounter = (id: string) => {
@@ -145,13 +218,13 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                         existing = {
                             id: generateId(),
                             name: `Mécanique: ${trait.name}`,
-                            type: 'effect',
+                            type: 'modifier',
                             formula: formulaString,
                             isActive: true,
                             isGlobal: true,
                             description: `Importé depuis le trait ${trait.name}`
                         };
-                        currentFormulas.push(existing);
+                        currentFormulas.push(existing as any);
                         formulasCreated++;
                     }
 
@@ -215,7 +288,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
             <div className="space-y-4">
                 {formulaCounters.map(counter => {
                     const isEditing = editingId === counter.id;
-                    const preview = isEditing && previewValue !== null ? previewValue : evaluateFormula(counter.formula || '', DUMMY_PREVIEW_DATA);
+                    const preview = isEditing && previewValue !== null ? previewValue : evaluateFormula(counter.formula || '', DUMMY_PREVIEW_DATA, counter);
 
                     return (
                         <div key={counter.id} className={`border rounded-sm overflow-hidden transition-all ${isEditing ? 'border-amber-500 ring-1 ring-amber-500/50 bg-stone-900/80' : 'border-stone-700/50 bg-stone-900/40 hover:border-amber-500/30'}`}>
@@ -225,23 +298,36 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                 onClick={() => {
                                     if (!isEditing) {
                                         setEditingId(counter.id);
-                                        setPreviewValue(evaluateFormula(counter.formula || '', DUMMY_PREVIEW_DATA));
+                                        setPreviewValue(evaluateFormula(counter.formula || '', DUMMY_PREVIEW_DATA, counter));
                                     }
                                 }}
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
-                                        <Calculator size={18} />
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${counter.type === 'variable' ? 'bg-blue-500/10 text-blue-400' :
+                                        'bg-amber-500/10 text-amber-500'
+                                        }`}>
+                                        {counter.aggregateConfig ? <Sigma size={18} /> : <Calculator size={18} />}
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-stone-200">{counter.name}</h3>
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="font-bold text-stone-200">{counter.name}</h3>
+                                            {counter.code && <span className="text-[10px] bg-stone-800 text-stone-400 px-1.5 py-0.5 rounded font-mono uppercase border border-stone-700">{counter.code}</span>}
+                                        </div>
                                         {!isEditing && <p className="text-xs text-stone-500 font-mono mt-0.5">{counter.formula}</p>}
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4">
-                                    <div className="text-right flex flex-col">
-                                        <span className="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Aperçu (Fictif)</span>
-                                        <span className="font-black text-xl text-amber-500 leading-none">{preview}</span>
+                                    <div className="text-right flex flex-col items-end">
+                                        <span className="text-[10px] text-stone-500 uppercase tracking-widest font-bold flex items-center gap-1">
+                                            Aperçu (Fictif)
+                                            {preview !== null && !isNaN(preview) ?
+                                                <Check size={10} className="text-emerald-500" /> :
+                                                <AlertCircle size={10} className="text-rose-500" />
+                                            }
+                                        </span>
+                                        <span className={`font-black text-xl leading-none ${preview !== null && !isNaN(preview) ? 'text-amber-500' : 'text-stone-600'}`}>
+                                            {preview !== null && !isNaN(preview) ? preview : 'ERROR'}
+                                        </span>
                                     </div>
                                     {isEditing && (
                                         <button
@@ -258,8 +344,8 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                             {/* Editor */}
                             {isEditing && (
                                 <div className="p-4 border-t border-stone-700/50 bg-stone-900 flex flex-col gap-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
+                                    <div className="grid grid-cols-12 gap-4">
+                                        <div className="col-span-4">
                                             <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Nom (ex: Calcul du Mana)</label>
                                             <input
                                                 type="text"
@@ -268,7 +354,18 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                                 className="w-full p-2 bg-stone-950 border border-stone-700 text-stone-300 rounded focus:border-amber-500 outline-none"
                                             />
                                         </div>
-                                        <div>
+                                        <div className="col-span-3">
+                                            <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1 flex items-center gap-1">
+                                                Code <span className="text-stone-600 italic">(UPPERCASE)</span>
+                                            </label>
+                                            <CodeInput
+                                                value={counter.code || ''}
+                                                onChange={val => updateCounter(counter.id, 'code', val)}
+                                                placeholder="EX: SUM_MYSTIC"
+                                                className="w-full p-2 bg-stone-950 border border-stone-700 text-amber-500 font-mono text-xs rounded focus:border-amber-500 outline-none"
+                                            />
+                                        </div>
+                                        <div className="col-span-5">
                                             <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Description (Optionnel)</label>
                                             <input
                                                 type="text"
@@ -280,24 +377,100 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                     </div>
 
                                     <div>
-                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Affichage & Comportement</label>
+                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Rôle de la Formule</label>
                                         <div className="flex gap-2 p-1 bg-stone-950 rounded border border-stone-700/50 w-fit">
                                             <button
-                                                onClick={() => updateCounter(counter.id, 'type', 'effect')}
-                                                className={`px-3 py-1 text-xs font-bold rounded ${counter.type === 'effect' ? 'bg-amber-600 text-stone-900' : 'text-stone-400 hover:text-stone-300'}`}
+                                                onClick={() => updateCounter(counter.id, 'type', 'variable')}
+                                                className={`px-3 py-1 text-xs font-bold rounded transition-colors ${counter.type === 'variable' ? 'bg-blue-600 text-white shadow-glow-blue' : 'text-stone-400 hover:text-stone-300'}`}
                                             >
-                                                Effet / Variable (Interne)
+                                                Variable MJ (Calcul)
                                             </button>
                                             <button
-                                                onClick={() => updateCounter(counter.id, 'type', 'reserve')}
-                                                className={`px-3 py-1 text-xs font-bold rounded ${counter.type === 'reserve' ? 'bg-amber-600 text-stone-900' : 'text-stone-400 hover:text-stone-300'}`}
+                                                onClick={() => updateCounter(counter.id, 'type', 'modifier')}
+                                                className={`px-3 py-1 text-xs font-bold rounded transition-colors ${counter.type === 'modifier' || (counter as any).type === 'effect' ? 'bg-amber-600 text-stone-900 border-amber-400/50' : 'text-stone-400 hover:text-stone-300'}`}
                                             >
-                                                Réserve Joueur (Jauge)
+                                                Effet (Modificateur)
                                             </button>
                                         </div>
+                                        <p className="text-[10px] text-stone-500 mt-2 italic px-1">
+                                            {counter.type === 'variable' && "Sert de brique de calcul interne (ex: SUM_MYSTIC ou MENACE)."}
+                                            {(counter.type === 'modifier' || (counter as any).type === 'effect') && "Modifie une caractéristique existante. Utilisable comme effet de trait."}
+                                        </p>
                                     </div>
 
-                                    {counter.type === 'effect' && (
+                                    {counter.type === 'variable' && (
+                                        <div className="animate-in fade-in slide-in-from-top-2">
+                                            <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Source de la Variable</label>
+                                            <div className="flex gap-2 p-1 bg-stone-950 rounded border border-stone-700/50 w-fit">
+                                                <button
+                                                    onClick={() => updateCounter(counter.id, 'aggregateConfig', undefined)}
+                                                    className={`px-3 py-1 text-[10px] font-bold rounded transition-colors ${!counter.aggregateConfig ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' : 'text-stone-500 hover:text-stone-400'}`}
+                                                >
+                                                    Équation Libre
+                                                </button>
+                                                <button
+                                                    onClick={() => updateCounter(counter.id, 'aggregateConfig', { operation: 'sum', targetType: 'skills', filterTarget: 'tag', filterValue: 'Mystique' })}
+                                                    className={`px-3 py-1 text-[10px] font-bold rounded transition-colors ${counter.aggregateConfig ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30' : 'text-stone-500 hover:text-stone-400'}`}
+                                                >
+                                                    Somme Automatique (Agrégat)
+                                                </button>
+                                            </div>
+
+                                            {counter.aggregateConfig && (
+                                                <div className="mt-4 p-3 bg-stone-950 border border-blue-500/20 rounded grid grid-cols-2 gap-4 animate-in zoom-in-95">
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Opération</label>
+                                                        <select
+                                                            value={counter.aggregateConfig.operation}
+                                                            onChange={e => updateCounter(counter.id, 'aggregateConfig', { ...counter.aggregateConfig, operation: e.target.value })}
+                                                            className="w-full bg-stone-900 border border-stone-700 text-stone-300 text-xs p-2 rounded outline-none focus:border-blue-500"
+                                                        >
+                                                            <option value="sum">Somme (Total des points)</option>
+                                                            <option value="count">Nombre (Total d'éléments)</option>
+                                                            <option value="max">Maximum (Plus haut score)</option>
+                                                            <option value="avg">Moyenne</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Groupe Cible</label>
+                                                        <select
+                                                            value={counter.aggregateConfig.targetType}
+                                                            onChange={e => updateCounter(counter.id, 'aggregateConfig', { ...counter.aggregateConfig, targetType: e.target.value })}
+                                                            className="w-full bg-stone-900 border border-stone-700 text-stone-300 text-xs p-2 rounded outline-none focus:border-blue-500"
+                                                        >
+                                                            <option value="skills">Compétences</option>
+                                                            <option value="attributes">Attributs</option>
+                                                            <option value="traits">Traits (Avantages/Désav.)</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Filtrer par</label>
+                                                        <select
+                                                            value={counter.aggregateConfig.filterTarget}
+                                                            onChange={e => updateCounter(counter.id, 'aggregateConfig', { ...counter.aggregateConfig, filterTarget: e.target.value })}
+                                                            className="w-full bg-stone-900 border border-stone-700 text-stone-300 text-xs p-2 rounded outline-none focus:border-blue-500"
+                                                        >
+                                                            <option value="tag">Tag (ex: Mystique)</option>
+                                                            <option value="category">Catégorie / Colonne</option>
+                                                            <option value="name">Nom Contient</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Mot-clé du filtre</label>
+                                                        <input
+                                                            type="text"
+                                                            value={counter.aggregateConfig.filterValue}
+                                                            onChange={e => updateCounter(counter.id, 'aggregateConfig', { ...counter.aggregateConfig, filterValue: e.target.value })}
+                                                            className="w-full bg-stone-900 border border-stone-700 text-stone-300 text-xs p-2 rounded outline-none focus:border-blue-500"
+                                                            placeholder="ex: Mystique"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {(counter.type === 'modifier' || (counter as any).type === 'effect') && (
                                         <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
                                             <div>
                                                 <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Cible de l'Effet (ex: Force, XP, PV)</label>
@@ -329,69 +502,71 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                         </div>
                                     )}
 
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Équation Mathématique</label>
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                value={counter.formula}
-                                                onChange={e => {
-                                                    const val = e.target.value;
-                                                    updateCounter(counter.id, 'formula', val);
+                                    {!counter.aggregateConfig && (
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Équation Mathématique</label>
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    value={counter.formula}
+                                                    onChange={e => {
+                                                        const val = e.target.value;
+                                                        updateCounter(counter.id, 'formula', val);
 
-                                                    // Get the word under cursor or last word
-                                                    const words = val.split(/[\s+\-*/()]/);
-                                                    const lastWord = words[words.length - 1];
-                                                    setSearchQuery(lastWord.length > 1 ? lastWord : '');
-                                                }}
-                                                className="w-full p-3 bg-stone-950 border border-stone-700 text-stone-300 rounded font-mono text-sm focus:border-amber-500 outline-none shadow-inner"
-                                                placeholder="ex: 10 + Constitution + Volonté"
-                                            />
+                                                        // Get the word under cursor or last word
+                                                        const words = val.split(/[\s+\-*/()]/);
+                                                        const lastWord = words[words.length - 1];
+                                                        setSearchQuery(lastWord.length > 1 ? lastWord : '');
+                                                    }}
+                                                    className="w-full p-3 bg-stone-950 border border-stone-700 text-stone-300 rounded font-mono text-sm focus:border-amber-500 outline-none shadow-inner"
+                                                    placeholder="ex: 10 + Constitution + Volonté"
+                                                />
 
-                                            {searchQuery && (
-                                                <div className="absolute z-10 top-full left-0 w-full mt-1 bg-stone-900 border border-amber-500/30 rounded shadow-2xl max-h-40 overflow-y-auto">
+                                                {searchQuery && (
+                                                    <div className="absolute z-10 top-full left-0 w-full mt-1 bg-stone-900 border border-amber-500/30 rounded shadow-2xl max-h-40 overflow-y-auto">
+                                                        {allVariables
+                                                            .filter(v => v.toLowerCase().includes(searchQuery.toLowerCase()) && v !== searchQuery)
+                                                            .slice(0, 10)
+                                                            .map(v => (
+                                                                <button
+                                                                    key={v}
+                                                                    onClick={() => {
+                                                                        const parts = counter.formula.split(/([\s+\-*/()])/);
+                                                                        parts[parts.length - 1] = v;
+                                                                        updateCounter(counter.id, 'formula', parts.join(''));
+                                                                        setSearchQuery('');
+                                                                    }}
+                                                                    className="w-full text-left p-2 hover:bg-amber-600 hover:text-stone-950 text-stone-300 text-xs border-b border-stone-800 last:border-0 transition-colors"
+                                                                >
+                                                                    {v}
+                                                                </button>
+                                                            ))}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="mt-3">
+                                                <span className="text-[10px] text-stone-500 flex items-center gap-1 uppercase tracking-widest font-bold mb-2">
+                                                    <Info size={12} /> Suggestions rapides (cliquez pour ajouter) :
+                                                </span>
+                                                <div className="flex wrap gap-1.5">
                                                     {allVariables
-                                                        .filter(v => v.toLowerCase().includes(searchQuery.toLowerCase()) && v !== searchQuery)
-                                                        .slice(0, 10)
+                                                        .filter(v => ['XP_TOTAL', 'SUM_MYSTIC', 'TRAIT_LEVEL', 'SCENARIOS_COUNT', 'Physique', 'Volonté', 'Constitution', 'Empathie', 'Intelligence'].includes(v))
                                                         .map(v => (
                                                             <button
                                                                 key={v}
-                                                                onClick={() => {
-                                                                    const parts = counter.formula.split(/([\s+\-*/()])/);
-                                                                    parts[parts.length - 1] = v;
-                                                                    updateCounter(counter.id, 'formula', parts.join(''));
-                                                                    setSearchQuery('');
-                                                                }}
-                                                                className="w-full text-left p-2 hover:bg-amber-600 hover:text-stone-950 text-stone-300 text-xs border-b border-stone-800 last:border-0 transition-colors"
+                                                                onClick={() => updateCounter(counter.id, 'formula', (counter.formula.trim() ? counter.formula + ' + ' : '') + v)}
+                                                                className="text-[10px] px-2 py-1 bg-stone-800 hover:bg-stone-700 border border-stone-700 rounded font-mono text-stone-400 transition-all hover:text-amber-400"
                                                             >
                                                                 {v}
                                                             </button>
-                                                        ))}
+                                                        ))
+                                                    }
+                                                    <span className="text-stone-700 text-[10px] self-center ml-2 italic">Tapez pour chercher d'autres variables...</span>
                                                 </div>
-                                            )}
-                                        </div>
-
-                                        <div className="mt-3">
-                                            <span className="text-[10px] text-stone-500 flex items-center gap-1 uppercase tracking-widest font-bold mb-2">
-                                                <Info size={12} /> Suggestions rapides (cliquez pour ajouter) :
-                                            </span>
-                                            <div className="flex flex-wrap gap-1.5">
-                                                {allVariables
-                                                    .filter(v => ['XP_TOTAL', 'SUM_MYSTIC', 'Physique', 'Volonté', 'Constitution', 'Empathie', 'Intelligence'].includes(v))
-                                                    .map(v => (
-                                                        <button
-                                                            key={v}
-                                                            onClick={() => updateCounter(counter.id, 'formula', (counter.formula.trim() ? counter.formula + ' + ' : '') + v)}
-                                                            className="text-[10px] px-2 py-1 bg-stone-800 hover:bg-stone-700 border border-stone-700 rounded font-mono text-stone-400 transition-all hover:text-amber-400"
-                                                        >
-                                                            {v}
-                                                        </button>
-                                                    ))
-                                                }
-                                                <span className="text-stone-700 text-[10px] self-center ml-2 italic">Tapez pour chercher d'autres variables...</span>
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
 
                                     <div className="flex justify-start items-center mt-2 pt-4 border-t border-stone-700/50">
                                         <button

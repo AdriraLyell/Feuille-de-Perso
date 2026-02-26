@@ -278,6 +278,9 @@ export const getInitialCharacterData = (): CharacterSheetData => {
       isActive: true,
       isGlobal: true
     })),
+    formulaLibrary: [],
+    formulaVariables: [],
+    formulaMacros: [],
     partyNotes: {
       members: [],
       columns: [],

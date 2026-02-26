@@ -81,7 +81,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
 
                     // Find current formula entry
                     const selectedFormulaEntry = allFormulas.find(f => f.id === effect.formulaId);
-                    const isReserve = selectedFormulaEntry?.type === 'reserve';
+                    const isReserve = selectedFormulaEntry?.type === 'variable';
 
                     return (
                         <div key={effect.id || `effect-${index}`} className={`rounded-lg border ${borderColor} ${bgColor} shadow-sm overflow-hidden group`}>
@@ -228,7 +228,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                     <option value="" className="italic text-stone-500">-- Choisir une mécanique globale --</option>
                                                     {allFormulas.map(f => (
                                                         <option key={f.id} value={f.id}>
-                                                            {f.type === 'reserve' ? '⭐ ' : '⚙️ '}{f.name} ({f.formula})
+                                                            {f.type === 'variable' ? '⭐ ' : '⚙️ '}{f.name} ({f.formula})
                                                         </option>
                                                     ))}
                                                 </select>

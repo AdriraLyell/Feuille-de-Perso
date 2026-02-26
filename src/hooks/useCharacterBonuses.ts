@@ -23,6 +23,7 @@ export const useCharacterBonuses = (
         const blockedSkills: Record<string, { isBlocked: boolean, sourceName: string }> = {};
         const counterCreationBonuses: Record<string, number> = {};
         const counterXPBonuses: Record<string, number> = {};
+        const calculatedMaxes: Record<string, number> = {};
         const activeReserves: Set<string> = new Set();
         const allTraits = [...(avantages || []), ...(desavantages || [])];
 
@@ -42,7 +43,7 @@ export const useCharacterBonuses = (
                         const globalFormula = rules.libraries.formulas.find(f => f.id === effect.formulaId);
                         if (globalFormula) {
                             formulaString = globalFormula.formula;
-                            if (globalFormula.type === 'reserve') {
+                            if (globalFormula.type === 'variable') {
                                 isReserve = true;
                                 activeReserves.add(globalFormula.id);
                             }
@@ -128,6 +129,26 @@ export const useCharacterBonuses = (
                 });
             }
         });
-        return { attributeBonuses, blockedSkills, counterCreationBonuses, counterXPBonuses, activeReserves: Array.from(activeReserves) };
+        // Calculate Dynamic Maxes for Counters
+        if (characterData && rules?.libraries?.counters) {
+            Object.values(characterData.skills || {}).flat().forEach(skill => {
+                // We only care about skills that are actually "Counters" 
+                // (This is determined by their category behavior, but checking library here is more direct)
+                const counterLibEntry = rules.libraries.counters.find(c => c.name === skill.name);
+                if (counterLibEntry?.formulaId) {
+                    const formulaEntry = rules.libraries.formulas?.find(f => f.id === counterLibEntry.formulaId);
+                    if (formulaEntry) {
+                        try {
+                            const maxVal = evaluateFormula(formulaEntry.formula, characterData);
+                            calculatedMaxes[skill.name] = maxVal;
+                        } catch (e) {
+                            logger.error(`Error calculating dynamic max for counter ${skill.name}:`, e);
+                        }
+                    }
+                }
+            });
+        }
+
+        return { attributeBonuses, blockedSkills, counterCreationBonuses, counterXPBonuses, calculatedMaxes, activeReserves: Array.from(activeReserves) };
     }, [avantages, desavantages, library, rulesTraits, characterData, rules]);
 };

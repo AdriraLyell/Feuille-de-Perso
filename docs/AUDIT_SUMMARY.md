@@ -1,9 +1,16 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.81.5)
+# Audit - État des Lieux & Roadmap (Synthèse v2.83.0)
 
-> **Dernière mise à jour** : 2026-02-25 — Version 2.81.5
+> **Dernière mise à jour** : 2026-02-26 — Version 2.83.0
 
 ## 1. Phases Complétées
- 
+
+### ✅ Phase 41 : Migration des Formules & Moteur de Calcul (v2.83.0)
+- [x] **Moteur Récursif** : Implémentation du moteur `formulaEvaluator.ts` avec support de la récursivité et détection de boucles.
+- [x] **Variables MJ & Agrégats** : Support des mots-clés dynamiques (`SUM_SKILL`, `COUNT_TRAITS`) et des variables définies par le MJ.
+- [x] **Dictionnaire Centralisé** : Unification des effets via `formulaLibrary`. Les formules portent désormais leur propre `target` et `effectType`.
+- [x] **Simplification UX** : Les traits peuvent désormais se lier à une formule globale unique, héritant automatiquement de son comportement mécanique.
+- [x] **Stabilité & Typage** : Refonte des types `CharacterSheetData` et des schémas Zod pour une intégration robuste du dictionnaire de formules.
+
 ### ✅ Phase 40 : Stabilisation CI & Workflow Prune (v2.81.5)
 - [x] **Correctif Workflow** : Ajout de `actions/checkout` et `--repo` au workflow `prune-history`.
 - [x] **Validation** : Run manuel réussi sur la branche `develop`.

@@ -97,17 +97,28 @@ export const LibraryMapper = {
         defaultValue: (c as any).default_value ?? c.defaultValue ?? 0,
         xpCost: (c as any).xp_cost ?? c.xpCost ?? 0,
         appearance: c.appearance || null,
+        formulaId: c.formula_id,
         defaultCategory: localDefaultCategory || c.defaultCategory || (c as any).default_category,
         isGlobal: c.setting_id == null,
         isActive: activeIds.has(c.id) || c.setting_id === sid
     }),
-    mapFormula: (f: DBFormula, activeIds: Set<string>, sid: string): LibraryFormulaEntry => ({
-        id: f.id,
-        name: f.name,
-        formula: f.formula,
-        type: f.type,
-        description: f.description || '',
-        isGlobal: f.setting_id == null,
-        isActive: activeIds.has(f.id) || f.setting_id === sid
-    })
+    mapFormula: (f: DBFormula, activeIds: Set<string>, sid: string): LibraryFormulaEntry => {
+        let type: 'modifier' | 'variable' = 'variable';
+        if (f.type === 'effect' || f.type === 'modifier') type = 'modifier';
+        else if (f.type === 'reserve' || f.type === 'variable') type = 'variable';
+
+        return {
+            id: f.id,
+            name: f.name,
+            code: f.code,
+            formula: f.formula,
+            type: type,
+            aggregateConfig: f.aggregate_config,
+            target: f.target,
+            effectType: f.effect_type,
+            description: f.description || '',
+            isGlobal: f.setting_id == null,
+            isActive: activeIds.has(f.id) || f.setting_id === sid
+        };
+    }
 };

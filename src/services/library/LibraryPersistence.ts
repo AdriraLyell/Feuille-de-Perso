@@ -40,6 +40,7 @@ export const LibraryPersistence = {
                     const payload: any = {
                         id: item.id,
                         name: item.name,
+                        code: item.code,
                         description: item.description,
                         setting_id: null
                     };
@@ -63,12 +64,16 @@ export const LibraryPersistence = {
                         payload.max_value = item.maxValue;
                         payload.default_value = item.defaultValue;
                         payload.xp_cost = item.xpCost;
+                        payload.formula_id = item.formulaId || null;
                     } else if (typeCfg.key === 'specializations') {
                         payload.skill_ids = item.skillIds;
                         payload.default_min_level = item.defaultMinLevel;
                     } else if (typeCfg.key === 'formulas') {
                         payload.formula = item.formula;
                         payload.type = item.type;
+                        payload.target = item.target;
+                        payload.effect_type = item.effectType;
+                        payload.aggregate_config = item.aggregateConfig;
                     }
 
                     toCreate.push(payload);
@@ -101,6 +106,7 @@ export const LibraryPersistence = {
                 const payload: any = {
                     id: item.id, // Mandatory for upsert
                     name: item.name,
+                    code: item.code,
                     description: item.description,
                     setting_id: null // Ensure it's marked as Global in the repository
                 };
@@ -136,12 +142,16 @@ export const LibraryPersistence = {
                     payload.max_value = item.maxValue;
                     payload.default_value = item.defaultValue;
                     payload.xp_cost = item.xpCost;
+                    payload.formula_id = item.formulaId || null;
                 } else if (typeCfg.key === 'specializations') {
                     payload.skill_ids = item.skillIds;
                     payload.default_min_level = item.defaultMinLevel;
                 } else if (typeCfg.key === 'formulas') {
                     payload.formula = item.formula;
                     payload.type = item.type;
+                    payload.target = item.target;
+                    payload.effect_type = item.effectType;
+                    payload.aggregate_config = item.aggregateConfig;
                 }
 
                 // Use UPSERT instead of update to handle newly created items from the UI

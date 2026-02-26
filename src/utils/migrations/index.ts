@@ -278,13 +278,13 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
                             existing = {
                                 id: generateId(),
                                 name: `Mécanique: ${trait.name}`,
-                                type: 'effect',
+                                type: 'modifier',
                                 formula: formulaString,
                                 isActive: true,
                                 isGlobal: true,
                                 description: `Importé depuis le trait ${trait.name}`
                             };
-                            rules.libraries.formulas!.push(existing);
+                            rules.libraries.formulas!.push(existing as any);
                         }
 
                         // Mutate the effect

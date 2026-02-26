@@ -85,6 +85,7 @@ export interface DBCounter {
     xpCost?: number;
     defaultCategory?: string;
     appearance?: 'squares_only' | null;
+    formula_id?: string;
     created_at?: string;
     updated_at?: string;
 }
@@ -167,8 +168,12 @@ export interface DBFormula {
     id: string;
     setting_id: string | null;
     name: string;
+    code?: string;
     formula: string;
-    type: 'effect' | 'reserve';
+    type: 'modifier' | 'variable' | 'effect' | 'reserve';
+    target?: string;
+    effect_type?: string;
+    aggregate_config?: any;
     description?: string;
     is_active?: boolean;
     created_at?: string;

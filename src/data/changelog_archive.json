@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.76.3",
+        "date": "2026-02-24",
+        "type": "refactor",
+        "description": "Admin : Compactage majeur de l'interface. Migration des pavés d'en-tête en bandeaux fins, passage à un layout sur deux colonnes pour l'onglet Paramètres, et correction visuelle des commutateurs (switches) pour éviter les débordements."
+    },
+    {
         "version": "2.76.2",
         "date": "2026-02-24",
         "type": "feat",
@@ -592,11 +598,5 @@
         "date": "2026-02-19",
         "type": "refactor",
         "description": "Refonte du 'Hub Cloud' : Fusion de la synchronisation (Push) et de la bibliothèque (Pull) dans une interface unifiée via le bouton Synchro. Le 'Grimoire de Sauvegarde' est désormais dédié exclusivement aux opérations locales (JSON)."
-    },
-    {
-        "version": "2.56.47",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Ajout du bandeau 'Oracle' et d'une surbrillance pour guider la configuration des Habilités Mystiques en mode création."
     }
 ]

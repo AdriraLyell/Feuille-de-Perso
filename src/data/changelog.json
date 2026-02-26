@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.90.0",
+        "date": "2026-02-26",
+        "type": "feat",
+        "description": "Refonte Architecturale (Logic vs Object) : Unification des variables MJ et agrégats dans un moteur de calcul centralisé. Les 'Réserves' sont désormais des 'Compteurs Dynamiques' liés à des formules. Ajout du support des agrégats personnalisés (Somme/Compte de traits/compétences avec filtres). Mise à jour de l'interface d'administration pour une expérience plus intuitive et guidée."
+    },
+    {
         "version": "2.83.0",
         "date": "2026-02-26",
         "type": "feat",
@@ -111,11 +117,5 @@
         "date": "2026-02-24",
         "type": "feat",
         "description": "Système de Formules : Intégration d'un module de Formules permettant aux admins de créer des compteurs numériques dynamiques et de définir leur maximum via des équations incluant Variables, Caractéristiques, et Compétences (ex: XP_TOTAL + Intelligence)."
-    },
-    {
-        "version": "2.76.3",
-        "date": "2026-02-24",
-        "type": "refactor",
-        "description": "Admin : Compactage majeur de l'interface. Migration des pavés d'en-tête en bandeaux fins, passage à un layout sur deux colonnes pour l'onglet Paramètres, et correction visuelle des commutateurs (switches) pour éviter les débordements."
     }
 ]

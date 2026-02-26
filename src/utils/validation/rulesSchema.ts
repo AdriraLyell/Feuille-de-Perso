@@ -61,6 +61,7 @@ export const LibraryCounterEntrySchema = z.object({
     maxValue: z.number().nullable().optional(),
     defaultValue: z.number().nullable().optional(),
     xpCost: z.number().nullable().optional(),
+    formulaId: z.string().nullable().optional(),
     isGlobal: z.boolean().nullable().optional(),
     isActive: z.boolean().nullable().optional(),
 });
@@ -68,8 +69,17 @@ export const LibraryCounterEntrySchema = z.object({
 export const LibraryFormulaEntrySchema = z.object({
     id: z.string(),
     name: z.string(),
+    code: z.string().nullable().optional(),
     formula: z.string(),
-    type: z.enum(['effect', 'reserve']),
+    type: z.enum(['modifier', 'variable']),
+    target: z.string().nullable().optional(),
+    effectType: z.string().nullable().optional(),
+    aggregateConfig: z.object({
+        operation: z.enum(['sum', 'count']),
+        targetType: z.enum(['skills', 'traits', 'backgrounds']),
+        filterTarget: z.enum(['tag', 'category', 'name', 'all']),
+        filterValue: z.string().optional(),
+    }).nullable().optional(),
     description: z.string().nullable().optional(),
     isGlobal: z.boolean().nullable().optional(),
     isActive: z.boolean().nullable().optional(),
@@ -140,6 +150,8 @@ export const RulesCounterDefinitionSchema = z.object({
     value: z.number().optional(),
     defaultValue: z.number().optional(),
     description: z.string().optional(),
+    formulaId: z.string().optional(),
+    appearance: z.string().optional(),
 });
 
 // --- Calendar ---

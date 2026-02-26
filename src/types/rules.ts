@@ -75,6 +75,7 @@ export interface RulesCounterDefinition {
     defaultValue?: number; // Starting value (New system)
     description?: string; // New: Description for tooltip
     appearance?: 'squares_only'; // Utilisé pour masquer les bulles (ex: Compteurs de Traits)
+    formulaId?: string; // ID de la formule globale à utiliser pour le Max
 }
 
 export interface RulesData {

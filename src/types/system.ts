@@ -170,18 +170,27 @@ export interface LibraryCounterEntry {
   globalUsage?: number;
   isNumeric?: boolean;
   formula?: string;
+  formulaId?: string; // ID de la formule globale à utiliser pour le Max
 }
 
 export interface LibraryFormulaEntry {
   id: string;
   name: string;
+  code?: string; // Identifiant technique pour les calculs (ex: SUM_MYSTIC)
   formula: string;
-  type: 'effect' | 'reserve'; // 'effect' = Bonus mécanique (ex: +1 Force), 'reserve' = Compteur dynamique (ex: Mana)
-  target?: string; // New: Nom de l'attribut/compétence cible (ex: "Force", "XP", "Vitesse")
-  effectType?: string; // New: Type d'effet sémantique (ex: "attribute_bonus", "block_skill_increase")
+  type: 'modifier' | 'variable'; // 'modifier' = Affecte une valeur (Cible/Action), 'variable' = Calcul interne (Equation ou Agrégat)
+  target?: string;
+  effectType?: string;
   description?: string;
   isGlobal?: boolean;
   isActive?: boolean;
+  // Configuration pour l'agrégation automatique (Mode Somme/Compte)
+  aggregateConfig?: {
+    operation: 'sum' | 'count' | 'max' | 'avg';
+    targetType: 'skills' | 'attributes' | 'traits';
+    filterTarget: 'category' | 'tag' | 'name';
+    filterValue: string;
+  };
 }
 
 export interface LogEntry {
