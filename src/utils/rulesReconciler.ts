@@ -278,6 +278,11 @@ const reconcileLibraries = (newState: CharacterSheetData, rules: RulesData) => {
     if (rules.libraries.mysticAbilities) {
         newState.mysticAbilities = rules.libraries.mysticAbilities;
     }
+
+    // 7. Formula Library
+    if (rules.libraries.formulas) {
+        newState.formulaLibrary = rules.libraries.formulas;
+    }
 };
 
 /**

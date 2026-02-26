@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.83.0",
+        "date": "2026-02-26",
+        "type": "feat",
+        "description": "Migration des Formules (Phase Finale) : Implémentation du moteur de calcul récursif avec variables MJ et agrégats. Refonte de l'éditeur de formules pour supporter les effets auto-portants (target/effectType hérités). Mise à jour du calculateur d'XP et de useCharacterBonuses pour une interprétation unifiée des mécaniques via le dictionnaire global."
+    },
+    {
         "version": "2.82.5",
         "date": "2026-02-25",
         "type": "fix",
@@ -111,11 +117,5 @@
         "date": "2026-02-24",
         "type": "refactor",
         "description": "Admin : Compactage majeur de l'interface. Migration des pavés d'en-tête en bandeaux fins, passage à un layout sur deux colonnes pour l'onglet Paramètres, et correction visuelle des commutateurs (switches) pour éviter les débordements."
-    },
-    {
-        "version": "2.76.2",
-        "date": "2026-02-24",
-        "type": "feat",
-        "description": "Admin (Général & Création) : Refonte structurelle de l'onglet avec l'introduction d'un système de sous-onglets ('Création' et 'Paramètres'). Compactage de l'en-tête via une disposition en grille des panneaux 'Information de Campagne' et 'Configuration Système'. Réorganisation thématique des réglages (méthodes de création d'un côté, mécaniques transverses comme l'XP, les cartes et les habilités mystiques de l'autre) pour une meilleure ergonomie."
     }
 ]

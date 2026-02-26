@@ -314,6 +314,18 @@ export const FormulaVariableSchema = z.object({
     description: z.string().optional()
 });
 
+export const LibraryFormulaEntrySchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    formula: z.string(),
+    type: z.enum(['effect', 'reserve']),
+    target: z.string().optional(),
+    effectType: z.string().optional(),
+    description: z.string().optional(),
+    isGlobal: z.boolean().optional(),
+    isActive: z.boolean().optional()
+});
+
 // --- Main Schema ---
 
 export const Page2DataSchema = z.object({
@@ -389,9 +401,10 @@ export const CharacterSheetDataSchema = z.object({
     }).optional(),
     appVersion: z.string().optional(),
     syncInfo: SyncInfoSchema.optional(),
-    mysticAbilities: z.array(LibrarySkillEntrySchema).optional().nullable().default([]),
+    mysticAbilities: z.array(LibrarySkillEntrySchema).optional().default([]),
     formulaMacros: z.array(FormulaMacroSchema).optional().default([]),
     formulaVariables: z.array(FormulaVariableSchema).optional().default([]),
+    formulaLibrary: z.array(LibraryFormulaEntrySchema).optional().default([]), // Nouveau : Dictionnaire central
     suggestions: z.array(z.any()).optional().default([]),
     _rulesVersion: z.string().optional(),
     _schemaVersion: z.number().optional()

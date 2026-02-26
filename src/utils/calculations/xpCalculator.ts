@@ -28,32 +28,52 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 
     // 1. Helpers pour les bonus
     const getFreeRankLimit = (skillName: string) => {
-        // 1. Bonus via free_skill_rank trait effect
-        const effect = activeEffects.find(e =>
-            e.type === 'free_skill_rank' &&
-            e.target &&
-            skillName.trim().toLowerCase() === e.target.trim().toLowerCase()
-        );
+        const normalizedSkillName = skillName.trim().toLowerCase();
+
+        // 1. Bonus via trait effects (including formula-derived ones)
+        const effect = activeEffects.find(e => {
+            const effectiveType = (e as any).inferredEffectType || e.type;
+            const effectiveTarget = e.target || (e as any).inferredTarget;
+
+            return (effectiveType === 'free_skill_rank' ||
+                (effectiveType === 'formula' && effectiveTarget === skillName)) &&
+                effectiveTarget &&
+                normalizedSkillName === effectiveTarget.trim().toLowerCase();
+        });
+
         if (effect) return effect.value;
 
         // 2. Compétence maîtrisée via master_skill : rang 5 entièrement gratuit
-        const normalizedSkillName = skillName.trim().toLowerCase();
-        const hasMasterEffect = [
+        const hasMasterEffect = activeEffects.some(e => {
+            const effectiveType = (e as any).inferredEffectType || e.type;
+            const effectiveTarget = e.target || (e as any).inferredTarget;
+
+            return effectiveType === 'master_skill' &&
+                effectiveTarget &&
+                effectiveTarget.trim().toLowerCase() === normalizedSkillName;
+        });
+
+        // Backward compatibility for old masterSkillTarget field on traits
+        const hasLegacyMasterEffect = [
             ...(data.page2?.avantages || []),
             ...(data.page2?.desavantages || [])
         ].some(trait =>
             trait.masterSkillTarget &&
             trait.masterSkillTarget.trim().toLowerCase() === normalizedSkillName
         );
-        if (hasMasterEffect) return 5;
+
+        if (hasMasterEffect || hasLegacyMasterEffect) return 5;
 
         return 0;
     };
 
     // Calcul des bonus XP via Formules
-    const xpFormulaEffects = activeEffects.filter(e =>
-        e.type === 'formula' && e.target && e.target.trim().toUpperCase() === 'XP'
-    );
+    const xpFormulaEffects = activeEffects.filter(e => {
+        const effectiveType = (e as any).inferredEffectType || e.type;
+        const effectiveTarget = e.target || (e as any).inferredTarget;
+        return (effectiveType === 'formula' || effectiveType === 'xp_bonus') &&
+            effectiveTarget && effectiveTarget.trim().toUpperCase() === 'XP';
+    });
 
     const scenarioLogs = (data.xpLogs || []).filter(log =>
         log.countsAsScenario !== undefined
@@ -157,17 +177,31 @@ function getActiveTraitEffects(data: CharacterSheetData, rules?: RulesData): Act
         if (!traitName) return;
         const normalizedName = normalizeString(traitName);
 
+        // helper to enrich effect with global formula data
+        const enrichEffect = (e: TraitEffect, source: string): ActiveEffect => {
+            const active: any = { ...e, source, traitLevel };
+            if (e.formulaId && rules?.libraries?.formulas) {
+                const global = rules.libraries.formulas.find(f => f.id === e.formulaId);
+                if (global) {
+                    if (global.target) active.inferredTarget = global.target;
+                    if (global.effectType) active.inferredEffectType = global.effectType;
+                    if (global.formula) active.formula = global.formula;
+                }
+            }
+            return active;
+        };
+
         // 1. Recherche Local
         const localEntry = data.library?.find(l => normalizeString(l.name) === normalizedName);
         if (localEntry && localEntry.effects && localEntry.effects.length > 0) {
-            localEntry.effects.forEach(e => activeEffects.push({ ...e, source: localEntry.name, traitLevel }));
+            localEntry.effects.forEach(e => activeEffects.push(enrichEffect(e, localEntry.name)));
             return;
         }
 
         // 2. Recherche Global
         const globalEntry = globalTraitMap.get(normalizedName);
         if (globalEntry && globalEntry.effects && globalEntry.effects.length > 0) {
-            globalEntry.effects.forEach(e => activeEffects.push({ ...e, source: globalEntry.name, traitLevel }));
+            globalEntry.effects.forEach(e => activeEffects.push(enrichEffect(e, globalEntry.name)));
         }
     };
 

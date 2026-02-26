@@ -314,6 +314,32 @@
         }
     },
     "libraries": {
+        "formulas": [
+            {
+                "id": "xp_heros",
+                "name": "XP : Héros d'Exception",
+                "formula": "20",
+                "target": "XP",
+                "effectType": "xp_bonus",
+                "description": "Bonus massif d'XP à la création"
+            },
+            {
+                "id": "maitrise_bagarre",
+                "name": "Maîtrise : Bagarre",
+                "formula": "5",
+                "target": "Bagarre",
+                "effectType": "free_skill_rank",
+                "description": "Rang 5 offert en Bagarre"
+            },
+            {
+                "id": "bonus_reflexes",
+                "name": "Bonus : Réflexes Rapides",
+                "formula": "Agilité + Intuition",
+                "target": "Initiative",
+                "effectType": "stat_bonus",
+                "description": "Bonus d'initiative basé sur les caracs"
+            }
+        ],
         "traits": [
             {
                 "id": "l80rw72gm",
@@ -458,14 +484,13 @@
                 "name": "Maitre",
                 "type": "avantage",
                 "cost": "3",
-                "description": "",
+                "description": "Maîtrise innée d'une discipline physique.",
                 "tags": [],
                 "effects": [
                     {
                         "id": "h6wxnagx8",
-                        "type": "free_skill_rank",
-                        "value": 5,
-                        "target": "Bagarre"
+                        "type": "formula",
+                        "formulaId": "maitrise_bagarre"
                     }
                 ]
             },
@@ -492,13 +517,13 @@
                 "name": "Héros d'Exception",
                 "type": "avantage",
                 "cost": "3",
-                "description": "",
+                "description": "Destiné à de grandes choses.",
                 "tags": [],
                 "effects": [
                     {
                         "id": "dod5zpi6j",
-                        "type": "xp_bonus",
-                        "value": 20
+                        "type": "formula",
+                        "formulaId": "xp_heros"
                     }
                 ]
             },

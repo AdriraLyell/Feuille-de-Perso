@@ -177,6 +177,8 @@ export interface LibraryFormulaEntry {
   name: string;
   formula: string;
   type: 'effect' | 'reserve'; // 'effect' = Bonus mécanique (ex: +1 Force), 'reserve' = Compteur dynamique (ex: Mana)
+  target?: string; // New: Nom de l'attribut/compétence cible (ex: "Force", "XP", "Vitesse")
+  effectType?: string; // New: Type d'effet sémantique (ex: "attribute_bonus", "block_skill_increase")
   description?: string;
   isGlobal?: boolean;
   isActive?: boolean;

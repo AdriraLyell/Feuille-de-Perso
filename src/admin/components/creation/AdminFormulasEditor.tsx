@@ -280,13 +280,13 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                     </div>
 
                                     <div>
-                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Type de Formule</label>
+                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Affichage & Comportement</label>
                                         <div className="flex gap-2 p-1 bg-stone-950 rounded border border-stone-700/50 w-fit">
                                             <button
                                                 onClick={() => updateCounter(counter.id, 'type', 'effect')}
                                                 className={`px-3 py-1 text-xs font-bold rounded ${counter.type === 'effect' ? 'bg-amber-600 text-stone-900' : 'text-stone-400 hover:text-stone-300'}`}
                                             >
-                                                Effet Invisible
+                                                Effet / Variable (Interne)
                                             </button>
                                             <button
                                                 onClick={() => updateCounter(counter.id, 'type', 'reserve')}
@@ -296,6 +296,38 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                             </button>
                                         </div>
                                     </div>
+
+                                    {counter.type === 'effect' && (
+                                        <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Cible de l'Effet (ex: Force, XP, PV)</label>
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        value={counter.target || ''}
+                                                        onChange={e => updateCounter(counter.id, 'target', e.target.value)}
+                                                        className="w-full p-2 bg-stone-950 border border-stone-700 text-stone-300 rounded focus:border-amber-500 outline-none"
+                                                        placeholder="Chercher une cible..."
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Type d'Action (Sémantique)</label>
+                                                <select
+                                                    value={counter.effectType || ''}
+                                                    onChange={e => updateCounter(counter.id, 'effectType', e.target.value)}
+                                                    className="w-full p-2 bg-stone-950 border border-stone-700 text-stone-300 rounded focus:border-amber-500 outline-none"
+                                                >
+                                                    <option value="">Standard (Bonus numérique)</option>
+                                                    <option value="attribute_bonus">Bonus d'Attribut (val2)</option>
+                                                    <option value="xp_bonus">Gain d'Expérience</option>
+                                                    <option value="block_skill_increase">Blocage de Compétence</option>
+                                                    <option value="free_skill_rank">Rang de Compétence Gratuit</option>
+                                                    <option value="master_skill">Maîtrise (Fixe à 5)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <div>
                                         <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Équation Mathématique</label>

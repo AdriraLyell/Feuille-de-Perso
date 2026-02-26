@@ -46,6 +46,16 @@ export const useCharacterBonuses = (
                                 isReserve = true;
                                 activeReserves.add(globalFormula.id);
                             }
+
+                            // AUTO-PORTANTE: Heirarchical Target and EffectType
+                            // If the effect doesn't have a target, use the global formula's target
+                            if (!effect.target && globalFormula.target) {
+                                effect.target = globalFormula.target;
+                            }
+                            // If the effect doesn't have a type or is generic 'formula', use global effectType if set
+                            if (globalFormula.effectType) {
+                                (effect as any).inferredEffectType = globalFormula.effectType;
+                            }
                         }
                     }
 
@@ -80,8 +90,13 @@ export const useCharacterBonuses = (
                         try {
                             const result = evaluateFormula(formulaString, localDataForEval);
 
-                            // Ignore formulas targeting XP (Handled by xpCalculator)
-                            if (targetName === 'xp') return;
+                            const effectiveEffectType = (effect as any).inferredEffectType || effect.type;
+
+                            // Handle special semantic effects even for formulas
+                            if (effectiveEffectType === 'xp_bonus' || targetName === 'xp') {
+                                // XP handled elsewhere (but we could record it here if needed)
+                                return;
+                            }
 
                             const isAttribute = Object.keys(characterData.attributes).some(
                                 cat => characterData.attributes[cat].some(attr => normalizeString(attr.name) === targetName)
@@ -93,6 +108,10 @@ export const useCharacterBonuses = (
                                 }
                                 attributeBonuses[targetName].value += result;
                                 attributeBonuses[targetName].sources.push(`${trait.name} (Formule: ${result > 0 ? '+' : ''}${result})`);
+                            } else if (effectiveEffectType === 'master_skill' || effectiveEffectType === 'block_skill_increase') {
+                                // These are handled by their own logic blocks usually, but if they came from a formula,
+                                // we might want to register them.
+                                // block_skill_increase is already handled above line 53 if it's the static type.
                             } else {
                                 // Assume it's a counter
                                 if (trait.isPostCreation) {

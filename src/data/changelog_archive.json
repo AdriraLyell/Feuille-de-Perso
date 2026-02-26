@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.76.2",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Admin (Général & Création) : Refonte structurelle de l'onglet avec l'introduction d'un système de sous-onglets ('Création' et 'Paramètres'). Compactage de l'en-tête via une disposition en grille des panneaux 'Information de Campagne' et 'Configuration Système'. Réorganisation thématique des réglages (méthodes de création d'un côté, mécaniques transverses comme l'XP, les cartes et les habilités mystiques de l'autre) pour une meilleure ergonomie."
+    },
+    {
         "version": "2.76.1",
         "date": "2026-02-23",
         "type": "fix",
@@ -592,11 +598,5 @@
         "date": "2026-02-19",
         "type": "feat",
         "description": "Ajout du bandeau 'Oracle' et d'une surbrillance pour guider la configuration des Habilités Mystiques en mode création."
-    },
-    {
-        "version": "2.56.46",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Nettoyage final du journal des modifications et validation de la structure JSON."
     }
 ]

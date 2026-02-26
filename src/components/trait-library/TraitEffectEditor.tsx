@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TraitEffect, LibraryFormulaEntry } from '../../types';
-import { Zap, X, Star, GraduationCap, Dumbbell, ChevronDown, Trophy, PlusCircle, TrendingUp, Calculator, Info } from 'lucide-react';
+import { Zap, X, Star, GraduationCap, Dumbbell, ChevronDown, Trophy, PlusCircle, TrendingUp, Calculator, Info, CheckCircle2 } from 'lucide-react';
 
 interface TraitEffectEditorProps {
     effects: TraitEffect[];
@@ -236,7 +236,30 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                             </div>
                                         </div>
 
-                                        {!isReserve && (
+                                        {isReserve ? (
+                                            <div className="bg-amber-100/30 p-2 rounded border border-amber-200/50 flex items-start gap-2 animate-in fade-in duration-300">
+                                                <Info size={14} className="text-amber-700 shrink-0 mt-0.5" />
+                                                <p className="text-[9px] text-amber-800 leading-tight">
+                                                    Cette formule étant de type <strong>Réserve Joueur</strong>, elle s'affichera automatiquement comme une jauge sur la fiche.
+                                                    Pas de cible spécifique requise.
+                                                </p>
+                                            </div>
+                                        ) : selectedFormulaEntry?.target ? (
+                                            <div className="bg-indigo-100/30 p-2 rounded border border-indigo-200/50 flex items-start justify-between items-center animate-in fade-in duration-300">
+                                                <div className="flex items-start gap-2">
+                                                    <CheckCircle2 size={14} className="text-indigo-700 shrink-0 mt-0.5" />
+                                                    <div>
+                                                        <p className="text-[10px] text-indigo-900 font-bold leading-tight">
+                                                            Cible héritée : <span className="text-indigo-600 bg-white/50 px-1 rounded">{selectedFormulaEntry.target}</span>
+                                                        </p>
+                                                        <p className="text-[8px] text-indigo-800/60 italic leading-tight mt-0.5">
+                                                            La cible est définie dans le dictionnaire MJ.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-[8px] font-bold text-indigo-400 uppercase tracking-tighter">Auto-Portante</div>
+                                            </div>
+                                        ) : (
                                             <div className="flex flex-col animate-in fade-in duration-300">
                                                 <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest flex justify-between items-center">
                                                     <span>Cible de l'Effet (Attribute, XP...)</span>
@@ -258,16 +281,6 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                     </select>
                                                     <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-800/40" />
                                                 </div>
-                                            </div>
-                                        )}
-
-                                        {isReserve && (
-                                            <div className="bg-amber-100/30 p-2 rounded border border-amber-200/50 flex items-start gap-2">
-                                                <Info size={14} className="text-amber-700 shrink-0 mt-0.5" />
-                                                <p className="text-[9px] text-amber-800 leading-tight">
-                                                    Cette formule étant de type <strong>Réserve Joueur</strong>, elle s'affichera automatiquement comme une jauge sur la fiche.
-                                                    Pas de cible spécifique requise.
-                                                </p>
                                             </div>
                                         )}
                                     </div>
