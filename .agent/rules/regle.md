@@ -10,7 +10,9 @@ Privilégier le Francais dans les docs/rapports/plans
 
 ## 1. ARCHITECTURE & PRINCIPES
 - **Hybrid Database Engine** : Supabase est maître. L'app est "Online First", mais doit TOUJOURS fonctionner Offline (via `src/data/defaultRules.ts`).
-- **Chirurgie du Code** : Modifications minimales et précises via l'agent de codage (**Aider** / `replace_file_content`). Ne jamais réécrire un fichier complet inutilement pour préserver l'historique et limiter l'usage de tokens.
+- **Chirurgie du Code** : Modifications minimales et précises via l'agent de codage (**Aider** / `replace_file_content`). Ne jamais réécrire un fichier complet inutilement pour préserver l'historique et limiter l'usage de tokens. Voir `/aider` pour la syntaxe sécurisée.
+- **Aider Integration** : Toujours utiliser le workflow `/aider` pour garantir la stabilité des commandes sous Windows. Se reposer sur `.aider.conf.yml` pour la configuration système.
+
 - **Typage Strict** : Éviter `any` et `@ts-ignore`. Préférer les structures Zod et les types inférés.
 - **UX Premium** : Interfaces vivantes, micro-animations, feedback visuel immédiat.
 - **Outil de Navigation (Playwright)** : Utiliser le `browser_subagent` pour valider visuellement les changements complexes (ex: pagination, overflow, responsive) lorsque les logs ne suffisent pas.
@@ -56,7 +58,9 @@ Avant chaque fin de tâche (notify_user) :
 - **Code** : `src/`
 - **Docs** : `docs/`
 - **Règles Agent** : `.agent/rules/`
+- **Workflows Agent** : `.agent/workflows/`
 - **Brain** : `<appDataDir>/brain/<uuid>/` (Artifacts temporaires).
+
 
 ## 7. WORKFLOW GIT (GitHub Flow+)
 

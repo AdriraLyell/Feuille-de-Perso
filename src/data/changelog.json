@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.92.5",
+        "date": "2026-02-26",
+        "type": "chore",
+        "description": "Suppression de l'intégration Aider et Cline : Retrait des configurations, historiques et scripts associés pour nettoyer l'environnement de travail."
+    },
+    {
+        "version": "2.92.4",
+        "date": "2026-02-26",
+        "type": "feat",
+        "description": "Support Aider : Intégration d'un workflow robuste (.agent/workflows/aider.md) et mise à jour des règles agent pour garantir des modifications précises et sans erreurs de syntaxe sous Windows."
+    },
+    {
         "version": "2.92.3",
         "date": "2026-02-26",
         "type": "fix",
@@ -106,16 +118,5 @@
         "date": "2026-02-24",
         "type": "fix",
         "description": "Migration des Règles Globales : Correction du script de migration pour inclure les paramètres de campagne globaux (`RulesData`), assurant la conversion silencieuse des anciens effets quantitatifs locaux en formules orphelines. Mise à jour de l'outil d'unification dans l'administration pour détecter, traiter et assigner ces effets legacy existants au dictionnaire global."
-    },
-    {
-        "version": "2.80.0",
-        "date": "2026-02-24",
-        "type": "feat",
-        "description": "Unification Formula System : Intégration complète du dictionnaire global de formules. Les traits peuvent désormais référencer des mécaniques centralisées (Bonus, Réserves). Introduction d'un outil de migration automatique dans l'administration pour transformer les anciennes formules locales en entrées globales. Support dynamique des 'Réserves Joueur' qui s'affichent automatiquement sur la fiche si le trait correspondant est possédé."
-    },
-    {
-        "version": "2.78.0",
-        "date": "2026-02-24",
-        "description": "Migration des données et Nettoyage de Code : Script de migration (v4) pour convertir tous les anciens effets quantitatifs (attribute_bonus, xp_bonus, counter_max_bonus) vers le nouveau système de formules. Suppression complète des anciennes mentions de ces effets du code source."
     }
 ]

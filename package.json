@@ -1,7 +1,7 @@
 {
   "name": "rpg-sheet-manager",
   "private": true,
-  "version": "2.92.3",
+  "version": "2.92.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,7 +14,6 @@
     "test:e2e": "playwright test",
     "sync-version": "node scripts/sync-version.js",
     "lint": "eslint src/",
-    "aider": "powershell -File ./scripts/aider-local.ps1",
     "verify": "powershell -File ./scripts/verify-agent.ps1"
   },
   "dependencies": {

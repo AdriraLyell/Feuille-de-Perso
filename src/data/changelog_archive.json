@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.80.0",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Unification Formula System : Intégration complète du dictionnaire global de formules. Les traits peuvent désormais référencer des mécaniques centralisées (Bonus, Réserves). Introduction d'un outil de migration automatique dans l'administration pour transformer les anciennes formules locales en entrées globales. Support dynamique des 'Réserves Joueur' qui s'affichent automatiquement sur la fiche si le trait correspondant est possédé."
+    },
+    {
+        "version": "2.78.0",
+        "date": "2026-02-24",
+        "description": "Migration des données et Nettoyage de Code : Script de migration (v4) pour convertir tous les anciens effets quantitatifs (attribute_bonus, xp_bonus, counter_max_bonus) vers le nouveau système de formules. Suppression complète des anciennes mentions de ces effets du code source."
+    },
+    {
         "version": "2.77.0",
         "date": "2026-02-24",
         "type": "feat",
@@ -586,17 +597,5 @@
         "date": "2026-02-20",
         "type": "style",
         "description": "Correction UI : Alignement de la barre latérale des spécialisations sous le bandeau de navigation principal pour éviter le masquage."
-    },
-    {
-        "version": "2.56.53",
-        "date": "2026-02-20",
-        "type": "feat",
-        "description": "Amélioration UI : Ajout d'une modale d'erreur explicite ('Promotion Impossible') si la compétence secondaire existe déjà."
-    },
-    {
-        "version": "2.56.51",
-        "date": "2026-02-20",
-        "type": "style",
-        "description": "Amélioration UI : Remplacement de la boîte de dialogue système 'confirm' par une modale thématique personnalisée pour confirmer la promotion d'une spécialisation en compétence secondaire."
     }
 ]
