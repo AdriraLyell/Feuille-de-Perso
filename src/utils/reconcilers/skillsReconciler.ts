@@ -79,6 +79,7 @@ function processSkillCategories(
                             ...existing,
                             name,
                             definitionId,
+                            mysticAbilityId: (libSkill as any)?.mysticAbilityId || (existing as any).mysticAbilityId,
                             max,
                             description: description || existing.description,
                             variant: existing.variant !== undefined ? existing.variant : ""
@@ -113,6 +114,7 @@ function processSkillCategories(
                         name,
                         description: description || existing.description,
                         definitionId,
+                        mysticAbilityId: (libSkill as any)?.mysticAbilityId || (existing as any).mysticAbilityId,
                         variant: (existing.variant === "" || existing.variant === undefined) ? undefined : existing.variant
                     }];
                 } else {

@@ -89,7 +89,10 @@ export const useCharacterBonuses = (
                         };
 
                         try {
-                            const result = evaluateFormula(formulaString, localDataForEval);
+                            const result = evaluateFormula(formulaString, {
+                                ...localDataForEval,
+                                formulaLibrary: rules?.libraries?.formulas || localDataForEval.formulaLibrary
+                            });
 
                             const effectiveEffectType = (effect as any).inferredEffectType || effect.type;
 
@@ -139,7 +142,10 @@ export const useCharacterBonuses = (
                     const formulaEntry = rules.libraries.formulas?.find(f => f.id === counterLibEntry.formulaId);
                     if (formulaEntry) {
                         try {
-                            const maxVal = evaluateFormula(formulaEntry.formula, characterData);
+                            const maxVal = evaluateFormula(formulaEntry.formula, {
+                                ...characterData,
+                                formulaLibrary: rules.libraries.formulas
+                            });
                             calculatedMaxes[skill.name] = maxVal;
                         } catch (e) {
                             logger.error(`Error calculating dynamic max for counter ${skill.name}:`, e);
@@ -147,6 +153,49 @@ export const useCharacterBonuses = (
                     }
                 }
             });
+
+            // Handle Standard Counters (those in data.counters)
+            if (characterData.counters) {
+                const processCounter = (counter: any) => {
+                    if (!counter || !counter.name) return;
+                    const nameKey = normalizeString(counter.name);
+                    const libEntry = rules.libraries.counters.find(c => normalizeString(c.name) === nameKey);
+
+                    if (libEntry?.formulaId) {
+                        const formulaEntry = rules.libraries.formulas?.find(f => f.id === libEntry.formulaId);
+                        if (formulaEntry) {
+                            try {
+                                const maxVal = evaluateFormula(formulaEntry.formula, {
+                                    ...characterData,
+                                    formulaLibrary: rules.libraries.formulas
+                                });
+                                calculatedMaxes[counter.name] = maxVal;
+                            } catch (e) {
+                                logger.error(`Error calculating dynamic max for counter ${counter.name}:`, e);
+                            }
+                        }
+                    } else if (libEntry?.formula) {
+                        try {
+                            const maxVal = evaluateFormula(libEntry.formula, {
+                                ...characterData,
+                                formulaLibrary: rules.libraries.formulas
+                            });
+                            calculatedMaxes[counter.name] = maxVal;
+                        } catch (e) {
+                            logger.error(`Error calculating dynamic max for counter ${counter.name}:`, e);
+                        }
+                    }
+                };
+
+                Object.keys(characterData.counters).forEach(key => {
+                    const value = characterData.counters[key as keyof typeof characterData.counters];
+                    if (Array.isArray(value)) {
+                        value.forEach(processCounter);
+                    } else {
+                        processCounter(value);
+                    }
+                });
+            }
         }
 
         return { attributeBonuses, blockedSkills, counterCreationBonuses, counterXPBonuses, calculatedMaxes, activeReserves: Array.from(activeReserves) };

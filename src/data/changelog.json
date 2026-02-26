@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.92.3",
+        "date": "2026-02-26",
+        "type": "fix",
+        "description": "Correction du bug critique d'injection dans le moteur de calcul : Les variables résolues récursivement (comme SUM_HABILITES_MYSTIQUES) sont désormais correctement propagées au contexte final de la fiche, garantissant la mise à jour en temps réel de la Force Vitale et des autres compteurs dynamiques."
+    },
+    {
+        "version": "2.92.0",
+        "date": "2026-02-26",
+        "type": "fix",
+        "description": "Normalisation globale du moteur de calcul : Support universel des accents dans les variables (ex: Volonté / Volonte), renforcement de la détection des compétences mystiques via normalisation des noms, et ajout de logs de diagnostic pour le suivi des agrégats dynamiques."
+    },
+    {
+        "version": "2.91.0",
+        "date": "2026-02-26",
+        "type": "fix",
+        "description": "Correction de la mise à jour des compteurs dynamiques : Amélioration de l'identification des compétences mystiques par nom (fallback), synchronisation forcée des propriétés mystiques lors de l'édition, et injection systématique de la bibliothèque globale de formules lors de l'évaluation des jauge de réserve (Force Vitale) pour garantir la réactivité en temps réel."
+    },
+    {
         "version": "2.90.0",
         "date": "2026-02-26",
         "type": "feat",
@@ -99,23 +117,5 @@
         "version": "2.78.0",
         "date": "2026-02-24",
         "description": "Migration des données et Nettoyage de Code : Script de migration (v4) pour convertir tous les anciens effets quantitatifs (attribute_bonus, xp_bonus, counter_max_bonus) vers le nouveau système de formules. Suppression complète des anciennes mentions de ces effets du code source."
-    },
-    {
-        "version": "2.77.0",
-        "date": "2026-02-24",
-        "type": "feat",
-        "description": "Système de Formules : Refonte des anciens modificateurs quantitatifs (+Attributs, +XP, +Comptoirs). Le créateur de trait (MJ) peut désormais utiliser l'option de calcul par Formule permettant de démultiplier les effets de n'importe quel attribut ou compteur à l'aide de données d'XP ou du Niveau de Trait."
-    },
-    {
-        "version": "2.76.5",
-        "date": "2026-02-24",
-        "type": "feat",
-        "description": "Système de Formules : L'onglet Formules a été déplacé du panneau des Paramètres Joueur (Rouage de la fiche) vers l'interface d'Administration (Général et création > Formules). Les formules sont désormais des paramètres globaux injectés directement aux fiches par le MJ."
-    },
-    {
-        "version": "2.76.4",
-        "date": "2026-02-24",
-        "type": "feat",
-        "description": "Système de Formules : Intégration d'un module de Formules permettant aux admins de créer des compteurs numériques dynamiques et de définir leur maximum via des équations incluant Variables, Caractéristiques, et Compétences (ex: XP_TOTAL + Intelligence)."
     }
 ]

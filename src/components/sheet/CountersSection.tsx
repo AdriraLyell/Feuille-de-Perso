@@ -117,7 +117,11 @@ export const CountersSection = React.memo<CountersSectionProps>(({
             formula = fEntry?.formula || '';
         }
 
-        const computedMax = calculatedMax ?? evaluateFormula(formula || '', data, entryOrFormula.aggregateConfig ? entryOrFormula : undefined);
+        const computedMax = calculatedMax ?? evaluateFormula(
+            formula || '',
+            { ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary },
+            entryOrFormula.aggregateConfig ? entryOrFormula : undefined
+        );
         const currentSpent = counter.current || 0;
         const currentRemaining = Math.max(0, computedMax - currentSpent);
 

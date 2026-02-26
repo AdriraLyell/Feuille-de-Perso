@@ -1,5 +1,7 @@
 import { Parser } from 'expr-eval';
 import { CharacterSheetData } from '../types';
+import { normalizeString, smartIncludes } from './stringUtils';
+import { logger } from './logger';
 
 const parser = new Parser();
 
@@ -35,7 +37,13 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
         Object.values(data.skills).flat().forEach(skill => {
             if (skill.name) {
                 const name = skill.name.trim();
-                vars[name] = skill.value || 0;
+                const val = skill.value || 0;
+                vars[name] = val;
+
+                const normalized = normalizeString(name);
+                if (normalized !== name.toLowerCase()) {
+                    vars[normalized] = val;
+                }
             }
         });
     }
@@ -45,13 +53,21 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
         Object.entries(data.counters).forEach(([key, value]) => {
             if (key === 'custom' && Array.isArray(value)) {
                 value.forEach(c => {
-                    if (c.name) vars[c.name.trim()] = c.value || 0;
+                    if (c.name) {
+                        const name = c.name.trim();
+                        vars[name] = c.value || 0;
+                        const normalized = normalizeString(name);
+                        if (normalized !== name.toLowerCase()) vars[normalized] = c.value || 0;
+                    }
                 });
             } else if (value && !Array.isArray(value)) {
-                // Use both ID (key) and Name if available
-                vars[key] = (value as any).value || 0;
+                const val = (value as any).value || 0;
+                vars[key] = val;
                 if ((value as any).name) {
-                    vars[(value as any).name.trim()] = (value as any).value || 0;
+                    const name = (value as any).name.trim();
+                    vars[name] = val;
+                    const normalized = normalizeString(name);
+                    if (normalized !== name.toLowerCase()) vars[normalized] = val;
                 }
             }
         });
@@ -62,10 +78,10 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
         Object.values(data.secondaryAttributes).flat().forEach(attr => {
             if (attr.name) {
                 const name = attr.name.trim();
-                const v1 = parseInt(attr.val1) || 0;
-                const v2 = parseInt(attr.val2) || 0;
-                const v3 = parseInt(attr.val3) || 0;
-                vars[name] = v1 + v2 + v3;
+                const total = (parseInt(attr.val1) || 0) + (parseInt(attr.val2) || 0) + (parseInt(attr.val3) || 0);
+                vars[name] = total;
+                const normalized = normalizeString(name);
+                if (normalized !== name.toLowerCase()) vars[normalized] = total;
             }
         });
     }
@@ -78,16 +94,24 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
                 const v1 = parseInt(attr.val1) || 0;
                 const v2 = parseInt(attr.val2) || 0;
                 const v3 = parseInt(attr.val3) || 0;
-                vars[name] = v1 + v2 + v3;
+                const total = v1 + v2 + v3;
+
+                vars[name] = total;
+                // Add normalized variant (e.g., Volonte for Volonté)
+                const normalized = normalizeString(name);
+                if (normalized !== name.toLowerCase()) {
+                    vars[normalized] = total;
+                }
             }
         });
     }
 
-    // 5. MJ Variables (from formulaLibrary)
+    // 5. MJ Variables (from formulaLibrary) - RESOLVED LAST TO HAVE PRIORITY
     // We do multiple passes to resolve dependencies between variables
     if (data.formulaLibrary && Array.isArray(data.formulaLibrary)) {
-        // Variables specifically marked as 'variable' are used as building blocks
         const variableEntries = data.formulaLibrary.filter(f => f.type === 'variable');
+
+
         const memo = new Map<string, number>();
         const visiting = new Set<string>();
 
@@ -100,11 +124,8 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
             try {
                 let result = 0;
                 if (entry.aggregateConfig) {
-                    // Aggregate Variable
                     result = calculateAggregate(data, entry.aggregateConfig);
                 } else if (entry.formula) {
-                    // Equation Variable
-                    // Pass the CURRENT vars (including aggregates found so far)
                     result = evaluateWithContext(entry.formula, { ...vars, ...Object.fromEntries(memo) }, resolveGlobal);
                 }
                 memo.set(name, result);
@@ -116,21 +137,21 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
             }
         };
 
+        // Pass 1: Resolve all MJ variables to populate the memo
         variableEntries.forEach(f => {
             const varName = f.code || f.name;
-            if (varName && !memo.has(varName)) {
-                vars[varName] = resolveGlobal(varName);
-            }
+            if (varName) resolveGlobal(varName);
+        });
+
+        // Pass 2: Inject everything from memo into vars
+        memo.forEach((val, varName) => {
+            vars[varName] = val;
+            // Also add normalized variant for MJ variables
+            const normalized = normalizeString(varName);
+            if (normalized !== varName.toLowerCase()) vars[normalized] = val;
         });
     }
 
-    // 6. Legacy Formula Variables (Support fallback for temporary structures)
-    if ((data as any).formulaVariables && Array.isArray((data as any).formulaVariables)) {
-        (data as any).formulaVariables.forEach((fVar: any) => {
-            if (!fVar.name) return;
-            vars[fVar.name] = calculateAggregate(data, fVar);
-        });
-    }
 
     return vars;
 };
@@ -178,9 +199,13 @@ export const calculateAggregate = (data: any, config: any): number => {
                         if (skill.mysticAbilityId) {
                             tagFallback += ' Mystique';
                         }
-                        // 2. Cross-reference with definitions to inject specialized tags (like Mystique)
+                        // 2. Cross-reference with definitions (local library)
                         else if (data.skillLibrary) {
-                            const def = data.skillLibrary.find((d: any) => d.id === skill.definitionId);
+                            // Match by definitionId OR by normalized name fallback
+                            const def = data.skillLibrary.find((d: any) =>
+                                (skill.definitionId && d.id === skill.definitionId) ||
+                                (skill.name && d.name && normalizeString(skill.name) === normalizeString(d.name))
+                            );
                             if (def && def.mysticAbilityId) {
                                 tagFallback += ' Mystique';
                             }
@@ -213,17 +238,15 @@ export const calculateAggregate = (data: any, config: any): number => {
     // Apply filtering
     let filteredList = baseList;
     if (config.filterTarget && config.filterValue) {
-        const val = config.filterValue.toLowerCase();
         if (config.filterTarget === 'tag') {
-            // For skills/general: match tag OR category ID (allows matching "Mystique" if category key contains it)
             filteredList = baseList.filter(item =>
-                (item.tag && item.tag.toLowerCase().includes(val)) ||
-                (item.category && item.category.toLowerCase().includes(val))
+                smartIncludes(item.tag, config.filterValue) ||
+                smartIncludes(item.category, config.filterValue)
             );
         } else if (config.filterTarget === 'category') {
-            filteredList = baseList.filter(item => item.category && item.category.toLowerCase().includes(val));
+            filteredList = baseList.filter(item => smartIncludes(item.category, config.filterValue));
         } else if (config.filterTarget === 'name') {
-            filteredList = baseList.filter(item => item.name && item.name.toLowerCase().includes(val));
+            filteredList = baseList.filter(item => smartIncludes(item.name, config.filterValue));
         }
     }
 
@@ -243,15 +266,20 @@ export const calculateAggregate = (data: any, config: any): number => {
 
     if (values.length === 0) return 0;
 
-    switch (config.operation) {
-        case 'sum': return values.reduce((a, b) => a + b, 0);
-        case 'count': return values.filter(v => v > 0).length;
+    const op = config.operation?.toLowerCase();
+    let result = 0;
+    switch (op) {
+        case 'sum': result = values.reduce((a, b) => a + b, 0); break;
+        case 'count': result = values.filter(v => v > 0).length; break;
         case 'max':
-        case 'highest': return Math.max(...values);
+        case 'highest': result = Math.max(...values); break;
         case 'avg':
-        case 'average': return values.reduce((a, b) => a + b, 0) / values.length;
-        default: return 0;
+        case 'average': result = values.reduce((a, b) => a + b, 0) / values.length; break;
+        default: result = 0;
     }
+
+
+    return result;
 };
 
 /**
@@ -279,6 +307,7 @@ export const evaluateFormula = (formula: string, data: CharacterSheetData & { va
 
         // Evaluate with safe context
         const result = expr.evaluate(context);
+
 
         return isNaN(result) ? 0 : Math.floor(Number(result));
     } catch (e) {

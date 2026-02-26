@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.77.0",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Système de Formules : Refonte des anciens modificateurs quantitatifs (+Attributs, +XP, +Comptoirs). Le créateur de trait (MJ) peut désormais utiliser l'option de calcul par Formule permettant de démultiplier les effets de n'importe quel attribut ou compteur à l'aide de données d'XP ou du Niveau de Trait."
+    },
+    {
+        "version": "2.76.5",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Système de Formules : L'onglet Formules a été déplacé du panneau des Paramètres Joueur (Rouage de la fiche) vers l'interface d'Administration (Général et création > Formules). Les formules sont désormais des paramètres globaux injectés directement aux fiches par le MJ."
+    },
+    {
+        "version": "2.76.4",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Système de Formules : Intégration d'un module de Formules permettant aux admins de créer des compteurs numériques dynamiques et de définir leur maximum via des équations incluant Variables, Caractéristiques, et Compétences (ex: XP_TOTAL + Intelligence)."
+    },
+    {
         "version": "2.76.3",
         "date": "2026-02-24",
         "type": "refactor",
@@ -580,23 +598,5 @@
         "date": "2026-02-20",
         "type": "style",
         "description": "Amélioration UI : Remplacement de la boîte de dialogue système 'confirm' par une modale thématique personnalisée pour confirmer la promotion d'une spécialisation en compétence secondaire."
-    },
-    {
-        "version": "2.56.50",
-        "date": "2026-02-20",
-        "type": "feat",
-        "description": "Promotion des spécialisations : Ajout d'une fonctionnalité permettant de convertir une spécialisation en compétence secondaire via un bouton d'action dans l'onglet Spécialisations. Cette action libère l'emplacement de spécialisation et crée une nouvelle compétence à 0 point dans la catégorie secondaire."
-    },
-    {
-        "version": "2.56.49",
-        "date": "2026-02-20",
-        "type": "style",
-        "description": "Amélioration UX : Harmonisation de la taille du Hub Cloud. La modale de synchronisation utilise désormais une taille large unifiée pour les onglets 'Push' et 'Pull', évitant les sauts de redimensionnement lors de la navigation."
-    },
-    {
-        "version": "2.56.48",
-        "date": "2026-02-19",
-        "type": "refactor",
-        "description": "Refonte du 'Hub Cloud' : Fusion de la synchronisation (Push) et de la bibliothèque (Pull) dans une interface unifiée via le bouton Synchro. Le 'Grimoire de Sauvegarde' est désormais dédié exclusivement aux opérations locales (JSON)."
     }
 ]
