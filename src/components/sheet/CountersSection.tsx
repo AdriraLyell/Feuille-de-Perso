@@ -1,13 +1,223 @@
-
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { CharacterSheetData, DotEntry } from '../../types';
 import DotRating from '../ui/DotRating';
 import { SectionHeader } from './Shared';
 import { useRules } from '../../context/RulesContext';
 import { normalizeString } from '../../utils/stringUtils';
-import { evaluateFormula } from '../../utils/formulaEvaluator';
+import { evaluateFormula, getSheetVariables, getAggregateDetails } from '../../utils/formulaEvaluator';
 import { Minus, Plus, RefreshCw } from 'lucide-react';
-import { generateId } from '../../utils/factories';
+import { Parser } from 'expr-eval';
+import { PortalTooltip } from '../ui/PortalTooltip';
+
+const parser = new Parser();
+
+interface NumericCounterItemProps {
+    counter: DotEntry;
+    entryOrFormula: any;
+    isCustom: boolean;
+    data: CharacterSheetData;
+    rules: any;
+    calculatedMaxes: Record<string, number>;
+    updateCounter: (id: string, value: number, isCustom: boolean, field: 'value' | 'current') => void;
+}
+
+const translateAggregateConfig = (config: any): string => {
+    if (!config) return '';
+    let target = config.targetType || config.target || '';
+    switch (target) {
+        case 'skills': target = 'Compétences'; break;
+        case 'attributes': target = 'Attributs'; break;
+        case 'secondaryAttributes': target = 'Attributs Sec.'; break;
+        case 'traits': target = 'Traits'; break;
+        case 'mysticAbilities': target = 'Cap. Mystiques'; break;
+    }
+
+    let op = config.operation?.toLowerCase() || '';
+    switch (op) {
+        case 'sum': op = 'Somme'; break;
+        case 'count': op = 'Nombre'; break;
+        case 'max':
+        case 'highest': op = 'Maximum'; break;
+        case 'avg':
+        case 'average': op = 'Moyenne'; break;
+    }
+
+    let filter = '';
+    if (config.filterTarget && config.filterValue) {
+        const typeF = config.filterTarget === 'tag' ? 'Tag' : config.filterTarget === 'category' ? 'Catégorie' : 'Nom';
+        filter = ` (${typeF}: ${config.filterValue})`;
+    }
+
+    return `${op} de : ${target}${filter}`;
+};
+
+const translateVariableName = (v: string): string => {
+    switch (v) {
+        case 'SUM_HABILITES_MYSTIQUES': return 'Somme Cap. Mystiques';
+        case 'SCENARIOS_COUNT': return 'Nombre de Scénarios';
+        case 'TRAIT_LEVEL': return 'Niveau de Trait';
+        default: return v;
+    }
+};
+
+const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
+    counter,
+    entryOrFormula,
+    isCustom,
+    data,
+    rules,
+    calculatedMaxes,
+    updateCounter
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const anchorRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (anchorRef.current && !anchorRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen]);
+
+    const nameKey = normalizeString(counter.name);
+    const calculatedMax = calculatedMaxes[counter.name] || calculatedMaxes[nameKey];
+
+    let formula = entryOrFormula.formula;
+    if (!formula && entryOrFormula.formulaId) {
+        const fEntry = rules?.libraries?.formulas?.find((f: any) => f.id === entryOrFormula.formulaId);
+        formula = fEntry?.formula || '';
+    }
+
+    const computedMax = calculatedMax ?? evaluateFormula(
+        formula || '',
+        { ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary },
+        entryOrFormula.aggregateConfig ? entryOrFormula : undefined
+    );
+
+    const currentSpent = counter.current || 0;
+    const currentRemaining = Math.max(0, computedMax - currentSpent);
+
+    const renderDetails = () => {
+        if (!isOpen) return null;
+
+        if (entryOrFormula.aggregateConfig) {
+            const details = getAggregateDetails({ ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary }, entryOrFormula.aggregateConfig);
+            const translatedDesc = translateAggregateConfig(entryOrFormula.aggregateConfig);
+
+            if (!details.length) {
+                return (
+                    <div className="flex flex-col gap-1 w-full min-w-[140px]">
+                        <div className="text-slate-400 italic text-[9px] mb-1">{translatedDesc}</div>
+                        <div className="text-stone-400 italic text-xs">Aucun élément correspondant</div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="flex flex-col gap-1 w-full min-w-[140px]">
+                    <div className="text-amber-200/80 italic text-[9px] border-b border-slate-600/50 pb-1 mb-1 leading-tight">
+                        {translatedDesc}
+                    </div>
+                    {details.map((d, i) => (
+                        <div key={i} className="flex justify-between items-center text-xs gap-4">
+                            <span className="text-slate-300 truncate max-w-[180px]" title={d.name}>{d.name || d.category || 'Inconnu'}</span>
+                            <span className="font-mono text-white text-right shrink-0">{d.value >= 0 ? `+${d.value}` : d.value}</span>
+                        </div>
+                    ))}
+                    <div className="border-t border-slate-600 mt-1 pt-1 flex justify-between items-center font-bold text-xs">
+                        <span className="text-slate-200">TOTAL</span>
+                        <span className="font-mono text-amber-400">{computedMax}</span>
+                    </div>
+                </div>
+            );
+        } else if (formula) {
+            const sheetVars = getSheetVariables({ ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary });
+            let parsedVars: string[] = [];
+            let baseValue = 0;
+            try {
+                const expr = parser.parse(formula);
+                parsedVars = expr.variables();
+                const zeroContext = parsedVars.reduce((acc, v) => ({ ...acc, [v]: 0 }), {});
+                baseValue = Number(expr.evaluate(zeroContext)) || 0;
+            } catch (e) {
+                // Ignore parse errors for UI
+            }
+
+            return (
+                <div className="flex flex-col gap-1 w-full min-w-[140px]">
+                    {baseValue !== 0 && (
+                        <div className="flex justify-between items-center text-xs border-b border-slate-600/50 pb-1 mb-1 gap-4">
+                            <span className="text-slate-400 italic">Base</span>
+                            <span className="font-mono text-slate-400 shrink-0">{baseValue >= 0 ? `+${baseValue}` : baseValue}</span>
+                        </div>
+                    )}
+                    {parsedVars.map(v => {
+                        const val = sheetVars[v] || 0;
+                        // Essayer de trouver le nom humain dans la bibliothèque de formules
+                        const formulaEntry = rules?.libraries?.formulas?.find((f: any) =>
+                            f.code === v || f.id === v || normalizeString(f.name) === normalizeString(v)
+                        );
+                        const displayName = formulaEntry?.name || translateVariableName(v);
+
+                        return (
+                            <div key={v} className="flex justify-between items-center text-xs gap-4">
+                                <span className="text-slate-300 truncate max-w-[180px]" title={v}>{displayName}</span>
+                                <span className="font-mono text-white text-right shrink-0">{val >= 0 ? `+${val}` : val}</span>
+                            </div>
+                        );
+                    })}
+                    <div className="border-t border-slate-600 mt-1 pt-1 flex justify-between items-center font-bold text-xs">
+                        <span className="text-slate-200">TOTAL</span>
+                        <span className="font-mono text-amber-400">{computedMax}</span>
+                    </div>
+                </div>
+            );
+        }
+
+        return <div className="text-stone-400 italic">Valeur de base : {computedMax}</div>;
+    };
+
+    return (
+        <div className="col-span-1 border border-[#bfae85]/40 bg-gradient-to-br from-[#fdfbf7] to-[#f4f2eb] rounded-sm shadow-[inset_0_1px_4px_rgba(0,0,0,0.05)] flex items-center justify-between px-1 overflow-visible h-9 group transition-all relative">
+            <div
+                className="flex flex-col items-start justify-center flex-grow cursor-help h-full w-full"
+                ref={anchorRef}
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <span className="font-bold text-[9px] uppercase tracking-tighter text-[#8b2e2e]/90 leading-tight truncate w-full">
+                    {counter.name}
+                </span>
+                <span className="font-black text-sm text-[#5c4d41] leading-none mb-[1px]">
+                    {currentRemaining} <span className="text-[10px] text-stone-400 font-normal">/ {computedMax}</span>
+                </span>
+            </div>
+
+            <PortalTooltip isOpen={isOpen} anchorRef={anchorRef} title={`${counter.name} (Calcul)`}>
+                {renderDetails()}
+            </PortalTooltip>
+
+            <div className={`flex flex-shrink-0 items-center justify-end transition-opacity z-10 bg-gradient-to-l from-[#f4f2eb] from-80% to-transparent pl-4 h-full absolute right-0 ${isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 md:opacity-0 md:group-hover:opacity-100'}`}>
+                <button onClick={() => updateCounter(counter.id, 0, isCustom, 'current')} className="w-5 h-5 mr-0.5 rounded hover:bg-stone-200 flex items-center justify-center text-stone-500 transition-colors" title="Restaurer (Reset dépense)">
+                    <RefreshCw size={11} />
+                </button>
+                <button onClick={() => updateCounter(counter.id, Math.min(computedMax, currentSpent + 1), isCustom, 'current')} className="w-5 h-5 mr-0.5 rounded hover:bg-[#8b2e2e]/10 flex items-center justify-center text-[#8b2e2e] transition-colors" title="Dépenser 1 (Baisse la jauge)">
+                    <Minus size={14} />
+                </button>
+                <button onClick={() => updateCounter(counter.id, Math.max(0, currentSpent - 1), isCustom, 'current')} className="w-5 h-5 rounded hover:bg-amber-600/10 flex items-center justify-center text-amber-600 transition-colors" title="Récupérer 1 (Remonte la jauge)">
+                    <Plus size={14} />
+                </button>
+            </div>
+        </div>
+    );
+};
 
 interface CountersSectionProps {
     data: CharacterSheetData;
@@ -36,9 +246,19 @@ export const CountersSection = React.memo<CountersSectionProps>(({
         const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey);
         const sysDef = rules?.definitions?.counters?.[nameKey] || Object.values(rules?.definitions?.counters || {}).find(c => normalizeString(c.name) === nameKey);
         const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId;
-
         if (isNumeric) {
-            return renderNumericCounterItem(counter, libEntry || sysDef, isCustom);
+            return (
+                <NumericCounterItem
+                    key={counter.id}
+                    counter={counter}
+                    entryOrFormula={libEntry || sysDef}
+                    isCustom={isCustom}
+                    data={data}
+                    rules={rules}
+                    calculatedMaxes={calculatedMaxes}
+                    updateCounter={updateCounter}
+                />
+            );
         }
 
         const creationBonus = creationBonuses[nameKey] || 0;
@@ -107,53 +327,6 @@ export const CountersSection = React.memo<CountersSectionProps>(({
         );
     };
 
-    const renderNumericCounterItem = (counter: DotEntry, entryOrFormula: any, isCustom: boolean) => {
-        const nameKey = normalizeString(counter.name);
-        const calculatedMax = calculatedMaxes[counter.name] || calculatedMaxes[nameKey];
-
-        let formula = entryOrFormula.formula;
-        if (!formula && entryOrFormula.formulaId) {
-            const fEntry = rules?.libraries?.formulas?.find(f => f.id === entryOrFormula.formulaId);
-            formula = fEntry?.formula || '';
-        }
-
-        const computedMax = calculatedMax ?? evaluateFormula(
-            formula || '',
-            { ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary },
-            entryOrFormula.aggregateConfig ? entryOrFormula : undefined
-        );
-        const currentSpent = counter.current || 0;
-        const currentRemaining = Math.max(0, computedMax - currentSpent);
-
-        return (
-            <div key={counter.id} className="col-span-1 border border-[#bfae85]/40 bg-gradient-to-br from-[#fdfbf7] to-[#f4f2eb] rounded-sm shadow-[inset_0_1px_4px_rgba(0,0,0,0.05)] flex items-center justify-between px-1 overflow-hidden h-9 group transition-all">
-                <div className="flex flex-col items-start justify-center flex-grow">
-                    <span
-                        className="font-bold text-[9px] uppercase tracking-tighter text-[#8b2e2e]/90 leading-tight truncate w-full cursor-help"
-                        title={entryOrFormula.description || counter.name}
-                    >
-                        {counter.name}
-                    </span>
-                    <span className="font-black text-sm text-[#5c4d41] leading-none mb-[1px]">
-                        {currentRemaining} <span className="text-[10px] text-stone-400 font-normal">/ {computedMax}</span>
-                    </span>
-                </div>
-
-                <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => updateCounter(counter.id, 0, isCustom, 'current')} className="w-5 h-5 rounded hover:bg-stone-200 flex items-center justify-center text-stone-500 transition-colors" title="Restaurer (Reset dépense)">
-                        <RefreshCw size={11} />
-                    </button>
-                    <button onClick={() => updateCounter(counter.id, Math.min(computedMax, currentSpent + 1), isCustom, 'current')} className="w-5 h-5 rounded hover:bg-[#8b2e2e]/10 flex items-center justify-center text-[#8b2e2e] transition-colors" title="Dépenser 1 (Baisse la jauge)">
-                        <Minus size={14} />
-                    </button>
-                    <button onClick={() => updateCounter(counter.id, Math.max(0, currentSpent - 1), isCustom, 'current')} className="w-5 h-5 rounded hover:bg-amber-600/10 flex items-center justify-center text-amber-600 transition-colors" title="Récupérer 1 (Remonte la jauge)">
-                        <Plus size={14} />
-                    </button>
-                </div>
-            </div>
-        );
-    };
-
     const counterCat = rules?.definitions?.skillCategories?.find((c: any) => c.behavior === 'Compteur');
     const sortedIds = counterCat ? (rules?.definitions?.skills?.[counterCat.id] || []) : [];
     const allKeys = Object.keys(data.counters).filter(k => k !== 'custom');
@@ -188,7 +361,18 @@ export const CountersSection = React.memo<CountersSectionProps>(({
         const sysDef = rules?.definitions?.counters?.[nameKey] || Object.values(rules?.definitions?.counters || {}).find(c => normalizeString(c.name) === nameKey);
         const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId;
         if (isNumeric) {
-            numericItems.push(renderNumericCounterItem(counter, libEntry || sysDef, false));
+            numericItems.push(
+                <NumericCounterItem
+                    key={`numeric-${counter.id}`}
+                    counter={counter}
+                    entryOrFormula={libEntry || sysDef}
+                    isCustom={false}
+                    data={data}
+                    rules={rules}
+                    calculatedMaxes={calculatedMaxes}
+                    updateCounter={updateCounter}
+                />
+            );
         } else {
             standardItems.push(renderCounterItem(counter, false));
         }
@@ -202,7 +386,18 @@ export const CountersSection = React.memo<CountersSectionProps>(({
             const sysDef = rules?.definitions?.counters?.[nameKey];
             const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId;
             if (isNumeric) {
-                numericItems.push(renderNumericCounterItem(c, libEntry || sysDef, true));
+                numericItems.push(
+                    <NumericCounterItem
+                        key={`custom-numeric-${c.id}`}
+                        counter={c}
+                        entryOrFormula={libEntry || sysDef}
+                        isCustom={true}
+                        data={data}
+                        rules={rules}
+                        calculatedMaxes={calculatedMaxes}
+                        updateCounter={updateCounter}
+                    />
+                );
             } else {
                 standardItems.push(renderCounterItem(c, true));
             }
@@ -221,7 +416,18 @@ export const CountersSection = React.memo<CountersSectionProps>(({
             max: 0,
             description: formulaEntry.description
         };
-        numericItems.push(renderNumericCounterItem(counterToRender, formulaEntry, true));
+        numericItems.push(
+            <NumericCounterItem
+                key={`reserve-${counterToRender.id}`}
+                counter={counterToRender}
+                entryOrFormula={formulaEntry}
+                isCustom={true}
+                data={data}
+                rules={rules}
+                calculatedMaxes={calculatedMaxes}
+                updateCounter={updateCounter}
+            />
+        );
     });
 
     return (

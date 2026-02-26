@@ -101,7 +101,6 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
 
     const allVariables = [
         'XP_TOTAL',
-        'SUM_MYSTIC',
         'TRAIT_LEVEL',
         'SCENARIOS_COUNT',
         ...lib.map(f => f.code).filter(Boolean), // Codes des autres formules
@@ -361,7 +360,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                             <CodeInput
                                                 value={counter.code || ''}
                                                 onChange={val => updateCounter(counter.id, 'code', val)}
-                                                placeholder="EX: SUM_MYSTIC"
+                                                placeholder="EX: MA_VARIABLE"
                                                 className="w-full p-2 bg-stone-950 border border-stone-700 text-amber-500 font-mono text-xs rounded focus:border-amber-500 outline-none"
                                             />
                                         </div>
@@ -551,7 +550,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                                 </span>
                                                 <div className="flex wrap gap-1.5">
                                                     {allVariables
-                                                        .filter(v => ['XP_TOTAL', 'SUM_MYSTIC', 'TRAIT_LEVEL', 'SCENARIOS_COUNT', 'Physique', 'Volonté', 'Constitution', 'Empathie', 'Intelligence'].includes(v))
+                                                        .filter(v => ['XP_TOTAL', 'TRAIT_LEVEL', 'SCENARIOS_COUNT', 'Physique', 'Volonté', 'Constitution', 'Empathie', 'Intelligence'].includes(v))
                                                         .map(v => (
                                                             <button
                                                                 key={v}

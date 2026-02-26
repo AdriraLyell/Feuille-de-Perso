@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.80.1",
+        "date": "2026-02-24",
+        "type": "fix",
+        "description": "Migration des Règles Globales : Correction du script de migration pour inclure les paramètres de campagne globaux (`RulesData`), assurant la conversion silencieuse des anciens effets quantitatifs locaux en formules orphelines. Mise à jour de l'outil d'unification dans l'administration pour détecter, traiter et assigner ces effets legacy existants au dictionnaire global."
+    },
+    {
         "version": "2.80.0",
         "date": "2026-02-24",
         "type": "feat",
@@ -591,11 +597,5 @@
         "date": "2026-02-20",
         "type": "feat",
         "description": "Ergonomie fiches de personnage : Cliquer sur un trait existant (Avantage/Désavantage) ouvre désormais un menu d'édition rapide au lieu de la bibliothèque de traits. Cliquer sur un emplacement vide continue d'ouvrir la bibliothèque pour ajouter un nouveau trait."
-    },
-    {
-        "version": "2.56.54",
-        "date": "2026-02-20",
-        "type": "style",
-        "description": "Correction UI : Alignement de la barre latérale des spécialisations sous le bandeau de navigation principal pour éviter le masquage."
     }
 ]

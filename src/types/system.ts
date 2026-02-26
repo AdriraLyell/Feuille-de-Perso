@@ -176,7 +176,7 @@ export interface LibraryCounterEntry {
 export interface LibraryFormulaEntry {
   id: string;
   name: string;
-  code?: string; // Identifiant technique pour les calculs (ex: SUM_MYSTIC)
+  code?: string; // Identifiant technique pour les calculs (ex: MA_VARIABLE)
   formula: string;
   type: 'modifier' | 'variable'; // 'modifier' = Affecte une valeur (Cible/Action), 'variable' = Calcul interne (Equation ou Agrégat)
   target?: string;

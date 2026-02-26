@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.92.6",
+        "date": "2026-02-26",
+        "type": "feat",
+        "description": "UX Tooltips & Moteur de Calcul : Implémentation de bulles d'aide interactives (PortalTooltip) affichant le détail des calculs des compteurs dynamiques. Traduction automatique des variables techniques en noms lisibles via la bibliothèque de formules. Nettoyage du moteur en supprimant la variable SUM_MYSTIC en dur au profit des agrégats dynamiques. Corrections de la position des tooltips pour assurer la visibilité des compteurs."
+    },
+    {
         "version": "2.92.5",
         "date": "2026-02-26",
         "type": "chore",
@@ -112,11 +118,5 @@
         "date": "2026-02-24",
         "type": "feat",
         "description": "Automatisation Complète de la Migration des Formules : Les effets mécaniques hérités (attribute_bonus, xp_bonus, counter_max_bonus) sont désormais convertis automatiquement en formules globales lors du chargement des règles de campagne. Implémentation du support base de données (`libraries_formulas`), des services de persistance et de chargement pour garantir l'intégrité et la permanence des données migrées sans intervention manuelle."
-    },
-    {
-        "version": "2.80.1",
-        "date": "2026-02-24",
-        "type": "fix",
-        "description": "Migration des Règles Globales : Correction du script de migration pour inclure les paramètres de campagne globaux (`RulesData`), assurant la conversion silencieuse des anciens effets quantitatifs locaux en formules orphelines. Mise à jour de l'outil d'unification dans l'administration pour détecter, traiter et assigner ces effets legacy existants au dictionnaire global."
     }
 ]

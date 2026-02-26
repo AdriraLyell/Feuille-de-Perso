@@ -20,18 +20,6 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
     // 1. Special Variables
     vars['XP_TOTAL'] = parseFloat(data.experience?.gain || "0") || 0;
 
-    let mysticSum = 0;
-    if (data.skills) {
-        Object.keys(data.skills).forEach(cat => {
-            if (cat.toLowerCase().includes('mystique')) {
-                data.skills[cat].forEach(skill => {
-                    mysticSum += (skill.value || 0);
-                });
-            }
-        });
-    }
-    vars['SUM_MYSTIC'] = mysticSum;
-
     // 2. Skills (Lower priority, might be overwritten by attributes/counters)
     if (data.skills) {
         Object.values(data.skills).flat().forEach(skill => {
@@ -181,9 +169,9 @@ const evaluateWithContext = (formula: string, context: Record<string, number>, r
 };
 
 /**
- * Helper to calculate aggregate values (Sum of Skills, Max Attribute, etc.)
+ * Gets the specific elements involved in an aggregate calculation (e.g. all mystic skills)
  */
-export const calculateAggregate = (data: any, config: any): number => {
+export const getAggregateDetails = (data: any, config: any): { name: string, value: number, category?: string, tag?: string }[] => {
     let baseList: any[] = [];
     const targetType = config.targetType || config.target; // Support both names
 
@@ -232,7 +220,7 @@ export const calculateAggregate = (data: any, config: any): number => {
         case 'mysticAbilities':
             baseList = (data.mysticAbilities || []).filter((s: any) => typeof s !== 'string');
             break;
-        default: return 0;
+        default: return [];
     }
 
     // Apply filtering
@@ -250,23 +238,44 @@ export const calculateAggregate = (data: any, config: any): number => {
         }
     }
 
-    // Perform operation
-    const values = filteredList.map(item => {
-        if (typeof item.value === 'number') return item.value;
+    // Perform extraction
+    const details = filteredList.map(item => {
+        let value = 0;
+        if (typeof item.value === 'number') {
+            value = item.value;
+        }
         // Attributes/Secondary Attributes: Sum val1 + val2 + val3
-        if (item.val1 !== undefined || item.val2 !== undefined || item.val3 !== undefined) {
+        else if (item.val1 !== undefined || item.val2 !== undefined || item.val3 !== undefined) {
             const v1 = parseInt(item.val1 || "0") || 0;
             const v2 = parseInt(item.val2 || "0") || 0;
             const v3 = parseInt(item.val3 || "0") || 0;
-            return v1 + v2 + v3;
+            value = v1 + v2 + v3;
         }
-        if (typeof item.level === 'number') return item.level; // Traits
-        return 0;
+        else if (typeof item.level === 'number') {
+            value = item.level; // Traits
+        }
+
+        return {
+            name: item.name || '',
+            value,
+            category: item.category,
+            tag: item.tag
+        };
     });
 
-    if (values.length === 0) return 0;
+    return details;
+};
+
+/**
+ * Helper to calculate aggregate values (Sum of Skills, Max Attribute, etc.)
+ */
+export const calculateAggregate = (data: any, config: any): number => {
+    const details = getAggregateDetails(data, config);
+    if (details.length === 0) return 0;
 
     const op = config.operation?.toLowerCase();
+    const values = details.map(d => d.value);
+
     let result = 0;
     switch (op) {
         case 'sum': result = values.reduce((a, b) => a + b, 0); break;
@@ -277,7 +286,6 @@ export const calculateAggregate = (data: any, config: any): number => {
         case 'average': result = values.reduce((a, b) => a + b, 0) / values.length; break;
         default: result = 0;
     }
-
 
     return result;
 };
