@@ -30,34 +30,56 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
     }
     vars['SUM_MYSTIC'] = mysticSum;
 
-    // 2. Attributes
-    if (data.attributes) {
-        Object.values(data.attributes).flat().forEach(attr => {
-            if (attr.name) {
-                const v1 = parseInt(attr.val1) || 0;
-                const v2 = parseInt(attr.val2) || 0;
-                const v3 = parseInt(attr.val3) || 0;
-                vars[attr.name] = v1 + v2 + v3;
+    // 2. Skills (Lower priority, might be overwritten by attributes/counters)
+    if (data.skills) {
+        Object.values(data.skills).flat().forEach(skill => {
+            if (skill.name) {
+                const name = skill.name.trim();
+                vars[name] = skill.value || 0;
             }
         });
     }
 
-    // 3. Secondary Attributes
+    // 3. Counters
+    if (data.counters) {
+        Object.entries(data.counters).forEach(([key, value]) => {
+            if (key === 'custom' && Array.isArray(value)) {
+                value.forEach(c => {
+                    if (c.name) vars[c.name.trim()] = c.value || 0;
+                });
+            } else if (value && !Array.isArray(value)) {
+                // Use both ID (key) and Name if available
+                vars[key] = (value as any).value || 0;
+                if ((value as any).name) {
+                    vars[(value as any).name.trim()] = (value as any).value || 0;
+                }
+            }
+        });
+    }
+
+    // 4. Secondary Attributes
     if (data.secondaryAttributes) {
         Object.values(data.secondaryAttributes).flat().forEach(attr => {
             if (attr.name) {
+                const name = attr.name.trim();
                 const v1 = parseInt(attr.val1) || 0;
                 const v2 = parseInt(attr.val2) || 0;
                 const v3 = parseInt(attr.val3) || 0;
-                vars[attr.name] = v1 + v2 + v3;
+                vars[name] = v1 + v2 + v3;
             }
         });
     }
 
-    // 4. Skills
-    if (data.skills) {
-        Object.values(data.skills).flat().forEach(skill => {
-            if (skill.name) vars[skill.name] = skill.value || 0;
+    // 5. Attributes (High priority for core attributes like Volonté)
+    if (data.attributes) {
+        Object.values(data.attributes).flat().forEach(attr => {
+            if (attr.name) {
+                const name = attr.name.trim();
+                const v1 = parseInt(attr.val1) || 0;
+                const v2 = parseInt(attr.val2) || 0;
+                const v3 = parseInt(attr.val3) || 0;
+                vars[name] = v1 + v2 + v3;
+            }
         });
     }
 
@@ -208,7 +230,13 @@ export const calculateAggregate = (data: any, config: any): number => {
     // Perform operation
     const values = filteredList.map(item => {
         if (typeof item.value === 'number') return item.value;
-        if (typeof item.val2 === 'string') return parseInt(item.val2) || 0; // Attributes
+        // Attributes/Secondary Attributes: Sum val1 + val2 + val3
+        if (item.val1 !== undefined || item.val2 !== undefined || item.val3 !== undefined) {
+            const v1 = parseInt(item.val1 || "0") || 0;
+            const v2 = parseInt(item.val2 || "0") || 0;
+            const v3 = parseInt(item.val3 || "0") || 0;
+            return v1 + v2 + v3;
+        }
         if (typeof item.level === 'number') return item.level; // Traits
         return 0;
     });
