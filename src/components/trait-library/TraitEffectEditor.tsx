@@ -336,25 +336,27 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                     )}
 
                                                     {/* Saisie de l'OPÉRATEUR si absent du modèle */}
-                                                    {!selectedFormulaEntry?.operator && (
-                                                        <div>
-                                                            <label className="block text-[9px] font-bold text-amber-800 mb-1 uppercase tracking-widest flex items-center gap-1">
-                                                                Opération <span className="text-amber-600/50 font-normal lowercase italic">(à définir)</span>
-                                                            </label>
-                                                            <div className="relative">
-                                                                <select
-                                                                    className="w-full text-xs border border-amber-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-amber-500 outline-none bg-amber-50/20 font-bold text-stone-800 shadow-sm"
-                                                                    value={effect.operator || 'ADD'}
-                                                                    onChange={(e) => onUpdate(effect.id, 'operator', e.target.value as any)}
-                                                                >
-                                                                    <option value="ADD">Ajoûter (+)</option>
-                                                                    <option value="SET">Remplacer (=)</option>
-                                                                    <option value="SUB">Soustraire (-)</option>
-                                                                </select>
-                                                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-amber-800/40" />
+                                                    {!selectedFormulaEntry?.operator &&
+                                                        selectedFormulaEntry?.effectType !== 'block_skill_increase' &&
+                                                        selectedFormulaEntry?.effectType !== 'master_skill' && (
+                                                            <div>
+                                                                <label className="block text-[9px] font-bold text-amber-800 mb-1 uppercase tracking-widest flex items-center gap-1">
+                                                                    Opération <span className="text-amber-600/50 font-normal lowercase italic">(à définir)</span>
+                                                                </label>
+                                                                <div className="relative">
+                                                                    <select
+                                                                        className="w-full text-xs border border-amber-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-amber-500 outline-none bg-amber-50/20 font-bold text-stone-800 shadow-sm"
+                                                                        value={effect.operator || 'ADD'}
+                                                                        onChange={(e) => onUpdate(effect.id, 'operator', e.target.value as any)}
+                                                                    >
+                                                                        <option value="ADD">Ajoûter (+)</option>
+                                                                        <option value="SET">Remplacer (=)</option>
+                                                                        <option value="SUB">Soustraire (-)</option>
+                                                                    </select>
+                                                                    <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-amber-800/40" />
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    )}
+                                                        )}
                                                 </div>
 
                                                 {/* ÉQUATION vs VALEUR FIXE */}
@@ -375,7 +377,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                         <span className="text-[8px] font-bold text-stone-400 uppercase tracking-tighter block mb-1">Moteur Mathématique Hérité</span>
                                                         <code className="text-[10px] font-mono font-bold text-stone-600">{selectedFormulaEntry.formula}</code>
                                                     </div>
-                                                ) : (
+                                                ) : (selectedFormulaEntry?.effectType !== 'block_skill_increase' && selectedFormulaEntry?.effectType !== 'master_skill') ? (
                                                     <div className="flex flex-col p-2 bg-amber-50/50 rounded border border-amber-200/50 border-dashed">
                                                         <label className="block text-[9px] font-bold text-amber-800 mb-1 uppercase tracking-widest">Valeur Fixe pour l'Effet</label>
                                                         <div className="flex items-center gap-2">
@@ -400,7 +402,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                         </div>
                                                         <p className="text-[8px] text-amber-700/60 mt-1 italic italic">Saisissez un nombre ou une petite équation locale.</p>
                                                     </div>
-                                                )}
+                                                ) : null}
                                             </div>
                                         )}
                                     </div>
