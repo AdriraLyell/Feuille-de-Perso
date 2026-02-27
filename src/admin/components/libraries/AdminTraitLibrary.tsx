@@ -57,6 +57,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
         removeTag,
         addEffect,
         updateEffect,
+        updateEffectFields,
         removeEffect
     } = useAdminTraitLibrary({ rules, onUpdate, globalUsage });
     const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'trait');

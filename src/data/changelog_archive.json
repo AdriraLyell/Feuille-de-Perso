@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.81.3",
+        "date": "2026-02-25",
+        "type": "docs",
+        "description": "Ébauche de rapport d'audit des formules (basée sur documentation)."
+    },
+    {
+        "version": "2.81.2",
+        "date": "2026-02-25",
+        "type": "fix",
+        "description": "Affinage de l'apparence des compteurs : retour à une disposition horizontale compacte avec titre à gauche et alignement à droite, conformément à la référence visuelle (sans les étiquettes 'MAXI' et 'UTILISÉ')."
+    },
+    {
         "version": "2.81.1",
         "date": "2026-02-25",
         "type": "fix",
@@ -585,17 +597,5 @@
         "date": "2026-02-20",
         "type": "fix",
         "description": "Budget Création : Les traits (Avantages/Désavantages) sont désormais totalement gratuits en mode Points comme en mode Rangs, et n'impactent plus la Valeur Totale XP affichée dans le HUD."
-    },
-    {
-        "version": "2.56.58",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Ajustement Budget Création (Mode Rangs) : Exclusion des traits du calcul d'équivalence XP et masquage de la limite de 450 XP (Starting XP) qui ne s'applique qu'au mode par points."
-    },
-    {
-        "version": "2.56.57",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction Arrière-plans : Résolution du bug de couleur (noir au lieu de bleu) et de coût XP erroné en mode création. Les points d'arrière-plan sont désormais correctement identifiés comme acquis à la création."
     }
 ]

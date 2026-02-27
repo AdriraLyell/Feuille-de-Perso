@@ -269,59 +269,74 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                     Pas de cible spécifique requise.
                                                 </p>
                                             </div>
-                                        ) : selectedFormulaEntry?.target ? (
+                                        ) : (selectedFormulaEntry?.target && selectedFormulaEntry?.operator) ? (
                                             <div className="bg-indigo-100/30 p-2 rounded border border-indigo-200/50 flex items-start justify-between items-center animate-in fade-in duration-300">
                                                 <div className="flex items-start gap-2">
                                                     <CheckCircle2 size={14} className="text-indigo-700 shrink-0 mt-0.5" />
-                                                    <div>
-                                                        <p className="text-[10px] text-indigo-900 font-bold leading-tight">
-                                                            Cible héritée : <span className="text-indigo-600 bg-white/50 px-1 rounded">{selectedFormulaEntry.target}</span>
-                                                        </p>
-                                                        <p className="text-[8px] text-indigo-800/60 italic leading-tight mt-0.5">
-                                                            La cible est définie dans le dictionnaire MJ.
-                                                        </p>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div>
+                                                            <p className="text-[10px] text-indigo-900 font-bold leading-tight">
+                                                                Cible héritée
+                                                            </p>
+                                                            <p className="text-xs font-bold text-indigo-600 bg-white/50 px-1.5 py-0.5 rounded mt-0.5 border border-indigo-200/50 inline-block">
+                                                                {selectedFormulaEntry.target}
+                                                            </p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] text-indigo-900 font-bold leading-tight">
+                                                                Opération héritée
+                                                            </p>
+                                                            <p className="text-xs font-bold text-indigo-600 bg-white/50 px-1.5 py-0.5 rounded mt-0.5 border border-indigo-200/50 inline-block font-serif">
+                                                                {selectedFormulaEntry.operator === 'ADD' ? 'Ajoûter (+)' :
+                                                                    selectedFormulaEntry.operator === 'SET' ? 'Remplacer (=)' : 'Soustraire (-)'}
+                                                            </p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="text-[8px] font-bold text-indigo-400 uppercase tracking-tighter">Auto-Portante</div>
+                                                <div className="text-[8px] font-bold text-indigo-400 uppercase tracking-tighter">Mécanique MJ</div>
                                             </div>
                                         ) : (
                                             <div className="flex flex-col gap-3 animate-in fade-in duration-300">
                                                 <div className="grid grid-cols-2 gap-3">
-                                                    <div>
-                                                        <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest">Cible</label>
-                                                        <div className="relative">
-                                                            <select
-                                                                className="w-full text-xs border border-indigo-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-indigo-500 outline-none bg-white font-bold text-stone-800 shadow-sm"
-                                                                value={effect.target || ''}
-                                                                onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
-                                                            >
-                                                                <option value="" className="italic text-stone-500">-- Choisir --</option>
-                                                                <option value="XP">Points d'Expérience</option>
-                                                                <optgroup label="Attributs">
-                                                                    {allAttributes.map(a => <option key={a.id} value={a.name}>{a.name}</option>)}
-                                                                </optgroup>
-                                                                <optgroup label="Compteurs / Réserves">
-                                                                    {allCounters.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                                                                </optgroup>
-                                                            </select>
-                                                            <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-800/40" />
+                                                    {(!selectedFormulaEntry?.target) && (
+                                                        <div>
+                                                            <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest">Cible</label>
+                                                            <div className="relative">
+                                                                <select
+                                                                    className="w-full text-xs border border-indigo-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-indigo-500 outline-none bg-white font-bold text-stone-800 shadow-sm"
+                                                                    value={effect.target || ''}
+                                                                    onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
+                                                                >
+                                                                    <option value="" className="italic text-stone-500">-- Choisir --</option>
+                                                                    <option value="XP">Points d'Expérience</option>
+                                                                    <optgroup label="Attributs">
+                                                                        {allAttributes.map(a => <option key={a.id} value={a.name}>{a.name}</option>)}
+                                                                    </optgroup>
+                                                                    <optgroup label="Compteurs / Réserves">
+                                                                        {allCounters.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                                                                    </optgroup>
+                                                                </select>
+                                                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-800/40" />
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest">Opération</label>
-                                                        <div className="relative">
-                                                            <select
-                                                                className="w-full text-xs border border-indigo-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-indigo-500 outline-none bg-white font-bold text-stone-800 shadow-sm"
-                                                                value={effect.operator || selectedFormulaEntry?.operator || 'ADD'}
-                                                                onChange={(e) => onUpdate(effect.id, 'operator', e.target.value as any)}
-                                                            >
-                                                                <option value="ADD">Ajoûter (+)</option>
-                                                                <option value="SET">Remplacer (=)</option>
-                                                                <option value="SUB">Soustraire (-)</option>
-                                                            </select>
-                                                            <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-800/40" />
+                                                    )}
+                                                    {(!selectedFormulaEntry?.operator) && (
+                                                        <div>
+                                                            <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest">Opération</label>
+                                                            <div className="relative">
+                                                                <select
+                                                                    className="w-full text-xs border border-indigo-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-indigo-500 outline-none bg-white font-bold text-stone-800 shadow-sm"
+                                                                    value={effect.operator || selectedFormulaEntry?.operator || 'ADD'}
+                                                                    onChange={(e) => onUpdate(effect.id, 'operator', e.target.value as any)}
+                                                                >
+                                                                    <option value="ADD">Ajoûter (+)</option>
+                                                                    <option value="SET">Remplacer (=)</option>
+                                                                    <option value="SUB">Soustraire (-)</option>
+                                                                </select>
+                                                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-800/40" />
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         )}

@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.93.2",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Unification de l'Héritage MJ : Dans l'éditeur de traits, les champs 'Cible' et 'Opération' sont désormais automatiquement masqués et verrouillés s'ils sont déjà définis dans le dictionnaire de formules MJ. Cela garantit une source de vérité unique et simplifie l'interface pour le créateur de contenu."
+    },
+    {
         "version": "2.93.1",
         "date": "2026-02-27",
         "type": "fix",
@@ -112,17 +118,5 @@
         "date": "2026-02-25",
         "type": "docs",
         "description": "Audit Technique Approfondi (Ground Truth) : Rapport d'état des formules basé exclusivement sur l'analyse du code source. Identification précise des variables injectées (XP_TOTAL, TRAIT_LEVEL, etc.), des points d'évaluation effectifs (XP, Bonus, Réserves) et des limites du hardcoding actuel."
-    },
-    {
-        "version": "2.81.3",
-        "date": "2026-02-25",
-        "type": "docs",
-        "description": "Ébauche de rapport d'audit des formules (basée sur documentation)."
-    },
-    {
-        "version": "2.81.2",
-        "date": "2026-02-25",
-        "type": "fix",
-        "description": "Affinage de l'apparence des compteurs : retour à une disposition horizontale compacte avec titre à gauche et alignement à droite, conformément à la référence visuelle (sans les étiquettes 'MAXI' et 'UTILISÉ')."
     }
 ]
