@@ -282,11 +282,45 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
 
     const handleMasterSkillConfirm = React.useCallback((categoryId: string, skillName: string) => {
         if (!masterSkillWizard) return;
+
+        // 1. Appliquer la maîtrise (mise à jour du rang et du variant du trait)
         const updated = applyMasterSkill(data, masterSkillWizard.traitType, masterSkillWizard.traitName, categoryId, skillName);
-        onChange(updated);
+
+        // 2. Si la compétence n'existe pas encore sur la fiche, on doit l'ajouter
+        let finalSheet = updated;
+        let skillFound = false;
+
+        // On cherche dans toutes les catégories si la compétence existe
+        for (const catId of Object.keys(updated.skills)) {
+            if (updated.skills[catId]?.some(s => s.name === skillName)) {
+                skillFound = true;
+                break;
+            }
+        }
+
+        if (!skillFound) {
+            const skillDef = rules?.libraries?.skills?.find(s => s.name === skillName);
+            if (skillDef) {
+                const newSkills = { ...updated.skills };
+                if (!newSkills[categoryId]) newSkills[categoryId] = [];
+
+                newSkills[categoryId].push({
+                    id: crypto.randomUUID(),
+                    name: skillDef.name,
+                    value: 5,
+                    creationValue: 5,
+                    max: 5,
+                    definitionId: skillDef.id
+                } as any);
+
+                finalSheet = { ...updated, skills: newSkills };
+            }
+        }
+
+        onChange(finalSheet);
         onAddLog(`Maîtrise accordée : ${skillName} portée au rang 5 (via ${masterSkillWizard.traitName})`, 'success', 'sheet');
         setMasterSkillWizard(null);
-    }, [masterSkillWizard, applyMasterSkill, data, onChange, onAddLog]);
+    }, [masterSkillWizard, applyMasterSkill, data, rules, onChange, onAddLog]);
 
     const updateCharacterImageId = React.useCallback((id: string) => {
         onChange((prev: CharacterSheetData) => ({

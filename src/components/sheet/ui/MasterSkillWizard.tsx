@@ -33,46 +33,45 @@ const MasterSkillWizard: React.FC<MasterSkillWizardProps> = ({
     const eligibleSkills = useMemo(() => {
         const skills: { categoryId: string; skillName: string; key: string }[] = [];
 
-        const categories = rules?.definitions?.skillCategories;
+        // 1. Collect currently possessed skills
+        // 2. Collect ALL library skills to allow choosing a new one
+        const categories = rules?.definitions?.skillCategories || [];
+        const libSkills = rules?.libraries?.skills || [];
 
-        if (categories && categories.length > 0) {
-            // Mode avec catégories définies
-            // N'inclure que les catégories primaires (behavior === 'Compétence')
-            const primaryCategories = categories.filter(cat =>
-                cat.behavior === 'Compétence'
-            );
+        // Helper to check if skill is primary
+        const isPrimary = (catId: string) => {
+            const cat = categories.find(c => c.id === catId);
+            if (cat) return cat.behavior === 'Compétence';
 
-            primaryCategories.forEach(cat => {
-                const list = sheet.skills[cat.id];
-                if (!Array.isArray(list)) return;
-                list.forEach(skill => {
-                    if (!skill.name.trim()) return;
-                    if ((skill.value || 0) === 0) {
-                        const key = `${cat.id}::${skill.name}`;
-                        skills.push({ categoryId: cat.id, skillName: skill.name, key });
-                    }
-                });
-            });
-        } else {
-            // Mode legacy : catégories hardcodées primaires
-            const primaryLegacyCats = [
+            // Legacy fallback
+            return [
                 'talents', 'competences', 'connaissances', 'autres_competences', 'autres',
                 'Col_Comp_1', 'Col_Comp_2', 'Col_Comp_3', 'Col_Comp_4', 'Col_Comp_5', 'Col_Comp_7'
-            ];
-            primaryLegacyCats.forEach(catId => {
-                const list = sheet.skills[catId];
-                if (!Array.isArray(list)) return;
-                list.forEach(skill => {
-                    if (!skill.name.trim()) return;
-                    if ((skill.value || 0) === 0) {
-                        const key = `${catId}::${skill.name}`;
-                        skills.push({ categoryId: catId, skillName: skill.name, key });
-                    }
-                });
-            });
-        }
+            ].includes(catId);
+        };
 
-        return skills;
+        // Add library skills first
+        libSkills
+            .filter(ls => isPrimary(ls.defaultCategory || ''))
+            .forEach(ls => {
+                const catId = ls.defaultCategory || 'competences';
+                const key = `${catId}::${ls.name}`;
+                skills.push({ categoryId: catId, skillName: ls.name, key });
+            });
+
+        // Add skills already on sheet if not already in list
+        Object.entries(sheet.skills).forEach(([catId, list]) => {
+            if (!isPrimary(catId) || !Array.isArray(list)) return;
+            list.forEach(s => {
+                if (!s.name.trim()) return;
+                const key = `${catId}::${s.name}`;
+                if (!skills.some(existing => existing.key === key)) {
+                    skills.push({ categoryId: catId, skillName: s.name, key });
+                }
+            });
+        });
+
+        return skills.sort((a, b) => a.skillName.localeCompare(b.skillName));
     }, [sheet.skills, rules]);
 
     if (!isOpen) return null;

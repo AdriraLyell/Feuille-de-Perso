@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.96.0",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Ergonomie (Traits de Maîtrise) : Refonte du flux d'ajout des traits utilisant 'master_skill'. Suppression de la double demande (variante + wizard) au profit d'un Wizard unique et amélioré. Celui-ci permet désormais de choisir parmi TOUTES les compétences définies dans les règles (même non possédées) et met automatiquement à jour le nom d'affichage du trait (ex: 'Maitre : Bagarre') dès la sélection effectuée."
+    },
+    {
         "version": "2.95.0",
         "date": "2026-02-27",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-26",
         "type": "fix",
         "description": "Correction de la mise à jour des compteurs dynamiques : Amélioration de l'identification des compétences mystiques par nom (fallback), synchronisation forcée des propriétés mystiques lors de l'édition, et injection systématique de la bibliothèque globale de formules lors de l'évaluation des jauge de réserve (Force Vitale) pour garantir la réactivité en temps réel."
-    },
-    {
-        "version": "2.90.0",
-        "date": "2026-02-26",
-        "type": "feat",
-        "description": "Refonte Architecturale (Logic vs Object) : Unification des variables MJ et agrégats dans un moteur de calcul centralisé. Les 'Réserves' sont désormais des 'Compteurs Dynamiques' liés à des formules. Ajout du support des agrégats personnalisés (Somme/Compte de traits/compétences avec filtres). Mise à jour de l'interface d'administration pour une expérience plus intuitive et guidée."
     }
 ]

@@ -262,10 +262,15 @@ export const useTraitEditor = (
         }
 
         // 2. Stocker le nom dans le TraitEntry correspondant (masterSkillTarget)
+        // Et mettre à jour le variant pour l'affichage ("Maitre : Bagarre")
         const traitList = [...currentData.page2[traitType]];
         const traitIdx = traitList.findIndex(t => t.name === traitName && !t.masterSkillTarget);
         if (traitIdx !== -1) {
-            traitList[traitIdx] = { ...traitList[traitIdx], masterSkillTarget: skillName };
+            traitList[traitIdx] = {
+                ...traitList[traitIdx],
+                masterSkillTarget: skillName,
+                variant: skillName
+            };
         }
 
         return {

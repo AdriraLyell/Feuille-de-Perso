@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.90.0",
+        "date": "2026-02-26",
+        "type": "feat",
+        "description": "Refonte Architecturale (Logic vs Object) : Unification des variables MJ et agrégats dans un moteur de calcul centralisé. Les 'Réserves' sont désormais des 'Compteurs Dynamiques' liés à des formules. Ajout du support des agrégats personnalisés (Somme/Compte de traits/compétences avec filtres). Mise à jour de l'interface d'administration pour une expérience plus intuitive et guidée."
+    },
+    {
         "version": "2.83.0",
         "date": "2026-02-26",
         "type": "feat",
@@ -591,11 +597,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Restauration UI & Mise en forme : Correction des classes CSS corrompues (espaces), retour aux libellés en majuscules pour les onglets et en-têtes de tableaux, et ajustement des dimensions du bilan d'XP (suppression du bloc solde redondant et retour à une granularité fine des gains) tout en conservant le moteur de calcul basé sur l'état."
-    },
-    {
-        "version": "2.56.69",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Vue Distribution d'XP finale : Le bilan d'XP est désormais calculé en temps réel à partir de l'état actuel de la fiche personnage (Distribution d'état). Cette approche garantit une fiabilité totale en affichant l'investissement exact pour chaque compétence, attribut, trait et compteur, sans dépendre de l'intégrité de l'historique brut des transactions."
     }
 ]
