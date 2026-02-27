@@ -769,43 +769,51 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                                         {!counter.target && <div className="absolute right-2 top-2 text-[8px] text-amber-500/50 font-bold uppercase pointer-events-none">Optionnel</div>}
                                                     </div>
                                                 </div>
-                                                <div>
-                                                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Type d'Effet</label>
-                                                    <select
-                                                        value={counter.effectType || 'modifier'}
-                                                        onChange={e => updateCounter(counter.id, 'effectType', e.target.value)}
-                                                        className="w-full p-2 bg-stone-950 border border-stone-700 text-stone-300 rounded focus:border-amber-500 outline-none"
-                                                    >
-                                                        <option value="modifier">Calcul Standard (Attribut, XP, Réserve)</option>
-                                                        <option value="block_skill_increase">Blocage de Progression</option>
-                                                        <option value="master_skill">Maîtrise (Forcer à 5)</option>
-                                                        <option value="free_skill_rank">Rang Gratuit (Cumulable)</option>
-                                                    </select>
-                                                </div>
-                                                {counter.effectType !== 'block_skill_increase' && counter.effectType !== 'master_skill' && (
+                                                <div className="flex flex-col gap-3">
                                                     <div>
-                                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Opération</label>
+                                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Type d'Effet</label>
                                                         <select
-                                                            value={counter.operator || ''}
-                                                            onChange={e => updateCounter(counter.id, 'operator', e.target.value as any)}
-                                                            className={`w-full p-2 bg-stone-950 border text-stone-300 rounded focus:border-amber-500 outline-none ${!counter.operator ? 'border-dashed border-stone-700 text-stone-500' : 'border-stone-700'}`}
+                                                            value={counter.effectType || 'modifier'}
+                                                            onChange={e => updateCounter(counter.id, 'effectType', e.target.value)}
+                                                            className="w-full p-2 bg-stone-950 border border-stone-700 text-stone-300 rounded focus:border-amber-500 outline-none"
                                                         >
-                                                            <option value="">-- Aucune (à définir dans le trait) --</option>
-                                                            <option value="ADD">Ajoûter (ADD)</option>
-                                                            <option value="SET">Remplacer (SET)</option>
-                                                            <option value="SUB">Soustraire (SUB)</option>
+                                                            <option value="modifier">Calcul Standard (Attribut, XP, Réserve)</option>
+                                                            <option value="block_skill_increase">Blocage de Progression</option>
+                                                            <option value="master_skill">Maîtrise (Forcer à 5)</option>
+                                                            <option value="free_skill_rank">Rang Gratuit (Cumulable)</option>
                                                         </select>
                                                     </div>
-                                                )}
-                                                <div className="flex flex-col justify-end">
-                                                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1 whitespace-nowrap">Forcer Variante</label>
-                                                    <button
-                                                        onClick={() => updateCounter(counter.id, 'forceVariant', !counter.forceVariant)}
-                                                        className={`w-full p-2 rounded border transition-all flex items-center justify-center gap-2 font-bold text-xs ${counter.forceVariant ? 'bg-indigo-600/20 border-indigo-500 text-indigo-400 shadow-glow-indigo' : 'bg-stone-900 border-stone-700 text-stone-500 hover:text-stone-400'}`}
-                                                    >
-                                                        {counter.forceVariant ? <Sparkles size={14} /> : null}
-                                                        {counter.forceVariant ? 'ACTIVÉ' : 'DÉSACTIVÉ'}
-                                                    </button>
+
+                                                    <div className="flex gap-4 items-end">
+                                                        {counter.effectType !== 'block_skill_increase' && counter.effectType !== 'master_skill' && (
+                                                            <div className="flex-grow">
+                                                                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Opération</label>
+                                                                <select
+                                                                    value={counter.operator || ''}
+                                                                    onChange={e => updateCounter(counter.id, 'operator', e.target.value as any)}
+                                                                    className={`w-full p-2 bg-stone-950 border text-stone-300 rounded focus:border-amber-500 outline-none ${!counter.operator ? 'border-dashed border-stone-700 text-stone-500' : 'border-stone-700'}`}
+                                                                >
+                                                                    <option value="">-- Aucune (à définir dans le trait) --</option>
+                                                                    <option value="ADD">Ajoûter (ADD)</option>
+                                                                    <option value="SET">Remplacer (SET)</option>
+                                                                    <option value="SUB">Soustraire (SUB)</option>
+                                                                </select>
+                                                            </div>
+                                                        )}
+
+                                                        <div className="flex flex-col items-center pb-1 min-w-[90px]">
+                                                            <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2 whitespace-nowrap text-center">Forcer Variante</label>
+                                                            <button
+                                                                onClick={() => updateCounter(counter.id, 'forceVariant', !counter.forceVariant)}
+                                                                className={`relative w-12 h-6 rounded-full transition-all duration-300 focus:outline-none ${counter.forceVariant ? 'bg-indigo-600 shadow-glow-indigo' : 'bg-stone-800 border border-stone-700'}`}
+                                                                title={counter.forceVariant ? 'Variante activée' : 'Activer la variante'}
+                                                            >
+                                                                <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-300 flex items-center justify-center ${counter.forceVariant ? 'translate-x-6' : 'translate-x-0'}`}>
+                                                                    {counter.forceVariant && <Sparkles size={10} className="text-indigo-600" />}
+                                                                </div>
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             {counter.forceVariant && (
