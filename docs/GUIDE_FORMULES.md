@@ -1,4 +1,4 @@
-# Guide du Système de Formules (v2.9+)
+# Guide du Système de Formules (v2.96.1)
 
 Ce document unifie la documentation technique, le guide d'utilisation et le plan de migration du moteur de règles par formules. Le système vise à transformer l'application d'un simple "calculateur passif" en un "moteur de règles actif" où le MJ a le contrôle des calculs sans modification de code.
 
@@ -35,21 +35,32 @@ Pour qu'un compteur ait un maximum calculé d'après les stats du personnage :
 
 ## 3. État Technique Actuel (Ground Truth)
 
-Le moteur de calcul (v2.93.0) est désormais entièrement unifié. Toutes les mécaniques sémantiques "en dur" ont été migrées vers le système de formules universel.
-
 ### ✅ Mécaniques fonctionnant par Formules :
 - **Modifications des Caractéristiques** : Bonus d'Attributs, de Compétences et de Compteurs via `useCharacterBonuses`.
+- **Forcer Variante (Nouveau)** : Les formules peuvent exiger une précision du joueur (ex: choix d'une Bagarre). Cette "Variante" devient dynamiquement la cible de l'effet.
 - **Rangs de Compétence Gratuit** : Géré via l'opérateur `ADD` sur une cible de type Compétence.
-- **Maîtrises de Compétence** : Géré via l'opérateur `SET` (fixe la valeur cible à x, typiquement 5).
+- **Maîtrises de Compétence** : Géré via l'opérateur `SET` (fixe la valeur cible à x, typiquement 5) avec assistant de sélection intelligent.
 - **Gain d'Expérience** : Calculs dynamiques de bonus/malus d'XP basés sur le niveau du trait ou du nombre de scénarios.
 - **Réserves (Compteurs)** : Capacité maximale (`maxValue`) calculée dynamiquement ou héritée.
 - **Blocage de Progression** : Géré par le type d'effet `block_skill_increase` via formule.
 
-### 🛠️ Système d'Opérateurs (Nouveau)
-Chaque formule appliquée peut désormais définir comment son résultat impacte la cible :
-- **ADD** (Défaut) : Ajoute le résultat de la formule à la valeur actuelle (ex: `For + 2`).
-- **SUB** : Soustrait le résultat de la formule (ex: `XP - (Niveau * 5)`).
+### 🛠️ Système d'Opérateurs
+Chaque formule appliquée définit comment son résultat impacte la cible :
+- **ADD** (Défaut) : Ajoute le résultat de la formule à la valeur actuelle (ex: `Physique + 2`).
+- **SUB** : Soustrait le résultat (ex: `XP - (TRAIT_LEVEL * 5)`).
 - **SET** : Remplace la valeur actuelle par le résultat (ex: `Maîtrise = 5`).
+
+### ⚡ Forcer Variante (Dynamique)
+Lorque l'option **"Forcer Variante"** est active dans une formule globale :
+1.  **Cible Dynamique** : Le champ "Cible" de la formule ne sert plus de destination finale mais de **Catégorie de Suggestion**.
+2.  **Saisie Joueur** : À l'ajout du trait, le joueur DOIT choisir une variante (ex: une compétence spécifique).
+3.  **Redirection** : Le moteur redirige automatiquement l'effet vers la variante choisie par le joueur.
+
+**Exemple : Maître d'Arme**
+- Formule: `Cible="Compétence"`, `Type="Maîtrise"`, `Equation="5"`, `Forcer Variante=ON`.
+- Résultat: Le joueur choisit "Épée", l'effet s'applique sur "Épée" (valeur=5).
+
+---
 
 ## 4. Architecture & Injection de Contexte
 
@@ -76,10 +87,11 @@ Afin de configurer correctement une **Formule (Modificateur/Effet)**, voici la l
 Le champ Cible indique au moteur quel élément de la fiche doit recevoir le résultat du calcul.
 Il doit s'agir du **nom exact** de l'élément tel qu'il apparaît sur la fiche de personnage ou dans la base de données.
 
-*   **Attributs** : Tapez le nom exact d'un des 9 attributs primaires (ex: `Physique`, `Vigueur`, `Volonté`, `Empathie`, etc.). *(Note : Cela modifie toujours la sous-valeur "val2" de l'attribut, c'est à dire le bonus passif).*
-*   **Compétences** : Tapez le nom exact d'une compétence existante dans votre référentiel (ex: `Bagarre`, `Savoir Mystique`, `Athlétisme`). *(La formule s'appliquera sur la valeur de cette compétence).*
-*   **Compteurs / Réserves** : Tapez le nom du compteur ou de la jauge (ex: `PV`, `Mana`, `Force Vitale`).
-*   **Expérience** : Tapez `XP` (ou `Total`) pour cibler le montant d'expérience du personnage.
+*   **Attributs** : Tapez le nom d'un des 9 attributs (ex: `Vigueur`). Modifie le bonus passif de l'attribut.
+*   **Compétences** : Tapez le nom d'une compétence existante (ex: `Bagarre`).
+*   **Compteurs / Réserves** : Tapez le nom de la jauge (ex: `Force Vitale`).
+*   **Expérience** : Tapez `XP` pour cibler le montant d'expérience.
+*   **Catégories (Suggestion)** : Si **Forcer Variante** est actif, vous pouvez saisir `Compétence` ou `Attribut` pour filtrer automatiquement la liste proposée au joueur.
 
 ### ⚙️ Liste des "TYPES D'EFFET"
 Le Type d'effet indique au moteur si la formule doit suivre un comportement standard ou déclencher une logique spéciale.
@@ -95,8 +107,8 @@ Le Type d'effet indique au moteur si la formule doit suivre un comportement stan
     *   **Note** : Bloque la compétence si le résultat du calcul est supérieur à 0.
 
 3.  **Maîtrise (Forcer à 5)**
-    *   **Usage** : Sémantique spéciale pour les traits de "Maîtrise". Souvent utilisé avec une cible de compétence pour la forcer à 5.
-    *   **Cible attendue** : Un nom de Compétence.
+    *   **Usage** : Sémantique spéciale pour les traits de "Maîtrise". Déclenche un assistant (Wizard) permettant de choisir une compétence (même non possédée) et de l'ajouter automatiquement à la fiche.
+    *   **Cible attendue** : Un nom de Compétence ou `Compétence` (si Forcer Variante est ON).
 
 4.  **Rang Gratuit (Cumulable)**
     *   **Usage** : Similaire au calcul standard mais typé sémantiquement pour les rangs offerts.

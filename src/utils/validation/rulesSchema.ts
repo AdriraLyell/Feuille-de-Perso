@@ -74,9 +74,11 @@ export const LibraryFormulaEntrySchema = z.object({
     type: z.enum(['modifier', 'variable']),
     target: z.string().nullable().optional(),
     effectType: z.string().nullable().optional(),
+    operator: z.enum(['ADD', 'SET', 'SUB', '']).nullable().optional(),
+    forceVariant: z.boolean().nullable().optional(),
     aggregateConfig: z.object({
-        operation: z.enum(['sum', 'count']),
-        targetType: z.enum(['skills', 'traits', 'backgrounds']),
+        operation: z.enum(['sum', 'count', 'max', 'avg']),
+        targetType: z.enum(['skills', 'attributes', 'traits', 'backgrounds']),
         filterTarget: z.enum(['tag', 'category', 'name', 'all']),
         filterValue: z.string().optional(),
     }).nullable().optional(),

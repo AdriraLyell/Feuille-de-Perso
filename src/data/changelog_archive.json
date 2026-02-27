@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.91.0",
+        "date": "2026-02-26",
+        "type": "fix",
+        "description": "Correction de la mise à jour des compteurs dynamiques : Amélioration de l'identification des compétences mystiques par nom (fallback), synchronisation forcée des propriétés mystiques lors de l'édition, et injection systématique de la bibliothèque globale de formules lors de l'évaluation des jauge de réserve (Force Vitale) pour garantir la réactivité en temps réel."
+    },
+    {
         "version": "2.90.0",
         "date": "2026-02-26",
         "type": "feat",
@@ -591,11 +597,5 @@
         "date": "2026-02-21",
         "type": "style",
         "description": "Ajustement UI : Centrage de la valeur du champ 'Gain' dans le résumé d'expérience pour une meilleure harmonie visuelle avec les autres champs de stats."
-    },
-    {
-        "version": "2.56.70",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Restauration UI & Mise en forme : Correction des classes CSS corrompues (espaces), retour aux libellés en majuscules pour les onglets et en-têtes de tableaux, et ajustement des dimensions du bilan d'XP (suppression du bloc solde redondant et retour à une granularité fine des gains) tout en conservant le moteur de calcul basé sur l'état."
     }
 ]

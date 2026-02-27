@@ -175,6 +175,8 @@ export interface DBFormula {
     effect_type?: string;
     aggregate_config?: any;
     description?: string;
+    operator?: string;
+    force_variant?: boolean;
     is_active?: boolean;
     created_at?: string;
 }

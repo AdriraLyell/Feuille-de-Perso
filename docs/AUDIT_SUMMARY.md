@@ -1,8 +1,14 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.93.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.96.1)
 
-> **Dernière mise à jour** : 27 Février 2026 — Version 2.93.0
+> **Dernière mise à jour** : 27 Février 2026 — Version 2.96.1
 
 ## 1. Phases Complétées
+
+### ✅ Phase 43 : Persistance & Forcer Variante (v2.96.1)
+- [x] **Persistance Cloud** : Correction critique de la sauvegarde des champs `force_variant` et `operator` dans Supabase (Migration SQL + Data Mapper).
+- [x] **Forcer Variante** : Implémentation du moteur de variante dynamique (la variante choisie par le joueur devient la cible de l'effet).
+- [x] **Wizard Maîtrise Amélioré** : Refonte du flux d'ajout des traits de Maîtrise (Assistant de sélection universel + synchronisation du nom du trait).
+- [x] **Suggestions Catégorielles** : Support des mots-clés `Compétence` et `Attribut` comme cibles pour générer des listes de suggestions automatiques.
 
 ### ✅ Phase 42 : Migration Systémique & Unification des Formules (v2.93.0)
 - [x] **Système d'Opérateurs** : Abstraction des effets sémantiques vers des opérateurs universels (`ADD`, `SET`, `SUB`).

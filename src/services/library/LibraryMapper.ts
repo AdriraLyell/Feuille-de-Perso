@@ -116,6 +116,8 @@ export const LibraryMapper = {
             aggregateConfig: f.aggregate_config,
             target: f.target,
             effectType: f.effect_type,
+            operator: f.operator as 'ADD' | 'SET' | 'SUB' | '',
+            forceVariant: f.force_variant || false,
             description: f.description || '',
             isGlobal: f.setting_id == null,
             isActive: activeIds.has(f.id) || f.setting_id === sid

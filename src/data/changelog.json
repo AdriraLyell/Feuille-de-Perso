@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.96.2",
+        "date": "2026-02-27",
+        "type": "refactor",
+        "description": "Refactor (Admin Formules) : Extraction de la logique d'édition individuelle des formules dans un composant dédié AdminFormulaEditorItem. Réduction massive de la taille et de la complexité du fichier AdminFormulasEditor.tsx (passage de ~950 à ~490 lignes) pour une meilleure maintenance et lisibilité."
+    },
+    {
+        "version": "2.96.1",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Système (Persistance des Formules) : Correction d'un bug majeur où l'option 'Forcer Variante' et l'opérateur mathématique (ADD/SET/SUB) des formules globales n'étaient pas sauvegardés en base de données ni restitués après un rechargement de page. Mise à jour de la structure de la table 'libraries_formulas', du schéma de validation Zod et du service de synchronisation Cloud."
+    },
+    {
         "version": "2.96.0",
         "date": "2026-02-27",
         "type": "feat",
@@ -112,11 +124,5 @@
         "date": "2026-02-26",
         "type": "fix",
         "description": "Normalisation globale du moteur de calcul : Support universel des accents dans les variables (ex: Volonté / Volonte), renforcement de la détection des compétences mystiques via normalisation des noms, et ajout de logs de diagnostic pour le suivi des agrégats dynamiques."
-    },
-    {
-        "version": "2.91.0",
-        "date": "2026-02-26",
-        "type": "fix",
-        "description": "Correction de la mise à jour des compteurs dynamiques : Amélioration de l'identification des compétences mystiques par nom (fallback), synchronisation forcée des propriétés mystiques lors de l'édition, et injection systématique de la bibliothèque globale de formules lors de l'évaluation des jauge de réserve (Force Vitale) pour garantir la réactivité en temps réel."
     }
 ]

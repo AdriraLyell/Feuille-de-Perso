@@ -74,6 +74,8 @@ export const LibraryPersistence = {
                         payload.target = item.target;
                         payload.effect_type = item.effectType;
                         payload.aggregate_config = item.aggregateConfig;
+                        payload.operator = item.operator;
+                        payload.force_variant = !!item.forceVariant;
                     }
 
                     toCreate.push(payload);
@@ -152,6 +154,8 @@ export const LibraryPersistence = {
                     payload.target = item.target;
                     payload.effect_type = item.effectType;
                     payload.aggregate_config = item.aggregateConfig;
+                    payload.operator = item.operator;
+                    payload.force_variant = !!item.forceVariant;
                 }
 
                 // Use UPSERT instead of update to handle newly created items from the UI
