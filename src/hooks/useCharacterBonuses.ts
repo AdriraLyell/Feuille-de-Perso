@@ -79,20 +79,11 @@ export const useCharacterBonuses = (
 
                         const traitValue = parseInt(trait.value?.toString() || '1') || 1;
 
-                        // Define TRAIT_LEVEL variable for the formula
-                        const localDataForEval = {
-                            ...characterData,
-                            variables: {
-                                ...(characterData.variables || {}),
-                                TRAIT_LEVEL: traitValue
-                            }
-                        };
-
                         try {
                             const result = evaluateFormula(formulaString, {
-                                ...localDataForEval,
-                                formulaLibrary: rules?.libraries?.formulas || localDataForEval.formulaLibrary
-                            });
+                                ...characterData,
+                                formulaLibrary: rules?.libraries?.formulas || characterData.formulaLibrary
+                            }, { traitLevel: traitValue });
 
                             const effectiveEffectType = (effect as any).inferredEffectType || effect.type;
 
@@ -106,22 +97,32 @@ export const useCharacterBonuses = (
                                 cat => characterData.attributes[cat].some(attr => normalizeString(attr.name) === targetName)
                             );
 
+                            const operator = effect.operator || (rules?.libraries?.formulas?.find(f => f.id === effect.formulaId)?.operator) || 'ADD';
+
                             if (isAttribute) {
                                 if (!attributeBonuses[targetName]) {
                                     attributeBonuses[targetName] = { value: 0, sources: [] };
                                 }
-                                attributeBonuses[targetName].value += result;
-                                attributeBonuses[targetName].sources.push(`${trait.name} (Formule: ${result > 0 ? '+' : ''}${result})`);
+                                if (operator === 'ADD') {
+                                    attributeBonuses[targetName].value += result;
+                                } else if (operator === 'SUB') {
+                                    attributeBonuses[targetName].value -= result;
+                                } else if (operator === 'SET') {
+                                    attributeBonuses[targetName].value = result;
+                                }
+                                attributeBonuses[targetName].sources.push(`${trait.name} (${operator === 'SUB' ? '-' : operator === 'SET' ? '=' : '+'}${result})`);
                             } else if (effectiveEffectType === 'master_skill' || effectiveEffectType === 'block_skill_increase') {
-                                // These are handled by their own logic blocks usually, but if they came from a formula,
-                                // we might want to register them.
-                                // block_skill_increase is already handled above line 53 if it's the static type.
+                                // These are handled by their own logic blocks usually
                             } else {
                                 // Assume it's a counter
                                 if (trait.isPostCreation) {
-                                    counterXPBonuses[targetName] = (counterXPBonuses[targetName] || 0) + result;
+                                    if (operator === 'SET') counterXPBonuses[targetName] = result;
+                                    else if (operator === 'SUB') counterXPBonuses[targetName] = (counterXPBonuses[targetName] || 0) - result;
+                                    else counterXPBonuses[targetName] = (counterXPBonuses[targetName] || 0) + result;
                                 } else {
-                                    counterCreationBonuses[targetName] = (counterCreationBonuses[targetName] || 0) + result;
+                                    if (operator === 'SET') counterCreationBonuses[targetName] = result;
+                                    else if (operator === 'SUB') counterCreationBonuses[targetName] = (counterCreationBonuses[targetName] || 0) - result;
+                                    else counterCreationBonuses[targetName] = (counterCreationBonuses[targetName] || 0) + result;
                                 }
                             }
 

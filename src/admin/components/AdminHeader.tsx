@@ -15,6 +15,8 @@ interface AdminHeaderProps {
     onLogout: () => void;
     onShowChangelog: () => void;
     onCheckSchema?: () => void;
+    onMigrate?: () => void;
+    legacyEffectsCount?: number;
 }
 
 const AdminHeader: React.FC<AdminHeaderProps> = ({
@@ -28,7 +30,9 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
     onPublish,
     onLogout,
     onShowChangelog,
-    onCheckSchema
+    onCheckSchema,
+    onMigrate,
+    legacyEffectsCount = 0
 }) => {
     return (
         <header className="bg-mystic-deep/95 text-stone-200 p-4 shadow-glass sticky top-0 z-50 border-b border-stone-800 backdrop-blur-md">
@@ -68,6 +72,18 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                             </MotionFade>
                         )}
                     </div>
+                    {legacyEffectsCount > 0 && (
+                        <MotionFade delay={0.25}>
+                            <button
+                                onClick={onMigrate}
+                                className="flex items-center gap-2 bg-rose-900/50 hover:bg-rose-950/70 text-rose-300 px-3 py-1 rounded-full border border-rose-800/50 animate-pulse"
+                                title={`Détecté ${legacyEffectsCount} effets hérités à migrer vers le système de formules.`}
+                            >
+                                <AlertTriangle size={14} />
+                                <span className="text-[10px] font-black uppercase tracking-widest hidden md:inline">{legacyEffectsCount} Effets à migrer</span>
+                            </button>
+                        </MotionFade>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-3 text-sm">

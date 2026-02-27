@@ -293,10 +293,18 @@ export const calculateAggregate = (data: any, config: any): number => {
 /**
  * Evaluates a given formula against a character's state.
  */
-export const evaluateFormula = (formula: string, data: CharacterSheetData & { variables?: Record<string, number> }, entry?: any): number => {
+export const evaluateFormula = (
+    formula: string,
+    data: CharacterSheetData & { variables?: Record<string, number> },
+    options: {
+        entry?: any,
+        traitLevel?: number,
+        scenariosCount?: number
+    } = {}
+): number => {
     // If it's an aggregate formula, calculate it directly
-    if (entry?.aggregateConfig) {
-        return calculateAggregate(data, entry.aggregateConfig);
+    if (options.entry?.aggregateConfig) {
+        return calculateAggregate(data, options.entry.aggregateConfig);
     }
 
     if (!formula) return 0;
@@ -304,6 +312,14 @@ export const evaluateFormula = (formula: string, data: CharacterSheetData & { va
     try {
         const sheetVars = getSheetVariables(data);
         const context = { ...sheetVars };
+
+        // Inject contextual variables from options
+        if (options.traitLevel !== undefined) {
+            context['TRAIT_LEVEL'] = options.traitLevel;
+        }
+        if (options.scenariosCount !== undefined) {
+            context['SCENARIOS_COUNT'] = options.scenariosCount;
+        }
 
         // Use expr-eval parser
         const expr = parser.parse(formula);

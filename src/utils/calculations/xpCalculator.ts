@@ -97,21 +97,29 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 
         if (!formulaString) return;
 
-        const dataForEval = {
-            ...data,
-            variables: {
-                ...(data.variables || {}),
-                TRAIT_LEVEL: e.traitLevel,
-                SCENARIOS_COUNT: scenarioCount
-            }
-        };
         try {
-            const result = evaluateFormula(formulaString, dataForEval);
+            const result = evaluateFormula(formulaString, data, {
+                traitLevel: e.traitLevel,
+                scenariosCount: scenarioCount
+            });
+
             if (result !== 0) {
-                totalTraitXP += result;
+                const operator = e.operator || (rules?.libraries?.formulas?.find(f => f.id === e.formulaId)?.operator) || 'ADD';
+
+                if (operator === 'SET') {
+                    // Logic for SET in XP gain is tricky, we treat it as "at least this amount" or "reset to this"
+                    // but for XP bonus it's usually incremental.
+                    // For now, let's just make it additive to not break history, but log correctly.
+                    totalTraitXP += result;
+                } else if (operator === 'SUB') {
+                    totalTraitXP -= result;
+                } else {
+                    totalTraitXP += result;
+                }
+
                 formulaBonusBreakdown.push({
                     name: `Bonus : ${e.source || 'Trait'}`,
-                    amount: result
+                    amount: operator === 'SUB' ? -result : result
                 });
             }
         } catch (err) {

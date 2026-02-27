@@ -153,9 +153,10 @@
       "effects": [
         {
           "id": "h6wxnagx8",
-          "type": "free_skill_rank",
-          "value": 5,
-          "target": "Bagarre"
+          "type": "formula",
+          "value": 0,
+          "target": "Bagarre",
+          "formulaId": "migrated_fd2wem38"
         }
       ]
     },
@@ -187,8 +188,9 @@
       "effects": [
         {
           "id": "dod5zpi6j",
-          "type": "xp_bonus",
-          "value": 20
+          "type": "formula",
+          "value": 0,
+          "formulaId": "migrated_4vkx95j5"
         }
       ]
     },
@@ -245,6 +247,32 @@
       "description": "Action supplémentaire en combat",
       "tags": [],
       "effects": []
+    }
+  ],
+  "formulas": [
+    {
+      "id": "migrated_fd2wem38",
+      "name": "Rang : Bagarre",
+      "formula": "5",
+      "type": "modifier",
+      "target": "Bagarre",
+      "effectType": "free_skill_rank",
+      "description": "Migré depuis le trait: Maitre",
+      "isActive": true,
+      "isGlobal": true,
+      "operator": "ADD"
+    },
+    {
+      "id": "migrated_4vkx95j5",
+      "name": "Bonus XP : Héros d'Exception",
+      "formula": "20",
+      "type": "modifier",
+      "target": "XP",
+      "effectType": "xp_bonus",
+      "description": "Migré depuis le trait: Héros d'Exception",
+      "isActive": true,
+      "isGlobal": true,
+      "operator": "ADD"
     }
   ]
 }

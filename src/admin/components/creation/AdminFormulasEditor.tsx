@@ -4,8 +4,20 @@ import { LibraryFormulaEntry } from '../../../types';
 import { generateId } from '../../../utils/factories';
 import { evaluateFormula } from '../../../utils/formulaEvaluator';
 import { Trash2, Plus, Calculator, Info, Check, Filter, Sigma, Code2, AlertCircle, User, Loader2 } from 'lucide-react';
+import { Parser } from 'expr-eval';
 import { CharacterSyncService, SyncedCharacterSummary } from '../../../services/CharacterSyncService';
 import { MotionCard } from '../../../components/ui/motion/MotionCard';
+
+const isFormulaSyntaxValid = (formula?: string): boolean => {
+    if (!formula || formula.trim() === '') return false;
+    try {
+        const parser = new Parser();
+        parser.parse(formula);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
 
 const DUMMY_PREVIEW_DATA: any = {
     experience: { total: 25, gain: "25" },
@@ -180,7 +192,8 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
             formula: "10",
             isActive: true,
             isGlobal: true,
-            description: ""
+            description: "",
+            operator: 'ADD'
         };
         handleUpdate([...lib, newCounter]);
         setEditingId(newCounter.id);
@@ -197,7 +210,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                 const updated = { ...c, [field]: value };
                 // Re-evaluate preview if formula or aggregate config changed
                 if (field === 'formula' || field === 'aggregateConfig' || field === 'type') {
-                    setPreviewValue(evaluateFormula(updated.formula || '', currentPreviewData, updated));
+                    setPreviewValue(evaluateFormula(updated.formula || '', currentPreviewData, { entry: updated }));
                 }
                 return updated as any;
             }
@@ -360,7 +373,61 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
             <div className="space-y-4">
                 {formulaCounters.map(counter => {
                     const isEditing = editingId === counter.id;
-                    const preview = isEditing && previewValue !== null ? previewValue : evaluateFormula(counter.formula || '', currentPreviewData, counter);
+                    const preview = isEditing && previewValue !== null ? previewValue : evaluateFormula(counter.formula || '', currentPreviewData, { entry: counter });
+
+                    // Formule valide ?
+                    let isValid = true;
+                    // L'équation mathématique doit être analysable (sauf si c'est un agrégat auto)
+                    const isMathValid = counter.aggregateConfig ? true : isFormulaSyntaxValid(counter.formula);
+                    let tooltipMessage = "Formule valide";
+
+                    const isTargetValid = (target: string, currentRules: RulesData): boolean => {
+                        if (!target || target.trim() === '') return false;
+                        const t = target.trim();
+
+                        if (['XP', 'Total', 'Niveau'].includes(t)) return true;
+
+                        if (currentRules.definitions?.attributes) {
+                            const allAttrs = Object.values(currentRules.definitions.attributes).flat();
+                            if (allAttrs.includes(t)) return true;
+                        }
+
+                        if (currentRules.definitions?.secondaryAttributes) {
+                            const allSecAttrs = Object.values(currentRules.definitions.secondaryAttributes).flat();
+                            if (allSecAttrs.includes(t)) return true;
+                        }
+
+                        if (currentRules.libraries?.skills) {
+                            if (currentRules.libraries.skills.some((s: any) => s.name === t)) return true;
+                        }
+
+                        if (currentRules.libraries?.counters) {
+                            if (currentRules.libraries.counters.some((c: any) => c.name === t)) return true;
+                        }
+
+                        return false;
+                    };
+
+                    if (counter.type === 'modifier' || (counter as any).type === 'effect') {
+                        // Un effet a absolument besoin d'une cible mathématique et d'un type d'effet en plus de l'équation
+                        if (!counter.target || counter.target.trim() === '') {
+                            isValid = false;
+                            tooltipMessage = "Cible manquante";
+                        } else if (!counter.effectType) {
+                            isValid = false;
+                            tooltipMessage = "Type d'effet manquant";
+                        } else if (!isTargetValid(counter.target, rules)) {
+                            isValid = false;
+                            tooltipMessage = `La cible '${counter.target}' n'existe pas dans les règles`;
+                        } else if (!isMathValid) {
+                            isValid = false;
+                            tooltipMessage = "Syntaxe mathématique invalide";
+                        }
+                    } else {
+                        // Une variable classique a juste besoin d'une équation valide
+                        isValid = isMathValid;
+                        if (!isValid) tooltipMessage = "Syntaxe mathématique invalide";
+                    }
 
                     return (
                         <div key={counter.id} className={`border rounded-sm overflow-hidden transition-all ${isEditing ? 'border-amber-500 ring-1 ring-amber-500/50 bg-stone-900/80' : 'border-stone-700/50 bg-stone-900/40 hover:border-amber-500/30'}`}>
@@ -370,7 +437,11 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                 onClick={() => {
                                     if (!isEditing) {
                                         setEditingId(counter.id);
-                                        setPreviewValue(evaluateFormula(counter.formula || '', currentPreviewData, counter));
+                                        setPreviewValue(evaluateFormula(
+                                            counter.formula || '',
+                                            currentPreviewData,
+                                            { entry: counter }
+                                        ));
                                     }
                                 }}
                             >
@@ -390,14 +461,14 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <div className="text-right flex flex-col items-end">
-                                        <span className="text-[10px] text-stone-500 uppercase tracking-widest font-bold flex items-center gap-1">
+                                        <span className="text-[10px] text-stone-500 uppercase tracking-widest font-bold flex items-center gap-1" title={tooltipMessage}>
                                             Aperçu {realCharData ? 'Réel' : '(Fictif)'}
-                                            {preview !== null && !isNaN(preview) ?
+                                            {isValid ?
                                                 <Check size={10} className="text-emerald-500" /> :
                                                 <AlertCircle size={10} className="text-rose-500" />
                                             }
                                         </span>
-                                        <span className={`font-black text-xl leading-none ${preview !== null && !isNaN(preview) ? 'text-amber-500' : 'text-stone-600'}`}>
+                                        <span className={`font-black text-xl leading-none ${isValid ? 'text-amber-500' : 'text-stone-600'}`}>
                                             {preview !== null && !isNaN(preview) ? preview : 'ERROR'}
                                         </span>
                                     </div>
@@ -557,18 +628,30 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                                 </div>
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Type d'Action (Sémantique)</label>
+                                                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Type d'Effet</label>
                                                 <select
-                                                    value={counter.effectType || ''}
+                                                    value={counter.effectType || 'attribute_bonus'}
                                                     onChange={e => updateCounter(counter.id, 'effectType', e.target.value)}
                                                     className="w-full p-2 bg-stone-950 border border-stone-700 text-stone-300 rounded focus:border-amber-500 outline-none"
                                                 >
-                                                    <option value="">Standard (Bonus numérique)</option>
                                                     <option value="attribute_bonus">Bonus d'Attribut (val2)</option>
                                                     <option value="xp_bonus">Gain d'Expérience</option>
                                                     <option value="block_skill_increase">Blocage de Compétence</option>
                                                     <option value="free_skill_rank">Rang de Compétence Gratuit</option>
                                                     <option value="master_skill">Maîtrise (Fixe à 5)</option>
+                                                    <option value="reserve_bonus">Bonus de Réserve</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Opération</label>
+                                                <select
+                                                    value={counter.operator || 'ADD'}
+                                                    onChange={e => updateCounter(counter.id, 'operator', e.target.value as any)}
+                                                    className="w-full p-2 bg-stone-950 border border-stone-700 text-stone-300 rounded focus:border-amber-500 outline-none"
+                                                >
+                                                    <option value="ADD">Ajoûter (ADD)</option>
+                                                    <option value="SET">Remplacer (SET)</option>
+                                                    <option value="SUB">Soustraire (SUB)</option>
                                                 </select>
                                             </div>
                                         </div>

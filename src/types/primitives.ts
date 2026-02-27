@@ -82,10 +82,13 @@ export interface TraitEntry {
   type?: 'avantage' | 'desavantage';
 }
 
+export type FormulaOperator = 'ADD' | 'SET' | 'SUB';
+
 export type EffectType = 'free_skill_rank' | 'auto_counter' | 'master_skill' | 'block_skill_increase' | 'xp_upgradeable' | 'formula';
+
 export interface TraitEffect {
   id: string;
-  type: EffectType;
+  type: EffectType; // Note: 'free_skill_rank', 'master_skill', 'block_skill_increase' are being phased out in favor of 'formula' + operator
   value: number; // Montant XP ou Rang Max Gratuit
   method?: 'fixed' | 'per_scenario';
   target?: string; // Nom de la compétence ciblée (pour free_skill_rank) ou cible de la formule
@@ -93,6 +96,7 @@ export interface TraitEffect {
   associatedCounterId?: string; // Rétrocompatibilité ou option alternative
   formula?: string; // (Legacy/Transitoire) La formule à évaluer (ex: "+2", "Volonté / 2")
   formulaId?: string; // NEW: Le lien vers la formule globale du Dictionnaire
+  operator?: FormulaOperator; // NEW: Comment appliquer le résultat (Défaut: ADD)
 }
 
 export interface PostItData {

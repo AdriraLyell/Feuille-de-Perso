@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.81.1",
+        "date": "2026-02-25",
+        "type": "fix",
+        "description": "Restauration de la mise en page des compteurs sur deux colonnes. Passage à une disposition verticale (nom au-dessus des points) pour garantir l'affichage correct des noms et des séries de points dans la barre latérale."
+    },
+    {
         "version": "2.81.0",
         "date": "2026-02-24",
         "type": "feat",
@@ -591,11 +597,5 @@
         "date": "2026-02-20",
         "type": "fix",
         "description": "Correction Arrière-plans : Résolution du bug de couleur (noir au lieu de bleu) et de coût XP erroné en mode création. Les points d'arrière-plan sont désormais correctement identifiés comme acquis à la création."
-    },
-    {
-        "version": "2.56.56",
-        "date": "2026-02-20",
-        "type": "feat",
-        "description": "Recréation Administration : Ajout de l'option 'Ouverture Simple' permettant de renvoyer le joueur en mode création sans réinitialiser ni purger ses statistiques existantes."
     }
 ]

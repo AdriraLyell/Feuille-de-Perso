@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.93.0",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Migration Systémique des Formules : Intégration d'un outil de migration robuste dans le tableau de bord Admin pour convertir automatiquement les anciens effets hérités (bonus d'attributs, XP, rangs gratuits) vers le nouveau système de formules unifié. Support complet des opérateurs ADD/SET/SUB dans le moteur de calcul et l'interface d'édition. Centralisation de la logique de calcul pour garantir la cohérence entre les modes de jeu online et offline."
+    },
+    {
         "version": "2.92.7",
         "date": "2026-02-27",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-25",
         "type": "fix",
         "description": "Affinage de l'apparence des compteurs : retour à une disposition horizontale compacte avec titre à gauche et alignement à droite, conformément à la référence visuelle (sans les étiquettes 'MAXI' et 'UTILISÉ')."
-    },
-    {
-        "version": "2.81.1",
-        "date": "2026-02-25",
-        "type": "fix",
-        "description": "Restauration de la mise en page des compteurs sur deux colonnes. Passage à une disposition verticale (nom au-dessus des points) pour garantir l'affichage correct des noms et des séries de points dans la barre latérale."
     }
 ]

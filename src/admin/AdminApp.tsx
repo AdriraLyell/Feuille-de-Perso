@@ -27,6 +27,7 @@ import { useAdminAuth } from './hooks/useAdminAuth';
 import { useAdminRulesHandler } from './hooks/useAdminRulesHandler';
 import AdminHeader from './components/AdminHeader';
 import { CampaignService } from '../services/CampaignService';
+import { migrationTool } from './utils/migrationTool';
 
 const AdminApp: React.FC = () => {
     const { session, isAdmin, logout } = useAdminAuth();
@@ -174,6 +175,21 @@ const AdminApp: React.FC = () => {
                 onLogout={logout}
                 onShowChangelog={() => setShowChangelog(true)}
                 onCheckSchema={() => currentSettingId && CampaignService.checkSchema?.(currentSettingId)}
+                legacyEffectsCount={(rules.libraries?.traits || []).reduce((acc, t) => acc + (t.effects?.filter(e => e.type !== 'formula' || !e.formulaId).length || 0), 0)}
+                onMigrate={() => {
+                    if (!rules) return;
+                    const { updatedRules, stats } = migrationTool.migrateTraitsToFormulas(rules);
+                    if (stats.effectsMigrated > 0) {
+                        handleUpdateRules(updatedRules);
+                        setImportReport({
+                            success: [`Migration terminée : ${stats.effectsMigrated} effets convertis en formules.`],
+                            warnings: [`${stats.formulasCreated} nouvelles formules créées dans la bibliothèque.`]
+                        });
+                        setShowImportResult(true);
+                    } else {
+                        alert("Aucun effet à migrer trouvé.");
+                    }
+                }}
             />
 
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />

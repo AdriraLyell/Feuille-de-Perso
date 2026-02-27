@@ -100,11 +100,16 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                         >
                                             <option value="formula" className="text-gray-900 bg-white font-bold bg-indigo-50">Calcul par Formule</option>
 
-                                            <option value="free_skill_rank" className="text-gray-900 bg-white border-t border-gray-200 mt-1">Rang de Compétence Offert</option>
-                                            <option value="auto_counter" className="text-gray-900 bg-white">Compteur Automatique (Magie, etc.)</option>
-                                            <option value="master_skill" className="text-gray-900 bg-white">Maîtrise (Rang 5 direct)</option>
-                                            <option value="block_skill_increase" className="text-gray-900 bg-white">Bloquer une Progression</option>
-                                            <option value="xp_upgradeable" className="text-gray-900 bg-white">Trait Améliorable (XP)</option>
+                                            {/* Legacy types hidden but kept for backwards compatibility if needed during migration */}
+                                            {['free_skill_rank', 'auto_counter', 'master_skill', 'block_skill_increase', 'xp_upgradeable'].includes(effect.type) && (
+                                                <optgroup label="Anciens Types (Hérités)">
+                                                    <option value="free_skill_rank">Rang de Compétence Offert</option>
+                                                    <option value="auto_counter">Compteur Automatique (Magie, etc.)</option>
+                                                    <option value="master_skill">Maîtrise (Rang 5 direct)</option>
+                                                    <option value="block_skill_increase">Bloquer une Progression</option>
+                                                    <option value="xp_upgradeable">Trait Améliorable (XP)</option>
+                                                </optgroup>
+                                            )}
                                         </select>
                                         <ChevronDown size={12} className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${themeColor} opacity-50`} />
                                     </div>
@@ -220,9 +225,14 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                     onChange={(e) => {
                                                         const fid = e.target.value;
                                                         onUpdate(effect.id, 'formulaId', fid);
-                                                        // Fallback for legacy display (optional)
+
                                                         const entry = allFormulas.find(f => f.id === fid);
-                                                        if (entry) onUpdate(effect.id, 'formula', entry.formula);
+                                                        if (entry) {
+                                                            onUpdate(effect.id, 'formula', entry.formula);
+                                                            // Inherit target and operator from global definition if preset
+                                                            if (entry.target) onUpdate(effect.id, 'target', entry.target);
+                                                            if (entry.operator) onUpdate(effect.id, 'operator', entry.operator);
+                                                        }
                                                     }}
                                                 >
                                                     <option value="" className="italic text-stone-500">-- Choisir une mécanique globale --</option>
@@ -260,26 +270,43 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                 <div className="text-[8px] font-bold text-indigo-400 uppercase tracking-tighter">Auto-Portante</div>
                                             </div>
                                         ) : (
-                                            <div className="flex flex-col animate-in fade-in duration-300">
-                                                <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest flex justify-between items-center">
-                                                    <span>Cible de l'Effet (Attribute, XP...)</span>
-                                                </label>
-                                                <div className="relative">
-                                                    <select
-                                                        className="w-full text-xs border border-indigo-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-indigo-500 outline-none bg-white font-bold text-stone-800 shadow-sm"
-                                                        value={effect.target || ''}
-                                                        onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
-                                                    >
-                                                        <option value="" className="italic text-stone-500">-- Choisir la cible à modifier --</option>
-                                                        <option value="XP">Points d'Expérience (Gains)</option>
-                                                        <optgroup label="Attributs">
-                                                            {allAttributes.map(a => <option key={a.id} value={a.name}>{a.name}</option>)}
-                                                        </optgroup>
-                                                        <optgroup label="Compteurs / Réserves">
-                                                            {allCounters.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                                                        </optgroup>
-                                                    </select>
-                                                    <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-800/40" />
+                                            <div className="flex flex-col gap-3 animate-in fade-in duration-300">
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest">Cible</label>
+                                                        <div className="relative">
+                                                            <select
+                                                                className="w-full text-xs border border-indigo-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-indigo-500 outline-none bg-white font-bold text-stone-800 shadow-sm"
+                                                                value={effect.target || ''}
+                                                                onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
+                                                            >
+                                                                <option value="" className="italic text-stone-500">-- Choisir --</option>
+                                                                <option value="XP">Points d'Expérience</option>
+                                                                <optgroup label="Attributs">
+                                                                    {allAttributes.map(a => <option key={a.id} value={a.name}>{a.name}</option>)}
+                                                                </optgroup>
+                                                                <optgroup label="Compteurs / Réserves">
+                                                                    {allCounters.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                                                                </optgroup>
+                                                            </select>
+                                                            <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-800/40" />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest">Opération</label>
+                                                        <div className="relative">
+                                                            <select
+                                                                className="w-full text-xs border border-indigo-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-indigo-500 outline-none bg-white font-bold text-stone-800 shadow-sm"
+                                                                value={effect.operator || selectedFormulaEntry?.operator || 'ADD'}
+                                                                onChange={(e) => onUpdate(effect.id, 'operator', e.target.value as any)}
+                                                            >
+                                                                <option value="ADD">Ajoûter (+)</option>
+                                                                <option value="SET">Remplacer (=)</option>
+                                                                <option value="SUB">Soustraire (-)</option>
+                                                            </select>
+                                                            <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-800/40" />
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}

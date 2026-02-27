@@ -1,8 +1,15 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.83.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.93.0)
 
-> **Dernière mise à jour** : 2026-02-26 — Version 2.83.0
+> **Dernière mise à jour** : 27 Février 2026 — Version 2.93.0
 
 ## 1. Phases Complétées
+
+### ✅ Phase 42 : Migration Systémique & Unification des Formules (v2.93.0)
+- [x] **Système d'Opérateurs** : Abstraction des effets sémantiques vers des opérateurs universels (`ADD`, `SET`, `SUB`).
+- [x] **Context Injection Centralisé** : Injection automatique de `TRAIT_LEVEL` et `SCENARIOS_COUNT` directement dans `formulaEvaluator.ts`.
+- [x] **Script de Migration Permanent** : Création de `scripts/migrate-traits.js` pour la mise à niveau automatique des fichiers de données JSON.
+- [x] **UI de Trait Simplifiée** : Masquage des types legacy et héritage automatique de la cible/opérateur depuis les formules globales.
+- [x] **Stabilité & Build** : Correction des erreurs JSX critiques dans `AdminFormulasEditor.tsx` assurant un build de production propre.
 
 ### ✅ Phase 41 : Migration des Formules & Moteur de Calcul (v2.83.0)
 - [x] **Moteur Récursif** : Implémentation du moteur `formulaEvaluator.ts` avec support de la récursivité et détection de boucles.
