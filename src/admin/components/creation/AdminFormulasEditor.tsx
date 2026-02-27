@@ -3,7 +3,8 @@ import { RulesData } from '../../../types/rules';
 import { LibraryFormulaEntry } from '../../../types';
 import { generateId } from '../../../utils/factories';
 import { evaluateFormula } from '../../../utils/formulaEvaluator';
-import { Trash2, Plus, Calculator, Info, Check, Filter, Sigma, Code2, AlertCircle } from 'lucide-react';
+import { Trash2, Plus, Calculator, Info, Check, Filter, Sigma, Code2, AlertCircle, User, Loader2 } from 'lucide-react';
+import { CharacterSyncService, SyncedCharacterSummary } from '../../../services/CharacterSyncService';
 import { MotionCard } from '../../../components/ui/motion/MotionCard';
 
 const DUMMY_PREVIEW_DATA: any = {
@@ -42,6 +43,7 @@ const DUMMY_PREVIEW_DATA: any = {
 interface AdminFormulasEditorProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
+    settingId?: string;
 }
 
 /**
@@ -91,13 +93,63 @@ const CodeInput: React.FC<{
     );
 };
 
-const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpdate }) => {
+const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpdate, settingId }) => {
     const lib = rules.libraries?.formulas || [];
     const formulaCounters = lib; // Now it contains all formulas
 
     const [editingId, setEditingId] = useState<string | null>(null);
     const [previewValue, setPreviewValue] = useState<number | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+
+    const [characters, setCharacters] = useState<SyncedCharacterSummary[]>([]);
+    const [selectedCharId, setSelectedCharId] = useState<string>('');
+    const [realCharData, setRealCharData] = useState<any | null>(null);
+    const [isLoadingList, setIsLoadingList] = useState(false);
+    const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+
+    const currentPreviewData = realCharData || DUMMY_PREVIEW_DATA;
+
+    useEffect(() => {
+        if (settingId) {
+            loadCharactersList();
+        }
+    }, [settingId]);
+
+    const loadCharactersList = async () => {
+        if (!settingId) return;
+        setIsLoadingList(true);
+        try {
+            const list = await CharacterSyncService.getCharactersBySettingId(settingId);
+            setCharacters(list);
+        } catch (error) {
+            console.error("Error loading characters list for formulas:", error);
+        } finally {
+            setIsLoadingList(false);
+        }
+    };
+
+    const handleCharacterSelect = async (id: string) => {
+        setSelectedCharId(id);
+        if (!id) {
+            setRealCharData(null);
+            setPreviewValue(null);
+            return;
+        }
+
+        setIsLoadingDetails(true);
+        try {
+            const fullChar = await CharacterSyncService.getCharacterById(id);
+            if (fullChar && fullChar.data) {
+                setRealCharData(fullChar.data);
+                // Clear any manual preview value to force re-evaluation with real data
+                setPreviewValue(null);
+            }
+        } catch (error) {
+            console.error("Error loading character details for formulas:", error);
+        } finally {
+            setIsLoadingDetails(false);
+        }
+    };
 
     const allVariables = [
         'XP_TOTAL',
@@ -132,7 +184,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
         };
         handleUpdate([...lib, newCounter]);
         setEditingId(newCounter.id);
-        setPreviewValue(evaluateFormula("10", DUMMY_PREVIEW_DATA));
+        setPreviewValue(evaluateFormula("10", currentPreviewData));
     };
 
     const updateCounter = (id: string, field: keyof LibraryFormulaEntry, value: any) => {
@@ -145,7 +197,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                 const updated = { ...c, [field]: value };
                 // Re-evaluate preview if formula or aggregate config changed
                 if (field === 'formula' || field === 'aggregateConfig' || field === 'type') {
-                    setPreviewValue(evaluateFormula(updated.formula || '', DUMMY_PREVIEW_DATA, updated));
+                    setPreviewValue(evaluateFormula(updated.formula || '', currentPreviewData, updated));
                 }
                 return updated as any;
             }
@@ -276,18 +328,39 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                         Ces formules seront intégrées à la Fiche de Personnage comme réserves numériques calculées.
                     </p>
                 </div>
-                <button
-                    onClick={addCounter}
-                    className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-stone-950 rounded-sm font-bold shadow-glow-gold hover:bg-amber-500 transition-colors"
-                >
-                    <Plus size={16} /> Nouvelle Formule
-                </button>
+                <div className="flex items-center gap-3">
+                    <div className="flex flex-col items-end">
+                        <label className="text-[9px] font-bold text-stone-500 uppercase tracking-widest mb-1 flex items-center gap-1">
+                            {isLoadingDetails ? <Loader2 size={10} className="animate-spin" /> : <User size={10} />} Source de l'Aperçu
+                        </label>
+                        <select
+                            value={selectedCharId}
+                            onChange={(e) => handleCharacterSelect(e.target.value)}
+                            disabled={isLoadingList}
+                            className="bg-stone-900 border border-stone-800 text-stone-300 text-[10px] font-bold py-1 px-3 rounded-sm outline-none focus:border-amber-500 transition-colors cursor-pointer min-w-[180px]"
+                        >
+                            <option value="">🔹 Jeu de Données Fictif</option>
+                            {characters.map(char => (
+                                <option key={char.id} value={char.id}>
+                                    🔸 {char.character_name} ({char.player_name || 'Inconnu'})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <button
+                        onClick={addCounter}
+                        className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-stone-950 rounded-sm font-bold shadow-glow-gold hover:bg-amber-500 transition-colors h-fit mt-auto"
+                    >
+                        <Plus size={16} /> Nouvelle Formule
+                    </button>
+                </div>
             </div>
 
             <div className="space-y-4">
                 {formulaCounters.map(counter => {
                     const isEditing = editingId === counter.id;
-                    const preview = isEditing && previewValue !== null ? previewValue : evaluateFormula(counter.formula || '', DUMMY_PREVIEW_DATA, counter);
+                    const preview = isEditing && previewValue !== null ? previewValue : evaluateFormula(counter.formula || '', currentPreviewData, counter);
 
                     return (
                         <div key={counter.id} className={`border rounded-sm overflow-hidden transition-all ${isEditing ? 'border-amber-500 ring-1 ring-amber-500/50 bg-stone-900/80' : 'border-stone-700/50 bg-stone-900/40 hover:border-amber-500/30'}`}>
@@ -297,7 +370,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                 onClick={() => {
                                     if (!isEditing) {
                                         setEditingId(counter.id);
-                                        setPreviewValue(evaluateFormula(counter.formula || '', DUMMY_PREVIEW_DATA, counter));
+                                        setPreviewValue(evaluateFormula(counter.formula || '', currentPreviewData, counter));
                                     }
                                 }}
                             >
@@ -318,7 +391,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                 <div className="flex items-center gap-4">
                                     <div className="text-right flex flex-col items-end">
                                         <span className="text-[10px] text-stone-500 uppercase tracking-widest font-bold flex items-center gap-1">
-                                            Aperçu (Fictif)
+                                            Aperçu {realCharData ? 'Réel' : '(Fictif)'}
                                             {preview !== null && !isNaN(preview) ?
                                                 <Check size={10} className="text-emerald-500" /> :
                                                 <AlertCircle size={10} className="text-rose-500" />

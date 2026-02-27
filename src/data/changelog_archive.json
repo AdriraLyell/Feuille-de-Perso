@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.81.0",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Automatisation Complète de la Migration des Formules : Les effets mécaniques hérités (attribute_bonus, xp_bonus, counter_max_bonus) sont désormais convertis automatiquement en formules globales lors du chargement des règles de campagne. Implémentation du support base de données (`libraries_formulas`), des services de persistance et de chargement pour garantir l'intégrité et la permanence des données migrées sans intervention manuelle."
+    },
+    {
         "version": "2.80.1",
         "date": "2026-02-24",
         "type": "fix",
@@ -591,11 +597,5 @@
         "date": "2026-02-20",
         "type": "feat",
         "description": "Recréation Administration : Ajout de l'option 'Ouverture Simple' permettant de renvoyer le joueur en mode création sans réinitialiser ni purger ses statistiques existantes."
-    },
-    {
-        "version": "2.56.55",
-        "date": "2026-02-20",
-        "type": "feat",
-        "description": "Ergonomie fiches de personnage : Cliquer sur un trait existant (Avantage/Désavantage) ouvre désormais un menu d'édition rapide au lieu de la bibliothèque de traits. Cliquer sur un emplacement vide continue d'ouvrir la bibliothèque pour ajouter un nouveau trait."
     }
 ]

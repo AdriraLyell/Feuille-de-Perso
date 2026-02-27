@@ -205,7 +205,7 @@ const AdminApp: React.FC = () => {
                         <h2 className="text-2xl font-serif font-bold mb-6 text-amber-gold border-b border-stone-700 pb-2 flex items-center gap-2">
                             Configuration Générale
                         </h2>
-                        <AdminCreationEditor rules={rules} onUpdate={handleUpdateRules} />
+                        <AdminCreationEditor rules={rules} onUpdate={handleUpdateRules} settingId={currentSettingId || ''} />
                     </div>
                 )}
                 {activeTab === 'attributes' && <AdminAttributesEditor rules={rules} onUpdate={handleUpdateRules} />}

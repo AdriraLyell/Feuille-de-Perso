@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.92.7",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Éditeur de Formules : Ajout d'un sélecteur de personnage réel pour l'aperçu dynamique des calculs. Permet aux MJ de valider leurs formules directement sur les fiches des personnages de la campagne, avec chargement à la demande des données via le service de synchronisation."
+    },
+    {
         "version": "2.92.6",
         "date": "2026-02-26",
         "type": "feat",
@@ -112,11 +118,5 @@
         "date": "2026-02-25",
         "type": "fix",
         "description": "Restauration de la mise en page des compteurs sur deux colonnes. Passage à une disposition verticale (nom au-dessus des points) pour garantir l'affichage correct des noms et des séries de points dans la barre latérale."
-    },
-    {
-        "version": "2.81.0",
-        "date": "2026-02-24",
-        "type": "feat",
-        "description": "Automatisation Complète de la Migration des Formules : Les effets mécaniques hérités (attribute_bonus, xp_bonus, counter_max_bonus) sont désormais convertis automatiquement en formules globales lors du chargement des règles de campagne. Implémentation du support base de données (`libraries_formulas`), des services de persistance et de chargement pour garantir l'intégrité et la permanence des données migrées sans intervention manuelle."
     }
 ]

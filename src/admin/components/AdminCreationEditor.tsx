@@ -17,9 +17,10 @@ import AdminFormulasEditor from './creation/AdminFormulasEditor';
 interface AdminCreationEditorProps {
     rules: RulesData;
     onUpdate: (newRules: RulesData) => void;
+    settingId: string;
 }
 
-const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpdate }) => {
+const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpdate, settingId }) => {
     const config = rules.configurations.creation;
     const cardConfig = rules.configurations.cards;
 
@@ -155,6 +156,7 @@ const AdminCreationEditor: React.FC<AdminCreationEditorProps> = ({ rules, onUpda
                         <AdminFormulasEditor
                             rules={rules}
                             onUpdate={onUpdate}
+                            settingId={settingId}
                         />
                     </MotionFade>
                 )}
