@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { LibraryEntry, TraitEffect, LibraryFormulaEntry } from '../../types';
-import { Edit2, Plus, X, AlignLeft, Save, AlertCircle, Coins, Info } from 'lucide-react';
+import { Edit2, Plus, X, AlignLeft, Save, AlertCircle, Coins, Info, Sparkles } from 'lucide-react';
 import TraitEffectEditor from './TraitEffectEditor';
 import ThematicModal from '../ui/ThematicModal';
 
@@ -225,19 +225,43 @@ const TraitForm: React.FC<TraitFormProps> = ({
                 </div>
 
                 {/* Configuration: Variable Trait */}
-                <div className="bg-[#bfae85]/10 border border-[#bfae85]/30 rounded-sm p-3 flex items-center gap-3">
-                    <input
-                        type="checkbox"
-                        id="isVariable"
-                        className="w-4 h-4 accent-amber-600 cursor-pointer"
-                        checked={editForm.isVariable || false}
-                        onChange={(e) => setEditForm({ ...editForm, isVariable: e.target.checked })}
-                    />
-                    <label htmlFor="isVariable" className="cursor-pointer select-none">
-                        <span className="block text-sm font-bold text-[#5c4d41]">Trait à Complément / Variable</span>
-                        <span className="block text-[10px] text-[#5c4d41]/70 italic">Cochez si le joueur doit préciser quelque chose à la sélection (ex: "Allergie : Chats").</span>
-                    </label>
-                </div>
+                {(() => {
+                    const isForcedByFormula = (editForm.effects || []).some(ef => {
+                        if (!ef.formulaId) return false;
+                        const formula = (allFormulas || []).find(f => f.id === ef.formulaId);
+                        return formula?.forceVariant;
+                    });
+
+                    return (
+                        <div className={`border rounded-sm p-3 flex items-center gap-3 transition-all ${isForcedByFormula ? 'bg-indigo-50/50 border-indigo-200 shadow-sm' : 'bg-[#bfae85]/10 border-[#bfae85]/30'}`}>
+                            <div className="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="isVariable"
+                                    className={`w-4 h-4 cursor-pointer ${isForcedByFormula ? 'accent-indigo-600' : 'accent-amber-600'}`}
+                                    checked={editForm.isVariable || false}
+                                    disabled={isForcedByFormula}
+                                    onChange={(e) => setEditForm({ ...editForm, isVariable: e.target.checked })}
+                                />
+                            </div>
+                            <label htmlFor="isVariable" className="cursor-pointer select-none flex-grow">
+                                <div className="flex items-center gap-2">
+                                    <span className={`text-sm font-bold ${isForcedByFormula ? 'text-indigo-900' : 'text-[#5c4d41]'}`}>Trait à Complément / Variable</span>
+                                    {isForcedByFormula && (
+                                        <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-indigo-600 text-[8px] text-white font-black tracking-tighter uppercase animate-in zoom-in-75">
+                                            <Sparkles size={8} /> FORCÉ
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="block text-[10px] text-[#5c4d41]/70 italic">
+                                    {isForcedByFormula
+                                        ? "Ce trait nécessite une variante car l'une de ses formules l'exige."
+                                        : "Cochez si le joueur doit préciser quelque chose à la sélection (ex: \"Allergie : Chats\")."}
+                                </span>
+                            </label>
+                        </div>
+                    );
+                })()}
 
                 {editForm.isVariable && (
                     <div className="animate-in fade-in slide-in-from-top-2 duration-200 -mt-4 px-1">

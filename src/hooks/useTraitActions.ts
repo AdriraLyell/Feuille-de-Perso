@@ -9,6 +9,7 @@ export const useTraitActions = (
     defaultType: 'avantage' | 'desavantage'
 ) => {
     const { rules, updateRules } = useRules();
+    const allFormulas = useMemo(() => rules?.libraries?.formulas || [], [rules]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editForm, setEditForm] = useState<LibraryEntry | null>(null);
     const [tagInput, setTagInput] = useState('');
@@ -148,16 +149,43 @@ export const useTraitActions = (
 
     const updateEffect = useCallback((id: string, field: keyof TraitEffect, value: any) => {
         if (!editForm) return;
-        setEditForm({
-            ...editForm,
-            effects: (editForm.effects || []).map(e => e.id === id ? { ...e, [field]: value } : e)
+
+        const newEffects = (editForm.effects || []).map(e => e.id === id ? { ...e, [field]: value } : e);
+
+        // Détecter si une des formules force la variante
+        const hasForceVariantFormula = newEffects.some(ef => {
+            if (!ef.formulaId) return false;
+            const formula = allFormulas.find(f => f.id === ef.formulaId);
+            return formula?.forceVariant;
         });
-    }, [editForm]);
+
+        // Si une formule force la variante, on s'assure que le trait est marqué comme variable
+        const updatedForm: LibraryEntry = {
+            ...editForm,
+            effects: newEffects,
+            isVariable: hasForceVariantFormula ? true : editForm.isVariable
+        };
+
+        setEditForm(updatedForm);
+    }, [editForm, allFormulas]);
 
     const removeEffect = useCallback((id: string) => {
         if (!editForm) return;
-        setEditForm({ ...editForm, effects: (editForm.effects || []).filter(e => e.id !== id) });
-    }, [editForm]);
+        const newEffects = (editForm.effects || []).filter(e => e.id !== id);
+
+        // Recalculer si une des formules restantes force toujours la variante
+        const hasForceVariantFormula = newEffects.some(ef => {
+            if (!ef.formulaId) return false;
+            const formula = allFormulas.find(f => f.id === ef.formulaId);
+            return formula?.forceVariant;
+        });
+
+        setEditForm({
+            ...editForm,
+            effects: newEffects,
+            isVariable: hasForceVariantFormula ? true : editForm.isVariable
+        });
+    }, [editForm, allFormulas]);
 
     const allSkills = useMemo(() => {
         if (!data || !data.skills) return [];
@@ -222,7 +250,7 @@ export const useTraitActions = (
         return counters.sort((a, b) => a.name.localeCompare(b.name));
     }, [data.counters, data.counterLibrary]);
 
-    const allFormulas = rules?.libraries?.formulas || [];
+
 
     return {
         isModalOpen,
