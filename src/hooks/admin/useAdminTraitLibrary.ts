@@ -272,12 +272,24 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         field: K,
         value: TraitEffect[K]
     ) => {
-        if (!editForm) return;
-        setEditForm({
-            ...editForm,
-            effects: (editForm.effects || []).map(e => e.id === id ? { ...e, [field]: value } as TraitEffect : e)
+        setEditForm(prev => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                effects: (prev.effects || []).map(e => e.id === id ? { ...e, [field]: value } as TraitEffect : e)
+            };
         });
-    }, [editForm]);
+    }, []);
+
+    const updateEffectFields = useCallback((id: string, updates: Partial<TraitEffect>) => {
+        setEditForm(prev => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                effects: (prev.effects || []).map(e => e.id === id ? { ...e, ...updates } : e)
+            };
+        });
+    }, []);
 
     const removeEffect = useCallback((id: string) => {
         if (!editForm) return;
@@ -350,6 +362,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         removeTag,
         addEffect,
         updateEffect,
+        updateEffectFields,
         removeEffect
     };
 };

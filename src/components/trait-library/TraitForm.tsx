@@ -22,6 +22,7 @@ interface TraitFormProps {
     removeTag: (tag: string) => void;
     addEffect: () => void;
     updateEffect: <K extends keyof TraitEffect>(id: string, field: K, value: TraitEffect[K]) => void;
+    updateEffectFields?: (id: string, updates: Partial<TraitEffect>) => void;
     removeEffect: (id: string) => void;
 }
 
@@ -43,6 +44,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
     removeTag,
     addEffect,
     updateEffect,
+    updateEffectFields,
     removeEffect
 }) => {
     const [variantDraft, setVariantDraft] = React.useState(editForm.variants?.join(', ') || '');
@@ -264,6 +266,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
                         allFormulas={allFormulas}
                         onAdd={addEffect}
                         onUpdate={updateEffect}
+                        onUpdateFields={updateEffectFields}
                         onRemove={removeEffect}
                     />
                 </div>

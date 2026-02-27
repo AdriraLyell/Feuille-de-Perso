@@ -11,6 +11,7 @@ interface TraitEffectEditorProps {
     allFormulas?: LibraryFormulaEntry[];
     onAdd: () => void;
     onUpdate: <K extends keyof TraitEffect>(id: string, field: K, value: TraitEffect[K]) => void;
+    onUpdateFields?: (id: string, updates: Partial<TraitEffect>) => void;
     onRemove: (id: string) => void;
 }
 
@@ -22,6 +23,7 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
     allFormulas = [],
     onAdd,
     onUpdate,
+    onUpdateFields,
     onRemove
 }) => {
     return (
@@ -224,14 +226,27 @@ const TraitEffectEditor: React.FC<TraitEffectEditorProps> = ({
                                                     value={effect.formulaId || ''}
                                                     onChange={(e) => {
                                                         const fid = e.target.value;
-                                                        onUpdate(effect.id, 'formulaId', fid);
 
                                                         const entry = allFormulas.find(f => f.id === fid);
                                                         if (entry) {
-                                                            onUpdate(effect.id, 'formula', entry.formula);
-                                                            // Inherit target and operator from global definition if preset
-                                                            if (entry.target) onUpdate(effect.id, 'target', entry.target);
-                                                            if (entry.operator) onUpdate(effect.id, 'operator', entry.operator);
+                                                            const updates: Partial<TraitEffect> = {
+                                                                formulaId: fid,
+                                                                formula: entry.formula
+                                                            };
+                                                            if (entry.target) updates.target = entry.target;
+                                                            if (entry.operator) updates.operator = entry.operator;
+
+                                                            if (onUpdateFields) {
+                                                                onUpdateFields(effect.id, updates);
+                                                            } else {
+                                                                // Fallback if not provided, though it might bug in React
+                                                                onUpdate(effect.id, 'formulaId', fid);
+                                                                onUpdate(effect.id, 'formula', entry.formula);
+                                                                if (entry.target) onUpdate(effect.id, 'target', entry.target);
+                                                                if (entry.operator) onUpdate(effect.id, 'operator', entry.operator);
+                                                            }
+                                                        } else {
+                                                            onUpdate(effect.id, 'formulaId', fid);
                                                         }
                                                     }}
                                                 >

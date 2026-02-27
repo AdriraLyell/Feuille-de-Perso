@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.93.1",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Correction du bug de Stale State React : La sélection d'une formule globale dans l'éditeur d'effets mécaniques est désormais sauvegardée avec succès grâce à l'utilisation de la fonction updater de l'état React (Update Multiple Fields)."
+    },
+    {
         "version": "2.93.0",
         "date": "2026-02-27",
         "type": "feat",
