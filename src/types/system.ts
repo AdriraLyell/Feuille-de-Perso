@@ -184,7 +184,8 @@ export interface LibraryFormulaEntry {
   description?: string;
   isGlobal?: boolean;
   isActive?: boolean;
-  operator?: 'ADD' | 'SET' | 'SUB'; // NEW: Default application method for this formula
+  operator?: 'ADD' | 'SET' | 'SUB' | ''; // Permet d'être vide pour l'héritage
+  forceVariant?: boolean;
   // Configuration pour l'agrégation automatique (Mode Somme/Compte)
   aggregateConfig?: {
     operation: 'sum' | 'count' | 'max' | 'avg';

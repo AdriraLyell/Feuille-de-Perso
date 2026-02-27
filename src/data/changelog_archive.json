@@ -1,5 +1,59 @@
 [
     {
+        "version": "2.83.0",
+        "date": "2026-02-26",
+        "type": "feat",
+        "description": "Migration des Formules (Phase Finale) : Implémentation du moteur de calcul récursif avec variables MJ et agrégats. Refonte de l'éditeur de formules pour supporter les effets auto-portants (target/effectType hérités). Mise à jour du calculateur d'XP et de useCharacterBonuses pour une interprétation unifiée des mécaniques via le dictionnaire global."
+    },
+    {
+        "version": "2.82.5",
+        "date": "2026-02-25",
+        "type": "fix",
+        "description": "Correction des tests unitaires (useCharacterBonuses) en mockant les contextes Character et Rules, débloquant l'étape Unit Tests de la CI GitHub."
+    },
+    {
+        "version": "2.82.4",
+        "date": "2026-02-25",
+        "type": "fix",
+        "description": "Correction des erreurs ESLint bloquantes (prefer-const) dans l'éditeur de formules pour débloquer la CI GitHub."
+    },
+    {
+        "version": "2.82.3",
+        "date": "2026-02-25",
+        "type": "docs",
+        "description": "Mise à jour des règles de l'agent : Intégration de l'agent de codage (Aider) comme outil privilégié pour la chirurgie du code dans .agent/rules/regle.md."
+    },
+    {
+        "version": "2.82.2",
+        "date": "2026-02-25",
+        "type": "refactor",
+        "description": "Refactorisation majeure de l'architecture : Décomposition de `RosterApp.tsx`, `CharacterSheetPage2.tsx`, `ColumnarEditor.tsx` et `AdminSkillLibrarySidebar.tsx` en composants et hooks spécialisés pour améliorer la maintenance et la lisibilité du code."
+    },
+    {
+        "version": "2.82.1",
+        "date": "2026-02-25",
+        "type": "docs",
+        "description": "Maintenance : Audit de la taille des fichiers sources. Identification de `RosterApp.tsx` comme candidat à la refactorisation (~700 lignes) et confirmation de la conformité des autres fichiers critiques (< 450 lignes) avant la migration des formules."
+    },
+    {
+        "version": "2.82.0",
+        "date": "2026-02-25",
+        "type": "refactor",
+        "description": "Harmonisation des données : Suppression des fichiers fantômes (default_rules.json), migration des services d'images de la racine de src/ vers src/services/imageDB.ts, centralisation des constantes dans app.ts, et synchronisation de initialState.ts avec defaultRules.ts."
+    },
+    {
+        "version": "2.81.5",
+        "date": "2026-02-25",
+        "type": "fix",
+        "description": "CI : Renforcement du workflow 'prune-history' avec l'ajout systématique de l'étape 'actions/checkout' pour prévenir les erreurs de contexte git, garantissant le nettoyage automatique des anciens runs d'actions."
+    },
+    {
+        "version": "2.81.4",
+        "date": "2026-02-25",
+        "type": "docs",
+        "description": "Audit Technique Approfondi (Ground Truth) : Rapport d'état des formules basé exclusivement sur l'analyse du code source. Identification précise des variables injectées (XP_TOTAL, TRAIT_LEVEL, etc.), des points d'évaluation effectifs (XP, Bonus, Réserves) et des limites du hardcoding actuel."
+    },
+    {
         "version": "2.81.3",
         "date": "2026-02-25",
         "type": "docs",
@@ -543,59 +597,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Vue Distribution d'XP finale : Le bilan d'XP est désormais calculé en temps réel à partir de l'état actuel de la fiche personnage (Distribution d'état). Cette approche garantit une fiabilité totale en affichant l'investissement exact pour chaque compétence, attribut, trait et compteur, sans dépendre de l'intégrité de l'historique brut des transactions."
-    },
-    {
-        "version": "2.56.68",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Agrégation du Bilan XP : Épuration de la vue Recçu en supprimant les horodatages et en regroupant les transactions par sujet (ex: groupement des achats d'une même compétence). Tri automatique par importance d'investissement et mise à jour des infobulles pour le 'Top 5'."
-    },
-    {
-        "version": "2.56.67",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Nouveau tableau de bord de Suivi d'XP (Concept B) : vue interactive et catégorisée (Gains et Investissements) remplaçant l'historique brut, avec infobulles contextuelles et tri par catégorie."
-    },
-    {
-        "version": "2.56.65",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Gestion XP : Déplacement de la colonne 'Session' en fin de tableau et renommage de 'SESS.' en 'Session' avec ajustement de la taille de police."
-    },
-    {
-        "version": "2.56.64",
-        "date": "2026-02-21",
-        "type": "refactor",
-        "description": "Calcul XP unifié : Suppression des écritures manuelles dans l'historique d'expérience pour les traits. Le moteur calcule désormais les dépenses d'XP de manière dynamique uniquement via l'état des traits (flag post-création et valeur initiale), évitant ainsi les doubles comptes."
-    },
-    {
-        "version": "2.56.63",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Harmonisation UI : Alignement de la taille de tous les boutons du footer de la modale de trait en format compact (sm)."
-    },
-    {
-        "version": "2.56.62",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Peaufinage UI : Réduction de la taille du bouton de rachat de désavantage dans la modale d'édition pour une interface plus compacte."
-    },
-    {
-        "version": "2.56.61",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Système d'achat de Traits post-création : Les avantages peuvent désormais être acquis via XP hors création (fonds émeraude, icône ❇️). Les désavantages peuvent être rachetés (coût fixe) ou réduits (rang par rang) via une nouvelle interface dans la modale d'édition. Les déductions d'XP sont automatiques et tracées dans l'historique."
-    },
-    {
-        "version": "2.56.60",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction de la sauvegarde des compteurs : Les modifications (valeur max, coût XP) effectuées depuis la bibliothèque d'administration sont désormais correctement sauvegardées en base de données et appliquées aux fiches des joueurs."
-    },
-    {
-        "version": "2.56.59",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Budget Création : Les traits (Avantages/Désavantages) sont désormais totalement gratuits en mode Points comme en mode Rangs, et n'impactent plus la Valeur Totale XP affichée dans le HUD."
     }
 ]

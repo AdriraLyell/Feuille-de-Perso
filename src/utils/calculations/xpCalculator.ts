@@ -86,16 +86,13 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
     const formulaBonusBreakdown: ExperienceBreakdownItem[] = [];
 
     xpFormulaEffects.forEach(e => {
-        // Resolve formula string: favor formulaId if present in rules
-        let formulaString = e.formula;
-        if (e.formulaId && rules?.libraries?.formulas) {
-            const globalFormula = rules.libraries.formulas.find(f => f.id === e.formulaId);
-            if (globalFormula) {
-                formulaString = globalFormula.formula;
-            }
-        }
+        // Resolve formula string: already enriched by getActiveTraitEffects
+        const formulaString = e.formula;
 
-        if (!formulaString) return;
+        if (!formulaString) {
+            logger.warn(`Formula string empty for XP effect from ${e.source}`);
+            return;
+        }
 
         try {
             const result = evaluateFormula(formulaString, data, {
@@ -104,7 +101,8 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
             });
 
             if (result !== 0) {
-                const operator = e.operator || (rules?.libraries?.formulas?.find(f => f.id === e.formulaId)?.operator) || 'ADD';
+                // Operator is already in e (either from trait or enriched from global)
+                const operator = e.operator || 'ADD';
 
                 if (operator === 'SET') {
                     // Logic for SET in XP gain is tricky, we treat it as "at least this amount" or "reset to this"
@@ -194,6 +192,7 @@ function getActiveTraitEffects(data: CharacterSheetData, rules?: RulesData): Act
                     if (global.target) active.inferredTarget = global.target;
                     if (global.effectType) active.inferredEffectType = global.effectType;
                     if (global.formula) active.formula = global.formula;
+                    if (global.operator && !active.operator) active.operator = global.operator;
                 }
             }
             return active;

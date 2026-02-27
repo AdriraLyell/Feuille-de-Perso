@@ -18,7 +18,6 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
     }
 
     // 1. Special Variables
-    vars['XP_TOTAL'] = parseFloat(data.experience?.gain || "0") || 0;
 
     // 2. Skills (Lower priority, might be overwritten by attributes/counters)
     if (data.skills) {

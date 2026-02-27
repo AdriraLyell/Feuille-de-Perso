@@ -38,31 +38,34 @@ export const useCharacterBonuses = (
                     // Try to resolve formula from global library if formulaId is present
                     let formulaString = effect.formula;
                     let isReserve = false;
+                    let effectiveTarget = effect.target;
+                    let effectiveType: string = effect.type;
 
                     if (effect.formulaId && rules?.libraries?.formulas) {
                         const globalFormula = rules.libraries.formulas.find(f => f.id === effect.formulaId);
                         if (globalFormula) {
-                            formulaString = globalFormula.formula;
+                            formulaString = globalFormula.formula || effect.formula;
                             if (globalFormula.type === 'variable') {
                                 isReserve = true;
                                 activeReserves.add(globalFormula.id);
                             }
 
                             // AUTO-PORTANTE: Heirarchical Target and EffectType
-                            // If the effect doesn't have a target, use the global formula's target
-                            if (!effect.target && globalFormula.target) {
-                                effect.target = globalFormula.target;
+                            if (globalFormula.forceVariant && !effect.target) {
+                                // If it forces a variant, the trait's variant is our target
+                                effectiveTarget = trait.variant;
+                            } else if (!effectiveTarget && globalFormula.target) {
+                                effectiveTarget = globalFormula.target;
                             }
-                            // If the effect doesn't have a type or is generic 'formula', use global effectType if set
                             if (globalFormula.effectType) {
-                                (effect as any).inferredEffectType = globalFormula.effectType;
+                                effectiveType = globalFormula.effectType;
                             }
                         }
                     }
 
                     // Skill Blocking
-                    if (effect.type === 'block_skill_increase' && effect.target) {
-                        const targetName = normalizeString(effect.target);
+                    if (effectiveType === 'block_skill_increase' && effectiveTarget) {
+                        const targetName = normalizeString(effectiveTarget);
                         blockedSkills[targetName] = {
                             isBlocked: true,
                             sourceName: trait.name
@@ -70,11 +73,12 @@ export const useCharacterBonuses = (
                     }
 
                     // Formula Evaluation
-                    if (effect.type === 'formula' && formulaString && characterData) {
+                    const isFormulaLike = effectiveType === 'formula' || effectiveType === 'xp_bonus';
+                    if (isFormulaLike && formulaString && characterData) {
                         // Skip evaluation for raw reserves (they don't target/modify existing stats, they ARE stats)
                         if (isReserve) return;
 
-                        const targetName = normalizeString(effect.target || "");
+                        const targetName = normalizeString(effectiveTarget || "");
                         if (!targetName) return;
 
                         const traitValue = parseInt(trait.value?.toString() || '1') || 1;
@@ -85,10 +89,8 @@ export const useCharacterBonuses = (
                                 formulaLibrary: rules?.libraries?.formulas || characterData.formulaLibrary
                             }, { traitLevel: traitValue });
 
-                            const effectiveEffectType = (effect as any).inferredEffectType || effect.type;
-
                             // Handle special semantic effects even for formulas
-                            if (effectiveEffectType === 'xp_bonus' || targetName === 'xp') {
+                            if (effectiveType === 'xp_bonus' || targetName === 'xp') {
                                 // XP handled elsewhere (but we could record it here if needed)
                                 return;
                             }
@@ -111,7 +113,7 @@ export const useCharacterBonuses = (
                                     attributeBonuses[targetName].value = result;
                                 }
                                 attributeBonuses[targetName].sources.push(`${trait.name} (${operator === 'SUB' ? '-' : operator === 'SET' ? '=' : '+'}${result})`);
-                            } else if (effectiveEffectType === 'master_skill' || effectiveEffectType === 'block_skill_increase') {
+                            } else if ((effectiveType as string) === 'master_skill' || (effectiveType as string) === 'block_skill_increase') {
                                 // These are handled by their own logic blocks usually
                             } else {
                                 // Assume it's a counter

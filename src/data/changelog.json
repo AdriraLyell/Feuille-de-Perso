@@ -1,5 +1,59 @@
 [
     {
+        "version": "2.95.0",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Système (Mécaniques Dynamiques) : Introduction de 'Forcer Variante' dans les formules globales. Permet aux traits d'exiger une précision du joueur (ex: choix d'une compétence) qui devient automatiquement la cible de l'effet. Ajout de suggestions dynamiques dans le sélecteur de variantes basées sur la cible de la formule (Compétence, Attribut, etc.)."
+    },
+    {
+        "version": "2.94.1",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Système (Calcul XP/Dictionnaire) : Correction d'un bug où l'XP bonus d'un trait n'était pas pris en compte lorsqu'une formule globale sélectionnée avait un contenu vide (l'héritage écrasait à tort la valeur fixe locale du trait)."
+    },
+    {
+        "version": "2.94.0",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Ergonomie (Admin Formules) : Auto-génération intelligente du code de la formule à partir du nom saisi (conversion en majuscules, retrait des accents et remplacement des espaces par des tirets bas). Lors de la création d'une nouvelle formule, le nom et le code sont désormais vides pour forcer explicitement une saisie propre."
+    },
+    {
+        "version": "2.93.9",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Correction du Mode Avertissement (Admin Formules) : Résolution du bug invisible empêchant l'affichage de la pastille orange (Modèle incomplet). Le validateur simule désormais correctement la configuration par défaut du type d'effet."
+    },
+    {
+        "version": "2.93.8",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Correction de la Réactivité (Admin Formules) : Le statut de validation et l'aperçu numérique se mettent désormais à jour instantanément lors de la modification de la Cible ou de l'Opération d'un effet. Plus besoin de changer de type d'effet ou de modifier l'équation pour forcer la validation."
+    },
+    {
+        "version": "2.93.6",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Ergonomie & Validation (Admin Formules) : Implémentation d'une autocomplétion intelligente et stylisée pour le champ 'Cible de l'effet'. La liste est désormais limitée en hauteur avec un défilement interne, et propose dynamiquement les Attributs, Compétences et Compteurs définis dans les règles. La validation des cibles est désormais insensible à la casse et aux espaces, garantissant un retour visuel (aperçu) fiable même en cas de saisie approximative."
+    },
+    {
+        "version": "2.93.5",
+        "date": "2026-02-27",
+        "type": "chore",
+        "description": "Nettoyage du Moteur : Suppression de la variable XP_TOTAL pour éviter toute confusion avec la cible XP. Mise à jour des outils d'administration et de la documentation."
+    },
+    {
+        "version": "2.93.4",
+        "date": "2026-02-27",
+        "type": "chore",
+        "description": "Simplification du Système de Formules : Suppression des types d'effets redondants (Gain XP, Bonus Attribut, Bonus Réserve). Le moteur est désormais piloté par la 'Cible' (Source de Vérité unique) et un type générique 'modifier', réduisant la confusion lors de la création de mécaniques MJ. Mise à jour du Guide des Formules."
+    },
+    {
+        "version": "2.93.3",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Flexibilité de l'Héritage MJ (Modèles Incomplets) : Le dictionnaire de formules supporte désormais des modèles 'partiels' ou 'incomplets' (statut orange). Les créateurs de traits peuvent compléter les paramètres manquants (Cible, Opérateur, Équation) au niveau du trait. Si l'équation est absente du modèle, une valeur numérique fixe peut être saisie directement dans le trait."
+    },
+    {
         "version": "2.93.2",
         "date": "2026-02-27",
         "type": "feat",
@@ -64,59 +118,5 @@
         "date": "2026-02-26",
         "type": "feat",
         "description": "Refonte Architecturale (Logic vs Object) : Unification des variables MJ et agrégats dans un moteur de calcul centralisé. Les 'Réserves' sont désormais des 'Compteurs Dynamiques' liés à des formules. Ajout du support des agrégats personnalisés (Somme/Compte de traits/compétences avec filtres). Mise à jour de l'interface d'administration pour une expérience plus intuitive et guidée."
-    },
-    {
-        "version": "2.83.0",
-        "date": "2026-02-26",
-        "type": "feat",
-        "description": "Migration des Formules (Phase Finale) : Implémentation du moteur de calcul récursif avec variables MJ et agrégats. Refonte de l'éditeur de formules pour supporter les effets auto-portants (target/effectType hérités). Mise à jour du calculateur d'XP et de useCharacterBonuses pour une interprétation unifiée des mécaniques via le dictionnaire global."
-    },
-    {
-        "version": "2.82.5",
-        "date": "2026-02-25",
-        "type": "fix",
-        "description": "Correction des tests unitaires (useCharacterBonuses) en mockant les contextes Character et Rules, débloquant l'étape Unit Tests de la CI GitHub."
-    },
-    {
-        "version": "2.82.4",
-        "date": "2026-02-25",
-        "type": "fix",
-        "description": "Correction des erreurs ESLint bloquantes (prefer-const) dans l'éditeur de formules pour débloquer la CI GitHub."
-    },
-    {
-        "version": "2.82.3",
-        "date": "2026-02-25",
-        "type": "docs",
-        "description": "Mise à jour des règles de l'agent : Intégration de l'agent de codage (Aider) comme outil privilégié pour la chirurgie du code dans .agent/rules/regle.md."
-    },
-    {
-        "version": "2.82.2",
-        "date": "2026-02-25",
-        "type": "refactor",
-        "description": "Refactorisation majeure de l'architecture : Décomposition de `RosterApp.tsx`, `CharacterSheetPage2.tsx`, `ColumnarEditor.tsx` et `AdminSkillLibrarySidebar.tsx` en composants et hooks spécialisés pour améliorer la maintenance et la lisibilité du code."
-    },
-    {
-        "version": "2.82.1",
-        "date": "2026-02-25",
-        "type": "docs",
-        "description": "Maintenance : Audit de la taille des fichiers sources. Identification de `RosterApp.tsx` comme candidat à la refactorisation (~700 lignes) et confirmation de la conformité des autres fichiers critiques (< 450 lignes) avant la migration des formules."
-    },
-    {
-        "version": "2.82.0",
-        "date": "2026-02-25",
-        "type": "refactor",
-        "description": "Harmonisation des données : Suppression des fichiers fantômes (default_rules.json), migration des services d'images de la racine de src/ vers src/services/imageDB.ts, centralisation des constantes dans app.ts, et synchronisation de initialState.ts avec defaultRules.ts."
-    },
-    {
-        "version": "2.81.5",
-        "date": "2026-02-25",
-        "type": "fix",
-        "description": "CI : Renforcement du workflow 'prune-history' avec l'ajout systématique de l'étape 'actions/checkout' pour prévenir les erreurs de contexte git, garantissant le nettoyage automatique des anciens runs d'actions."
-    },
-    {
-        "version": "2.81.4",
-        "date": "2026-02-25",
-        "type": "docs",
-        "description": "Audit Technique Approfondi (Ground Truth) : Rapport d'état des formules basé exclusivement sur l'analyse du code source. Identification précise des variables injectées (XP_TOTAL, TRAIT_LEVEL, etc.), des points d'évaluation effectifs (XP, Bonus, Réserves) et des limites du hardcoding actuel."
     }
 ]

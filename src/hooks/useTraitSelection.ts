@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { LibraryEntry } from '../types';
+import { LibraryEntry, LibraryFormulaEntry } from '../types';
 import { MergedEntry } from '../utils/libraryMerger';
 
 export interface SelectedInstance {
@@ -9,10 +9,12 @@ export interface SelectedInstance {
     cost?: string;
 }
 
-export const useTraitSelection = (onMultiSelect?: (instances: { entry: LibraryEntry; variant?: string; cost?: string }[]) => void) => {
+export const useTraitSelection = (
+    onMultiSelect?: (instances: { entry: LibraryEntry; variant?: string; cost?: string }[]) => void,
+    formulas: LibraryFormulaEntry[] = []
+) => {
     const [selection, setSelection] = useState<SelectedInstance[]>([]);
     const [variantPicker, setVariantPicker] = useState<LibraryEntry | null>(null);
-
     const isVariableCost = (entry: any) => {
         if (entry.isVariableCost || entry.is_variable_cost) return true;
         const label = entry.pointsLabel || entry.points_label || entry.cost;
@@ -25,8 +27,15 @@ export const useTraitSelection = (onMultiSelect?: (instances: { entry: LibraryEn
         const entry = hybridList.find(m => m.entry.id === id)?.entry;
         if (!entry) return;
 
-        // Open configuration modal if it has variants OR variable cost
-        if (entry.isVariable || (entry as any).is_variable || isVariableCost(entry)) {
+        // Check if any effect in this trait uses a formula that forces a variant
+        const hasForceVariantFormula = entry.effects?.some(eff => {
+            if (!eff.formulaId) return false;
+            const formula = formulas.find(f => f.id === eff.formulaId);
+            return formula?.forceVariant;
+        }) || false;
+
+        // Open configuration modal if it has variants OR variable cost OR forced by formula
+        if (entry.isVariable || (entry as any).is_variable || isVariableCost(entry) || hasForceVariantFormula) {
             setVariantPicker(entry);
         } else {
             setSelection(prev => {
@@ -38,7 +47,7 @@ export const useTraitSelection = (onMultiSelect?: (instances: { entry: LibraryEn
                 }
             });
         }
-    }, []);
+    }, [formulas]);
 
     const addInstanceWithVariant = useCallback((entry: LibraryEntry, variant: string, cost?: string) => {
         setSelection(prev => [

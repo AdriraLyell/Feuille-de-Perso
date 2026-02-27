@@ -1,14 +1,21 @@
 import React, { useState, useMemo } from 'react';
-import { X, Settings, Check } from 'lucide-react';
-import { LibraryEntry } from '../../types';
+import { X, Settings, Check, Sparkles } from 'lucide-react';
+import { LibraryEntry, LibraryFormulaEntry } from '../../types';
+import { normalizeString } from '../../utils/stringUtils';
 
 interface TraitVariantPickerProps {
     variantPicker: LibraryEntry;
     onClose: () => void;
     onSelect: (entry: LibraryEntry, variant: string, cost?: string) => void;
+    allFormulas?: LibraryFormulaEntry[];
+    allSkills?: any[];
+    allAttributes?: any[];
 }
 
-const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, onClose, onSelect }) => {
+const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({
+    variantPicker, onClose, onSelect,
+    allFormulas = [], allSkills = [], allAttributes = []
+}) => {
     const [customVariant, setCustomVariant] = useState('');
     const [selectedCost, setSelectedCost] = useState(variantPicker.pointsLabel || (variantPicker as any).points_label || variantPicker.cost);
 
@@ -43,6 +50,38 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, 
         // Handle List: 1, 3, 5
         return numbers;
     }, [isVariableCost, variantPicker.cost, variantPicker.pointsLabel, (variantPicker as any).points_label]);
+
+    // New: Dynamic suggestions based on Force Variant formulas
+    const dynamicSuggestions = useMemo(() => {
+        const forceEffect = variantPicker.effects?.find(eff => {
+            if (!eff.formulaId) return false;
+            const formula = allFormulas.find(f => f.id === eff.formulaId);
+            return formula?.forceVariant;
+        });
+
+        if (!forceEffect) return [];
+
+        const formula = allFormulas.find(f => f.id === forceEffect.formulaId);
+        const targetRaw = formula?.target || "";
+        const targetClean = normalizeString(targetRaw);
+
+        if (targetClean === 'competence') return allSkills.map(s => s.name);
+        if (targetClean === 'attribut') return allAttributes.map(a => a.name);
+
+        // Filter by category if target matches a category name
+        const byCategory = allSkills.filter(s => normalizeString(s.category || "") === targetClean);
+        if (byCategory.length > 0) return byCategory.map(s => s.name);
+
+        return [];
+    }, [variantPicker, allFormulas, allSkills, allAttributes]);
+
+    // Combiner les variantes statiques du trait et les suggestions dynamiques
+    const allVariantSuggestions = useMemo(() => {
+        const statics = variantPicker.variants || [];
+        const combined = [...statics, ...dynamicSuggestions];
+        // Dédupliquer par nom
+        return Array.from(new Set(combined));
+    }, [variantPicker.variants, dynamicSuggestions]);
 
     const handleConfirm = (variant: string) => {
         let finalCost = selectedCost;
@@ -111,7 +150,7 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, 
                     )}
 
                     {/* Variant Section */}
-                    {(isVariable || (variantPicker.variants && variantPicker.variants.length > 0)) ? (
+                    {(isVariable || allVariantSuggestions.length > 0) ? (
                         <div className="space-y-3">
                             <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider">Précision / Variant (Ex: Alcool, Chats...)</label>
                             <div className="flex gap-2">
@@ -136,17 +175,15 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({ variantPicker, 
                             </div>
 
                             {/* Suggested Variants */}
-                            {variantPicker.variants && variantPicker.variants.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                    {variantPicker.variants.map(v => (
+                            {allVariantSuggestions.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2 max-h-32 overflow-y-auto p-1 bg-stone-50/50 rounded border border-stone-100 no-scrollbar">
+                                    {allVariantSuggestions.map(v => (
                                         <button
                                             key={v}
                                             onClick={() => {
                                                 if (isVariableCost) {
-                                                    // If cost is variable, just fill the input to let user check cost before confirming
                                                     setCustomVariant(v);
                                                 } else {
-                                                    // Quick confirm if only variants matter
                                                     handleConfirm(v);
                                                 }
                                             }}

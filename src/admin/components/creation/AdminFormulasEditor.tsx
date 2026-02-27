@@ -1,15 +1,17 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryFormulaEntry } from '../../../types';
 import { generateId } from '../../../utils/factories';
 import { evaluateFormula } from '../../../utils/formulaEvaluator';
-import { Trash2, Plus, Calculator, Info, Check, Filter, Sigma, Code2, AlertCircle, User, Loader2 } from 'lucide-react';
+import { Trash2, Plus, Calculator, Info, Check, Filter, Sigma, Code2, AlertCircle, User, Loader2, Sparkles } from 'lucide-react';
 import { Parser } from 'expr-eval';
 import { CharacterSyncService, SyncedCharacterSummary } from '../../../services/CharacterSyncService';
 import { MotionCard } from '../../../components/ui/motion/MotionCard';
+import ConfirmationModal from '../../../components/ui/ConfirmationModal';
+import { normalizeString } from '../../../utils/stringUtils';
 
 const isFormulaSyntaxValid = (formula?: string): boolean => {
-    if (!formula || formula.trim() === '') return false;
+    if (!formula || formula.trim() === '') return true; // Une équation vide est valide syntaxiquement (on ne l'évalue pas)
     try {
         const parser = new Parser();
         parser.parse(formula);
@@ -17,6 +19,33 @@ const isFormulaSyntaxValid = (formula?: string): boolean => {
     } catch (e) {
         return false;
     }
+};
+
+const isTargetValid = (target: string, rules: RulesData): boolean => {
+    if (!target) return true;
+    const cleanTarget = target.trim().toLowerCase();
+    if (cleanTarget === 'xp' || cleanTarget === 'total') return true;
+
+    // Check Attributes
+    const allAttributes = Object.values(rules.definitions.attributes || {}).flat();
+    if (allAttributes.some(a => a.toLowerCase() === cleanTarget)) return true;
+
+    // Check Secondary
+    const secondaryAttributes = Object.values(rules.definitions.secondaryAttributes || {}).flat();
+    if (secondaryAttributes.some(a => a.toLowerCase() === cleanTarget)) return true;
+
+    // Check Counters
+    const allCounters = Object.values(rules.definitions.counters || {}).map(c => c.name);
+    if (allCounters.some(c => c.toLowerCase() === cleanTarget)) return true;
+
+    // Check Skills
+    const allSkills = Object.values(rules.definitions.skills || {}).flat();
+    if (allSkills.some(s => s.toLowerCase() === cleanTarget)) return true;
+
+    const allLibSkills = rules.libraries.skills?.map(s => s.name) || [];
+    if (allLibSkills.some(s => s.toLowerCase() === cleanTarget)) return true;
+
+    return false;
 };
 
 const DUMMY_PREVIEW_DATA: any = {
@@ -119,6 +148,66 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
     const [isLoadingList, setIsLoadingList] = useState(false);
     const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
+    const [isTargetDropdownOpen, setIsTargetDropdownOpen] = useState(false);
+    const targetDropdownRef = useRef<HTMLDivElement>(null);
+
+    // États pour la modale de suppression
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [formulaToDelete, setFormulaToDelete] = useState<LibraryFormulaEntry | null>(null);
+
+    // Clicks outside pour fermer le dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (targetDropdownRef.current && !targetDropdownRef.current.contains(event.target as Node)) {
+                setIsTargetDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const targetSuggestions = useMemo(() => {
+        let suggestions: { value: string, label: string, type: string }[] = [
+            { value: 'XP', label: 'Expérience', type: 'Système' }
+        ];
+
+        // 1. Collecte des Attributs
+        const attrs = Object.values(rules.definitions.attributes || {}).flat()
+            .filter(a => a.trim() !== '')
+            .sort((a, b) => a.localeCompare(b));
+        attrs.forEach(a => suggestions.push({ value: a, label: a, type: 'Attribut' }));
+
+        // 2. Collecte des Attributs Secondaires (si activés)
+        if (rules.configurations.global.secondaryAttributes !== false) {
+            const secAttrs = Object.values(rules.definitions.secondaryAttributes || {}).flat()
+                .filter(a => a.trim() !== '')
+                .sort((a, b) => a.localeCompare(b));
+            secAttrs.forEach(a => suggestions.push({ value: a, label: a, type: 'Attribut Secondaire' }));
+        }
+
+        // 3. Collecte des Compteurs
+        const counters = (rules.definitions.counters ? Object.values(rules.definitions.counters) : [])
+            .map((c: any) => c.name)
+            .filter(c => c && c.trim() !== '')
+            .sort((a, b) => a.localeCompare(b));
+        counters.forEach(c => suggestions.push({ value: c, label: c, type: 'Compteur' }));
+
+        // 4. Collecte des Compétences de base
+        const coreSkills = Object.values(rules.definitions.skills || {}).flat()
+            .filter(s => s.trim() !== '');
+
+        // 5. Collecte des Compétences de la bibliothèque (regroupées sous "Compétence")
+        const libSkills = (rules.libraries.skills || [])
+            .map(s => s.name)
+            .filter(s => s.trim() !== '');
+
+        // Fusionner et trier toutes les compétences
+        const allSkills = [...new Set([...coreSkills, ...libSkills])].sort((a, b) => a.localeCompare(b));
+        allSkills.forEach(s => suggestions.push({ value: s, label: s, type: 'Compétence' }));
+
+        return suggestions;
+    }, [rules]);
+
     const currentPreviewData = realCharData || DUMMY_PREVIEW_DATA;
 
     useEffect(() => {
@@ -164,7 +253,6 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
     };
 
     const allVariables = [
-        'XP_TOTAL',
         'TRAIT_LEVEL',
         'SCENARIOS_COUNT',
         ...lib.map(f => f.code).filter(Boolean), // Codes des autres formules
@@ -186,8 +274,8 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
     const addCounter = () => {
         const newCounter: LibraryFormulaEntry = {
             id: generateId(),
-            name: "Nouvelle Variable",
-            code: "VAR_" + generateId().substring(0, 4).toUpperCase(),
+            name: "",
+            code: "",
             type: 'variable',
             formula: "10",
             isActive: true,
@@ -205,11 +293,30 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
         const oldCode = oldEntry?.code;
         const isCodeChange = field === 'code' && oldCode && oldCode !== value;
 
+        const generateCodeFromName = (name: string) => {
+            return name
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "") // retire les accents
+                .toUpperCase()
+                .replace(/[\s\-']/g, '_') // remplace espaces, tirets, apostrophes par underscores
+                .replace(/[^A-Z0-9_]/g, ''); // garde uniquement alphanumérique et underscores
+        };
+
         const newLib = lib.map(c => {
             if (c.id === id) {
                 const updated = { ...c, [field]: value };
-                // Re-evaluate preview if formula or aggregate config changed
-                if (field === 'formula' || field === 'aggregateConfig' || field === 'type') {
+
+                // Auto-génération du code à partir du nom
+                if (field === 'name') {
+                    const oldExpectedCode = generateCodeFromName(c.name || '');
+                    if (!c.code || c.code === oldExpectedCode || c.code.startsWith('VAR_')) {
+                        updated.code = generateCodeFromName(value);
+                    }
+                }
+
+                // Re-evaluate preview if formula, target, operator, effectType or aggregate config changed
+                const triggeringFields: (keyof LibraryFormulaEntry)[] = ['formula', 'aggregateConfig', 'type', 'target', 'operator', 'effectType'];
+                if (triggeringFields.includes(field)) {
                     setPreviewValue(evaluateFormula(updated.formula || '', currentPreviewData, { entry: updated }));
                 }
                 return updated as any;
@@ -228,8 +335,19 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
     };
 
     const removeCounter = (id: string) => {
-        if (!confirm("Voulez-vous vraiment supprimer cette formule ?")) return;
-        handleUpdate(lib.filter(c => c.id !== id));
+        const formula = lib.find(c => c.id === id);
+        if (formula) {
+            setFormulaToDelete(formula);
+            setIsDeleteModalOpen(true);
+        }
+    };
+
+    const confirmRemoveCounter = () => {
+        if (formulaToDelete) {
+            handleUpdate(lib.filter(c => c.id !== formulaToDelete.id));
+            setIsDeleteModalOpen(false);
+            setFormulaToDelete(null);
+        }
     };
 
     /* 
@@ -375,59 +493,52 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                     const isEditing = editingId === counter.id;
                     const preview = isEditing && previewValue !== null ? previewValue : evaluateFormula(counter.formula || '', currentPreviewData, { entry: counter });
 
-                    // Formule valide ?
-                    let isValid = true;
+                    // Calcul du statut de validation
+                    let validationStatus: 'valid' | 'warning' | 'error' = 'valid';
+                    let tooltipMessage = "Formule complète et valide";
+
                     // L'équation mathématique doit être analysable (sauf si c'est un agrégat auto)
                     const isMathValid = counter.aggregateConfig ? true : isFormulaSyntaxValid(counter.formula);
-                    let tooltipMessage = "Formule valide";
 
-                    const isTargetValid = (target: string, currentRules: RulesData): boolean => {
-                        if (!target || target.trim() === '') return false;
-                        const t = target.trim();
+                    if (!isMathValid) {
+                        validationStatus = 'error';
+                        tooltipMessage = "Syntaxe mathématique invalide";
+                    } else if (counter.type === 'modifier' || (counter as any).type === 'effect') {
+                        const hasTarget = !!(counter.target && counter.target.trim() !== '');
+                        const hasOperator = !!(counter.operator && (counter.operator as string) !== '');
+                        const hasEquation = !!(counter.formula && counter.formula.trim() !== '');
+                        const actualEffectType = counter.effectType || 'modifier';
+                        const hasEffectType = !!(actualEffectType && actualEffectType !== '');
 
-                        if (['XP', 'Total', 'Niveau'].includes(t)) return true;
+                        // Si ForceVariant est actif, la cible n'a pas besoin d'être "valide" au sens strict (car c'est une catégorie de suggestion)
+                        const isSuggestionCategory = counter.forceVariant && (
+                            normalizeString(counter.target || "") === 'competence' ||
+                            normalizeString(counter.target || "") === 'attribut' ||
+                            normalizeString(counter.target || "") === 'trait'
+                        );
 
-                        if (currentRules.definitions?.attributes) {
-                            const allAttrs = Object.values(currentRules.definitions.attributes).flat();
-                            if (allAttrs.includes(t)) return true;
-                        }
-
-                        if (currentRules.definitions?.secondaryAttributes) {
-                            const allSecAttrs = Object.values(currentRules.definitions.secondaryAttributes).flat();
-                            if (allSecAttrs.includes(t)) return true;
-                        }
-
-                        if (currentRules.libraries?.skills) {
-                            if (currentRules.libraries.skills.some((s: any) => s.name === t)) return true;
-                        }
-
-                        if (currentRules.libraries?.counters) {
-                            if (currentRules.libraries.counters.some((c: any) => c.name === t)) return true;
-                        }
-
-                        return false;
-                    };
-
-                    if (counter.type === 'modifier' || (counter as any).type === 'effect') {
-                        // Un effet a absolument besoin d'une cible mathématique et d'un type d'effet en plus de l'équation
-                        if (!counter.target || counter.target.trim() === '') {
-                            isValid = false;
-                            tooltipMessage = "Cible manquante";
-                        } else if (!counter.effectType) {
-                            isValid = false;
+                        if (!hasEffectType) {
+                            validationStatus = 'error';
                             tooltipMessage = "Type d'effet manquant";
-                        } else if (!isTargetValid(counter.target, rules)) {
-                            isValid = false;
+                        } else if (hasTarget && !counter.forceVariant && !isTargetValid(counter.target!, rules)) {
+                            validationStatus = 'error';
                             tooltipMessage = `La cible '${counter.target}' n'existe pas dans les règles`;
-                        } else if (!isMathValid) {
-                            isValid = false;
-                            tooltipMessage = "Syntaxe mathématique invalide";
+                        } else if ((!hasTarget && !counter.forceVariant) || !hasOperator || !hasEquation) {
+                            validationStatus = 'warning';
+                            tooltipMessage = "Modèle incomplet (sera complété dans le trait)";
+                        } else if (counter.forceVariant && !hasTarget) {
+                            validationStatus = 'warning';
+                            tooltipMessage = "Cible vide : Le joueur devra saisir le nom manuellement.";
                         }
                     } else {
-                        // Une variable classique a juste besoin d'une équation valide
-                        isValid = isMathValid;
-                        if (!isValid) tooltipMessage = "Syntaxe mathématique invalide";
+                        // Pour une variable simple
+                        if (!counter.formula || counter.formula.trim() === '') {
+                            validationStatus = 'warning';
+                            tooltipMessage = "Équation vide (sera complétée dans le trait)";
+                        }
                     }
+
+                    const isValid = validationStatus !== 'error';
 
                     return (
                         <div key={counter.id} className={`border rounded-sm overflow-hidden transition-all ${isEditing ? 'border-amber-500 ring-1 ring-amber-500/50 bg-stone-900/80' : 'border-stone-700/50 bg-stone-900/40 hover:border-amber-500/30'}`}>
@@ -463,10 +574,9 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                     <div className="text-right flex flex-col items-end">
                                         <span className="text-[10px] text-stone-500 uppercase tracking-widest font-bold flex items-center gap-1" title={tooltipMessage}>
                                             Aperçu {realCharData ? 'Réel' : '(Fictif)'}
-                                            {isValid ?
-                                                <Check size={10} className="text-emerald-500" /> :
-                                                <AlertCircle size={10} className="text-rose-500" />
-                                            }
+                                            {validationStatus === 'valid' && <Check size={10} className="text-emerald-500" />}
+                                            {validationStatus === 'warning' && <AlertCircle size={10} className="text-amber-500" />}
+                                            {validationStatus === 'error' && <AlertCircle size={10} className="text-rose-500" />}
                                         </span>
                                         <span className={`font-black text-xl leading-none ${isValid ? 'text-amber-500' : 'text-stone-600'}`}>
                                             {preview !== null && !isNaN(preview) ? preview : 'ERROR'}
@@ -614,56 +724,114 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                     )}
 
                                     {(counter.type === 'modifier' || (counter as any).type === 'effect') && (
-                                        <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Cible de l'Effet (ex: Force, XP, PV)</label>
-                                                <div className="relative">
-                                                    <input
-                                                        type="text"
-                                                        value={counter.target || ''}
-                                                        onChange={e => updateCounter(counter.id, 'target', e.target.value)}
+                                        <React.Fragment>
+                                            <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                                                <div>
+                                                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Cible de l'Effet (ex: Force, XP, PV)</label>
+                                                    <div className="relative" ref={targetDropdownRef}>
+                                                        <input
+                                                            type="text"
+                                                            value={counter.target || ''}
+                                                            autoComplete="off"
+                                                            onFocus={() => setIsTargetDropdownOpen(true)}
+                                                            onChange={e => {
+                                                                updateCounter(counter.id, 'target', e.target.value);
+                                                                setIsTargetDropdownOpen(true);
+                                                            }}
+                                                            className={`w-full p-2 bg-stone-950 border text-stone-300 rounded focus:border-amber-500 outline-none ${!counter.target ? 'border-dashed border-stone-700' : 'border-stone-700'}`}
+                                                            placeholder="Cible libre (ex: Force)"
+                                                        />
+
+                                                        {isTargetDropdownOpen && (
+                                                            <div className="absolute z-50 w-full mt-1 bg-stone-900 border border-amber-500/30 rounded shadow-2xl max-h-96 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-100">
+                                                                {targetSuggestions
+                                                                    .filter((s: any) => !counter.target || s.value.toLowerCase().includes(counter.target.toLowerCase()) || s.type.toLowerCase().includes(counter.target.toLowerCase()))
+                                                                    .map((s: any, idx: number) => (
+                                                                        <button
+                                                                            key={`${s.value}-${idx}`}
+                                                                            onClick={() => {
+                                                                                updateCounter(counter.id, 'target', s.value);
+                                                                                setIsTargetDropdownOpen(false);
+                                                                            }}
+                                                                            className="w-full text-left px-3 py-2 hover:bg-amber-500/10 border-b border-stone-800/50 last:border-0 group flex justify-between items-center transition-colors"
+                                                                        >
+                                                                            <span className="font-bold text-stone-300 group-hover:text-amber-500">{s.value}</span>
+                                                                            <span className="text-[9px] uppercase font-bold text-stone-600 px-1.5 py-0.5 bg-stone-950 rounded border border-stone-800">{s.type}</span>
+                                                                        </button>
+                                                                    ))}
+                                                                {targetSuggestions.filter((s: any) => !counter.target || s.value.toLowerCase().includes(counter.target.toLowerCase())).length === 0 && (
+                                                                    <div className="p-3 text-xs text-stone-600 italic text-center">
+                                                                        Aucune suggestion correspondante
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                        {!counter.target && <div className="absolute right-2 top-2 text-[8px] text-amber-500/50 font-bold uppercase pointer-events-none">Optionnel</div>}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Type d'Effet</label>
+                                                    <select
+                                                        value={counter.effectType || 'modifier'}
+                                                        onChange={e => updateCounter(counter.id, 'effectType', e.target.value)}
                                                         className="w-full p-2 bg-stone-950 border border-stone-700 text-stone-300 rounded focus:border-amber-500 outline-none"
-                                                        placeholder="Chercher une cible..."
-                                                    />
+                                                    >
+                                                        <option value="modifier">Calcul Standard (Attribut, XP, Réserve)</option>
+                                                        <option value="block_skill_increase">Blocage de Progression</option>
+                                                        <option value="master_skill">Maîtrise (Forcer à 5)</option>
+                                                        <option value="free_skill_rank">Rang Gratuit (Cumulable)</option>
+                                                    </select>
+                                                </div>
+                                                {counter.effectType !== 'block_skill_increase' && counter.effectType !== 'master_skill' && (
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Opération</label>
+                                                        <select
+                                                            value={counter.operator || ''}
+                                                            onChange={e => updateCounter(counter.id, 'operator', e.target.value as any)}
+                                                            className={`w-full p-2 bg-stone-950 border text-stone-300 rounded focus:border-amber-500 outline-none ${!counter.operator ? 'border-dashed border-stone-700 text-stone-500' : 'border-stone-700'}`}
+                                                        >
+                                                            <option value="">-- Aucune (à définir dans le trait) --</option>
+                                                            <option value="ADD">Ajoûter (ADD)</option>
+                                                            <option value="SET">Remplacer (SET)</option>
+                                                            <option value="SUB">Soustraire (SUB)</option>
+                                                        </select>
+                                                    </div>
+                                                )}
+                                                <div className="flex flex-col justify-end">
+                                                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1 whitespace-nowrap">Forcer Variante</label>
+                                                    <button
+                                                        onClick={() => updateCounter(counter.id, 'forceVariant', !counter.forceVariant)}
+                                                        className={`w-full p-2 rounded border transition-all flex items-center justify-center gap-2 font-bold text-xs ${counter.forceVariant ? 'bg-indigo-600/20 border-indigo-500 text-indigo-400 shadow-glow-indigo' : 'bg-stone-900 border-stone-700 text-stone-500 hover:text-stone-400'}`}
+                                                    >
+                                                        {counter.forceVariant ? <Sparkles size={14} /> : null}
+                                                        {counter.forceVariant ? 'ACTIVÉ' : 'DÉSACTIVÉ'}
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Type d'Effet</label>
-                                                <select
-                                                    value={counter.effectType || 'attribute_bonus'}
-                                                    onChange={e => updateCounter(counter.id, 'effectType', e.target.value)}
-                                                    className="w-full p-2 bg-stone-950 border border-stone-700 text-stone-300 rounded focus:border-amber-500 outline-none"
-                                                >
-                                                    <option value="attribute_bonus">Bonus d'Attribut (val2)</option>
-                                                    <option value="xp_bonus">Gain d'Expérience</option>
-                                                    <option value="block_skill_increase">Blocage de Compétence</option>
-                                                    <option value="free_skill_rank">Rang de Compétence Gratuit</option>
-                                                    <option value="master_skill">Maîtrise (Fixe à 5)</option>
-                                                    <option value="reserve_bonus">Bonus de Réserve</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Opération</label>
-                                                <select
-                                                    value={counter.operator || 'ADD'}
-                                                    onChange={e => updateCounter(counter.id, 'operator', e.target.value as any)}
-                                                    className="w-full p-2 bg-stone-950 border border-stone-700 text-stone-300 rounded focus:border-amber-500 outline-none"
-                                                >
-                                                    <option value="ADD">Ajoûter (ADD)</option>
-                                                    <option value="SET">Remplacer (SET)</option>
-                                                    <option value="SUB">Soustraire (SUB)</option>
-                                                </select>
-                                            </div>
-                                        </div>
+                                            {counter.forceVariant && (
+                                                <div className="mt-3 p-2 bg-indigo-950/20 border border-indigo-500/30 rounded flex gap-3 items-start animate-in slide-in-from-top-1 duration-300">
+                                                    <Sparkles className="text-indigo-400 shrink-0 mt-0.5" size={16} />
+                                                    <div>
+                                                        <p className="text-[10px] text-indigo-300/80 leading-relaxed font-medium">
+                                                            <strong className="text-indigo-300">Logique de Variante Dynamique :</strong> Le trait utilisant cette mécanique exigera une précision (Variante) de la part du joueur.
+                                                            Cette précision deviendra la cible de l'effet.
+                                                        </p>
+                                                        <p className="text-[10px] text-indigo-400/60 mt-1 italic">
+                                                            Note : Indiquez "Compétence" ou "Attribut" dans le champ Cible pour suggérer une liste au joueur.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
                                     )}
 
-                                    {!counter.aggregateConfig && (
+                                    {!counter.aggregateConfig && counter.effectType !== 'block_skill_increase' && counter.effectType !== 'master_skill' && (
                                         <div>
                                             <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Équation Mathématique</label>
                                             <div className="relative">
                                                 <input
                                                     type="text"
-                                                    value={counter.formula}
+                                                    value={counter.formula || ''}
                                                     onChange={e => {
                                                         const val = e.target.value;
                                                         updateCounter(counter.id, 'formula', val);
@@ -673,9 +841,10 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                                         const lastWord = words[words.length - 1];
                                                         setSearchQuery(lastWord.length > 1 ? lastWord : '');
                                                     }}
-                                                    className="w-full p-3 bg-stone-950 border border-stone-700 text-stone-300 rounded font-mono text-sm focus:border-amber-500 outline-none shadow-inner"
-                                                    placeholder="ex: 10 + Constitution + Volonté"
+                                                    className={`w-full p-3 bg-stone-950 border text-stone-300 rounded font-mono text-sm focus:border-amber-500 outline-none shadow-inner ${!counter.formula ? 'border-dashed border-stone-700' : 'border-stone-700'}`}
+                                                    placeholder="Laisse vide pour saisir une Valeur Fixe dans le trait"
                                                 />
+                                                {!counter.formula && <div className="absolute right-3 top-3 text-[8px] text-amber-500/50 font-bold uppercase">Modèle de valeur</div>}
 
                                                 {searchQuery && (
                                                     <div className="absolute z-10 top-full left-0 w-full mt-1 bg-stone-900 border border-amber-500/30 rounded shadow-2xl max-h-40 overflow-y-auto">
@@ -706,7 +875,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                                 </span>
                                                 <div className="flex wrap gap-1.5">
                                                     {allVariables
-                                                        .filter(v => ['XP_TOTAL', 'TRAIT_LEVEL', 'SCENARIOS_COUNT', 'Physique', 'Volonté', 'Constitution', 'Empathie', 'Intelligence'].includes(v))
+                                                        .filter(v => ['TRAIT_LEVEL', 'SCENARIOS_COUNT', 'Physique', 'Volonté', 'Constitution', 'Empathie', 'Intelligence'].includes(v))
                                                         .map(v => (
                                                             <button
                                                                 key={v}
@@ -732,7 +901,8 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                                         </button>
                                     </div>
                                 </div>
-                            )}
+                            )
+                            }
                         </div>
                     );
                 })}
@@ -748,7 +918,27 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
 
             {/* Maintenance & Unification Tool */}
             {/* Removed: Auto-migration is now handled transparently on campaign load */}
-        </MotionCard>
+
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmRemoveCounter}
+                title="Supprimer la Formule"
+                message={
+                    <div className="space-y-2">
+                        <p>Voulez-vous vraiment supprimer la formule <strong>{formulaToDelete?.name}</strong> ?</p>
+                        {formulaToDelete?.code && (
+                            <p className="text-xs opacity-60">Identifiant technique : <code className="bg-black/20 px-1 rounded">{formulaToDelete.code}</code></p>
+                        )}
+                        <p className="text-xs text-red-400 mt-2">Attention : Si d'autres formules utilisent cet identifiant, leurs calculs risquent de casser.</p>
+                    </div>
+                }
+                confirmLabel="Supprimer"
+                cancelLabel="Annuler"
+                type="danger"
+                scheme="mystic"
+            />
+        </MotionCard >
     );
 };
 

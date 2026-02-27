@@ -38,16 +38,6 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
     );
 
     const {
-        selection,
-        variantPicker,
-        setVariantPicker,
-        toggleSelection,
-        addInstanceWithVariant,
-        removeInstance,
-        handleConfirmMultiSelect
-    } = useTraitSelection(onMultiSelect);
-
-    const {
         isModalOpen,
         setIsModalOpen,
         editForm,
@@ -78,6 +68,16 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
         allCounters,
         allFormulas
     } = useTraitActions(data, onUpdate, filterType === 'all' ? 'avantage' : filterType);
+
+    const {
+        selection,
+        variantPicker,
+        setVariantPicker,
+        toggleSelection,
+        addInstanceWithVariant,
+        removeInstance,
+        handleConfirmMultiSelect
+    } = useTraitSelection(onMultiSelect, allFormulas);
 
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
@@ -281,6 +281,9 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                         variantPicker={variantPicker}
                         onClose={() => setVariantPicker(null)}
                         onSelect={addInstanceWithVariant}
+                        allFormulas={allFormulas}
+                        allSkills={allSkills}
+                        allAttributes={allAttributes}
                     />
                 )
             }

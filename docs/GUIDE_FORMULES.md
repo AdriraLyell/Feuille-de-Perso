@@ -16,7 +16,7 @@ L'éditeur admin propose deux entités principales :
 ### Écrire une formule
 Pour utiliser une variable dans une équation, tapez son **nom exact** :
 - **Variables MJ** : Si vous avez créé une variable nommée `MENACE`, tapez `MENACE * 2`.
-- **Variables Système** : `XP_TOTAL` (total XP), `SCENARIOS_COUNT` (nombre de scénarios validés), `TRAIT_LEVEL` (niveau du trait portant l'effet).
+- **Variables Système** : `SCENARIOS_COUNT` (nombre de scénarios validés), `TRAIT_LEVEL` (niveau du trait portant l'effet).
 - **Caractéristiques de la Fiche** : Attributs (`Force`, `Volonté`) ou Compétences (`Bagarre`, `Discrétion`).
 - **Agrégats prédéfinis** : `SUM_MYSTIC` (Somme de toutes les compétences étiquetées 'Mystique').
 
@@ -57,7 +57,6 @@ L'injection de variables contextuelles est désormais centralisée dans `src/uti
 
 - `TRAIT_LEVEL` : Le niveau (1 à 5) du trait portant l'effet.
 - `SCENARIOS_COUNT` : Le nombre total de scénarios validés sur la fiche.
-- `XP_TOTAL` : Le total théorique d'XP gagnée.
 
 ## 5. Maintenance des Données
 
@@ -83,23 +82,22 @@ Il doit s'agir du **nom exact** de l'élément tel qu'il apparaît sur la fiche 
 *   **Expérience** : Tapez `XP` (ou `Total`) pour cibler le montant d'expérience du personnage.
 
 ### ⚙️ Liste des "TYPES D'EFFET"
-Le Type d'effet indique au moteur dans quel "sous-système" la formule doit s'exécuter. Il catégorise l'action.
+Le Type d'effet indique au moteur si la formule doit suivre un comportement standard ou déclencher une logique spéciale.
 
-1.  **Bonus d'Attribut (val2)**
-    *   **Usage** : Pour augmenter ou diminuer le score passif d'un attribut.
-    *   **Cible attendue** : Un nom d'Attribut.
-2.  **Gain d'Expérience**
-    *   **Usage** : Pour modifier la réserve d'XP (bonus de background, malus lié à un trait).
-    *   **Cible attendue** : `XP`.
-3.  **Blocage de Compétence**
-    *   **Usage** : Empêche le joueur de dépenser de l'XP pour monter cette compétence. (Si l'équation renvoie une valeur > 0, le blocage est actif).
+1.  **Calcul Standard (Attribut, XP, Réserve)**
+    *   **Usage** : Type par défaut pour la majorité des effets. Le moteur détecte automatiquement la cible.
+    *   **Cible attendue** : Un nom d'Attribut, un Compteur ou `XP`.
+    *   **Résultat** : Ajoute, soustrait ou fixe la valeur ciblée selon l'opération choisie.
+
+2.  **Blocage de Progression**
+    *   **Usage** : Empêche le joueur d'augmenter une compétence par lui-même.
     *   **Cible attendue** : Un nom de Compétence.
-4.  **Rang de Compétence Gratuit**
-    *   **Usage** : Donne un bonus direct permanent au niveau de la compétence (se cumule avec l'XP dépensée).
+    *   **Note** : Bloque la compétence si le résultat du calcul est supérieur à 0.
+
+3.  **Maîtrise (Forcer à 5)**
+    *   **Usage** : Sémantique spéciale pour les traits de "Maîtrise". Souvent utilisé avec une cible de compétence pour la forcer à 5.
     *   **Cible attendue** : Un nom de Compétence.
-5.  **Maîtrise (Fixe à 5)**
-    *   **Usage** : Fixe le niveau de la cible à une valeur précise (souvent 5) quels que soient les autres bonus. *S'utilise conjointement avec l'opération "Fixer (SET)".*
+
+4.  **Rang Gratuit (Cumulable)**
+    *   **Usage** : Similaire au calcul standard mais typé sémantiquement pour les rangs offerts.
     *   **Cible attendue** : Un nom de Compétence.
-6.  **Bonus de Réserve**
-    *   **Usage** : Pour augmenter la valeur maximale d'une jauge ou d'un compteur (ex: +10 PV Max).
-    *   **Cible attendue** : Un nom de Compteur.
