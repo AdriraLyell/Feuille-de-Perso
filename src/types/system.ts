@@ -153,6 +153,7 @@ export interface LibrarySpecializationEntry {
   isGlobal?: boolean;
   isActive?: boolean;
   isLocked?: boolean;
+  isImposed?: boolean;
   globalUsage?: number;
 }
 

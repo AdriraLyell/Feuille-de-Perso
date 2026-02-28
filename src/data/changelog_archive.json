@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.7",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Ajout de la migration V5 pour forcer explicitement la réconciliation des règles au chargement du personnage",
+            "Mise à jour du bouton 'Officiel' pour forcer la réconciliation immédiate des bibliothèques locales"
+        ]
+    },
+    {
         "version": "2.97.6",
         "date": "2026-02-28",
         "type": "fix",
@@ -613,11 +622,5 @@
         "date": "2026-02-21",
         "type": "refactor",
         "description": "Amélioration de l'interface admin : Regroupement des widgets de coût XP (Arrière-Plans, Attributs, Traits) dans un seul bloc 'Facteurs de Coût' pour une meilleure lisibilité et aération de la vue configuration."
-    },
-    {
-        "version": "2.65.0",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Déploiement production : Intégration de l'effet Maître, corrections bugs reset et confiance, améliorations journal et synchronisation cloud."
     }
 ]

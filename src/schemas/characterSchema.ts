@@ -221,7 +221,8 @@ export const LibrarySpecializationEntrySchema = z.object({
     name: z.string(),
     skillIds: z.array(z.string()),
     defaultMinLevel: z.number(),
-    description: z.string().optional()
+    description: z.string().optional(),
+    isImposed: z.boolean().optional()
 });
 
 export const LibraryCounterEntrySchema = z.object({

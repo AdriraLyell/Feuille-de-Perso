@@ -6,6 +6,7 @@ import { normalizeString } from './stringUtils';
 import { getSkillCategory, getCounter, setCounter } from './stateAccessors';
 import { reconcileSkillsAndBackgrounds } from './reconcilers/skillsReconciler';
 import { migrateTraitLibrary } from './migrations/migrateTraitProperties';
+import { logger } from './logger';
 import { LibraryEntry } from '../types';
 
 // --- Sub-functions ---
@@ -399,6 +400,69 @@ const reconcileHeader = (newState: CharacterSheetData, rules: RulesData) => {
     }
 };
 
+/**
+ * Automatically injects imposed specializations from the campaign library
+ * if the character meets the skill requirements.
+ */
+const reconcileImposedSpecializations = (newState: CharacterSheetData, rules: RulesData) => {
+    if (!rules.libraries?.specializations) return;
+
+    const imposedLibrarySpecs = rules.libraries.specializations.filter(s => s.isImposed && s.isActive !== false);
+    if (imposedLibrarySpecs.length === 0) {
+        // Optionnel : On pourrait choisir de nettoyer les anciennes spécialisations auto qui ne sont plus dans la lib
+        // mais pour l'instant on se concentre sur l'ajout.
+        return;
+    }
+
+    // Ensure object exists
+    if (!newState.imposedSpecializations) {
+        newState.imposedSpecializations = {};
+    }
+
+    // Get all character skill IDs and their levels
+    const characterSkills: Record<string, number> = {};
+    Object.values(newState.skills).flat().forEach(s => {
+        if (s.id && s.name) {
+            characterSkills[s.id] = s.value || 0;
+        }
+    });
+
+    // Process each skill
+    Object.keys(characterSkills).forEach(skillId => {
+        const level = characterSkills[skillId];
+        const currentImposed = newState.imposedSpecializations[skillId] || [];
+
+        // 1. Find library specs applicable to this skill
+        const applicableLibrarySpecs = imposedLibrarySpecs.filter(ls =>
+            ls.skillIds.includes(skillId) && level >= ls.defaultMinLevel
+        );
+
+        // 2. Add missing ones
+        let modified = false;
+        const nextImposed = [...currentImposed];
+
+        applicableLibrarySpecs.forEach(ls => {
+            const alreadyPresent = nextImposed.some(ci => ci.name.trim().toLowerCase() === ls.name.trim().toLowerCase());
+            if (!alreadyPresent) {
+                nextImposed.push({
+                    name: ls.name,
+                    minLevel: ls.defaultMinLevel
+                });
+                modified = true;
+                logger.log(`[Reconciler] Auto-adding imposed specialization "${ls.name}" for skill "${skillId}"`);
+            }
+        });
+
+        // 3. (Optional) Remove ones that come from library but are no longer valid
+        // Identifying those accurately is hard without a library source flag on the character entry.
+        // For now, we only add. If the MJ removes "isImposed", it stays on the sheet until manual deletion.
+
+        if (modified) {
+            newState.imposedSpecializations[skillId] = nextImposed;
+        }
+    });
+};
+
 // --- Main Function ---
 
 /**
@@ -431,6 +495,7 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
     reconcileSkillsAndBackgrounds(newState, currentState, rules);
     reconcileCounters(newState, currentState, rules);
     reconcileTraits(newState, currentState, rules);
+    reconcileImposedSpecializations(newState, rules);
     reconcileCleanup(newState, currentState, rules);
     reconcileHeader(newState, rules);
 

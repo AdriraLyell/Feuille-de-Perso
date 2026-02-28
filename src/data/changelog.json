@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.27",
+        "date": "2026-03-01",
+        "type": "feat",
+        "changes": [
+            "Système de spécialisations imposées dans la bibliothèque d'administration",
+            "Ajout d'une option 'Spécialisation Imposée' pour les MJ dans le catalogue",
+            "Réconciliation automatique : les spécialisations s'ajoutent seules sur les fiches si le seuil est atteint",
+            "Indicateur visuel (éclair) pour les spécialisations automatiques dans la liste admin"
+        ]
+    },
+    {
         "version": "2.97.26",
         "date": "2026-02-28",
         "type": "fix",
@@ -187,15 +198,6 @@
             "Protection des champs 'mysticAbilityId' et 'isVariable' lors du nettoyage de la bibliothèque.",
             "Migration V6 pour restaurer les liens mystiques cassés sur les fiches existantes.",
             "Passage des règles par défaut en 1.0.4 pour forcer la réconciliation correcte."
-        ]
-    },
-    {
-        "version": "2.97.7",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Ajout de la migration V5 pour forcer explicitement la réconciliation des règles au chargement du personnage",
-            "Mise à jour du bouton 'Officiel' pour forcer la réconciliation immédiate des bibliothèques locales"
         ]
     }
 ]
