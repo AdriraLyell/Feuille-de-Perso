@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.3",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Correction du bug de pollution de la bibliothèque locale par les traits officiels",
+            "Suppression de la synchronisation forcée des bibliothèques dans rulesReconciler.ts",
+            "Mise en place d'un nettoyage automatique des entrées redondantes (exact match) dans la sauvegarde locale",
+            "Restauration du badge 'Officiel' (Globe) pour les traits non modifiés"
+        ]
+    },
+    {
         "version": "2.97.2",
         "date": "2026-02-28",
         "type": "refactor",
@@ -596,11 +607,5 @@
         "date": "2026-02-22",
         "type": "feat",
         "description": "Nouvel effet de trait 'Maître' (master_skill) : Quand un trait avec cet effet est ajouté, un wizard s'ouvre permettant au joueur de choisir une compétence primaire à rang 0. Celle-ci est automatiquement portée au rang 5 sans coût XP. Suppression du trait : la compétence revient au rang 0. L'xpCalculator reconnaît les compétences maîtrisées via masterSkillTarget et les traite comme entièrement gratuites jusqu'au rang 5. Interface admin : couleur violette + description informative."
-    },
-    {
-        "version": "2.63.3",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction des couleurs des compétences Habiletés Mystiques : (1) Le wizard d'ajout de compétences mystiques stocke désormais `definitionId` et `mysticAbilityId` sur chaque DotEntry ajouté, permettant à useSheetLayout de les enrichir correctement. (2) Ajout d'un fallback par nom dans useSheetLayout pour rétrocompatibilité avec les fiches existantes. (3) Alignement des couleurs de fallback dans l'AppearanceEditor sur les valeurs de DEFAULT_THEME (#8b5cf6 mystique, #d97706 variable)."
     }
 ]

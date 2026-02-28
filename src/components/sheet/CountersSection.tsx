@@ -231,7 +231,7 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
                 </span>
             </div>
 
-            <PortalTooltip isOpen={isOpen} anchorRef={anchorRef} title={`${counter.name} (Calcul)`}>
+            <PortalTooltip isOpen={isOpen} anchorRef={anchorRef} title={`${counter.name} (Calcul)`} maxWidth={420}>
                 {renderDetails()}
             </PortalTooltip>
 

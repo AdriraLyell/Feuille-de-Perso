@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.97.23",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Tooltip : Élargissement de la largeur maximale autorisée du portail d'infobulle pour éviter que la 2ème colonne ne soit masquée par débordement."
+        ]
+    },
+    {
         "version": "2.97.22",
         "date": "2026-02-28",
         "type": "feat",
@@ -190,17 +198,6 @@
             "Amélioration de la détection des traits redondants (ignore les IDs d'effets)",
             "Forçage de la réconciliation via montée de version des règles par défaut (v1.0.1)",
             "Restauration effective du statut 'Officiel' pour les traits importés ou pollués"
-        ]
-    },
-    {
-        "version": "2.97.3",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Correction du bug de pollution de la bibliothèque locale par les traits officiels",
-            "Suppression de la synchronisation forcée des bibliothèques dans rulesReconciler.ts",
-            "Mise en place d'un nettoyage automatique des entrées redondantes (exact match) dans la sauvegarde locale",
-            "Restauration du badge 'Officiel' (Globe) pour les traits non modifiés"
         ]
     }
 ]
