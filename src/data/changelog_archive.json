@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.95.0",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Système (Mécaniques Dynamiques) : Introduction de 'Forcer Variante' dans les formules globales. Permet aux traits d'exiger une précision du joueur (ex: choix d'une compétence) qui devient automatiquement la cible de l'effet. Ajout de suggestions dynamiques dans le sélecteur de variantes basées sur la cible de la formule (Compétence, Attribut, etc.)."
+    },
+    {
         "version": "2.94.1",
         "date": "2026-02-27",
         "type": "fix",
@@ -591,11 +597,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction de la visibilité de la barre d'outils du Journal de Campagne : Fix du positionnement sticky sur petit écran (ajustement du top à 112px pour éviter le chevauchement avec la navigation) et ajout du support flex-wrap pour éviter le débordement horizontal des icônes de mise en forme. Suppression des animations parents interférant avec le contexte sticky."
-    },
-    {
-        "version": "2.62.6",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction du transfert d'images entre PC : Centralisation de la décompression GZIP dans le service de synchronisation cloud. Les images synchronisées (Grimoire, Portraits, Notes) sont désormais décompressées directement lors de l'injection dans IndexedDB, garantissant un affichage immédiat et correct sur tous les supports sans logique de décompression locale redondante."
     }
 ]
