@@ -49,8 +49,11 @@ export const MIGRATIONS: Record<number, MigrationFunction[]> = {
         restoreMysticLinks
     ],
     7: [
-        restoreMysticLinks  // Re-run after DotEntrySchema fix (V6 ran but Zod stripped the result)
+        forceRulesReconciliation  // Force reconciliation to rehydrate mysticAbilityId from rules.libraries.skills
+    ],
+    8: [
+        forceRulesReconciliation  // Re-force after V7 ran wrong migration content
     ]
 };
 
-export const CURRENT_SCHEMA_VERSION = 7;
+export const CURRENT_SCHEMA_VERSION = 8;
