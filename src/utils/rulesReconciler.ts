@@ -241,49 +241,69 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
 }
 
 /**
- * Synchronizes character libraries with rules libraries.
- * 
- * @param newState - The current draft state
- * @param rules - The rules containing library definitions
+ * Cleanup redundant local library entries that are exact matches of official ones.
+ * This fixes the issue where traits lose their "Official" status because they were 
+ * copied into the local library by a previous bug.
  */
-const reconcileLibraries = (newState: CharacterSheetData, rules: RulesData) => {
+const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterSheetData, rules: RulesData) => {
     if (!rules.libraries) return;
 
-    // 1. Traits
-    if (rules.libraries.traits) {
-        newState.library = rules.libraries.traits;
+    // Helper to check if a local entry is redundant compared to its official counterpart
+    const isRedundant = (local: any, officialList: any[]) => {
+        // Un élément explicitement marqué comme "customisé" ne doit jamais être supprimé
+        if (local.isCustomized) return false;
+
+        return officialList.some(off => {
+            if (normalizeString(off.name) !== normalizeString(local.name)) return false;
+            // Only compare types if both have one, handling 'vertu' vs 'avantage' legacy
+            if (off.type && local.type && off.type !== local.type) return false;
+
+            // Robust cost/value match (treat '2' and 2 as equal)
+            const offCost = Number(off.cost) || Number(off.value) || 0;
+            const locCost = Number(local.cost) || Number(local.value) || 0;
+            if (offCost !== locCost) return false;
+
+            // Robust pointsLabel match (strip non-digits to handle "2 pts" vs "2")
+            const normalizeLabel = (l?: string) => (l || '').replace(/\D/g, '');
+            if (normalizeLabel(off.pointsLabel) !== normalizeLabel(local.pointsLabel)) return false;
+
+            // Robust Effects Comparison (ignore IDs, ignore property order)
+            const simplifyEffects = (effects: any[]) => (effects || []).map(eff => {
+                const { id, definitionId, formulaId, ...rest } = eff; // skip IDs
+                return JSON.stringify(Object.keys(rest).sort().reduce((obj: any, key) => {
+                    obj[key] = rest[key];
+                    return obj;
+                }, {}));
+            }).sort();
+
+            const offEff = simplifyEffects(off.effects);
+            const locEff = simplifyEffects(local.effects);
+
+            return JSON.stringify(offEff) === JSON.stringify(locEff);
+        });
+    };
+
+    // 1. Clean Traits Library
+    if (currentState.library && rules.libraries.traits) {
+        newState.library = currentState.library.filter(l => !isRedundant(l, rules.libraries.traits!));
     }
 
-    // 2. Skills
-    if (rules.libraries.skills) {
-        newState.skillLibrary = rules.libraries.skills;
+    // 2. Clean Skill Library
+    if (currentState.skillLibrary && rules.libraries.skills) {
+        newState.skillLibrary = currentState.skillLibrary.filter(l => !isRedundant(l, rules.libraries.skills!));
     }
 
-    // 3. Specializations
-    if (rules.libraries.specializations) {
-        newState.specializationLibrary = rules.libraries.specializations;
+    // 3. Clean Specialization Library
+    if (currentState.specializationLibrary && rules.libraries.specializations) {
+        newState.specializationLibrary = currentState.specializationLibrary.filter(l => !isRedundant(l, rules.libraries.specializations!));
     }
 
-    // 4. Backgrounds
-    if (rules.libraries.backgrounds) {
-        newState.backgroundLibrary = rules.libraries.backgrounds;
-    }
-
-    // 5. Counters
-    if (rules.libraries.counters) {
-        newState.counterLibrary = rules.libraries.counters;
-    }
-
-    // 6. Mystic Abilities
-    if (rules.libraries.mysticAbilities) {
-        newState.mysticAbilities = rules.libraries.mysticAbilities;
-    }
-
-    // 7. Formula Library
-    if (rules.libraries.formulas) {
-        newState.formulaLibrary = rules.libraries.formulas;
+    // 4. Clean Background Library
+    if (currentState.backgroundLibrary && rules.libraries.backgrounds) {
+        newState.backgroundLibrary = currentState.backgroundLibrary.filter(l => !isRedundant(l, rules.libraries.backgrounds!));
     }
 };
+
 
 /**
  * Synchronizes header dates with campaign calendar if available.
@@ -347,7 +367,7 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
     reconcileSkillsAndBackgrounds(newState, currentState, rules);
     reconcileCounters(newState, currentState, rules);
     reconcileTraits(newState, currentState, rules);
-    reconcileLibraries(newState, rules);
+    reconcileCleanup(newState, currentState, rules);
     reconcileHeader(newState, rules);
 
     return newState;

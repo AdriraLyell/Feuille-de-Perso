@@ -1,5 +1,35 @@
 [
     {
+        "version": "2.97.5",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Normalisation des coûts (texte/nombre) et du format 'pointsLabel' lors de la comparaison pour résoudre la perte du statut 'Officiel'",
+            "Montée de version des règles internes à v1.0.2 pour déclencher la mise à jour et nettoyer la fiche locale"
+        ]
+    },
+    {
+        "version": "2.97.4",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Amélioration de la détection des traits redondants (ignore les IDs d'effets)",
+            "Forçage de la réconciliation via montée de version des règles par défaut (v1.0.1)",
+            "Restauration effective du statut 'Officiel' pour les traits importés ou pollués"
+        ]
+    },
+    {
+        "version": "2.97.3",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Correction du bug de pollution de la bibliothèque locale par les traits officiels",
+            "Suppression de la synchronisation forcée des bibliothèques dans rulesReconciler.ts",
+            "Mise en place d'un nettoyage automatique des entrées redondantes (exact match) dans la sauvegarde locale",
+            "Restauration du badge 'Officiel' (Globe) pour les traits non modifiés"
+        ]
+    },
+    {
         "version": "2.97.2",
         "date": "2026-02-28",
         "type": "refactor",
@@ -105,23 +135,5 @@
         "date": "2026-02-27",
         "type": "fix",
         "description": "Correction du bug de Stale State React : La sélection d'une formule globale dans l'éditeur d'effets mécaniques est désormais sauvegardée avec succès grâce à l'utilisation de la fonction updater de l'état React (Update Multiple Fields)."
-    },
-    {
-        "version": "2.93.0",
-        "date": "2026-02-27",
-        "type": "feat",
-        "description": "Migration Systémique des Formules : Intégration d'un outil de migration robuste dans le tableau de bord Admin pour convertir automatiquement les anciens effets hérités (bonus d'attributs, XP, rangs gratuits) vers le nouveau système de formules unifié. Support complet des opérateurs ADD/SET/SUB dans le moteur de calcul et l'interface d'édition. Centralisation de la logique de calcul pour garantir la cohérence entre les modes de jeu online et offline."
-    },
-    {
-        "version": "2.92.7",
-        "date": "2026-02-27",
-        "type": "feat",
-        "description": "Éditeur de Formules : Ajout d'un sélecteur de personnage réel pour l'aperçu dynamique des calculs. Permet aux MJ de valider leurs formules directement sur les fiches des personnages de la campagne, avec chargement à la demande des données via le service de synchronisation."
-    },
-    {
-        "version": "2.92.6",
-        "date": "2026-02-26",
-        "type": "feat",
-        "description": "UX Tooltips & Moteur de Calcul : Implémentation de bulles d'aide interactives (PortalTooltip) affichant le détail des calculs des compteurs dynamiques. Traduction automatique des variables techniques en noms lisibles via la bibliothèque de formules. Nettoyage du moteur en supprimant la variable SUM_MYSTIC en dur au profit des agrégats dynamiques. Corrections de la position des tooltips pour assurer la visibilité des compteurs."
     }
 ]

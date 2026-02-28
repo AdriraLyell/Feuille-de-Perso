@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.93.0",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Migration Systémique des Formules : Intégration d'un outil de migration robuste dans le tableau de bord Admin pour convertir automatiquement les anciens effets hérités (bonus d'attributs, XP, rangs gratuits) vers le nouveau système de formules unifié. Support complet des opérateurs ADD/SET/SUB dans le moteur de calcul et l'interface d'édition. Centralisation de la logique de calcul pour garantir la cohérence entre les modes de jeu online et offline."
+    },
+    {
+        "version": "2.92.7",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Éditeur de Formules : Ajout d'un sélecteur de personnage réel pour l'aperçu dynamique des calculs. Permet aux MJ de valider leurs formules directement sur les fiches des personnages de la campagne, avec chargement à la demande des données via le service de synchronisation."
+    },
+    {
+        "version": "2.92.6",
+        "date": "2026-02-26",
+        "type": "feat",
+        "description": "UX Tooltips & Moteur de Calcul : Implémentation de bulles d'aide interactives (PortalTooltip) affichant le détail des calculs des compteurs dynamiques. Traduction automatique des variables techniques en noms lisibles via la bibliothèque de formules. Nettoyage du moteur en supprimant la variable SUM_MYSTIC en dur au profit des agrégats dynamiques. Corrections de la position des tooltips pour assurer la visibilité des compteurs."
+    },
+    {
         "version": "2.92.5",
         "date": "2026-02-26",
         "type": "chore",
@@ -579,23 +597,5 @@
         "date": "2026-02-21",
         "type": "refactor",
         "description": "Renommage sémantique : L'effet 'Compteur de Trait' devient 'Compteur Auto' pour refléter son usage polyvalent. Implémentation du nommage intelligent : le champ 'Nom de Base' devient optionnel dans l'éditeur d'effet. Si laissé vide, le compteur prendra automatiquement le nom de la variante (ou le nom du trait) lors de l'instanciation sur la fiche du Héro."
-    },
-    {
-        "version": "2.58.0",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Amélioration des Compteurs de Traits (Dynamic Counters) : Les compteurs liés aux traits ne polluent plus la bibliothèque d'administration. Ils sont désormais générés dynamiquement et uniquement sur la fiche du personnage. Support des Traits Variables : le compteur ajoute automatiquement le nom de la variante choisie au nom de base de l'effet."
-    },
-    {
-        "version": "2.57.0",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Intégration des Compteurs de Traits : Nouveau type d'effet 'trait_counter' permettant de lier l'acquisition d'un trait à la création automatique d'un compteur personnalisé (ex: Munitions, Magie, Stress). Inclus : mode d'affichage compact 'squares_only' (sans ligne Maxi), synchronisation bidirectionnelle entre traits et compteurs sur la fiche, et gestion automatisée dans la bibliothèque admin."
-    },
-    {
-        "version": "2.56.75",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Correction UI : Suppression de la hauteur fixe et de l'ascenseur interne dans le bilan d'XP, permettant au tableau de s'étendre naturellement sur toute la page A4."
     }
 ]
