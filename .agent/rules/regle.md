@@ -69,6 +69,14 @@ Avant chaque fin de tâche (notify_user) :
 
 ## 7. WORKFLOW GIT (GitHub Flow+)
 
+### Dépôts Distants (Remotes)
+- **Principal** : `Feuille-de-Perso` (et NON `origin`). Toujours vérifier le nom via `git remote -v`.
+
+### Gestion des Erreurs & Verrous (Windows/PS)
+- **Fichiers Verrouillés** : Avant tout `git checkout` ou `merge`, arrêter le serveur de dev (`npm run dev`) et tuer les processus node résiduels (`taskkill /F /IM node.exe`).
+- **Prompts Interactifs** : Si une commande Git s'interrompt avec une question (ex: `Should I try again? (y/n)`), **ne jamais répondre en boucle**. Arrêter la commande, identifier le verrou (souvent un dossier comme `sql/` ou `.context/` ouvert par un autre processus) et en informer l'utilisateur.
+- **Restauration** : En cas d'échec de bascule de branche laissant des fichiers supprimés, utiliser `git restore .` pour stabiliser l'index avant de réessayer.
+
 ### Branches
 - **`main`** : Production. **Interdit de push ou PR sans demande explicite.**
 - **`develop`** : Intégration. Push direct autorisé. CI sans déploiement.
