@@ -36,7 +36,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
     const allSkills = useMemo(() => {
         const skills: { id: string, name: string }[] = [];
 
-        // 1. From Categories (Base Skills Definitions)
+        // 1. From Categories (Base Skills Definitions - Legacy)
         if (rules.definitions && rules.definitions.skills) {
             Object.values(rules.definitions.skills).forEach(categorySkills => {
                 categorySkills.forEach(skillName => {
@@ -48,16 +48,37 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         }
 
         // 2. From Official Library (Reserve)
-        if (rules.libraries && rules.libraries.skills) {
-            rules.libraries.skills.forEach(skill => {
-                if (!skills.some(s => s.id === skill.id)) {
-                    skills.push({ id: skill.id, name: skill.name });
-                }
-            });
+        if (rules.libraries) {
+            // Regular Skills
+            if (rules.libraries.skills) {
+                rules.libraries.skills.forEach(skill => {
+                    if (!skills.some(s => s.id === skill.id)) {
+                        skills.push({ id: skill.id, name: skill.name });
+                    }
+                });
+            }
+
+            // Mystic Abilities (Often used as parents for styles/specializations)
+            if (rules.libraries.mysticAbilities) {
+                rules.libraries.mysticAbilities.forEach(ma => {
+                    if (!skills.some(s => s.id === ma.id)) {
+                        skills.push({ id: ma.id, name: ma.name });
+                    }
+                });
+            }
+
+            // Backgrounds & Counters (Just in case)
+            if (rules.libraries.backgrounds) {
+                rules.libraries.backgrounds.forEach(bg => {
+                    if (!skills.some(s => s.id === bg.id)) {
+                        skills.push({ id: bg.id, name: bg.name });
+                    }
+                });
+            }
         }
 
         return skills.sort((a, b) => a.name.localeCompare(b.name));
-    }, [rules.definitions, rules.libraries.skills]);
+    }, [rules.definitions, rules.libraries.skills, rules.libraries.mysticAbilities, rules.libraries.backgrounds]);
 
     const filteredSkillsForModal = useMemo(() => {
         return allSkills.filter(s =>

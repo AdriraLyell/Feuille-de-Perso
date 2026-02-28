@@ -96,18 +96,18 @@ export const LibraryFormulaEntrySchema = z.object({
 export const RulesCreationConfigSchema = z.object({
     mode: z.enum(['points', 'rangs']),
     startingXP: z.number(),
-    pointsDistributionMode: z.enum(['global', 'buckets']).optional(),
+    pointsDistributionMode: z.enum(['global', 'buckets']).nullable().optional(),
     pointsBuckets: z.object({
         attributes: z.number(),
         skills: z.number(),
         backgrounds: z.number(),
-    }).optional(),
-    attributePoints: z.number().optional(),
-    backgroundPoints: z.number().optional(),
+    }).nullable().optional(),
+    attributePoints: z.number().nullable().optional(),
+    backgroundPoints: z.number().nullable().optional(),
     attributeMin: z.number(),
     attributeMax: z.number(),
-    attributeCost: z.number().optional(),
-    backgroundCost: z.number().optional(),
+    attributeCost: z.number().nullable().optional(),
+    backgroundCost: z.number().nullable().optional(),
     rankSlots: z.object({
         1: z.number(),
         2: z.number(),
@@ -115,7 +115,7 @@ export const RulesCreationConfigSchema = z.object({
         4: z.number(),
         5: z.number(),
     }).catchall(z.number()),
-    extendedSkills: z.boolean().optional(),
+    extendedSkills: z.boolean().nullable().optional(),
 });
 
 export const RulesXPCostsSchema = z.object({
@@ -153,11 +153,11 @@ export const RulesCounterDefinitionSchema = z.object({
     name: z.string(),
     max: z.number(),
     xpCost: z.number(),
-    value: z.number().optional(),
-    defaultValue: z.number().optional(),
-    description: z.string().optional(),
-    formulaId: z.string().optional(),
-    appearance: z.string().optional(),
+    value: z.number().nullable().optional(),
+    defaultValue: z.number().nullable().optional(),
+    description: z.string().nullable().optional(),
+    formulaId: z.string().nullable().optional(),
+    appearance: z.string().nullable().optional(),
 });
 
 // --- Calendar ---

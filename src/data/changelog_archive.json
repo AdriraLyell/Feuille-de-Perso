@@ -1,5 +1,24 @@
 [
     {
+        "version": "2.97.5",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Normalisation des coûts (texte/nombre) et du format 'pointsLabel' lors de la comparaison pour résoudre la perte du statut 'Officiel'",
+            "Montée de version des règles internes à v1.0.2 pour déclencher la mise à jour et nettoyer la fiche locale"
+        ]
+    },
+    {
+        "version": "2.97.4",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Amélioration de la détection des traits redondants (ignore les IDs d'effets)",
+            "Forçage de la réconciliation via montée de version des règles par défaut (v1.0.1)",
+            "Restauration effective du statut 'Officiel' pour les traits importés ou pollués"
+        ]
+    },
+    {
         "version": "2.97.3",
         "date": "2026-02-28",
         "type": "fix",
@@ -595,17 +614,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction du pavé fantôme 'PAVE_ATTRIBUTS_4' après réinitialisation : (1) dans rulesAdapter, l'attributeSettings est désormais reconstruit depuis les clés des attributs primaires (et non secondaires), éliminant l'apparition erronée d'un 4ème pavé avec label brut. (2) Filtre défensif sur les secondaryAttributes pour ignorer les clés orphelines absentes de l'attributeSettings. (3) Nettoyage de l'état initial : suppression de la clé pave_attributs_4 superflue dans secondaryAttributes de getInitialCharacterData."
-    },
-    {
-        "version": "2.64.1",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction de la réinitialisation du compteur de Confiance : (1) Nettoyage des doublons historiques (slugs au lieu d'UUIDs) dans les définitions de compteurs en base de données qui forçaient la valeur à 4. (2) Renforcement du mécanisme de synchronisation (campaignReconciler) pour assurer l'unicité des clés de compteurs basées sur leur ID, prévenant ainsi la réapparition de doublons causant des états asynchrones lors d'une réinitialisation."
-    },
-    {
-        "version": "2.64.0",
-        "date": "2026-02-22",
-        "type": "feat",
-        "description": "Nouvel effet de trait 'Maître' (master_skill) : Quand un trait avec cet effet est ajouté, un wizard s'ouvre permettant au joueur de choisir une compétence primaire à rang 0. Celle-ci est automatiquement portée au rang 5 sans coût XP. Suppression du trait : la compétence revient au rang 0. L'xpCalculator reconnaît les compétences maîtrisées via masterSkillTarget et les traite comme entièrement gratuites jusqu'au rang 5. Interface admin : couleur violette + description informative."
     }
 ]
