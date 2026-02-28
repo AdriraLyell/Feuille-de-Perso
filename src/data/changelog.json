@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.97.22",
+        "date": "2026-02-28",
+        "type": "feat",
+        "changes": [
+            "Tooltip : suppression de l'affichage de l'expression brute pour épurer le visuel.",
+            "Tooltip : refonte du container en 2 colonnes pour une meilleure lisibilité quand il y a beaucoup d'éléments.",
+            "Tooltip : agrandissement général de la police des infobulles."
+        ]
+    },
+    {
         "version": "2.97.21",
         "date": "2026-02-28",
         "type": "fix",
@@ -191,17 +201,6 @@
             "Suppression de la synchronisation forcée des bibliothèques dans rulesReconciler.ts",
             "Mise en place d'un nettoyage automatique des entrées redondantes (exact match) dans la sauvegarde locale",
             "Restauration du badge 'Officiel' (Globe) pour les traits non modifiés"
-        ]
-    },
-    {
-        "version": "2.97.2",
-        "date": "2026-02-28",
-        "type": "refactor",
-        "changes": [
-            "Restructuration majeure de TraitEffectEditor.tsx (448 -> 60 lignes)",
-            "Extraction de FormulaEffectFields.tsx et LegacyEffectFields.tsx",
-            "Centralisation de l'UI des effets dans TraitEffectItem.tsx",
-            "Amélioration de la modularité et de la lisibilité de la bibliothèque de traits"
         ]
     }
 ]
