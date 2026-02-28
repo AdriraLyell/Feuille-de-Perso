@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.97.18",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Compteurs : Correction de l'affichage de Force Vitale (et autres compteurs à formule) qui s'affichait en mode points/cases au lieu du mode numérique.",
+            "Réconciliation : Propagation de formulaId, isNumeric, formula et appearance depuis la bibliothèque de compteurs vers les définitions de règles (campaignReconciler).",
+            "Fiche : Fallback vers rules.libraries.counters pour la détection du type de compteur quand la counterLibrary du personnage est incomplète."
+        ]
+    },
+    {
         "version": "2.97.17",
         "date": "2026-02-28",
         "type": "fix",

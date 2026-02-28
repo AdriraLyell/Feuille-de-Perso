@@ -1,6 +1,5 @@
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-import Underline from '@tiptap/extension-underline';
 import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
 import { ChapterHeading } from '../../../../extensions/chapterHeading';
@@ -24,7 +23,6 @@ export const getBookExtensions = () => [
     NarrativeSection,
     TextStyle,
     Color,
-    Underline,
     Highlight.configure({
         multicolor: true,
     }),
