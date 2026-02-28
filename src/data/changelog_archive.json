@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.92.5",
+        "date": "2026-02-26",
+        "type": "chore",
+        "description": "Suppression de l'intégration Aider et Cline : Retrait des configurations, historiques et scripts associés pour nettoyer l'environnement de travail."
+    },
+    {
         "version": "2.92.4",
         "date": "2026-02-26",
         "type": "feat",
@@ -591,11 +597,5 @@
         "date": "2026-02-21",
         "type": "style",
         "description": "Correction UI : Suppression de la hauteur fixe et de l'ascenseur interne dans le bilan d'XP, permettant au tableau de s'étendre naturellement sur toute la page A4."
-    },
-    {
-        "version": "2.56.74",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Amélioration UI (Historique Dépenses XP) : Remplacement de la catégorie globale 'Compétences' par un découpage thématique des compétences selon leur origine (ex: Talents (Orange), Connaissances (Bleu clair), Mêlée & Tir (Rouge), etc.) avec icônes et codes couleurs dédiés."
     }
 ]

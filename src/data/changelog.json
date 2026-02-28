@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.2",
+        "date": "2026-02-28",
+        "type": "refactor",
+        "changes": [
+            "Restructuration majeure de TraitEffectEditor.tsx (448 -> 60 lignes)",
+            "Extraction de FormulaEffectFields.tsx et LegacyEffectFields.tsx",
+            "Centralisation de l'UI des effets dans TraitEffectItem.tsx",
+            "Amélioration de la modularité et de la lisibilité de la bibliothèque de traits"
+        ]
+    },
+    {
         "version": "2.97.1",
         "date": "2026-02-28",
         "type": "refactor",
@@ -112,11 +123,5 @@
         "date": "2026-02-26",
         "type": "feat",
         "description": "UX Tooltips & Moteur de Calcul : Implémentation de bulles d'aide interactives (PortalTooltip) affichant le détail des calculs des compteurs dynamiques. Traduction automatique des variables techniques en noms lisibles via la bibliothèque de formules. Nettoyage du moteur en supprimant la variable SUM_MYSTIC en dur au profit des agrégats dynamiques. Corrections de la position des tooltips pour assurer la visibilité des compteurs."
-    },
-    {
-        "version": "2.92.5",
-        "date": "2026-02-26",
-        "type": "chore",
-        "description": "Suppression de l'intégration Aider et Cline : Retrait des configurations, historiques et scripts associés pour nettoyer l'environnement de travail."
     }
 ]
