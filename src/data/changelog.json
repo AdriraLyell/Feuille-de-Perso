@@ -154,11 +154,5 @@
         "date": "2026-02-27",
         "type": "chore",
         "description": "Nettoyage du Moteur : Suppression de la variable XP_TOTAL pour éviter toute confusion avec la cible XP. Mise à jour des outils d'administration et de la documentation."
-    },
-    {
-        "version": "2.93.4",
-        "date": "2026-02-27",
-        "type": "chore",
-        "description": "Simplification du Système de Formules : Suppression des types d'effets redondants (Gain XP, Bonus Attribut, Bonus Réserve). Le moteur est désormais piloté par la 'Cible' (Source de Vérité unique) et un type générique 'modifier', réduisant la confusion lors de la création de mécaniques MJ. Mise à jour du Guide des Formules."
     }
 ]

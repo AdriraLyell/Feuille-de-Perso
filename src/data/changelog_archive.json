@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.93.4",
+        "date": "2026-02-27",
+        "type": "chore",
+        "description": "Simplification du Système de Formules : Suppression des types d'effets redondants (Gain XP, Bonus Attribut, Bonus Réserve). Le moteur est désormais piloté par la 'Cible' (Source de Vérité unique) et un type générique 'modifier', réduisant la confusion lors de la création de mécaniques MJ. Mise à jour du Guide des Formules."
+    },
+    {
         "version": "2.93.3",
         "date": "2026-02-27",
         "type": "feat",
@@ -591,11 +597,5 @@
         "date": "2026-02-21",
         "type": "perf",
         "description": "Optimisation du Journal de Campagne : Cache LRU d'images (chargement instantané au retour sur une page), sauvegarde sécurisée (flush sur perte de focus + indicateur ✓), interactions image fluides à 60fps (rendu DOM direct pendant resize/pan), correction du wrapping texte-image (clear CSS + marges generatives). Ajout : indicateur de page (dots), boutons Annuler/Rétablir, confirmation de suppression dans le Tableau de Groupe, compression automatique des images (WebP 80%) à l'upload."
-    },
-    {
-        "version": "2.61.0",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Nouvel onglet Calendrier dans l'administration. Deux modes : Calendrier Réel (date grégorienne avec jours de la semaine calculés, avance rapide) et Calendrier Fictif (mois avec jours variables, jours de semaine personnalisés, saisons avec assignation par mois et couleur). Gestion d'événements avec sélecteur de couleur dans les deux modes. Aperçu mensuel live et navigable. Configuration stockée dans les RulesData du setting."
     }
 ]

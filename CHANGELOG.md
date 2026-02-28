@@ -1,5 +1,9 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.61.0] - 2026-02-21 [FEAT]
+
+
+
 ## [2.60.1] - 2026-02-20 [REFACTOR]
 
 

@@ -9,7 +9,11 @@ export const DotEntrySchema = z.object({
     creationValue: z.number().optional(),
     current: z.number().optional(),
     max: z.number(),
-    variant: z.string().optional()
+    variant: z.string().optional(),
+    definitionId: z.string().optional(),
+    mysticAbilityId: z.string().optional(),
+    description: z.string().optional(),
+    tag: z.string().optional()
 });
 
 export const AttributeEntrySchema = z.object({
