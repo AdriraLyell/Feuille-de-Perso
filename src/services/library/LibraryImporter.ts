@@ -45,6 +45,9 @@ export const LibraryImporter = {
             description: t.description || '',
             tags: t.tags || [],
             is_variable: t.isVariable || false,
+            has_auto_counter: t.hasAutoCounter,
+            auto_counter_name: t.autoCounterName,
+            is_xp_upgradeable: t.isXPUpgradeable,
             effects: t.effects || []
         }));
 

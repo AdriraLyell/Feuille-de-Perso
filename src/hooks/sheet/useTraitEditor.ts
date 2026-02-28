@@ -27,7 +27,6 @@ export const useTraitEditor = (
             const traitDef = _rules.libraries.traits.find(t => t.id === removedItem.definitionId);
             if (traitDef) {
                 const hasNewProperty = traitDef.hasAutoCounter;
-                const hasNewProperty = traitDef.hasAutoCounter;
 
                 // If it should have a counter but associatedCounterId is missing, this is an edge case
                 // usually we rely on associatedCounterId stored on the character's instance.

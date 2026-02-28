@@ -15,6 +15,9 @@ export interface DBTrait {
     type?: string;           // 'avantage' | 'desavantage'
     tags?: string[];
     is_variable?: boolean;
+    has_auto_counter?: boolean;
+    auto_counter_name?: string;
+    is_xp_upgradeable?: boolean;
     effects?: TraitEffect[];         // JSONB: List of effects
     created_at?: string;
     updated_at?: string;

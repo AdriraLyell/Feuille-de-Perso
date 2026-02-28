@@ -53,6 +53,9 @@ export const LibraryPersistence = {
                         payload.is_variable_cost = item.isVariableCost || false;
                         payload.tags = item.tags || [];
                         payload.is_variable = item.isVariable;
+                        payload.has_auto_counter = item.hasAutoCounter;
+                        payload.auto_counter_name = item.autoCounterName;
+                        payload.is_xp_upgradeable = item.isXPUpgradeable;
                         payload.effects = item.effects || [];
                     } else if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds') {
                         payload.is_variable = item.isVariable;
@@ -120,6 +123,9 @@ export const LibraryPersistence = {
                     payload.is_variable_cost = item.isVariableCost || false;
                     payload.tags = item.tags;
                     payload.is_variable = item.isVariable;
+                    payload.has_auto_counter = item.hasAutoCounter;
+                    payload.auto_counter_name = item.autoCounterName;
+                    payload.is_xp_upgradeable = item.isXPUpgradeable;
                     payload.effects = item.effects;
                 } else if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds') {
                     payload.is_variable = !!item.isVariable;

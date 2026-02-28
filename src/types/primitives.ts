@@ -88,7 +88,7 @@ export interface TraitEntry {
 
 export type FormulaOperator = 'ADD' | 'SET' | 'SUB';
 
-export type EffectType = 'free_skill_rank' | 'master_skill' | 'block_skill_increase' | 'formula';
+export type EffectType = 'free_skill_rank' | 'master_skill' | 'block_skill_increase' | 'formula' | 'auto_counter' | 'xp_upgradeable';
 
 export interface TraitEffect {
   id: string;
