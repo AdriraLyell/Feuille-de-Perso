@@ -137,11 +137,18 @@ function processSkillCategories(
             !processedNames.has(e.name) &&
             ((e.value || 0) > 0 || e.variant !== undefined || (e.definitionId && rules.libraries?.skills?.find(s => s.id === e.definitionId)?.isVariable))
         ).map(e => {
-            if (!e.definitionId) {
-                const libMatch = rules.libraries?.skills?.find(s => normalizeString(s.name) === normalizeString(e.name));
-                if (libMatch) {
-                    return { ...e, definitionId: libMatch.id };
-                }
+            let libMatch = null;
+            if (e.definitionId) {
+                libMatch = rules.libraries?.skills?.find(s => s.id === e.definitionId);
+            } else {
+                libMatch = rules.libraries?.skills?.find(s => normalizeString(s.name) === normalizeString(e.name));
+            }
+            if (libMatch) {
+                return {
+                    ...e,
+                    definitionId: libMatch.id,
+                    mysticAbilityId: libMatch.mysticAbilityId || e.mysticAbilityId
+                };
             }
             return e;
         });
@@ -156,7 +163,23 @@ function processSkillCategories(
     ];
     standardCats.forEach(cat => {
         if (!newSkills[cat]) {
-            newSkills[cat] = getSkillCategory(currentState, cat);
+            newSkills[cat] = getSkillCategory(currentState, cat).map(e => {
+                if (!e) return e;
+                let libMatch = null;
+                if (e.definitionId) {
+                    libMatch = rules.libraries?.skills?.find(s => s.id === e.definitionId);
+                } else {
+                    libMatch = rules.libraries?.skills?.find(s => s.name && e.name && normalizeString(s.name) === normalizeString(e.name));
+                }
+                if (libMatch) {
+                    return {
+                        ...e,
+                        definitionId: libMatch.id,
+                        mysticAbilityId: libMatch.mysticAbilityId || e.mysticAbilityId
+                    };
+                }
+                return e;
+            });
         }
     });
 

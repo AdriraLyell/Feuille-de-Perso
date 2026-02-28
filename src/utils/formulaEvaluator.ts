@@ -213,12 +213,25 @@ export const getAggregateDetails = (data: any, config: any): { name: string, val
         case 'secondaryAttributes':
             baseList = Object.values(data.secondaryAttributes || {}).flat();
             break;
-        case 'traits':
-            baseList = [
+        case 'traits': {
+            const traitSources = [
                 ...(data.page2?.avantages || []),
                 ...(data.page2?.desavantages || [])
             ];
+            baseList = traitSources.map((t: any) => {
+                // Resolve tag from mysticAbilityId if explicit tag is missing
+                let resolvedTag = t.tag || '';
+                if (!resolvedTag && t.mysticAbilityId) {
+                    resolvedTag = 'Mystique';
+                }
+                // Normalize numeric value (trait.value is a string like '2')
+                const numericValue = typeof t.value === 'number' ? t.value
+                    : typeof t.value === 'string' ? (parseInt(t.value, 10) || 0)
+                        : 0;
+                return { ...t, tag: resolvedTag, value: numericValue };
+            });
             break;
+        }
         case 'mysticAbilities':
             baseList = (data.mysticAbilities || []).filter((s: any) => typeof s !== 'string');
             break;

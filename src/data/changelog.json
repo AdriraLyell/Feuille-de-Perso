@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.9",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Correction de la cause racine du bug Force Vitale : les avantages mystiques (tag ou mysticAbilityId) étaient invisibles au filtre d'agrégat car le champ 'tag' n'était pas propagé depuis 'mysticAbilityId'.",
+            "La fonction getAggregateDetails résout maintenant automatiquement le tag 'Mystique' à partir du champ mysticAbilityId si tag est absent sur le trait.",
+            "Les valeurs de traits (string '2' → number 2) sont normalisées en amont de l'agrégation pour garantir l'exactitude du calcul.",
+            "Réhydratation de mysticAbilityId et definitionId lors de la réconciliation des compétences et traits (skillsReconciler + rulesReconciler)."
+        ]
+    },
+    {
         "version": "2.97.8",
         "date": "2026-02-28",
         "type": "patch",

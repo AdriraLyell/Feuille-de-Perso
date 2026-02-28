@@ -214,19 +214,22 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
     const processTraitList = (list: TraitEntry[], type: 'avantage' | 'desavantage'): TraitEntry[] => {
         if (!list) return [];
         return list.map(existing => {
-            // Si déjà lié, on garde (on pourrait update le nom ici si besoin, mais attention aux customs)
-            if (existing.definitionId) return existing;
-
-            // Tentative de liaison par nom (Migration)
-            const libMatch = rules.libraries?.traits?.find(t =>
-                t.type === type &&
-                normalizeString(t.name) === normalizeString(existing.name)
-            );
+            let libMatch = null;
+            if (existing.definitionId) {
+                libMatch = rules.libraries?.traits?.find(t => t.id === existing.definitionId);
+            } else {
+                libMatch = rules.libraries?.traits?.find(t =>
+                    t.type === type && normalizeString(t.name) === normalizeString(existing.name)
+                );
+            }
 
             if (libMatch) {
+                const isMystic = libMatch.mysticAbilityId || libMatch.tags?.some(tag => normalizeString(tag) === 'mystique');
                 return {
                     ...existing,
                     definitionId: libMatch.id,
+                    mysticAbilityId: libMatch.mysticAbilityId || existing.mysticAbilityId,
+                    tag: isMystic ? 'Mystique' : existing.tag
                 };
             }
 
@@ -280,6 +283,14 @@ const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterS
                 if (stripText(offCostVal) !== stripText(locCostVal)) return false;
             }
 
+            // Normalise traits tags into a sorted array for comparison
+            const offTagsList = Array.isArray(off.tags) ? off.tags.map(normalizeString).sort() : [];
+            const locTagsList = Array.isArray(local.tags)
+                ? local.tags.map(normalizeString).sort()
+                : (local.tag ? [normalizeString(local.tag)] : []);
+
+            if (JSON.stringify(offTagsList) !== JSON.stringify(locTagsList)) return false;
+
             // Robust pointsLabel match (strip non-digits to handle "2 pts" vs "2")
             const normalizeLabel = (l?: string) => String(l || '').replace(/\D/g, '');
             if (normalizeLabel(off.pointsLabel) !== normalizeLabel(local.pointsLabel)) return false;
@@ -301,7 +312,7 @@ const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterS
 
             // Protect metadata: if local has mysticAbilityId or isVariable, and official doesn't match, keep it
             if (local.mysticAbilityId && off.mysticAbilityId !== local.mysticAbilityId) return false;
-            if (local.isVariable !== off.isVariable) return false;
+            if (Boolean(local.isVariable) !== Boolean(off.isVariable)) return false;
 
             return JSON.stringify(offEff) === JSON.stringify(locEff);
         });
