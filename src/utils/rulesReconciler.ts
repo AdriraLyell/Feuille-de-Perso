@@ -323,7 +323,7 @@ const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterS
         newState.library = currentState.library.filter(l => !isRedundant(l, rules.libraries.traits!));
     }
 
-    // 2. Clean Skill Library
+    // 2. Clean Skill Library (remove local copies of official skills)
     if (currentState.skillLibrary && rules.libraries.skills) {
         newState.skillLibrary = currentState.skillLibrary.filter(l => !isRedundant(l, rules.libraries.skills!));
     }
@@ -336,6 +336,15 @@ const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterS
     // 4. Clean Background Library
     if (currentState.backgroundLibrary && rules.libraries.backgrounds) {
         newState.backgroundLibrary = currentState.backgroundLibrary.filter(l => !isRedundant(l, rules.libraries.backgrounds!));
+    }
+
+    // 5. Re-inject official libraries (needed by getAggregateDetails for mysticAbilityId fallback)
+    // This restores the behavior of the original reconcileLibraries function.
+    if (rules.libraries.skills) {
+        newState.skillLibrary = rules.libraries.skills;
+    }
+    if (rules.libraries.formulas) {
+        newState.formulaLibrary = rules.libraries.formulas;
     }
 };
 

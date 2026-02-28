@@ -14,7 +14,6 @@ import { migrateCampaignNotes } from './migrateCampaignNotes';
 import { migrateHeaderDates } from './migrateHeaderDates';
 import { migrateFormulas } from './migrateFormulas';
 import { forceRulesReconciliation } from './forceRulesReconciliation';
-import { restoreMysticLinks } from './restoreMysticLinks';
 
 // Type for a migration function
 type MigrationFunction = (data: any) => void;
@@ -46,14 +45,9 @@ export const MIGRATIONS: Record<number, MigrationFunction[]> = {
         forceRulesReconciliation
     ],
     6: [
-        restoreMysticLinks
-    ],
-    7: [
-        forceRulesReconciliation  // Force reconciliation to rehydrate mysticAbilityId from rules.libraries.skills
-    ],
-    8: [
-        forceRulesReconciliation  // Re-force after V7 ran wrong migration content
+        forceRulesReconciliation  // Re-force after reconcileCleanup fix (re-injects skillLibrary with mysticAbilityId)
     ]
 };
 
-export const CURRENT_SCHEMA_VERSION = 8;
+export const CURRENT_SCHEMA_VERSION = 6;
+
