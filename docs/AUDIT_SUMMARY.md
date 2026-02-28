@@ -1,8 +1,15 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.96.1)
+# Audit - État des Lieux & Roadmap (Synthèse v2.97.14)
 
-> **Dernière mise à jour** : 27 Février 2026 — Version 2.96.1
+> **Dernière mise à jour** : 28 Février 2026 — Version 2.97.14
 
 ## 1. Phases Complétées
+
+### ✅ Phase 44 : Migration & Unification des Propriétés de Traits (v2.97.14)
+- [x] **Propriétés Natives** : Introduction de `hasAutoCounter`, `autoCounterName` et `isXPUpgradeable` directement sur le schéma du trait.
+- [x] **Nettoyage Legacy** : Suppression définitive des types d'effets `auto_counter` et `xp_upgradeable` (Code & Types).
+- [x] **Outil de Migration Admin** : Implémentation d'un bouton de migration avec rapport détaillé des modifications par trait dans l'interface d'administration.
+- [x] **Réconciliation Robuste** : Intégration de la migration automatique en mémoire dans `rulesReconciler.ts` pour garantir la compatibilité ascendante.
+- [x] **UI/UX Cleanup** : Simplification des modales d'édition et des cartes de traits ; suppression du script de migration JSON autonome obsolète.
 
 ### ✅ Phase 43 : Persistance & Forcer Variante (v2.96.1)
 - [x] **Persistance Cloud** : Correction critique de la sauvegarde des champs `force_variant` et `operator` dans Supabase (Migration SQL + Data Mapper).

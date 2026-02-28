@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, X, Star, GraduationCap, ChevronDown, Trophy, TrendingUp, Calculator } from 'lucide-react';
+import { Zap, X, Star, GraduationCap, ChevronDown, Trophy, Calculator } from 'lucide-react';
 import { TraitEffect, LibraryFormulaEntry } from '../../../types';
 import { FormulaEffectFields } from './FormulaEffectFields';
 import { LegacyEffectFields } from './LegacyEffectFields';
@@ -43,21 +43,11 @@ export const TraitEffectItem: React.FC<TraitEffectItemProps> = ({
         themeColor = 'text-blue-800';
         borderColor = 'border-blue-400/30';
         bgColor = 'bg-blue-50/40';
-    } else if (effect.type === 'auto_counter') {
-        typeIcon = <Zap size={14} />;
-        themeColor = 'text-emerald-800';
-        borderColor = 'border-emerald-400/30';
-        bgColor = 'bg-emerald-50/40';
     } else if (effect.type === 'master_skill') {
         typeIcon = <Trophy size={14} />;
         themeColor = 'text-purple-800';
         borderColor = 'border-purple-400/30';
         bgColor = 'bg-purple-50/40';
-    } else if (effect.type === 'xp_upgradeable') {
-        typeIcon = <TrendingUp size={14} />;
-        themeColor = 'text-orange-800';
-        borderColor = 'border-orange-400/30';
-        bgColor = 'bg-orange-50/40';
     }
 
     return (
@@ -75,13 +65,11 @@ export const TraitEffectItem: React.FC<TraitEffectItemProps> = ({
                         >
                             <option value="formula" className="text-gray-900 bg-white font-bold bg-indigo-50">Calcul par Formule</option>
 
-                            {['free_skill_rank', 'auto_counter', 'master_skill', 'block_skill_increase', 'xp_upgradeable'].includes(effect.type) && (
+                            {['free_skill_rank', 'master_skill', 'block_skill_increase'].includes(effect.type) && (
                                 <optgroup label="Anciens Types (Hérités)">
                                     {effect.type === 'free_skill_rank' && <option value="free_skill_rank">Rang de Compétence Offert</option>}
-                                    {effect.type === 'auto_counter' && <option value="auto_counter">Compteur Automatique (Magie, etc.)</option>}
                                     {effect.type === 'master_skill' && <option value="master_skill">Maîtrise (Rang 5 direct)</option>}
                                     {effect.type === 'block_skill_increase' && <option value="block_skill_increase">Bloquer une Progression</option>}
-                                    {effect.type === 'xp_upgradeable' && <option value="xp_upgradeable">Trait Améliorable (XP)</option>}
                                 </optgroup>
                             )}
                         </select>

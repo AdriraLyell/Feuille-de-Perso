@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.94.1",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Système (Calcul XP/Dictionnaire) : Correction d'un bug où l'XP bonus d'un trait n'était pas pris en compte lorsqu'une formule globale sélectionnée avait un contenu vide (l'héritage écrasait à tort la valeur fixe locale du trait)."
+    },
+    {
+        "version": "2.94.0",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Ergonomie (Admin Formules) : Auto-génération intelligente du code de la formule à partir du nom saisi (conversion en majuscules, retrait des accents et remplacement des espaces par des tirets bas). Lors de la création d'une nouvelle formule, le nom et le code sont désormais vides pour forcer explicitement une saisie propre."
+    },
+    {
+        "version": "2.93.9",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Correction du Mode Avertissement (Admin Formules) : Résolution du bug invisible empêchant l'affichage de la pastille orange (Modèle incomplet). Le validateur simule désormais correctement la configuration par défaut du type d'effet."
+    },
+    {
         "version": "2.93.8",
         "date": "2026-02-27",
         "type": "fix",
@@ -579,23 +597,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction du transfert d'images entre PC : Centralisation de la décompression GZIP dans le service de synchronisation cloud. Les images synchronisées (Grimoire, Portraits, Notes) sont désormais décompressées directement lors de l'injection dans IndexedDB, garantissant un affichage immédiat et correct sur tous les supports sans logique de décompression locale redondante."
-    },
-    {
-        "version": "2.62.5",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction des erreurs 401 Supabase (RLS) pour les fiches anonymes et fix du crash 'compressBase64' sur images volumineuses (passage en traitement par chunks de 8Ko). Réduction du bruit console en mode auto-sync."
-    },
-    {
-        "version": "2.62.4",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction robuste de la duplication des images : désactivation du drag natif sur l'élément IMG et renforcement du guard via les types MIME ProseMirror pour distinguer les fichiers externes des déplacements internes."
-    },
-    {
-        "version": "2.62.3",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Fix duplication des images au drag-drop : le plugin de drop ignore désormais les fichiers si ProseMirror est déjà en train de gérer un déplacement de nœud interne."
     }
 ]

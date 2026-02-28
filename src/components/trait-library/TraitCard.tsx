@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { LibraryEntry } from '../../types';
-import { Zap, Edit2, Trash2, Plus, CheckSquare, Square, Lock, Globe, Layers } from 'lucide-react';
+import { Zap, Edit2, Trash2, Plus, CheckSquare, Square, Lock, Globe, Layers, Activity, TrendingUp } from 'lucide-react';
 import { PortalTooltip } from '../ui/PortalTooltip';
 import { ItemUsageDetail } from '../../types/usageTypes';
 import { UsageLockedTooltip } from '../../admin/components/libraries/UsageLockedTooltip';
@@ -61,13 +61,11 @@ const TraitCardItemEffects: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
     const anchorRef = useRef<HTMLDivElement>(null);
 
     const getEffectLabel = (eff: any) => {
-        switch (eff.type) {
-            case 'formula': return `Calcul Formule : ${eff.target || '?'} = ${eff.formula}`;
+        switch (eff.type || eff.effectType) {
+            case 'formula': return `Equation : ${eff.target || '?'} = ${eff.formula}`;
             case 'free_skill_rank': return `Rang gratuit : ${eff.target || '?'} (+${eff.value})`;
-            case 'auto_counter': return `Compteur Auto${eff.target ? ` : ${eff.target}` : ''}`;
             case 'master_skill': return `Maître : compétence au rang 5 (choix joueur)`;
-            case 'xp_upgradeable': return `Améliorable via XP`;
-            default: return 'Effet inconnu';
+            default: return 'Effet spécial actif';
         }
     };
 
@@ -87,11 +85,63 @@ const TraitCardItemEffects: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
             >
                 <div className="flex flex-col gap-1 mt-1">
                     {entry.effects?.map((eff, i) => (
-                        <div key={i} className="text-[10px] text-white/90 whitespace-nowrap flex items-center gap-1.5 font-bold">
+                        <div key={i} className={`text-[10px] text-white/90 whitespace-nowrap flex items-center gap-1.5 font-bold`}>
                             <span className="w-1 h-1 bg-amber-400 rounded-full inline-block"></span>
                             {getEffectLabel(eff)}
                         </div>
                     ))}
+                </div>
+            </PortalTooltip>
+        </div>
+    );
+};
+
+const TraitCardItemCounter: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+    const anchorRef = useRef<HTMLDivElement>(null);
+
+    return (
+        <div
+            ref={anchorRef}
+            className="relative flex items-center justify-center cursor-help"
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+        >
+            <Activity size={14} className="text-blue-500" />
+
+            <PortalTooltip
+                anchorRef={anchorRef}
+                isOpen={showTooltip}
+                title="Compteur associé"
+            >
+                <div className="text-[10px] text-white/90">
+                    Ce trait crée automatiquement un compteur "{entry.autoCounterName || entry.name}"
+                </div>
+            </PortalTooltip>
+        </div>
+    );
+};
+
+const TraitCardItemXP: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+    const anchorRef = useRef<HTMLDivElement>(null);
+
+    return (
+        <div
+            ref={anchorRef}
+            className="relative flex items-center justify-center cursor-help"
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+        >
+            <TrendingUp size={14} className="text-emerald-500" />
+
+            <PortalTooltip
+                anchorRef={anchorRef}
+                isOpen={showTooltip}
+                title="Amélioration par XP"
+            >
+                <div className="text-[10px] text-white/90">
+                    Ce trait peut être acquis ou amélioré avec de l'expérience.
                 </div>
             </PortalTooltip>
         </div>
@@ -149,6 +199,8 @@ const TraitCard: React.FC<TraitCardProps> = ({
                 {entry.isVariable && <TraitCardItemVariants entry={entry} hasVariants={!!hasVariants} />}
                 {source === 'official' && <div title="Trait Officiel"><Globe size={14} className="text-indigo-500" /></div>}
                 {entry.effects && entry.effects.length > 0 && <TraitCardItemEffects entry={entry} />}
+                {entry.hasAutoCounter && <TraitCardItemCounter entry={entry} />}
+                {entry.isXPUpgradeable && <TraitCardItemXP entry={entry} />}
                 {isLocked && (
                     <div
                         ref={lockIconRef}

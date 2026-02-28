@@ -27,12 +27,11 @@ export const useTraitEditor = (
             const traitDef = _rules.libraries.traits.find(t => t.id === removedItem.definitionId);
             if (traitDef) {
                 const hasNewProperty = traitDef.hasAutoCounter;
-                const counterEffect = traitDef.effects?.find(e => e.type === 'auto_counter');
+                const hasNewProperty = traitDef.hasAutoCounter;
 
                 // If it should have a counter but associatedCounterId is missing, this is an edge case
                 // usually we rely on associatedCounterId stored on the character's instance.
                 if (hasNewProperty) {
-                    // Logic to find it if id was not stored (fallback)
                     onAddLog(`Suppression du compteur lié à ${removedName}`, 'info', 'sheet');
                 }
             }
@@ -138,10 +137,10 @@ export const useTraitEditor = (
                 // Determine if this trait has a auto_counter effect
                 let associatedCounterId: string | undefined = undefined;
                 const hasNewAutoCounter = entry.hasAutoCounter;
-                const counterEffect = entry.effects?.map(resolveEffect).find(e => e.type === 'auto_counter' || e.effectType === 'auto_counter');
+                const counterEffect = entry.effects?.map(resolveEffect).find(e => e.effectType === 'auto_counter');
 
                 if (hasNewAutoCounter || counterEffect) {
-                    const baseCounterName = (entry.autoCounterName || (counterEffect?.target || (counterEffect?.effectType === 'auto_counter' ? counterEffect.target : undefined)))?.trim();
+                    const baseCounterName = (entry.autoCounterName || counterEffect?.target)?.trim();
                     const variantName = instance.variant?.trim();
 
                     let finalCounterName = "";
@@ -176,9 +175,10 @@ export const useTraitEditor = (
                 }
 
                 // Detect master_skill effect — wizard will fill in masterSkillTarget later
+                // Detect master_skill effect — wizard will fill in masterSkillTarget later
                 const hasMasterSkill = entry.effects?.some(e => {
                     const resolved = resolveEffect(e);
-                    return resolved.type === 'master_skill' || resolved.effectType === 'master_skill';
+                    return resolved.effectType === 'master_skill';
                 });
                 if (hasMasterSkill && masterSkillTraitIndex === null) {
                     masterSkillTraitIndex = listIndex;

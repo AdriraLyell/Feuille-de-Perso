@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, GraduationCap, TrendingUp, Trophy, Zap } from 'lucide-react';
+import { ChevronDown, GraduationCap, Trophy } from 'lucide-react';
 import { TraitEffect } from '../../../types';
 
 interface LegacyEffectFieldsProps {
@@ -73,42 +73,6 @@ export const LegacyEffectFields: React.FC<LegacyEffectFieldsProps> = ({
         );
     }
 
-    if (effect.type === 'auto_counter') {
-        return (
-            <div className="flex flex-col gap-2">
-                <div className="flex items-start gap-2">
-                    <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wide w-24 mt-1">Nom de Base :</span>
-                    <div className="flex-grow">
-                        <input
-                            type="text"
-                            className="w-full border border-emerald-400/30 rounded-sm px-2 py-1 text-sm focus:border-emerald-500 outline-none bg-white text-stone-800 font-bold shadow-sm"
-                            placeholder="Optionnel (ex: Munitions, Magie)..."
-                            value={effect.target || ''}
-                            onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
-                        />
-                        <p className="text-[9px] text-emerald-700/60 mt-1 italic leading-tight">
-                            Si vide, utilise le <strong>Nom du Trait</strong> ou de la <strong>Variante</strong>.<br />
-                            Max 10. Automatiquement instancié sur la fiche du joueur.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (effect.type === 'xp_upgradeable') {
-        return (
-            <div className="flex flex-col gap-1 p-1 bg-orange-50/50 rounded border border-orange-200/50">
-                <div className="flex items-center gap-2">
-                    <TrendingUp size={14} className="text-orange-600" />
-                    <span className="text-[10px] font-bold text-orange-900 uppercase">Clé de Progression XP</span>
-                </div>
-                <p className="text-[9px] text-orange-800/70 italic leading-tight">
-                    En ajoutant cet effet, les joueurs pourront dépenser de l'XP sur ce trait pour l'augmenter, déclenchant le coût de progression système.
-                </p>
-            </div>
-        );
-    }
 
     if (effect.type === 'master_skill') {
         return (

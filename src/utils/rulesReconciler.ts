@@ -5,6 +5,8 @@ import { generateId } from './factories';
 import { normalizeString } from './stringUtils';
 import { getSkillCategory, getCounter, setCounter } from './stateAccessors';
 import { reconcileSkillsAndBackgrounds } from './reconcilers/skillsReconciler';
+import { migrateTraitLibrary } from './migrations/migrateTraitProperties';
+import { LibraryEntry } from '../types';
 
 // --- Sub-functions ---
 
@@ -202,15 +204,13 @@ const reconcileCounters = (newState: CharacterSheetData, currentState: Character
 
 /**
  * Links traits (advantages/disadvantages) to their latest library definitions.
+ * Also performs property migration (legacy effects -> direct fields) during load.
  * 
  * @param newState - The current draft state
  * @param currentState - The source state
  * @param rules - The campaign rules
  */
 const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSheetData, rules: RulesData) => {
-    // Migrer les Avantages (avantages) et Désavantages (desavantages)
-    // Le but est de lier les entrées existantes aux définitions de la bibliothèque via definitionId
-
     const processTraitList = (list: TraitEntry[], type: 'avantage' | 'desavantage'): TraitEntry[] => {
         if (!list) return [];
         return list.map(existing => {
@@ -225,11 +225,22 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
 
             if (libMatch) {
                 const isMystic = libMatch.mysticAbilityId || libMatch.tags?.some(tag => normalizeString(tag) === 'mystique');
+
+                // --- Migration Logic ---
+                // We ensure the character trait has the latest flags from the library
+                // and we also check if it has legacy effects that need migration.
+                const needsMigration = (libMatch.hasAutoCounter && !existing.hasAutoCounter) ||
+                    (libMatch.isXPUpgradeable && !existing.isXPUpgradeable);
+
                 return {
                     ...existing,
                     definitionId: libMatch.id,
                     mysticAbilityId: libMatch.mysticAbilityId || existing.mysticAbilityId,
-                    tag: isMystic ? 'Mystique' : existing.tag
+                    tag: isMystic ? 'Mystique' : existing.tag,
+                    // Copy native properties from library if missing
+                    hasAutoCounter: libMatch.hasAutoCounter ?? existing.hasAutoCounter,
+                    autoCounterName: libMatch.autoCounterName ?? existing.autoCounterName,
+                    isXPUpgradeable: libMatch.isXPUpgradeable ?? existing.isXPUpgradeable
                 };
             }
 
@@ -400,6 +411,15 @@ const reconcileHeader = (newState: CharacterSheetData, rules: RulesData) => {
  */
 export const reconcileRulesWithState = (currentState: CharacterSheetData, rules: RulesData): CharacterSheetData => {
     const newState: CharacterSheetData = JSON.parse(JSON.stringify(currentState));
+
+    // --- Data Migration (In-Memory) ---
+    // Ensure the library traits are migrated to the new property system BEFORE reconciliation.
+    // This handles legacy data in the DB or JSON file gracefully on-the-fly.
+    if (rules.libraries?.traits) {
+        // Only run migration if there are traits in the library
+        rules.libraries.traits = migrateTraitLibrary(rules.libraries.traits as LibraryEntry[]).traits;
+    }
+    // ----------------------------------
 
     if (rules.version) {
         newState._rulesVersion = rules.version;

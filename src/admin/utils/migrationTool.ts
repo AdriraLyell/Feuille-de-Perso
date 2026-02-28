@@ -2,7 +2,7 @@
 import { RulesData } from '../../types/rules';
 import { LibraryEntry, TraitEffect, LibraryFormulaEntry } from '../../types';
 import { generateId } from '../../utils/factories';
-import { migrateTraitProperties } from '../../utils/migrations/migrateTraitProperties';
+import { migrateTraitProperties, migrateTraitLibrary } from '../../utils/migrations/migrateTraitProperties';
 
 /**
  * Migration tool to move hardcoded trait effects to the new formula system.
@@ -126,23 +126,19 @@ export const migrationTool = {
      * Migrates trait legacy properties (auto_counter, xp_upgradeable) to direct fields.
      */
     migrateTraitProperties: (rules: RulesData): { updatedRules: RulesData, stats: any } => {
-        const stats = { traitsMigrated: 0 };
-        const traits = rules.libraries?.traits || [];
-        const newTraits = traits.map(trait => {
-            const migrated = migrateTraitProperties(trait);
-            if (migrated !== trait) stats.traitsMigrated++;
-            return migrated;
-        });
+        if (!rules.libraries?.traits) return { updatedRules: rules, stats: { traitsMigrated: 0, details: [] } };
+
+        const result = migrateTraitLibrary(rules.libraries.traits as LibraryEntry[]);
 
         return {
             updatedRules: {
                 ...rules,
                 libraries: {
                     ...rules.libraries,
-                    traits: newTraits
+                    traits: result.traits
                 }
             },
-            stats
+            stats: result.stats
         };
     }
 };

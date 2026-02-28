@@ -62,6 +62,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
     } = useAdminTraitLibrary({ rules, onUpdate, globalUsage });
     const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'trait');
 
+
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-120px)] flex flex-col">
             <div className="flex justify-between items-center mb-6">
@@ -86,6 +87,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
                         <Plus size={18} /> Nouveau Trait
                     </button>
                 </div>
+
             </div>
 
             {/* Toolbar & Filters */}

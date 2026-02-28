@@ -175,7 +175,11 @@ const AdminApp: React.FC = () => {
                 onLogout={logout}
                 onShowChangelog={() => setShowChangelog(true)}
                 onCheckSchema={() => currentSettingId && CampaignService.checkSchema?.(currentSettingId)}
-                legacyEffectsCount={(rules.libraries?.traits || []).reduce((acc, t) => acc + (t.effects?.filter(e => e.type !== 'formula' || !e.formulaId).length || 0), 0)}
+                legacyEffectsCount={(rules.libraries?.traits || []).reduce((acc, t) => acc + (t.effects?.filter(e => {
+                    const isFormula = e.type === 'formula';
+                    const isLegacyCandidate = ['free_skill_rank', 'master_skill', 'attribute_bonus', 'xp_bonus'].includes(e.type as string);
+                    return isLegacyCandidate || (isFormula && !e.formulaId);
+                }).length || 0), 0)}
                 onMigrate={() => {
                     if (!rules) return;
                     const { updatedRules, stats } = migrationTool.migrateTraitsToFormulas(rules);

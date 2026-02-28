@@ -1,5 +1,25 @@
 [
     {
+        "version": "2.97.15",
+        "date": "2026-02-28",
+        "type": "feat",
+        "changes": [
+            "UI (Admin bibliothèque) : Ajout d'icônes indicatives dans les vignettes de traits pour les compteurs associés (icône Activité) et l'amélioration par XP (icône Tendance).",
+            "UX : Ajout de tooltips informatifs sur ces nouvelles icônes pour clarifier le comportement du trait sans avoir à l'ouvrir."
+        ]
+    },
+    {
+        "version": "2.97.14",
+        "date": "2026-02-28",
+        "type": "chore",
+        "changes": [
+            "Système : Suppression définitive des anciens types d'effets `auto_counter` et `xp_upgradeable` du codebase (Nettoyage post-migration).",
+            "UI (Admin) : Retrait des champs et icônes associés dans l'éditeur d'effets de traits.",
+            "UI (Fiche) : Simplification de l'affichage des cartes de traits et de la modale d'édition, utilisant désormais exclusivement les propriétés natives.",
+            "Maintenance : Suppression du script de migration `migrate-traits.js` devenu obsolète."
+        ]
+    },
+    {
         "version": "2.97.13",
         "date": "2026-02-28",
         "type": "feat",
@@ -160,23 +180,5 @@
         "date": "2026-02-27",
         "type": "feat",
         "description": "Système (Mécaniques Dynamiques) : Introduction de 'Forcer Variante' dans les formules globales. Permet aux traits d'exiger une précision du joueur (ex: choix d'une compétence) qui devient automatiquement la cible de l'effet. Ajout de suggestions dynamiques dans le sélecteur de variantes basées sur la cible de la formule (Compétence, Attribut, etc.)."
-    },
-    {
-        "version": "2.94.1",
-        "date": "2026-02-27",
-        "type": "fix",
-        "description": "Système (Calcul XP/Dictionnaire) : Correction d'un bug où l'XP bonus d'un trait n'était pas pris en compte lorsqu'une formule globale sélectionnée avait un contenu vide (l'héritage écrasait à tort la valeur fixe locale du trait)."
-    },
-    {
-        "version": "2.94.0",
-        "date": "2026-02-27",
-        "type": "feat",
-        "description": "Ergonomie (Admin Formules) : Auto-génération intelligente du code de la formule à partir du nom saisi (conversion en majuscules, retrait des accents et remplacement des espaces par des tirets bas). Lors de la création d'une nouvelle formule, le nom et le code sont désormais vides pour forcer explicitement une saisie propre."
-    },
-    {
-        "version": "2.93.9",
-        "date": "2026-02-27",
-        "type": "fix",
-        "description": "Correction du Mode Avertissement (Admin Formules) : Résolution du bug invisible empêchant l'affichage de la pastille orange (Modèle incomplet). Le validateur simule désormais correctement la configuration par défaut du type d'effet."
     }
 ]
