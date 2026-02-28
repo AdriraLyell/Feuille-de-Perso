@@ -47,7 +47,10 @@ export const MIGRATIONS: Record<number, MigrationFunction[]> = {
     ],
     6: [
         restoreMysticLinks
+    ],
+    7: [
+        restoreMysticLinks  // Re-run after DotEntrySchema fix (V6 ran but Zod stripped the result)
     ]
 };
 
-export const CURRENT_SCHEMA_VERSION = 6;
+export const CURRENT_SCHEMA_VERSION = 7;
