@@ -59,7 +59,7 @@ describe('useCharacterBonuses Hook', () => {
 
         expect(result.current.attributeBonuses['constitution']).toBeDefined();
         expect(result.current.attributeBonuses['constitution'].value).toBe(1);
-        expect(result.current.attributeBonuses['constitution'].sources).toContain('Robuste (Formule: +1)');
+        expect(result.current.attributeBonuses['constitution'].sources).toContain('Robuste (+1)');
     });
 
     it('should handle multiple traits affecting the same attribute', () => {

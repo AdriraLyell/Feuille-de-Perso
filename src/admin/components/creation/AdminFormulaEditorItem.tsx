@@ -11,7 +11,6 @@ interface AdminFormulaEditorItemProps {
     previewValue: number | null;
     currentPreviewData: any;
     allVariables: string[];
-    targetSuggestions: { value: string, label: string, type: string }[];
     realCharData?: any;
     onEdit: () => void;
     onRemove: (id: string) => void;
@@ -23,7 +22,6 @@ export const AdminFormulaEditorItem: React.FC<AdminFormulaEditorItemProps> = ({
     previewValue,
     currentPreviewData,
     allVariables,
-    targetSuggestions,
     realCharData,
     onEdit,
     onRemove

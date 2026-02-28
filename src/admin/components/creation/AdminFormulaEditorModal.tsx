@@ -5,7 +5,7 @@ import ThematicModal from '../../../components/ui/ThematicModal';
 import { AdminFormulaFormFields } from './AdminFormulaFormFields';
 import { evaluateFormula } from '../../../utils/formulaEvaluator';
 import { validateFormulaEntry } from '../../../utils/formulaValidation';
-import { Calculator, Save, X, Check, AlertCircle } from 'lucide-react';
+import { Calculator, Save, Check, AlertCircle } from 'lucide-react';
 
 interface AdminFormulaEditorModalProps {
     isOpen: boolean;

@@ -284,7 +284,6 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                         previewValue={previewValue}
                         currentPreviewData={currentPreviewData}
                         allVariables={allVariables}
-                        targetSuggestions={targetSuggestions}
                         realCharData={realCharData}
                         onEdit={() => {
                             setFormulaToEdit(counter);
