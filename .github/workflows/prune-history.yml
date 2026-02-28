@@ -21,7 +21,7 @@ jobs:
           echo "Policy: Keep only last $MIN_KEPT_RUNS CI runs, delete all older ones."
 
           # Récupérer les runs du workflow CI, ignorer les (MIN_KEPT_RUNS) premiers
-          RUNS_TO_DELETE=$(gh run list --repo ${{ github.repository }} --workflow ci.yml --limit 300 --json databaseId | jq -r --argjson n $(( MIN_KEPT_RUNS )) ".[$n:] | .[].databaseId")
+          RUNS_TO_DELETE=$(gh run list --repo ${{ github.repository }} --workflow ci.yml --limit 300 --json databaseId | jq -r ".[${MIN_KEPT_RUNS}:] | .[].databaseId")
 
           # 3. Supprimer
           if [ -z "$RUNS_TO_DELETE" ]; then
