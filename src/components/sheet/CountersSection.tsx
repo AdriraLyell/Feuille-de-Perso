@@ -136,10 +136,10 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
                     <div className="text-amber-200/80 italic text-sm border-b border-slate-600/50 pb-1 mb-2 leading-tight">
                         {translatedDesc}
                     </div>
-                    <div className="columns-2 gap-x-4">
+                    <div className="columns-2 gap-x-6">
                         {details.map((d, i) => (
-                            <div key={i} className="flex justify-between items-center text-sm gap-4 mb-0.5 break-inside-avoid">
-                                <span className="text-slate-300 truncate max-w-[180px]" title={d.name}>{d.name || d.category || 'Inconnu'}</span>
+                            <div key={i} className="flex justify-between items-center text-sm mb-0.5 break-inside-avoid px-2">
+                                <span className="text-slate-300 truncate font-medium flex-1 mr-2" title={d.name}>{d.name || d.category || 'Inconnu'}</span>
                                 <span className="font-mono text-white text-right shrink-0">{d.value >= 0 ? `+${d.value}` : d.value}</span>
                             </div>
                         ))}
@@ -164,9 +164,9 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
             }
 
             return (
-                <div className="flex flex-col gap-1 w-[380px] max-w-[90vw]">
+                <div className="flex flex-col gap-1 w-[460px] max-w-[95vw]">
                     {baseValue !== 0 && (
-                        <div className="flex justify-between items-center text-sm border-b border-slate-600/50 pb-2 mb-2 gap-4">
+                        <div className="flex justify-between items-center text-sm border-b border-slate-600/50 pb-2 mb-2 px-2">
                             <span className="text-slate-400 italic">Base</span>
                             <span className="font-mono text-slate-400 shrink-0">{baseValue >= 0 ? `+${baseValue}` : baseValue}</span>
                         </div>
@@ -186,17 +186,17 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
                                 : [];
 
                             return (
-                                <div key={v} className="flex flex-col gap-0.5 mb-2.5 break-inside-avoid">
-                                    <div className="flex justify-between items-center text-sm gap-2">
-                                        <span className="text-slate-300 truncate max-w-[140px] font-medium" title={v}>{displayName}</span>
+                                <div key={v} className="flex flex-col mb-3">
+                                    <div className="flex justify-between items-center text-sm pb-1 break-after-avoid px-2">
+                                        <span className="text-slate-200 truncate font-semibold flex-1 mr-2" title={displayName}>{displayName}</span>
                                         <span className="font-mono text-white text-right shrink-0">{val >= 0 ? `+${val}` : val}</span>
                                     </div>
                                     {aggDetails.length > 0 && (
-                                        <div className="pl-2.5 flex flex-col gap-0.5 border-l border-slate-600/80 mb-1 ml-1.5 mt-1">
+                                        <div className="pl-3 flex flex-col gap-1 border-l-2 border-slate-600/80 mb-1 ml-2 mt-1">
                                             {aggDetails.map((d, i) => (
-                                                <div key={i} className="flex justify-between items-center text-xs opacity-80 gap-2">
-                                                    <span className="truncate max-w-[120px] text-slate-400">{d.name || d.category || 'Inconnu'}</span>
-                                                    <span className="font-mono text-slate-300">{d.value >= 0 ? `+${d.value}` : d.value}</span>
+                                                <div key={i} className="flex justify-between items-center text-xs opacity-90 break-inside-avoid pr-2">
+                                                    <span className="truncate flex-1 text-slate-400 mr-2" title={d.name || d.category || 'Inconnu'}>{d.name || d.category || 'Inconnu'}</span>
+                                                    <span className="font-mono text-slate-300 shrink-0">{d.value >= 0 ? `+${d.value}` : d.value}</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -231,7 +231,7 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
                 </span>
             </div>
 
-            <PortalTooltip isOpen={isOpen} anchorRef={anchorRef} title={`${counter.name} (Calcul)`} maxWidth={420}>
+            <PortalTooltip isOpen={isOpen} anchorRef={anchorRef} title={`${counter.name} (Calcul)`} maxWidth={540}>
                 {renderDetails()}
             </PortalTooltip>
 

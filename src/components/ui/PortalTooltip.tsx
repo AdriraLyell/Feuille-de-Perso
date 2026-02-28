@@ -68,7 +68,7 @@ export const PortalTooltip: React.FC<PortalTooltipProps> = ({
         >
             <div className="bg-slate-800 text-white text-[10px] p-2 rounded shadow-xl animate-in fade-in zoom-in duration-150 relative">
                 {title && (
-                    <div className="font-bold border-b border-slate-600 mb-1 pb-1 text-slate-300">
+                    <div className="font-bold text-sm border-b border-slate-600 mb-2 pb-1.5 text-slate-200 tracking-wide">
                         {title}
                     </div>
                 )}
