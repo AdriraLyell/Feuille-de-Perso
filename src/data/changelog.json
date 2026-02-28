@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.11",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "UI (Admin Formules) : Ajustement du layout dans la modale d'édition. La description occupe désormais toute la largeur sous le Nom et le Code.",
+            "UI (Admin Formules) : Normalisation de la taille du champ Code pour correspondre au champ Nom."
+        ]
+    },
+    {
         "version": "2.97.10",
         "date": "2026-02-28",
         "type": "feat",
