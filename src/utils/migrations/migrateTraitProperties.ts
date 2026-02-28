@@ -36,7 +36,7 @@ export function migrateTraitProperties(trait: LibraryEntry): { trait: LibraryEnt
         if (effect.type === 'auto_counter') {
             hasAutoCounter = true;
             if (!autoCounterName) {
-                // @ts-ignore - target can exist on legacy effect
+                // @ts-expect-error - target can exist on legacy effect
                 autoCounterName = effect.target || (effect as any).associatedCounterId;
             }
             effects.splice(i, 1);

@@ -70,7 +70,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
     const [formulaToDelete, setFormulaToDelete] = useState<LibraryFormulaEntry | null>(null);
 
     const targetSuggestions = useMemo(() => {
-        let suggestions: { value: string, label: string, type: string }[] = [
+        const suggestions: { value: string, label: string, type: string }[] = [
             { value: 'XP', label: 'Expérience', type: 'Système' }
         ];
 

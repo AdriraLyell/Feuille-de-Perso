@@ -20,7 +20,7 @@ export const useTraitEditor = (
         // Determine if this trait has a auto_counter effect and an associated counter
         const newCustomCounters = [...data.counters.custom];
         let hasCounterChanges = false;
-        let counterIdToRemove = removedItem.associatedCounterId;
+        const counterIdToRemove = removedItem.associatedCounterId;
 
         // If not found directly, try via definition
         if (!counterIdToRemove && removedItem.definitionId && _rules?.libraries?.traits) {
