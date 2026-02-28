@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.26",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Joueur : Correction chirurgicale de l'affichage des compétences parentes dans la bibliothèque de spécialisations (résolution via les bibliothèques globales).",
+            "Traits : Amélioration de la résolution des noms de compétences pour les effets de traits."
+        ]
+    },
+    {
         "version": "2.97.25",
         "date": "2026-02-28",
         "type": "fix",
@@ -187,17 +196,6 @@
         "changes": [
             "Ajout de la migration V5 pour forcer explicitement la réconciliation des règles au chargement du personnage",
             "Mise à jour du bouton 'Officiel' pour forcer la réconciliation immédiate des bibliothèques locales"
-        ]
-    },
-    {
-        "version": "2.97.6",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Correction du bug d'évaluation `NaN` empêchant le nettoyage des traits à coût de points variable",
-            "Mise en correspondance des anciens types ('Vertu'/'Tare') avec la casse stricte",
-            "Stringification des valeurs d'effets pour prévenir les faux-positifs de mismatch JSON",
-            "Montée de la version rules à v1.0.3 pour déclenchement garanti du nettoyage de `library` local"
         ]
     }
 ]

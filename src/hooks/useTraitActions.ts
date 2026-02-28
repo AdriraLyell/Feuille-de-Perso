@@ -189,17 +189,46 @@ export const useTraitActions = (
     }, [editForm, allFormulas]);
 
     const allSkills = useMemo(() => {
-        if (!data || !data.skills) return [];
         const skills: { id: string, name: string }[] = [];
-        Object.values(data.skills).forEach(skillList => {
-            skillList.forEach(s => {
-                if (s.name && s.name.trim() !== '') {
-                    skills.push({ id: s.id, name: s.name });
-                }
+
+        // 1. From Character Sheet (Local)
+        if (data?.skills) {
+            Object.values(data.skills).forEach(skillList => {
+                skillList.forEach(s => {
+                    if (s.name && s.name.trim() !== '') {
+                        skills.push({ id: s.id, name: s.name });
+                    }
+                });
             });
-        });
+        }
+
+        // 2. From Official Campaign Libraries
+        if (rules?.libraries) {
+            if (rules.libraries.skills) {
+                rules.libraries.skills.forEach(skill => {
+                    if (!skills.some(s => s.id === skill.id)) {
+                        skills.push({ id: skill.id, name: skill.name });
+                    }
+                });
+            }
+            if (rules.libraries.mysticAbilities) {
+                rules.libraries.mysticAbilities.forEach(ma => {
+                    if (!skills.some(s => s.id === ma.id)) {
+                        skills.push({ id: ma.id, name: ma.name });
+                    }
+                });
+            }
+            if (rules.libraries.backgrounds) {
+                rules.libraries.backgrounds.forEach(bg => {
+                    if (!skills.some(s => s.id === bg.id)) {
+                        skills.push({ id: bg.id, name: bg.name });
+                    }
+                });
+            }
+        }
+
         return skills.sort((a, b) => a.name.localeCompare(b.name));
-    }, [data.skills]);
+    }, [data.skills, rules?.libraries]);
 
     const allAttributes = useMemo(() => {
         if (!data || !data.attributes) return [];

@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.6",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Correction du bug d'évaluation `NaN` empêchant le nettoyage des traits à coût de points variable",
+            "Mise en correspondance des anciens types ('Vertu'/'Tare') avec la casse stricte",
+            "Stringification des valeurs d'effets pour prévenir les faux-positifs de mismatch JSON",
+            "Montée de la version rules à v1.0.3 pour déclenchement garanti du nettoyage de `library` local"
+        ]
+    },
+    {
         "version": "2.97.5",
         "date": "2026-02-28",
         "type": "fix",
@@ -608,11 +619,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Déploiement production : Intégration de l'effet Maître, corrections bugs reset et confiance, améliorations journal et synchronisation cloud."
-    },
-    {
-        "version": "2.64.2",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction du pavé fantôme 'PAVE_ATTRIBUTS_4' après réinitialisation : (1) dans rulesAdapter, l'attributeSettings est désormais reconstruit depuis les clés des attributs primaires (et non secondaires), éliminant l'apparition erronée d'un 4ème pavé avec label brut. (2) Filtre défensif sur les secondaryAttributes pour ignorer les clés orphelines absentes de l'attributeSettings. (3) Nettoyage de l'état initial : suppression de la clé pave_attributs_4 superflue dans secondaryAttributes de getInitialCharacterData."
     }
 ]
