@@ -26,7 +26,7 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
     return (
         <div className="flex flex-col gap-4">
             <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12 lg:col-span-8">
+                <div className="col-span-12 lg:col-span-6">
                     <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Nom (ex: Calcul du Mana)</label>
                     <input
                         type="text"
@@ -35,7 +35,7 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                         className="w-full p-2 bg-stone-950 border border-stone-700 text-stone-300 rounded focus:border-amber-500 outline-none"
                     />
                 </div>
-                <div className="col-span-12 lg:col-span-4">
+                <div className="col-span-12 lg:col-span-6">
                     <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1 flex items-center gap-1">
                         Code <span className="text-stone-600 italic">(UPPERCASE)</span>
                     </label>
