@@ -90,16 +90,18 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
     const nameKey = normalizeString(counter.name);
     const calculatedMax = calculatedMaxes[counter.name] || calculatedMaxes[nameKey];
 
-    let formula = entryOrFormula.formula;
-    if (!formula && entryOrFormula.formulaId) {
-        const fEntry = rules?.libraries?.formulas?.find((f: any) => f.id === entryOrFormula.formulaId);
-        formula = fEntry?.formula || '';
-    }
+    const resolvedFormula = !entryOrFormula.formula && entryOrFormula.formulaId
+        ? rules?.libraries?.formulas?.find((f: any) => f.id === entryOrFormula.formulaId)
+        : null;
+
+    const formula = entryOrFormula.formula || resolvedFormula?.formula || '';
+    const aggregateConfig = entryOrFormula.aggregateConfig || resolvedFormula?.aggregateConfig;
+    const effectiveEntry = resolvedFormula ? { ...entryOrFormula, ...resolvedFormula } : entryOrFormula;
 
     const computedMax = calculatedMax ?? evaluateFormula(
-        formula || '',
+        formula,
         { ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary },
-        entryOrFormula.aggregateConfig ? entryOrFormula : undefined
+        aggregateConfig ? { ...effectiveEntry, aggregateConfig } : undefined
     );
 
     const currentSpent = counter.current || 0;
@@ -108,9 +110,9 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
     const renderDetails = () => {
         if (!isOpen) return null;
 
-        if (entryOrFormula.aggregateConfig) {
-            const details = getAggregateDetails({ ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary }, entryOrFormula.aggregateConfig);
-            const translatedDesc = translateAggregateConfig(entryOrFormula.aggregateConfig);
+        if (aggregateConfig) {
+            const details = getAggregateDetails({ ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary }, aggregateConfig);
+            const translatedDesc = translateAggregateConfig(aggregateConfig);
 
             if (!details.length) {
                 return (
@@ -153,6 +155,9 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
 
             return (
                 <div className="flex flex-col gap-1 w-full min-w-[140px]">
+                    <div className="text-[9px] text-slate-500 font-mono italic mb-1 break-all opacity-80 border-b border-slate-700/30 pb-1">
+                        {formula}
+                    </div>
                     {baseValue !== 0 && (
                         <div className="flex justify-between items-center text-xs border-b border-slate-600/50 pb-1 mb-1 gap-4">
                             <span className="text-slate-400 italic">Base</span>
@@ -167,10 +172,27 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
                         );
                         const displayName = formulaEntry?.name || translateVariableName(v);
 
+                        const hasAggregateDetails = formulaEntry?.aggregateConfig && val !== 0;
+                        const aggDetails = hasAggregateDetails
+                            ? getAggregateDetails({ ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary }, formulaEntry.aggregateConfig)
+                            : [];
+
                         return (
-                            <div key={v} className="flex justify-between items-center text-xs gap-4">
-                                <span className="text-slate-300 truncate max-w-[180px]" title={v}>{displayName}</span>
-                                <span className="font-mono text-white text-right shrink-0">{val >= 0 ? `+${val}` : val}</span>
+                            <div key={v} className="flex flex-col gap-0.5 mt-0.5">
+                                <div className="flex justify-between items-center text-xs gap-4">
+                                    <span className="text-slate-300 truncate max-w-[180px]" title={v}>{displayName}</span>
+                                    <span className="font-mono text-white text-right shrink-0">{val >= 0 ? `+${val}` : val}</span>
+                                </div>
+                                {aggDetails.length > 0 && (
+                                    <div className="pl-2.5 flex flex-col gap-0.5 border-l border-slate-700/50 mb-1 ml-1.5 mt-0.5">
+                                        {aggDetails.map((d, i) => (
+                                            <div key={i} className="flex justify-between items-center text-[10px] opacity-70 gap-3">
+                                                <span className="truncate max-w-[150px] text-slate-400">{d.name || d.category || 'Inconnu'}</span>
+                                                <span className="font-mono text-slate-300">{d.value >= 0 ? `+${d.value}` : d.value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         );
                     })}

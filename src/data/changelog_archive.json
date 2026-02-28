@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.97.0",
+        "date": "2026-02-28",
+        "type": "feat",
+        "description": "Système (Orchestration Locale) : Mise en place d'une infrastructure d'agent hybride. Antigravity (Cloud) pilote désormais un agent local (Qwen3 via LM Studio) pour les tâches de rédaction, de génération de données et de boilerplate. Cette optimisation 'Circuit Court' permet une réduction massive de la consommation de tokens Cloud tout en garantissant une expertise technique locale via des profils configurables (TECH_STRICT, LORE_CREATIVE). Intégration d'un système de surveillance qualité systématique dans les règles de l'agent."
+    },
+    {
         "version": "2.96.2",
         "date": "2026-02-27",
         "type": "refactor",
@@ -591,11 +597,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction majeure de la visibilité des items supprimés : Restriction du chargement des bibliothèques MJ aux seuls items explicitement rattachés à la campagne ou créés pour elle. Cette modification garantit que les items supprimés (via l'icône corbeille) disparaissent définitivement de la vue MJ après un rafraîchissement, même s'ils subsistent dans le dépôt global pour d'autres campagnes."
-    },
-    {
-        "version": "2.63.0",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction de la persistance des suppressions dans la bibliothèque : Les éléments supprimés du catalogue d'une campagne sont désormais correctement nettoyés dans le dépôt global s'ils ne sont plus utilisés ailleurs. Amélioration de la gestion du statut d'activation (isActive) via les liens relationnels de la base de données pour garantir que les items désactivés mais non supprimés sont conservés de manière cohérente."
     }
 ]
