@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.97.1",
+        "date": "2026-02-28",
+        "type": "refactor",
+        "description": "Refactor (Moteur de Formules) : Restructuration majeure du composant AdminFormulaEditorItem. Extraction de la logique de validation, des utilitaires mathématiques et découpage en sous-composants réutilisables (AggregateConfigEditor, TargetSearchDropdown, CodeInput). Cette chirurgie réduit la taille du fichier principal de ~550 à ~230 lignes, améliorant significativement la maintenabilité et la séparation des préoccupations."
+    },
+    {
         "version": "2.97.0",
         "date": "2026-02-28",
         "type": "feat",
@@ -591,11 +597,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction du nom du compteur auto lors de l'édition d'un trait avec variant : quand le variant d'un trait 'Compteur Auto' est modifié via le modal d'édition, le nom du compteur associé est désormais recalculé et mis à jour en conséquence (ex: 'Munitions (Pistolet)' → 'Munitions (Fusil)')."
-    },
-    {
-        "version": "2.63.1",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction majeure de la visibilité des items supprimés : Restriction du chargement des bibliothèques MJ aux seuls items explicitement rattachés à la campagne ou créés pour elle. Cette modification garantit que les items supprimés (via l'icône corbeille) disparaissent définitivement de la vue MJ après un rafraîchissement, même s'ils subsistent dans le dépôt global pour d'autres campagnes."
     }
 ]
