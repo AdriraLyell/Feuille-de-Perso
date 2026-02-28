@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.8",
+        "date": "2026-02-28",
+        "type": "patch",
+        "changes": [
+            "Correction du calcul de la Force Vitale suite à la perte de métadonnées mystiques.",
+            "Protection des champs 'mysticAbilityId' et 'isVariable' lors du nettoyage de la bibliothèque.",
+            "Migration V6 pour restaurer les liens mystiques cassés sur les fiches existantes.",
+            "Passage des règles par défaut en 1.0.4 pour forcer la réconciliation correcte."
+        ]
+    },
+    {
         "version": "2.97.7",
         "date": "2026-02-28",
         "type": "fix",
@@ -137,11 +148,5 @@
         "date": "2026-02-27",
         "type": "chore",
         "description": "Simplification du Système de Formules : Suppression des types d'effets redondants (Gain XP, Bonus Attribut, Bonus Réserve). Le moteur est désormais piloté par la 'Cible' (Source de Vérité unique) et un type générique 'modifier', réduisant la confusion lors de la création de mécaniques MJ. Mise à jour du Guide des Formules."
-    },
-    {
-        "version": "2.93.3",
-        "date": "2026-02-27",
-        "type": "feat",
-        "description": "Flexibilité de l'Héritage MJ (Modèles Incomplets) : Le dictionnaire de formules supporte désormais des modèles 'partiels' ou 'incomplets' (statut orange). Les créateurs de traits peuvent compléter les paramètres manquants (Cible, Opérateur, Équation) au niveau du trait. Si l'équation est absente du modèle, une valeur numérique fixe peut être saisie directement dans le trait."
     }
 ]

@@ -299,6 +299,10 @@ const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterS
             const offEff = simplifyEffects(off.effects);
             const locEff = simplifyEffects(local.effects);
 
+            // Protect metadata: if local has mysticAbilityId or isVariable, and official doesn't match, keep it
+            if (local.mysticAbilityId && off.mysticAbilityId !== local.mysticAbilityId) return false;
+            if (local.isVariable !== off.isVariable) return false;
+
             return JSON.stringify(offEff) === JSON.stringify(locEff);
         });
     };

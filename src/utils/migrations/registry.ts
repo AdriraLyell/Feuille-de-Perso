@@ -14,6 +14,7 @@ import { migrateCampaignNotes } from './migrateCampaignNotes';
 import { migrateHeaderDates } from './migrateHeaderDates';
 import { migrateFormulas } from './migrateFormulas';
 import { forceRulesReconciliation } from './forceRulesReconciliation';
+import { restoreMysticLinks } from './restoreMysticLinks';
 
 // Type for a migration function
 type MigrationFunction = (data: any) => void;
@@ -43,7 +44,10 @@ export const MIGRATIONS: Record<number, MigrationFunction[]> = {
     ],
     5: [
         forceRulesReconciliation
+    ],
+    6: [
+        restoreMysticLinks
     ]
 };
 
-export const CURRENT_SCHEMA_VERSION = 5;
+export const CURRENT_SCHEMA_VERSION = 6;
