@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Eye, EyeOff, CheckCircle2, Globe, RefreshCw, Download, Layers, Edit2, Trash2, GraduationCap, Sparkles } from 'lucide-react';
+import { Search, Plus, Eye, EyeOff, CheckCircle2, Globe, RefreshCw, Download, Layers, Edit2, Trash2, GraduationCap, Sparkles, X } from 'lucide-react';
 import { LibrarySkillEntry } from '../../types';
 import { MergedEntry } from '../../utils/libraryMerger';
 
@@ -43,11 +43,19 @@ const SkillLibraryTab: React.FC<SkillLibraryTabProps> = ({
                     <div className="relative flex-grow">
                         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
                         <input
-                            className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
+                            className="w-full pl-9 pr-9 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
                             placeholder="Rechercher une compétence..."
                             value={skillSearch}
                             onChange={(e) => setSkillSearch(e.target.value)}
                         />
+                        {skillSearch && (
+                            <button
+                                onClick={() => setSkillSearch('')}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#4a3b32]/40 hover:text-amber-600 transition-colors"
+                            >
+                                <X size={14} />
+                            </button>
+                        )}
                     </div>
                     <button
                         onClick={() => setHideKnownSkills(!hideKnownSkills)}

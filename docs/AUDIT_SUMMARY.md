@@ -1,8 +1,60 @@
-# Audit - État des Lieux & Roadmap (Synthèse v2.68.0)
+# Audit - État des Lieux & Roadmap (Synthèse v2.97.14)
 
-> **Dernière mise à jour** : 2026-02-23 — Version 2.68.0
+> **Dernière mise à jour** : 28 Février 2026 — Version 2.97.14
 
 ## 1. Phases Complétées
+
+### ✅ Phase 44 : Migration & Unification des Propriétés de Traits (v2.97.14)
+- [x] **Propriétés Natives** : Introduction de `hasAutoCounter`, `autoCounterName` et `isXPUpgradeable` directement sur le schéma du trait.
+- [x] **Nettoyage Legacy** : Suppression définitive des types d'effets `auto_counter` et `xp_upgradeable` (Code & Types).
+- [x] **Outil de Migration Admin** : Implémentation d'un bouton de migration avec rapport détaillé des modifications par trait dans l'interface d'administration.
+- [x] **Réconciliation Robuste** : Intégration de la migration automatique en mémoire dans `rulesReconciler.ts` pour garantir la compatibilité ascendante.
+- [x] **UI/UX Cleanup** : Simplification des modales d'édition et des cartes de traits ; suppression du script de migration JSON autonome obsolète.
+
+### ✅ Phase 43 : Persistance & Forcer Variante (v2.96.1)
+- [x] **Persistance Cloud** : Correction critique de la sauvegarde des champs `force_variant` et `operator` dans Supabase (Migration SQL + Data Mapper).
+- [x] **Forcer Variante** : Implémentation du moteur de variante dynamique (la variante choisie par le joueur devient la cible de l'effet).
+- [x] **Wizard Maîtrise Amélioré** : Refonte du flux d'ajout des traits de Maîtrise (Assistant de sélection universel + synchronisation du nom du trait).
+- [x] **Suggestions Catégorielles** : Support des mots-clés `Compétence` et `Attribut` comme cibles pour générer des listes de suggestions automatiques.
+
+### ✅ Phase 42 : Migration Systémique & Unification des Formules (v2.93.0)
+- [x] **Système d'Opérateurs** : Abstraction des effets sémantiques vers des opérateurs universels (`ADD`, `SET`, `SUB`).
+- [x] **Context Injection Centralisé** : Injection automatique de `TRAIT_LEVEL` et `SCENARIOS_COUNT` directement dans `formulaEvaluator.ts`.
+- [x] **Script de Migration Permanent** : Création de `scripts/migrate-traits.js` pour la mise à niveau automatique des fichiers de données JSON.
+- [x] **UI de Trait Simplifiée** : Masquage des types legacy et héritage automatique de la cible/opérateur depuis les formules globales.
+- [x] **Stabilité & Build** : Correction des erreurs JSX critiques dans `AdminFormulasEditor.tsx` assurant un build de production propre.
+
+### ✅ Phase 41 : Migration des Formules & Moteur de Calcul (v2.83.0)
+- [x] **Moteur Récursif** : Implémentation du moteur `formulaEvaluator.ts` avec support de la récursivité et détection de boucles.
+- [x] **Variables MJ & Agrégats** : Support des mots-clés dynamiques (`SUM_SKILL`, `COUNT_TRAITS`) et des variables définies par le MJ.
+- [x] **Dictionnaire Centralisé** : Unification des effets via `formulaLibrary`. Les formules portent désormais leur propre `target` et `effectType`.
+- [x] **Simplification UX** : Les traits peuvent désormais se lier à une formule globale unique, héritant automatiquement de son comportement mécanique.
+- [x] **Stabilité & Typage** : Refonte des types `CharacterSheetData` et des schémas Zod pour une intégration robuste du dictionnaire de formules.
+
+### ✅ Phase 40 : Stabilisation CI & Workflow Prune (v2.81.5)
+- [x] **Correctif Workflow** : Ajout de `actions/checkout` et `--repo` au workflow `prune-history`.
+- [x] **Validation** : Run manuel réussi sur la branche `develop`.
+
+### ✅ Phase 39 : Planification de la Migration "Tout Formule" (v2.81.4)
+- [x] **Audit Technique** : Identification des effets sémantiques codés en dur (`free_skill_rank`, `master_skill`, etc.).
+- [x] **Conception Visionnaire** : Élaboration du concept de "Dictionnaire MJ" et de formules "Auto-Portantes" (incluant leur propre cible).
+- [x] **Validation de Faisabilité** : Confirmation que 100% des mécaniques actuelles sont migrables sans perte de données.
+- [x] **Plan de Route** : Création de `docs/PLAN_MIGRATION_FORMULES.md` détaillant les étapes A à D.
+
+### ✅ Phase 38 : Unification des Mécaniques par Formules (v2.80.0)
+- [x] **Dictionnaire Central** : Intégration du `AdminFormulasEditor` pour gérer les formules globales (Bonus & Réserves).
+- [x] **Injection Admin** : Support du `formulaId` dans l'éditeur de traits avec sélection via dropdown.
+- [x] **Réserves Dynamiques** : Support des formules de type 'reserve' qui s'injectent automatiquement dans la `CountersSection` de la fiche personnage.
+- [x] **XP Engine Corrigé** : Mise à jour de `xpCalculator` pour résoudre les formules globales via leur ID.
+- [x] **Maintenance** : Création d'un outil de migration "One-Click" dans l'admin pour centraliser les formules orphelines.
+
+### ✅ Phase 37 : Notifications Temps Réel (v2.75.0)
+- [x] **Infrastructure** : Activation de `supabase_realtime` sur les tables `game_settings` et `characters`.
+- [x] **Client Engine** : Création de `RealtimeService` pour la gestion des abonnements WebSocket isolés.
+- [x] **React Integration** : Création du hook `useRealtimeSync` avec protection offline et debounce de 500ms.
+- [x] **Featurability** : Propagation instantanée des changements de calendrier (MJ) et des mises à jour de fiches (MJ → Joueur) sans refresh.
+- [x] **Feedback** : Notifications automatiques via le système `addLog` existant.
+
 
 ### ✅ Phase 36 : Chroniqueur & Narrative Enhancements (v2.68.0)
 - [x] **UI Control** : Possibilité de masquer/afficher le Chroniqueur (widget temporaire) depuis la barre latérale pour libérer de l'espace visuel.

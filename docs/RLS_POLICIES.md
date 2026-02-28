@@ -42,3 +42,13 @@ UPDATE auth.users
 SET raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role": "admin"}' 
 WHERE email = 'user@example.com';
 ```
+
+## Realtime Subscription
+Depuis la v2.75.0, les notifications temps réel sont activées. Pour que Supabase diffuse les changements via WebSocket, les tables doivent être ajoutées à la publication `supabase_realtime`.
+
+**Tables incluses :**
+- `game_settings` : Pour les règles et le calendrier.
+- `characters` : Pour les updates de fiches par le MJ.
+
+**Sécurité :**
+Le Realtime respecte les politiques RLS définies ci-dessus. Un utilisateur ne recevra des notifications que pour les lignes qu'il a le droit de lire.

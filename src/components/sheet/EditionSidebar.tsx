@@ -106,10 +106,18 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                     <input
                         type="text"
                         placeholder="Rechercher..."
-                        className="w-full bg-slate-950/50 border border-slate-700 rounded-md py-2 pl-9 pr-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-[#bfae85]/50 transition-colors"
+                        className="w-full bg-slate-950/50 border border-slate-700 rounded-md py-2 pl-9 pr-9 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-[#bfae85]/50 transition-colors"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
+                    {searchTerm && (
+                        <button
+                            onClick={() => setSearchTerm('')}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-amber-500 transition-colors"
+                        >
+                            <X size={14} />
+                        </button>
+                    )}
                 </div>
 
                 <div className="flex gap-2">

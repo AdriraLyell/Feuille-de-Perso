@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { CharacterSheetData, ImageConfig, NoteImage } from '../types';
-import { saveImage, deleteImage } from '../imageDB';
+import { saveImage, deleteImage } from '../services/imageDB';
 import { ErrorService } from '../services/ErrorService';
 
 export const useJournalImages = (

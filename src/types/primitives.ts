@@ -8,6 +8,7 @@ export interface DotEntry {
   max: number;
   variant?: string; // Précision pour les compétences variables (ex: "Artisanat : Forge")
   definitionId?: string; // ID de la définition parente (pour lien solide)
+  mysticAbilityId?: string; // Link to Mystic Ability ID
   description?: string; // New: Description info-bubble
 }
 
@@ -76,18 +77,40 @@ export interface TraitEntry {
   definitionId?: string; // ID de la définition parente
   mysticAbilityId?: string; // Link to Mystic Ability
   associatedCounterId?: string; // Link to a dynamically created trait counter
+  hasAutoCounter?: boolean;
+  autoCounterName?: string;
+  isXPUpgradeable?: boolean;
   masterSkillTarget?: string; // Nom de compétence mise au rang 5 (effet master_skill)
   isPostCreation?: boolean;
   creationValue?: string;
+  type?: 'avantage' | 'desavantage';
 }
 
-export type EffectType = 'xp_bonus' | 'free_skill_rank' | 'attribute_bonus' | 'auto_counter' | 'master_skill';
+export type FormulaOperator = 'ADD' | 'SET' | 'SUB';
+
+export type EffectType = 'free_skill_rank' | 'master_skill' | 'block_skill_increase' | 'formula' | 'auto_counter' | 'xp_upgradeable';
+
 export interface TraitEffect {
   id: string;
-  type: EffectType;
+  type: EffectType; // Note: 'free_skill_rank', 'master_skill', 'block_skill_increase' are being phased out in favor of 'formula' + operator
   value: number; // Montant XP ou Rang Max Gratuit
   method?: 'fixed' | 'per_scenario';
-  target?: string; // Nom de la compétence ciblée (pour free_skill_rank)
+  target?: string; // Nom de la compétence ciblée (pour free_skill_rank) ou cible de la formule
   source?: string; // Nom du trait d'origine (optionnel)
   associatedCounterId?: string; // Rétrocompatibilité ou option alternative
+  formula?: string; // (Legacy/Transitoire) La formule à évaluer (ex: "+2", "Volonté / 2")
+  formulaId?: string; // NEW: Le lien vers la formule globale du Dictionnaire
+  operator?: FormulaOperator; // NEW: Comment appliquer le résultat (Défaut: ADD)
 }
+
+export interface PostItData {
+  id: string;
+  text: string;
+  color: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  tabId: string; // The tab they are placed on ('p1', 'p2', 'specs', 'xp', 'notes', etc)
+}
+

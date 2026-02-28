@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Search, Plus, Award, CheckCircle2, Edit2, Trash2, Download, RefreshCw, Eye, EyeOff, Globe } from 'lucide-react';
+import { Search, Plus, Award, CheckCircle2, Edit2, Trash2, Download, RefreshCw, Eye, EyeOff, Globe, X } from 'lucide-react';
 import { CharacterSheetData } from '../../types';
 import { useSpecializationLibrary } from './hooks/useSpecializationLibrary';
 import SpecializationEditModal from './parts/SpecializationEditModal';
@@ -50,6 +50,14 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
+                        {searchTerm && (
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#4a3b32]/40 hover:text-amber-600 transition-colors"
+                            >
+                                <X size={14} />
+                            </button>
+                        )}
                     </div>
                     <button
                         onClick={() => setHideKnown(!hideKnown)}

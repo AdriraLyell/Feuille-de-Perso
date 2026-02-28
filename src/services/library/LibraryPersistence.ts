@@ -40,6 +40,7 @@ export const LibraryPersistence = {
                     const payload: any = {
                         id: item.id,
                         name: item.name,
+                        code: item.code,
                         description: item.description,
                         setting_id: null
                     };
@@ -52,6 +53,9 @@ export const LibraryPersistence = {
                         payload.is_variable_cost = item.isVariableCost || false;
                         payload.tags = item.tags || [];
                         payload.is_variable = item.isVariable;
+                        payload.has_auto_counter = item.hasAutoCounter;
+                        payload.auto_counter_name = item.autoCounterName;
+                        payload.is_xp_upgradeable = item.isXPUpgradeable;
                         payload.effects = item.effects || [];
                     } else if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds') {
                         payload.is_variable = item.isVariable;
@@ -63,9 +67,18 @@ export const LibraryPersistence = {
                         payload.max_value = item.maxValue;
                         payload.default_value = item.defaultValue;
                         payload.xp_cost = item.xpCost;
+                        payload.formula_id = item.formulaId || null;
                     } else if (typeCfg.key === 'specializations') {
                         payload.skill_ids = item.skillIds;
                         payload.default_min_level = item.defaultMinLevel;
+                    } else if (typeCfg.key === 'formulas') {
+                        payload.formula = item.formula;
+                        payload.type = item.type;
+                        payload.target = item.target;
+                        payload.effect_type = item.effectType;
+                        payload.aggregate_config = item.aggregateConfig;
+                        payload.operator = item.operator;
+                        payload.force_variant = !!item.forceVariant;
                     }
 
                     toCreate.push(payload);
@@ -98,6 +111,7 @@ export const LibraryPersistence = {
                 const payload: any = {
                     id: item.id, // Mandatory for upsert
                     name: item.name,
+                    code: item.code,
                     description: item.description,
                     setting_id: null // Ensure it's marked as Global in the repository
                 };
@@ -109,6 +123,9 @@ export const LibraryPersistence = {
                     payload.is_variable_cost = item.isVariableCost || false;
                     payload.tags = item.tags;
                     payload.is_variable = item.isVariable;
+                    payload.has_auto_counter = item.hasAutoCounter;
+                    payload.auto_counter_name = item.autoCounterName;
+                    payload.is_xp_upgradeable = item.isXPUpgradeable;
                     payload.effects = item.effects;
                 } else if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds') {
                     payload.is_variable = !!item.isVariable;
@@ -133,9 +150,18 @@ export const LibraryPersistence = {
                     payload.max_value = item.maxValue;
                     payload.default_value = item.defaultValue;
                     payload.xp_cost = item.xpCost;
+                    payload.formula_id = item.formulaId || null;
                 } else if (typeCfg.key === 'specializations') {
                     payload.skill_ids = item.skillIds;
                     payload.default_min_level = item.defaultMinLevel;
+                } else if (typeCfg.key === 'formulas') {
+                    payload.formula = item.formula;
+                    payload.type = item.type;
+                    payload.target = item.target;
+                    payload.effect_type = item.effectType;
+                    payload.aggregate_config = item.aggregateConfig;
+                    payload.operator = item.operator;
+                    payload.force_variant = !!item.forceVariant;
                 }
 
                 // Use UPSERT instead of update to handle newly created items from the UI

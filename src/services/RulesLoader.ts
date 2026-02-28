@@ -37,7 +37,7 @@ export const loadRules = async (forceSettingId?: string): Promise<RulesData | nu
                 cached.source = 'cache';
                 return cached;
             }
-            logger.warn('[RulesLoader] No cached rules found while offline. Using default backup.');
+            logger.warn('[RulesLoader] No cached rules found while offline. Using default backup configuration.');
             return defaultRules;
         }
 
@@ -127,7 +127,7 @@ export const loadRules = async (forceSettingId?: string): Promise<RulesData | nu
         }
 
         // ABSOLUTE LAST RESORT: Default Embedded Rules
-        logger.log('[RulesLoader] Using Default Embedded Rules.');
+        logger.log('[RulesLoader] Using Default Embedded Configuration (Source: defaultRules.ts).');
         return defaultRules;
 
     } catch (error) {

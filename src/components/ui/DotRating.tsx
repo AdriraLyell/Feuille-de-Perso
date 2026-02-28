@@ -17,6 +17,7 @@ interface DotRatingProps {
   creationColor?: string; // New: Dynamic creation color
   xpColor?: string;       // New: Dynamic XP color
   symbol?: string;        // New: Custom symbol shape
+  blockedReason?: string;
 }
 
 // Icon Mapping for easy lookup
@@ -65,32 +66,52 @@ const DotRating: React.FC<DotRatingProps> = ({
   readOnly = false,
   creationColor,
   xpColor,
-  symbol = 'circle'
+  symbol = 'circle',
+  blockedReason
 }) => {
   const IconComponent = SYMBOL_MAP[symbol] || Circle;
+  const isBlocked = !!blockedReason;
+
   return (
     <div className={`flex items-center space-x-1 ${className}`}>
       {Array.from({ length: max }).map((_, index) => {
         const filled = index < value;
         const isCreationDot = index < creationValue;
 
+        // Option C: Hide dots above current value if blocked
+        if (isBlocked && index >= value) {
+          return <div key={index} className="w-3" />; // Empty spacer to keep width or just nothing? 
+          // Better to keep a small spacer or nothing? User said "faire disparaître".
+          // If I return null, the width of the row will jump. 
+          // But since it's aligned to the right (ml-auto), it might be better to return null to compress it.
+        }
+
         const activeColor = isCreationDot ? (creationColor || '#2563eb') : (xpColor || '#292524');
         const inactiveColor = '#d6d3d1'; // stone-300
+
+        const handleClick = () => {
+          if (readOnly || !onChange) return;
+          const newValue = index + 1;
+
+          // Soft block check even if UI hides dots (safety)
+          if (isBlocked && newValue > value) {
+            // The dot would be hidden anyway, but just in case
+            return;
+          }
+
+          onChange(newValue === value ? newValue - 1 : newValue);
+        };
 
         return (
           <button
             key={index}
             type="button"
             disabled={readOnly}
-            onClick={() => {
-              if (readOnly || !onChange) return;
-              const newValue = index + 1;
-              onChange(newValue === value ? newValue - 1 : newValue);
-            }}
+            onClick={handleClick}
             className={`w-3 h-3 flex items-center justify-center transition-all ${readOnly ? 'cursor-default' : 'cursor-pointer hover:scale-125'
               }`}
             aria-label={`Set rating to ${index + 1}`}
-            title={isCreationDot ? "Acquis à la création (Coût: 0 XP)" : "Acquis par XP"}
+            title={isBlocked ? `Bloqué par : ${blockedReason}` : (isCreationDot ? "Acquis à la création (Coût: 0 XP)" : "Acquis par XP")}
           >
             <IconComponent
               size={12}

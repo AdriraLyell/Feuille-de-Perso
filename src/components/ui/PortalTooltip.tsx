@@ -34,12 +34,12 @@ export const PortalTooltip: React.FC<PortalTooltipProps> = ({
             const tooltipHeightEstimate = 80;
 
             let position: 'top' | 'bottom' = 'top';
-            let top = rect.top + scrollY - 8; // Default above
+            let top = rect.top + scrollY;
 
             // If too close to the top, flip to bottom
             if (rect.top < tooltipHeightEstimate) {
                 position = 'bottom';
-                top = rect.bottom + scrollY + 8;
+                top = rect.bottom + scrollY;
             }
 
             setCoords({
@@ -55,11 +55,13 @@ export const PortalTooltip: React.FC<PortalTooltipProps> = ({
     return createPortal(
         <div
             ref={tooltipRef}
-            className="fixed z-[9999] pointer-events-none"
+            className="absolute z-[9999] pointer-events-none"
             style={{
                 top: coords.top,
                 left: coords.left,
-                transform: coords.position === 'top' ? 'translate(-50%, -100%)' : 'translate(-50%, 0)',
+                transform: coords.position === 'top'
+                    ? 'translate(-50%, calc(-100% - 10px))'
+                    : 'translate(-50%, 10px)',
                 width: 'max-content',
                 maxWidth: `${maxWidth}px`
             }}

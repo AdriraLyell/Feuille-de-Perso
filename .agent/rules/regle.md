@@ -9,8 +9,9 @@ Ces règles sont la source de vérité pour le comportement de l'agent dans ce w
 Privilégier le Francais dans les docs/rapports/plans
 
 ## 1. ARCHITECTURE & PRINCIPES
-- **Hybrid Database Engine** : Supabase est maître. L'app est "Online First", mais doit TOUJOURS fonctionner Offline (via `default_rules.json`).
-- **Chirurgie du Code** : Modifications minimales et précises. Ne jamais réécrire un fichier complet inutilement.
+- **Hybrid Database Engine** : Supabase est maître. L'app est "Online First", mais doit TOUJOURS fonctionner Offline (via `src/data/defaultRules.ts`).
+- **Chirurgie du Code** : Modifications minimales et précises. Ne jamais réécrire un fichier complet inutilement pour préserver l'historique et limiter l'usage de tokens. Utiliser l'outil `replace_file_content` pour les éditions chirurgicales.
+
 - **Typage Strict** : Éviter `any` et `@ts-ignore`. Préférer les structures Zod et les types inférés.
 - **UX Premium** : Interfaces vivantes, micro-animations, feedback visuel immédiat.
 - **Outil de Navigation (Playwright)** : Utiliser le `browser_subagent` pour valider visuellement les changements complexes (ex: pagination, overflow, responsive) lorsque les logs ne suffisent pas.
@@ -18,6 +19,12 @@ Privilégier le Francais dans les docs/rapports/plans
 - **Supabase & DB Tools** : Utiliser le serveur MCP `supabase-mcp-server` pour les migrations (`apply_migration`), l'inspection (`execute_sql`) et les logs système.
 - **Type Safety & Linting** : Utiliser les serveurs MCP `typescript` (renommage de symboles, diagnostics) et `eslint` pour garantir la conformité avant chaque commit.
 - **Logging** : Utiliser `src/utils/logger.ts` au lieu de `console.log` directement.
+
+## 1.1 ORCHESTRATION AGENT LOCAL (LM Studio / Qwen3)
+- **Surveillance de la Qualité** : L'agent Cloud (Antigravity) doit SYSTÉMATIQUEMENT vérifier les sorties de l'agent local.
+- **Vérification Critique** : Tester la validité du code (syntaxe, types), le respect du format (ex: JSON) et la pertinence du contenu par rapport au profil (`local_agent_config.json`).
+- **Alerte & Ajustement** : Si la qualité est insuffisante (hallucinations, politesse excessive, imprécision), l'agent DOIT en informer l'utilisateur et proposer un ajustement des paramètres (`temperature`, `max_tokens`) ou du prompt.
+- **Optimisation de Quota** : Privilégier le "Circuit Court" (écriture directe sur disque par le local) pour minimiser les tokens Cloud.
 
 ## 2. DOCUMENTATION DE RÉFÉRENCE
 *Consulter ces fichiers avant toute intervention majeure pour limiter l'usage des tokens :*
@@ -56,7 +63,9 @@ Avant chaque fin de tâche (notify_user) :
 - **Code** : `src/`
 - **Docs** : `docs/`
 - **Règles Agent** : `.agent/rules/`
+- **Workflows Agent** : `.agent/workflows/`
 - **Brain** : `<appDataDir>/brain/<uuid>/` (Artifacts temporaires).
+
 
 ## 7. WORKFLOW GIT (GitHub Flow+)
 

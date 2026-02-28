@@ -5,6 +5,7 @@ import { TraitEntry } from '../../../types';
 import { Save, X, Edit, Sparkles } from 'lucide-react';
 import { useCharacter } from '../../../context/CharacterContext';
 import { useRules } from '../../../context/RulesContext';
+import { normalizeString } from '../../../utils/stringUtils';
 
 interface TraitEditModalProps {
     isOpen: boolean;
@@ -56,17 +57,55 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
             creationValue: editedTrait.creationValue ?? editedTrait.value // Store initial if not set
         };
 
-        // If the trait reaches 0, its effects are already ignored by xpCalculator check if value === 0
         setEditedTrait(updatedTrait);
         onSave(updatedTrait);
         onAddLog(`${isFixedCost ? 'Rachat' : 'Réduction'} du trait ${editedTrait.name} pour ${xpCost} XP.`, 'success', 'sheet');
+    };
+
+    const handleIncreaseTrait = () => {
+        if (!editedTrait || !isPostCreation) return;
+
+        const currentValue = parseInt(editedTrait.value) || 0;
+
+        const updatedTrait = {
+            ...editedTrait,
+            value: (currentValue + 1).toString(),
+            creationValue: editedTrait.creationValue ?? editedTrait.value // Preserve initial creation value
+        };
+
+        setEditedTrait(updatedTrait);
+        onSave(updatedTrait);
+        onAddLog(`Amélioration du trait ${editedTrait.name} pour ${traitCostFactor} XP.`, 'success', 'sheet');
     };
 
     if (!editedTrait) return null;
 
     const currentValue = parseInt(editedTrait.value) || 0;
     const isFixedCost = editedTrait.value.toLowerCase().includes('pts') || !/^\d+$/.test(editedTrait.value.trim());
+
+    // Extract max value from library cost strings (e.g., "1-3", "2 à 5", "1, 2, 3")
+    const extractMaxFromCost = (cost: string): number => {
+        const matches = cost.match(/\d+/g);
+        if (matches && matches.length >= 2) {
+            return Math.max(...matches.map(Number));
+        }
+        return 0; // Not a range
+    };
+
+    // Check if the trait is variable in the library and get its max
+    const libEntry = data.library?.find(e => e.id === editedTrait.definitionId);
+    const libCost = libEntry?.pointsLabel || libEntry?.cost || '';
+    const maxValue = extractMaxFromCost(libCost);
+    const isActuallyVariable = maxValue > 0;
+
+    const isImproved = !editedTrait.isPostCreation && editedTrait.creationValue !== undefined && currentValue > (parseInt(editedTrait.creationValue) || 0);
+
+    // Check if upgradeable via new property (native to TraitEntry or LibraryEntry)
+    const isUpgradeable = !!editedTrait.isXPUpgradeable || !!libEntry?.isXPUpgradeable ||
+        !!rules?.libraries?.traits?.find(t => t.id === editedTrait.definitionId || normalizeString(t.name) === normalizeString(editedTrait.name))?.isXPUpgradeable;
+
     const canReduce = isPostCreation && type === 'desavantages' && currentValue > 0;
+    const canIncrease = isPostCreation && type === 'avantages' && (isActuallyVariable || isUpgradeable) && currentValue > 0;
 
     return (
         <ThematicModal
@@ -77,7 +116,7 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
             size="md"
             footer={
                 <div className="flex justify-between items-center w-full">
-                    <div>
+                    <div className="flex gap-2">
                         {canReduce && (
                             <ThematicButton
                                 onClick={handleReduceTrait}
@@ -89,6 +128,17 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
                                 {isFixedCost
                                     ? `Racheter totalement (${currentValue * traitCostFactor} XP)`
                                     : `Réduire d'un niveau (${traitCostFactor} XP)`}
+                            </ThematicButton>
+                        )}
+                        {canIncrease && (
+                            <ThematicButton
+                                onClick={handleIncreaseTrait}
+                                variant="primary"
+                                size="sm"
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                leftIcon={<Sparkles size={16} />}
+                            >
+                                Améliorer d'un niveau ({traitCostFactor} XP)
                             </ThematicButton>
                         )}
                     </div>
@@ -107,6 +157,11 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
                 {editedTrait.isPostCreation && (
                     <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-emerald-800 text-xs font-bold flex items-center gap-2">
                         <Sparkles size={14} /> Trait acquis post-création via XP
+                    </div>
+                )}
+                {isImproved && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-blue-800 text-xs font-bold flex items-center gap-2">
+                        <Sparkles size={14} /> Trait amélioré post-création via XP
                     </div>
                 )}
                 <div>

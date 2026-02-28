@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { NodeViewWrapper } from '@tiptap/react';
 import { BookImageAttributes } from '../../../extensions/bookImage';
 import { Image as ImageIcon, Loader, Move } from 'lucide-react';
-import { deleteImage } from '../../../imageDB';
+import { deleteImage } from '../../../services/imageDB';
 import { getCachedImageUrl, invalidateCachedImage } from '../../../services/ImageCacheService';
 import { logger } from '../../../utils/logger';
 import { useBookImageInteraction } from './hooks/useBookImageInteraction';

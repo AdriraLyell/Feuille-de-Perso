@@ -3,7 +3,7 @@ import { RulesData } from '../../types/rules';
 import { LibrarySkillEntry } from '../../types';
 import { smartIncludes } from '../../utils/stringUtils';
 import { disambiguateCategories } from '../../utils/categoryUtils';
-import { CATEGORY_HELP } from '../../data/constants';
+import { CATEGORY_HELP } from '../../constants/app';
 import { publishFileToGitHub } from '../../services/githubService';
 
 /**
@@ -92,7 +92,7 @@ export const useAdminSkillLibrary = (
                 code: cat.id,
                 label: cat.label,
                 loc: cat.description || ""
-            }));
+            })) as any;
         }
         return disambiguateCategories(rawCategories);
     }, [rules.definitions.skillCategories]);

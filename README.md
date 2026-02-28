@@ -39,3 +39,5 @@ Vous obtiendrez dans le dossier `dist/` :
 - `admin.html` : L'interface d'administration (MJ).
 
 Note : L'application Admin chargera automatiquement une configuration par défaut si aucun fichier `rules.js` externe n'est détecté.
+
+<!-- Agent Beta: Parallel Check -->

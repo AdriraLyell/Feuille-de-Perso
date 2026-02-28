@@ -1,14 +1,15 @@
-
+import { THEME } from '../constants/theme';
+import { defaultRules } from './defaultRules';
 import { CharacterSheetData, LibrarySkillEntry, DotEntry, ThemeConfig, AttributeEntry } from '../types';
 import { createDotEntry, createAttributeEntry, createCombatEntry, generateId } from '../utils/factories';
 
 export const DEFAULT_THEME: ThemeConfig = {
-  creationColor: '#2563eb', // blue-600
-  xpColor: '#292524',       // stone-800
+  creationColor: THEME.colors.status.info, // Synchronized with palette
+  xpColor: THEME.colors.background.surface, // Stone-800
   dotSymbol: 'circle',
   skillColors: {
-    variable: '#d97706',      // Amber-600 (Orange)
-    mysticDefault: '#8b5cf6', // Violet-500
+    variable: THEME.colors.primary.main,      // Amber-600
+    mysticDefault: '#8b5cf6', // Keeping violet for mystic contrast
     mysticOverrides: {}
   }
 };
@@ -143,27 +144,23 @@ export const getInitialCharacterData = (): CharacterSheetData => {
   return {
     creationConfig: {
       active: false,
-      mode: 'rangs',
+      mode: defaultRules.configurations.creation.mode,
       pointsDistributionMode: 'global',
-      startingXP: 350,
-      pointsBuckets: {
-        attributes: 60,
-        skills: 140,
-        backgrounds: 20
-      },
-      attributePoints: 12,
-      attributeCost: 6,
-      attributeMin: -1,
-      attributeMax: 3,
-      backgroundPoints: 7,
-      rankSlots: { 1: 10, 2: 8, 3: 6, 4: 2, 5: 0 },
+      startingXP: defaultRules.configurations.creation.startingXP,
+      pointsBuckets: defaultRules.configurations.creation.pointsBuckets,
+      attributePoints: defaultRules.configurations.creation.attributePoints || 12,
+      attributeCost: defaultRules.configurations.xpCosts.attributeFactor,
+      attributeMin: defaultRules.configurations.creation.attributeMin,
+      attributeMax: defaultRules.configurations.creation.attributeMax,
+      backgroundPoints: defaultRules.configurations.creation.backgroundPoints || 7,
+      rankSlots: defaultRules.configurations.creation.rankSlots,
       cardConfig: {
-        active: true,
-        bestSkillsCount: 6,
-        increment: 0.5,
-        baseStart: 2
+        active: defaultRules.configurations.cards.active,
+        bestSkillsCount: defaultRules.configurations.cards.bestSkillsCount,
+        increment: defaultRules.configurations.cards.increment,
+        baseStart: defaultRules.configurations.cards.baseStart
       },
-      extendedSkills: false
+      extendedSkills: defaultRules.configurations.creation.extendedSkills || false
     },
     theme: JSON.parse(JSON.stringify(DEFAULT_THEME)),
     header: {
@@ -179,7 +176,12 @@ export const getInitialCharacterData = (): CharacterSheetData => {
     },
     experience: { gain: '0', spent: '0', rest: '0' },
     // Default Attributes Configuration
-    attributeSettings: [
+    attributeSettings: defaultRules.definitions.skillCategories
+      .filter(cat => cat.behavior === 'Compétence' && cat.id.startsWith('pave_attributs'))
+      .map(cat => ({ id: cat.id, label: cat.label }))
+      .length > 0 ? defaultRules.definitions.skillCategories
+        .filter(cat => cat.behavior === 'Compétence' && cat.id.startsWith('pave_attributs'))
+        .map(cat => ({ id: cat.id, label: cat.label })) : [
       { id: 'pave_attributs_1', label: 'Physique' },
       { id: 'pave_attributs_2', label: 'Mental' },
       { id: 'pave_attributs_3', label: 'Social' }
@@ -263,6 +265,12 @@ export const getInitialCharacterData = (): CharacterSheetData => {
     library: [],
     skillLibrary: generateDefaultSkillLibrary(skills),
     specializationLibrary: [],
+    backgroundLibrary: [],
+    counterLibrary: [],
+    xpLogs: [],
+    xpTransactions: [],
+    appLogs: [],
+    campaignNotes: [],
     mysticAbilities: DEFAULT_MYSTIC_ABILITIES.map(name => ({
       id: generateId(),
       name,
@@ -270,10 +278,9 @@ export const getInitialCharacterData = (): CharacterSheetData => {
       isActive: true,
       isGlobal: true
     })),
-    xpLogs: [],
-    xpTransactions: [],
-    appLogs: [],
-    campaignNotes: [],
+    formulaLibrary: [],
+    formulaVariables: [],
+    formulaMacros: [],
     partyNotes: {
       members: [],
       columns: [],

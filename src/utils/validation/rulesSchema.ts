@@ -9,6 +9,8 @@ export const TraitEffectSchema = z.object({
     value: z.any().optional(),
     target: z.string().optional(),
     conditions: z.any().optional(),
+    formula: z.string().optional(),
+    formulaId: z.string().optional(),
 });
 
 // --- System Libraries ---
@@ -19,9 +21,13 @@ export const LibraryEntrySchema = z.object({
     name: z.string(),
     cost: z.string().nullable().optional(),
     pointsLabel: z.string().optional().default(''),
+    isVariableCost: z.boolean().nullable().optional(),
     description: z.string().nullable().optional(),
     tags: z.array(z.string()).nullable().optional(),
     isVariable: z.boolean().nullable().optional(),
+    hasAutoCounter: z.boolean().nullable().optional(),
+    autoCounterName: z.string().nullable().optional(),
+    isXPUpgradeable: z.boolean().nullable().optional(),
     variants: z.array(z.string()).nullable().optional(),
     effects: z.array(TraitEffectSchema).nullable().optional(),
     isGlobal: z.boolean().nullable().optional(),
@@ -59,6 +65,28 @@ export const LibraryCounterEntrySchema = z.object({
     maxValue: z.number().nullable().optional(),
     defaultValue: z.number().nullable().optional(),
     xpCost: z.number().nullable().optional(),
+    formulaId: z.string().nullable().optional(),
+    isGlobal: z.boolean().nullable().optional(),
+    isActive: z.boolean().nullable().optional(),
+});
+
+export const LibraryFormulaEntrySchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    code: z.string().nullable().optional(),
+    formula: z.string(),
+    type: z.enum(['modifier', 'variable']),
+    target: z.string().nullable().optional(),
+    effectType: z.string().nullable().optional(),
+    operator: z.enum(['ADD', 'SET', 'SUB', '']).nullable().optional(),
+    forceVariant: z.boolean().nullable().optional(),
+    aggregateConfig: z.object({
+        operation: z.enum(['sum', 'count', 'max', 'avg']),
+        targetType: z.enum(['skills', 'attributes', 'traits', 'backgrounds']),
+        filterTarget: z.enum(['tag', 'category', 'name', 'all']),
+        filterValue: z.string().optional(),
+    }).nullable().optional(),
+    description: z.string().nullable().optional(),
     isGlobal: z.boolean().nullable().optional(),
     isActive: z.boolean().nullable().optional(),
 });
@@ -128,6 +156,8 @@ export const RulesCounterDefinitionSchema = z.object({
     value: z.number().optional(),
     defaultValue: z.number().optional(),
     description: z.string().optional(),
+    formulaId: z.string().optional(),
+    appearance: z.string().optional(),
 });
 
 // --- Calendar ---
@@ -208,6 +238,7 @@ export const RulesDataSchema = z.object({
         counters: z.array(LibraryCounterEntrySchema),
         specializations: z.array(LibrarySpecializationEntrySchema),
         mysticAbilities: z.array(LibrarySkillEntrySchema).optional().default([]),
+        formulas: z.array(LibraryFormulaEntrySchema).optional().default([]),
     }),
 });
 

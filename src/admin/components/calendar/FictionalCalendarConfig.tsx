@@ -104,23 +104,24 @@ const FictionalCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
             {/* Dates courantes */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 bg-mystic-deep/30 p-4 rounded-sm border border-stone-700/30">
                 <div>
-                    <label className={labelCls}>Année de départ</label>
-                    <input type="number" value={config.startYear} onChange={e => onUpdate({ ...config, startYear: Number(e.target.value) })} className={inputCls} />
+                    <label htmlFor="cal-start-year" className={labelCls}>Année de départ</label>
+                    <input id="cal-start-year" type="number" value={config.startYear} onChange={e => onUpdate({ ...config, startYear: Number(e.target.value) })} className={inputCls} />
                 </div>
                 <div>
-                    <label className={labelCls}>Année courante</label>
-                    <input type="number" value={config.currentYear} onChange={e => onUpdate({ ...config, currentYear: Number(e.target.value) })} className={inputCls} />
+                    <label htmlFor="cal-current-year" className={labelCls}>Année courante</label>
+                    <input id="cal-current-year" type="number" value={config.currentYear} onChange={e => onUpdate({ ...config, currentYear: Number(e.target.value) })} className={inputCls} />
                 </div>
                 <div>
-                    <label className={labelCls}>Mois courant</label>
-                    <select value={config.currentMonthIndex} onChange={e => onUpdate({ ...config, currentMonthIndex: Number(e.target.value) })} className={inputCls}>
+                    <label htmlFor="cal-current-month" className={labelCls}>Mois courant</label>
+                    <select id="cal-current-month" value={config.currentMonthIndex} onChange={e => onUpdate({ ...config, currentMonthIndex: Number(e.target.value) })} className={inputCls}>
                         {config.months.map((m: CalendarMonthDef, i: number) => <option key={i} value={i}>{m.name}</option>)}
                     </select>
                 </div>
                 <div>
-                    <label className={labelCls}>Jour courant</label>
+                    <label htmlFor="cal-current-day" className={labelCls}>Jour courant</label>
                     <div className="flex gap-2">
                         <input
+                            id="cal-current-day"
                             type="number"
                             min={1}
                             max={config.months[config.currentMonthIndex]?.days ?? 30}
@@ -141,7 +142,7 @@ const FictionalCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
 
             {/* Mois */}
             <div>
-                <label className={labelCls}>Mois de l'année ({config.months.length})</label>
+                <span className={labelCls}>Mois de l'année ({config.months.length})</span>
                 <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                     {config.months.map((m: CalendarMonthDef, i: number) => (
                         <div key={i} className="flex items-center gap-2">
@@ -175,7 +176,7 @@ const FictionalCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
 
             {/* Jours de la semaine */}
             <div>
-                <label className={labelCls}>Jours de la semaine ({config.dayNames.length})</label>
+                <span className={labelCls}>Jours de la semaine ({config.dayNames.length})</span>
                 <div className="flex flex-wrap gap-2">
                     {config.dayNames.map((d: string, i: number) => (
                         <div key={i} className="flex items-center gap-1 bg-stone-800 border border-stone-700 rounded-sm px-2 py-1">

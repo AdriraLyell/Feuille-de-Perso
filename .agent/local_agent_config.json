@@ -1,0 +1,25 @@
+{
+    "profiles": {
+        "TECH_STRICT": {
+            "temperature": 0.1,
+            "top_p": 0.95,
+            "max_tokens": 1024,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "system_instruction": "Tu es un expert en TypeScript et calculs de JdR. Sois concis, réponds directement en JSON ou code sans politesse."
+        },
+        "LORE_CREATIVE": {
+            "temperature": 0.8,
+            "top_p": 1.0,
+            "max_tokens": 2048,
+            "presence_penalty": 0.2,
+            "frequency_penalty": 0.3,
+            "system_instruction": "Tu es un écrivain de JdR créatif. Utilise un style immersif et varié."
+        }
+    },
+    "monitoring": {
+        "auto_eval": true,
+        "min_quality_threshold": 0.7,
+        "report_on_failure": true
+    }
+}

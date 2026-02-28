@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { RotateCcw, AlertTriangle, Coins, Sparkles } from 'lucide-react';
+import { AlertTriangle, Coins, Sparkles } from 'lucide-react';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
-import { CharacterSheetData, RulesData } from '../../types';
+import { CharacterSheetData } from '../../types';
 import { RecreationService } from '../services/RecreationService';
-import { MotionFade } from '../../components/ui/motion/MotionFade';
+
 
 interface RecreationModalProps {
     isOpen: boolean;

@@ -108,6 +108,9 @@ export interface LibraryEntry {
   description?: string | null;
   tags?: string[] | null;
   isVariable?: boolean; // Si vrai, demande une précision (variant) à l'ajout
+  hasAutoCounter?: boolean;
+  autoCounterName?: string;
+  isXPUpgradeable?: boolean;
   variants?: string[] | null; // Liste des variantes suggérées (ex: "Chats", "Pollen" pour Allergie)
   effects?: TraitEffect[] | null; // New Effects System
   isGlobal?: boolean;
@@ -168,6 +171,31 @@ export interface LibraryCounterEntry {
   isActive?: boolean;
   isLocked?: boolean;
   globalUsage?: number;
+  isNumeric?: boolean;
+  formula?: string;
+  formulaId?: string; // ID de la formule globale à utiliser pour le Max
+}
+
+export interface LibraryFormulaEntry {
+  id: string;
+  name: string;
+  code?: string; // Identifiant technique pour les calculs (ex: MA_VARIABLE)
+  formula: string;
+  type: 'modifier' | 'variable'; // 'modifier' = Affecte une valeur (Cible/Action), 'variable' = Calcul interne (Equation ou Agrégat)
+  target?: string;
+  effectType?: string;
+  description?: string;
+  isGlobal?: boolean;
+  isActive?: boolean;
+  operator?: 'ADD' | 'SET' | 'SUB' | ''; // Permet d'être vide pour l'héritage
+  forceVariant?: boolean;
+  // Configuration pour l'agrégation automatique (Mode Somme/Compte)
+  aggregateConfig?: {
+    operation: 'sum' | 'count' | 'max' | 'avg';
+    targetType: 'skills' | 'attributes' | 'traits';
+    filterTarget: 'category' | 'tag' | 'name';
+    filterValue: string;
+  };
 }
 
 export interface LogEntry {

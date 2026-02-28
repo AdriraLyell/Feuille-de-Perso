@@ -5,6 +5,7 @@ import { generateId } from '../utils/factories';
 import { RulesData } from '../types/rules';
 import { CharacterSheetData } from '../types/character';
 import { getSkillCategory, getCounter, setCounter } from '../utils/stateAccessors';
+import { evaluateFormula } from '../utils/formulaEvaluator';
 
 interface DropPayload {
     type: string;
@@ -281,9 +282,8 @@ export const useCharacterSheetActions = (
                         if (isCreationMode) newItem.creationValue = value;
                         const effectiveMax = newItem.variant === 'squares_only' ? (newItem.max || 10) : newItem.value;
                         if ((newItem.current || 0) > effectiveMax) newItem.current = effectiveMax;
-                    } else {
-                        const effectiveMax = newItem.variant === 'squares_only' ? (newItem.max || 10) : newItem.value;
-                        newItem.current = Math.min(value, effectiveMax);
+                    } else if (field === 'current') {
+                        newItem.current = value;
                     }
                     return newItem;
                 });
@@ -325,9 +325,8 @@ export const useCharacterSheetActions = (
                     }
                     newItem.value = value;
                     if ((newItem.current || 0) > value) newItem.current = value;
-                } else {
-                    const effectiveMax = newItem.variant === 'squares_only' ? (newItem.max || 10) : newItem.value;
-                    newItem.current = Math.min(value, effectiveMax);
+                } else if (field === 'current') {
+                    newItem.current = value;
                 }
 
                 const updatedCounters = { ...prev.counters };

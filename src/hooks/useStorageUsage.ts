@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { checkStorageQuota } from '../imageDB';
+import { checkStorageQuota } from '../services/imageDB';
 import { logger } from '../utils/logger';
 
 export interface StorageStats {

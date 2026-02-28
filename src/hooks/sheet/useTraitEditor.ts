@@ -20,14 +20,19 @@ export const useTraitEditor = (
         // Determine if this trait has a auto_counter effect and an associated counter
         const newCustomCounters = [...data.counters.custom];
         let hasCounterChanges = false;
-        let counterIdToRemove = removedItem.associatedCounterId;
+        const counterIdToRemove = removedItem.associatedCounterId;
 
         // If not found directly, try via definition
         if (!counterIdToRemove && removedItem.definitionId && _rules?.libraries?.traits) {
             const traitDef = _rules.libraries.traits.find(t => t.id === removedItem.definitionId);
             if (traitDef) {
-                const counterEffect = traitDef.effects?.find(e => e.type === 'auto_counter');
-                counterIdToRemove = counterEffect?.target || counterEffect?.associatedCounterId;
+                const hasNewProperty = traitDef.hasAutoCounter;
+
+                // If it should have a counter but associatedCounterId is missing, this is an edge case
+                // usually we rely on associatedCounterId stored on the character's instance.
+                if (hasNewProperty) {
+                    onAddLog(`Suppression du compteur lié à ${removedName}`, 'info', 'sheet');
+                }
             }
         }
 
@@ -115,24 +120,38 @@ export const useTraitEditor = (
             }
 
             if (listIndex < currentList.length) {
+                // Helper to resolve effective effect properties from global library
+                const resolveEffect = (e: any) => {
+                    const res = { ...e };
+                    if (e.formulaId && _rules?.libraries?.formulas) {
+                        const global = _rules.libraries.formulas.find(f => f.id === e.formulaId);
+                        if (global) {
+                            if (global.target) res.target = global.target;
+                            if (global.effectType) res.effectType = global.effectType;
+                        }
+                    }
+                    return res;
+                };
+
                 // Determine if this trait has a auto_counter effect
                 let associatedCounterId: string | undefined = undefined;
-                const counterEffect = entry.effects?.find(e => e.type === 'auto_counter');
+                const hasNewAutoCounter = entry.hasAutoCounter;
+                const counterEffect = entry.effects?.map(resolveEffect).find(e => e.effectType === 'auto_counter');
 
-                if (counterEffect) {
-                    const baseCounterName = counterEffect.target?.trim();
+                if (hasNewAutoCounter || counterEffect) {
+                    const baseCounterName = (entry.autoCounterName || counterEffect?.target)?.trim();
                     const variantName = instance.variant?.trim();
 
                     let finalCounterName = "";
                     if (baseCounterName) {
                         finalCounterName = variantName ? `${baseCounterName} (${variantName})` : baseCounterName;
                     } else {
-                        // Option C: Fallback to variant or trait name
+                        // Fallback to variant or trait name
                         finalCounterName = variantName || entry.name;
                     }
 
                     associatedCounterId = Math.random().toString(36).substring(2, 9);
-                    const newCounter = {
+                    const newCounter: any = {
                         id: associatedCounterId,
                         name: finalCounterName,
                         value: 0,
@@ -155,7 +174,11 @@ export const useTraitEditor = (
                 }
 
                 // Detect master_skill effect — wizard will fill in masterSkillTarget later
-                const hasMasterSkill = entry.effects?.some(e => e.type === 'master_skill');
+                // Detect master_skill effect — wizard will fill in masterSkillTarget later
+                const hasMasterSkill = entry.effects?.some(e => {
+                    const resolved = resolveEffect(e);
+                    return resolved.effectType === 'master_skill';
+                });
                 if (hasMasterSkill && masterSkillTraitIndex === null) {
                     masterSkillTraitIndex = listIndex;
                     masterSkillTraitName = entry.name;
@@ -168,10 +191,14 @@ export const useTraitEditor = (
                     tag: entry.tags?.[0] || '',
                     variant: instance.variant || '',
                     definitionId: entry.id,
+                    type: multiSelectTarget === 'avantages' ? 'avantage' : 'desavantage',
                     mysticAbilityId: entry.mysticAbilityId || undefined,
                     isPostCreation: isPostCreation ? true : undefined,
                     creationValue: isPostCreation ? "0" : undefined,
-                    associatedCounterId: associatedCounterId
+                    associatedCounterId: associatedCounterId,
+                    hasAutoCounter: entry.hasAutoCounter,
+                    autoCounterName: entry.autoCounterName,
+                    isXPUpgradeable: entry.isXPUpgradeable
                 };
 
                 if (isPostCreation) {
@@ -245,10 +272,15 @@ export const useTraitEditor = (
         }
 
         // 2. Stocker le nom dans le TraitEntry correspondant (masterSkillTarget)
+        // Et mettre à jour le variant pour l'affichage ("Maitre : Bagarre")
         const traitList = [...currentData.page2[traitType]];
         const traitIdx = traitList.findIndex(t => t.name === traitName && !t.masterSkillTarget);
         if (traitIdx !== -1) {
-            traitList[traitIdx] = { ...traitList[traitIdx], masterSkillTarget: skillName };
+            traitList[traitIdx] = {
+                ...traitList[traitIdx],
+                masterSkillTarget: skillName,
+                variant: skillName
+            };
         }
 
         return {

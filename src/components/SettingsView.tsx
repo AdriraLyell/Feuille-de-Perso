@@ -17,7 +17,7 @@ import LibrarySidebar from './settings/LibrarySidebar';
 import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
 import LibraryView from './LibraryView';
 import AdminSuggestions from './settings/AdminSuggestions'; // NEW
-import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Lock, UploadCloud, Lightbulb } from 'lucide-react';
+import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Lock, UploadCloud, Lightbulb, Calculator } from 'lucide-react';
 
 // Rules Integration
 import { useRules } from '../context/RulesContext';

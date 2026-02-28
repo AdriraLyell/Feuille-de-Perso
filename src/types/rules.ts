@@ -1,4 +1,4 @@
-import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry } from './system';
+import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry, LibraryFormulaEntry } from './system';
 
 export interface RulesCreationConfig {
     mode: 'points' | 'rangs';
@@ -75,6 +75,7 @@ export interface RulesCounterDefinition {
     defaultValue?: number; // Starting value (New system)
     description?: string; // New: Description for tooltip
     appearance?: 'squares_only'; // Utilisé pour masquer les bulles (ex: Compteurs de Traits)
+    formulaId?: string; // ID de la formule globale à utiliser pour le Max
 }
 
 export interface RulesData {
@@ -114,6 +115,7 @@ export interface RulesData {
         counters: LibraryCounterEntry[]; // Unified Counters
         specializations: LibrarySpecializationEntry[];
         mysticAbilities: LibrarySkillEntry[];
+        formulas?: LibraryFormulaEntry[]; // Dictionnaire central des formules
     };
 }
 // --- Calendar ---

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Plus, Award, Save, UploadCloud, CheckCircle2, Circle } from 'lucide-react';
+import { Search, Plus, Award, Save, UploadCloud, CheckCircle2, Circle, X } from 'lucide-react';
 import { RulesData } from '../../../types/rules';
 import { LibrarySpecializationEntry } from '../../../types';
 import { smartIncludes } from '../../../utils/stringUtils';
@@ -227,11 +227,19 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                 <div className="relative flex-grow max-w-md w-full">
                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
                     <input
-                        className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
+                        className="w-full pl-9 pr-9 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
                         placeholder="Rechercher une spécialisation..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
+                    {searchTerm && (
+                        <button
+                            onClick={() => setSearchTerm('')}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/40 hover:text-amber-600 transition-colors"
+                        >
+                            <X size={14} />
+                        </button>
+                    )}
                 </div>
 
                 {/* Bulk Actions */}

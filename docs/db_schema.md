@@ -11,6 +11,7 @@
 - **`libraries_backgrounds`** : Arrière-plans.
 - **`libraries_counters`** : Compteurs (Volonté, etc.).
 - **`libraries_mystic_abilities`** : Capacités mystiques (Arts Martiaux, Magies, etc.).
+- **`libraries_formulas`** : Dictionnaire central des calculs (Modificateurs et Variables).
 - **`libraries_traits_variants`** : Variantes de noms pour les Traits (ex: "Peureux" pour "Phobie").
 - **`libraries_skills_variants`** : Variantes de noms pour les Compétences.
 - **`libraries_backgrounds_variants`** : Variantes de noms pour les Arrière-plans.

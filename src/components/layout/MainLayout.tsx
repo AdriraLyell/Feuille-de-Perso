@@ -15,6 +15,7 @@ import { INITIAL_DATA } from '../../data/initialState';
 import { logger } from '../../utils/logger';
 import { useCloudSyncCheck } from '../../hooks/useCloudSyncCheck';
 import { useAutoSave } from '../../hooks/useAutoSave';
+import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 
 // Static Components
 import DiegeticNavigation from './DiegeticNavigation';
@@ -43,13 +44,14 @@ import { exportCharacterAsJSON } from '../../utils/importExportUtils';
 import { useNavigationState } from '../../hooks/layout/useNavigationState';
 import { usePrintManager } from '../../hooks/layout/usePrintManager';
 import { useRulesSync } from '../../hooks/layout/useRulesSync';
+import PostItBoard from '../ui/PostItBoard';
 
 // Icons
 import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, TrendingUp, History, Clock, X, Trash2, Save, Book, LogOut, Menu, Upload } from 'lucide-react';
 
 const MainLayout: React.FC = () => {
     const { data, updateData: setData, addLog, importData, isSyncing, sync } = useCharacter();
-    const { rules, updateRules } = useRules();
+    const { rules, updateRules, isOnlineMode, reloadRules } = useRules();
 
     // Custom Hooks
     const [isLandscape, setIsLandscape] = useState(() => {
@@ -87,6 +89,15 @@ const MainLayout: React.FC = () => {
     } = useRulesSync(data, rules, setData, updateRules, addLog);
 
     const { hasUpdate, mjMessage } = useCloudSyncCheck(data);
+
+    // Notifications temps réel : admin → joueur
+    useRealtimeSync({
+        settingId: rules?.settingId,
+        characterId: data?.syncInfo?.syncId,
+        isOnlineMode,
+        reloadRules,
+        addLog,
+    });
 
     // Auto-Save Logic
     const { countdown } = useAutoSave(data, false, (mode) => sync(mode));
@@ -326,6 +337,7 @@ const MainLayout: React.FC = () => {
                                     </div>
 
                                     {data.creationConfig?.active && (<CreationHUD />)}
+                                    <PostItBoard currentTab={sheetTab} />
                                 </>
                             ) : (
                                 <SettingsView

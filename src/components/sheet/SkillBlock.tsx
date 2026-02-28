@@ -6,6 +6,7 @@ import { Info } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { logger } from '../../utils/logger';
+import { useNotification } from '../../context/NotificationContext';
 
 const DotRow: React.FC<{
     entry: DotEntry;
@@ -19,8 +20,10 @@ const DotRow: React.FC<{
     isEditing?: boolean;
     onRemove?: (category: string, id: string) => void;
     validateIncrease?: (id: string, newValue: number) => { allowed: boolean; reason?: string };
-}> = ({ entry, category, onUpdate, specializations = [], theme, imposedSpecs = [], onDefineVariant, allowExtendedSkills = false, isEditing = false, onRemove, validateIncrease }) => {
+    blockedReason?: string;
+}> = ({ entry, category, onUpdate, specializations = [], theme, imposedSpecs = [], onDefineVariant, allowExtendedSkills = false, isEditing = false, onRemove, validateIncrease, blockedReason }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const addLog = useNotification();
 
     // Spacer logic
     if (!entry.name) {
@@ -103,20 +106,16 @@ const DotRow: React.FC<{
     };
 
     const textColor = getTextColor();
+    const isBlocked = !!blockedReason;
 
     // Validation Check for Interaction
     const handleUpdate = (val: number) => {
         if (validateIncrease && val > entry.value) {
             const check = validateIncrease(entry.id, val);
             if (!check.allowed) {
-                // Show toast/alert? For now just block and maybe log
-                // Ideally we show a tooltip on hover if blocked?
-                // But DotRating handles clicks.
-                // We just won't call onUpdate if invalid?
-                // And show a browser alert or console warning is brutal.
-                // Let's rely on the parent to handle the "rejection" or just block.
-                logger.warn(`Skill increase blocked: ${check.reason}`);
-                alert(check.reason); // Simple fallback
+                if (check.reason) {
+                    addLog(check.reason, 'danger', 'sheet', `block-${entry.id}`);
+                }
                 return;
             }
         }
@@ -139,23 +138,24 @@ const DotRow: React.FC<{
             onMouseLeave={() => setIsOpen(false)}
         >
             <span
-                className={`text-xs truncate font-medium transition-colors ${isUndefinedVariable
+                className={`text-xs truncate font-medium transition-all ${isUndefinedVariable
                     ? 'font-bold cursor-pointer hover:underline' // Removed text-color classes to let style override
                     : hasSpecs
                         ? 'font-semibold cursor-help underline underline-offset-2 decoration-blue-300' // Removed text-blue-900
-                        : 'cursor-default'}`} // Removed text-stone-700
+                        : 'cursor-default'
+                    } ${isBlocked ? 'line-through opacity-60 italic' : ''}`}
                 // Dynamic width adjustment to avoid overlap with extra bubbles
                 style={{
                     width: effectiveMax > 5 ? '45%' : '65%',
-                    color: textColor ? textColor : (isUndefinedVariable ? '#d97706' : (hasSpecs ? '#1e3a8a' : '#44403c')) // Fallbacks: amber-600, blue-900, stone-700
+                    color: isBlocked ? '#71717a' : (textColor ? textColor : (isUndefinedVariable ? '#d97706' : (hasSpecs ? '#1e3a8a' : '#44403c'))) // Fallbacks: amber-600, blue-900, stone-700
                 }}
                 onClick={handleClick}
                 title={entry.description || (entry.variant ? `${entry.name} : ${entry.variant}` : entry.name)}
             >
                 {entry.variant !== undefined ? (
                     <>
-                        <span style={{ color: textColor || '#d97706' }} className="font-bold">{entry.name}{' : '}</span>
-                        <span className={`${isUndefinedVariable ? 'italic opacity-60' : 'font-normal'}`} style={{ color: textColor ? textColor : (isUndefinedVariable ? 'inherit' : '#78716c') }}>
+                        <span style={{ color: isBlocked ? '#71717a' : (textColor || '#d97706') }} className="font-bold">{entry.name}{' : '}</span>
+                        <span className={`${isUndefinedVariable ? 'italic opacity-60' : 'font-normal'}`} style={{ color: isBlocked ? '#71717a' : (textColor ? textColor : (isUndefinedVariable ? 'inherit' : '#78716c')) }}>
                             {entry.variant || '...'}
                         </span>
                     </>
@@ -193,6 +193,7 @@ const DotRow: React.FC<{
                 symbol={theme?.dotSymbol}
                 max={effectiveMax}
                 readOnly={isEditing}
+                blockedReason={blockedReason}
             />
 
             {isEditing && (entry.value === 0 || !entry.name) && (
@@ -223,7 +224,8 @@ export const SkillBlock = React.memo<{
     onDrop?: (category: string, item: any, targetIndex: number) => void;
     onRemove?: (category: string, id: string) => void;
     validateIncrease?: (id: string, newValue: number) => { allowed: boolean; reason?: string };
-}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, isEditing = false, onDrop, onRemove, validateIncrease }) => {
+    blockedSkills?: Record<string, { isBlocked: boolean, sourceName: string }>;
+}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, isEditing = false, onDrop, onRemove, validateIncrease, blockedSkills = {} }) => {
     const [showDesc, setShowDesc] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
     const [dropIndex, setDropIndex] = useState<number>(-1);
@@ -316,6 +318,8 @@ export const SkillBlock = React.memo<{
                 {(items || []).map((item, idx) => {
                     const iSpecs = imposedSpecs[item.id] || [];
                     const uSpecs = userSpecs[item.id] || [];
+                    const normalizedName = item.name.trim().toLowerCase();
+                    const blockedInfo = blockedSkills[normalizedName];
 
                     return (
                         <DotRow
@@ -331,6 +335,7 @@ export const SkillBlock = React.memo<{
                             isEditing={isEditing}
                             onRemove={onRemove}
                             validateIncrease={validateIncrease}
+                            blockedReason={blockedInfo?.sourceName}
                         />
                     );
                 })}

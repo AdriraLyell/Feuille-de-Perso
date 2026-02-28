@@ -1,4 +1,4 @@
-import { saveImage, base64ToBlob } from '../../imageDB';
+import { saveImage, base64ToBlob } from '../../services/imageDB';
 import { logger } from '../../utils/logger';
 
 /**

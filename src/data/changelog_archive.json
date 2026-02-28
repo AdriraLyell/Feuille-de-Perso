@@ -1,5 +1,574 @@
 [
     {
+        "version": "2.95.0",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Système (Mécaniques Dynamiques) : Introduction de 'Forcer Variante' dans les formules globales. Permet aux traits d'exiger une précision du joueur (ex: choix d'une compétence) qui devient automatiquement la cible de l'effet. Ajout de suggestions dynamiques dans le sélecteur de variantes basées sur la cible de la formule (Compétence, Attribut, etc.)."
+    },
+    {
+        "version": "2.94.1",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Système (Calcul XP/Dictionnaire) : Correction d'un bug où l'XP bonus d'un trait n'était pas pris en compte lorsqu'une formule globale sélectionnée avait un contenu vide (l'héritage écrasait à tort la valeur fixe locale du trait)."
+    },
+    {
+        "version": "2.94.0",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Ergonomie (Admin Formules) : Auto-génération intelligente du code de la formule à partir du nom saisi (conversion en majuscules, retrait des accents et remplacement des espaces par des tirets bas). Lors de la création d'une nouvelle formule, le nom et le code sont désormais vides pour forcer explicitement une saisie propre."
+    },
+    {
+        "version": "2.93.9",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Correction du Mode Avertissement (Admin Formules) : Résolution du bug invisible empêchant l'affichage de la pastille orange (Modèle incomplet). Le validateur simule désormais correctement la configuration par défaut du type d'effet."
+    },
+    {
+        "version": "2.93.8",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Correction de la Réactivité (Admin Formules) : Le statut de validation et l'aperçu numérique se mettent désormais à jour instantanément lors de la modification de la Cible ou de l'Opération d'un effet. Plus besoin de changer de type d'effet ou de modifier l'équation pour forcer la validation."
+    },
+    {
+        "version": "2.93.6",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Ergonomie & Validation (Admin Formules) : Implémentation d'une autocomplétion intelligente et stylisée pour le champ 'Cible de l'effet'. La liste est désormais limitée en hauteur avec un défilement interne, et propose dynamiquement les Attributs, Compétences et Compteurs définis dans les règles. La validation des cibles est désormais insensible à la casse et aux espaces, garantissant un retour visuel (aperçu) fiable même en cas de saisie approximative."
+    },
+    {
+        "version": "2.93.5",
+        "date": "2026-02-27",
+        "type": "chore",
+        "description": "Nettoyage du Moteur : Suppression de la variable XP_TOTAL pour éviter toute confusion avec la cible XP. Mise à jour des outils d'administration et de la documentation."
+    },
+    {
+        "version": "2.93.4",
+        "date": "2026-02-27",
+        "type": "chore",
+        "description": "Simplification du Système de Formules : Suppression des types d'effets redondants (Gain XP, Bonus Attribut, Bonus Réserve). Le moteur est désormais piloté par la 'Cible' (Source de Vérité unique) et un type générique 'modifier', réduisant la confusion lors de la création de mécaniques MJ. Mise à jour du Guide des Formules."
+    },
+    {
+        "version": "2.93.3",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Flexibilité de l'Héritage MJ (Modèles Incomplets) : Le dictionnaire de formules supporte désormais des modèles 'partiels' ou 'incomplets' (statut orange). Les créateurs de traits peuvent compléter les paramètres manquants (Cible, Opérateur, Équation) au niveau du trait. Si l'équation est absente du modèle, une valeur numérique fixe peut être saisie directement dans le trait."
+    },
+    {
+        "version": "2.93.2",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Unification de l'Héritage MJ : Dans l'éditeur de traits, les champs 'Cible' et 'Opération' sont désormais automatiquement masqués et verrouillés s'ils sont déjà définis dans le dictionnaire de formules MJ. Cela garantit une source de vérité unique et simplifie l'interface pour le créateur de contenu."
+    },
+    {
+        "version": "2.93.1",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Correction du bug de Stale State React : La sélection d'une formule globale dans l'éditeur d'effets mécaniques est désormais sauvegardée avec succès grâce à l'utilisation de la fonction updater de l'état React (Update Multiple Fields)."
+    },
+    {
+        "version": "2.93.0",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Migration Systémique des Formules : Intégration d'un outil de migration robuste dans le tableau de bord Admin pour convertir automatiquement les anciens effets hérités (bonus d'attributs, XP, rangs gratuits) vers le nouveau système de formules unifié. Support complet des opérateurs ADD/SET/SUB dans le moteur de calcul et l'interface d'édition. Centralisation de la logique de calcul pour garantir la cohérence entre les modes de jeu online et offline."
+    },
+    {
+        "version": "2.92.7",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Éditeur de Formules : Ajout d'un sélecteur de personnage réel pour l'aperçu dynamique des calculs. Permet aux MJ de valider leurs formules directement sur les fiches des personnages de la campagne, avec chargement à la demande des données via le service de synchronisation."
+    },
+    {
+        "version": "2.92.6",
+        "date": "2026-02-26",
+        "type": "feat",
+        "description": "UX Tooltips & Moteur de Calcul : Implémentation de bulles d'aide interactives (PortalTooltip) affichant le détail des calculs des compteurs dynamiques. Traduction automatique des variables techniques en noms lisibles via la bibliothèque de formules. Nettoyage du moteur en supprimant la variable SUM_MYSTIC en dur au profit des agrégats dynamiques. Corrections de la position des tooltips pour assurer la visibilité des compteurs."
+    },
+    {
+        "version": "2.92.5",
+        "date": "2026-02-26",
+        "type": "chore",
+        "description": "Suppression de l'intégration Aider et Cline : Retrait des configurations, historiques et scripts associés pour nettoyer l'environnement de travail."
+    },
+    {
+        "version": "2.92.4",
+        "date": "2026-02-26",
+        "type": "feat",
+        "description": "Support Aider : Intégration d'un workflow robuste (.agent/workflows/aider.md) et mise à jour des règles agent pour garantir des modifications précises et sans erreurs de syntaxe sous Windows."
+    },
+    {
+        "version": "2.92.3",
+        "date": "2026-02-26",
+        "type": "fix",
+        "description": "Correction du bug critique d'injection dans le moteur de calcul : Les variables résolues récursivement (comme SUM_HABILITES_MYSTIQUES) sont désormais correctement propagées au contexte final de la fiche, garantissant la mise à jour en temps réel de la Force Vitale et des autres compteurs dynamiques."
+    },
+    {
+        "version": "2.92.0",
+        "date": "2026-02-26",
+        "type": "fix",
+        "description": "Normalisation globale du moteur de calcul : Support universel des accents dans les variables (ex: Volonté / Volonte), renforcement de la détection des compétences mystiques via normalisation des noms, et ajout de logs de diagnostic pour le suivi des agrégats dynamiques."
+    },
+    {
+        "version": "2.91.0",
+        "date": "2026-02-26",
+        "type": "fix",
+        "description": "Correction de la mise à jour des compteurs dynamiques : Amélioration de l'identification des compétences mystiques par nom (fallback), synchronisation forcée des propriétés mystiques lors de l'édition, et injection systématique de la bibliothèque globale de formules lors de l'évaluation des jauge de réserve (Force Vitale) pour garantir la réactivité en temps réel."
+    },
+    {
+        "version": "2.90.0",
+        "date": "2026-02-26",
+        "type": "feat",
+        "description": "Refonte Architecturale (Logic vs Object) : Unification des variables MJ et agrégats dans un moteur de calcul centralisé. Les 'Réserves' sont désormais des 'Compteurs Dynamiques' liés à des formules. Ajout du support des agrégats personnalisés (Somme/Compte de traits/compétences avec filtres). Mise à jour de l'interface d'administration pour une expérience plus intuitive et guidée."
+    },
+    {
+        "version": "2.83.0",
+        "date": "2026-02-26",
+        "type": "feat",
+        "description": "Migration des Formules (Phase Finale) : Implémentation du moteur de calcul récursif avec variables MJ et agrégats. Refonte de l'éditeur de formules pour supporter les effets auto-portants (target/effectType hérités). Mise à jour du calculateur d'XP et de useCharacterBonuses pour une interprétation unifiée des mécaniques via le dictionnaire global."
+    },
+    {
+        "version": "2.82.5",
+        "date": "2026-02-25",
+        "type": "fix",
+        "description": "Correction des tests unitaires (useCharacterBonuses) en mockant les contextes Character et Rules, débloquant l'étape Unit Tests de la CI GitHub."
+    },
+    {
+        "version": "2.82.4",
+        "date": "2026-02-25",
+        "type": "fix",
+        "description": "Correction des erreurs ESLint bloquantes (prefer-const) dans l'éditeur de formules pour débloquer la CI GitHub."
+    },
+    {
+        "version": "2.82.3",
+        "date": "2026-02-25",
+        "type": "docs",
+        "description": "Mise à jour des règles de l'agent : Intégration de l'agent de codage (Aider) comme outil privilégié pour la chirurgie du code dans .agent/rules/regle.md."
+    },
+    {
+        "version": "2.82.2",
+        "date": "2026-02-25",
+        "type": "refactor",
+        "description": "Refactorisation majeure de l'architecture : Décomposition de `RosterApp.tsx`, `CharacterSheetPage2.tsx`, `ColumnarEditor.tsx` et `AdminSkillLibrarySidebar.tsx` en composants et hooks spécialisés pour améliorer la maintenance et la lisibilité du code."
+    },
+    {
+        "version": "2.82.1",
+        "date": "2026-02-25",
+        "type": "docs",
+        "description": "Maintenance : Audit de la taille des fichiers sources. Identification de `RosterApp.tsx` comme candidat à la refactorisation (~700 lignes) et confirmation de la conformité des autres fichiers critiques (< 450 lignes) avant la migration des formules."
+    },
+    {
+        "version": "2.82.0",
+        "date": "2026-02-25",
+        "type": "refactor",
+        "description": "Harmonisation des données : Suppression des fichiers fantômes (default_rules.json), migration des services d'images de la racine de src/ vers src/services/imageDB.ts, centralisation des constantes dans app.ts, et synchronisation de initialState.ts avec defaultRules.ts."
+    },
+    {
+        "version": "2.81.5",
+        "date": "2026-02-25",
+        "type": "fix",
+        "description": "CI : Renforcement du workflow 'prune-history' avec l'ajout systématique de l'étape 'actions/checkout' pour prévenir les erreurs de contexte git, garantissant le nettoyage automatique des anciens runs d'actions."
+    },
+    {
+        "version": "2.81.4",
+        "date": "2026-02-25",
+        "type": "docs",
+        "description": "Audit Technique Approfondi (Ground Truth) : Rapport d'état des formules basé exclusivement sur l'analyse du code source. Identification précise des variables injectées (XP_TOTAL, TRAIT_LEVEL, etc.), des points d'évaluation effectifs (XP, Bonus, Réserves) et des limites du hardcoding actuel."
+    },
+    {
+        "version": "2.81.3",
+        "date": "2026-02-25",
+        "type": "docs",
+        "description": "Ébauche de rapport d'audit des formules (basée sur documentation)."
+    },
+    {
+        "version": "2.81.2",
+        "date": "2026-02-25",
+        "type": "fix",
+        "description": "Affinage de l'apparence des compteurs : retour à une disposition horizontale compacte avec titre à gauche et alignement à droite, conformément à la référence visuelle (sans les étiquettes 'MAXI' et 'UTILISÉ')."
+    },
+    {
+        "version": "2.81.1",
+        "date": "2026-02-25",
+        "type": "fix",
+        "description": "Restauration de la mise en page des compteurs sur deux colonnes. Passage à une disposition verticale (nom au-dessus des points) pour garantir l'affichage correct des noms et des séries de points dans la barre latérale."
+    },
+    {
+        "version": "2.81.0",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Automatisation Complète de la Migration des Formules : Les effets mécaniques hérités (attribute_bonus, xp_bonus, counter_max_bonus) sont désormais convertis automatiquement en formules globales lors du chargement des règles de campagne. Implémentation du support base de données (`libraries_formulas`), des services de persistance et de chargement pour garantir l'intégrité et la permanence des données migrées sans intervention manuelle."
+    },
+    {
+        "version": "2.80.1",
+        "date": "2026-02-24",
+        "type": "fix",
+        "description": "Migration des Règles Globales : Correction du script de migration pour inclure les paramètres de campagne globaux (`RulesData`), assurant la conversion silencieuse des anciens effets quantitatifs locaux en formules orphelines. Mise à jour de l'outil d'unification dans l'administration pour détecter, traiter et assigner ces effets legacy existants au dictionnaire global."
+    },
+    {
+        "version": "2.80.0",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Unification Formula System : Intégration complète du dictionnaire global de formules. Les traits peuvent désormais référencer des mécaniques centralisées (Bonus, Réserves). Introduction d'un outil de migration automatique dans l'administration pour transformer les anciennes formules locales en entrées globales. Support dynamique des 'Réserves Joueur' qui s'affichent automatiquement sur la fiche si le trait correspondant est possédé."
+    },
+    {
+        "version": "2.78.0",
+        "date": "2026-02-24",
+        "description": "Migration des données et Nettoyage de Code : Script de migration (v4) pour convertir tous les anciens effets quantitatifs (attribute_bonus, xp_bonus, counter_max_bonus) vers le nouveau système de formules. Suppression complète des anciennes mentions de ces effets du code source."
+    },
+    {
+        "version": "2.77.0",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Système de Formules : Refonte des anciens modificateurs quantitatifs (+Attributs, +XP, +Comptoirs). Le créateur de trait (MJ) peut désormais utiliser l'option de calcul par Formule permettant de démultiplier les effets de n'importe quel attribut ou compteur à l'aide de données d'XP ou du Niveau de Trait."
+    },
+    {
+        "version": "2.76.5",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Système de Formules : L'onglet Formules a été déplacé du panneau des Paramètres Joueur (Rouage de la fiche) vers l'interface d'Administration (Général et création > Formules). Les formules sont désormais des paramètres globaux injectés directement aux fiches par le MJ."
+    },
+    {
+        "version": "2.76.4",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Système de Formules : Intégration d'un module de Formules permettant aux admins de créer des compteurs numériques dynamiques et de définir leur maximum via des équations incluant Variables, Caractéristiques, et Compétences (ex: XP_TOTAL + Intelligence)."
+    },
+    {
+        "version": "2.76.3",
+        "date": "2026-02-24",
+        "type": "refactor",
+        "description": "Admin : Compactage majeur de l'interface. Migration des pavés d'en-tête en bandeaux fins, passage à un layout sur deux colonnes pour l'onglet Paramètres, et correction visuelle des commutateurs (switches) pour éviter les débordements."
+    },
+    {
+        "version": "2.76.2",
+        "date": "2026-02-24",
+        "type": "feat",
+        "description": "Admin (Général & Création) : Refonte structurelle de l'onglet avec l'introduction d'un système de sous-onglets ('Création' et 'Paramètres'). Compactage de l'en-tête via une disposition en grille des panneaux 'Information de Campagne' et 'Configuration Système'. Réorganisation thématique des réglages (méthodes de création d'un côté, mécaniques transverses comme l'XP, les cartes et les habilités mystiques de l'autre) pour une meilleure ergonomie."
+    },
+    {
+        "version": "2.76.1",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Mécaniques : Correction d'un bug empêchant l'application des bonus de maximum de compteur (counter_max_bonus). Centralisation du calcul des bonus dans useCharacterBonuses et renforcement de la détection par normalisation des noms (accents/casse) et vérification systématique de la bibliothèque globale."
+    },
+    {
+        "version": "2.76.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Mécaniques : Implémentation du système de 'Confiance' et des effets complexes pour les traits. Introduction de l'effet 'counter_max_bonus' permettant d'augmenter dynamiquement le maximum d'un compteur (ex: +1 Confiance par rang de trait) et de l'effet 'xp_upgradeable' autorisant la montée en niveau de certains traits spécifiques via la dépense d'XP post-création. Mise à jour de l'éditeur de traits admin pour supporter ces nouveaux effets."
+    },
+    {
+        "version": "2.75.18",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Interface (Fiche) : Agrandissement de la zone de texte des noms de compteurs (Confiance, Volonté, etc.) pour une meilleure lisibilité et éviter les coupures de mots."
+    },
+    {
+        "version": "2.75.17",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Interface (Fiche) : Suppression des libellés 'MAXI' et 'UTILISÉ' (ou 'Cases') dans la section des compteurs pour un design plus épuré, conformément aux retours utilisateur."
+    },
+    {
+        "version": "2.75.16",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Mécaniques : Implémentation du blocage d'augmentation de compétence par les traits. Un trait peut désormais être configuré pour empêcher le joueur d'augmenter le niveau d'une compétence spécifique. Visualisation immédiate par le nom barré et la disparition des bulles de progression futures, avec retour d'erreur (toast) en cas de tentative d'augmentation."
+    },
+    {
+        "version": "2.75.15",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "CI : Correction du workflow de nettoyage des anciens runs (prune-history). Ajout du contexte explicite du dépôt aux commandes GitHub CLI pour éviter les erreurs d'exécution en environnement sans dossier .git."
+    },
+    {
+        "version": "2.75.14",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Registre (Roster) : Ajout d'options de tri global pour les avantages et désavantages dans la section Profils. Permet de trier les traits par nom ou par coût pour tous les personnages simultanément."
+    },
+    {
+        "version": "2.75.13",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Bibliothèque de Traits : Amélioration des options de tri. Ajout de boutons explicites pour le tri par ordre alphabétique et par coût, avec retour visuel amélioré et icônes directionnelles."
+    },
+    {
+        "version": "2.75.12",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Interface (Registre) : Refonte de la mise en page des attributs pour regrouper les colonnes par 'pavés' (Physique, Mental, Social). Ajout de séparateurs visuels forts et d'un fond coloré subtil par catégorie pour une lecture plus structurée."
+    },
+    {
+        "version": "2.75.11",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie : Généralisation du bouton de suppression (croix) dans tous les champs de recherche de l'application (Bibliothèques Joueur, Registre, Vues Admin, etc.) pour une expérience utilisateur cohérente."
+    },
+    {
+        "version": "2.75.10",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie (Registre) : Ajout d'un bouton de suppression (croix) dans le champ de recherche des compétences pour vider rapidement la saisie."
+    },
+    {
+        "version": "2.75.9",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Ergonomie (Registre) : Agrandissement de la taille du texte des valeurs dans le tableau des attributs pour améliorer la lisibilité."
+    },
+    {
+        "version": "2.75.8",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie (Registre) : Affichage discret de la date courante de la chronique dans l'en-tête de la section 'Gestion Temporelle' lorsque celle-ci est repliée."
+    },
+    {
+        "version": "2.75.7",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Ergonomie (Registre) : Alignement sur une seule ligne des contrôles de gestion de date et des boutons d'avancée du temps pour minimiser l'encombrement."
+    },
+    {
+        "version": "2.75.6",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Registre : Ajout d'une section 'Gestion Temporelle' permettant d'afficher la date actuelle de la chronique et d'avancer le temps (+1 Jour, +1 Semaine, +1 Mois) directement depuis l'interface."
+    },
+    {
+        "version": "2.75.5",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie : Ajout de menus accordéons pour les sections 'Compétences' et 'Traits' dans le Registre, permettant de réduire l'encombrement visuel lors de la consultation."
+    },
+    {
+        "version": "2.75.4",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Registre : Suppression du sélecteur de format portrait/paysage pour revenir à l'affichage standard (Attributs en lignes, Compétences en lignes) tout en conservant l'accordéon et le nouvel alignement des traits."
+    },
+    {
+        "version": "2.75.3",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Amélioration du Roster : Ajout d'un accordéon pour masquer les attributs, d'un commutateur de format (Paysage/Portrait) pour basculer l'orientation des matrices, et alignement structuré des avantages et désavantages dans les cartes de personnages."
+    },
+    {
+        "version": "2.75.2",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Ergonomie : Déplacement du sélecteur de Thème (icône palette) vers la section des contrôles de vue (à côté du switch Portrait/Paysage) et suppression de son label textuel pour plus de cohérence visuelle."
+    },
+    {
+        "version": "2.75.1",
+        "date": "2026-02-23",
+        "type": "fix",
+        "description": "Ergonomie : Suppression du label textuel 'Réglages' dans la barre de navigation pour un design plus épuré, conservant uniquement l'icône avec une info-bulle d'aide."
+    },
+    {
+        "version": "2.75.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Notifications temps réel admin → joueur via Supabase Realtime (WebSocket). Les modifications apportées par le Maître de Jeu (calendrier, règles, données de fiche) sont désormais propagées instantanément à tous les joueurs connectés, sans rechargement de page. Une notification apparaît automatiquement dans l'historique des actions."
+    },
+    {
+        "version": "2.74.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Amélioration du Roster : Séparation des habiletés mystiques par catégorie parente. Chaque type d'habileté (Magie, Arts Martiaux, etc.) dispose désormais de son propre tiroir dans la matrice des compétences pour une meilleure clarté."
+    },
+    {
+        "version": "2.73.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Fusion et consolidation globale des compétences dans le Registre des Acteurs (Roster). Les compétences sont désormais classées selon le référentiel maître de la chronique, ignorant les classements individuels pour éviter les doublons. Ajout d'une gestion intelligente des variantes et regroupement automatique des capacités liées aux Habiletés Mystiques."
+    },
+    {
+        "version": "2.72.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Création du Registre des Acteurs (Roster View). Ajout d'une nouvelle URL publique '?roster=uuid' permettant d'afficher une présentation tabulaire et détaillée de l'ensemble des personnages joueurs d'une chronique. Accessible via un nouveau bouton raccourci sur les cartes de campagne depuis le Tableau de Bord Admin."
+    },
+    {
+        "version": "2.71.5",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Amélioration visuelle de l'interface des Habilités Mystiques. Lorsqu'un personnage a un accès sans limite (niveau 5+) aux compétences liées, le compteur par défaut (999) est remplacé par un symbole 'Infini' et un texte plus immersif ('SANS LIMITE' & 'Vous avez un accès illimité')."
+    },
+    {
+        "version": "2.71.4",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Système d'expérience : Distinction visuelle des traits. Utilisation de l'icône ⬆️ bleue pour les avantages améliorés et ❇️ verte pour les nouveaux traits acquis post-création."
+    },
+    {
+        "version": "2.71.3",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Système d'expérience : Les limites d'amélioration des avantages sont désormais dynamiquement extraites des plages de coûts définies en bibliothèque (ex: un avantage coûtant '1-3' sera bridé au niveau 3)."
+    },
+    {
+        "version": "2.71.2",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Système d'expérience : Précision des règles d'amélioration des avantages. Seuls les avantages à coût variable (vérification en bibliothèque) peuvent être augmentés. Uniformisation de l'icône visuelle : le symbole ❇️ (en bleu) identifie désormais les avantages améliorés, en cohérence avec l'icône d'acquisition post-création."
+    },
+    {
+        "version": "2.71.1",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Système d'expérience : Limite maximale de l'amélioration des avantages fixée à 5. Ajout d'une icône ⬆️ distinctive dans la liste des traits pour repérer rapidement les avantages qui ont été améliorés post-création avec de l'XP."
+    },
+    {
+        "version": "2.71.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Système d'expérience : Il est désormais possible de dépenser de l'XP post-création pour augmenter le niveau d'un avantage (trait) que le personnage possède déjà. L'intégration calcule automatiquement la différence de coût pour un suivi précis de l'expérience dépensée."
+    },
+    {
+        "version": "2.70.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Nouveau système de Post-its : Vous pouvez désormais créer des notes visuelles colorées sur chaque onglet de la fiche de personnage. Ces Post-its peuvent être déplacés librement à l'écran, modifiés, redimensionnés et sont sauvegardés avec votre personnage."
+    },
+    {
+        "version": "2.69.5",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "UI : Ajout d'une marge dynamique sur les onglets Personnage et Spécialisations pour éviter que les barres latérales (Édition et Catalogue) ne chevauchent le contenu de la fiche."
+    },
+    {
+        "version": "2.69.4",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ergonomie : Persistance de l'état ouvert/fermé du Chroniqueur (calendrier) dans les notes de campagne. Le calendrier conserve désormais son état même après avoir changé d'onglet ou rechargé la page."
+    },
+    {
+        "version": "2.69.3",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ergonomie : Ajout d'un curseur 'pointer' (main) sur les cartes de sélection des sources (Chroniques, Hors Ligne, Reprendre) pour indiquer clairement qu'elles sont interactives."
+    },
+    {
+        "version": "2.69.2",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ergonomie : Augmentation de la hauteur de la fenêtre de synchronisation (modal) pour permettre une meilleure visibilité de l'historique des sauvegardes sans défilement excessif."
+    },
+    {
+        "version": "2.69.1",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Ergonomie : Mémorisation de la préférence d'affichage (mode portrait / paysage) dans le cache local (localStorage). Le mode choisi persiste désormais après rechargement de la page."
+    },
+    {
+        "version": "2.69.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Système de 'Date Picker' interactif pour le Journal : Cliquez sur les icônes calendrier des blocs narratifs pour sélectionner une date directement depuis le Chroniqueur sans créer de nouveau chapitre. Ajout de champs de titre personnalisés pour le sommaire automatique et réduction globale de la taille des labels pour une interface plus épurée."
+    },
+    {
+        "version": "2.68.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Améliorations majeures des sections narratives et du Chroniqueur : (1) Possibilité de masquer/afficher le Chroniqueur depuis la barre latérale. (2) Ajout de champs d'heure pour les moments de journée. (3) Ajout de champs de date pour les flashbacks. (4) Support des calendriers fictifs pour les sélecteurs de date de voyage et flashbacks."
+    },
+    {
+        "version": "2.67.1",
+        "date": "2026-02-23",
+        "type": "chore",
+        "description": "Ajustements ergonomiques du Chroniqueur : renommage du widget, formatage des dates en JJ/MM/AAAA dans la Timeline, et déplacement des flèches de navigation vers le haut pour éviter les chevauchements."
+    },
+    {
+        "version": "2.67.0",
+        "date": "2026-02-23",
+        "type": "feat",
+        "description": "Fusion majeure du Compagnon Temporel et du Journal de Campagne : (1) Navigation chronologique par clic sur les dates. (2) Mode 'Timeline' synthétique. (3) Assistant de création de chapitre à date. (4) Indicateurs de météo et ambiances sur les chapitres et le calendrier. (5) Compte à rebours avant le prochain évènement majeur. (6) Nouveaux blocs narratifs flexibles (Moments de journée, Voyages)."
+    },
+    {
+        "version": "2.66.3",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Correction majeure de la visibilité du Compagnon Temporel : (1) Correction du chemin d'accès aux données (configurations.calendar). (2) Repositionnement du widget à gauche de la barre latérale pour éviter qu'il ne soit hors-écran sur les résolutions standards."
+    },
+    {
+        "version": "2.66.2",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Ajustement du positionnement du Compagnon Temporel pour une meilleure visibilité dans le Grimoire et correction du filtrage des événements calendaires."
+    },
+    {
+        "version": "2.66.1",
+        "date": "2026-02-22",
+        "type": "fix",
+        "description": "Correction d'une erreur de référence sur BookChapterSidebar dans le journal de campagne."
+    },
+    {
+        "version": "2.66.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Intégration du calendrier dans le journal de campagne ('Compagnon Temporel') : Un nouveau widget interactif s'affiche dans la barre latérale du Grimoire, permettant de consulter la date actuelle et les événements planifiés sans quitter l'éditeur. Améliorations Admin : nouveau bouton '+1 Jour' pour le calendrier fictif avec passage automatique des mois et années, et optimisation de l'avance de date pour le calendrier réel."
+    },
+    {
+        "version": "2.65.4",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction du calcul d'âge pour supporter les formats de date flexibles (français et fictif). Verrouillage des champs 'Début' et 'Date Fiction' lorsqu'ils sont gérés par le calendrier de campagne du MJ."
+    },
+    {
+        "version": "2.65.3",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Synchronisation automatique des dates de l'en-tête (Début et Date Fiction) avec le calendrier de campagne défini dans les paramètres. Amélioration de la détection des mises à jour des règles pour refléter immédiatement les changements du MJ sur les fiches joueurs."
+    },
+    {
+        "version": "2.65.2",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Amélioration de l'en-tête de la fiche personnage : Intégration des champs 'Date de début de campagne' et 'Date courante (fiction)'. Implémentation du calcul automatique de l'âge basé sur la date de naissance et la date de la fiction, avec fallback en saisie manuelle si les données sont absentes."
+    },
+    {
+        "version": "2.65.1",
+        "date": "2026-02-21",
+        "type": "refactor",
+        "description": "Amélioration de l'interface admin : Regroupement des widgets de coût XP (Arrière-Plans, Attributs, Traits) dans un seul bloc 'Facteurs de Coût' pour une meilleure lisibilité et aération de la vue configuration."
+    },
+    {
+        "version": "2.65.0",
+        "date": "2026-02-21",
+        "type": "feat",
+        "description": "Déploiement production : Intégration de l'effet Maître, corrections bugs reset et confiance, améliorations journal et synchronisation cloud."
+    },
+    {
+        "version": "2.64.2",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction du pavé fantôme 'PAVE_ATTRIBUTS_4' après réinitialisation : (1) dans rulesAdapter, l'attributeSettings est désormais reconstruit depuis les clés des attributs primaires (et non secondaires), éliminant l'apparition erronée d'un 4ème pavé avec label brut. (2) Filtre défensif sur les secondaryAttributes pour ignorer les clés orphelines absentes de l'attributeSettings. (3) Nettoyage de l'état initial : suppression de la clé pave_attributs_4 superflue dans secondaryAttributes de getInitialCharacterData."
+    },
+    {
+        "version": "2.64.1",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction de la réinitialisation du compteur de Confiance : (1) Nettoyage des doublons historiques (slugs au lieu d'UUIDs) dans les définitions de compteurs en base de données qui forçaient la valeur à 4. (2) Renforcement du mécanisme de synchronisation (campaignReconciler) pour assurer l'unicité des clés de compteurs basées sur leur ID, prévenant ainsi la réapparition de doublons causant des états asynchrones lors d'une réinitialisation."
+    },
+    {
+        "version": "2.64.0",
+        "date": "2026-02-22",
+        "type": "feat",
+        "description": "Nouvel effet de trait 'Maître' (master_skill) : Quand un trait avec cet effet est ajouté, un wizard s'ouvre permettant au joueur de choisir une compétence primaire à rang 0. Celle-ci est automatiquement portée au rang 5 sans coût XP. Suppression du trait : la compétence revient au rang 0. L'xpCalculator reconnaît les compétences maîtrisées via masterSkillTarget et les traite comme entièrement gratuites jusqu'au rang 5. Interface admin : couleur violette + description informative."
+    },
+    {
+        "version": "2.63.3",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction des couleurs des compétences Habiletés Mystiques : (1) Le wizard d'ajout de compétences mystiques stocke désormais `definitionId` et `mysticAbilityId` sur chaque DotEntry ajouté, permettant à useSheetLayout de les enrichir correctement. (2) Ajout d'un fallback par nom dans useSheetLayout pour rétrocompatibilité avec les fiches existantes. (3) Alignement des couleurs de fallback dans l'AppearanceEditor sur les valeurs de DEFAULT_THEME (#8b5cf6 mystique, #d97706 variable)."
+    },
+    {
+        "version": "2.63.2",
+        "date": "2026-02-21",
+        "type": "fix",
+        "description": "Correction du nom du compteur auto lors de l'édition d'un trait avec variant : quand le variant d'un trait 'Compteur Auto' est modifié via le modal d'édition, le nom du compteur associé est désormais recalculé et mis à jour en conséquence (ex: 'Munitions (Pistolet)' → 'Munitions (Fusil)')."
+    },
+    {
         "version": "2.63.1",
         "date": "2026-02-21",
         "type": "fix",
@@ -28,657 +597,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction de la visibilité de la barre d'outils du Journal de Campagne : Fix du positionnement sticky sur petit écran (ajustement du top à 112px pour éviter le chevauchement avec la navigation) et ajout du support flex-wrap pour éviter le débordement horizontal des icônes de mise en forme. Suppression des animations parents interférant avec le contexte sticky."
-    },
-    {
-        "version": "2.62.6",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction du transfert d'images entre PC : Centralisation de la décompression GZIP dans le service de synchronisation cloud. Les images synchronisées (Grimoire, Portraits, Notes) sont désormais décompressées directement lors de l'injection dans IndexedDB, garantissant un affichage immédiat et correct sur tous les supports sans logique de décompression locale redondante."
-    },
-    {
-        "version": "2.62.5",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction des erreurs 401 Supabase (RLS) pour les fiches anonymes et fix du crash 'compressBase64' sur images volumineuses (passage en traitement par chunks de 8Ko). Réduction du bruit console en mode auto-sync."
-    },
-    {
-        "version": "2.62.4",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction robuste de la duplication des images : désactivation du drag natif sur l'élément IMG et renforcement du guard via les types MIME ProseMirror pour distinguer les fichiers externes des déplacements internes."
-    },
-    {
-        "version": "2.62.3",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Fix duplication des images au drag-drop : le plugin de drop ignore désormais les fichiers si ProseMirror est déjà en train de gérer un déplacement de nœud interne."
-    },
-    {
-        "version": "2.62.2",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Fix clipping toolbar images : conversion en React Portal pour la barre d'outils et le HUD de resize. Le positionnement est désormais dynamique (fixed) basé sur le bounding rect de l'image, garantissant une visibilité complète même en bord de page ou à cheval sur les colonnes CSS."
-    },
-    {
-        "version": "2.62.1",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Fix resize images latérales (L/R/free) : architecture dual-ref — le resize applique désormais la largeur sur le NodeViewWrapper flottant (non le div interne), la largeur de référence est calculée via getComputedStyle sur la colonne ProseMirror au mousedown (valeur runtime exacte), éliminant le saut visible au relâchement et le calcul erroné du cap 55%."
-    },
-    {
-        "version": "2.62.0",
-        "date": "2026-02-21",
-        "type": "perf",
-        "description": "Optimisation du Journal de Campagne : Cache LRU d'images (chargement instantané au retour sur une page), sauvegarde sécurisée (flush sur perte de focus + indicateur ✓), interactions image fluides à 60fps (rendu DOM direct pendant resize/pan), correction du wrapping texte-image (clear CSS + marges generatives). Ajout : indicateur de page (dots), boutons Annuler/Rétablir, confirmation de suppression dans le Tableau de Groupe, compression automatique des images (WebP 80%) à l'upload."
-    },
-    {
-        "version": "2.61.0",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Nouvel onglet Calendrier dans l'administration. Deux modes : Calendrier Réel (date grégorienne avec jours de la semaine calculés, avance rapide) et Calendrier Fictif (mois avec jours variables, jours de semaine personnalisés, saisons avec assignation par mois et couleur). Gestion d'événements avec sélecteur de couleur dans les deux modes. Aperçu mensuel live et navigable. Configuration stockée dans les RulesData du setting."
-    },
-    {
-        "version": "2.60.1",
-        "date": "2026-02-20",
-        "type": "refactor",
-        "description": "Admin : Déplacement des paramètres de coût XP (formule Triangulaire/Linéaire + multiplicateur) de l'onglet 'Coûts & Limites' vers une section collapsable dans chaque carte de catégorie de compétences. Suppression de l'onglet 'Coûts & Limites' devenu vide et du composant AdminCostsEditor."
-    },
-    {
-        "version": "2.60.0",
-        "date": "2026-02-21",
-        "type": "refactor",
-        "description": "Refactorisation majeure pour la maintenance : 1) Refonte de la modale de synchronisation en un 'Cloud Hub' unifié avec onglets (Push vs Library). 2) Décomposition des composants massifs (SyncModal, AttributesEditor, BookImageView, SpecializationLibraryView) en hooks personnalisés et sous-composants. 3) Modularisation du moteur de calcul d'XP (xpCalculator) en utilitaires spécialisés (Skills, Attributes, Traits, Counters)."
-    },
-    {
-        "version": "2.59.0",
-        "date": "2026-02-21",
-        "type": "refactor",
-        "description": "Renommage sémantique : L'effet 'Compteur de Trait' devient 'Compteur Auto' pour refléter son usage polyvalent. Implémentation du nommage intelligent : le champ 'Nom de Base' devient optionnel dans l'éditeur d'effet. Si laissé vide, le compteur prendra automatiquement le nom de la variante (ou le nom du trait) lors de l'instanciation sur la fiche du Héro."
-    },
-    {
-        "version": "2.58.0",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Amélioration des Compteurs de Traits (Dynamic Counters) : Les compteurs liés aux traits ne polluent plus la bibliothèque d'administration. Ils sont désormais générés dynamiquement et uniquement sur la fiche du personnage. Support des Traits Variables : le compteur ajoute automatiquement le nom de la variante choisie au nom de base de l'effet."
-    },
-    {
-        "version": "2.57.0",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Intégration des Compteurs de Traits : Nouveau type d'effet 'trait_counter' permettant de lier l'acquisition d'un trait à la création automatique d'un compteur personnalisé (ex: Munitions, Magie, Stress). Inclus : mode d'affichage compact 'squares_only' (sans ligne Maxi), synchronisation bidirectionnelle entre traits et compteurs sur la fiche, et gestion automatisée dans la bibliothèque admin."
-    },
-    {
-        "version": "2.56.75",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Correction UI : Suppression de la hauteur fixe et de l'ascenseur interne dans le bilan d'XP, permettant au tableau de s'étendre naturellement sur toute la page A4."
-    },
-    {
-        "version": "2.56.74",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Amélioration UI (Historique Dépenses XP) : Remplacement de la catégorie globale 'Compétences' par un découpage thématique des compétences selon leur origine (ex: Talents (Orange), Connaissances (Bleu clair), Mêlée & Tir (Rouge), etc.) avec icônes et codes couleurs dédiés."
-    },
-    {
-        "version": "2.56.73",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Ajustement UI : L'onglet de Gestion de l'Expérience est de nouveau affiché au format A4 pour être cohérent avec le reste de la fiche de personnage (correction des classes CSS corrompues encadrant le conteneur)."
-    },
-    {
-        "version": "2.56.72",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction UI : Alignement et centrage des valeurs dans le résumé d'expérience. Suppression des conteneurs flex imbriqués qui empêchaient le centrage correct du champ 'Gain' et application d'une largeur fixe avec marge automatique pour un alignement vertical parfait de toutes les statistiques d'expérience."
-    },
-    {
-        "version": "2.56.71",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Ajustement UI : Centrage de la valeur du champ 'Gain' dans le résumé d'expérience pour une meilleure harmonie visuelle avec les autres champs de stats."
-    },
-    {
-        "version": "2.56.70",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Restauration UI & Mise en forme : Correction des classes CSS corrompues (espaces), retour aux libellés en majuscules pour les onglets et en-têtes de tableaux, et ajustement des dimensions du bilan d'XP (suppression du bloc solde redondant et retour à une granularité fine des gains) tout en conservant le moteur de calcul basé sur l'état."
-    },
-    {
-        "version": "2.56.69",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Vue Distribution d'XP finale : Le bilan d'XP est désormais calculé en temps réel à partir de l'état actuel de la fiche personnage (Distribution d'état). Cette approche garantit une fiabilité totale en affichant l'investissement exact pour chaque compétence, attribut, trait et compteur, sans dépendre de l'intégrité de l'historique brut des transactions."
-    },
-    {
-        "version": "2.56.68",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Agrégation du Bilan XP : Épuration de la vue Recçu en supprimant les horodatages et en regroupant les transactions par sujet (ex: groupement des achats d'une même compétence). Tri automatique par importance d'investissement et mise à jour des infobulles pour le 'Top 5'."
-    },
-    {
-        "version": "2.56.67",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Nouveau tableau de bord de Suivi d'XP (Concept B) : vue interactive et catégorisée (Gains et Investissements) remplaçant l'historique brut, avec infobulles contextuelles et tri par catégorie."
-    },
-    {
-        "version": "2.56.65",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Gestion XP : Déplacement de la colonne 'Session' en fin de tableau et renommage de 'SESS.' en 'Session' avec ajustement de la taille de police."
-    },
-    {
-        "version": "2.56.64",
-        "date": "2026-02-21",
-        "type": "refactor",
-        "description": "Calcul XP unifié : Suppression des écritures manuelles dans l'historique d'expérience pour les traits. Le moteur calcule désormais les dépenses d'XP de manière dynamique uniquement via l'état des traits (flag post-création et valeur initiale), évitant ainsi les doubles comptes."
-    },
-    {
-        "version": "2.56.63",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Harmonisation UI : Alignement de la taille de tous les boutons du footer de la modale de trait en format compact (sm)."
-    },
-    {
-        "version": "2.56.62",
-        "date": "2026-02-21",
-        "type": "style",
-        "description": "Peaufinage UI : Réduction de la taille du bouton de rachat de désavantage dans la modale d'édition pour une interface plus compacte."
-    },
-    {
-        "version": "2.56.61",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Système d'achat de Traits post-création : Les avantages peuvent désormais être acquis via XP hors création (fonds émeraude, icône ❇️). Les désavantages peuvent être rachetés (coût fixe) ou réduits (rang par rang) via une nouvelle interface dans la modale d'édition. Les déductions d'XP sont automatiques et tracées dans l'historique."
-    },
-    {
-        "version": "2.56.60",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction de la sauvegarde des compteurs : Les modifications (valeur max, coût XP) effectuées depuis la bibliothèque d'administration sont désormais correctement sauvegardées en base de données et appliquées aux fiches des joueurs."
-    },
-    {
-        "version": "2.56.59",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Budget Création : Les traits (Avantages/Désavantages) sont désormais totalement gratuits en mode Points comme en mode Rangs, et n'impactent plus la Valeur Totale XP affichée dans le HUD."
-    },
-    {
-        "version": "2.56.58",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Ajustement Budget Création (Mode Rangs) : Exclusion des traits du calcul d'équivalence XP et masquage de la limite de 450 XP (Starting XP) qui ne s'applique qu'au mode par points."
-    },
-    {
-        "version": "2.56.57",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction Arrière-plans : Résolution du bug de couleur (noir au lieu de bleu) et de coût XP erroné en mode création. Les points d'arrière-plan sont désormais correctement identifiés comme acquis à la création."
-    },
-    {
-        "version": "2.56.56",
-        "date": "2026-02-20",
-        "type": "feat",
-        "description": "Recréation Administration : Ajout de l'option 'Ouverture Simple' permettant de renvoyer le joueur en mode création sans réinitialiser ni purger ses statistiques existantes."
-    },
-    {
-        "version": "2.56.55",
-        "date": "2026-02-20",
-        "type": "feat",
-        "description": "Ergonomie fiches de personnage : Cliquer sur un trait existant (Avantage/Désavantage) ouvre désormais un menu d'édition rapide au lieu de la bibliothèque de traits. Cliquer sur un emplacement vide continue d'ouvrir la bibliothèque pour ajouter un nouveau trait."
-    },
-    {
-        "version": "2.56.54",
-        "date": "2026-02-20",
-        "type": "style",
-        "description": "Correction UI : Alignement de la barre latérale des spécialisations sous le bandeau de navigation principal pour éviter le masquage."
-    },
-    {
-        "version": "2.56.53",
-        "date": "2026-02-20",
-        "type": "feat",
-        "description": "Amélioration UI : Ajout d'une modale d'erreur explicite ('Promotion Impossible') si la compétence secondaire existe déjà."
-    },
-    {
-        "version": "2.56.51",
-        "date": "2026-02-20",
-        "type": "style",
-        "description": "Amélioration UI : Remplacement de la boîte de dialogue système 'confirm' par une modale thématique personnalisée pour confirmer la promotion d'une spécialisation en compétence secondaire."
-    },
-    {
-        "version": "2.56.50",
-        "date": "2026-02-20",
-        "type": "feat",
-        "description": "Promotion des spécialisations : Ajout d'une fonctionnalité permettant de convertir une spécialisation en compétence secondaire via un bouton d'action dans l'onglet Spécialisations. Cette action libère l'emplacement de spécialisation et crée une nouvelle compétence à 0 point dans la catégorie secondaire."
-    },
-    {
-        "version": "2.56.49",
-        "date": "2026-02-20",
-        "type": "style",
-        "description": "Amélioration UX : Harmonisation de la taille du Hub Cloud. La modale de synchronisation utilise désormais une taille large unifiée pour les onglets 'Push' et 'Pull', évitant les sauts de redimensionnement lors de la navigation."
-    },
-    {
-        "version": "2.56.48",
-        "date": "2026-02-19",
-        "type": "refactor",
-        "description": "Refonte du 'Hub Cloud' : Fusion de la synchronisation (Push) et de la bibliothèque (Pull) dans une interface unifiée via le bouton Synchro. Le 'Grimoire de Sauvegarde' est désormais dédié exclusivement aux opérations locales (JSON)."
-    },
-    {
-        "version": "2.56.47",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Ajout du bandeau 'Oracle' et d'une surbrillance pour guider la configuration des Habilités Mystiques en mode création."
-    },
-    {
-        "version": "2.56.46",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Nettoyage final du journal des modifications et validation de la structure JSON."
-    },
-    {
-        "version": "2.56.45",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction finale d'une erreur de syntaxe JSON dans le journal des modifications qui bloquait le serveur de développement."
-    },
-    {
-        "version": "2.56.44",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de l'affichage du Journal des Modifications : les descriptions de versions s'affichent désormais correctement dans l'interface."
-    },
-    {
-        "version": "2.56.43",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Stabilisation technique : Correction des erreurs de syntaxe JSON, suppression des doublons d'attributs JSX et rétablissement des imports React dans la modale de synchronisation."
-    },
-    {
-        "version": "2.56.39",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Ajout de l'interface de restauration des backups (SyncModal). Les joueurs peuvent désormais consulter leurs deux dernières versions historiques sur le cloud et les restaurer d'un clic."
-    },
-    {
-        "version": "2.56.38",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Implémentation de l'Auto-Save (1min) et backups rotatifs (Trigger SQL). Ajout d'un compteur visuel sur le bouton de synchronisation Cloud et gestion intelligente de l'historique (2 versions max) côté serveur."
-    },
-    {
-        "version": "2.56.37",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction critique du calcul des bonus XP des traits (ex: Apprentissage Rapide). Le calculateur prend désormais en compte les définitions globales des traits (Base de Données) lorsque ceux-ci ne sont pas redéfinis localement, assurant l'application correcte des effets."
-    },
-    {
-        "version": "2.56.36",
-        "date": "2026-02-19",
-        "type": "chore",
-        "description": "Maintenance Base de Données : Activation de la sécurité RLS sur les tables Mystiques, ajout des index manquants sur les clés étrangères pour la performance, et optimisation des requêtes de vérification des droits Admin."
-    },
-    {
-        "version": "2.56.35",
-        "date": "2026-02-19",
-        "type": "refactor",
-        "description": "Optimisation de la structure Admin : Découpage des bibliothèques (Compétences, Historiques, Habilités Mystiques, Compteurs) en sous-composants dédiés pour améliorer la maintenabilité et réduire la taille des fichiers sources (gain de ~150-200 lignes par fichier critique)."
-    },
-    {
-        "version": "2.56.34",
-        "date": "2026-02-19",
-        "type": "chore",
-        "description": "Opération 'Racine Propre' : Migration des scripts utilitaires vers le dossier dédié, archivage des fichiers SQL temporaires et nettoyage des logs. Migration systématique des derniers `console.log/warn/error` vers le logger applicatif pour une meilleure hygiène de production."
-    },
-    {
-        "version": "2.56.33",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Amélioration de la persistance des données portables : Synchronisation complète des images du Grimoire et des couvertures de Notes de Campagne. Persistance des paramètres locaux (Mode Expert, Source des Règles) dans le JSON exporté pour une expérience sans couture entre appareils. Sécurisation de la compression d'images (idempotence WebP/Gzip)."
-    },
-    {
-        "version": "2.56.32",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Implémentation de la 'Purge Profonde' séparée de la réinitialisation de fiche. Ajout d'un bouton de purge dans l'onglet Cloud (Moniteur de Stockage) permettant de vider complètement l'IndexedDB (images, règles) et le LocalStorage en cas de blocage majeur, avec redémarrage automatique."
-    },
-    {
-        "version": "2.56.31",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction du calcul du bonus d'XP par scénario (Traits). Les sessions sont désormais mieux détectées même si le montant est à 0 (détection via le nom du scénario). Amélioration des logs de diagnostic XP et fixation des erreurs de validation Zod lors du chargement initial."
-    },
-    {
-        "version": "2.56.30",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Sécurisation et typage strict des champs optionnels (mysticAbilityId, coûts, descriptions) à travers l'application. Harmonisation des Interfaces et Schémas Zod pour éliminer les erreurs de build et prévenir les plantages liés aux valeurs nulles."
-    },
-    {
-        "version": "2.56.29",
-        "date": "2026-02-20",
-        "type": "fix",
-        "description": "Correction d'un blocage de navigation après réinitialisation des paramètres. Ajout de la modale de confirmation d'abandon et amélioration de la détection des changements non enregistrés."
-    },
-    {
-        "version": "2.56.28",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Refonte majeure de la robustesse du schéma de données personnage (Zod) pour éliminer les erreurs de chargement au rafraîchissement. Ajout de logs de diagnostic pour le calcul des bonus XP des traits."
-    },
-    {
-        "version": "2.56.27",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction d'une erreur de validation (Zod) au chargement du personnage liée aux nouveaux IDs d'effets de traits."
-    },
-    {
-        "version": "2.56.26",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de la persistance du mode de calcul des bonus XP (Fixe vs Par Scénario) dans les bibliothèques Admin."
-    },
-    {
-        "version": "2.56.25",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de l'avertissement React sur les clés manquantes dans l'éditeur d'effets de traits (TraitEffectEditor) et garantie des IDs uniques lors de l'édition."
-    },
-    {
-        "version": "2.56.24",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de la sauvegarde des effets mécaniques des traits dans la bibliothèque Admin (évite les réinitialisations). Synchronisation automatique des bibliothèques (traits, compétences) sur la feuille lors de la mise à jour des règles, assurant la transmission correcte des effets."
-    },
-    {
-        "version": "2.56.23",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Amélioration de l'affichage de l'expérience (Total XP incluant les bonus + infobulle de détail). Ajout d'une case à cocher 'Session' dans l'historique d'XP pour contrôler explicitement quelles entrées comptent pour le bonus par scénario, résolvant les problèmes de détection automatique."
-    },
-    {
-        "version": "2.56.22",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Ajout de la possibilité de définir des bonus d'XP par scénario dans les effets de traits. L'XP totale est calculée dynamiquement en fonction du nombre de scénarios joués (entrées dans l'historique)."
-    },
-    {
-        "version": "2.56.21",
-        "date": "2026-02-19",
-        "type": "ui",
-        "description": "Amélioration du layout des bibliothèques Admin (Arrière-plans, Habilités Mystiques, Compétences) : le badge de catégorie de placement a été déplacé sous le nom de l'item, sur la même ligne que les icônes de statut, pour clarifier l'interface."
-    },
-    {
-        "version": "2.56.20",
-        "date": "2026-02-19",
-        "type": "refactor",
-        "description": "Refactorisation majeure de l'éditeur du grimoire (ColumnarEditor.tsx). Extraction de la barre d'outils, du fond de page et de la barre latérale des chapitres en composants distincts. Migration des styles CSS vers un fichier externe. Amélioration de la maintenabilité et réduction du bruit dans le fichier principal."
-    },
-    {
-        "version": "2.56.19",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Amélioration du placement automatique des compétences mystiques (Art Martial/Martiaux). Les compétences héritent désormais de la catégorie de placement de leur habilité parente si aucune n'est définie. Correction de la détection de la casse et du pluriel pour les Arts Martiaux."
-    },
-    {
-        "version": "2.56.18",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de la persistance de la catégorie de placement (localisation) pour les habilités mystiques en base de données (ajout des colonnes manquantes et mise à jour des services de synchronisation)."
-    },
-    {
-        "version": "2.56.17",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction d'une erreur de référence (ReferenceError) dans les bibliothèques d'administration introduite lors de la mise à jour des badges."
-    },
-    {
-        "version": "2.56.16",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Amélioration des badges de bibliothèques Admin : affichage des noms des catégories au lieu des codes techniques. Correction du bug de sauvegarde du placement pour les Habilités Mystiques."
-    },
-    {
-        "version": "2.56.15",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Affichage du code de placement (colonne) directement sur les cartes des bibliothèques Admin (Skills, BG, Compteurs, Mystique) pour une meilleure visibilité immédiate."
-    },
-    {
-        "version": "2.56.14",
-        "date": "2026-02-19",
-        "type": "feat",
-        "description": "Restauration des sélecteurs de catégorie dans les bibliothèques Admin (Skills, BG, Compteurs, Mystique) avec sécurisation du système de Reset (masterDefinition). Ajout du placement mystique configurable dans les paramètres de création."
-    },
-    {
-        "version": "2.56.13",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Correction de la logique de placement : Seules les Habilités Mystiques utilisent désormais le placement de secours (Col 7 pour l'Art Martial, Col 5 pour le reste)."
-    },
-    {
-        "version": "2.56.12",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Logique de placement de secours pour les compétences Wizard : Arts Martiaux en Col_Comp_7, autres en Col_Comp_5."
-    },
-    {
-        "version": "2.56.11",
-        "date": "2026-02-19",
-        "type": "fix",
-        "description": "Initialisation des compétences Wizard au niveau 0 pour permettre le nettoyage facile et documentation des règles de placement."
-    },
-    {
-        "version": "2.53.0",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🛠️ Admin : Correction de l'erreur 400 lors de la sauvegarde des traits (alignement SQL cost/points)",
-            "🛡️ Système : Amélioration de la détection d'erreurs en cascade pour garantir que la modale 'Sauvegarde Réussie' ne s'affiche qu'en cas de succès réel",
-            "📊 Bibliothèque : Support complet des coûts textuels (ex: '1-3', 'Variable') dans la couche de persistance"
-        ]
-    },
-    {
-        "version": "2.52.0",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "✅ Import : Sélection individuelle des items (nouveaux et conflits) via des cases à cocher",
-            "🎭 UI : Feedback dynamique des badges (Ignoré, Remplacé, Doublon, Exclu) en fonction de la stratégie",
-            "🛠️ Core : Support technique de l'exclusion via IDs uniques dans le moteur de fusion"
-        ]
-    },
-    {
-        "version": "2.51.0",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "🔍 UI : Ajout d'une vue détaillée des changements dans l'assistant d'importation (Nouveaux items et Conflits)",
-            "📋 Import : Comparaison précise des propriétés des items (coût, description, effets, etc.) avec visualisation Ancien vs Nouveau",
-            "🔠 Système : Détection inteligente ignorant la casse pour éviter les doublons tout en permettant la normalisation"
-        ]
-    },
-    {
-        "version": "2.50.1",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "📥 Système : Support de l'import de fichiers JSON partiels (ex: uniquement les traits ou compétences)",
-            "🛡️ Validation : Renforcement du schéma de données pour inclure toutes les bibliothèques dans les exports de fiches"
-        ]
-    },
-    {
-        "version": "2.50.0",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "🛡️ Admin : Renforcement de la détection des conflits lors de l'import (ID + Nom)",
-            "🧹 Bibliothèque : Prévention de la pollution par doublons visuels lors de l'import de fiches personnages",
-            "📥 Système : Amélioration de la robustesse de l'Assistant d'Importation pour tous les types de contenu (Traits, Skills, Backgrounds, Counters)"
-        ]
-    },
-    {
-        "version": "2.49.99",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "🛠️ Admin : Correction du bug de réinitialisation des coûts des traits (mismatch SQL points/cost)",
-            "📊 Bibliothèque : Implémentation des coûts variables et multiples (ex: 1-5, 1/3/5) avec libellés personnalisables",
-            "💾 Persistance : Ajout des colonnes points_label et is_variable_cost pour une gestion robuste des coûts en BDD"
-        ]
-    },
-    {
-        "version": "2.49.98",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "✨ Bibliothèque : Ajout de l'icône 'Habilités Mystiques' (Sparkles) dans la réserve de la fiche personnage",
-            "📊 UI : Implémentation d'une légende complète des icônes dans la réserve de compétences et la bibliothèque de traits"
-        ]
-    },
-    {
-        "version": "2.49.97",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "📝 Grimoire : Amélioration de la réactivité de l'enroulement (Wrap) par suppression des délais d'animation pendant le drag",
-            "🖼️ UX : Système de collision solide pour les images en mode libre, forçant le recalcul du flux dans les colonnes CSS"
-        ]
-    },
-    {
-        "version": "2.49.96",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "📝 Grimoire : Correction définitive de l'enroulement (Wrap) globale. Le texte est désormais physique poussé par l'image via un système de marges 4D (Haut/Bas/Gauche/Droite)",
-            "🖼️ Layout : Suppression des transformations visuelles (fantômes) pour garantir que le texte ne se cache plus jamais derrière une image"
-        ]
-    },
-    {
-        "version": "2.49.95",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "📝 Grimoire : L'enroulement du texte (Wrap) suit désormais le décalage vertical des images grâce à un système de marges dynamiques",
-            "🖱️ UX : Le bouton 'F' restaure désormais l'alignement latéral précédent (L/R) au lieu de forcer le centré",
-            "🖼️ Layout : Correction des chevauchements de texte en mode déplacement libre"
-        ]
-    },
-    {
-        "version": "2.49.94",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🖱️ UX : Le bouton 'F' (Libre) permet désormais de basculer (toggle) entre le mode libre et le mode centré",
-            "🔄 Système : La désactivation du mode libre réinitialise automatiquement la position de l'image (Reset Offsets)"
-        ]
-    },
-    {
-        "version": "2.49.93",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🛡️ UI : La barre d'outils suit désormais l'image dans ses déplacements libres (Flush Toolbar)",
-            "🔼 UX : La sélection d'une image la fait désormais passer au-dessus de tous les éléments (sommaire, menus) via un Z-index dynamique",
-            "🛠️ Système : Correction des problèmes d'images 'bloquées' derrière l'interface du grimoire"
-        ]
-    },
-    {
-        "version": "2.49.92",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "🖱️ UX : Double sens d'enroulement (Float L/R) désormais disponible en mode déplacement libre",
-            "📊 UI : Ajout d'un HUD (Head-Up Display) affichant les coordonnées X/Y et la taille en temps réel",
-            "🖼️ Grimoire : Guide de recadrage (Crop) ajusté pour exclure dynamiquement la bordure blanche",
-            "🔧 UX : Amélioration de la réactivité des poignées de redimensionnement et de sélection"
-        ]
-    },
-    {
-        "version": "2.49.91",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🎨 UI : Le cadre de sélection bleu suit désormais précisément les dimensions de l'image même en déplacement libre",
-            "🛡️ Système : Désactivation intelligente du recadrage (Crop) sur les images à hauteur automatique",
-            "📋 Audit : Réalisation d'un audit complet du système d'images pour prévenir les conflits d'options"
-        ]
-    },
-    {
-        "version": "2.49.90",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🖼️ Grimoire : Ajustement automatique de la largeur lors du passage en mode libre pour un meilleur enroulement",
-            "🎨 UI : Cadre de sélection plus serré (fit-content) sur les images libres"
-        ]
-    },
-    {
-        "version": "2.49.89",
-        "date": "2026-02-17",
-        "type": "fix",
-        "changes": [
-            "🖱️ UX : Le mode déplacement libre ne s'active désormais que lorsque l'image est sélectionnée",
-            "📖 Grimoire : Support de l'enroulement du texte (wrap) en mode déplacement libre"
-        ]
-    },
-    {
-        "version": "2.49.88",
-        "date": "2026-02-17",
-        "type": "feat",
-        "changes": [
-            "🖼️ Grimoire : Ajout du mode 'Déplacement Libre' (F) pour les images",
-            "🖱️ UX : Déplacement des images par Drag & Drop dans tout l'espace de la page",
-            "🔄 UI : Nouveau bouton de réinitialisation de la position et support des coordonnées persistantes"
-        ]
-    },
-    {
-        "version": "2.49.87",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🐞 Sidebar : Fix du bouton Reset qui pouvait échouer selon l'état des données",
-            "⚠️ React : Correction de l'avertissement 'value prop on select should not be null'",
-            "🔧 Système : Robustesse accrue de la gestion des états de personnalisation (isCustomized)"
-        ]
-    },
-    {
-        "version": "2.49.86",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🔓 Bibliothèque : Réactivation de l'édition globale pour les compétences personnalisées",
-            "🛡️ Système : Verrouillage strict de la suppression pour les compétences surchargées localement",
-            "🎨 UI : Harmonisation visuelle avec une icône de surcharge Cyan unifiée (Bibliothèque & Réserve)"
-        ]
-    },
-    {
-        "version": "2.49.85",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🔒 Bibliothèque : Verrouillage de l'édition globale si une compétence est personnalisée localement",
-            "🔄 Réserve : Nouveau bouton 'Reset' pour restaurer instantanément une compétence à son état d'origine",
-            "🏗️ Système : Stockage de la définition master pour permettre la réinitialisation sans perte de données"
-        ]
-    },
-    {
-        "version": "2.49.84",
-        "date": "2026-02-16",
-        "type": "feat",
-        "changes": [
-            "🧠 Admin : Distinction claire entre édition de la Bibliothèque Globale et Personnalisation de Campagne",
-            "🛡️ Système : La modification via l'onglet Bibliothèque met désormais à jour la base master pour tous les réglages",
-            "🖋️ UI : Titres de modales explicites selon le contexte d'édition (Base Globale vs Campagne)"
-        ]
-    },
-    {
-        "version": "2.49.83",
-        "date": "2026-02-16",
-        "type": "fix",
-        "changes": [
-            "🔍 Bibliothèques : Correction de la visibilité des compétences à variantes (Artisanat, etc.) en mode filtré",
-            "🛠️ Système : Amélioration de la détection 'Global' pour le catalogue chargé depuis JSON",
-            "🎨 UI : Ajustement de la visibilité des boutons d'édition dans les listes administratives"
-        ]
     }
 ]

@@ -5,6 +5,8 @@ import { generateId } from './factories';
 import { normalizeString } from './stringUtils';
 import { getSkillCategory, getCounter, setCounter } from './stateAccessors';
 import { reconcileSkillsAndBackgrounds } from './reconcilers/skillsReconciler';
+import { migrateTraitLibrary } from './migrations/migrateTraitProperties';
+import { LibraryEntry } from '../types';
 
 // --- Sub-functions ---
 
@@ -202,31 +204,43 @@ const reconcileCounters = (newState: CharacterSheetData, currentState: Character
 
 /**
  * Links traits (advantages/disadvantages) to their latest library definitions.
+ * Also performs property migration (legacy effects -> direct fields) during load.
  * 
  * @param newState - The current draft state
  * @param currentState - The source state
  * @param rules - The campaign rules
  */
 const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSheetData, rules: RulesData) => {
-    // Migrer les Avantages (avantages) et Désavantages (desavantages)
-    // Le but est de lier les entrées existantes aux définitions de la bibliothèque via definitionId
-
     const processTraitList = (list: TraitEntry[], type: 'avantage' | 'desavantage'): TraitEntry[] => {
         if (!list) return [];
         return list.map(existing => {
-            // Si déjà lié, on garde (on pourrait update le nom ici si besoin, mais attention aux customs)
-            if (existing.definitionId) return existing;
-
-            // Tentative de liaison par nom (Migration)
-            const libMatch = rules.libraries?.traits?.find(t =>
-                t.type === type &&
-                normalizeString(t.name) === normalizeString(existing.name)
-            );
+            let libMatch = null;
+            if (existing.definitionId) {
+                libMatch = rules.libraries?.traits?.find(t => t.id === existing.definitionId);
+            } else {
+                libMatch = rules.libraries?.traits?.find(t =>
+                    t.type === type && normalizeString(t.name) === normalizeString(existing.name)
+                );
+            }
 
             if (libMatch) {
+                const isMystic = libMatch.mysticAbilityId || libMatch.tags?.some(tag => normalizeString(tag) === 'mystique');
+
+                // --- Migration Logic ---
+                // We ensure the character trait has the latest flags from the library
+                // and we also check if it has legacy effects that need migration.
+                const needsMigration = (libMatch.hasAutoCounter && !existing.hasAutoCounter) ||
+                    (libMatch.isXPUpgradeable && !existing.isXPUpgradeable);
+
                 return {
                     ...existing,
                     definitionId: libMatch.id,
+                    mysticAbilityId: libMatch.mysticAbilityId || existing.mysticAbilityId,
+                    tag: isMystic ? 'Mystique' : existing.tag,
+                    // Copy native properties from library if missing
+                    hasAutoCounter: libMatch.hasAutoCounter ?? existing.hasAutoCounter,
+                    autoCounterName: libMatch.autoCounterName ?? existing.autoCounterName,
+                    isXPUpgradeable: libMatch.isXPUpgradeable ?? existing.isXPUpgradeable
                 };
             }
 
@@ -241,44 +255,110 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
 }
 
 /**
- * Synchronizes character libraries with rules libraries.
- * 
- * @param newState - The current draft state
- * @param rules - The rules containing library definitions
+ * Cleanup redundant local library entries that are exact matches of official ones.
+ * This fixes the issue where traits lose their "Official" status because they were 
+ * copied into the local library by a previous bug.
  */
-const reconcileLibraries = (newState: CharacterSheetData, rules: RulesData) => {
+const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterSheetData, rules: RulesData) => {
     if (!rules.libraries) return;
 
-    // 1. Traits
-    if (rules.libraries.traits) {
-        newState.library = rules.libraries.traits;
+    const isRedundant = (local: any, officialList: any[]) => {
+        // Un élément explicitement marqué comme "customisé" ne doit jamais être supprimé
+        if (local.isCustomized) return false;
+
+        return officialList.some(off => {
+            if (normalizeString(off.name) !== normalizeString(local.name)) return false;
+
+            // Types mapping: vertu == avantage, tare == desavantage
+            if (off.type && local.type) {
+                const mapType = (t: string) => {
+                    const low = t.toLowerCase();
+                    if (low === 'vertu') return 'avantage';
+                    if (low === 'tare' || low === 'défaut' || low === 'defaut') return 'desavantage';
+                    return low;
+                };
+                if (mapType(off.type) !== mapType(local.type)) return false;
+            }
+
+            // Robust cost/value match (treat '2' and 2 as equal, fallback to string if NaN)
+            const offCostVal = off.cost !== undefined ? off.cost : off.value;
+            const locCostVal = local.cost !== undefined ? local.cost : local.value;
+            const offCostNum = Number(offCostVal);
+            const locCostNum = Number(locCostVal);
+
+            if (!isNaN(offCostNum) && !isNaN(locCostNum)) {
+                if (offCostNum !== locCostNum) return false;
+            } else {
+                // If either is NaN (e.g. "1-3 pts"), fallback to stripped string comparison
+                const stripText = (s: any) => String(s || '').replace(/\s|pts?/gi, '').toLowerCase();
+                if (stripText(offCostVal) !== stripText(locCostVal)) return false;
+            }
+
+            // Normalise traits tags into a sorted array for comparison
+            const offTagsList = Array.isArray(off.tags) ? off.tags.map(normalizeString).sort() : [];
+            const locTagsList = Array.isArray(local.tags)
+                ? local.tags.map(normalizeString).sort()
+                : (local.tag ? [normalizeString(local.tag)] : []);
+
+            if (JSON.stringify(offTagsList) !== JSON.stringify(locTagsList)) return false;
+
+            // Robust pointsLabel match (strip non-digits to handle "2 pts" vs "2")
+            const normalizeLabel = (l?: string) => String(l || '').replace(/\D/g, '');
+            if (normalizeLabel(off.pointsLabel) !== normalizeLabel(local.pointsLabel)) return false;
+
+            // Robust Effects Comparison (ignore IDs, ignore property order, drop empty)
+            const simplifyEffects = (effects: any[]) => (effects || []).map(eff => {
+                const { id, definitionId, formulaId, ...rest } = eff; // skip IDs
+                return JSON.stringify(Object.keys(rest).sort().reduce((obj: any, key) => {
+                    // Only keep properties that have real value
+                    if (rest[key] !== '' && rest[key] !== undefined && rest[key] !== null) {
+                        obj[key] = String(rest[key]); // Force string to bypass 1 vs "1"
+                    }
+                    return obj;
+                }, {}));
+            }).sort();
+
+            const offEff = simplifyEffects(off.effects);
+            const locEff = simplifyEffects(local.effects);
+
+            // Protect metadata: if local has mysticAbilityId or isVariable, and official doesn't match, keep it
+            if (local.mysticAbilityId && off.mysticAbilityId !== local.mysticAbilityId) return false;
+            if (Boolean(local.isVariable) !== Boolean(off.isVariable)) return false;
+
+            return JSON.stringify(offEff) === JSON.stringify(locEff);
+        });
+    };
+
+    // 1. Clean Traits Library
+    if (currentState.library && rules.libraries.traits) {
+        newState.library = currentState.library.filter(l => !isRedundant(l, rules.libraries.traits!));
     }
 
-    // 2. Skills
+    // 2. Clean Skill Library (remove local copies of official skills)
+    if (currentState.skillLibrary && rules.libraries.skills) {
+        newState.skillLibrary = currentState.skillLibrary.filter(l => !isRedundant(l, rules.libraries.skills!));
+    }
+
+    // 3. Clean Specialization Library
+    if (currentState.specializationLibrary && rules.libraries.specializations) {
+        newState.specializationLibrary = currentState.specializationLibrary.filter(l => !isRedundant(l, rules.libraries.specializations!));
+    }
+
+    // 4. Clean Background Library
+    if (currentState.backgroundLibrary && rules.libraries.backgrounds) {
+        newState.backgroundLibrary = currentState.backgroundLibrary.filter(l => !isRedundant(l, rules.libraries.backgrounds!));
+    }
+
+    // 5. Re-inject official libraries (needed by getAggregateDetails for mysticAbilityId fallback)
+    // This restores the behavior of the original reconcileLibraries function.
     if (rules.libraries.skills) {
         newState.skillLibrary = rules.libraries.skills;
     }
-
-    // 3. Specializations
-    if (rules.libraries.specializations) {
-        newState.specializationLibrary = rules.libraries.specializations;
-    }
-
-    // 4. Backgrounds
-    if (rules.libraries.backgrounds) {
-        newState.backgroundLibrary = rules.libraries.backgrounds;
-    }
-
-    // 5. Counters
-    if (rules.libraries.counters) {
-        newState.counterLibrary = rules.libraries.counters;
-    }
-
-    // 6. Mystic Abilities
-    if (rules.libraries.mysticAbilities) {
-        newState.mysticAbilities = rules.libraries.mysticAbilities;
+    if (rules.libraries.formulas) {
+        newState.formulaLibrary = rules.libraries.formulas;
     }
 };
+
 
 /**
  * Synchronizes header dates with campaign calendar if available.
@@ -332,6 +412,15 @@ const reconcileHeader = (newState: CharacterSheetData, rules: RulesData) => {
 export const reconcileRulesWithState = (currentState: CharacterSheetData, rules: RulesData): CharacterSheetData => {
     const newState: CharacterSheetData = JSON.parse(JSON.stringify(currentState));
 
+    // --- Data Migration (In-Memory) ---
+    // Ensure the library traits are migrated to the new property system BEFORE reconciliation.
+    // This handles legacy data in the DB or JSON file gracefully on-the-fly.
+    if (rules.libraries?.traits) {
+        // Only run migration if there are traits in the library
+        rules.libraries.traits = migrateTraitLibrary(rules.libraries.traits as LibraryEntry[]).traits;
+    }
+    // ----------------------------------
+
     if (rules.version) {
         newState._rulesVersion = rules.version;
     }
@@ -342,7 +431,7 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
     reconcileSkillsAndBackgrounds(newState, currentState, rules);
     reconcileCounters(newState, currentState, rules);
     reconcileTraits(newState, currentState, rules);
-    reconcileLibraries(newState, rules);
+    reconcileCleanup(newState, currentState, rules);
     reconcileHeader(newState, rules);
 
     return newState;

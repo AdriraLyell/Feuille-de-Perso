@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryCounterEntry } from '../../../types/system';
-import { Search, Plus, Save, AlertOctagon, Gauge, CheckCircle2, Circle } from 'lucide-react';
+import { Search, Plus, Save, AlertOctagon, Gauge, CheckCircle2, Circle, X, Calculator } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import { useItemUsageDetails } from '../../../hooks/admin/useItemUsageDetails';
 import { smartIncludes } from '../../../utils/stringUtils';
@@ -113,17 +113,18 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
         const newDefinitionsCounters = { ...(rules.definitions.counters || {}) };
 
         // key format as in campaignReconciler.ts
-        const key = safeItem.id || safeItem.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+        const key = safeItem.id || safeItem.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
 
         newDefinitionsCounters[key] = {
             id: safeItem.id,
             name: safeItem.name,
             description: safeItem.description || newDefinitionsCounters[key]?.description || '',
-            max: safeItem.maxValue ?? newDefinitionsCounters[key]?.max ?? 10,
+            max: safeItem.formulaId ? 0 : (safeItem.maxValue ?? 10), // Will be calculated if formulaId is present
             value: safeItem.defaultValue ?? newDefinitionsCounters[key]?.value,
             defaultValue: safeItem.defaultValue ?? newDefinitionsCounters[key]?.defaultValue,
             xpCost: safeItem.xpCost ?? newDefinitionsCounters[key]?.xpCost ?? 0,
-            appearance: safeItem.appearance === 'squares_only' ? 'squares_only' : undefined
+            appearance: safeItem.appearance === 'squares_only' ? 'squares_only' : undefined,
+            formulaId: safeItem.formulaId
         };
 
         onUpdate({
@@ -185,11 +186,19 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
             <div className="relative mb-4">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded focus:border-red-500 outline-none"
+                    className="w-full pl-9 pr-9 py-2 text-sm border border-slate-300 rounded focus:border-red-500 outline-none"
                     placeholder="Rechercher..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
+                {searchTerm && (
+                    <button
+                        onClick={() => setSearchTerm('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-600 transition-colors"
+                    >
+                        <X size={14} />
+                    </button>
+                )}
             </div>
 
             {/* Bulk Actions */}
@@ -306,36 +315,60 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                 }
                             </select>
                         </div>
-                        <div className="grid grid-cols-3 gap-4">
-                            <div>
-                                <label htmlFor="counter-max" className="block text-xs font-bold text-slate-500 uppercase mb-1">Max (Cases)</label>
-                                <input
-                                    id="counter-max"
-                                    type="number"
-                                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-red-500 outline-none"
-                                    value={editingItem.maxValue ?? 10}
-                                    onChange={(e) => setEditingItem({ ...editingItem, maxValue: Number(e.target.value) })}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="counter-default" className="block text-xs font-bold text-slate-500 uppercase mb-1">Défaut (Rempli)</label>
-                                <input
-                                    id="counter-default"
-                                    type="number"
-                                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-red-500 outline-none"
-                                    value={editingItem.defaultValue ?? 0}
-                                    onChange={(e) => setEditingItem({ ...editingItem, defaultValue: Number(e.target.value) })}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="counter-xp-cost" className="block text-xs font-bold text-slate-500 uppercase mb-1">Coût XP</label>
-                                <input
-                                    id="counter-xp-cost"
-                                    type="number"
-                                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-red-500 outline-none"
-                                    value={editingItem.xpCost ?? 0}
-                                    onChange={(e) => setEditingItem({ ...editingItem, xpCost: Number(e.target.value) })}
-                                />
+                        <div className="bg-amber-500/5 p-3 rounded border border-amber-500/20 mb-2">
+                            <label className="block text-xs font-bold text-amber-700 uppercase mb-2 flex items-center gap-2">
+                                <Calculator size={14} /> Valeur Max (Calculée)
+                            </label>
+                            <select
+                                className="w-full border border-stone-200 rounded px-3 py-2 text-sm focus:border-amber-500 outline-none bg-white font-medium mb-3"
+                                value={editingItem.formulaId || ''}
+                                onChange={(e) => setEditingItem({ ...editingItem, formulaId: e.target.value || undefined })}
+                            >
+                                <option value="">-- Valeur Fixe (Manuel) --</option>
+                                {rules.libraries.formulas
+                                    ?.filter(f => f.type === 'variable')
+                                    .map(f => (
+                                        <option key={f.id} value={f.id}>{f.name} ({f.formula || 'Agrégat'})</option>
+                                    ))
+                                }
+                            </select>
+
+                            <div className="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label htmlFor="counter-max" className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                        {editingItem.formulaId ? 'Max de Secours' : 'Max (Fixe)'}
+                                    </label>
+                                    <input
+                                        id="counter-max"
+                                        type="number"
+                                        disabled={!!editingItem.formulaId}
+                                        className={`w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-red-500 outline-none ${editingItem.formulaId ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : ''}`}
+                                        value={editingItem.maxValue ?? 10}
+                                        onChange={(e) => setEditingItem({ ...editingItem, maxValue: Number(e.target.value) })}
+                                    />
+                                </div>
+                                <div className={editingItem.formulaId ? 'opacity-40 grayscale pointer-events-none' : ''}>
+                                    <label htmlFor="counter-default" className="block text-xs font-bold text-slate-500 uppercase mb-1">Défaut (Rempli)</label>
+                                    <input
+                                        id="counter-default"
+                                        type="number"
+                                        disabled={!!editingItem.formulaId}
+                                        className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-red-500 outline-none"
+                                        value={editingItem.defaultValue ?? 0}
+                                        onChange={(e) => setEditingItem({ ...editingItem, defaultValue: Number(e.target.value) })}
+                                    />
+                                </div>
+                                <div className={editingItem.formulaId ? 'opacity-40 grayscale pointer-events-none' : ''}>
+                                    <label htmlFor="counter-cost" className="block text-xs font-bold text-slate-500 uppercase mb-1">Coût XP</label>
+                                    <input
+                                        id="counter-cost"
+                                        type="number"
+                                        disabled={!!editingItem.formulaId}
+                                        className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-red-500 outline-none"
+                                        value={editingItem.xpCost ?? 0}
+                                        onChange={(e) => setEditingItem({ ...editingItem, xpCost: Number(e.target.value) })}
+                                    />
+                                </div>
                             </div>
                         </div>
 

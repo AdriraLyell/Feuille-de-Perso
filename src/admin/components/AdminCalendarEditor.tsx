@@ -147,7 +147,7 @@ const AdminCalendarEditor: React.FC<Props> = ({ rules, onUpdate }) => {
                                     <span className="text-amber-gold">●</span> Aperçu
                                 </h3>
                                 <CalendarPreview
-                                    config={calendar as any}
+                                    config={calendar as CalendarConfig}
                                     mode={calendar.type}
                                 />
                             </div>

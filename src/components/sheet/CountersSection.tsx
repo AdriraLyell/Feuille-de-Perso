@@ -1,95 +1,325 @@
-
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { CharacterSheetData, DotEntry } from '../../types';
 import DotRating from '../ui/DotRating';
 import { SectionHeader } from './Shared';
 import { useRules } from '../../context/RulesContext';
+import { normalizeString } from '../../utils/stringUtils';
+import { evaluateFormula, getSheetVariables, getAggregateDetails } from '../../utils/formulaEvaluator';
+import { Minus, Plus, RefreshCw } from 'lucide-react';
+import { Parser } from 'expr-eval';
+import { PortalTooltip } from '../ui/PortalTooltip';
+
+const parser = new Parser();
+
+interface NumericCounterItemProps {
+    counter: DotEntry;
+    entryOrFormula: any;
+    isCustom: boolean;
+    data: CharacterSheetData;
+    rules: any;
+    calculatedMaxes: Record<string, number>;
+    updateCounter: (id: string, value: number, isCustom: boolean, field: 'value' | 'current') => void;
+}
+
+const translateAggregateConfig = (config: any): string => {
+    if (!config) return '';
+    let target = config.targetType || config.target || '';
+    switch (target) {
+        case 'skills': target = 'Compétences'; break;
+        case 'attributes': target = 'Attributs'; break;
+        case 'secondaryAttributes': target = 'Attributs Sec.'; break;
+        case 'traits': target = 'Traits'; break;
+        case 'mysticAbilities': target = 'Cap. Mystiques'; break;
+    }
+
+    let op = config.operation?.toLowerCase() || '';
+    switch (op) {
+        case 'sum': op = 'Somme'; break;
+        case 'count': op = 'Nombre'; break;
+        case 'max':
+        case 'highest': op = 'Maximum'; break;
+        case 'avg':
+        case 'average': op = 'Moyenne'; break;
+    }
+
+    let filter = '';
+    if (config.filterTarget && config.filterValue) {
+        const typeF = config.filterTarget === 'tag' ? 'Tag' : config.filterTarget === 'category' ? 'Catégorie' : 'Nom';
+        filter = ` (${typeF}: ${config.filterValue})`;
+    }
+
+    return `${op} de : ${target}${filter}`;
+};
+
+const translateVariableName = (v: string): string => {
+    switch (v) {
+        case 'SUM_HABILITES_MYSTIQUES': return 'Somme Cap. Mystiques';
+        case 'SCENARIOS_COUNT': return 'Nombre de Scénarios';
+        case 'TRAIT_LEVEL': return 'Niveau de Trait';
+        default: return v;
+    }
+};
+
+const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
+    counter,
+    entryOrFormula,
+    isCustom,
+    data,
+    rules,
+    calculatedMaxes,
+    updateCounter
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const anchorRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (anchorRef.current && !anchorRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen]);
+
+    const nameKey = normalizeString(counter.name);
+    const calculatedMax = calculatedMaxes[counter.name] || calculatedMaxes[nameKey];
+
+    let formula = entryOrFormula.formula;
+    if (!formula && entryOrFormula.formulaId) {
+        const fEntry = rules?.libraries?.formulas?.find((f: any) => f.id === entryOrFormula.formulaId);
+        formula = fEntry?.formula || '';
+    }
+
+    const computedMax = calculatedMax ?? evaluateFormula(
+        formula || '',
+        { ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary },
+        entryOrFormula.aggregateConfig ? entryOrFormula : undefined
+    );
+
+    const currentSpent = counter.current || 0;
+    const currentRemaining = Math.max(0, computedMax - currentSpent);
+
+    const renderDetails = () => {
+        if (!isOpen) return null;
+
+        if (entryOrFormula.aggregateConfig) {
+            const details = getAggregateDetails({ ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary }, entryOrFormula.aggregateConfig);
+            const translatedDesc = translateAggregateConfig(entryOrFormula.aggregateConfig);
+
+            if (!details.length) {
+                return (
+                    <div className="flex flex-col gap-1 w-full min-w-[140px]">
+                        <div className="text-slate-400 italic text-[9px] mb-1">{translatedDesc}</div>
+                        <div className="text-stone-400 italic text-xs">Aucun élément correspondant</div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="flex flex-col gap-1 w-full min-w-[140px]">
+                    <div className="text-amber-200/80 italic text-[9px] border-b border-slate-600/50 pb-1 mb-1 leading-tight">
+                        {translatedDesc}
+                    </div>
+                    {details.map((d, i) => (
+                        <div key={i} className="flex justify-between items-center text-xs gap-4">
+                            <span className="text-slate-300 truncate max-w-[180px]" title={d.name}>{d.name || d.category || 'Inconnu'}</span>
+                            <span className="font-mono text-white text-right shrink-0">{d.value >= 0 ? `+${d.value}` : d.value}</span>
+                        </div>
+                    ))}
+                    <div className="border-t border-slate-600 mt-1 pt-1 flex justify-between items-center font-bold text-xs">
+                        <span className="text-slate-200">TOTAL</span>
+                        <span className="font-mono text-amber-400">{computedMax}</span>
+                    </div>
+                </div>
+            );
+        } else if (formula) {
+            const sheetVars = getSheetVariables({ ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary });
+            let parsedVars: string[] = [];
+            let baseValue = 0;
+            try {
+                const expr = parser.parse(formula);
+                parsedVars = expr.variables();
+                const zeroContext = parsedVars.reduce((acc, v) => ({ ...acc, [v]: 0 }), {});
+                baseValue = Number(expr.evaluate(zeroContext)) || 0;
+            } catch (e) {
+                // Ignore parse errors for UI
+            }
+
+            return (
+                <div className="flex flex-col gap-1 w-full min-w-[140px]">
+                    {baseValue !== 0 && (
+                        <div className="flex justify-between items-center text-xs border-b border-slate-600/50 pb-1 mb-1 gap-4">
+                            <span className="text-slate-400 italic">Base</span>
+                            <span className="font-mono text-slate-400 shrink-0">{baseValue >= 0 ? `+${baseValue}` : baseValue}</span>
+                        </div>
+                    )}
+                    {parsedVars.map(v => {
+                        const val = sheetVars[v] || 0;
+                        // Essayer de trouver le nom humain dans la bibliothèque de formules
+                        const formulaEntry = rules?.libraries?.formulas?.find((f: any) =>
+                            f.code === v || f.id === v || normalizeString(f.name) === normalizeString(v)
+                        );
+                        const displayName = formulaEntry?.name || translateVariableName(v);
+
+                        return (
+                            <div key={v} className="flex justify-between items-center text-xs gap-4">
+                                <span className="text-slate-300 truncate max-w-[180px]" title={v}>{displayName}</span>
+                                <span className="font-mono text-white text-right shrink-0">{val >= 0 ? `+${val}` : val}</span>
+                            </div>
+                        );
+                    })}
+                    <div className="border-t border-slate-600 mt-1 pt-1 flex justify-between items-center font-bold text-xs">
+                        <span className="text-slate-200">TOTAL</span>
+                        <span className="font-mono text-amber-400">{computedMax}</span>
+                    </div>
+                </div>
+            );
+        }
+
+        return <div className="text-stone-400 italic">Valeur de base : {computedMax}</div>;
+    };
+
+    return (
+        <div className="col-span-1 border border-[#bfae85]/40 bg-gradient-to-br from-[#fdfbf7] to-[#f4f2eb] rounded-sm shadow-[inset_0_1px_4px_rgba(0,0,0,0.05)] flex items-center justify-between px-1 overflow-visible h-9 group transition-all relative">
+            <div
+                className="flex flex-col items-start justify-center flex-grow cursor-help h-full w-full"
+                ref={anchorRef}
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <span className="font-bold text-[9px] uppercase tracking-tighter text-[#8b2e2e]/90 leading-tight truncate w-full">
+                    {counter.name}
+                </span>
+                <span className="font-black text-sm text-[#5c4d41] leading-none mb-[1px]">
+                    {currentRemaining} <span className="text-[10px] text-stone-400 font-normal">/ {computedMax}</span>
+                </span>
+            </div>
+
+            <PortalTooltip isOpen={isOpen} anchorRef={anchorRef} title={`${counter.name} (Calcul)`}>
+                {renderDetails()}
+            </PortalTooltip>
+
+            <div className={`flex flex-shrink-0 items-center justify-end transition-opacity z-10 bg-gradient-to-l from-[#f4f2eb] from-80% to-transparent pl-4 h-full absolute right-0 ${isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 md:opacity-0 md:group-hover:opacity-100'}`}>
+                <button onClick={() => updateCounter(counter.id, 0, isCustom, 'current')} className="w-5 h-5 mr-0.5 rounded hover:bg-stone-200 flex items-center justify-center text-stone-500 transition-colors" title="Restaurer (Reset dépense)">
+                    <RefreshCw size={11} />
+                </button>
+                <button onClick={() => updateCounter(counter.id, Math.min(computedMax, currentSpent + 1), isCustom, 'current')} className="w-5 h-5 mr-0.5 rounded hover:bg-[#8b2e2e]/10 flex items-center justify-center text-[#8b2e2e] transition-colors" title="Dépenser 1 (Baisse la jauge)">
+                    <Minus size={14} />
+                </button>
+                <button onClick={() => updateCounter(counter.id, Math.max(0, currentSpent - 1), isCustom, 'current')} className="w-5 h-5 rounded hover:bg-amber-600/10 flex items-center justify-center text-amber-600 transition-colors" title="Récupérer 1 (Remonte la jauge)">
+                    <Plus size={14} />
+                </button>
+            </div>
+        </div>
+    );
+};
 
 interface CountersSectionProps {
     data: CharacterSheetData;
     updateCounter: (id: string, value: number, isCustom: boolean, field: 'value' | 'current') => void;
     isLandscape: boolean;
+    creationBonuses?: Record<string, number>;
+    xpBonuses?: Record<string, number>;
+    calculatedMaxes?: Record<string, number>;
+    activeReserves?: string[];
 }
 
-export const CountersSection = React.memo<CountersSectionProps>(({ data, updateCounter, isLandscape }) => {
+export const CountersSection = React.memo<CountersSectionProps>(({
+    data,
+    updateCounter,
+    isLandscape,
+    creationBonuses = {},
+    xpBonuses = {},
+    calculatedMaxes = {},
+    activeReserves = []
+}) => {
     const { rules } = useRules();
+
     const renderCounterItem = (counter: DotEntry, isCustom: boolean) => {
         const isSquaresOnly = counter.variant === 'squares_only';
+        const nameKey = normalizeString(counter.name);
+        const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey);
+        const sysDef = rules?.definitions?.counters?.[nameKey] || Object.values(rules?.definitions?.counters || {}).find(c => normalizeString(c.name) === nameKey);
+        const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId;
+        if (isNumeric) {
+            return (
+                <NumericCounterItem
+                    key={counter.id}
+                    counter={counter}
+                    entryOrFormula={libEntry || sysDef}
+                    isCustom={isCustom}
+                    data={data}
+                    rules={rules}
+                    calculatedMaxes={calculatedMaxes}
+                    updateCounter={updateCounter}
+                />
+            );
+        }
+
+        const creationBonus = creationBonuses[nameKey] || 0;
+        const xpBonus = xpBonuses[nameKey] || 0;
+        const calculatedMax = calculatedMaxes[counter.name] || calculatedMaxes[nameKey];
+
+        const effectiveValue = counter.value + creationBonus + xpBonus;
+        const effectiveCreationValue = (counter.creationValue || 0) + creationBonus;
+        const effectiveMax = calculatedMax ?? (counter.max || 10);
 
         return (
-            <div key={counter.id} className="col-span-1 border border-stone-300 bg-white rounded-sm shadow-sm flex items-center p-1 overflow-hidden h-9">
-                {/* Title on the left */}
+            <div key={counter.id} className="col-span-2 border border-stone-300 bg-white rounded-sm shadow-sm flex items-center p-1 overflow-hidden h-9">
                 <div
-                    className="w-16 shrink-0 font-bold text-[9px] uppercase tracking-tighter text-stone-800 border-r border-stone-200 mr-1 pr-1 h-full flex items-center break-words leading-none justify-center text-center cursor-help"
+                    className="w-16 shrink-0 font-bold text-[8px] leading-tight uppercase tracking-tighter text-stone-800 border-r border-stone-200 mr-1 pr-1 h-full flex items-center justify-center text-center cursor-help"
                     title={counter.description || counter.name}
                 >
                     {counter.name}
                 </div>
 
-                {/* Right side stacks */}
-                <div className="flex flex-col gap-0.5 flex-grow justify-center w-full">
+                <div className="flex flex-col gap-0.5 flex-grow justify-center items-end pr-1 overflow-hidden">
                     {!isSquaresOnly && (
-                        /* Maxi */
-                        <div className="flex items-center justify-end h-3 pr-1 gap-2">
-                            <span className="text-[8px] text-stone-400 font-bold uppercase tracking-tight">Maxi</span>
-                            <div className="relative w-[142px] h-3">
-                                <div className="absolute right-0 top-1/2 -translate-y-1/2 scale-[0.9] origin-right">
-                                    <DotRating
-                                        value={counter.value}
-                                        creationValue={counter.creationValue}
-                                        max={counter.max || 10}
-                                        onChange={(v) => updateCounter(counter.id, v, isCustom, 'value')}
-                                        creationColor={data.theme?.creationColor}
-                                        xpColor={data.theme?.xpColor}
-                                        symbol={data.theme?.dotSymbol}
-                                    />
-                                </div>
+                        <div className="flex items-center h-3.5">
+                            <div className="scale-[0.85] origin-right">
+                                <DotRating
+                                    value={effectiveValue}
+                                    creationValue={effectiveCreationValue}
+                                    max={effectiveMax}
+                                    onChange={(v) => {
+                                        const newBaseValue = Math.max(0, v - creationBonus - xpBonus);
+                                        updateCounter(counter.id, newBaseValue, isCustom, 'value');
+                                    }}
+                                    creationColor={data.theme?.creationColor}
+                                    xpColor={data.theme?.xpColor}
+                                    symbol={data.theme?.dotSymbol}
+                                />
                             </div>
                         </div>
                     )}
 
-                    {/* Utilisé (ou Cases) */}
-                    <div className="flex items-center justify-end h-3 pr-1 gap-2 mt-0.5">
-                        <span className="text-[8px] text-stone-400 font-bold uppercase tracking-tight">{isSquaresOnly ? 'Cases' : 'Utilisé'}</span>
-                        <div className="relative w-[142px] h-3">
-                            <div className="absolute right-0 top-1/2 -translate-y-1/2 scale-[0.9] origin-right flex items-center space-x-1">
-                                {Array.from({ length: counter.max || 10 }).map((_, i) => {
-                                    // If squares_only, counter.value dictates how many squares are shown as "max active"
-                                    // Normally counter.value was max, but if it has a max=10, we could just show i < counter.max.
-                                    // Let's rely on counter.max for the full length, or counter.value if squares_only needs to be restricted.
-                                    // The user said: "seul les cases (squares) sont affichées, cachant la ligne de bulle inutilisée"
-                                    // so we show squares up to counter.max, and only the active ones are filled.
-                                    // Wait, if we hide the bubbles (Maxi), how do we set the maximum for squares_only?
-                                    // The "Maxi" line is what allows the player to INCREASE the length of the used counter if they spend XP. 
-                                    // So for squares_only, the max length might be fixed at counter.max, but what if they can increase it?
-                                    // Let's assume the max is static. No wait, in squares_only, the squares themselves represent the tracker. 
-                                    // We show squares up to counter.max.
-                                    if (i >= (counter.max || 10)) {
-                                        return null;
-                                    }
-
-                                    // If squares_only, we don't limit by counter.value if we don't want to track it, but we should always show them.
-                                    if (!isSquaresOnly && i >= counter.value) {
-                                        return <div key={i} className="w-3 h-3" />;
-                                    }
-
-                                    const isChecked = i < (counter.current || 0);
-
-                                    return (
-                                        <button
-                                            key={i}
-                                            type="button"
-                                            onClick={() => {
-                                                const newVal = i + 1;
-                                                const currentVal = counter.current || 0;
-                                                updateCounter(counter.id, newVal === currentVal ? newVal - 1 : newVal, isCustom, 'current');
-                                            }}
-                                            className={`w-3 h-3 border border-stone-600 transition-colors ${isChecked ? 'bg-ink' : 'bg-white hover:bg-stone-100'}`}
-                                            title="Point utilisé"
-                                        />
-                                    );
-                                })}
-                            </div>
+                    <div className="flex items-center h-3.5">
+                        <div className="scale-[0.85] origin-right flex items-center space-x-1">
+                            {Array.from({ length: effectiveMax }).map((_, i) => {
+                                if (i >= effectiveMax) return null;
+                                if (!isSquaresOnly && i >= effectiveValue) {
+                                    return <div key={i} className="w-3 h-3" />;
+                                }
+                                const isChecked = i < (counter.current || 0);
+                                return (
+                                    <button
+                                        key={i}
+                                        type="button"
+                                        onClick={() => {
+                                            const newVal = i + 1;
+                                            const currentVal = counter.current || 0;
+                                            updateCounter(counter.id, newVal === currentVal ? newVal - 1 : newVal, isCustom, 'current');
+                                        }}
+                                        className={`w-3 h-3 border border-stone-600 transition-colors ${isChecked ? 'bg-ink' : 'bg-white hover:bg-stone-100'}`}
+                                        title="Point utilisé"
+                                    />
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -97,60 +327,116 @@ export const CountersSection = React.memo<CountersSectionProps>(({ data, updateC
         );
     };
 
-    // Sorting Logic
-    // rules is available from useRules hook at top of component
-
-    // Fallback if rules not passed (though we will update parent)
     const counterCat = rules?.definitions?.skillCategories?.find((c: any) => c.behavior === 'Compteur');
     const sortedIds = counterCat ? (rules?.definitions?.skills?.[counterCat.id] || []) : [];
-
     const allKeys = Object.keys(data.counters).filter(k => k !== 'custom');
+    const customCounters = data.counters.custom || [];
 
-    // Sort keys based on sortedIds (which might be IDs or Names)
     const orderedKeys: string[] = [];
     const remainingKeys = new Set(allKeys);
 
     sortedIds.forEach((idOrName: string) => {
-        // Find a key that matches this idOrName
         const matchedKey = Array.from(remainingKeys).find(key => {
-            // 1. Exact Key Match
             if (key === idOrName) return true;
-            // 2. Name Match (current data)
-            // @ts-expect-error -- counters[key] may be DotEntry[]
-            if (data.counters[key]?.name === idOrName) return true;
-            // 3. System Definition Name Match
+            const counterData = data.counters[key];
+            if (counterData && !Array.isArray(counterData) && counterData.name === idOrName) return true;
             const sysDef = rules?.definitions?.counters?.[key];
             if (sysDef?.name === idOrName) return true;
-
             return false;
         });
-
         if (matchedKey) {
             orderedKeys.push(matchedKey);
             remainingKeys.delete(matchedKey);
         }
     });
 
-    // Add remaining keys (custom or unsorted)
-    // FIX: User requested STRICT visibility. Only show counters in the list.
-    // remainingKeys.forEach(key => orderedKeys.push(key));
+    const numericItems: React.ReactNode[] = [];
+    const standardItems: React.ReactNode[] = [];
+
+    orderedKeys.forEach(key => {
+        const counter = data.counters[key];
+        if (Array.isArray(counter)) return;
+        const nameKey = normalizeString(counter.name);
+        const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey);
+        const sysDef = rules?.definitions?.counters?.[nameKey] || Object.values(rules?.definitions?.counters || {}).find(c => normalizeString(c.name) === nameKey);
+        const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId;
+        if (isNumeric) {
+            numericItems.push(
+                <NumericCounterItem
+                    key={`numeric-${counter.id}`}
+                    counter={counter}
+                    entryOrFormula={libEntry || sysDef}
+                    isCustom={false}
+                    data={data}
+                    rules={rules}
+                    calculatedMaxes={calculatedMaxes}
+                    updateCounter={updateCounter}
+                />
+            );
+        } else {
+            standardItems.push(renderCounterItem(counter, false));
+        }
+    });
+
+    customCounters
+        .filter(c => c.name?.trim())
+        .forEach(c => {
+            const nameKey = normalizeString(c.name);
+            const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey);
+            const sysDef = rules?.definitions?.counters?.[nameKey];
+            const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId;
+            if (isNumeric) {
+                numericItems.push(
+                    <NumericCounterItem
+                        key={`custom-numeric-${c.id}`}
+                        counter={c}
+                        entryOrFormula={libEntry || sysDef}
+                        isCustom={true}
+                        data={data}
+                        rules={rules}
+                        calculatedMaxes={calculatedMaxes}
+                        updateCounter={updateCounter}
+                    />
+                );
+            } else {
+                standardItems.push(renderCounterItem(c, true));
+            }
+        });
+
+    activeReserves.forEach(formulaId => {
+        const formulaEntry = rules?.libraries?.formulas?.find(f => f.id === formulaId);
+        if (!formulaEntry) return;
+        const existingCustom = customCounters.find(c => normalizeString(c.name) === normalizeString(formulaEntry.name));
+        const counterToRender: DotEntry = existingCustom || {
+            id: formulaId,
+            name: formulaEntry.name,
+            value: 0,
+            creationValue: 0,
+            current: 0,
+            max: 0,
+            description: formulaEntry.description
+        };
+        numericItems.push(
+            <NumericCounterItem
+                key={`reserve-${counterToRender.id}`}
+                counter={counterToRender}
+                entryOrFormula={formulaEntry}
+                isCustom={true}
+                data={data}
+                rules={rules}
+                calculatedMaxes={calculatedMaxes}
+                updateCounter={updateCounter}
+            />
+        );
+    });
 
     return (
         <div className="flex flex-col h-full border-l border-stone-400">
-            <SectionHeader title="Compteurs" />
+            <SectionHeader title="Compteurs & Réserves" />
             <div className="p-1 flex-grow overflow-y-auto bg-stone-50/30">
-                <div className={`grid gap-1 ${isLandscape ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                    {/* Dynamic System Counters (Sorted) */}
-                    {orderedKeys.map(key => {
-                        const counter = data.counters[key];
-                        if (Array.isArray(counter)) return null;
-                        return renderCounterItem(counter, false);
-                    })}
-
-                    {/* Legacy Custom Counters array (if any) */}
-                    {(data.counters.custom || [])
-                        .filter(c => c.name?.trim())
-                        .map(c => renderCounterItem(c, true))}
+                <div className="grid grid-cols-4 gap-1">
+                    {standardItems}
+                    {numericItems}
                 </div>
             </div>
         </div>

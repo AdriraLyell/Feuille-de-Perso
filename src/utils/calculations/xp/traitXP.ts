@@ -11,19 +11,39 @@ export function calculateTraitXP(data: CharacterSheetData, rules: RulesData | un
 
     let traitSpent = 0;
 
-    // 1. Avantages achetés post-création
+    // 1. Avantages achetés ou améliorés post-création
     data.page2.avantages?.forEach(trait => {
         if (trait.isPostCreation) {
             const val = parseInt(trait.value) || 0;
             const cost = val * traitCostFactor;
-            traitSpent += cost;
-            breakdown.push({ name: trait.name, amount: -cost });
+            if (cost > 0) {
+                traitSpent += cost;
+                breakdown.push({ name: trait.name, amount: -cost });
+            }
+        } else if (trait.creationValue !== undefined) {
+            const currentVal = parseInt(trait.value) || 0;
+            const creationVal = parseInt(trait.creationValue) || 0;
+            const diff = Math.max(0, currentVal - creationVal);
+            if (diff > 0) {
+                const cost = diff * traitCostFactor;
+                traitSpent += cost;
+                breakdown.push({ name: `Amélioration : ${trait.name}`, amount: -cost });
+            }
         }
     });
 
-    // 2. Désavantages rachetés (réduits) post-création
+    // 2. Désavantages rachetés (réduits) ou ajoutés post-création
     data.page2.desavantages?.forEach(trait => {
-        if (trait.creationValue !== undefined) {
+        if (trait.isPostCreation) {
+            // Nouveau désavantage = GAIN d'XP (+cost)
+            const val = parseInt(trait.value) || 0;
+            const cost = val * traitCostFactor;
+            if (cost > 0) {
+                traitSpent -= cost; // Soustraire de la dépense = Gain
+                breakdown.push({ name: `Nouveau : ${trait.name}`, amount: cost });
+            }
+        } else if (trait.creationValue !== undefined) {
+            // Désavantage d'origine racheté = DÉPENSE d'XP (-cost)
             const currentVal = parseInt(trait.value) || 0;
             const creationVal = parseInt(trait.creationValue) || 0;
             const diff = Math.max(0, creationVal - currentVal);

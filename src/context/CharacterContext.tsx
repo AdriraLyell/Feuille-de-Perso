@@ -109,6 +109,12 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
                     if (activeRulesId !== undefined) localStorage.setItem('rules-source-id', activeRulesId);
                 }
 
+                // Force reconciliation if skillLibrary was emptied (fixes mysticAbilityId loss)
+                if (!validated.skillLibrary || validated.skillLibrary.length === 0) {
+                    delete (validated as any)._rulesVersion;
+                    delete (validated as any)._rulesLastUpdated;
+                }
+
                 return validated;
             } catch (e) {
                 ErrorService.handleError(e, { context: 'CharacterContext.Init', userMessage: "Erreur lors du chargement des données locales." });

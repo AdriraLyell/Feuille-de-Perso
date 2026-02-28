@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryBackgroundEntry } from '../../../types/system';
-import { Search, Plus, Users, Save, AlertOctagon, Layers, CheckCircle2, Circle, Globe, Filter } from 'lucide-react';
+import { Search, Plus, Users, Save, AlertOctagon, Layers, CheckCircle2, Circle, Globe, Filter, X } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import TriStateChip from '../../../components/ui/TriStateChip';
 import { useItemUsageDetails } from '../../../hooks/admin/useItemUsageDetails';
@@ -152,11 +152,19 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
             <div className="relative mb-4">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded focus:border-purple-500 outline-none"
+                    className="w-full pl-9 pr-9 py-2 text-sm border border-slate-300 rounded focus:border-purple-500 outline-none"
                     placeholder="Rechercher..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
+                {searchTerm && (
+                    <button
+                        onClick={() => setSearchTerm('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-purple-600 transition-colors"
+                    >
+                        <X size={14} />
+                    </button>
+                )}
             </div>
 
             <div className="flex flex-wrap gap-2 items-center mb-4 p-2 bg-slate-50 border border-slate-200 rounded">

@@ -7,6 +7,8 @@ import { logger } from '../logger';
 import { MIGRATIONS, CURRENT_SCHEMA_VERSION } from './registry';
 import { LEGACY_SKILL_MAP } from './migrateSkills';
 import { migrateAttributeId } from './migrateAttributes';
+import { migrateFormulas } from './migrateFormulas';
+import { generateId } from '../factories';
 
 /**
  * Main migration function for character sheet data.
@@ -233,6 +235,69 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
                 defaultMax: c.max,
                 xpCost: c.xpCost
             };
+        });
+    }
+
+    // 7. Migrate formulas in traits mapping attribute_bonus to formula
+    if (rules.libraries.traits) {
+        if (!rules.libraries.formulas) rules.libraries.formulas = [];
+
+        rules.libraries.traits.forEach((trait: any) => {
+            if (Array.isArray(trait.effects)) {
+                trait.effects.forEach((effect: any) => {
+                    const isLegacy = ['attribute_bonus', 'counter_max_bonus', 'xp_bonus'].includes(effect.type as string);
+                    const isOrphanFormula = effect.type === 'formula' && !effect.formulaId && effect.formula;
+
+                    if (isLegacy || isOrphanFormula) {
+                        let formulaString = effect.formula || '';
+                        let target = effect.target;
+
+                        if (isLegacy) {
+                            const legacyEffect = effect as any;
+                            if (legacyEffect.type === 'attribute_bonus') {
+                                formulaString = legacyEffect.value?.toString() || '0';
+                            } else if (legacyEffect.type === 'counter_max_bonus') {
+                                formulaString = `${legacyEffect.value || 0} * TRAIT_LEVEL`;
+                            } else if (legacyEffect.type === 'xp_bonus') {
+                                target = 'XP';
+                                if (legacyEffect.method === 'per_scenario') {
+                                    formulaString = `${legacyEffect.value || 0} * SCENARIOS_COUNT`;
+                                } else {
+                                    formulaString = legacyEffect.value?.toString() || '0';
+                                }
+                            }
+                        }
+
+                        if (!formulaString) return;
+
+                        // Try to find a global formula with EXACTLY the same formula string
+                        let existing = rules.libraries.formulas!.find((f: any) => f.formula === formulaString);
+
+                        if (!existing) {
+                            // Create one
+                            existing = {
+                                id: generateId(),
+                                name: `Mécanique: ${trait.name}`,
+                                type: 'modifier',
+                                formula: formulaString,
+                                isActive: true,
+                                isGlobal: true,
+                                description: `Importé depuis le trait ${trait.name}`
+                            };
+                            rules.libraries.formulas!.push(existing as any);
+                        }
+
+                        // Mutate the effect
+                        effect.type = 'formula';
+                        effect.formula = formulaString;
+                        effect.formulaId = existing.id;
+                        effect.target = target;
+                        // Clear legacy values
+                        delete (effect as any).value;
+                        delete (effect as any).method;
+                    }
+                });
+            }
         });
     }
 

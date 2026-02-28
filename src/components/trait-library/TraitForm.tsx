@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { LibraryEntry, TraitEffect } from '../../types';
-import { Edit2, Plus, X, AlignLeft, Save, AlertCircle, Coins, Info } from 'lucide-react';
+import { LibraryEntry, TraitEffect, LibraryFormulaEntry } from '../../types';
+import { Edit2, Plus, X, AlignLeft, Save, AlertCircle, Coins, Info, Sparkles } from 'lucide-react';
 import TraitEffectEditor from './TraitEffectEditor';
 import ThematicModal from '../ui/ThematicModal';
 
@@ -10,6 +10,8 @@ interface TraitFormProps {
     library: LibraryEntry[];
     allSkills: { id: string, name: string }[];
     allAttributes: { id: string, name: string }[];
+    allCounters: { id: string, name: string }[];
+    allFormulas?: LibraryFormulaEntry[];
     tagInput: string;
     error: string | null;
     setEditForm: (entry: LibraryEntry | null) => void;
@@ -20,6 +22,7 @@ interface TraitFormProps {
     removeTag: (tag: string) => void;
     addEffect: () => void;
     updateEffect: <K extends keyof TraitEffect>(id: string, field: K, value: TraitEffect[K]) => void;
+    updateEffectFields?: (id: string, updates: Partial<TraitEffect>) => void;
     removeEffect: (id: string) => void;
 }
 
@@ -29,6 +32,8 @@ const TraitForm: React.FC<TraitFormProps> = ({
     library,
     allSkills,
     allAttributes,
+    allCounters,
+    allFormulas,
     tagInput,
     error,
     setEditForm,
@@ -39,6 +44,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
     removeTag,
     addEffect,
     updateEffect,
+    updateEffectFields,
     removeEffect
 }) => {
     const [variantDraft, setVariantDraft] = React.useState(editForm.variants?.join(', ') || '');
@@ -132,8 +138,8 @@ const TraitForm: React.FC<TraitFormProps> = ({
                 </div>
 
                 {/* Name & Cost (Smart Input) */}
-                <div className="grid grid-cols-5 gap-4">
-                    <div className="col-span-3">
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-1">
                         <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest">Nom du Trait</label>
                         <input
                             className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm placeholder-stone-300"
@@ -142,7 +148,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
                             placeholder="Ex: Chance, Ennemi..."
                         />
                     </div>
-                    <div className="col-span-2 relative">
+                    <div className="col-span-1 relative">
                         <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest flex items-center justify-between">
                             <span>Coût / Valeur</span>
                             <div className="group relative">
@@ -218,20 +224,94 @@ const TraitForm: React.FC<TraitFormProps> = ({
                     </div>
                 </div>
 
-                {/* Configuration: Variable Trait */}
-                <div className="bg-[#bfae85]/10 border border-[#bfae85]/30 rounded-sm p-3 flex items-center gap-3">
-                    <input
-                        type="checkbox"
-                        id="isVariable"
-                        className="w-4 h-4 accent-amber-600 cursor-pointer"
-                        checked={editForm.isVariable || false}
-                        onChange={(e) => setEditForm({ ...editForm, isVariable: e.target.checked })}
-                    />
-                    <label htmlFor="isVariable" className="cursor-pointer select-none">
-                        <span className="block text-sm font-bold text-[#5c4d41]">Trait à Complément / Variable</span>
-                        <span className="block text-[10px] text-[#5c4d41]/70 italic">Cochez si le joueur doit préciser quelque chose à la sélection (ex: "Allergie : Chats").</span>
+                {/* Configuration: Auto Counter */}
+                <div className="border rounded-sm p-3 flex items-center gap-3 bg-[#bfae85]/10 border-[#bfae85]/30">
+                    <div className="relative flex items-center">
+                        <input
+                            type="checkbox"
+                            id="hasAutoCounter"
+                            className="w-4 h-4 cursor-pointer accent-amber-600"
+                            checked={editForm.hasAutoCounter || false}
+                            onChange={(e) => setEditForm({ ...editForm, hasAutoCounter: e.target.checked })}
+                        />
+                    </div>
+                    <label htmlFor="hasAutoCounter" className="cursor-pointer select-none flex-grow">
+                        <span className="text-sm font-bold text-[#5c4d41]">Créer un compteur associé</span>
+                        <span className="block text-[10px] text-[#5c4d41]/70 italic">
+                            Ajoute automatiquement un compteur à "carrés" sur la fiche quand le trait est choisi.
+                        </span>
                     </label>
                 </div>
+
+                {editForm.hasAutoCounter && (
+                    <div className="animate-in fade-in slide-in-from-top-2 duration-200 -mt-4 px-1">
+                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Nom du compteur (Optionnel)</label>
+                        <input
+                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-xs text-[#1c1917] bg-[#fdfbf7] focus:border-amber-500 outline-none shadow-sm font-bold placeholder:italic placeholder:font-normal"
+                            value={editForm.autoCounterName || ''}
+                            onChange={(e) => setEditForm({ ...editForm, autoCounterName: e.target.value })}
+                            placeholder="Laisser vide pour utiliser le nom du trait"
+                        />
+                    </div>
+                )}
+
+                {/* Configuration: XP Upgradeable */}
+                <div className="border rounded-sm p-3 flex items-center gap-3 bg-[#bfae85]/10 border-[#bfae85]/30">
+                    <div className="relative flex items-center">
+                        <input
+                            type="checkbox"
+                            id="isXPUpgradeable"
+                            className="w-4 h-4 cursor-pointer accent-amber-600"
+                            checked={editForm.isXPUpgradeable || false}
+                            onChange={(e) => setEditForm({ ...editForm, isXPUpgradeable: e.target.checked })}
+                        />
+                    </div>
+                    <label htmlFor="isXPUpgradeable" className="cursor-pointer select-none flex-grow">
+                        <span className="text-sm font-bold text-[#5c4d41]">Peut être acheté / amélioré avec XP</span>
+                        <span className="block text-[10px] text-[#5c4d41]/70 italic">
+                            Permet de dépenser de l'expérience pour acquérir ou augmenter ce trait.
+                        </span>
+                    </label>
+                </div>
+
+                {/* Configuration: Variable Trait */}
+                {(() => {
+                    const isForcedByFormula = (editForm.effects || []).some(ef => {
+                        if (!ef.formulaId) return false;
+                        const formula = (allFormulas || []).find(f => f.id === ef.formulaId);
+                        return formula?.forceVariant;
+                    });
+
+                    return (
+                        <div className={`border rounded-sm p-3 flex items-center gap-3 transition-all ${isForcedByFormula ? 'bg-indigo-50/50 border-indigo-200 shadow-sm' : 'bg-[#bfae85]/10 border-[#bfae85]/30'}`}>
+                            <div className="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="isVariable"
+                                    className={`w-4 h-4 cursor-pointer ${isForcedByFormula ? 'accent-indigo-600' : 'accent-amber-600'}`}
+                                    checked={editForm.isVariable || false}
+                                    disabled={isForcedByFormula}
+                                    onChange={(e) => setEditForm({ ...editForm, isVariable: e.target.checked })}
+                                />
+                            </div>
+                            <label htmlFor="isVariable" className="cursor-pointer select-none flex-grow">
+                                <div className="flex items-center gap-2">
+                                    <span className={`text-sm font-bold ${isForcedByFormula ? 'text-indigo-900' : 'text-[#5c4d41]'}`}>Trait à Complément / Variable</span>
+                                    {isForcedByFormula && (
+                                        <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-indigo-600 text-[8px] text-white font-black tracking-tighter uppercase animate-in zoom-in-75">
+                                            <Sparkles size={8} /> FORCÉ
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="block text-[10px] text-[#5c4d41]/70 italic">
+                                    {isForcedByFormula
+                                        ? "Ce trait nécessite une variante car l'une de ses formules l'exige."
+                                        : "Cochez si le joueur doit préciser quelque chose à la sélection (ex: \"Allergie : Chats\")."}
+                                </span>
+                            </label>
+                        </div>
+                    );
+                })()}
 
                 {editForm.isVariable && (
                     <div className="animate-in fade-in slide-in-from-top-2 duration-200 -mt-4 px-1">
@@ -256,8 +336,11 @@ const TraitForm: React.FC<TraitFormProps> = ({
                         effects={editForm.effects || []}
                         allSkills={allSkills}
                         allAttributes={allAttributes}
+                        allCounters={allCounters}
+                        allFormulas={allFormulas}
                         onAdd={addEffect}
                         onUpdate={updateEffect}
+                        onUpdateFields={updateEffectFields}
                         onRemove={removeEffect}
                     />
                 </div>

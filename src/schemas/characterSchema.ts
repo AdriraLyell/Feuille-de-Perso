@@ -9,7 +9,11 @@ export const DotEntrySchema = z.object({
     creationValue: z.number().optional(),
     current: z.number().optional(),
     max: z.number(),
-    variant: z.string().optional()
+    variant: z.string().optional(),
+    definitionId: z.string().optional(),
+    mysticAbilityId: z.string().optional(),
+    description: z.string().optional(),
+    tag: z.string().optional()
 });
 
 export const AttributeEntrySchema = z.object({
@@ -82,6 +86,9 @@ export const TraitEntrySchema = z.object({
     definitionId: z.string().optional(),
     mysticAbilityId: z.string().optional(),
     associatedCounterId: z.string().optional(),
+    hasAutoCounter: z.boolean().optional(),
+    autoCounterName: z.string().optional(),
+    isXPUpgradeable: z.boolean().optional(),
     masterSkillTarget: z.string().optional(),
     isPostCreation: z.boolean().optional(),
     creationValue: z.string().optional()
@@ -89,10 +96,14 @@ export const TraitEntrySchema = z.object({
 
 export const TraitEffectSchema = z.object({
     id: z.string().default(() => Math.random().toString(36).substr(2, 9)),
-    type: z.enum(['xp_bonus', 'free_skill_rank', 'attribute_bonus', 'auto_counter', 'master_skill']),
+    type: z.enum(['free_skill_rank', 'master_skill', 'block_skill_increase', 'formula']),
     value: z.number(),
     method: z.enum(['fixed', 'per_scenario']).optional(),
-    target: z.string().optional()
+    target: z.string().optional(),
+    source: z.string().optional(),
+    associatedCounterId: z.string().optional(),
+    formula: z.string().optional(),
+    formulaId: z.string().optional()
 });
 
 // --- System ---
@@ -177,6 +188,9 @@ export const LibraryEntrySchema = z.object({
     description: z.string().nullable().optional(),
     tags: z.array(z.string()).nullable().optional(),
     isVariable: z.boolean().optional(),
+    hasAutoCounter: z.boolean().optional(),
+    autoCounterName: z.string().optional(),
+    isXPUpgradeable: z.boolean().optional(),
     variants: z.array(z.string()).nullable().optional(),
     effects: z.array(TraitEffectSchema).nullable().optional(),
     isGlobal: z.boolean().optional(),
@@ -219,7 +233,10 @@ export const LibraryCounterEntrySchema = z.object({
     xpCost: z.number().nullable().optional(),
     isGlobal: z.boolean().optional(),
     isActive: z.boolean().optional(),
-    defaultCategory: z.string().nullable().optional()
+    defaultCategory: z.string().nullable().optional(),
+    isNumeric: z.boolean().optional(),
+    formula: z.string().optional(),
+    formulaId: z.string().optional() // ID de la formule globale à utiliser pour le Max
 });
 
 export const LibraryBackgroundEntrySchema = LibrarySkillEntrySchema;
@@ -287,6 +304,43 @@ export const PartyMemberEntrySchema = z.object({
 export const ImposedSpecializationSchema = z.object({
     name: z.string(),
     minLevel: z.number()
+});
+
+// --- Formulas ---
+
+export const FormulaMacroSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    formula: z.string(),
+    description: z.string().optional()
+});
+
+export const FormulaVariableSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    operation: z.enum(['sum', 'count', 'highest', 'average']),
+    target: z.enum(['skills', 'attributes', 'traits', 'specializations', 'mysticAbilities']),
+    filterTarget: z.string().optional(), // 'category', 'tag', 'name'
+    filterValue: z.string().optional(),  // e.g. "Habiletés Mystiques" or "Artisanat"
+    description: z.string().optional()
+});
+
+export const LibraryFormulaEntrySchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    formula: z.string(),
+    type: z.enum(['modifier', 'variable']), // 'modifier' = Affecte une carac, 'variable' = Calcul pur
+    target: z.string().optional(),
+    effectType: z.string().optional(),
+    description: z.string().optional(),
+    isGlobal: z.boolean().optional(),
+    isActive: z.boolean().optional(),
+    aggregateConfig: z.object({
+        operation: z.enum(['sum', 'count', 'max', 'avg']),
+        targetType: z.enum(['skills', 'attributes', 'traits']),
+        filterTarget: z.enum(['category', 'tag', 'name']),
+        filterValue: z.string()
+    }).optional()
 });
 
 // --- Main Schema ---
@@ -364,7 +418,10 @@ export const CharacterSheetDataSchema = z.object({
     }).optional(),
     appVersion: z.string().optional(),
     syncInfo: SyncInfoSchema.optional(),
-    mysticAbilities: z.array(LibrarySkillEntrySchema).optional().nullable().default([]),
+    mysticAbilities: z.array(LibrarySkillEntrySchema).optional().default([]),
+    formulaMacros: z.array(FormulaMacroSchema).optional().default([]),
+    formulaVariables: z.array(FormulaVariableSchema).optional().default([]),
+    formulaLibrary: z.array(LibraryFormulaEntrySchema).optional().default([]), // Nouveau : Dictionnaire central
     suggestions: z.array(z.any()).optional().default([]),
     _rulesVersion: z.string().optional(),
     _schemaVersion: z.number().optional()

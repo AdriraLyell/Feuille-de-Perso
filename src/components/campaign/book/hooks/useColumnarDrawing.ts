@@ -1,7 +1,7 @@
 import { useState, useCallback, RefObject } from 'react';
 import { Editor } from '@tiptap/react';
 import { PAGE_WIDTH } from '../../constants';
-import { saveImage } from '../../../../imageDB';
+import { saveImage } from '../../../../services/imageDB';
 import { logger } from '../../../../utils/logger';
 
 interface UseColumnarDrawingProps {

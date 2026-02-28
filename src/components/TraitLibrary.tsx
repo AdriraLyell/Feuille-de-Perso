@@ -38,16 +38,6 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
     );
 
     const {
-        selection,
-        variantPicker,
-        setVariantPicker,
-        toggleSelection,
-        addInstanceWithVariant,
-        removeInstance,
-        handleConfirmMultiSelect
-    } = useTraitSelection(onMultiSelect);
-
-    const {
         isModalOpen,
         setIsModalOpen,
         editForm,
@@ -74,8 +64,20 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
         updateEffect,
         removeEffect,
         allSkills,
-        allAttributes
+        allAttributes,
+        allCounters,
+        allFormulas
     } = useTraitActions(data, onUpdate, filterType === 'all' ? 'avantage' : filterType);
+
+    const {
+        selection,
+        variantPicker,
+        setVariantPicker,
+        toggleSelection,
+        addInstanceWithVariant,
+        removeInstance,
+        handleConfirmMultiSelect
+    } = useTraitSelection(onMultiSelect, allFormulas);
 
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
@@ -131,7 +133,20 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                 <div className="flex gap-2 items-center flex-wrap md:flex-nowrap">
                     <div className="relative flex-grow min-w-[150px]">
                         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
-                        <input className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80" placeholder="Rechercher..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                        <input
+                            className="w-full pl-9 pr-9 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
+                            placeholder="Rechercher..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        {searchTerm && (
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#4a3b32]/40 hover:text-amber-600 transition-colors"
+                            >
+                                <X size={14} />
+                            </button>
+                        )}
                     </div>
                     {!lockFilter && (
                         <div className="flex bg-[#bfae85]/20 rounded-sm p-0.5 shrink-0">
@@ -146,14 +161,29 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
 
                 <div className="flex items-center gap-2 text-xs border-t border-[#bfae85]/20 pt-2">
                     <span className="font-bold text-[#5c4d41]/70 uppercase tracking-wide">Trier par :</span>
-                    <button onClick={() => handleSortChange('name')} className={`flex items-center gap-1 px-2 py-1 rounded-sm border transition-colors ${sortBy === 'name' ? 'bg-amber-50/50 border-amber-200/50 text-amber-800' : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41] hover:bg-stone-50'}`}>
-                        {sortBy === 'name' && (sortOrder === 'asc' ? <ArrowDownAZ size={14} /> : <ArrowUpAZ size={14} />)} Nom
+                    <button
+                        onClick={() => handleSortChange('name')}
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded-sm border transition-all ${sortBy === 'name' ? 'bg-amber-100/50 border-amber-300 text-amber-900 font-bold' : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41] hover:bg-stone-50'}`}
+                        title="Trier par ordre alphabétique"
+                    >
+                        {sortBy === 'name' ? (sortOrder === 'asc' ? <ArrowDownAZ size={14} /> : <ArrowUpAZ size={14} />) : <ArrowDownAZ size={14} className="opacity-40" />}
+                        Nom
                     </button>
-                    <button onClick={() => handleSortChange('cost')} className={`flex items-center gap-1 px-2 py-1 rounded-sm border transition-colors ${sortBy === 'cost' ? 'bg-amber-50/50 border-amber-200/50 text-amber-800' : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41] hover:bg-stone-50'}`}>
-                        <Coins size={14} /> Coût {sortBy === 'cost' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    <button
+                        onClick={() => handleSortChange('cost')}
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded-sm border transition-all ${sortBy === 'cost' ? 'bg-amber-100/50 border-amber-300 text-amber-900 font-bold' : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41] hover:bg-stone-50'}`}
+                        title="Trier par coût en points"
+                    >
+                        <Coins size={14} className={sortBy === 'cost' ? 'text-amber-600' : 'opacity-40'} />
+                        Coût {sortBy === 'cost' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </button>
-                    <button onClick={() => handleSortChange('type')} className={`flex items-center gap-1 px-2 py-1 rounded-sm border transition-colors ${sortBy === 'type' ? 'bg-amber-50/50 border-amber-200/50 text-amber-800' : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41] hover:bg-stone-50'}`}>
-                        <Layers size={14} /> Type {sortBy === 'type' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    <button
+                        onClick={() => handleSortChange('type')}
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded-sm border transition-all ${sortBy === 'type' ? 'bg-amber-100/50 border-amber-300 text-amber-900 font-bold' : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41] hover:bg-stone-50'}`}
+                        title="Trier par type (Avantage/Désavantage)"
+                    >
+                        <Layers size={14} className={sortBy === 'type' ? 'text-blue-600' : 'opacity-40'} />
+                        Type {sortBy === 'type' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </button>
                 </div>
 
@@ -251,6 +281,9 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                         variantPicker={variantPicker}
                         onClose={() => setVariantPicker(null)}
                         onSelect={addInstanceWithVariant}
+                        allFormulas={allFormulas}
+                        allSkills={allSkills}
+                        allAttributes={allAttributes}
                     />
                 )
             }
@@ -262,6 +295,8 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                         library={[]}
                         allSkills={allSkills}
                         allAttributes={allAttributes}
+                        allCounters={allCounters}
+                        allFormulas={allFormulas}
                         tagInput={tagInput}
                         error={error}
                         setEditForm={setEditForm}

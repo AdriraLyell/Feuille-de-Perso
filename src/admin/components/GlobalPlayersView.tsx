@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Users, Search, Eye, Trash2, AlertCircle, Loader2, User, Clock, RefreshCw } from 'lucide-react';
+import { Users, Search, Eye, Trash2, AlertCircle, Loader2, User, Clock, RefreshCw, X } from 'lucide-react';
 import { CharacterSyncService, SyncedCharacterSummary, SyncedCharacter } from '../../services/CharacterSyncService';
 import CharacterReadOnlyView from './CharacterReadOnlyView';
 import { GameSettingSummary, CampaignService } from '../../services/CampaignService';
@@ -130,8 +130,16 @@ const GlobalPlayersView: React.FC = () => {
                             placeholder="RECHERCHER UNE ÂME OU UN GARDIEN..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-stone-900/50 border border-stone-800/50 rounded-sm focus:border-amber-900/50 outline-none text-[11px] font-bold tracking-widest text-stone-200 placeholder-stone-800 transition-all shadow-inner uppercase"
+                            className="w-full pl-10 pr-10 py-2.5 bg-stone-900/50 border border-stone-800/50 rounded-sm focus:border-amber-900/50 outline-none text-[11px] font-bold tracking-widest text-stone-200 placeholder-stone-800 transition-all shadow-inner uppercase"
                         />
+                        {searchTerm && (
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-600 hover:text-amber-500 transition-colors"
+                            >
+                                <X size={16} />
+                            </button>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2">

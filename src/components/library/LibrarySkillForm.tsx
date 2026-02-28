@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GraduationCap, Save, HelpCircle, X, AlertOctagon } from 'lucide-react';
 import ThematicModal from '../ui/ThematicModal';
-import { CATEGORY_HELP } from '../../data/constants';
+import { CATEGORY_HELP } from '../../constants/app';
 import { LibrarySkillEntry } from '../../types';
 
 interface LibrarySkillFormProps {

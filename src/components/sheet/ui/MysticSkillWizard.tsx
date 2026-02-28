@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { CharacterSheetData, LibrarySkillEntry } from '../../../types';
 import { RulesData } from '../../../types/rules';
-import { Sparkles, CheckCircle2, ChevronRight, AlertCircle } from 'lucide-react';
+import { Sparkles, CheckCircle2, ChevronRight, AlertCircle, Infinity as InfinityIcon } from 'lucide-react';
 import { getMysticCapacity } from '../../../utils/mysticUtils';
 import ThematicModal from '../../ui/ThematicModal';
 
@@ -93,13 +93,31 @@ const MysticSkillWizard: React.FC<MysticSkillWizardProps> = ({
                     <div>
                         <div className="text-sm font-bold text-purple-200 mb-1">Capacité Mystique (Niveau {traitLevel})</div>
                         <div className="text-xs text-purple-300/80">
-                            Vous pouvez apprendre jusqu'à <span className="text-white font-bold">{allowed}</span> compétences liées.
-                            Actuellement connues : <span className="text-white font-bold">{current}</span>.
+                            {allowed === 999 ? (
+                                <>
+                                    Vous avez un accès <span className="text-white font-bold">illimité</span> aux compétences liées.<br />
+                                    Actuellement connues : <span className="text-white font-bold">{current}</span>.
+                                </>
+                            ) : (
+                                <>
+                                    Vous pouvez apprendre jusqu'à <span className="text-white font-bold">{allowed}</span> compétences liées.
+                                    Actuellement connues : <span className="text-white font-bold">{current}</span>.
+                                </>
+                            )}
                         </div>
                     </div>
                     <div className="text-right">
-                        <div className="text-2xl font-bold text-purple-400">{remainingSlots}</div>
-                        <div className="text-[10px] uppercase tracking-wider text-purple-500 font-bold">Slots Restants</div>
+                        {allowed === 999 ? (
+                            <>
+                                <div className="text-purple-400 flex justify-end mb-1"><InfinityIcon size={32} /></div>
+                                <div className="text-[10px] uppercase tracking-wider text-purple-500 font-bold">SANS LIMITE</div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="text-2xl font-bold text-purple-400">{remainingSlots}</div>
+                                <div className="text-[10px] uppercase tracking-wider text-purple-500 font-bold">Slots Restants</div>
+                            </>
+                        )}
                     </div>
                 </div>
 

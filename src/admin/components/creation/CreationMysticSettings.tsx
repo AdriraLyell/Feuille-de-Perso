@@ -24,12 +24,12 @@ const CreationMysticSettings: React.FC<CreationMysticSettingsProps> = ({ config,
     };
 
     return (
-        <div className="bg-stone-900/40 p-6 rounded border border-stone-700 space-y-6">
-            <div className="flex items-center gap-3 mb-4 border-b border-stone-700/50 pb-2">
-                <div className="w-8 h-8 rounded bg-purple-500/20 flex items-center justify-center text-purple-400">
-                    <Sparkles size={18} />
+        <div className="bg-stone-900/40 p-4 rounded border border-stone-700 space-y-4 h-full">
+            <div className="flex items-center gap-2 mb-2 border-b border-stone-700/50 pb-2">
+                <div className="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center text-purple-400">
+                    <Sparkles size={14} />
                 </div>
-                <h3 className="text-lg font-serif font-bold text-stone-200">Habilités Mystiques</h3>
+                <h3 className="text-sm font-serif font-bold text-stone-200 uppercase tracking-widest">Habilités Mystiques</h3>
             </div>
 
             {/* Main Toggle */}

@@ -2,7 +2,7 @@
 import { RulesData } from '../types/rules';
 
 export const defaultRules: RulesData = {
-    version: "1.0.0",
+    version: "1.0.5",
     lastUpdated: Date.now(),
     configurations: {
         global: {
@@ -93,6 +93,7 @@ export const defaultRules: RulesData = {
         specializations: [],
         backgrounds: [],
         counters: [],
-        mysticAbilities: []
+        mysticAbilities: [],
+        formulas: []
     }
 };

@@ -1,39 +1,206 @@
 import { useMemo } from 'react';
 import { TraitEntry, LibraryEntry, BonusInfo } from '../types';
+import { normalizeString } from '../utils/stringUtils';
+import { logger } from '../utils/logger';
+import { evaluateFormula } from '../utils/formulaEvaluator';
+import { useCharacter } from '../context/CharacterContext';
+import { useRules } from '../context/RulesContext';
 
 /**
  * Hook chirurgical pour extraire la logique de calcul des bonus d'attributs.
- * Cette logique était auparavant située dans CharacterSheet.tsx.
  */
 export const useCharacterBonuses = (
     avantages: TraitEntry[] = [],
     desavantages: TraitEntry[] = [],
-    library: LibraryEntry[] = []
+    library: LibraryEntry[] = [],
+    rulesTraits: LibraryEntry[] = []
 ) => {
+    const { data: characterData } = useCharacter();
+    const { rules } = useRules();
+
     return useMemo(() => {
-        const bonuses: Record<string, BonusInfo> = {};
+        const attributeBonuses: Record<string, BonusInfo> = {};
+        const blockedSkills: Record<string, { isBlocked: boolean, sourceName: string }> = {};
+        const counterCreationBonuses: Record<string, number> = {};
+        const counterXPBonuses: Record<string, number> = {};
+        const calculatedMaxes: Record<string, number> = {};
+        const activeReserves: Set<string> = new Set();
         const allTraits = [...(avantages || []), ...(desavantages || [])];
 
         allTraits.forEach(trait => {
             if (!trait.name) return;
-            // Find corresponding library entry to get active effects
-            const libEntry = library?.find(l => l.name.trim().toLowerCase() === trait.name.trim().toLowerCase());
+            const normalizedTraitName = normalizeString(trait.name);
+            const libEntry = library?.find(l => normalizeString(l.name) === normalizedTraitName) ||
+                rulesTraits?.find(t => normalizeString(t.name) === normalizedTraitName);
 
             if (libEntry && libEntry.effects) {
                 libEntry.effects.forEach(effect => {
-                    if (effect.type === 'attribute_bonus' && effect.target) {
-                        const targetName = effect.target.trim().toLowerCase();
+                    // Try to resolve formula from global library if formulaId is present
+                    let formulaString = effect.formula;
+                    let isReserve = false;
+                    let effectiveTarget = effect.target;
+                    let effectiveType: string = effect.type;
 
-                        if (!bonuses[targetName]) {
-                            bonuses[targetName] = { value: 0, sources: [] };
+                    if (effect.formulaId && rules?.libraries?.formulas) {
+                        const globalFormula = rules.libraries.formulas.find(f => f.id === effect.formulaId);
+                        if (globalFormula) {
+                            formulaString = globalFormula.formula || effect.formula;
+                            if (globalFormula.type === 'variable') {
+                                isReserve = true;
+                                activeReserves.add(globalFormula.id);
+                            }
+
+                            // AUTO-PORTANTE: Heirarchical Target and EffectType
+                            if (globalFormula.forceVariant && !effect.target) {
+                                // If it forces a variant, the trait's variant is our target
+                                effectiveTarget = trait.variant;
+                            } else if (!effectiveTarget && globalFormula.target) {
+                                effectiveTarget = globalFormula.target;
+                            }
+                            if (globalFormula.effectType) {
+                                effectiveType = globalFormula.effectType;
+                            }
                         }
+                    }
 
-                        bonuses[targetName].value += effect.value;
-                        bonuses[targetName].sources.push(`${trait.name} (${effect.value > 0 ? '+' : ''}${effect.value})`);
+                    // Skill Blocking
+                    if (effectiveType === 'block_skill_increase' && effectiveTarget) {
+                        const targetName = normalizeString(effectiveTarget);
+                        blockedSkills[targetName] = {
+                            isBlocked: true,
+                            sourceName: trait.name
+                        };
+                    }
+
+                    // Formula Evaluation
+                    const isFormulaLike = effectiveType === 'formula' || effectiveType === 'xp_bonus';
+                    if (isFormulaLike && formulaString && characterData) {
+                        // Skip evaluation for raw reserves (they don't target/modify existing stats, they ARE stats)
+                        if (isReserve) return;
+
+                        const targetName = normalizeString(effectiveTarget || "");
+                        if (!targetName) return;
+
+                        const traitValue = parseInt(trait.value?.toString() || '1') || 1;
+
+                        try {
+                            const result = evaluateFormula(formulaString, {
+                                ...characterData,
+                                formulaLibrary: rules?.libraries?.formulas || characterData.formulaLibrary
+                            }, { traitLevel: traitValue });
+
+                            // Handle special semantic effects even for formulas
+                            if (effectiveType === 'xp_bonus' || targetName === 'xp') {
+                                // XP handled elsewhere (but we could record it here if needed)
+                                return;
+                            }
+
+                            const isAttribute = Object.keys(characterData.attributes).some(
+                                cat => characterData.attributes[cat].some(attr => normalizeString(attr.name) === targetName)
+                            );
+
+                            const operator = effect.operator || (rules?.libraries?.formulas?.find(f => f.id === effect.formulaId)?.operator) || 'ADD';
+
+                            if (isAttribute) {
+                                if (!attributeBonuses[targetName]) {
+                                    attributeBonuses[targetName] = { value: 0, sources: [] };
+                                }
+                                if (operator === 'ADD') {
+                                    attributeBonuses[targetName].value += result;
+                                } else if (operator === 'SUB') {
+                                    attributeBonuses[targetName].value -= result;
+                                } else if (operator === 'SET') {
+                                    attributeBonuses[targetName].value = result;
+                                }
+                                attributeBonuses[targetName].sources.push(`${trait.name} (${operator === 'SUB' ? '-' : operator === 'SET' ? '=' : '+'}${result})`);
+                            } else if ((effectiveType as string) === 'master_skill' || (effectiveType as string) === 'block_skill_increase') {
+                                // These are handled by their own logic blocks usually
+                            } else {
+                                // Assume it's a counter
+                                if (trait.isPostCreation) {
+                                    if (operator === 'SET') counterXPBonuses[targetName] = result;
+                                    else if (operator === 'SUB') counterXPBonuses[targetName] = (counterXPBonuses[targetName] || 0) - result;
+                                    else counterXPBonuses[targetName] = (counterXPBonuses[targetName] || 0) + result;
+                                } else {
+                                    if (operator === 'SET') counterCreationBonuses[targetName] = result;
+                                    else if (operator === 'SUB') counterCreationBonuses[targetName] = (counterCreationBonuses[targetName] || 0) - result;
+                                    else counterCreationBonuses[targetName] = (counterCreationBonuses[targetName] || 0) + result;
+                                }
+                            }
+
+                        } catch (e) {
+                            logger.error(`Error evaluating formula for trait ${trait.name}:`, e);
+                        }
                     }
                 });
             }
         });
-        return bonuses;
-    }, [avantages, desavantages, library]);
+        // Calculate Dynamic Maxes for Counters
+        if (characterData && rules?.libraries?.counters) {
+            Object.values(characterData.skills || {}).flat().forEach(skill => {
+                // We only care about skills that are actually "Counters" 
+                // (This is determined by their category behavior, but checking library here is more direct)
+                const counterLibEntry = rules.libraries.counters.find(c => c.name === skill.name);
+                if (counterLibEntry?.formulaId) {
+                    const formulaEntry = rules.libraries.formulas?.find(f => f.id === counterLibEntry.formulaId);
+                    if (formulaEntry) {
+                        try {
+                            const maxVal = evaluateFormula(formulaEntry.formula, {
+                                ...characterData,
+                                formulaLibrary: rules.libraries.formulas
+                            });
+                            calculatedMaxes[skill.name] = maxVal;
+                        } catch (e) {
+                            logger.error(`Error calculating dynamic max for counter ${skill.name}:`, e);
+                        }
+                    }
+                }
+            });
+
+            // Handle Standard Counters (those in data.counters)
+            if (characterData.counters) {
+                const processCounter = (counter: any) => {
+                    if (!counter || !counter.name) return;
+                    const nameKey = normalizeString(counter.name);
+                    const libEntry = rules.libraries.counters.find(c => normalizeString(c.name) === nameKey);
+
+                    if (libEntry?.formulaId) {
+                        const formulaEntry = rules.libraries.formulas?.find(f => f.id === libEntry.formulaId);
+                        if (formulaEntry) {
+                            try {
+                                const maxVal = evaluateFormula(formulaEntry.formula, {
+                                    ...characterData,
+                                    formulaLibrary: rules.libraries.formulas
+                                });
+                                calculatedMaxes[counter.name] = maxVal;
+                            } catch (e) {
+                                logger.error(`Error calculating dynamic max for counter ${counter.name}:`, e);
+                            }
+                        }
+                    } else if (libEntry?.formula) {
+                        try {
+                            const maxVal = evaluateFormula(libEntry.formula, {
+                                ...characterData,
+                                formulaLibrary: rules.libraries.formulas
+                            });
+                            calculatedMaxes[counter.name] = maxVal;
+                        } catch (e) {
+                            logger.error(`Error calculating dynamic max for counter ${counter.name}:`, e);
+                        }
+                    }
+                };
+
+                Object.keys(characterData.counters).forEach(key => {
+                    const value = characterData.counters[key as keyof typeof characterData.counters];
+                    if (Array.isArray(value)) {
+                        value.forEach(processCounter);
+                    } else {
+                        processCounter(value);
+                    }
+                });
+            }
+        }
+
+        return { attributeBonuses, blockedSkills, counterCreationBonuses, counterXPBonuses, calculatedMaxes, activeReserves: Array.from(activeReserves) };
+    }, [avantages, desavantages, library, rulesTraits, characterData, rules]);
 };

@@ -12,6 +12,8 @@ import { migrateSkills } from './migrateSkills';
 import { migrateDefaults } from './migrateDefaults';
 import { migrateCampaignNotes } from './migrateCampaignNotes';
 import { migrateHeaderDates } from './migrateHeaderDates';
+import { migrateFormulas } from './migrateFormulas';
+import { forceRulesReconciliation } from './forceRulesReconciliation';
 
 // Type for a migration function
 type MigrationFunction = (data: any) => void;
@@ -35,7 +37,17 @@ export const MIGRATIONS: Record<number, MigrationFunction[]> = {
     ],
     3: [
         migrateHeaderDates
+    ],
+    4: [
+        migrateFormulas
+    ],
+    5: [
+        forceRulesReconciliation
+    ],
+    6: [
+        forceRulesReconciliation  // Re-force after reconcileCleanup fix (re-injects skillLibrary with mysticAbilityId)
     ]
 };
 
-export const CURRENT_SCHEMA_VERSION = 3;
+export const CURRENT_SCHEMA_VERSION = 6;
+

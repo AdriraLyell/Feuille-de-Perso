@@ -6,7 +6,8 @@ import {
   HeaderInfo,
   CombatEntry,
   ReputationEntry,
-  TraitEntry
+  TraitEntry,
+  PostItData
 } from './primitives';
 import {
   CreationConfig,
@@ -49,6 +50,7 @@ export interface CharacterSheetData {
   creationConfig: CreationConfig;
   theme: ThemeConfig; // New Theme Config
   header: HeaderInfo;
+  postIts?: PostItData[]; // Les notes visuelles
 
   // Dynamic Attributes Structure
   attributes: Record<string, AttributeEntry[]>;
@@ -95,7 +97,11 @@ export interface CharacterSheetData {
   specializationLibrary?: LibrarySpecializationEntry[]; // Catalogue de spécialisations réutilisables
   backgroundLibrary?: LibraryBackgroundEntry[]; // Catalogue d'arrière-plans
   counterLibrary?: LibraryCounterEntry[]; // Catalogue de compteurs
-  mysticAbilities?: LibrarySkillEntry[] | null; // Categories of mystic powers (Martial Arts, Magic, etc.)
+  mysticAbilities?: LibrarySkillEntry[]; // Catalogue d'habilités mystiques
+  variables?: Record<string, number>; // Variables pour les formules (Valeurs calculées en cache)
+  formulaLibrary?: import('./system').LibraryFormulaEntry[]; // Dictionnaire central (Local cache)
+  formulaMacros?: any[]; // Macros de calcul (Legacy)
+  formulaVariables?: any[]; // Définitions de variables calculées (Aggregate)
   xpLogs: XPEntry[];
   xpTransactions: XPTransaction[];
   appLogs: LogEntry[];

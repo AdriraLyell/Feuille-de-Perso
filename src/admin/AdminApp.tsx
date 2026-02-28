@@ -27,6 +27,7 @@ import { useAdminAuth } from './hooks/useAdminAuth';
 import { useAdminRulesHandler } from './hooks/useAdminRulesHandler';
 import AdminHeader from './components/AdminHeader';
 import { CampaignService } from '../services/CampaignService';
+import { migrationTool } from './utils/migrationTool';
 
 const AdminApp: React.FC = () => {
     const { session, isAdmin, logout } = useAdminAuth();
@@ -174,6 +175,25 @@ const AdminApp: React.FC = () => {
                 onLogout={logout}
                 onShowChangelog={() => setShowChangelog(true)}
                 onCheckSchema={() => currentSettingId && CampaignService.checkSchema?.(currentSettingId)}
+                legacyEffectsCount={(rules.libraries?.traits || []).reduce((acc, t) => acc + (t.effects?.filter(e => {
+                    const isFormula = e.type === 'formula';
+                    const isLegacyCandidate = ['free_skill_rank', 'master_skill', 'attribute_bonus', 'xp_bonus'].includes(e.type as string);
+                    return isLegacyCandidate || (isFormula && !e.formulaId);
+                }).length || 0), 0)}
+                onMigrate={() => {
+                    if (!rules) return;
+                    const { updatedRules, stats } = migrationTool.migrateTraitsToFormulas(rules);
+                    if (stats.effectsMigrated > 0) {
+                        handleUpdateRules(updatedRules);
+                        setImportReport({
+                            success: [`Migration terminée : ${stats.effectsMigrated} effets convertis en formules.`],
+                            warnings: [`${stats.formulasCreated} nouvelles formules créées dans la bibliothèque.`]
+                        });
+                        setShowImportResult(true);
+                    } else {
+                        alert("Aucun effet à migrer trouvé.");
+                    }
+                }}
             />
 
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
@@ -205,7 +225,7 @@ const AdminApp: React.FC = () => {
                         <h2 className="text-2xl font-serif font-bold mb-6 text-amber-gold border-b border-stone-700 pb-2 flex items-center gap-2">
                             Configuration Générale
                         </h2>
-                        <AdminCreationEditor rules={rules} onUpdate={handleUpdateRules} />
+                        <AdminCreationEditor rules={rules} onUpdate={handleUpdateRules} settingId={currentSettingId || ''} />
                     </div>
                 )}
                 {activeTab === 'attributes' && <AdminAttributesEditor rules={rules} onUpdate={handleUpdateRules} />}

@@ -15,6 +15,9 @@ export interface DBTrait {
     type?: string;           // 'avantage' | 'desavantage'
     tags?: string[];
     is_variable?: boolean;
+    has_auto_counter?: boolean;
+    auto_counter_name?: string;
+    is_xp_upgradeable?: boolean;
     effects?: TraitEffect[];         // JSONB: List of effects
     created_at?: string;
     updated_at?: string;
@@ -85,6 +88,7 @@ export interface DBCounter {
     xpCost?: number;
     defaultCategory?: string;
     appearance?: 'squares_only' | null;
+    formula_id?: string;
     created_at?: string;
     updated_at?: string;
 }
@@ -161,6 +165,29 @@ export interface RelSettingMysticAbility {
     mystic_ability_id: string;
     is_active: boolean;
     default_category?: string;
+}
+
+export interface DBFormula {
+    id: string;
+    setting_id: string | null;
+    name: string;
+    code?: string;
+    formula: string;
+    type: 'modifier' | 'variable' | 'effect' | 'reserve';
+    target?: string;
+    effect_type?: string;
+    aggregate_config?: any;
+    description?: string;
+    operator?: string;
+    force_variant?: boolean;
+    is_active?: boolean;
+    created_at?: string;
+}
+
+export interface RelSettingFormula {
+    setting_id: string;
+    formula_id: string;
+    is_active: boolean;
 }
 
 /**

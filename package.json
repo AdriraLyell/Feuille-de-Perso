@@ -1,7 +1,7 @@
 {
   "name": "rpg-sheet-manager",
   "private": true,
-  "version": "2.69.2",
+  "version": "2.97.16",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,9 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
-    "sync-version": "node scripts/sync-version.js"
+    "sync-version": "node scripts/sync-version.js",
+    "lint": "eslint src/",
+    "verify": "powershell -File ./scripts/verify-agent.ps1"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.94.1",
@@ -27,6 +29,7 @@
     "@tiptap/react": "^3.19.0",
     "@tiptap/starter-kit": "^3.19.0",
     "clsx": "^2.1.1",
+    "expr-eval": "^2.0.2",
     "framer-motion": "^12.34.0",
     "idb-keyval": "^6.2.1",
     "lucide-react": "^0.344.0",

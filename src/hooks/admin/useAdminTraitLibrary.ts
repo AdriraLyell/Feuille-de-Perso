@@ -73,6 +73,20 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         return attrs.sort((a, b) => a.name.localeCompare(b.name));
     }, [rules.definitions.attributes, rules.configurations.global.secondaryAttributes, rules.definitions.secondaryAttributes]);
 
+    const allCounters = useMemo(() => {
+        const counters: { id: string, name: string }[] = [];
+        if (!rules.definitions.counters) return counters;
+
+        Object.values(rules.definitions.counters).forEach(c => {
+            if (c.name && c.name.trim() !== '') {
+                counters.push({ id: c.id, name: c.name });
+            }
+        });
+        return counters.sort((a, b) => a.name.localeCompare(b.name));
+    }, [rules.definitions.counters]);
+
+    const allFormulas = rules.libraries?.formulas || [];
+
     // Helpers
     const handleOpenNew = useCallback(() => {
         setError(null);
@@ -249,7 +263,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
 
     const addEffect = useCallback(() => {
         if (!editForm) return;
-        const newEffect: TraitEffect = { id: crypto.randomUUID(), type: 'xp_bonus', value: 0 };
+        const newEffect: TraitEffect = { id: crypto.randomUUID(), type: 'formula', value: 0 };
         setEditForm({ ...editForm, effects: [...(editForm.effects || []), newEffect] });
     }, [editForm]);
 
@@ -258,12 +272,24 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         field: K,
         value: TraitEffect[K]
     ) => {
-        if (!editForm) return;
-        setEditForm({
-            ...editForm,
-            effects: (editForm.effects || []).map(e => e.id === id ? { ...e, [field]: value } as TraitEffect : e)
+        setEditForm(prev => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                effects: (prev.effects || []).map(e => e.id === id ? { ...e, [field]: value } as TraitEffect : e)
+            };
         });
-    }, [editForm]);
+    }, []);
+
+    const updateEffectFields = useCallback((id: string, updates: Partial<TraitEffect>) => {
+        setEditForm(prev => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                effects: (prev.effects || []).map(e => e.id === id ? { ...e, ...updates } : e)
+            };
+        });
+    }, []);
 
     const removeEffect = useCallback((id: string) => {
         if (!editForm) return;
@@ -319,6 +345,8 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         allAvailableTags,
         allSkills,
         allAttributes,
+        allCounters,
+        allFormulas,
 
         // Handlers
         handleOpenNew,
@@ -334,6 +362,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         removeTag,
         addEffect,
         updateEffect,
+        updateEffectFields,
         removeEffect
     };
 };

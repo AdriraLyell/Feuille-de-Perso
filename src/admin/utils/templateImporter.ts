@@ -1,27 +1,26 @@
 
-import { CharacterSheetData, DotEntry, AttributeEntry } from '../../types';
+import { CharacterSheetData, DotEntry, AttributeEntry, LibrarySkillEntry, LibraryFormulaEntry } from '../../types';
 import { RulesData } from '../../types/rules';
 
 /**
  * Tries to detect if the JSON is a Full Backup or a Direct Sheet Export
  * and returns the CharacterSheetData if found.
  */
-const normalizeInput = (json: any): CharacterSheetData | null => {
+const normalizeInput = (json: any): any => {
     if (!json || typeof json !== 'object') return null;
 
     // 1. Direct CharacterSheetData
     if (json.header && json.attributes && json.skills) {
-        return json as CharacterSheetData;
+        return json as any;
     }
 
     // 2. Full Backup Wrapper (legacy or specific export)
     if (json.data && typeof json.data === 'object' && json.data.header && json.data.attributes) {
-        return json.data as CharacterSheetData;
+        return json.data as any;
     }
 
-    // 3. "System" or "Template" export from ExportPanel
     if (json.creationConfig && json.skills) {
-        return json as CharacterSheetData;
+        return json as any;
     }
 
     // 4. Specialized Library Export (e.g. skills_campaign.json)
@@ -32,7 +31,7 @@ const normalizeInput = (json: any): CharacterSheetData | null => {
             attributes: {},
             skills: {},
             skillLibrary: json.data
-        } as CharacterSheetData;
+        } as any;
     }
 
     // 5. Direct Library Export (e.g. { libraries: { traits: [] } })
@@ -46,7 +45,9 @@ const normalizeInput = (json: any): CharacterSheetData | null => {
             skillLibrary: libs.skills || libs.skillLibrary || [],
             specializationLibrary: libs.specializations || [],
             backgroundLibrary: libs.backgrounds || libs.backgroundLibrary || [],
-            counterLibrary: libs.counters || libs.counterLibrary || []
+            counterLibrary: libs.counters || libs.counterLibrary || [],
+            mysticAbilities: libs.mysticAbilities || [],
+            formulaLibrary: libs.formulas || []
         } as any;
     }
 
@@ -224,8 +225,13 @@ export const extractRulesFromCharacter = (
     }
 
     if (sheet.mysticAbilities && Array.isArray(sheet.mysticAbilities)) {
-        newRules.libraries.mysticAbilities = sheet.mysticAbilities;
+        newRules.libraries.mysticAbilities = sheet.mysticAbilities as LibrarySkillEntry[];
         success.push(`Bibliothèque d'Habilités Mystiques (${sheet.mysticAbilities.length} items)`);
+    }
+
+    if (sheet.formulaLibrary && Array.isArray(sheet.formulaLibrary)) {
+        newRules.libraries.formulas = sheet.formulaLibrary as LibraryFormulaEntry[];
+        success.push(`Bibliothèque de Formules (${sheet.formulaLibrary.length} items)`);
     }
 
     return { rules: newRules, report: { success, warnings } };

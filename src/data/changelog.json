@@ -1,122 +1,187 @@
 [
     {
-        "version": "2.69.2",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Ergonomie : Augmentation de la hauteur de la fenêtre de synchronisation (modal) pour permettre une meilleure visibilité de l'historique des sauvegardes sans défilement excessif."
-    },
-    {
-        "version": "2.69.1",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Ergonomie : Mémorisation de la préférence d'affichage (mode portrait / paysage) dans le cache local (localStorage). Le mode choisi persiste désormais après rechargement de la page."
-    },
-    {
-        "version": "2.69.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Système de 'Date Picker' interactif pour le Journal : Cliquez sur les icônes calendrier des blocs narratifs pour sélectionner une date directement depuis le Chroniqueur sans créer de nouveau chapitre. Ajout de champs de titre personnalisés pour le sommaire automatique et réduction globale de la taille des labels pour une interface plus épurée."
-    },
-    {
-        "version": "2.68.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Améliorations majeures des sections narratives et du Chroniqueur : (1) Possibilité de masquer/afficher le Chroniqueur depuis la barre latérale. (2) Ajout de champs d'heure pour les moments de journée. (3) Ajout de champs de date pour les flashbacks. (4) Support des calendriers fictifs pour les sélecteurs de date de voyage et flashbacks."
-    },
-    {
-        "version": "2.67.1",
-        "date": "2026-02-23",
+        "version": "2.97.16",
+        "date": "2026-02-28",
         "type": "chore",
-        "description": "Ajustements ergonomiques du Chroniqueur : renommage du widget, formatage des dates en JJ/MM/AAAA dans la Timeline, et déplacement des flèches de navigation vers le haut pour éviter les chevauchements."
+        "changes": [
+            "CI : Mise en place d'un workflow de nettoyage automatique des anciens runs GitHub Actions pour optimiser le stockage.",
+            "UI : Ajout d'un indicateur `cursor-pointer` sur les cartes interactives de la bibliothèque pour une meilleure affordance."
+        ]
     },
     {
-        "version": "2.67.0",
-        "date": "2026-02-23",
+        "version": "2.97.15",
+        "date": "2026-02-28",
         "type": "feat",
-        "description": "Fusion majeure du Compagnon Temporel et du Journal de Campagne : (1) Navigation chronologique par clic sur les dates. (2) Mode 'Timeline' synthétique. (3) Assistant de création de chapitre à date. (4) Indicateurs de météo et ambiances sur les chapitres et le calendrier. (5) Compte à rebours avant le prochain évènement majeur. (6) Nouveaux blocs narratifs flexibles (Moments de journée, Voyages)."
+        "changes": [
+            "UI (Admin bibliothèque) : Ajout d'icônes indicatives dans les vignettes de traits pour les compteurs associés (icône Activité) et l'amélioration par XP (icône Tendance).",
+            "UX : Ajout de tooltips informatifs sur ces nouvelles icônes pour clarifier le comportement du trait sans avoir à l'ouvrir."
+        ]
     },
     {
-        "version": "2.66.3",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Correction majeure de la visibilité du Compagnon Temporel : (1) Correction du chemin d'accès aux données (configurations.calendar). (2) Repositionnement du widget à gauche de la barre latérale pour éviter qu'il ne soit hors-écran sur les résolutions standards."
+        "version": "2.97.14",
+        "date": "2026-02-28",
+        "type": "chore",
+        "changes": [
+            "Système : Suppression définitive des anciens types d'effets `auto_counter` et `xp_upgradeable` du codebase (Nettoyage post-migration).",
+            "UI (Admin) : Retrait des champs et icônes associés dans l'éditeur d'effets de traits.",
+            "UI (Fiche) : Simplification de l'affichage des cartes de traits et de la modale d'édition, utilisant désormais exclusivement les propriétés natives.",
+            "Maintenance : Suppression du script de migration `migrate-traits.js` devenu obsolète."
+        ]
     },
     {
-        "version": "2.66.2",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Ajustement du positionnement du Compagnon Temporel pour une meilleure visibilité dans le Grimoire et correction du filtrage des événements calendaires."
-    },
-    {
-        "version": "2.66.1",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Correction d'une erreur de référence sur BookChapterSidebar dans le journal de campagne."
-    },
-    {
-        "version": "2.66.0",
-        "date": "2026-02-22",
+        "version": "2.97.13",
+        "date": "2026-02-28",
         "type": "feat",
-        "description": "Intégration du calendrier dans le journal de campagne ('Compagnon Temporel') : Un nouveau widget interactif s'affiche dans la barre latérale du Grimoire, permettant de consulter la date actuelle et les événements planifiés sans quitter l'éditeur. Améliorations Admin : nouveau bouton '+1 Jour' pour le calendrier fictif avec passage automatique des mois et années, et optimisation de l'avance de date pour le calendrier réel."
+        "changes": [
+            "Traits : Introduction des propriétés directes `hasAutoCounter`, `autoCounterName` et `isXPUpgradeable` pour standardiser les mécaniques de jeu.",
+            "Admin (Bibliothèque) : Ajout des options de configuration 'Compteur Auto' et 'Améliorable via XP' dans le formulaire de trait.",
+            "Système : Mise en place d'un outil de migration (`migrateTraitProperties`) pour convertir les anciens effets hérités en propriétés natives.",
+            "Hook (TraitEditor) : Support natif de la création automatique de compteurs lors de l'ajout d'un trait, avec gestion de la suppression associée.",
+            "UI : Masquage des types d'effets dépréciés (`auto_counter`, `xp_upgradeable`, `free_skill_rank`, `master_skill`) pour les nouveaux traits afin d'encourager l'usage du moteur de formules."
+        ]
     },
     {
-        "version": "2.65.4",
-        "date": "2026-02-21",
+        "version": "2.97.12",
+        "date": "2026-02-28",
         "type": "fix",
-        "description": "Correction du calcul d'âge pour supporter les formats de date flexibles (français et fictif). Verrouillage des champs 'Début' et 'Date Fiction' lorsqu'ils sont gérés par le calendrier de campagne du MJ."
+        "changes": [
+            "UI (Admin Formules) : Équilibrage de la largeur des champs Nom et Code (50/50)."
+        ]
     },
     {
-        "version": "2.65.3",
-        "date": "2026-02-21",
+        "version": "2.97.11",
+        "date": "2026-02-28",
         "type": "fix",
-        "description": "Synchronisation automatique des dates de l'en-tête (Début et Date Fiction) avec le calendrier de campagne défini dans les paramètres. Amélioration de la détection des mises à jour des règles pour refléter immédiatement les changements du MJ sur les fiches joueurs."
+        "changes": [
+            "UI (Admin Formules) : Ajustement du layout dans la modale d'édition. La description occupe désormais toute la largeur sous le Nom et le Code.",
+            "UI (Admin Formules) : Normalisation de la taille du champ Code pour correspondre au champ Nom."
+        ]
     },
     {
-        "version": "2.65.2",
-        "date": "2026-02-21",
+        "version": "2.97.10",
+        "date": "2026-02-28",
         "type": "feat",
-        "description": "Amélioration de l'en-tête de la fiche personnage : Intégration des champs 'Date de début de campagne' et 'Date courante (fiction)'. Implémentation du calcul automatique de l'âge basé sur la date de naissance et la date de la fiction, avec fallback en saisie manuelle si les données sont absentes."
+        "changes": [
+            "Ergonomie (Admin Formules) : Refonte du flux de création et d'édition des formules.",
+            "Remplacement de l'édition en ligne par une fenêtre modale unifiée (AdminFormulaEditorModal).",
+            "Extraction des champs de formulaire dans un composant réutilisable (AdminFormulaFormFields) garantissant la cohérence visuelle et technique.",
+            "Ajout d'un bouton d'édition direct sur chaque formule de la liste.",
+            "Amélioration de la sécurité : les modifications ne sont enregistrées en base de données qu'après validation explicite dans la modale.",
+            "Refactorisation du composant de liste (AdminFormulaEditorItem) pour une interface plus épurée centrée sur la lecture et les actions rapides."
+        ]
     },
     {
-        "version": "2.65.1",
-        "date": "2026-02-21",
+        "version": "2.97.9",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Correction de la cause racine du bug Force Vitale : les avantages mystiques (tag ou mysticAbilityId) étaient invisibles au filtre d'agrégat car le champ 'tag' n'était pas propagé depuis 'mysticAbilityId'.",
+            "La fonction getAggregateDetails résout maintenant automatiquement le tag 'Mystique' à partir du champ mysticAbilityId si tag est absent sur le trait.",
+            "Les valeurs de traits (string '2' → number 2) sont normalisées en amont de l'agrégation pour garantir l'exactitude du calcul.",
+            "Réhydratation de mysticAbilityId et definitionId lors de la réconciliation des compétences et traits (skillsReconciler + rulesReconciler)."
+        ]
+    },
+    {
+        "version": "2.97.8",
+        "date": "2026-02-28",
+        "type": "patch",
+        "changes": [
+            "Correction du calcul de la Force Vitale suite à la perte de métadonnées mystiques.",
+            "Correction de la résolution des traits (avantages/désavantages) dans les formules de calcul.",
+            "Protection des champs 'mysticAbilityId' et 'isVariable' lors du nettoyage de la bibliothèque.",
+            "Migration V6 pour restaurer les liens mystiques cassés sur les fiches existantes.",
+            "Passage des règles par défaut en 1.0.4 pour forcer la réconciliation correcte."
+        ]
+    },
+    {
+        "version": "2.97.7",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Ajout de la migration V5 pour forcer explicitement la réconciliation des règles au chargement du personnage",
+            "Mise à jour du bouton 'Officiel' pour forcer la réconciliation immédiate des bibliothèques locales"
+        ]
+    },
+    {
+        "version": "2.97.6",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Correction du bug d'évaluation `NaN` empêchant le nettoyage des traits à coût de points variable",
+            "Mise en correspondance des anciens types ('Vertu'/'Tare') avec la casse stricte",
+            "Stringification des valeurs d'effets pour prévenir les faux-positifs de mismatch JSON",
+            "Montée de la version rules à v1.0.3 pour déclenchement garanti du nettoyage de `library` local"
+        ]
+    },
+    {
+        "version": "2.97.5",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Normalisation des coûts (texte/nombre) et du format 'pointsLabel' lors de la comparaison pour résoudre la perte du statut 'Officiel'",
+            "Montée de version des règles internes à v1.0.2 pour déclencher la mise à jour et nettoyer la fiche locale"
+        ]
+    },
+    {
+        "version": "2.97.4",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Amélioration de la détection des traits redondants (ignore les IDs d'effets)",
+            "Forçage de la réconciliation via montée de version des règles par défaut (v1.0.1)",
+            "Restauration effective du statut 'Officiel' pour les traits importés ou pollués"
+        ]
+    },
+    {
+        "version": "2.97.3",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Correction du bug de pollution de la bibliothèque locale par les traits officiels",
+            "Suppression de la synchronisation forcée des bibliothèques dans rulesReconciler.ts",
+            "Mise en place d'un nettoyage automatique des entrées redondantes (exact match) dans la sauvegarde locale",
+            "Restauration du badge 'Officiel' (Globe) pour les traits non modifiés"
+        ]
+    },
+    {
+        "version": "2.97.2",
+        "date": "2026-02-28",
         "type": "refactor",
-        "description": "Amélioration de l'interface admin : Regroupement des widgets de coût XP (Arrière-Plans, Attributs, Traits) dans un seul bloc 'Facteurs de Coût' pour une meilleure lisibilité et aération de la vue configuration."
+        "changes": [
+            "Restructuration majeure de TraitEffectEditor.tsx (448 -> 60 lignes)",
+            "Extraction de FormulaEffectFields.tsx et LegacyEffectFields.tsx",
+            "Centralisation de l'UI des effets dans TraitEffectItem.tsx",
+            "Amélioration de la modularité et de la lisibilité de la bibliothèque de traits"
+        ]
     },
     {
-        "version": "2.65.0",
-        "date": "2026-02-21",
+        "version": "2.97.1",
+        "date": "2026-02-28",
+        "type": "refactor",
+        "description": "Refactor (Moteur de Formules) : Restructuration majeure du composant AdminFormulaEditorItem. Extraction de la logique de validation, des utilitaires mathématiques et découpage en sous-composants réutilisables (AggregateConfigEditor, TargetSearchDropdown, CodeInput). Cette chirurgie réduit la taille du fichier principal de ~550 à ~230 lignes, améliorant significativement la maintenabilité et la séparation des préoccupations."
+    },
+    {
+        "version": "2.97.0",
+        "date": "2026-02-28",
         "type": "feat",
-        "description": "Déploiement production : Intégration de l'effet Maître, corrections bugs reset et confiance, améliorations journal et synchronisation cloud."
+        "description": "Système (Orchestration Locale) : Mise en place d'une infrastructure d'agent hybride. Antigravity (Cloud) pilote désormais un agent local (Qwen3 via LM Studio) pour les tâches de rédaction, de génération de données et de boilerplate. Cette optimisation 'Circuit Court' permet une réduction massive de la consommation de tokens Cloud tout en garantissant une expertise technique locale via des profils configurables (TECH_STRICT, LORE_CREATIVE). Intégration d'un système de surveillance qualité systématique dans les règles de l'agent."
     },
     {
-        "version": "2.64.2",
-        "date": "2026-02-21",
+        "version": "2.96.2",
+        "date": "2026-02-27",
+        "type": "refactor",
+        "description": "Refactor (Admin Formules) : Extraction de la logique d'édition individuelle des formules dans un composant dédié AdminFormulaEditorItem. Réduction massive de la taille et de la complexité du fichier AdminFormulasEditor.tsx (passage de ~950 à ~490 lignes) pour une meilleure maintenance et lisibilité."
+    },
+    {
+        "version": "2.96.1",
+        "date": "2026-02-27",
         "type": "fix",
-        "description": "Correction du pavé fantôme 'PAVE_ATTRIBUTS_4' après réinitialisation : (1) dans rulesAdapter, l'attributeSettings est désormais reconstruit depuis les clés des attributs primaires (et non secondaires), éliminant l'apparition erronée d'un 4ème pavé avec label brut. (2) Filtre défensif sur les secondaryAttributes pour ignorer les clés orphelines absentes de l'attributeSettings. (3) Nettoyage de l'état initial : suppression de la clé pave_attributs_4 superflue dans secondaryAttributes de getInitialCharacterData."
+        "description": "Système (Persistance des Formules) : Correction d'un bug majeur où l'option 'Forcer Variante' et l'opérateur mathématique (ADD/SET/SUB) des formules globales n'étaient pas sauvegardés en base de données ni restitués après un rechargement de page. Mise à jour de la structure de la table 'libraries_formulas', du schéma de validation Zod et du service de synchronisation Cloud."
     },
     {
-        "version": "2.64.1",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction de la réinitialisation du compteur de Confiance : (1) Nettoyage des doublons historiques (slugs au lieu d'UUIDs) dans les définitions de compteurs en base de données qui forçaient la valeur à 4. (2) Renforcement du mécanisme de synchronisation (campaignReconciler) pour assurer l'unicité des clés de compteurs basées sur leur ID, prévenant ainsi la réapparition de doublons causant des états asynchrones lors d'une réinitialisation."
-    },
-    {
-        "version": "2.64.0",
-        "date": "2026-02-22",
+        "version": "2.96.0",
+        "date": "2026-02-27",
         "type": "feat",
-        "description": "Nouvel effet de trait 'Maître' (master_skill) : Quand un trait avec cet effet est ajouté, un wizard s'ouvre permettant au joueur de choisir une compétence primaire à rang 0. Celle-ci est automatiquement portée au rang 5 sans coût XP. Suppression du trait : la compétence revient au rang 0. L'xpCalculator reconnaît les compétences maîtrisées via masterSkillTarget et les traite comme entièrement gratuites jusqu'au rang 5. Interface admin : couleur violette + description informative."
-    },
-    {
-        "version": "2.63.3",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction des couleurs des compétences Habiletés Mystiques : (1) Le wizard d'ajout de compétences mystiques stocke désormais `definitionId` et `mysticAbilityId` sur chaque DotEntry ajouté, permettant à useSheetLayout de les enrichir correctement. (2) Ajout d'un fallback par nom dans useSheetLayout pour rétrocompatibilité avec les fiches existantes. (3) Alignement des couleurs de fallback dans l'AppearanceEditor sur les valeurs de DEFAULT_THEME (#8b5cf6 mystique, #d97706 variable)."
-    },
-    {
-        "version": "2.63.2",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction du nom du compteur auto lors de l'édition d'un trait avec variant : quand le variant d'un trait 'Compteur Auto' est modifié via le modal d'édition, le nom du compteur associé est désormais recalculé et mis à jour en conséquence (ex: 'Munitions (Pistolet)' → 'Munitions (Fusil)')."
+        "description": "Ergonomie (Traits de Maîtrise) : Refonte du flux d'ajout des traits utilisant 'master_skill'. Suppression de la double demande (variante + wizard) au profit d'un Wizard unique et amélioré. Celui-ci permet désormais de choisir parmi TOUTES les compétences définies dans les règles (même non possédées) et met automatiquement à jour le nom d'affichage du trait (ex: 'Maitre : Bagarre') dès la sélection effectuée."
     }
 ]

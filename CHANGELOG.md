@@ -1,5 +1,427 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.62.6] - 2026-02-21 [FIX]
+
+
+
+## [2.62.5] - 2026-02-21 [FIX]
+
+
+
+## [2.62.4] - 2026-02-21 [FIX]
+
+
+
+## [2.62.3] - 2026-02-21 [FIX]
+
+
+
+## [2.62.2] - 2026-02-21 [FIX]
+
+
+
+## [2.62.1] - 2026-02-21 [FIX]
+
+
+
+## [2.62.0] - 2026-02-21 [PERF]
+
+
+
+## [2.61.0] - 2026-02-21 [FEAT]
+
+
+
+## [2.60.1] - 2026-02-20 [REFACTOR]
+
+
+
+## [2.60.0] - 2026-02-21 [REFACTOR]
+
+
+
+## [2.59.0] - 2026-02-21 [REFACTOR]
+
+
+
+## [2.58.0] - 2026-02-21 [FEAT]
+
+
+
+## [2.57.0] - 2026-02-21 [FEAT]
+
+
+
+## [2.56.75] - 2026-02-21 [STYLE]
+
+
+
+## [2.56.74] - 2026-02-21 [FEAT]
+
+
+
+## [2.56.73] - 2026-02-21 [STYLE]
+
+
+
+## [2.56.72] - 2026-02-21 [FIX]
+
+
+
+## [2.56.71] - 2026-02-21 [STYLE]
+
+
+
+## [2.56.70] - 2026-02-21 [FIX]
+
+
+
+## [2.56.69] - 2026-02-21 [FEAT]
+
+
+
+## [2.56.68] - 2026-02-21 [FEAT]
+
+
+
+## [2.56.67] - 2026-02-21 [FEAT]
+
+
+
+## [2.56.65] - 2026-02-21 [STYLE]
+
+
+
+## [2.56.64] - 2026-02-21 [REFACTOR]
+
+
+
+## [2.56.63] - 2026-02-21 [STYLE]
+
+
+
+## [2.56.62] - 2026-02-21 [STYLE]
+
+
+
+## [2.56.61] - 2026-02-21 [FEAT]
+
+
+
+## [2.56.60] - 2026-02-20 [FIX]
+
+
+
+## [2.56.59] - 2026-02-20 [FIX]
+
+
+
+## [2.56.58] - 2026-02-20 [FIX]
+
+
+
+## [2.56.57] - 2026-02-20 [FIX]
+
+
+
+## [2.56.56] - 2026-02-20 [FEAT]
+
+
+
+# Historique Ancien (Legacy Changelog)
+
+## [2.56.55] - 2026-02-20 [FEAT]
+
+
+
+## [2.56.54] - 2026-02-20 [STYLE]
+
+
+
+## [2.56.53] - 2026-02-20 [FEAT]
+
+
+
+## [2.56.51] - 2026-02-20 [STYLE]
+
+
+
+## [2.56.50] - 2026-02-20 [FEAT]
+
+
+
+## [2.56.49] - 2026-02-20 [STYLE]
+
+
+
+## [2.56.48] - 2026-02-19 [REFACTOR]
+
+
+
+## [2.56.47] - 2026-02-19 [FEAT]
+
+
+
+## [2.56.46] - 2026-02-19 [FIX]
+
+
+
+## [2.56.45] - 2026-02-19 [FIX]
+
+
+
+## [2.56.44] - 2026-02-19 [FIX]
+
+
+
+## [2.56.43] - 2026-02-19 [FIX]
+
+
+
+## [2.56.39] - 2026-02-19 [FEAT]
+
+
+
+## [2.56.38] - 2026-02-19 [FEAT]
+
+
+
+## [2.56.37] - 2026-02-19 [FIX]
+
+
+
+## [2.56.36] - 2026-02-19 [CHORE]
+
+
+
+## [2.56.35] - 2026-02-19 [REFACTOR]
+
+
+
+## [2.56.34] - 2026-02-19 [CHORE]
+
+
+
+## [2.56.33] - 2026-02-19 [FEAT]
+
+
+
+## [2.56.32] - 2026-02-19 [FEAT]
+
+
+
+## [2.56.31] - 2026-02-20 [FIX]
+
+
+
+## [2.56.30] - 2026-02-20 [FIX]
+
+
+
+## [2.56.29] - 2026-02-20 [FIX]
+
+
+
+## [2.56.28] - 2026-02-19 [FIX]
+
+
+
+## [2.56.27] - 2026-02-19 [FIX]
+
+
+
+## [2.56.26] - 2026-02-19 [FIX]
+
+
+
+## [2.56.25] - 2026-02-19 [FIX]
+
+
+
+## [2.56.24] - 2026-02-19 [FIX]
+
+
+
+## [2.56.23] - 2026-02-19 [FEAT]
+
+
+
+## [2.56.22] - 2026-02-19 [FEAT]
+
+
+
+## [2.56.21] - 2026-02-19 [UI]
+
+
+
+## [2.56.20] - 2026-02-19 [REFACTOR]
+
+
+
+## [2.56.19] - 2026-02-19 [FIX]
+
+
+
+## [2.56.18] - 2026-02-19 [FIX]
+
+
+
+## [2.56.17] - 2026-02-19 [FIX]
+
+
+
+## [2.56.16] - 2026-02-19 [FIX]
+
+
+
+## [2.56.15] - 2026-02-19 [FEAT]
+
+
+
+## [2.56.14] - 2026-02-19 [FEAT]
+
+
+
+## [2.56.13] - 2026-02-19 [FIX]
+
+
+
+## [2.56.12] - 2026-02-19 [FIX]
+
+
+
+## [2.56.11] - 2026-02-19 [FIX]
+
+
+
+## [2.53.0] - 2026-02-17 [FIX]
+
+- 🛠️ Admin : Correction de l'erreur 400 lors de la sauvegarde des traits (alignement SQL cost/points)
+- 🛡️ Système : Amélioration de la détection d'erreurs en cascade pour garantir que la modale 'Sauvegarde Réussie' ne s'affiche qu'en cas de succès réel
+- 📊 Bibliothèque : Support complet des coûts textuels (ex: '1-3', 'Variable') dans la couche de persistance
+
+## [2.52.0] - 2026-02-17 [FEAT]
+
+- ✅ Import : Sélection individuelle des items (nouveaux et conflits) via des cases à cocher
+- 🎭 UI : Feedback dynamique des badges (Ignoré, Remplacé, Doublon, Exclu) en fonction de la stratégie
+- 🛠️ Core : Support technique de l'exclusion via IDs uniques dans le moteur de fusion
+
+## [2.51.0] - 2026-02-17 [FEAT]
+
+- 🔍 UI : Ajout d'une vue détaillée des changements dans l'assistant d'importation (Nouveaux items et Conflits)
+- 📋 Import : Comparaison précise des propriétés des items (coût, description, effets, etc.) avec visualisation Ancien vs Nouveau
+- 🔠 Système : Détection inteligente ignorant la casse pour éviter les doublons tout en permettant la normalisation
+
+## [2.50.1] - 2026-02-17 [FEAT]
+
+- 📥 Système : Support de l'import de fichiers JSON partiels (ex: uniquement les traits ou compétences)
+- 🛡️ Validation : Renforcement du schéma de données pour inclure toutes les bibliothèques dans les exports de fiches
+
+## [2.50.0] - 2026-02-17 [FEAT]
+
+- 🛡️ Admin : Renforcement de la détection des conflits lors de l'import (ID + Nom)
+- 🧹 Bibliothèque : Prévention de la pollution par doublons visuels lors de l'import de fiches personnages
+- 📥 Système : Amélioration de la robustesse de l'Assistant d'Importation pour tous les types de contenu (Traits, Skills, Backgrounds, Counters)
+
+## [2.49.99] - 2026-02-17 [FEAT]
+
+- 🛠️ Admin : Correction du bug de réinitialisation des coûts des traits (mismatch SQL points/cost)
+- 📊 Bibliothèque : Implémentation des coûts variables et multiples (ex: 1-5, 1/3/5) avec libellés personnalisables
+- 💾 Persistance : Ajout des colonnes points_label et is_variable_cost pour une gestion robuste des coûts en BDD
+
+## [2.49.98] - 2026-02-17 [FEAT]
+
+- ✨ Bibliothèque : Ajout de l'icône 'Habilités Mystiques' (Sparkles) dans la réserve de la fiche personnage
+- 📊 UI : Implémentation d'une légende complète des icônes dans la réserve de compétences et la bibliothèque de traits
+
+## [2.49.97] - 2026-02-17 [FIX]
+
+- 📝 Grimoire : Amélioration de la réactivité de l'enroulement (Wrap) par suppression des délais d'animation pendant le drag
+- 🖼️ UX : Système de collision solide pour les images en mode libre, forçant le recalcul du flux dans les colonnes CSS
+
+## [2.49.96] - 2026-02-17 [FIX]
+
+- 📝 Grimoire : Correction définitive de l'enroulement (Wrap) globale. Le texte est désormais physique poussé par l'image via un système de marges 4D (Haut/Bas/Gauche/Droite)
+- 🖼️ Layout : Suppression des transformations visuelles (fantômes) pour garantir que le texte ne se cache plus jamais derrière une image
+
+## [2.49.95] - 2026-02-17 [FIX]
+
+- 📝 Grimoire : L'enroulement du texte (Wrap) suit désormais le décalage vertical des images grâce à un système de marges dynamiques
+- 🖱️ UX : Le bouton 'F' restaure désormais l'alignement latéral précédent (L/R) au lieu de forcer le centré
+- 🖼️ Layout : Correction des chevauchements de texte en mode déplacement libre
+
+## [2.49.94] - 2026-02-17 [FIX]
+
+- 🖱️ UX : Le bouton 'F' (Libre) permet désormais de basculer (toggle) entre le mode libre et le mode centré
+- 🔄 Système : La désactivation du mode libre réinitialise automatiquement la position de l'image (Reset Offsets)
+
+## [2.49.93] - 2026-02-17 [FIX]
+
+- 🛡️ UI : La barre d'outils suit désormais l'image dans ses déplacements libres (Flush Toolbar)
+- 🔼 UX : La sélection d'une image la fait désormais passer au-dessus de tous les éléments (sommaire, menus) via un Z-index dynamique
+- 🛠️ Système : Correction des problèmes d'images 'bloquées' derrière l'interface du grimoire
+
+## [2.49.92] - 2026-02-17 [FEAT]
+
+- 🖱️ UX : Double sens d'enroulement (Float L/R) désormais disponible en mode déplacement libre
+- 📊 UI : Ajout d'un HUD (Head-Up Display) affichant les coordonnées X/Y et la taille en temps réel
+- 🖼️ Grimoire : Guide de recadrage (Crop) ajusté pour exclure dynamiquement la bordure blanche
+- 🔧 UX : Amélioration de la réactivité des poignées de redimensionnement et de sélection
+
+## [2.49.91] - 2026-02-17 [FIX]
+
+- 🎨 UI : Le cadre de sélection bleu suit désormais précisément les dimensions de l'image même en déplacement libre
+- 🛡️ Système : Désactivation intelligente du recadrage (Crop) sur les images à hauteur automatique
+- 📋 Audit : Réalisation d'un audit complet du système d'images pour prévenir les conflits d'options
+
+## [2.49.90] - 2026-02-17 [FIX]
+
+- 🖼️ Grimoire : Ajustement automatique de la largeur lors du passage en mode libre pour un meilleur enroulement
+- 🎨 UI : Cadre de sélection plus serré (fit-content) sur les images libres
+
+## [2.49.89] - 2026-02-17 [FIX]
+
+- 🖱️ UX : Le mode déplacement libre ne s'active désormais que lorsque l'image est sélectionnée
+- 📖 Grimoire : Support de l'enroulement du texte (wrap) en mode déplacement libre
+
+## [2.49.88] - 2026-02-17 [FEAT]
+
+- 🖼️ Grimoire : Ajout du mode 'Déplacement Libre' (F) pour les images
+- 🖱️ UX : Déplacement des images par Drag & Drop dans tout l'espace de la page
+- 🔄 UI : Nouveau bouton de réinitialisation de la position et support des coordonnées persistantes
+
+## [2.49.87] - 2026-02-16 [FIX]
+
+- 🐞 Sidebar : Fix du bouton Reset qui pouvait échouer selon l'état des données
+- ⚠️ React : Correction de l'avertissement 'value prop on select should not be null'
+- 🔧 Système : Robustesse accrue de la gestion des états de personnalisation (isCustomized)
+
+## [2.49.86] - 2026-02-16 [FEAT]
+
+- 🔓 Bibliothèque : Réactivation de l'édition globale pour les compétences personnalisées
+- 🛡️ Système : Verrouillage strict de la suppression pour les compétences surchargées localement
+- 🎨 UI : Harmonisation visuelle avec une icône de surcharge Cyan unifiée (Bibliothèque & Réserve)
+
+## [2.49.85] - 2026-02-16 [FEAT]
+
+- 🔒 Bibliothèque : Verrouillage de l'édition globale si une compétence est personnalisée localement
+- 🔄 Réserve : Nouveau bouton 'Reset' pour restaurer instantanément une compétence à son état d'origine
+- 🏗️ Système : Stockage de la définition master pour permettre la réinitialisation sans perte de données
+
+## [2.49.84] - 2026-02-16 [FEAT]
+
+- 🧠 Admin : Distinction claire entre édition de la Bibliothèque Globale et Personnalisation de Campagne
+- 🛡️ Système : La modification via l'onglet Bibliothèque met désormais à jour la base master pour tous les réglages
+- 🖋️ UI : Titres de modales explicites selon le contexte d'édition (Base Globale vs Campagne)
+
+## [2.49.83] - 2026-02-16 [FIX]
+
+- 🔍 Bibliothèques : Correction de la visibilité des compétences à variantes (Artisanat, etc.) en mode filtré
+- 🛠️ Système : Amélioration de la détection 'Global' pour le catalogue chargé depuis JSON
+- 🎨 UI : Ajustement de la visibilité des boutons d'édition dans les listes administratives
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.49.82] - 2026-02-16 [FEAT]
 
 - 🚀 Système : Utilisation d'un Portal React pour les modales (correction confinement UI)

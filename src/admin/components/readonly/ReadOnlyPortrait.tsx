@@ -17,7 +17,7 @@ export const ReadOnlyPortrait: React.FC<ReadOnlyPortraitProps> = ({ imageId, leg
             setError(false);
             if (imageId && imageId.startsWith('img_')) {
                 try {
-                    const { getImage } = await import('../../../imageDB');
+                    const { getImage } = await import('../../../services/imageDB');
                     const blob = await getImage(imageId);
                     if (blob && active) {
                         // Check for GZIP compressed data in blob because ImageSyncResolver stores them as text blobs

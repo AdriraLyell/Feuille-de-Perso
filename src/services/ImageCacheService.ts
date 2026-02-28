@@ -1,4 +1,4 @@
-import { getImage } from '../imageDB';
+import { getImage } from './imageDB';
 import { logger } from '../utils/logger';
 
 /**

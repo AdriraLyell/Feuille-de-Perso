@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, EyeOff, BookOpen, Copy, Trash2, FileCog } from 'lucide-react';
+import { Eye, EyeOff, BookOpen, Copy, Trash2, FileCog, Users } from 'lucide-react';
 import { GameSettingSummary } from '../../../services/CampaignService';
 import { MotionCard } from '../../../components/ui/motion/MotionCard';
 
@@ -76,6 +76,16 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
 
             {/* Quick Actions (Hover Reveal) */}
             <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0 z-20">
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(`/?roster=${setting.id}`, '_blank');
+                    }}
+                    className="p-2 bg-stone-800/90 text-emerald-400 hover:text-emerald-300 hover:bg-stone-700 rounded-full transition-colors shadow-lg border border-transparent hover:border-emerald-900/50"
+                    title="Afficher le Registre des PJ"
+                >
+                    <Users size={16} />
+                </button>
                 <button
                     onClick={(e) => {
                         e.stopPropagation();

@@ -1,5 +1,4 @@
-
-import { getImage, saveImage, blobToBase64, base64ToBlob } from '../imageDB';
+import { getImage, saveImage, blobToBase64, base64ToBlob } from './imageDB';
 import { GZIP_MARKER, ImageCompressionService } from './ImageCompressionService';
 import { logger } from '../utils/logger';
 

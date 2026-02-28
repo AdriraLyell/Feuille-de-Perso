@@ -4,15 +4,15 @@ import { RulesData } from '../../types/rules';
 import { LibraryMapper } from './LibraryMapper';
 import { ErrorService } from '../ErrorService';
 import {
-    DBTrait, DBSkill, DBSpecialization, DBBackground, DBCounter, DBMysticAbility,
+    DBTrait, DBSkill, DBSpecialization, DBBackground, DBCounter, DBMysticAbility, DBFormula,
     RelSettingTrait, RelSettingSkill, RelSettingSpecialization,
-    RelSettingBackground, RelSettingCounter, RelSettingMysticAbility,
+    RelSettingBackground, RelSettingCounter, RelSettingMysticAbility, RelSettingFormula,
     DBTraitVariant, DBSkillVariant, DBBackgroundVariant
 } from '../../types/database';
 import { ItemUsageDetail } from '../../types/usageTypes';
 import {
-    TABLE_LIBRARIES_TRAITS, TABLE_LIBRARIES_SKILLS, TABLE_LIBRARIES_SPECIALIZATIONS, TABLE_LIBRARIES_BACKGROUNDS, TABLE_LIBRARIES_COUNTERS, TABLE_LIBRARIES_MYSTIC_ABILITIES,
-    TABLE_REL_SETTING_TRAITS, TABLE_REL_SETTING_SKILLS, TABLE_REL_SETTING_SPECIALIZATIONS, TABLE_REL_SETTING_BACKGROUNDS, TABLE_REL_SETTING_COUNTERS, TABLE_REL_SETTING_MYSTIC_ABILITIES,
+    TABLE_LIBRARIES_TRAITS, TABLE_LIBRARIES_SKILLS, TABLE_LIBRARIES_SPECIALIZATIONS, TABLE_LIBRARIES_BACKGROUNDS, TABLE_LIBRARIES_COUNTERS, TABLE_LIBRARIES_MYSTIC_ABILITIES, TABLE_LIBRARIES_FORMULAS,
+    TABLE_REL_SETTING_TRAITS, TABLE_REL_SETTING_SKILLS, TABLE_REL_SETTING_SPECIALIZATIONS, TABLE_REL_SETTING_BACKGROUNDS, TABLE_REL_SETTING_COUNTERS, TABLE_REL_SETTING_MYSTIC_ABILITIES, TABLE_REL_SETTING_FORMULAS,
     TABLE_LIBRARIES_TRAITS_VARIANTS, TABLE_LIBRARIES_SKILLS_VARIANTS, TABLE_LIBRARIES_BACKGROUNDS_VARIANTS
 } from '../../constants/db';
 
@@ -24,14 +24,15 @@ export const LibraryLoader = {
         try {
             // 1. Fetch Relations first to identify what belongs to this campaign
             const [
-                relTraits, relSkills, relSpecs, relBackgrounds, relCounters, relMysticAbilities
+                relTraits, relSkills, relSpecs, relBackgrounds, relCounters, relMysticAbilities, relFormulas
             ] = await Promise.all([
                 DatabaseService.fetchAll<RelSettingTrait>(TABLE_REL_SETTING_TRAITS, { eq: { setting_id: settingId } }, 'LibraryLoader.relTraits'),
                 DatabaseService.fetchAll<RelSettingSkill>(TABLE_REL_SETTING_SKILLS, { eq: { setting_id: settingId } }, 'LibraryLoader.relSkills'),
                 DatabaseService.fetchAll<RelSettingSpecialization>(TABLE_REL_SETTING_SPECIALIZATIONS, { eq: { setting_id: settingId } }, 'LibraryLoader.relSpecs'),
                 DatabaseService.fetchAll<RelSettingBackground>(TABLE_REL_SETTING_BACKGROUNDS, { eq: { setting_id: settingId } }, 'LibraryLoader.relBackgrounds'),
                 DatabaseService.fetchAll<RelSettingCounter>(TABLE_REL_SETTING_COUNTERS, { eq: { setting_id: settingId } }, 'LibraryLoader.relCounters'),
-                DatabaseService.fetchAll<RelSettingMysticAbility>(TABLE_REL_SETTING_MYSTIC_ABILITIES, { eq: { setting_id: settingId } }, 'LibraryLoader.relMystic')
+                DatabaseService.fetchAll<RelSettingMysticAbility>(TABLE_REL_SETTING_MYSTIC_ABILITIES, { eq: { setting_id: settingId } }, 'LibraryLoader.relMystic'),
+                DatabaseService.fetchAll<RelSettingFormula>(TABLE_REL_SETTING_FORMULAS, { eq: { setting_id: settingId } }, 'LibraryLoader.relFormulas')
             ]);
 
             const traitIds = relTraits.map(r => r.trait_id);
@@ -40,6 +41,7 @@ export const LibraryLoader = {
             const bgIds = relBackgrounds.map(r => r.background_id);
             const counterIds = relCounters.map(r => r.counter_id);
             const mysticIds = relMysticAbilities.map(r => r.mystic_ability_id);
+            const formulaIds = relFormulas.map(r => r.formula_id);
 
             // 2. Build filters for reference tables
             // We load items that are linked OR explicitly belong to this setting (legacy/local bypass)
@@ -53,7 +55,7 @@ export const LibraryLoader = {
                 traits, skills, specs,
                 backgrounds, counters,
                 traitVariants, skillVariants, bgVariants,
-                mysticAbilities
+                mysticAbilities, formulas
             ] = await Promise.all([
                 DatabaseService.fetchAll<DBTrait>(TABLE_LIBRARIES_TRAITS, { or: buildFilter(traitIds) }, 'LibraryLoader.loadTraits'),
                 DatabaseService.fetchAll<DBSkill>(TABLE_LIBRARIES_SKILLS, { or: buildFilter(skillIdsList) }, 'LibraryLoader.loadSkills'),
@@ -63,7 +65,8 @@ export const LibraryLoader = {
                 DatabaseService.fetchAll<DBTraitVariant>(TABLE_LIBRARIES_TRAITS_VARIANTS, { or: buildFilter(traitIds), select: 'trait_id, name' }, 'LibraryLoader.loadTraitsVariants'),
                 DatabaseService.fetchAll<DBSkillVariant>(TABLE_LIBRARIES_SKILLS_VARIANTS, { or: buildFilter(skillIdsList), select: 'skill_id, name' }, 'LibraryLoader.loadSkillsVariants'),
                 DatabaseService.fetchAll<DBBackgroundVariant>(TABLE_LIBRARIES_BACKGROUNDS_VARIANTS, { or: buildFilter(bgIds), select: 'background_id, name' }, 'LibraryLoader.loadBgVariants'),
-                DatabaseService.fetchAll<DBMysticAbility>(TABLE_LIBRARIES_MYSTIC_ABILITIES, { or: buildFilter(mysticIds) }, 'LibraryLoader.loadMystic')
+                DatabaseService.fetchAll<DBMysticAbility>(TABLE_LIBRARIES_MYSTIC_ABILITIES, { or: buildFilter(mysticIds) }, 'LibraryLoader.loadMystic'),
+                DatabaseService.fetchAll<DBFormula>(TABLE_LIBRARIES_FORMULAS, { or: buildFilter(formulaIds) }, 'LibraryLoader.loadFormulas')
             ]);
 
             const traitVarMap = new Map<string, string[]>();
@@ -99,6 +102,7 @@ export const LibraryLoader = {
             const activeBgIds = new Set<string>(relBackgrounds.filter((r: RelSettingBackground) => r.is_active).map((r: RelSettingBackground) => r.background_id));
             const activeCounterIds = new Set<string>(relCounters.filter((r: RelSettingCounter) => r.is_active).map((r: RelSettingCounter) => r.counter_id));
             const activeMysticIds = new Set<string>(relMysticAbilities.filter((r: any) => r.is_active).map((r: any) => r.mystic_ability_id));
+            const activeFormulaIds = new Set<string>(relFormulas.filter((r: RelSettingFormula) => r.is_active).map((r: RelSettingFormula) => r.formula_id));
 
             const skillRelMap = new Map<string, RelSettingSkill>(relSkills.map((r: RelSettingSkill) => [r.skill_id, r]));
             const bgDefaultMap = new Map<string, string>(relBackgrounds.map((r: RelSettingBackground) => [r.background_id, r.default_category]));
@@ -112,14 +116,15 @@ export const LibraryLoader = {
                 specializations: specs.map((s: DBSpecialization) => LibraryMapper.mapSpec(s, activeSpecIds, settingId)).sort((a, b) => a.name.localeCompare(b.name)),
                 backgrounds: backgrounds.map((b: DBBackground) => LibraryMapper.mapBackground(b, activeBgIds, settingId, bgVarMap.get(b.id), bgDefaultMap.get(b.id))).sort((a, b) => a.name.localeCompare(b.name)),
                 counters: counters.map((c: DBCounter) => LibraryMapper.mapCounter(c, activeCounterIds, settingId, counterDefaultMap.get(c.id))).sort((a, b) => a.name.localeCompare(b.name)),
-                mysticAbilities: mysticAbilities.map((m: any) => LibraryMapper.mapMysticAbility(m, activeMysticIds, settingId, mysticDefaultMap.get(m.id))).sort((a: any, b: any) => a.name.localeCompare(b.name))
+                mysticAbilities: mysticAbilities.map((m: any) => LibraryMapper.mapMysticAbility(m, activeMysticIds, settingId, mysticDefaultMap.get(m.id))).sort((a: any, b: any) => a.name.localeCompare(b.name)),
+                formulas: (formulas || []).map((f: DBFormula) => LibraryMapper.mapFormula(f, activeFormulaIds, settingId)).sort((a, b) => a.name.localeCompare(b.name))
             };
         } catch (error) {
             ErrorService.handleError(error, {
                 context: 'LibraryLoader.loadLibraries',
                 userMessage: 'Erreur de chargement des bibliothèques'
             });
-            return { traits: [], skills: [], specializations: [], backgrounds: [], counters: [], mysticAbilities: [] };
+            return { traits: [], skills: [], specializations: [], backgrounds: [], counters: [], mysticAbilities: [], formulas: [] };
         }
     },
 
@@ -134,7 +139,8 @@ export const LibraryLoader = {
                 { table: TABLE_REL_SETTING_BACKGROUNDS, id: 'background_id', cat: true },
                 { table: TABLE_REL_SETTING_COUNTERS, id: 'counter_id', cat: true },
                 { table: TABLE_REL_SETTING_SPECIALIZATIONS, id: 'specialization_id', cat: false },
-                { table: TABLE_REL_SETTING_MYSTIC_ABILITIES, id: 'mystic_ability_id', cat: true }
+                { table: TABLE_REL_SETTING_MYSTIC_ABILITIES, id: 'mystic_ability_id', cat: true },
+                { table: TABLE_REL_SETTING_FORMULAS, id: 'formula_id', cat: false }
             ];
 
             const results = await Promise.all(tables.map(async t => {
@@ -175,7 +181,7 @@ export const LibraryLoader = {
     async loadItemUsageDetails(
         itemId: string,
         currentSettingId: string,
-        itemType: 'trait' | 'skill' | 'background' | 'counter' | 'mystic' | 'specialization'
+        itemType: 'trait' | 'skill' | 'background' | 'counter' | 'mystic' | 'specialization' | 'formula'
     ): Promise<ItemUsageDetail> {
         try {
             // 1. Determine rel table and columns
@@ -189,6 +195,7 @@ export const LibraryLoader = {
                 case 'counter': relTable = TABLE_REL_SETTING_COUNTERS; idColumn = 'counter_id'; break;
                 case 'mystic': relTable = TABLE_REL_SETTING_MYSTIC_ABILITIES; idColumn = 'mystic_ability_id'; break;
                 case 'specialization': relTable = TABLE_REL_SETTING_SPECIALIZATIONS; idColumn = 'specialization_id'; break;
+                case 'formula': relTable = TABLE_REL_SETTING_FORMULAS; idColumn = 'formula_id'; break;
             }
 
             if (!relTable) return { settings: [], characters: [] };

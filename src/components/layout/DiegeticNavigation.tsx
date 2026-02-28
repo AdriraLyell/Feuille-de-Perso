@@ -94,6 +94,15 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                         {isLandscape ? <RectangleHorizontal size={18} /> : <RectangleVertical size={18} />}
                     </button>
 
+                    <button
+                        onClick={onOpenAppearance}
+                        className="px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600 hover:text-white"
+                        title="Changer l'apparence"
+                        aria-label="Changer l'apparence"
+                    >
+                        <Palette size={18} />
+                    </button>
+
                     <div className="w-px h-6 bg-gray-600 hidden md:block"></div>
 
                     {/* Sheet Button & Setting Badge */}
@@ -144,17 +153,11 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                     <div className="hidden md:flex items-center gap-2">
                         <div className="flex items-center gap-2 mr-4 border-r border-gray-600 pr-4">
                             <button
-                                onClick={onOpenAppearance}
-                                className="px-4 py-1.5 rounded-md text-sm font-bold transition-colors flex items-center gap-2 text-gray-300 hover:text-white hover:bg-gray-700"
-                                title="Changer l'apparence"
-                            >
-                                <Palette size={16} /> Thème
-                            </button>
-                            <button
                                 onClick={() => onModeChange('settings')}
                                 className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all flex items-center gap-2 relative ${currentMode === 'settings'
                                     ? 'bg-blue-600 text-white shadow-sm'
                                     : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
+                                title="Réglages"
                             >
                                 <div className="relative">
                                     <Settings size={16} />
@@ -165,7 +168,6 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                                         </div>
                                     )}
                                 </div>
-                                Réglages
                                 {stats?.isCritical && (
                                     <AlertTriangle size={14} className="text-red-400 animate-pulse ml-0.5" />
                                 )}

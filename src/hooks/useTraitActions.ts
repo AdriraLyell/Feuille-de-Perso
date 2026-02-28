@@ -9,6 +9,7 @@ export const useTraitActions = (
     defaultType: 'avantage' | 'desavantage'
 ) => {
     const { rules, updateRules } = useRules();
+    const allFormulas = useMemo(() => rules?.libraries?.formulas || [], [rules]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editForm, setEditForm] = useState<LibraryEntry | null>(null);
     const [tagInput, setTagInput] = useState('');
@@ -99,7 +100,8 @@ export const useTraitActions = (
                 libraries: {
                     ...rules!.libraries,
                     traits: newTraits
-                }
+                },
+                lastUpdated: Date.now() // Force CharacterContext reconciliation
             };
             updateRules(updatedRules);
             setUpdateResult({ success: true, message: `Bibliothèque officielle mise à jour (${newTraits.length} traits).` });
@@ -142,22 +144,49 @@ export const useTraitActions = (
 
     const addEffect = useCallback(() => {
         if (!editForm) return;
-        const newEffect: TraitEffect = { id: Math.random().toString(36).substr(2, 9), type: 'xp_bonus', value: 0 };
+        const newEffect: TraitEffect = { id: Math.random().toString(36).substr(2, 9), type: 'formula', value: 0 };
         setEditForm({ ...editForm, effects: [...(editForm.effects || []), newEffect] });
     }, [editForm]);
 
     const updateEffect = useCallback((id: string, field: keyof TraitEffect, value: any) => {
         if (!editForm) return;
-        setEditForm({
-            ...editForm,
-            effects: (editForm.effects || []).map(e => e.id === id ? { ...e, [field]: value } : e)
+
+        const newEffects = (editForm.effects || []).map(e => e.id === id ? { ...e, [field]: value } : e);
+
+        // Détecter si une des formules force la variante
+        const hasForceVariantFormula = newEffects.some(ef => {
+            if (!ef.formulaId) return false;
+            const formula = allFormulas.find(f => f.id === ef.formulaId);
+            return formula?.forceVariant;
         });
-    }, [editForm]);
+
+        // Si une formule force la variante, on s'assure que le trait est marqué comme variable
+        const updatedForm: LibraryEntry = {
+            ...editForm,
+            effects: newEffects,
+            isVariable: hasForceVariantFormula ? true : editForm.isVariable
+        };
+
+        setEditForm(updatedForm);
+    }, [editForm, allFormulas]);
 
     const removeEffect = useCallback((id: string) => {
         if (!editForm) return;
-        setEditForm({ ...editForm, effects: (editForm.effects || []).filter(e => e.id !== id) });
-    }, [editForm]);
+        const newEffects = (editForm.effects || []).filter(e => e.id !== id);
+
+        // Recalculer si une des formules restantes force toujours la variante
+        const hasForceVariantFormula = newEffects.some(ef => {
+            if (!ef.formulaId) return false;
+            const formula = allFormulas.find(f => f.id === ef.formulaId);
+            return formula?.forceVariant;
+        });
+
+        setEditForm({
+            ...editForm,
+            effects: newEffects,
+            isVariable: hasForceVariantFormula ? true : editForm.isVariable
+        });
+    }, [editForm, allFormulas]);
 
     const allSkills = useMemo(() => {
         if (!data || !data.skills) return [];
@@ -187,6 +216,43 @@ export const useTraitActions = (
         return attrs.sort((a, b) => a.name.localeCompare(b.name));
     }, [data.attributes]);
 
+    const allCounters = useMemo(() => {
+        if (!data || !data.counters) return [];
+        const counters: { id: string, name: string }[] = [];
+
+        // System counters
+        Object.keys(data.counters).forEach(key => {
+            if (key !== 'custom' && !Array.isArray(data.counters[key])) {
+                const c = data.counters[key] as any;
+                if (c && c.name && c.name.trim() !== '') {
+                    counters.push({ id: c.id || key, name: c.name });
+                }
+            }
+        });
+
+        // Custom counters
+        if (data.counters.custom && Array.isArray(data.counters.custom)) {
+            data.counters.custom.forEach(c => {
+                if (c && c.name && c.name.trim() !== '') {
+                    counters.push({ id: c.id, name: c.name });
+                }
+            });
+        }
+
+        // Also look at counterLibrary
+        if (data.counterLibrary && Array.isArray(data.counterLibrary)) {
+            data.counterLibrary.forEach(c => {
+                if (c && c.name && c.name.trim() !== '' && !counters.some(ex => ex.name === c.name)) {
+                    counters.push({ id: c.id, name: c.name });
+                }
+            });
+        }
+
+        return counters.sort((a, b) => a.name.localeCompare(b.name));
+    }, [data.counters, data.counterLibrary]);
+
+
+
     return {
         isModalOpen,
         setIsModalOpen,
@@ -214,6 +280,8 @@ export const useTraitActions = (
         updateEffect,
         removeEffect,
         allSkills,
-        allAttributes
+        allAttributes,
+        allCounters,
+        allFormulas
     };
 };
