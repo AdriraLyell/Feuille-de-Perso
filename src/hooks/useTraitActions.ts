@@ -100,7 +100,8 @@ export const useTraitActions = (
                 libraries: {
                     ...rules!.libraries,
                     traits: newTraits
-                }
+                },
+                lastUpdated: Date.now() // Force CharacterContext reconciliation
             };
             updateRules(updatedRules);
             setUpdateResult({ success: true, message: `Bibliothèque officielle mise à jour (${newTraits.length} traits).` });

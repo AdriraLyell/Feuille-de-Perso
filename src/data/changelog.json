@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.7",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Ajout de la migration V5 pour forcer explicitement la réconciliation des règles au chargement du personnage",
+            "Mise à jour du bouton 'Officiel' pour forcer la réconciliation immédiate des bibliothèques locales"
+        ]
+    },
+    {
         "version": "2.97.6",
         "date": "2026-02-28",
         "type": "fix",
@@ -134,17 +143,5 @@
         "date": "2026-02-27",
         "type": "feat",
         "description": "Flexibilité de l'Héritage MJ (Modèles Incomplets) : Le dictionnaire de formules supporte désormais des modèles 'partiels' ou 'incomplets' (statut orange). Les créateurs de traits peuvent compléter les paramètres manquants (Cible, Opérateur, Équation) au niveau du trait. Si l'équation est absente du modèle, une valeur numérique fixe peut être saisie directement dans le trait."
-    },
-    {
-        "version": "2.93.2",
-        "date": "2026-02-27",
-        "type": "feat",
-        "description": "Unification de l'Héritage MJ : Dans l'éditeur de traits, les champs 'Cible' et 'Opération' sont désormais automatiquement masqués et verrouillés s'ils sont déjà définis dans le dictionnaire de formules MJ. Cela garantit une source de vérité unique et simplifie l'interface pour le créateur de contenu."
-    },
-    {
-        "version": "2.93.1",
-        "date": "2026-02-27",
-        "type": "fix",
-        "description": "Correction du bug de Stale State React : La sélection d'une formule globale dans l'éditeur d'effets mécaniques est désormais sauvegardée avec succès grâce à l'utilisation de la fonction updater de l'état React (Update Multiple Fields)."
     }
 ]

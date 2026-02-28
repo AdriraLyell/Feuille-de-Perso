@@ -13,6 +13,7 @@ import { migrateDefaults } from './migrateDefaults';
 import { migrateCampaignNotes } from './migrateCampaignNotes';
 import { migrateHeaderDates } from './migrateHeaderDates';
 import { migrateFormulas } from './migrateFormulas';
+import { forceRulesReconciliation } from './forceRulesReconciliation';
 
 // Type for a migration function
 type MigrationFunction = (data: any) => void;
@@ -39,7 +40,10 @@ export const MIGRATIONS: Record<number, MigrationFunction[]> = {
     ],
     4: [
         migrateFormulas
+    ],
+    5: [
+        forceRulesReconciliation
     ]
 };
 
-export const CURRENT_SCHEMA_VERSION = 4;
+export const CURRENT_SCHEMA_VERSION = 5;
