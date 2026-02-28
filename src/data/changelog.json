@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.21",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Tooltip : Correction du lien avec les calculs globaux pour les compteurs perso (récupération forcée des métadonnées de formule).",
+            "Moteur : Normalisation des clés de recherche (suppression d'espaces) pour correspondre aux définitions système."
+        ]
+    },
+    {
         "version": "2.97.20",
         "date": "2026-02-28",
         "type": "feat",
@@ -194,11 +203,5 @@
             "Centralisation de l'UI des effets dans TraitEffectItem.tsx",
             "Amélioration de la modularité et de la lisibilité de la bibliothèque de traits"
         ]
-    },
-    {
-        "version": "2.97.1",
-        "date": "2026-02-28",
-        "type": "refactor",
-        "description": "Refactor (Moteur de Formules) : Restructuration majeure du composant AdminFormulaEditorItem. Extraction de la logique de validation, des utilitaires mathématiques et découpage en sous-composants réutilisables (AggregateConfigEditor, TargetSearchDropdown, CodeInput). Cette chirurgie réduit la taille du fichier principal de ~550 à ~230 lignes, améliorant significativement la maintenabilité et la séparation des préoccupations."
     }
 ]
