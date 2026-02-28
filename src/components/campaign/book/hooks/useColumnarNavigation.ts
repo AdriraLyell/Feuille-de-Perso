@@ -26,7 +26,7 @@ export const useColumnarNavigation = ({
             const stride = PAGE_WIDTH + 40;
 
             const contentPages = Math.max(1, Math.ceil(scrollWidth / stride));
-            const totalPages = contentPages + 1;
+            const totalPages = contentPages;
 
             setPageCount(prev => prev !== totalPages ? totalPages : prev);
             setScrollPos(containerRef.current.scrollLeft);

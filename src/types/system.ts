@@ -183,7 +183,7 @@ export interface LibraryFormulaEntry {
   formula: string;
   type: 'modifier' | 'variable'; // 'modifier' = Affecte une valeur (Cible/Action), 'variable' = Calcul interne (Equation ou Agrégat)
   target?: string;
-  effectType?: string;
+  effectType?: string | null;
   description?: string;
   isGlobal?: boolean;
   isActive?: boolean;

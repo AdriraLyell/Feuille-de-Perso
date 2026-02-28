@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.97.0",
+        "date": "2026-02-28",
+        "type": "feat",
+        "description": "Système (Orchestration Locale) : Mise en place d'une infrastructure d'agent hybride. Antigravity (Cloud) pilote désormais un agent local (Qwen3 via LM Studio) pour les tâches de rédaction, de génération de données et de boilerplate. Cette optimisation 'Circuit Court' permet une réduction massive de la consommation de tokens Cloud tout en garantissant une expertise technique locale via des profils configurables (TECH_STRICT, LORE_CREATIVE). Intégration d'un système de surveillance qualité systématique dans les règles de l'agent."
+    },
+    {
+        "version": "2.96.2",
+        "date": "2026-02-27",
+        "type": "refactor",
+        "description": "Refactor (Admin Formules) : Extraction de la logique d'édition individuelle des formules dans un composant dédié AdminFormulaEditorItem. Réduction massive de la taille et de la complexité du fichier AdminFormulasEditor.tsx (passage de ~950 à ~490 lignes) pour une meilleure maintenance et lisibilité."
+    },
+    {
+        "version": "2.96.1",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Système (Persistance des Formules) : Correction d'un bug majeur où l'option 'Forcer Variante' et l'opérateur mathématique (ADD/SET/SUB) des formules globales n'étaient pas sauvegardés en base de données ni restitués après un rechargement de page. Mise à jour de la structure de la table 'libraries_formulas', du schéma de validation Zod et du service de synchronisation Cloud."
+    },
+    {
         "version": "2.96.0",
         "date": "2026-02-27",
         "type": "feat",
@@ -579,23 +597,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction majeure de la visibilité des items supprimés : Restriction du chargement des bibliothèques MJ aux seuls items explicitement rattachés à la campagne ou créés pour elle. Cette modification garantit que les items supprimés (via l'icône corbeille) disparaissent définitivement de la vue MJ après un rafraîchissement, même s'ils subsistent dans le dépôt global pour d'autres campagnes."
-    },
-    {
-        "version": "2.63.0",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction de la persistance des suppressions dans la bibliothèque : Les éléments supprimés du catalogue d'une campagne sont désormais correctement nettoyés dans le dépôt global s'ils ne sont plus utilisés ailleurs. Amélioration de la gestion du statut d'activation (isActive) via les liens relationnels de la base de données pour garantir que les items désactivés mais non supprimés sont conservés de manière cohérente."
-    },
-    {
-        "version": "2.62.9",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Amélioration de la bibliothèque d'administration : Intégration de détails d'utilisation avancés. Désormais, survoler l'icône de cadenas d'un élément verrouillé (trait, compétence, historique, compteur, etc.) affiche précisément quelles campagnes ou quels personnages utilisent cet élément, facilitant la gestion de la bibliothèque globale."
-    },
-    {
-        "version": "2.62.8",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction de l'erreur 'net::ERR_FILE_NOT_FOUND' lors de la sauvegarde des réglages : Stabilisation des callbacks de mise à jour d'image et renforcement du cycle de vie des ObjectURLs dans le widget de portrait. Cette correction élimine les révocations prématurées d'URLs de blobs encore en cours d'utilisation lors des cycles de re-rendu de React."
     }
 ]

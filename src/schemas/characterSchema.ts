@@ -331,7 +331,7 @@ export const LibraryFormulaEntrySchema = z.object({
     formula: z.string(),
     type: z.enum(['modifier', 'variable']), // 'modifier' = Affecte une carac, 'variable' = Calcul pur
     target: z.string().optional(),
-    effectType: z.string().optional(),
+    effectType: z.string().nullable().optional(),
     description: z.string().optional(),
     isGlobal: z.boolean().optional(),
     isActive: z.boolean().optional(),

@@ -1,5 +1,27 @@
 [
     {
+        "version": "2.97.20",
+        "date": "2026-02-28",
+        "type": "feat",
+        "changes": [
+            "Tooltip : Affichage de l'expression de la formule calculée en haut de l'infobulle.",
+            "Tooltip : Détails récursifs pour les variables d'agrégation (ex: voir le détail des compétences mystiques dans le calcul de la Force Vitale).",
+            "Moteur : Meilleure résolution des configurations (formula/aggregateConfig) lorsque les compteurs pointent vers des IDs de formule.",
+            "Robustesse : Amélioration de smartIncludes pour ignorer le préfixe '@' souvent utilisé dans les filtres de tags/catégories.",
+            "Fix : Correction d'une erreur de schéma Zod sur le champ effectType des formules (nullable)."
+        ]
+    },
+    {
+        "version": "2.97.19",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Journal de Campagne : Correction du chevauchement du Sommaire et restauration des notes page 1 — le sommaire opaque a été déplacé dans sa propre page (physical shift), laissant les notes apparaître en Page 2.",
+            "Journal de Campagne : Correction de la couleur de texte — le texte ProseMirror est désormais forcé en `stone-900` (#1c1917) pour une lisibilité parfaite sur fond beige.",
+            "Journal de Campagne : Suppression d'un warning console Tiptap (Doublon d'extension Underline)."
+        ]
+    },
+    {
         "version": "2.97.18",
         "date": "2026-02-28",
         "type": "fix",
@@ -178,23 +200,5 @@
         "date": "2026-02-28",
         "type": "refactor",
         "description": "Refactor (Moteur de Formules) : Restructuration majeure du composant AdminFormulaEditorItem. Extraction de la logique de validation, des utilitaires mathématiques et découpage en sous-composants réutilisables (AggregateConfigEditor, TargetSearchDropdown, CodeInput). Cette chirurgie réduit la taille du fichier principal de ~550 à ~230 lignes, améliorant significativement la maintenabilité et la séparation des préoccupations."
-    },
-    {
-        "version": "2.97.0",
-        "date": "2026-02-28",
-        "type": "feat",
-        "description": "Système (Orchestration Locale) : Mise en place d'une infrastructure d'agent hybride. Antigravity (Cloud) pilote désormais un agent local (Qwen3 via LM Studio) pour les tâches de rédaction, de génération de données et de boilerplate. Cette optimisation 'Circuit Court' permet une réduction massive de la consommation de tokens Cloud tout en garantissant une expertise technique locale via des profils configurables (TECH_STRICT, LORE_CREATIVE). Intégration d'un système de surveillance qualité systématique dans les règles de l'agent."
-    },
-    {
-        "version": "2.96.2",
-        "date": "2026-02-27",
-        "type": "refactor",
-        "description": "Refactor (Admin Formules) : Extraction de la logique d'édition individuelle des formules dans un composant dédié AdminFormulaEditorItem. Réduction massive de la taille et de la complexité du fichier AdminFormulasEditor.tsx (passage de ~950 à ~490 lignes) pour une meilleure maintenance et lisibilité."
-    },
-    {
-        "version": "2.96.1",
-        "date": "2026-02-27",
-        "type": "fix",
-        "description": "Système (Persistance des Formules) : Correction d'un bug majeur où l'option 'Forcer Variante' et l'opérateur mathématique (ADD/SET/SUB) des formules globales n'étaient pas sauvegardés en base de données ni restitués après un rechargement de page. Mise à jour de la structure de la table 'libraries_formulas', du schéma de validation Zod et du service de synchronisation Cloud."
     }
 ]

@@ -16,5 +16,7 @@ export const normalizeString = (str: string): string => {
 export const smartIncludes = (text: string, query: string): boolean => {
     if (!query) return true;
     if (!text) return false;
-    return normalizeString(text).includes(normalizeString(query));
+    const normText = normalizeString(text).replace(/^@/, "");
+    const normQuery = normalizeString(query).replace(/^@/, "");
+    return normText.includes(normQuery);
 };

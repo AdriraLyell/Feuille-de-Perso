@@ -1,7 +1,7 @@
 {
   "name": "rpg-sheet-manager",
   "private": true,
-  "version": "2.97.18",
+  "version": "2.97.20",
   "type": "module",
   "scripts": {
     "dev": "vite",
