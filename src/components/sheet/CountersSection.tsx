@@ -93,8 +93,8 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
 
     // Metadata recovery: if entryOrFormula is a "dumb" character entry, 
     // try to find the full definition in the rules libraries.
-    const globalDef = rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === nameKey)
-        || Object.values(rules?.definitions?.counters || {}).find((c: any) => normalizeString(c.name) === nameKey);
+    const globalDef = rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === normalizedName)
+        || Object.values(rules?.definitions?.counters || {}).find((c: any) => normalizeString(c.name) === normalizedName);
 
     const effectiveEntryOrFormula = { ...globalDef, ...entryOrFormula };
 
