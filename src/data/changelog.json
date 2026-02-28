@@ -1,5 +1,18 @@
 [
     {
+        "version": "2.97.10",
+        "date": "2026-02-28",
+        "type": "feat",
+        "changes": [
+            "Ergonomie (Admin Formules) : Refonte du flux de création et d'édition des formules.",
+            "Remplacement de l'édition en ligne par une fenêtre modale unifiée (AdminFormulaEditorModal).",
+            "Extraction des champs de formulaire dans un composant réutilisable (AdminFormulaFormFields) garantissant la cohérence visuelle et technique.",
+            "Ajout d'un bouton d'édition direct sur chaque formule de la liste.",
+            "Amélioration de la sécurité : les modifications ne sont enregistrées en base de données qu'après validation explicite dans la modale.",
+            "Refactorisation du composant de liste (AdminFormulaEditorItem) pour une interface plus épurée centrée sur la lecture et les actions rapides."
+        ]
+    },
+    {
         "version": "2.97.9",
         "date": "2026-02-28",
         "type": "fix",

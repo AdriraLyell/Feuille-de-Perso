@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryFormulaEntry } from '../../../types';
 import { generateId } from '../../../utils/factories';
@@ -8,6 +8,7 @@ import { CharacterSyncService, SyncedCharacterSummary } from '../../../services/
 import { MotionCard } from '../../../components/ui/motion/MotionCard';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 import { AdminFormulaEditorItem } from './AdminFormulaEditorItem';
+import { AdminFormulaEditorModal } from './AdminFormulaEditorModal';
 
 const DUMMY_PREVIEW_DATA: any = {
     experience: { total: 25, gain: "25" },
@@ -48,13 +49,15 @@ interface AdminFormulasEditorProps {
     settingId?: string;
 }
 
-
 const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpdate, settingId }) => {
     const lib = rules.libraries?.formulas || [];
     const formulaCounters = lib; // Now it contains all formulas
 
-    const [editingId, setEditingId] = useState<string | null>(null);
     const [previewValue, setPreviewValue] = useState<number | null>(null);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [formulaToEdit, setFormulaToEdit] = useState<LibraryFormulaEntry | null>(null);
+    const [isNewFormula, setIsNewFormula] = useState(false);
 
     const [characters, setCharacters] = useState<SyncedCharacterSummary[]>([]);
     const [selectedCharId, setSelectedCharId] = useState<string>('');
@@ -161,7 +164,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
         ...(rules.libraries.skills || []).map(s => s.name)
     ].filter((v, i, a) => a && v && a.indexOf(v) === i) as string[]; // Unique values
 
-    const handleUpdate = (newLib: LibraryFormulaEntry[]) => {
+    const handleUpdateRules = (newLib: LibraryFormulaEntry[]) => {
         onUpdate({
             ...rules,
             libraries: {
@@ -183,55 +186,37 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
             description: "",
             operator: 'ADD'
         };
-        handleUpdate([...lib, newCounter]);
-        setEditingId(newCounter.id);
-        setPreviewValue(evaluateFormula("10", currentPreviewData));
+        setFormulaToEdit(newCounter);
+        setIsNewFormula(true);
+        setIsModalOpen(true);
     };
 
-    const updateCounter = (id: string, field: keyof LibraryFormulaEntry, value: any) => {
-        const oldEntry = lib.find(c => c.id === id);
-        const oldCode = oldEntry?.code;
-        const isCodeChange = field === 'code' && oldCode && oldCode !== value;
+    const handleSaveFormula = (formula: LibraryFormulaEntry) => {
+        let newLib;
+        if (isNewFormula) {
+            newLib = [...lib, formula];
+        } else {
+            newLib = lib.map(c => c.id === formula.id ? formula : c);
+        }
 
-        const generateCodeFromName = (name: string) => {
-            return name
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "") // retire les accents
-                .toUpperCase()
-                .replace(/[\s\-']/g, '_') // remplace espaces, tirets, apostrophes par underscores
-                .replace(/[^A-Z0-9_]/g, ''); // garde uniquement alphanumérique et underscores
-        };
-
-        const newLib = lib.map(c => {
-            if (c.id === id) {
-                const updated = { ...c, [field]: value };
-
-                // Auto-génération du code à partir du nom
-                if (field === 'name') {
-                    const oldExpectedCode = generateCodeFromName(c.name || '');
-                    if (!c.code || c.code === oldExpectedCode || c.code.startsWith('VAR_')) {
-                        updated.code = generateCodeFromName(value);
-                    }
-                }
-
-                // Re-evaluate preview if formula, target, operator, effectType or aggregate config changed
-                const triggeringFields: (keyof LibraryFormulaEntry)[] = ['formula', 'aggregateConfig', 'type', 'target', 'operator', 'effectType'];
-                if (triggeringFields.includes(field)) {
-                    setPreviewValue(evaluateFormula(updated.formula || '', currentPreviewData, { entry: updated }));
-                }
-                return updated as any;
-            }
-
-            // CASCADE: If code changed, update occurrences in other formulas
-            if (isCodeChange && c.formula && c.formula.includes(oldCode)) {
-                // Regex for exact word replacement to avoid partial matches (ex: VAR vs VAR_2)
+        // CASCADE: If code changed, update occurrences in other formulas
+        if (!isNewFormula) {
+            const oldEntry = lib.find(c => c.id === formula.id);
+            const oldCode = oldEntry?.code;
+            if (oldCode && oldCode !== formula.code) {
                 const regex = new RegExp(`\\b${oldCode}\\b`, 'g');
-                return { ...c, formula: c.formula.replace(regex, value) };
+                newLib = newLib.map(c => {
+                    if (c.id !== formula.id && c.formula && c.formula.includes(oldCode)) {
+                        return { ...c, formula: c.formula.replace(regex, formula.code || '') };
+                    }
+                    return c;
+                });
             }
+        }
 
-            return c;
-        });
-        handleUpdate(newLib);
+        handleUpdateRules(newLib);
+        setIsModalOpen(false);
+        setFormulaToEdit(null);
     };
 
     const removeCounter = (id: string) => {
@@ -244,109 +229,11 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
 
     const confirmRemoveCounter = () => {
         if (formulaToDelete) {
-            handleUpdate(lib.filter(c => c.id !== formulaToDelete.id));
+            handleUpdateRules(lib.filter(c => c.id !== formulaToDelete.id));
             setIsDeleteModalOpen(false);
             setFormulaToDelete(null);
         }
     };
-
-    /* 
-    // Migration Logic - Kept for reference or future button
-    const _orphanCount = (rules.libraries.traits || []).reduce((acc, trait) => {
-        return acc + (trait.effects?.filter(e =>
-            (e.type === 'formula' && !e.formulaId) ||
-            ['attribute_bonus', 'counter_max_bonus', 'xp_bonus'].includes(e.type as string)
-        ).length || 0);
-    }, 0);
-
-    const _autoMigrateFormulas = () => {
-        const currentFormulas = [...lib];
-        let traitsUpdated = 0;
-        let formulasCreated = 0;
-
-        const newTraits = (rules.libraries.traits || []).map(trait => {
-            let traitChanged = false;
-            const newEffects = (trait.effects || []).map(effect => {
-                const isLegacy = ['attribute_bonus', 'counter_max_bonus', 'xp_bonus'].includes(effect.type as string);
-                const isOrphanFormula = effect.type === 'formula' && !effect.formulaId && effect.formula;
-
-                if (isLegacy || isOrphanFormula) {
-                    let formulaString = effect.formula || '';
-                    let target = effect.target;
-
-                    if (isLegacy) {
-                        const legacyEffect = effect as any;
-                        if (legacyEffect.type === 'attribute_bonus') {
-                            formulaString = legacyEffect.value?.toString() || '0';
-                        } else if (legacyEffect.type === 'counter_max_bonus') {
-                            formulaString = `${legacyEffect.value || 0} * TRAIT_LEVEL`;
-                        } else if (legacyEffect.type === 'xp_bonus') {
-                            target = 'XP';
-                            if (legacyEffect.method === 'per_scenario') {
-                                formulaString = `${legacyEffect.value || 0} * SCENARIOS_COUNT`;
-                            } else {
-                                formulaString = legacyEffect.value?.toString() || '0';
-                            }
-                        }
-                    }
-
-                    if (!formulaString) return effect;
-
-                    // Try to find a global formula with EXACTLY the same formula string
-                    let existing = currentFormulas.find(f => f.formula === formulaString);
-
-                    if (!existing) {
-                        // Create one
-                        existing = {
-                            id: generateId(),
-                            name: `Mécanique: ${trait.name}`,
-                            type: 'modifier',
-                            formula: formulaString,
-                            isActive: true,
-                            isGlobal: true,
-                            description: `Importé depuis le trait ${trait.name}`
-                        };
-                        currentFormulas.push(existing as any);
-                        formulasCreated++;
-                    }
-
-                    traitChanged = true;
-                    // Return as the new 'formula' type
-                    return {
-                        ...effect,
-                        type: 'formula',
-                        formula: formulaString,
-                        formulaId: existing.id,
-                        target: target,
-                        value: undefined, // Clear legacy fields
-                        method: undefined // Clear legacy fields
-                    } as any;
-                }
-                return effect;
-            });
-
-            if (traitChanged) {
-                traitsUpdated++;
-                return { ...trait, effects: newEffects };
-            }
-            return trait;
-        });
-
-        if (traitsUpdated > 0) {
-            onUpdate({
-                ...rules,
-                libraries: {
-                    ...rules.libraries,
-                    traits: newTraits,
-                    formulas: currentFormulas
-                }
-            });
-            alert(`${traitsUpdated} traits mis à jour. ${formulasCreated} nouvelles formules créées dans le dictionnaire.`);
-        } else {
-            alert("Aucune formule orpheline trouvée.");
-        }
-    };
-    */
 
     return (
         <MotionCard className="p-6 h-full" hoverEffect="glow">
@@ -394,22 +281,16 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                         key={counter.id}
                         counter={counter}
                         rules={rules}
-                        isEditing={editingId === counter.id}
                         previewValue={previewValue}
                         currentPreviewData={currentPreviewData}
                         allVariables={allVariables}
                         targetSuggestions={targetSuggestions}
                         realCharData={realCharData}
-                        onEditStart={() => {
-                            setEditingId(counter.id);
-                            setPreviewValue(evaluateFormula(
-                                counter.formula || '',
-                                currentPreviewData,
-                                { entry: counter }
-                            ));
+                        onEdit={() => {
+                            setFormulaToEdit(counter);
+                            setIsNewFormula(false);
+                            setIsModalOpen(true);
                         }}
-                        onEditClose={() => setEditingId(null)}
-                        onUpdate={updateCounter}
                         onRemove={removeCounter}
                     />
                 ))}
@@ -423,8 +304,18 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                 )}
             </div>
 
-            {/* Maintenance & Unification Tool */}
-            {/* Removed: Auto-migration is now handled transparently on campaign load */}
+            <AdminFormulaEditorModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSaveFormula}
+                initialFormula={formulaToEdit}
+                rules={rules}
+                currentPreviewData={currentPreviewData}
+                allVariables={allVariables}
+                targetSuggestions={targetSuggestions}
+                realCharData={realCharData}
+                isNew={isNewFormula}
+            />
 
             <ConfirmationModal
                 isOpen={isDeleteModalOpen}
