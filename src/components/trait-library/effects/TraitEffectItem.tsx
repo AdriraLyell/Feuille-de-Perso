@@ -77,11 +77,11 @@ export const TraitEffectItem: React.FC<TraitEffectItemProps> = ({
 
                             {['free_skill_rank', 'auto_counter', 'master_skill', 'block_skill_increase', 'xp_upgradeable'].includes(effect.type) && (
                                 <optgroup label="Anciens Types (Hérités)">
-                                    <option value="free_skill_rank">Rang de Compétence Offert</option>
-                                    <option value="auto_counter">Compteur Automatique (Magie, etc.)</option>
-                                    <option value="master_skill">Maîtrise (Rang 5 direct)</option>
-                                    <option value="block_skill_increase">Bloquer une Progression</option>
-                                    <option value="xp_upgradeable">Trait Améliorable (XP)</option>
+                                    {effect.type === 'free_skill_rank' && <option value="free_skill_rank">Rang de Compétence Offert</option>}
+                                    {effect.type === 'auto_counter' && <option value="auto_counter">Compteur Automatique (Magie, etc.)</option>}
+                                    {effect.type === 'master_skill' && <option value="master_skill">Maîtrise (Rang 5 direct)</option>}
+                                    {effect.type === 'block_skill_increase' && <option value="block_skill_increase">Bloquer une Progression</option>}
+                                    {effect.type === 'xp_upgradeable' && <option value="xp_upgradeable">Trait Améliorable (XP)</option>}
                                 </optgroup>
                             )}
                         </select>

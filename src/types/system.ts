@@ -108,6 +108,9 @@ export interface LibraryEntry {
   description?: string | null;
   tags?: string[] | null;
   isVariable?: boolean; // Si vrai, demande une précision (variant) à l'ajout
+  hasAutoCounter?: boolean;
+  autoCounterName?: string;
+  isXPUpgradeable?: boolean;
   variants?: string[] | null; // Liste des variantes suggérées (ex: "Chats", "Pollen" pour Allergie)
   effects?: TraitEffect[] | null; // New Effects System
   isGlobal?: boolean;

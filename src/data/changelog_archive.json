@@ -1,5 +1,23 @@
 [
     {
+        "version": "2.93.8",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Correction de la Réactivité (Admin Formules) : Le statut de validation et l'aperçu numérique se mettent désormais à jour instantanément lors de la modification de la Cible ou de l'Opération d'un effet. Plus besoin de changer de type d'effet ou de modifier l'équation pour forcer la validation."
+    },
+    {
+        "version": "2.93.6",
+        "date": "2026-02-27",
+        "type": "feat",
+        "description": "Ergonomie & Validation (Admin Formules) : Implémentation d'une autocomplétion intelligente et stylisée pour le champ 'Cible de l'effet'. La liste est désormais limitée en hauteur avec un défilement interne, et propose dynamiquement les Attributs, Compétences et Compteurs définis dans les règles. La validation des cibles est désormais insensible à la casse et aux espaces, garantissant un retour visuel (aperçu) fiable même en cas de saisie approximative."
+    },
+    {
+        "version": "2.93.5",
+        "date": "2026-02-27",
+        "type": "chore",
+        "description": "Nettoyage du Moteur : Suppression de la variable XP_TOTAL pour éviter toute confusion avec la cible XP. Mise à jour des outils d'administration et de la documentation."
+    },
+    {
         "version": "2.93.4",
         "date": "2026-02-27",
         "type": "chore",
@@ -579,23 +597,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Fix duplication des images au drag-drop : le plugin de drop ignore désormais les fichiers si ProseMirror est déjà en train de gérer un déplacement de nœud interne."
-    },
-    {
-        "version": "2.62.2",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Fix clipping toolbar images : conversion en React Portal pour la barre d'outils et le HUD de resize. Le positionnement est désormais dynamique (fixed) basé sur le bounding rect de l'image, garantissant une visibilité complète même en bord de page ou à cheval sur les colonnes CSS."
-    },
-    {
-        "version": "2.62.1",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Fix resize images latérales (L/R/free) : architecture dual-ref — le resize applique désormais la largeur sur le NodeViewWrapper flottant (non le div interne), la largeur de référence est calculée via getComputedStyle sur la colonne ProseMirror au mousedown (valeur runtime exacte), éliminant le saut visible au relâchement et le calcul erroné du cap 55%."
-    },
-    {
-        "version": "2.62.0",
-        "date": "2026-02-21",
-        "type": "perf",
-        "description": "Optimisation du Journal de Campagne : Cache LRU d'images (chargement instantané au retour sur une page), sauvegarde sécurisée (flush sur perte de focus + indicateur ✓), interactions image fluides à 60fps (rendu DOM direct pendant resize/pan), correction du wrapping texte-image (clear CSS + marges generatives). Ajout : indicateur de page (dots), boutons Annuler/Rétablir, confirmation de suppression dans le Tableau de Groupe, compression automatique des images (WebP 80%) à l'upload."
     }
 ]

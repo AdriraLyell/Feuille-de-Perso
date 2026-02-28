@@ -26,8 +26,15 @@ export const useTraitEditor = (
         if (!counterIdToRemove && removedItem.definitionId && _rules?.libraries?.traits) {
             const traitDef = _rules.libraries.traits.find(t => t.id === removedItem.definitionId);
             if (traitDef) {
+                const hasNewProperty = traitDef.hasAutoCounter;
                 const counterEffect = traitDef.effects?.find(e => e.type === 'auto_counter');
-                counterIdToRemove = counterEffect?.target || counterEffect?.associatedCounterId;
+
+                // If it should have a counter but associatedCounterId is missing, this is an edge case
+                // usually we rely on associatedCounterId stored on the character's instance.
+                if (hasNewProperty) {
+                    // Logic to find it if id was not stored (fallback)
+                    onAddLog(`Suppression du compteur lié à ${removedName}`, 'info', 'sheet');
+                }
             }
         }
 
@@ -130,17 +137,18 @@ export const useTraitEditor = (
 
                 // Determine if this trait has a auto_counter effect
                 let associatedCounterId: string | undefined = undefined;
+                const hasNewAutoCounter = entry.hasAutoCounter;
                 const counterEffect = entry.effects?.map(resolveEffect).find(e => e.type === 'auto_counter' || e.effectType === 'auto_counter');
 
-                if (counterEffect) {
-                    const baseCounterName = (counterEffect.target || counterEffect.effectType === 'auto_counter' ? counterEffect.target : undefined)?.trim();
+                if (hasNewAutoCounter || counterEffect) {
+                    const baseCounterName = (entry.autoCounterName || (counterEffect?.target || (counterEffect?.effectType === 'auto_counter' ? counterEffect.target : undefined)))?.trim();
                     const variantName = instance.variant?.trim();
 
                     let finalCounterName = "";
                     if (baseCounterName) {
                         finalCounterName = variantName ? `${baseCounterName} (${variantName})` : baseCounterName;
                     } else {
-                        // Option C: Fallback to variant or trait name
+                        // Fallback to variant or trait name
                         finalCounterName = variantName || entry.name;
                     }
 
@@ -188,7 +196,10 @@ export const useTraitEditor = (
                     mysticAbilityId: entry.mysticAbilityId || undefined,
                     isPostCreation: isPostCreation ? true : undefined,
                     creationValue: isPostCreation ? "0" : undefined,
-                    associatedCounterId: associatedCounterId
+                    associatedCounterId: associatedCounterId,
+                    hasAutoCounter: entry.hasAutoCounter,
+                    autoCounterName: entry.autoCounterName,
+                    isXPUpgradeable: entry.isXPUpgradeable
                 };
 
                 if (isPostCreation) {

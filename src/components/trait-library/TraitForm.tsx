@@ -138,8 +138,8 @@ const TraitForm: React.FC<TraitFormProps> = ({
                 </div>
 
                 {/* Name & Cost (Smart Input) */}
-                <div className="grid grid-cols-5 gap-4">
-                    <div className="col-span-3">
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-1">
                         <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest">Nom du Trait</label>
                         <input
                             className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm placeholder-stone-300"
@@ -148,7 +148,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
                             placeholder="Ex: Chance, Ennemi..."
                         />
                     </div>
-                    <div className="col-span-2 relative">
+                    <div className="col-span-1 relative">
                         <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest flex items-center justify-between">
                             <span>Coût / Valeur</span>
                             <div className="group relative">
@@ -222,6 +222,56 @@ const TraitForm: React.FC<TraitFormProps> = ({
                             </span>
                         ))}
                     </div>
+                </div>
+
+                {/* Configuration: Auto Counter */}
+                <div className="border rounded-sm p-3 flex items-center gap-3 bg-[#bfae85]/10 border-[#bfae85]/30">
+                    <div className="relative flex items-center">
+                        <input
+                            type="checkbox"
+                            id="hasAutoCounter"
+                            className="w-4 h-4 cursor-pointer accent-amber-600"
+                            checked={editForm.hasAutoCounter || false}
+                            onChange={(e) => setEditForm({ ...editForm, hasAutoCounter: e.target.checked })}
+                        />
+                    </div>
+                    <label htmlFor="hasAutoCounter" className="cursor-pointer select-none flex-grow">
+                        <span className="text-sm font-bold text-[#5c4d41]">Créer un compteur associé</span>
+                        <span className="block text-[10px] text-[#5c4d41]/70 italic">
+                            Ajoute automatiquement un compteur à "carrés" sur la fiche quand le trait est choisi.
+                        </span>
+                    </label>
+                </div>
+
+                {editForm.hasAutoCounter && (
+                    <div className="animate-in fade-in slide-in-from-top-2 duration-200 -mt-4 px-1">
+                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Nom du compteur (Optionnel)</label>
+                        <input
+                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-xs text-[#1c1917] bg-[#fdfbf7] focus:border-amber-500 outline-none shadow-sm font-bold placeholder:italic placeholder:font-normal"
+                            value={editForm.autoCounterName || ''}
+                            onChange={(e) => setEditForm({ ...editForm, autoCounterName: e.target.value })}
+                            placeholder="Laisser vide pour utiliser le nom du trait"
+                        />
+                    </div>
+                )}
+
+                {/* Configuration: XP Upgradeable */}
+                <div className="border rounded-sm p-3 flex items-center gap-3 bg-[#bfae85]/10 border-[#bfae85]/30">
+                    <div className="relative flex items-center">
+                        <input
+                            type="checkbox"
+                            id="isXPUpgradeable"
+                            className="w-4 h-4 cursor-pointer accent-amber-600"
+                            checked={editForm.isXPUpgradeable || false}
+                            onChange={(e) => setEditForm({ ...editForm, isXPUpgradeable: e.target.checked })}
+                        />
+                    </div>
+                    <label htmlFor="isXPUpgradeable" className="cursor-pointer select-none flex-grow">
+                        <span className="text-sm font-bold text-[#5c4d41]">Peut être acheté / amélioré avec XP</span>
+                        <span className="block text-[10px] text-[#5c4d41]/70 italic">
+                            Permet de dépenser de l'expérience pour acquérir ou augmenter ce trait.
+                        </span>
+                    </label>
                 </div>
 
                 {/* Configuration: Variable Trait */}

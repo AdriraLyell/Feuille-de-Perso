@@ -100,8 +100,10 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
 
     const isImproved = !editedTrait.isPostCreation && editedTrait.creationValue !== undefined && currentValue > (parseInt(editedTrait.creationValue) || 0);
 
-    // Check if upgradeable via effect
-    const isUpgradeable = !!libEntry?.effects?.some(e => e.type === 'xp_upgradeable') ||
+    // Check if upgradeable via new property or legacy effect
+    const isUpgradeable = !!editedTrait.isXPUpgradeable || !!libEntry?.isXPUpgradeable ||
+        !!libEntry?.effects?.some(e => e.type === 'xp_upgradeable') ||
+        !!rules?.libraries?.traits?.find(t => normalizeString(t.name) === normalizeString(editedTrait.name))?.isXPUpgradeable ||
         !!rules?.libraries?.traits?.find(t => normalizeString(t.name) === normalizeString(editedTrait.name))?.effects?.some(e => e.type === 'xp_upgradeable');
 
     const canReduce = isPostCreation && type === 'desavantages' && currentValue > 0;

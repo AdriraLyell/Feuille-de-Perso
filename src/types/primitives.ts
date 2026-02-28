@@ -77,6 +77,9 @@ export interface TraitEntry {
   definitionId?: string; // ID de la définition parente
   mysticAbilityId?: string; // Link to Mystic Ability
   associatedCounterId?: string; // Link to a dynamically created trait counter
+  hasAutoCounter?: boolean;
+  autoCounterName?: string;
+  isXPUpgradeable?: boolean;
   masterSkillTarget?: string; // Nom de compétence mise au rang 5 (effet master_skill)
   isPostCreation?: boolean;
   creationValue?: string;
