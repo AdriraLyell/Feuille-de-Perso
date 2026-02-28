@@ -111,7 +111,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         setIsDrawingMode
     });
 
-    const { entries } = useBookTableOfContents(editor, contentRef);
+    const { entries } = useBookTableOfContents(editor, contentRef, 0);
 
     // Initial Content Injection
     useEffect(() => {
@@ -305,7 +305,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                             columnWidth: `${PAGE_WIDTH}px`,
                             columnGap: '40px',
                             columnFill: 'auto',
-                            padding: '60px 20px',
+                            padding: `60px 20px 60px ${PAGE_WIDTH + 40 + 20}px`,
                             pointerEvents: isDrawingMode ? 'none' : 'auto'
                         }}
                     />

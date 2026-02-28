@@ -1,5 +1,11 @@
 [
     {
+        "version": "2.96.1",
+        "date": "2026-02-27",
+        "type": "fix",
+        "description": "Système (Persistance des Formules) : Correction d'un bug majeur où l'option 'Forcer Variante' et l'opérateur mathématique (ADD/SET/SUB) des formules globales n'étaient pas sauvegardés en base de données ni restitués après un rechargement de page. Mise à jour de la structure de la table 'libraries_formulas', du schéma de validation Zod et du service de synchronisation Cloud."
+    },
+    {
         "version": "2.96.0",
         "date": "2026-02-27",
         "type": "feat",
@@ -591,11 +597,5 @@
         "date": "2026-02-21",
         "type": "feat",
         "description": "Amélioration de la bibliothèque d'administration : Intégration de détails d'utilisation avancés. Désormais, survoler l'icône de cadenas d'un élément verrouillé (trait, compétence, historique, compteur, etc.) affiche précisément quelles campagnes ou quels personnages utilisent cet élément, facilitant la gestion de la bibliothèque globale."
-    },
-    {
-        "version": "2.62.8",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction de l'erreur 'net::ERR_FILE_NOT_FOUND' lors de la sauvegarde des réglages : Stabilisation des callbacks de mise à jour d'image et renforcement du cycle de vie des ObjectURLs dans le widget de portrait. Cette correction élimine les révocations prématurées d'URLs de blobs encore en cours d'utilisation lors des cycles de re-rendu de React."
     }
 ]

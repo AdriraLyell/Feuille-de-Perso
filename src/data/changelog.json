@@ -190,11 +190,5 @@
         "date": "2026-02-27",
         "type": "refactor",
         "description": "Refactor (Admin Formules) : Extraction de la logique d'édition individuelle des formules dans un composant dédié AdminFormulaEditorItem. Réduction massive de la taille et de la complexité du fichier AdminFormulasEditor.tsx (passage de ~950 à ~490 lignes) pour une meilleure maintenance et lisibilité."
-    },
-    {
-        "version": "2.96.1",
-        "date": "2026-02-27",
-        "type": "fix",
-        "description": "Système (Persistance des Formules) : Correction d'un bug majeur où l'option 'Forcer Variante' et l'opérateur mathématique (ADD/SET/SUB) des formules globales n'étaient pas sauvegardés en base de données ni restitués après un rechargement de page. Mise à jour de la structure de la table 'libraries_formulas', du schéma de validation Zod et du service de synchronisation Cloud."
     }
 ]
