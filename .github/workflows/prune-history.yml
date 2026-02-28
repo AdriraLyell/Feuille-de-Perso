@@ -7,7 +7,7 @@ on:
 
 jobs:
   prune:
-    name: Prune History (Keep 7 days + 5 last)
+    name: Prune CI History (Keep last 10)
     runs-on: ubuntu-latest
     permissions:
       actions: write
@@ -15,24 +15,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Delete old workflow runs
+      - name: Delete old CI workflow runs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RETENTION_DAYS: 7
-          MIN_KEPT_RUNS: 5
+          MIN_KEPT_RUNS: 10
         run: |
-          echo "Policy: Keep at least last $MIN_KEPT_RUNS runs, delete others older than $RETENTION_DAYS days."
+          echo "Policy: Keep only last $MIN_KEPT_RUNS CI runs, delete all older ones."
 
-          # 1. Calculer la date limite (ISO 8601 pour comparaison de chaînes JSON/JQ)
-          # Note: ubuntu-latest utilise GNU date
-          CUTOFF=$(date -u -d "-$RETENTION_DAYS days" +%Y-%m-%dT%H:%M:%SZ)
-          echo "Cutoff date: $CUTOFF"
-
-          # 2. Récupérer les runs, ignorer les (MIN_KEPT_RUNS) premiers, filtrer par date
-          # gh run list retourne par défaut du plus récent au plus ancien
-          RUNS_TO_DELETE=$(gh run list --repo ${{ github.repository }} --limit 300 --json databaseId,createdAt --jq "
-            .[$MIN_KEPT_RUNS:] | .[] | select(.createdAt < \"$CUTOFF\") | .databaseId
-          ")
+          # Récupérer les runs du workflow CI, ignorer les (MIN_KEPT_RUNS) premiers
+          RUNS_TO_DELETE=$(gh run list --repo ${{ github.repository }} --workflow ci.yml --limit 300 --json databaseId --jq ".[$MIN_KEPT_RUNS:] | .[].databaseId")
 
           # 3. Supprimer
           if [ -z "$RUNS_TO_DELETE" ]; then
