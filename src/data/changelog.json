@@ -5,6 +5,7 @@
         "type": "patch",
         "changes": [
             "Correction du calcul de la Force Vitale suite à la perte de métadonnées mystiques.",
+            "Correction de la résolution des traits (avantages/désavantages) dans les formules de calcul.",
             "Protection des champs 'mysticAbilityId' et 'isVariable' lors du nettoyage de la bibliothèque.",
             "Migration V6 pour restaurer les liens mystiques cassés sur les fiches existantes.",
             "Passage des règles par défaut en 1.0.4 pour forcer la réconciliation correcte."

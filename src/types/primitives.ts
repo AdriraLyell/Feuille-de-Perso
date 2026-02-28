@@ -8,6 +8,7 @@ export interface DotEntry {
   max: number;
   variant?: string; // Précision pour les compétences variables (ex: "Artisanat : Forge")
   definitionId?: string; // ID de la définition parente (pour lien solide)
+  mysticAbilityId?: string; // Link to Mystic Ability ID
   description?: string; // New: Description info-bubble
 }
 

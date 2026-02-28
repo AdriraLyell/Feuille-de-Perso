@@ -48,4 +48,18 @@ export const restoreMysticLinks = (data: CharacterSheetData): void => {
             }
         });
     }
+
+    // 4. Réparer les instances de compétences sur la fiche
+    if (data.skills) {
+        Object.values(data.skills).forEach(skillList => {
+            if (Array.isArray(skillList)) {
+                skillList.forEach(skill => {
+                    const normalized = normalizeString(skill.name);
+                    if (abilityMap.has(normalized) && !skill.mysticAbilityId) {
+                        skill.mysticAbilityId = abilityMap.get(normalized);
+                    }
+                });
+            }
+        });
+    }
 };

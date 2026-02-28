@@ -214,7 +214,10 @@ export const getAggregateDetails = (data: any, config: any): { name: string, val
             baseList = Object.values(data.secondaryAttributes || {}).flat();
             break;
         case 'traits':
-            baseList = data.traits || [];
+            baseList = [
+                ...(data.page2?.avantages || []),
+                ...(data.page2?.desavantages || [])
+            ];
             break;
         case 'mysticAbilities':
             baseList = (data.mysticAbilities || []).filter((s: any) => typeof s !== 'string');
@@ -242,6 +245,8 @@ export const getAggregateDetails = (data: any, config: any): { name: string, val
         let value = 0;
         if (typeof item.value === 'number') {
             value = item.value;
+        } else if (typeof item.value === 'string') {
+            value = parseInt(item.value, 10) || 0;
         }
         // Attributes/Secondary Attributes: Sum val1 + val2 + val3
         else if (item.val1 !== undefined || item.val2 !== undefined || item.val3 !== undefined) {
@@ -251,7 +256,7 @@ export const getAggregateDetails = (data: any, config: any): { name: string, val
             value = v1 + v2 + v3;
         }
         else if (typeof item.level === 'number') {
-            value = item.level; // Traits
+            value = item.level; // Legacy traits or custom entries
         }
 
         return {
