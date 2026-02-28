@@ -2,7 +2,7 @@
 import { RulesData } from '../types/rules';
 
 export const defaultRules: RulesData = {
-    version: "1.0.2",
+    version: "1.0.3",
     lastUpdated: Date.now(),
     configurations: {
         global: {

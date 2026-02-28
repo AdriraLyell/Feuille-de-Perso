@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.6",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Correction du bug d'évaluation `NaN` empêchant le nettoyage des traits à coût de points variable",
+            "Mise en correspondance des anciens types ('Vertu'/'Tare') avec la casse stricte",
+            "Stringification des valeurs d'effets pour prévenir les faux-positifs de mismatch JSON",
+            "Montée de la version rules à v1.0.3 pour déclenchement garanti du nettoyage de `library` local"
+        ]
+    },
+    {
         "version": "2.97.5",
         "date": "2026-02-28",
         "type": "fix",

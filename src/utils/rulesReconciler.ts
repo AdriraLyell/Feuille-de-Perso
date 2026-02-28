@@ -248,30 +248,50 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
 const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterSheetData, rules: RulesData) => {
     if (!rules.libraries) return;
 
-    // Helper to check if a local entry is redundant compared to its official counterpart
     const isRedundant = (local: any, officialList: any[]) => {
         // Un élément explicitement marqué comme "customisé" ne doit jamais être supprimé
         if (local.isCustomized) return false;
 
         return officialList.some(off => {
             if (normalizeString(off.name) !== normalizeString(local.name)) return false;
-            // Only compare types if both have one, handling 'vertu' vs 'avantage' legacy
-            if (off.type && local.type && off.type !== local.type) return false;
 
-            // Robust cost/value match (treat '2' and 2 as equal)
-            const offCost = Number(off.cost) || Number(off.value) || 0;
-            const locCost = Number(local.cost) || Number(local.value) || 0;
-            if (offCost !== locCost) return false;
+            // Types mapping: vertu == avantage, tare == desavantage
+            if (off.type && local.type) {
+                const mapType = (t: string) => {
+                    const low = t.toLowerCase();
+                    if (low === 'vertu') return 'avantage';
+                    if (low === 'tare' || low === 'défaut' || low === 'defaut') return 'desavantage';
+                    return low;
+                };
+                if (mapType(off.type) !== mapType(local.type)) return false;
+            }
+
+            // Robust cost/value match (treat '2' and 2 as equal, fallback to string if NaN)
+            const offCostVal = off.cost !== undefined ? off.cost : off.value;
+            const locCostVal = local.cost !== undefined ? local.cost : local.value;
+            const offCostNum = Number(offCostVal);
+            const locCostNum = Number(locCostVal);
+
+            if (!isNaN(offCostNum) && !isNaN(locCostNum)) {
+                if (offCostNum !== locCostNum) return false;
+            } else {
+                // If either is NaN (e.g. "1-3 pts"), fallback to stripped string comparison
+                const stripText = (s: any) => String(s || '').replace(/\s|pts?/gi, '').toLowerCase();
+                if (stripText(offCostVal) !== stripText(locCostVal)) return false;
+            }
 
             // Robust pointsLabel match (strip non-digits to handle "2 pts" vs "2")
-            const normalizeLabel = (l?: string) => (l || '').replace(/\D/g, '');
+            const normalizeLabel = (l?: string) => String(l || '').replace(/\D/g, '');
             if (normalizeLabel(off.pointsLabel) !== normalizeLabel(local.pointsLabel)) return false;
 
-            // Robust Effects Comparison (ignore IDs, ignore property order)
+            // Robust Effects Comparison (ignore IDs, ignore property order, drop empty)
             const simplifyEffects = (effects: any[]) => (effects || []).map(eff => {
                 const { id, definitionId, formulaId, ...rest } = eff; // skip IDs
                 return JSON.stringify(Object.keys(rest).sort().reduce((obj: any, key) => {
-                    obj[key] = rest[key];
+                    // Only keep properties that have real value
+                    if (rest[key] !== '' && rest[key] !== undefined && rest[key] !== null) {
+                        obj[key] = String(rest[key]); // Force string to bypass 1 vs "1"
+                    }
                     return obj;
                 }, {}));
             }).sort();
