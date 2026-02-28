@@ -92,7 +92,11 @@ export const reconcileRulesWithLibraries = (rules: RulesData, libraries: RulesDa
                 max: libCounter.maxValue ?? rules.definitions.counters[key]?.max ?? 10,
                 value: libCounter.defaultValue ?? rules.definitions.counters[key]?.value,
                 defaultValue: libCounter.defaultValue ?? rules.definitions.counters[key]?.defaultValue,
-                xpCost: libCounter.xpCost ?? rules.definitions.counters[key]?.xpCost ?? 0
+                xpCost: libCounter.xpCost ?? rules.definitions.counters[key]?.xpCost ?? 0,
+                formulaId: libCounter.formulaId,
+                isNumeric: libCounter.isNumeric,
+                formula: libCounter.formula,
+                appearance: libCounter.appearance || undefined
             };
         });
     }

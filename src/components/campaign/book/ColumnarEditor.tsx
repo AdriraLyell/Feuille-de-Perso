@@ -250,8 +250,9 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                     <BookPageBackground pageCount={pageCount} />
 
                     {/* Table of Contents Page Overlay (Page 1) */}
+                    {/* bg-[#fbf4e9] = couleur papier de BookPageBackground : masque le contenu éditeur visible en transparence */}
                     <div
-                        className="absolute top-0 left-0 z-20 pointer-events-auto"
+                        className="absolute top-0 left-0 z-20 pointer-events-auto bg-[#fbf4e9]"
                         style={{
                             width: `${PAGE_WIDTH}px`,
                             height: `${PAGE_HEIGHT}px`,

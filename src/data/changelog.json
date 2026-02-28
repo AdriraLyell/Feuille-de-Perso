@@ -1,5 +1,24 @@
 [
     {
+        "version": "2.97.18",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Compteurs : Correction de l'affichage de Force Vitale (et autres compteurs à formule) qui s'affichait en mode points/cases au lieu du mode numérique.",
+            "Réconciliation : Propagation de formulaId, isNumeric, formula et appearance depuis la bibliothèque de compteurs vers les définitions de règles (campaignReconciler).",
+            "Fiche : Fallback vers rules.libraries.counters pour la détection du type de compteur quand la counterLibrary du personnage est incomplète."
+        ]
+    },
+    {
+        "version": "2.97.17",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Journal de Campagne : Correction du chevauchement du Sommaire — ajout d'un fond opaque (#fbf4e9) sur le TOC overlay pour masquer le contenu éditeur visible en transparence.",
+            "Journal de Campagne : Correction de la couleur de police quasi-invisible — le texte ProseMirror héritait de `text-stone-200` (thème sombre global). Ajout d'un `color: #1c1917` explicite pour garantir la lisibilité sur fond papier beige."
+        ]
+    },
+    {
         "version": "2.97.16",
         "date": "2026-02-28",
         "type": "chore",
@@ -177,11 +196,5 @@
         "date": "2026-02-27",
         "type": "fix",
         "description": "Système (Persistance des Formules) : Correction d'un bug majeur où l'option 'Forcer Variante' et l'opérateur mathématique (ADD/SET/SUB) des formules globales n'étaient pas sauvegardés en base de données ni restitués après un rechargement de page. Mise à jour de la structure de la table 'libraries_formulas', du schéma de validation Zod et du service de synchronisation Cloud."
-    },
-    {
-        "version": "2.96.0",
-        "date": "2026-02-27",
-        "type": "feat",
-        "description": "Ergonomie (Traits de Maîtrise) : Refonte du flux d'ajout des traits utilisant 'master_skill'. Suppression de la double demande (variante + wizard) au profit d'un Wizard unique et amélioré. Celui-ci permet désormais de choisir parmi TOUTES les compétences définies dans les règles (même non possédées) et met automatiquement à jour le nom d'affichage du trait (ex: 'Maitre : Bagarre') dès la sélection effectuée."
     }
 ]

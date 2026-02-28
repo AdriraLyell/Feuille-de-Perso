@@ -76,6 +76,8 @@ export interface RulesCounterDefinition {
     description?: string; // New: Description for tooltip
     appearance?: 'squares_only'; // Utilisé pour masquer les bulles (ex: Compteurs de Traits)
     formulaId?: string; // ID de la formule globale à utiliser pour le Max
+    isNumeric?: boolean; // Si vrai, affiche un compteur numérique au lieu de points
+    formula?: string; // Formule directe pour le calcul du Max
 }
 
 export interface RulesData {

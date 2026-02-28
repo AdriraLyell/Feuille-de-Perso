@@ -16,7 +16,8 @@ export const ColumnarEditorStyles = () => (
             width: 100%;
             height: 100%;
             outline: none;
-            padding: 0 60px !important; 
+            padding: 0 60px !important;
+            color: #1c1917; /* Override text-stone-200 hérité du thème sombre (MainLayout) */
         }
 
         .ProseMirror > * {

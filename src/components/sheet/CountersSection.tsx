@@ -243,9 +243,10 @@ export const CountersSection = React.memo<CountersSectionProps>(({
     const renderCounterItem = (counter: DotEntry, isCustom: boolean) => {
         const isSquaresOnly = counter.variant === 'squares_only';
         const nameKey = normalizeString(counter.name);
-        const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey);
+        const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey)
+            || rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === nameKey);
         const sysDef = rules?.definitions?.counters?.[nameKey] || Object.values(rules?.definitions?.counters || {}).find(c => normalizeString(c.name) === nameKey);
-        const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId;
+        const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId || sysDef?.isNumeric;
         if (isNumeric) {
             return (
                 <NumericCounterItem
@@ -357,9 +358,10 @@ export const CountersSection = React.memo<CountersSectionProps>(({
         const counter = data.counters[key];
         if (Array.isArray(counter)) return;
         const nameKey = normalizeString(counter.name);
-        const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey);
+        const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey)
+            || rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === nameKey);
         const sysDef = rules?.definitions?.counters?.[nameKey] || Object.values(rules?.definitions?.counters || {}).find(c => normalizeString(c.name) === nameKey);
-        const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId;
+        const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId || sysDef?.isNumeric;
         if (isNumeric) {
             numericItems.push(
                 <NumericCounterItem
@@ -382,9 +384,10 @@ export const CountersSection = React.memo<CountersSectionProps>(({
         .filter(c => c.name?.trim())
         .forEach(c => {
             const nameKey = normalizeString(c.name);
-            const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey);
+            const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey)
+                || rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === nameKey);
             const sysDef = rules?.definitions?.counters?.[nameKey];
-            const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId;
+            const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId || sysDef?.isNumeric;
             if (isNumeric) {
                 numericItems.push(
                     <NumericCounterItem
