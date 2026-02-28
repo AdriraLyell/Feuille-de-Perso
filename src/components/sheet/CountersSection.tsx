@@ -87,16 +87,24 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
         };
     }, [isOpen]);
 
-    const nameKey = normalizeString(counter.name);
-    const calculatedMax = calculatedMaxes[counter.name] || calculatedMaxes[nameKey];
+    const normalizedName = normalizeString(counter.name);
+    const nameKey = normalizedName.replace(/\s+/g, '');
+    const calculatedMax = calculatedMaxes[counter.name] || calculatedMaxes[normalizedName] || calculatedMaxes[nameKey];
 
-    const resolvedFormula = !entryOrFormula.formula && entryOrFormula.formulaId
-        ? rules?.libraries?.formulas?.find((f: any) => f.id === entryOrFormula.formulaId)
+    // Metadata recovery: if entryOrFormula is a "dumb" character entry, 
+    // try to find the full definition in the rules libraries.
+    const globalDef = rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === nameKey)
+        || Object.values(rules?.definitions?.counters || {}).find((c: any) => normalizeString(c.name) === nameKey);
+
+    const effectiveEntryOrFormula = { ...globalDef, ...entryOrFormula };
+
+    const resolvedFormula = !effectiveEntryOrFormula.formula && effectiveEntryOrFormula.formulaId
+        ? rules?.libraries?.formulas?.find((f: any) => f.id === effectiveEntryOrFormula.formulaId)
         : null;
 
-    const formula = entryOrFormula.formula || resolvedFormula?.formula || '';
-    const aggregateConfig = entryOrFormula.aggregateConfig || resolvedFormula?.aggregateConfig;
-    const effectiveEntry = resolvedFormula ? { ...entryOrFormula, ...resolvedFormula } : entryOrFormula;
+    const formula = effectiveEntryOrFormula.formula || resolvedFormula?.formula || '';
+    const aggregateConfig = effectiveEntryOrFormula.aggregateConfig || resolvedFormula?.aggregateConfig;
+    const effectiveEntry = resolvedFormula ? { ...effectiveEntryOrFormula, ...resolvedFormula } : effectiveEntryOrFormula;
 
     const computedMax = calculatedMax ?? evaluateFormula(
         formula,
@@ -264,10 +272,11 @@ export const CountersSection = React.memo<CountersSectionProps>(({
 
     const renderCounterItem = (counter: DotEntry, isCustom: boolean) => {
         const isSquaresOnly = counter.variant === 'squares_only';
-        const nameKey = normalizeString(counter.name);
-        const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey)
-            || rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === nameKey);
-        const sysDef = rules?.definitions?.counters?.[nameKey] || Object.values(rules?.definitions?.counters || {}).find(c => normalizeString(c.name) === nameKey);
+        const normalizedName = normalizeString(counter.name);
+        const nameKey = normalizedName.replace(/\s+/g, '');
+        const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === normalizedName)
+            || rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === normalizedName);
+        const sysDef = rules?.definitions?.counters?.[nameKey] || Object.values(rules?.definitions?.counters || {}).find(c => normalizeString(c.name) === normalizedName);
         const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId || sysDef?.isNumeric;
         if (isNumeric) {
             return (
@@ -379,10 +388,11 @@ export const CountersSection = React.memo<CountersSectionProps>(({
     orderedKeys.forEach(key => {
         const counter = data.counters[key];
         if (Array.isArray(counter)) return;
-        const nameKey = normalizeString(counter.name);
-        const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey)
-            || rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === nameKey);
-        const sysDef = rules?.definitions?.counters?.[nameKey] || Object.values(rules?.definitions?.counters || {}).find(c => normalizeString(c.name) === nameKey);
+        const normalizedName = normalizeString(counter.name);
+        const nameKey = normalizedName.replace(/\s+/g, '');
+        const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === normalizedName)
+            || rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === normalizedName);
+        const sysDef = rules?.definitions?.counters?.[nameKey] || Object.values(rules?.definitions?.counters || {}).find(c => normalizeString(c.name) === normalizedName);
         const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId || sysDef?.isNumeric;
         if (isNumeric) {
             numericItems.push(
