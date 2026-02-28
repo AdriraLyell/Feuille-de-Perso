@@ -32,7 +32,7 @@ const CalendarPreview: React.FC<Props> = ({ config, mode }) => {
         return cfg.currentMonthIndex;
     });
 
-    const { days, firstWeekday, monthName, dayNames, daysInMonth, eventsByDay, currentDay } = useMemo(() => {
+    const { firstWeekday, monthName, dayNames, daysInMonth, eventsByDay, currentDay } = useMemo(() => {
         if (mode === 'real') {
             const cfg = config as CalendarConfigReal;
             const currentDt = new Date(cfg.currentDate || cfg.startDate);
@@ -48,7 +48,7 @@ const CalendarPreview: React.FC<Props> = ({ config, mode }) => {
             }
             const isCurrent = (currentDt.getFullYear() === viewYear && currentDt.getMonth() === viewMonth)
                 ? currentDt.getDate() : null;
-            return { days: dim, firstWeekday: firstDow, monthName: MONTH_NAMES[viewMonth], dayNames: WEEKDAY_NAMES, daysInMonth: dim, eventsByDay: evByDay, currentDay: isCurrent };
+            return { firstWeekday: firstDow, monthName: MONTH_NAMES[viewMonth], dayNames: WEEKDAY_NAMES, daysInMonth: dim, eventsByDay: evByDay, currentDay: isCurrent };
         }
 
         const cfg = config as Extract<typeof config, { type: 'fictional' }>;
@@ -71,7 +71,7 @@ const CalendarPreview: React.FC<Props> = ({ config, mode }) => {
                 (evByDay[ed] = evByDay[ed] || []).push(ev);
             }
         }
-        return { days: dim, firstWeekday: firstDow, monthName: monthDef.name, dayNames: cfg.dayNames.map((n: string) => n.slice(0, 3)), daysInMonth: dim, eventsByDay: evByDay, currentDay: (cfg.currentMonthIndex === viewMonth ? cfg.currentDay : null) };
+        return { firstWeekday: firstDow, monthName: monthDef.name, dayNames: cfg.dayNames.map((n: string) => n.slice(0, 3)), daysInMonth: dim, eventsByDay: evByDay, currentDay: (cfg.currentMonthIndex === viewMonth ? cfg.currentDay : null) };
     }, [config, mode, viewYear, viewMonth]);
 
     const totalCols = dayNames.length;
@@ -81,11 +81,11 @@ const CalendarPreview: React.FC<Props> = ({ config, mode }) => {
     while (cells.length % totalCols !== 0) cells.push(null);
 
     const prevMonth = () => {
-        if (viewMonth === 0) { setViewMonth(mode === 'real' ? 11 : ((config as any).months?.length ?? 12) - 1); setViewYear(v => v - 1); }
+        if (viewMonth === 0) { setViewMonth(mode === 'real' ? 11 : ((config as Extract<typeof config, { type: 'fictional' }>).months?.length ?? 12) - 1); setViewYear(v => v - 1); }
         else setViewMonth(m => m - 1);
     };
     const nextMonth = () => {
-        const maxM = mode === 'real' ? 12 : ((config as any).months?.length ?? 12);
+        const maxM = mode === 'real' ? 12 : ((config as Extract<typeof config, { type: 'fictional' }>).months?.length ?? 12);
         if (viewMonth === maxM - 1) { setViewMonth(0); setViewYear(v => v + 1); }
         else setViewMonth(m => m + 1);
     };
