@@ -1,5 +1,45 @@
 [
     {
+        "version": "2.97.14",
+        "date": "2026-02-28",
+        "type": "chore",
+        "changes": [
+            "Système : Suppression définitive des anciens types d'effets `auto_counter` et `xp_upgradeable` du codebase (Nettoyage post-migration).",
+            "UI (Admin) : Retrait des champs et icônes associés dans l'éditeur d'effets de traits.",
+            "UI (Fiche) : Simplification de l'affichage des cartes de traits et de la modale d'édition, utilisant désormais exclusivement les propriétés natives.",
+            "Maintenance : Suppression du script de migration `migrate-traits.js` devenu obsolète."
+        ]
+    },
+    {
+        "version": "2.97.13",
+        "date": "2026-02-28",
+        "type": "feat",
+        "changes": [
+            "Traits : Introduction des propriétés directes `hasAutoCounter`, `autoCounterName` et `isXPUpgradeable` pour standardiser les mécaniques de jeu.",
+            "Admin (Bibliothèque) : Ajout des options de configuration 'Compteur Auto' et 'Améliorable via XP' dans le formulaire de trait.",
+            "Système : Mise en place d'un outil de migration (`migrateTraitProperties`) pour convertir les anciens effets hérités en propriétés natives.",
+            "Hook (TraitEditor) : Support natif de la création automatique de compteurs lors de l'ajout d'un trait, avec gestion de la suppression associée.",
+            "UI : Masquage des types d'effets dépréciés (`auto_counter`, `xp_upgradeable`, `free_skill_rank`, `master_skill`) pour les nouveaux traits afin d'encourager l'usage du moteur de formules."
+        ]
+    },
+    {
+        "version": "2.97.12",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "UI (Admin Formules) : Équilibrage de la largeur des champs Nom et Code (50/50)."
+        ]
+    },
+    {
+        "version": "2.97.11",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "UI (Admin Formules) : Ajustement du layout dans la modale d'édition. La description occupe désormais toute la largeur sous le Nom et le Code.",
+            "UI (Admin Formules) : Normalisation de la taille du champ Code pour correspondre au champ Nom."
+        ]
+    },
+    {
         "version": "2.97.10",
         "date": "2026-02-28",
         "type": "feat",
@@ -616,29 +656,5 @@
         "date": "2026-02-22",
         "type": "fix",
         "description": "Correction majeure de la visibilité du Compagnon Temporel : (1) Correction du chemin d'accès aux données (configurations.calendar). (2) Repositionnement du widget à gauche de la barre latérale pour éviter qu'il ne soit hors-écran sur les résolutions standards."
-    },
-    {
-        "version": "2.66.2",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Ajustement du positionnement du Compagnon Temporel pour une meilleure visibilité dans le Grimoire et correction du filtrage des événements calendaires."
-    },
-    {
-        "version": "2.66.1",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Correction d'une erreur de référence sur BookChapterSidebar dans le journal de campagne."
-    },
-    {
-        "version": "2.66.0",
-        "date": "2026-02-22",
-        "type": "feat",
-        "description": "Intégration du calendrier dans le journal de campagne ('Compagnon Temporel') : Un nouveau widget interactif s'affiche dans la barre latérale du Grimoire, permettant de consulter la date actuelle et les événements planifiés sans quitter l'éditeur. Améliorations Admin : nouveau bouton '+1 Jour' pour le calendrier fictif avec passage automatique des mois et années, et optimisation de l'avance de date pour le calendrier réel."
-    },
-    {
-        "version": "2.65.4",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Correction du calcul d'âge pour supporter les formats de date flexibles (français et fictif). Verrouillage des champs 'Début' et 'Date Fiction' lorsqu'ils sont gérés par le calendrier de campagne du MJ."
     }
 ]

@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.34",
+        "date": "2026-03-01",
+        "type": "feat",
+        "changes": [
+            "UI : Refonte de l'infobulle des spécialisations pour correspondre au style premium des compteurs (ex: Force Vitale).",
+            "UI : Passage au composant PortalTooltip pour éviter les débordements et améliorer le positionnement.",
+            "UI : Support de l'affichage en deux colonnes quand le nombre de spécialisations dépasse 5.",
+            "UI : Amélioration visuelle avec puces dorées et bordures de séparation subtiles."
+        ]
+    },
+    {
         "version": "2.97.33",
         "date": "2026-03-01",
         "type": "fix",
@@ -180,46 +191,6 @@
         "changes": [
             "UI (Admin bibliothèque) : Ajout d'icônes indicatives dans les vignettes de traits pour les compteurs associés (icône Activité) et l'amélioration par XP (icône Tendance).",
             "UX : Ajout de tooltips informatifs sur ces nouvelles icônes pour clarifier le comportement du trait sans avoir à l'ouvrir."
-        ]
-    },
-    {
-        "version": "2.97.14",
-        "date": "2026-02-28",
-        "type": "chore",
-        "changes": [
-            "Système : Suppression définitive des anciens types d'effets `auto_counter` et `xp_upgradeable` du codebase (Nettoyage post-migration).",
-            "UI (Admin) : Retrait des champs et icônes associés dans l'éditeur d'effets de traits.",
-            "UI (Fiche) : Simplification de l'affichage des cartes de traits et de la modale d'édition, utilisant désormais exclusivement les propriétés natives.",
-            "Maintenance : Suppression du script de migration `migrate-traits.js` devenu obsolète."
-        ]
-    },
-    {
-        "version": "2.97.13",
-        "date": "2026-02-28",
-        "type": "feat",
-        "changes": [
-            "Traits : Introduction des propriétés directes `hasAutoCounter`, `autoCounterName` et `isXPUpgradeable` pour standardiser les mécaniques de jeu.",
-            "Admin (Bibliothèque) : Ajout des options de configuration 'Compteur Auto' et 'Améliorable via XP' dans le formulaire de trait.",
-            "Système : Mise en place d'un outil de migration (`migrateTraitProperties`) pour convertir les anciens effets hérités en propriétés natives.",
-            "Hook (TraitEditor) : Support natif de la création automatique de compteurs lors de l'ajout d'un trait, avec gestion de la suppression associée.",
-            "UI : Masquage des types d'effets dépréciés (`auto_counter`, `xp_upgradeable`, `free_skill_rank`, `master_skill`) pour les nouveaux traits afin d'encourager l'usage du moteur de formules."
-        ]
-    },
-    {
-        "version": "2.97.12",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "UI (Admin Formules) : Équilibrage de la largeur des champs Nom et Code (50/50)."
-        ]
-    },
-    {
-        "version": "2.97.11",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "UI (Admin Formules) : Ajustement du layout dans la modale d'édition. La description occupe désormais toute la largeur sous le Nom et le Code.",
-            "UI (Admin Formules) : Normalisation de la taille du champ Code pour correspondre au champ Nom."
         ]
     }
 ]

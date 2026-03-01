@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { DotEntry } from '../../types';
 import DotRating from '../ui/DotRating';
 import { SectionHeader } from './Shared';
@@ -7,6 +7,7 @@ import * as LucideIcons from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { logger } from '../../utils/logger';
 import { useNotification } from '../../context/NotificationContext';
+import { PortalTooltip } from '../ui/PortalTooltip';
 
 const DotRow: React.FC<{
     entry: DotEntry;
@@ -23,6 +24,7 @@ const DotRow: React.FC<{
     blockedReason?: string;
 }> = ({ entry, category, onUpdate, specializations = [], theme, imposedSpecs = [], onDefineVariant, allowExtendedSkills = false, isEditing = false, onRemove, validateIncrease, blockedReason }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const anchorRef = useRef<HTMLSpanElement>(null);
     const addLog = useNotification();
 
     // Spacer logic
@@ -150,6 +152,9 @@ const DotRow: React.FC<{
                     color: isBlocked ? '#71717a' : (textColor ? textColor : (isUndefinedVariable ? '#d97706' : (hasSpecs ? '#1e3a8a' : '#44403c'))) // Fallbacks: amber-600, blue-900, stone-700
                 }}
                 onClick={handleClick}
+                ref={anchorRef}
+                onMouseEnter={() => hasSpecs && setIsOpen(true)}
+                onMouseLeave={() => setIsOpen(false)}
                 title={entry.description || (entry.variant ? `${entry.name} : ${entry.variant}` : entry.name)}
             >
                 {entry.variant !== undefined ? (
@@ -166,22 +171,25 @@ const DotRow: React.FC<{
             </span>
 
             {/* Tooltip for Specializations */}
-            {
-                isOpen && hasSpecs && (
-                    <div className="absolute z-[100] left-4 bottom-full mb-1 w-max max-w-[200px] bg-slate-800 text-white text-[10px] p-2 rounded shadow-xl animate-in fade-in zoom-in duration-150 pointer-events-none">
-                        <div className="font-bold border-b border-slate-600 mb-1 pb-1 text-slate-300">
-                            Spécialisations
-                        </div>
-                        <ul className="list-disc list-inside space-y-0.5">
-                            {combinedValidSpecs.map((s, i) => (
-                                <li key={i} className="truncate">{s}</li>
-                            ))}
-                        </ul>
-                        {/* Arrow */}
-                        <div className="absolute left-6 top-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-slate-800"></div>
+            <PortalTooltip
+                isOpen={isOpen && hasSpecs}
+                anchorRef={anchorRef}
+                title={`${entry.name} : Spécialisations`}
+                maxWidth={400}
+            >
+                <div className="flex flex-col gap-1 w-full min-w-[220px] py-1">
+                    <div className={combinedValidSpecs.length > 5 ? "columns-2 gap-x-8" : "flex flex-col"}>
+                        {combinedValidSpecs.map((s, i) => (
+                            <div key={i} className="flex items-center text-[11px] mb-1.5 break-inside-avoid px-2 border-l border-slate-700/50 hover:border-amber-500/50 transition-colors ml-1">
+                                <span className="text-slate-300 truncate font-medium flex-1 flex items-center pr-2" title={s}>
+                                    <span className="text-amber-400/80 mr-2 shrink-0 text-base leading-none translate-y-[1px]">•</span>
+                                    {s}
+                                </span>
+                            </div>
+                        ))}
                     </div>
-                )
-            }
+                </div>
+            </PortalTooltip>
 
             <DotRating
                 value={entry.value}
