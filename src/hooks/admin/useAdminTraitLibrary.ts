@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { RulesData } from '../../types/rules';
 import { LibraryEntry, TraitEffect } from '../../types';
-import { smartIncludes } from '../../utils/stringUtils';
+import { smartIncludes, normalizeString } from '../../utils/stringUtils';
 import { publishFileToGitHub } from '../../services/githubService';
 
 interface UseAdminTraitLibraryProps {
@@ -12,6 +12,7 @@ interface UseAdminTraitLibraryProps {
 
 export type SortOption = 'name' | 'cost' | 'type';
 export type SortOrder = 'asc' | 'desc';
+export type AuditMode = 'incomplete' | 'complex' | 'popular' | 'unused' | 'duplicates' | null;
 
 export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseAdminTraitLibraryProps) => {
     // Safe access to library
@@ -24,6 +25,15 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
     const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
     const [sourceFilter, setSourceFilter] = useState<boolean | null>(null);
     const [typeFilter, setTypeFilter] = useState<boolean | null>(null); // true = Avantage, false = Desavantage
+
+    // Property Filters (icon toggles)
+    const [filterEffects, setFilterEffects] = useState(false);
+    const [filterCounter, setFilterCounter] = useState(false);
+    const [filterXP, setFilterXP] = useState(false);
+    const [filterVariants, setFilterVariants] = useState(false);
+
+    // Audit Mode
+    const [auditMode, setAuditMode] = useState<AuditMode>(null);
 
     // Sorting
     const [sortBy, setSortBy] = useState<SortOption>('name');
@@ -210,6 +220,25 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
     }, [library, rules.version]);
 
     // Filter & Sort Logic
+    const duplicateIds = useMemo(() => {
+        const normalized = library.map(e => ({ id: e.id, key: normalizeString(e.name).replace(/\s+/g, '') }));
+        const seen = new Map<string, string>();
+        const dupes = new Set<string>();
+        normalized.forEach(({ id, key }) => {
+            // Check if any existing key is a prefix or substring of current (min 4 chars)
+            for (const [existingKey, existingId] of seen.entries()) {
+                const shorter = key.length < existingKey.length ? key : existingKey;
+                const longer = key.length < existingKey.length ? existingKey : key;
+                if (shorter.length >= 4 && longer.startsWith(shorter)) {
+                    dupes.add(id);
+                    dupes.add(existingId);
+                }
+            }
+            seen.set(key, id);
+        });
+        return dupes;
+    }, [library]);
+
     const processedList = useMemo(() => {
         const list = library.filter(entry => {
             const entryTags = entry.tags || [];
@@ -224,7 +253,29 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
             const matchesTags = selectedTags.length === 0 || selectedTags.every(sel =>
                 entryTags.some(t => t.toLowerCase() === sel.toLowerCase())
             );
-            return matchesSearch && matchesType && matchesActive && matchesSource && matchesTags;
+
+            // Property icon filters
+            const matchesEffects = !filterEffects || (entry.effects && entry.effects.length > 0);
+            const matchesCounter = !filterCounter || !!entry.hasAutoCounter;
+            const matchesXP = !filterXP || !!entry.isXPUpgradeable;
+            const matchesVariants = !filterVariants || (entry.variants && entry.variants.length > 0);
+
+            // Audit mode
+            let matchesAudit = true;
+            if (auditMode === 'incomplete') {
+                matchesAudit = !entry.description?.trim() || !entry.tags || entry.tags.length === 0;
+            } else if (auditMode === 'complex') {
+                matchesAudit = (entry.effects || []).some(e => e.type === 'formula');
+            } else if (auditMode === 'popular') {
+                matchesAudit = (globalUsage[entry.id] || 0) > 0;
+            } else if (auditMode === 'unused') {
+                matchesAudit = (globalUsage[entry.id] || 0) === 0;
+            } else if (auditMode === 'duplicates') {
+                matchesAudit = duplicateIds.has(entry.id);
+            }
+
+            return matchesSearch && matchesType && matchesActive && matchesSource && matchesTags
+                && matchesEffects && matchesCounter && matchesXP && matchesVariants && matchesAudit;
         });
 
         list.sort((a, b) => {
@@ -238,7 +289,8 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         });
 
         return list;
-    }, [library, searchTerm, typeFilter, activeFilter, sourceFilter, selectedTags, sortBy, sortOrder]);
+    }, [library, searchTerm, typeFilter, activeFilter, sourceFilter, selectedTags, sortBy, sortOrder,
+        filterEffects, filterCounter, filterXP, filterVariants, auditMode, duplicateIds, globalUsage]);
 
     const allAvailableTags = useMemo(() => {
         const tags = new Set<string>();
@@ -338,6 +390,16 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         showDeleteConfirm, setShowDeleteConfirm,
         publishResult, setPublishResult,
         showConfigAlert, setShowConfigAlert,
+
+        // Property filters
+        filterEffects, setFilterEffects,
+        filterCounter, setFilterCounter,
+        filterXP, setFilterXP,
+        filterVariants, setFilterVariants,
+
+        // Audit mode
+        auditMode, setAuditMode,
+        duplicateIds,
 
         // Derived Data
         library,

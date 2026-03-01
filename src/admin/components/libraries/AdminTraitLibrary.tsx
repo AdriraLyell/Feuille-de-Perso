@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { RulesData } from '../../../types/rules';
-import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, UploadCloud, CheckCircle2, Circle, Globe, X } from 'lucide-react';
+import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, UploadCloud, CheckCircle2, Circle, Globe, X, Zap, Activity, TrendingUp, ClipboardList } from 'lucide-react';
 import TraitCard from '../../../components/trait-library/TraitCard';
 import TraitForm from '../../../components/trait-library/TraitForm';
 import TriStateChip from '../../../components/ui/TriStateChip';
@@ -43,6 +43,15 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
         allCounters,
         allFormulas,
 
+        // Property filters
+        filterEffects, setFilterEffects,
+        filterCounter, setFilterCounter,
+        filterXP, setFilterXP,
+        filterVariants, setFilterVariants,
+
+        // Audit mode
+        auditMode, setAuditMode,
+
         // Handlers
         handleOpenNew,
         handleOpenEdit,
@@ -61,6 +70,9 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
         removeEffect
     } = useAdminTraitLibrary({ rules, onUpdate, globalUsage });
     const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'trait');
+
+    const hasActiveFilters = activeFilter !== null || sourceFilter !== null || typeFilter !== null
+        || filterEffects || filterCounter || filterXP || filterVariants || auditMode !== null;
 
 
     return (
@@ -91,67 +103,97 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
             </div>
 
             {/* Toolbar & Filters */}
-            <div className="flex flex-wrap gap-4 items-center mb-4 p-3 bg-slate-50 rounded border border-slate-200">
-                <div className="relative flex-grow max-w-sm">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input
-                        className="w-full pl-9 pr-9 py-2 text-sm border border-slate-300 rounded focus:border-blue-500 outline-none"
-                        placeholder="Rechercher..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    {searchTerm && (
-                        <button
-                            onClick={() => setSearchTerm('')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
+            <div className="flex flex-wrap gap-3 items-center mb-4 p-3 bg-slate-50 rounded border border-slate-200">
+                {/* Row 1: Search + Audit */}
+                <div className="flex items-center gap-3 w-full">
+                    <div className="relative flex-grow max-w-sm">
+                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                            className="w-full pl-9 pr-9 py-2 text-sm border border-slate-300 rounded focus:border-blue-500 outline-none"
+                            placeholder="Rechercher..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        {searchTerm && (
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
+                            >
+                                <X size={14} />
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Audit Dropdown */}
+                    <div className="flex items-center gap-1.5">
+                        <ClipboardList size={15} className={auditMode ? 'text-violet-600' : 'text-slate-400'} />
+                        <select
+                            value={auditMode ?? ''}
+                            onChange={(e) => setAuditMode((e.target.value || null) as typeof auditMode)}
+                            className={`text-xs border rounded py-1.5 px-2 outline-none cursor-pointer ${auditMode
+                                    ? 'border-violet-400 bg-violet-50 text-violet-700 font-semibold'
+                                    : 'border-slate-300 bg-white text-slate-600'
+                                }`}
                         >
-                            <X size={14} />
+                            <option value="">Audit…</option>
+                            <option value="incomplete">📋 À compléter</option>
+                            <option value="complex">⚡ Mécaniques formules</option>
+                            <option value="popular">📊 Favoris des joueurs</option>
+                            <option value="unused">👻 Jamais utilisés</option>
+                            <option value="duplicates">🔁 Doublons potentiels</option>
+                        </select>
+                    </div>
+
+                    {/* Sort buttons */}
+                    <div className="ml-auto flex gap-2 border-l border-slate-300 pl-3">
+                        <button onClick={() => { setSortBy('name'); setSortOrder(o => o === 'asc' ? 'desc' : 'asc'); }} className={`p-2 rounded border ${sortBy === 'name' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-300 text-slate-600'}`}>
+                            {sortBy === 'name' && sortOrder === 'asc' ? <ArrowDownAZ size={16} /> : <ArrowUpAZ size={16} />}
                         </button>
-                    )}
+                        <button onClick={() => { setSortBy('cost'); setSortOrder(o => o === 'asc' ? 'desc' : 'asc'); }} className={`p-2 rounded border ${sortBy === 'cost' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-300 text-slate-600'}`}>
+                            <Coins size={16} />
+                        </button>
+                    </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                    <TriStateChip
-                        label="Actifs"
-                        value={activeFilter}
-                        onChange={setActiveFilter}
-                        icon={CheckCircle2}
-                        activeColor="green"
-                    />
+                {/* Row 2: Boolean chips + Icon pills */}
+                <div className="flex flex-wrap items-center gap-2 w-full">
+                    <TriStateChip label="Actifs" value={activeFilter} onChange={setActiveFilter} icon={CheckCircle2} activeColor="green" />
+                    <TriStateChip label="Officiels" value={sourceFilter} onChange={setSourceFilter} icon={Globe} activeColor="indigo" />
+                    <TriStateChip label="Avantages" value={typeFilter} onChange={setTypeFilter} icon={Layers} activeColor="blue" />
 
-                    <TriStateChip
-                        label="Officiels"
-                        value={sourceFilter}
-                        onChange={setSourceFilter}
-                        icon={Globe}
-                        activeColor="indigo"
-                    />
+                    <span className="w-px h-5 bg-slate-300 mx-1" />
 
-                    <TriStateChip
-                        label="Avantages"
-                        value={typeFilter}
-                        onChange={setTypeFilter}
-                        icon={Layers}
-                        activeColor="blue"
-                    />
-
-                    {(activeFilter !== null || sourceFilter !== null || typeFilter !== null) && (
+                    {/* Property icon pills */}
+                    {([
+                        { icon: Zap, label: 'Effets', active: filterEffects, toggle: () => setFilterEffects(v => !v), color: 'text-amber-600', activeBg: 'bg-amber-50 border-amber-400 text-amber-700' },
+                        { icon: Activity, label: 'Compteur', active: filterCounter, toggle: () => setFilterCounter(v => !v), color: 'text-blue-500', activeBg: 'bg-blue-50 border-blue-400 text-blue-700' },
+                        { icon: TrendingUp, label: 'XP', active: filterXP, toggle: () => setFilterXP(v => !v), color: 'text-emerald-500', activeBg: 'bg-emerald-50 border-emerald-400 text-emerald-700' },
+                        { icon: Layers, label: 'Variantes', active: filterVariants, toggle: () => setFilterVariants(v => !v), color: 'text-purple-500', activeBg: 'bg-purple-50 border-purple-400 text-purple-700' },
+                    ] as const).map(({ icon: Icon, label, active, toggle, color, activeBg }) => (
                         <button
-                            onClick={() => { setActiveFilter(null); setSourceFilter(null); setTypeFilter(null); }}
-                            className="text-[10px] font-bold text-red-500 hover:text-red-700 ml-2"
+                            key={label}
+                            onClick={toggle}
+                            title={label}
+                            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all select-none ${active ? activeBg : `bg-white border-slate-300 ${color} hover:border-slate-400 hover:bg-slate-50`
+                                }`}
+                        >
+                            <Icon size={12} />
+                            {label}
+                        </button>
+                    ))}
+
+                    {hasActiveFilters && (
+                        <button
+                            onClick={() => {
+                                setActiveFilter(null); setSourceFilter(null); setTypeFilter(null);
+                                setFilterEffects(false); setFilterCounter(false); setFilterXP(false); setFilterVariants(false);
+                                setAuditMode(null);
+                            }}
+                            className="text-[10px] font-bold text-red-500 hover:text-red-700 ml-auto"
                         >
                             RESET
                         </button>
                     )}
-                </div>
-
-                <div className="ml-auto flex gap-2 border-l border-slate-300 pl-4">
-                    <button onClick={() => { setSortBy('name'); setSortOrder(o => o === 'asc' ? 'desc' : 'asc'); }} className={`p-2 rounded border ${sortBy === 'name' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-300 text-slate-600'}`}>
-                        {sortBy === 'name' && sortOrder === 'asc' ? <ArrowDownAZ size={16} /> : <ArrowUpAZ size={16} />}
-                    </button>
-                    <button onClick={() => { setSortBy('cost'); setSortOrder(o => o === 'asc' ? 'desc' : 'asc'); }} className={`p-2 rounded border ${sortBy === 'cost' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-300 text-slate-600'}`}>
-                        <Coins size={16} />
-                    </button>
                 </div>
             </div>
 

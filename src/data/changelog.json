@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.38",
+        "date": "2026-03-01",
+        "type": "feat",
+        "changes": [
+            "Admin Traits : Ajout de 4 pills iconiques (Effets/Zap, Compteur/Activity, XP/TrendingUp, Variantes/Layers) pour filtrer par propriétés de trait en un clic.",
+            "Admin Traits : Ajout d'un sélecteur Audit avec 5 modes intelligents (À compléter, Mécaniques formules, Favoris, Jamais utilisés, Doublons potentiels).",
+            "Admin Traits : Bouton RESET unifié réinitialisant l'ensemble des filtres (chips, pills, audit).",
+            "Admin Traits : Réorganisation de la barre de filtres en 2 lignes (recherche+audit+tri / chips+pills) pour plus de clarté."
+        ]
+    },
+    {
         "version": "2.97.37",
         "date": "2026-03-01",
         "type": "feat",
