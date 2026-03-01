@@ -7,7 +7,8 @@ import { getSkillCategory, getCounter, setCounter } from './stateAccessors';
 import { reconcileSkillsAndBackgrounds } from './reconcilers/skillsReconciler';
 import { migrateTraitLibrary } from './migrations/migrateTraitProperties';
 import { logger } from './logger';
-import { LibraryEntry } from '../types';
+import { LibraryEntry, LibrarySpecializationEntry } from '../types';
+import { mergeLibraries } from './libraryMerger';
 
 // --- Sub-functions ---
 
@@ -405,9 +406,10 @@ const reconcileHeader = (newState: CharacterSheetData, rules: RulesData) => {
  * if the character meets the skill requirements.
  */
 const reconcileImposedSpecializations = (newState: CharacterSheetData, rules: RulesData) => {
-    if (!rules.libraries?.specializations) return;
-
-    const imposedLibrarySpecs = rules.libraries.specializations.filter(s => s.isImposed && s.isActive !== false);
+    const hybridSpecs = mergeLibraries(newState.specializationLibrary || [], rules.libraries?.specializations || []);
+    const imposedLibrarySpecs = hybridSpecs
+        .filter(m => m.entry.isImposed && m.entry.isActive !== false)
+        .map(m => m.entry);
 
     // Always clear and rebuild to avoid stale data
     newState.imposedSpecializations = {};

@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.16",
+        "date": "2026-02-28",
+        "type": "chore",
+        "changes": [
+            "CI : Mise en place d'un workflow de nettoyage automatique des anciens runs GitHub Actions pour optimiser le stockage.",
+            "UI : Ajout d'un indicateur `cursor-pointer` sur les cartes interactives de la bibliothèque pour une meilleure affordance."
+        ]
+    },
+    {
         "version": "2.97.15",
         "date": "2026-02-28",
         "type": "feat",
@@ -653,11 +662,5 @@
         "date": "2026-02-23",
         "type": "chore",
         "description": "Ajustements ergonomiques du Chroniqueur : renommage du widget, formatage des dates en JJ/MM/AAAA dans la Timeline, et déplacement des flèches de navigation vers le haut pour éviter les chevauchements."
-    },
-    {
-        "version": "2.67.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Fusion majeure du Compagnon Temporel et du Journal de Campagne : (1) Navigation chronologique par clic sur les dates. (2) Mode 'Timeline' synthétique. (3) Assistant de création de chapitre à date. (4) Indicateurs de météo et ambiances sur les chapitres et le calendrier. (5) Compte à rebours avant le prochain évènement majeur. (6) Nouveaux blocs narratifs flexibles (Moments de journée, Voyages)."
     }
 ]

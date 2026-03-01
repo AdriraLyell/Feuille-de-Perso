@@ -354,12 +354,22 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         // This ensures updates are caught even if the semantic version string isn't manually bumped.
         if (data._rulesVersion === rules.version &&
             data._rulesLastUpdated === rules.lastUpdated &&
-            data.appVersion === APP_VERSION) {
+            data.appVersion === APP_VERSION &&
+            // Check if local libraries have changed (using simple stringification as a quick structural equality check)
+            JSON.stringify(data.specializationLibrary) === localStorage.getItem('last-spec-lib-sync') &&
+            JSON.stringify(data.skillLibrary) === localStorage.getItem('last-skill-lib-sync') &&
+            JSON.stringify(data.library) === localStorage.getItem('last-trait-lib-sync')
+        ) {
             return;
         }
 
         setData(currentData => {
-            if (currentData._rulesVersion === rules.version && currentData._rulesLastUpdated === rules.lastUpdated) {
+            if (currentData._rulesVersion === rules.version &&
+                currentData._rulesLastUpdated === rules.lastUpdated &&
+                JSON.stringify(currentData.specializationLibrary) === localStorage.getItem('last-spec-lib-sync') &&
+                JSON.stringify(currentData.skillLibrary) === localStorage.getItem('last-skill-lib-sync') &&
+                JSON.stringify(currentData.library) === localStorage.getItem('last-trait-lib-sync')
+            ) {
                 return currentData;
             }
 
@@ -369,6 +379,11 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
 
                 const newData = reconcileRulesWithState(currentData, rules);
                 newData._rulesLastUpdated = rules.lastUpdated;
+
+                // Update sync markers
+                localStorage.setItem('last-spec-lib-sync', JSON.stringify(newData.specializationLibrary || []));
+                localStorage.setItem('last-skill-lib-sync', JSON.stringify(newData.skillLibrary || []));
+                localStorage.setItem('last-trait-lib-sync', JSON.stringify(newData.library || []));
 
                 const skillsAfter = Object.values(newData.skills).flat().filter(s => s.name).length;
                 logger.log(`[CharacterContext] Reconciliation complete. Skills after: ${skillsAfter}`);
@@ -384,7 +399,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
             }
         });
 
-    }, [rules, data._rulesVersion]);
+    }, [rules, data._rulesVersion, data.specializationLibrary, data.skillLibrary, data.library]);
 
     // 3. XP Calculation Effect (Remains here as it depends on data and changes data)
     useEffect(() => {

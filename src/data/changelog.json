@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.36",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "Logic : Prise en compte des modifications du seuil MJ (defaultMinLevel) dans la bibliothèque locale pour les spécialisations imposées.",
+            "System : Déclenchement automatique de la réconciliation dès qu'une bibliothèque locale (spécialisations, compétences, traits) est modifiée."
+        ]
+    },
+    {
         "version": "2.97.35",
         "date": "2026-03-01",
         "type": "fix",
@@ -182,15 +191,6 @@
         "changes": [
             "Journal de Campagne : Correction du chevauchement du Sommaire — ajout d'un fond opaque (#fbf4e9) sur le TOC overlay pour masquer le contenu éditeur visible en transparence.",
             "Journal de Campagne : Correction de la couleur de police quasi-invisible — le texte ProseMirror héritait de `text-stone-200` (thème sombre global). Ajout d'un `color: #1c1917` explicite pour garantir la lisibilité sur fond papier beige."
-        ]
-    },
-    {
-        "version": "2.97.16",
-        "date": "2026-02-28",
-        "type": "chore",
-        "changes": [
-            "CI : Mise en place d'un workflow de nettoyage automatique des anciens runs GitHub Actions pour optimiser le stockage.",
-            "UI : Ajout d'un indicateur `cursor-pointer` sur les cartes interactives de la bibliothèque pour une meilleure affordance."
         ]
     }
 ]
