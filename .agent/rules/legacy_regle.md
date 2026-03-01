@@ -1,5 +1,5 @@
 ---
-trigger: always_on
+trigger: manual
 ---
 
 # RÈGLES DE L'AGENT - Feuille de Perso
