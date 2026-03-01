@@ -30,7 +30,8 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
         executeOfficialUpdate,
         executeImportFromSheet,
         handleDeleteRequest,
-        executeDelete
+        executeDelete,
+        hasItems
     } = useSpecializationLibrary({ data, onUpdate });
 
     const isExisting = useMemo(() => {
@@ -95,8 +96,11 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                 {filteredLibrary.length === 0 ? (
                     <div className="text-center text-[#5c4d41]/60 py-10 italic px-4 text-sm flex flex-col items-center">
                         <Award size={48} className="opacity-20 mb-2" />
-                        <p>{searchTerm ? "Aucun résultat." : "La bibliothèque de spécialisations est vide."}</p>
-                        {!searchTerm && <p className="text-xs mt-2 text-[#5c4d41]/80 italic">Peuplez-la manuellement ou importez l'existant.</p>}
+                        <p>{searchTerm ? "Aucun résultat." : hasItems ? "Toutes les spécialisations sont déjà sur votre fiche." : "La bibliothèque de spécialisations est vide."}</p>
+                        {!searchTerm && hasItems && hideKnown && (
+                            <button onClick={() => setHideKnown(false)} className="mt-2 text-xs text-amber-700 underline hover:text-amber-900 transition-colors">Afficher les spécialisations acquises</button>
+                        )}
+                        {!searchTerm && !hasItems && <p className="text-xs mt-2 text-[#5c4d41]/80 italic">Peuplez-la manuellement ou importez l'existant.</p>}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

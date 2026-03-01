@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.33",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "UI : Filtre 'hideKnown' par défaut à false — la bibliothèque affiche maintenant le catalogue complet au lieu de cacher les spécialisations acquises.",
+            "UI : Message contextuel quand toutes les spécialisations sont filtrées, avec bouton de réactivation."
+        ]
+    },
+    {
         "version": "2.97.32",
         "date": "2026-03-01",
         "type": "fix",

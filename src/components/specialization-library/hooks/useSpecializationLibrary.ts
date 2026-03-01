@@ -15,7 +15,7 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
     const { rules, updateRules } = useRules();
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [hideKnown, setHideKnown] = useState(true);
+    const [hideKnown, setHideKnown] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEntry, setEditingEntry] = useState<LibrarySpecializationEntry | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -254,6 +254,8 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
         setEntryToDelete(null);
     }, [entryToDelete, data, onUpdate, addLog]);
 
+    const hasItems = hybridSpecializations.length > 0;
+
     return {
         searchTerm, setSearchTerm,
         hideKnown, setHideKnown,
@@ -268,6 +270,7 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
         allSkills,
         usedSpecializations,
         filteredLibrary,
+        hasItems,
         handleOpenNew,
         handleOpenEdit,
         handleSave,
