@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.37",
+        "date": "2026-03-01",
+        "type": "feat",
+        "changes": [
+            "UI : Les spécialisations imposées (⚡) affichent un bouton de promotion au survol dans l'onglet Spécialisations.",
+            "Logic : Une spécialisation imposée peut être transformée en compétence secondaire (valeur 0) sans être supprimée — elle reste pilotée par les règles MJ."
+        ]
+    },
+    {
         "version": "2.97.36",
         "date": "2026-03-01",
         "type": "fix",
@@ -182,15 +191,6 @@
             "Compteurs : Correction de l'affichage de Force Vitale (et autres compteurs à formule) qui s'affichait en mode points/cases au lieu du mode numérique.",
             "Réconciliation : Propagation de formulaId, isNumeric, formula et appearance depuis la bibliothèque de compteurs vers les définitions de règles (campaignReconciler).",
             "Fiche : Fallback vers rules.libraries.counters pour la détection du type de compteur quand la counterLibrary du personnage est incomplète."
-        ]
-    },
-    {
-        "version": "2.97.17",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Journal de Campagne : Correction du chevauchement du Sommaire — ajout d'un fond opaque (#fbf4e9) sur le TOC overlay pour masquer le contenu éditeur visible en transparence.",
-            "Journal de Campagne : Correction de la couleur de police quasi-invisible — le texte ProseMirror héritait de `text-stone-200` (thème sombre global). Ajout d'un `color: #1c1917` explicite pour garantir la lisibilité sur fond papier beige."
         ]
     }
 ]

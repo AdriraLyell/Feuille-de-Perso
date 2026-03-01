@@ -1,5 +1,9 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.67.1] - 2026-02-23 [CHORE]
+
+
+
 ## [2.67.0] - 2026-02-23 [FEAT]
 
 

@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.17",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Journal de Campagne : Correction du chevauchement du Sommaire — ajout d'un fond opaque (#fbf4e9) sur le TOC overlay pour masquer le contenu éditeur visible en transparence.",
+            "Journal de Campagne : Correction de la couleur de police quasi-invisible — le texte ProseMirror héritait de `text-stone-200` (thème sombre global). Ajout d'un `color: #1c1917` explicite pour garantir la lisibilité sur fond papier beige."
+        ]
+    },
+    {
         "version": "2.97.16",
         "date": "2026-02-28",
         "type": "chore",
@@ -656,11 +665,5 @@
         "date": "2026-02-23",
         "type": "feat",
         "description": "Améliorations majeures des sections narratives et du Chroniqueur : (1) Possibilité de masquer/afficher le Chroniqueur depuis la barre latérale. (2) Ajout de champs d'heure pour les moments de journée. (3) Ajout de champs de date pour les flashbacks. (4) Support des calendriers fictifs pour les sélecteurs de date de voyage et flashbacks."
-    },
-    {
-        "version": "2.67.1",
-        "date": "2026-02-23",
-        "type": "chore",
-        "description": "Ajustements ergonomiques du Chroniqueur : renommage du widget, formatage des dates en JJ/MM/AAAA dans la Timeline, et déplacement des flèches de navigation vers le haut pour éviter les chevauchements."
     }
 ]

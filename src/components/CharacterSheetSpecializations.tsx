@@ -4,7 +4,7 @@ import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../types';
 import SpecializationOmnibar from './specialization-library/SpecializationOmnibar';
 import SpecializationLibraryDrawer from './specialization-library/SpecializationLibraryDrawer';
 import ConfirmationModal from './ui/ConfirmationModal';
-import { Award, Book, Plus, Zap } from 'lucide-react';
+import { Award, ArrowUpCircle, Plus, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { useRules } from '../context/RulesContext';
 import { logger } from '../utils/logger';
@@ -26,6 +26,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
     const { rules } = useRules();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [duplicateErrorModal, setDuplicateErrorModal] = useState<string | null>(null);
+    const [promoteImposedModal, setPromoteImposedModal] = useState<{ skillId: string; specName: string } | null>(null);
 
     const getSkillName = (skillId: string): string => {
         for (const cat of Object.keys(data.skills)) {
@@ -68,7 +69,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
             // 2. Vérifier si la compétence n'existe pas déjà
             const existingSkills = data.skills[secondaryCat] || [];
-            const isDuplicate = existingSkills.some(s => s.name.trim().toLowerCase() === specName.trim().toLowerCase());
+            const isDuplicate = existingSkills.some((s: DotEntry) => s.name.trim().toLowerCase() === specName.trim().toLowerCase());
 
             if (isDuplicate) {
                 onAddLog(`La compétence secondaire "${specName}" existe déjà.`, 'danger', 'sheet');
@@ -106,6 +107,44 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         } catch (err) {
             logger.error(`[Promotion] Error:`, err);
             ErrorService.handleError(err, { context: 'CharacterSheetSpecializations.handlePromote' });
+        }
+    };
+
+    const handlePromoteImposed = (skillId: string, specName: string) => {
+        try {
+            if (!specName || specName.trim() === '') return;
+
+            // 1. Identifier la catégorie cible "Secondaire"
+            const secondaryCat = rules?.definitions?.skillCategories?.find((cat: any) => cat.behavior === 'Secondaire' || cat.label.toLowerCase().includes('secondaire'))?.id || 'competences_secondaires';
+
+            // 2. Vérifier si la compétence n'existe pas déjà
+            const existingSkills = data.skills[secondaryCat] || [];
+            const isDuplicate = existingSkills.some((s: DotEntry) => s.name.trim().toLowerCase() === specName.trim().toLowerCase());
+
+            if (isDuplicate) {
+                onAddLog(`La compétence secondaire "${specName}" existe déjà.`, 'danger', 'sheet');
+                setDuplicateErrorModal(specName);
+                return;
+            }
+
+            logger.info(`[PromotionImposée] Promouvoir "${specName}" vers ${secondaryCat} (Skill ID: ${skillId})`);
+
+            // 3. Créer la nouvelle compétence (valeur 0)
+            const newSkill = createDotEntry(specName, 0);
+
+            // 4. Ajouter la compétence sans toucher aux specs imposées (le MJ reste maître)
+            onChange((prev: CharacterSheetData) => ({
+                ...prev,
+                skills: {
+                    ...prev.skills,
+                    [secondaryCat]: [...(prev.skills[secondaryCat] || []), newSkill]
+                }
+            }));
+
+            onAddLog(`Spécialisation imposée "${specName}" convertie en compétence secondaire.`, 'success', 'sheet');
+        } catch (err) {
+            logger.error(`[PromotionImposée] Error:`, err);
+            ErrorService.handleError(err, { context: 'CharacterSheetSpecializations.handlePromoteImposed' });
         }
     };
 
@@ -175,13 +214,20 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                 </div>
 
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
-                    {/* Render Imposed Specializations first (Read Only) */}
+                    {/* Render Imposed Specializations first (avec bouton de promotion) */}
                     {imposedSpecs.map((spec: any, i: number) => (
-                        <div key={`imp-${i}`} className="bg-slate-100 border border-slate-200 rounded-full py-0.5 px-2 flex items-center shadow-inner h-5">
+                        <div key={`imp-${i}`} className="group/imposed bg-slate-100 border border-slate-200 rounded-full py-0.5 px-2 flex items-center shadow-inner h-5 hover:border-indigo-300 hover:bg-indigo-50 transition-colors">
                             <Zap size={10} className="text-blue-500 fill-blue-500 mr-1 shrink-0" />
-                            <span className="text-[10px] font-bold text-slate-600 truncate leading-none" title={spec.name}>
+                            <span className="text-[10px] font-bold text-slate-600 truncate leading-none flex-1" title={spec.name}>
                                 {spec.name}
                             </span>
+                            <button
+                                onClick={() => setPromoteImposedModal({ skillId: skill.id, specName: spec.name })}
+                                className="opacity-0 group-hover/imposed:opacity-100 transition-opacity ml-0.5 text-indigo-500 hover:text-indigo-700"
+                                title="Transformer en compétence secondaire"
+                            >
+                                <ArrowUpCircle size={10} />
+                            </button>
                         </div>
                     ))}
 
@@ -332,6 +378,31 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                         confirmLabel="Compris"
                         cancelLabel=""
                         type="danger"
+                        scheme="paper"
+                    />
+                )}
+
+                {promoteImposedModal && (
+                    <ConfirmationModal
+                        isOpen={!!promoteImposedModal}
+                        onClose={() => setPromoteImposedModal(null)}
+                        onConfirm={() => {
+                            handlePromoteImposed(promoteImposedModal.skillId, promoteImposedModal.specName);
+                            setPromoteImposedModal(null);
+                        }}
+                        title="Transformer en Compétence Secondaire"
+                        message={
+                            <span>
+                                Souhaitez-vous transformer <strong>"{promoteImposedModal.specName}"</strong> en compétence secondaire ?
+                                <br /><br />
+                                <span className="text-[11px] opacity-80">
+                                    Une nouvelle compétence sera créée avec une valeur de 0. La spécialisation imposée restera visible (elle est définie par les règles).
+                                </span>
+                            </span>
+                        }
+                        confirmLabel="Transformer"
+                        cancelLabel="Annuler"
+                        type="warning"
                         scheme="paper"
                     />
                 )}
