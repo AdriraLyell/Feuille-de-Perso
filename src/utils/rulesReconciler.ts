@@ -216,14 +216,11 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
     const processTraitList = (list: TraitEntry[], type: 'avantage' | 'desavantage'): TraitEntry[] => {
         if (!list) return [];
         return list.map(existing => {
-            let libMatch = null;
-            if (existing.definitionId) {
-                libMatch = rules.libraries?.traits?.find(t => t.id === existing.definitionId);
-            } else {
-                libMatch = rules.libraries?.traits?.find(t =>
+            const libMatch = existing.definitionId
+                ? rules.libraries?.traits?.find(t => t.id === existing.definitionId)
+                : rules.libraries?.traits?.find(t =>
                     t.type === type && normalizeString(t.name) === normalizeString(existing.name)
                 );
-            }
 
             if (libMatch) {
                 const isMystic = libMatch.mysticAbilityId || libMatch.tags?.some(tag => normalizeString(tag) === 'mystique');

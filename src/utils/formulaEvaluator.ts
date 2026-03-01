@@ -293,16 +293,17 @@ export const calculateAggregate = (data: any, config: any): number => {
     const op = config.operation?.toLowerCase();
     const values = details.map(d => d.value);
 
-    let result = 0;
-    switch (op) {
-        case 'sum': result = values.reduce((a, b) => a + b, 0); break;
-        case 'count': result = values.filter(v => v > 0).length; break;
-        case 'max':
-        case 'highest': result = Math.max(...values); break;
-        case 'avg':
-        case 'average': result = values.reduce((a, b) => a + b, 0) / values.length; break;
-        default: result = 0;
-    }
+    const result = ((): number => {
+        switch (op) {
+            case 'sum': return values.reduce((a, b) => a + b, 0);
+            case 'count': return values.filter(v => v > 0).length;
+            case 'max':
+            case 'highest': return Math.max(...values);
+            case 'avg':
+            case 'average': return values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+            default: return 0;
+        }
+    })();
 
     return result;
 };

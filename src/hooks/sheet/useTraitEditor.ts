@@ -142,7 +142,7 @@ export const useTraitEditor = (
                     const baseCounterName = (entry.autoCounterName || counterEffect?.target)?.trim();
                     const variantName = instance.variant?.trim();
 
-                    let finalCounterName = "";
+                    let finalCounterName: string;
                     if (baseCounterName) {
                         finalCounterName = variantName ? `${baseCounterName} (${variantName})` : baseCounterName;
                     } else {

@@ -29,7 +29,7 @@ export function calculateSkillXP(
                 const effectiveCreationValue = Math.max(skill.creationValue || 0, freeLimit);
 
                 let baseFactor = multiplier;
-                let cost = 0;
+                let cost: number;
 
                 if (behavior === 'Arrière-plan') {
                     const baseCost = data.creationConfig?.backgroundCost ?? 2;

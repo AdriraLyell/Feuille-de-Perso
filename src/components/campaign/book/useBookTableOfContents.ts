@@ -19,7 +19,7 @@ export function useBookTableOfContents(
 
         sections.forEach((section) => {
             const htmlSection = section as HTMLElement;
-            let title = 'Section sans titre';
+            let title: string;
             let dateText = '';
 
             if (htmlSection.classList.contains('chapter-header-wrapper')) {

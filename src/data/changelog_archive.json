@@ -1,5 +1,25 @@
 [
     {
+        "version": "2.97.19",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Journal de Campagne : Correction du chevauchement du Sommaire et restauration des notes page 1 — le sommaire opaque a été déplacé dans sa propre page (physical shift), laissant les notes apparaître en Page 2.",
+            "Journal de Campagne : Correction de la couleur de texte — le texte ProseMirror est désormais forcé en `stone-900` (#1c1917) pour une lisibilité parfaite sur fond beige.",
+            "Journal de Campagne : Suppression d'un warning console Tiptap (Doublon d'extension Underline)."
+        ]
+    },
+    {
+        "version": "2.97.18",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Compteurs : Correction de l'affichage de Force Vitale (et autres compteurs à formule) qui s'affichait en mode points/cases au lieu du mode numérique.",
+            "Réconciliation : Propagation de formulaId, isNumeric, formula et appearance depuis la bibliothèque de compteurs vers les définitions de règles (campaignReconciler).",
+            "Fiche : Fallback vers rules.libraries.counters pour la détection du type de compteur quand la counterLibrary du personnage est incomplète."
+        ]
+    },
+    {
         "version": "2.97.17",
         "date": "2026-02-28",
         "type": "fix",
@@ -653,17 +673,5 @@
         "date": "2026-02-23",
         "type": "feat",
         "description": "Ergonomie : Mémorisation de la préférence d'affichage (mode portrait / paysage) dans le cache local (localStorage). Le mode choisi persiste désormais après rechargement de la page."
-    },
-    {
-        "version": "2.69.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Système de 'Date Picker' interactif pour le Journal : Cliquez sur les icônes calendrier des blocs narratifs pour sélectionner une date directement depuis le Chroniqueur sans créer de nouveau chapitre. Ajout de champs de titre personnalisés pour le sommaire automatique et réduction globale de la taille des labels pour une interface plus épurée."
-    },
-    {
-        "version": "2.68.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Améliorations majeures des sections narratives et du Chroniqueur : (1) Possibilité de masquer/afficher le Chroniqueur depuis la barre latérale. (2) Ajout de champs d'heure pour les moments de journée. (3) Ajout de champs de date pour les flashbacks. (4) Support des calendriers fictifs pour les sélecteurs de date de voyage et flashbacks."
     }
 ]
