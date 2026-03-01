@@ -1,5 +1,5 @@
 import { RulesData } from '../types/rules';
-import { Parser } from 'expr-eval';
+import { Parser } from 'safe-expr-eval';
 
 /**
  * Vérifie si la syntaxe d'une formule est valide via expr-eval

@@ -1,9 +1,23 @@
-import { Parser } from 'expr-eval';
+import { Parser, Tokenizer } from 'safe-expr-eval';
 import { CharacterSheetData } from '../types';
 import { normalizeString, smartIncludes } from './stringUtils';
-import { logger } from './logger';
 
 const parser = new Parser();
+
+const getExpressionVariables = (formula: string): string[] => {
+    try {
+        const tokenizer = new Tokenizer(formula);
+        const tokens = tokenizer.tokenize();
+        return Array.from(new Set(
+            tokens
+                .filter(t => t.type === 'IDENTIFIER')
+                .map(t => String(t.value))
+                .filter(v => v !== 'true' && v !== 'false')
+        ));
+    } catch {
+        return [];
+    }
+};
 
 /**
  * Extracts a map of variable names to their values from the character sheet.
@@ -153,7 +167,7 @@ const evaluateWithContext = (formula: string, context: Record<string, number>, r
 
         // Custom resolver for missing variables if needed
         if (resolver) {
-            expr.variables().forEach(v => {
+            getExpressionVariables(formula).forEach(v => {
                 if (context[v] === undefined) {
                     context[v] = resolver(v);
                 }
@@ -339,11 +353,11 @@ export const evaluateFormula = (
             context['SCENARIOS_COUNT'] = options.scenariosCount;
         }
 
-        // Use expr-eval parser
+        // Use safe-expr-eval parser
         const expr = parser.parse(formula);
 
         // Map undefined variables to 0 to prevent evaluation errors
-        expr.variables().forEach(v => {
+        getExpressionVariables(formula).forEach((v: string) => {
             if (context[v] === undefined) context[v] = 0;
         });
 
