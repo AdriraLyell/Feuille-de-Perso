@@ -66,7 +66,6 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
         removeTag,
         addEffect,
         updateEffect,
-        updateEffectFields,
         removeEffect
     } = useAdminTraitLibrary({ rules, onUpdate, globalUsage });
     const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'trait');
@@ -131,8 +130,8 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
                             value={auditMode ?? ''}
                             onChange={(e) => setAuditMode((e.target.value || null) as typeof auditMode)}
                             className={`text-xs border rounded py-1.5 px-2 outline-none cursor-pointer ${auditMode
-                                    ? 'border-violet-400 bg-violet-50 text-violet-700 font-semibold'
-                                    : 'border-slate-300 bg-white text-slate-600'
+                                ? 'border-violet-400 bg-violet-50 text-violet-700 font-semibold'
+                                : 'border-slate-300 bg-white text-slate-600'
                                 }`}
                         >
                             <option value="">Audit…</option>

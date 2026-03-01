@@ -30,7 +30,7 @@ export function useItemUsageDetails(currentSettingId: string, itemType: ItemType
                 next.delete(itemId);
                 return next;
             });
-        } catch (error) {
+        } catch {
             setLoadingIds(prev => {
                 const next = new Set(prev);
                 next.delete(itemId);

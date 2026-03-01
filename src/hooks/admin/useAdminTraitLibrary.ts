@@ -170,11 +170,6 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
         setEditForm(null);
     }, [editForm, library, onUpdate, rules]);
 
-    const handleBulkSelect = useCallback((active: boolean) => {
-        // We'll need the processed list for this, so we compute it or pass it.
-        // Actually, better to compute it here too.
-    }, []);
-
     const handlePublishClick = useCallback(() => {
         const token = localStorage.getItem('GITHUB_TOKEN');
         const owner = localStorage.getItem('GITHUB_OWNER');

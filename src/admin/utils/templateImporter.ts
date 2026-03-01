@@ -1,5 +1,5 @@
 
-import { CharacterSheetData, DotEntry, AttributeEntry, LibrarySkillEntry, LibraryFormulaEntry } from '../../types';
+import { DotEntry, AttributeEntry, LibrarySkillEntry, LibraryFormulaEntry } from '../../types';
 import { RulesData } from '../../types/rules';
 
 /**

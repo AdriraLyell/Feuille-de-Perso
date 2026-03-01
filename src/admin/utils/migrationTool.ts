@@ -2,7 +2,7 @@
 import { RulesData } from '../../types/rules';
 import { LibraryEntry, TraitEffect, LibraryFormulaEntry } from '../../types';
 import { generateId } from '../../utils/factories';
-import { migrateTraitProperties, migrateTraitLibrary } from '../../utils/migrations/migrateTraitProperties';
+import { migrateTraitLibrary } from '../../utils/migrations/migrateTraitProperties';
 
 /**
  * Migration tool to move hardcoded trait effects to the new formula system.

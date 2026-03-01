@@ -366,7 +366,7 @@ export const evaluateFormula = (
 
 
         return isNaN(result) ? 0 : Math.floor(Number(result));
-    } catch (e) {
+    } catch {
         // Fallback for rough editing
         return 0;
     }

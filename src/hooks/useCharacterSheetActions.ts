@@ -5,7 +5,6 @@ import { generateId } from '../utils/factories';
 import { RulesData } from '../types/rules';
 import { CharacterSheetData } from '../types/character';
 import { getSkillCategory, getCounter, setCounter } from '../utils/stateAccessors';
-import { evaluateFormula } from '../utils/formulaEvaluator';
 
 interface DropPayload {
     type: string;

@@ -21,7 +21,6 @@ export const AdminFormulaEditorItem: React.FC<AdminFormulaEditorItemProps> = ({
     rules,
     previewValue,
     currentPreviewData,
-    allVariables,
     realCharData,
     onEdit,
     onRemove

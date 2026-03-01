@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, GraduationCap, Trophy } from 'lucide-react';
+import { ChevronDown, Trophy } from 'lucide-react';
 import { TraitEffect } from '../../../types';
 
 interface LegacyEffectFieldsProps {

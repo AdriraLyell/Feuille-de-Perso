@@ -115,7 +115,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         setIsModalOpen(true);
     };
 
-    const handleDelete = (id: string, name: string) => {
+    const handleDelete = (id: string) => {
         setShowDeleteConfirm(id);
     };
 

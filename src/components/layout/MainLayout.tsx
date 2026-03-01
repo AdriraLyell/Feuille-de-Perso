@@ -1,17 +1,17 @@
 
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { useNotification } from '../../context/NotificationContext';
+
 import { useCharacter } from '../../context/CharacterContext';
 import { NotificationProvider } from '../../context/NotificationContext';
 import { CharacterSheetData } from '../../types';
 import { APP_VERSION } from '../../constants/app';
 import { migrateData } from '../../utils/migrations';
 import { useRules } from '../../context/RulesContext';
-import { loadRules } from '../../services/RulesLoader';
-import { RulesData } from '../../types/rules';
+
+
 import { CampaignService } from '../../services/CampaignService';
 import { ErrorService } from '../../services/ErrorService';
-import { INITIAL_DATA } from '../../data/initialState';
+
 import { logger } from '../../utils/logger';
 import { useCloudSyncCheck } from '../../hooks/useCloudSyncCheck';
 import { useAutoSave } from '../../hooks/useAutoSave';
@@ -47,7 +47,7 @@ import { useRulesSync } from '../../hooks/layout/useRulesSync';
 import PostItBoard from '../ui/PostItBoard';
 
 // Icons
-import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, TrendingUp, History, Clock, X, Trash2, Save, Book, LogOut, Menu, Upload } from 'lucide-react';
+import { Layers, FileType, List, TrendingUp, Clock, X, Trash2, Book } from 'lucide-react';
 
 const MainLayout: React.FC = () => {
     const { data, updateData: setData, addLog, importData, isSyncing, sync } = useCharacter();
@@ -69,7 +69,7 @@ const MainLayout: React.FC = () => {
         mode, setMode,
         sheetTab, setSheetTab,
         showDiscardConfirm, setShowDiscardConfirm,
-        isSettingsDirty, setIsSettingsDirty,
+
         handleSwitchMode,
         confirmDiscard
     } = useNavigationState();
@@ -103,7 +103,7 @@ const MainLayout: React.FC = () => {
     const { countdown } = useAutoSave(data, false, (mode) => sync(mode));
 
     // Other UI States
-    const [lastSavedState, setLastSavedState] = useState<string>("");
+
     const [showImportExport, setShowImportExport] = useState(false);
     const [showChangelog, setShowChangelog] = useState(false);
     const [showUserGuide, setShowUserGuide] = useState(false);
@@ -122,7 +122,7 @@ const MainLayout: React.FC = () => {
 
     // Initialize Reference State & Error Service
     useEffect(() => {
-        if (data) setLastSavedState(JSON.stringify(data));
+
         ErrorService.init(addLog);
 
         // Show welcome message if available and not shown in this session
@@ -180,8 +180,6 @@ const MainLayout: React.FC = () => {
         }
 
         setMode('sheet');
-        setIsSettingsDirty(false);
-        setLastSavedState(JSON.stringify(newData));
     };
 
     useEffect(() => {
@@ -340,7 +338,7 @@ const MainLayout: React.FC = () => {
                             ) : (
                                 <SettingsView
                                     onClose={() => handleSwitchMode('sheet')}
-                                    onDirtyChange={setIsSettingsDirty}
+
                                 />
                             )}
                         </Suspense>
@@ -359,7 +357,7 @@ const MainLayout: React.FC = () => {
                             isOpen={showImportExport}
                             onClose={() => setShowImportExport(false)}
                             onImportSuccess={handleImportSuccess}
-                            onExportSuccess={() => { setLastSavedState(JSON.stringify(data)); }}
+                            onExportSuccess={() => { }}
                             variant={mode === 'settings' ? 'gm' : 'player'}
                         />
                         <PrintSelectionModal isOpen={showPrintModal} onClose={() => setShowPrintModal(false)} onConfirm={(s: Record<string, boolean>) => handlePrintConfirm(s as any)} />

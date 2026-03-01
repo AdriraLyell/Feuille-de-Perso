@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import { loadRules } from './RulesLoader';
 import { GithubRateLimiter } from '../utils/githubUtils';
 import { OfflineStorageService } from './OfflineStorageService';

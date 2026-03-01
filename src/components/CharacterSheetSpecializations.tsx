@@ -280,9 +280,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         if (skills.length === 0) return null;
 
         // Adapt columns based on landscape mode (6 for portrait, 8 for landscape)
-        const gridClass = isLandscape
-            ? "grid grid-cols-8 gap-1"
-            : "grid grid-cols-6 gap-1";
+
 
         return (
             <div className="mb-1 break-inside-avoid">

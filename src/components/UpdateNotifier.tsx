@@ -24,13 +24,13 @@ const isNewer = (remote: string, local: string) => {
 const UpdateNotifier: React.FC = () => {
     const [updateAvailable, setUpdateAvailable] = useState<VersionManifest | null>(null);
     const [isVisible, setIsVisible] = useState(true);
-    const [isChecking, setIsChecking] = useState(false);
+
 
     useEffect(() => {
         const checkVersion = async () => {
             if (!REMOTE_MANIFEST_URL || REMOTE_MANIFEST_URL.includes("votre-site-web")) return;
 
-            setIsChecking(true);
+
             try {
                 // Add timestamp to prevent caching
                 const response = await fetch(`${REMOTE_MANIFEST_URL}?t=${Date.now()}`);
@@ -42,8 +42,7 @@ const UpdateNotifier: React.FC = () => {
                 }
             } catch (error) {
                 logger.warn("Impossible de vérifier la mise à jour", error);
-            } finally {
-                setIsChecking(false);
+
             }
         };
 

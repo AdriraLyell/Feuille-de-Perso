@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { CharacterSheetData } from '../../types';
-import { Sliders, List, PieChart, CreditCard, Info, AlertCircle } from 'lucide-react';
+import { Sliders, List, PieChart, CreditCard, Info } from 'lucide-react';
 
 interface CreationConfigEditorProps {
     data: CharacterSheetData;

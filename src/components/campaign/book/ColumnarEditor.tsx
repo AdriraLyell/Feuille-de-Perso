@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { Check } from 'lucide-react';
-import { useEditor, EditorContent, JSONContent, Editor } from '@tiptap/react';
+import { useEditor, EditorContent, JSONContent } from '@tiptap/react';
 import { getBookExtensions } from './extensions/bookExtensions';
 import { PAGE_WIDTH, PAGE_HEIGHT } from '../constants';
 import { BookTableOfContents } from './BookTableOfContents';
@@ -78,7 +78,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         isCalendarVisible,
         setIsCalendarVisible,
         pickingTarget,
-        setPickingTarget,
+
         notifiedDates,
         voyageRanges,
         handleCalendarDateClick

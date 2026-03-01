@@ -91,7 +91,8 @@ export const SkillCustomizationModal: React.FC<SkillCustomizationModalProps> = (
                                                 setEditingSkill({ ...editingSkill, mysticAbilityId: firstId });
                                             }
                                         } else {
-                                            const { mysticAbilityId: maId, ...rest } = editingSkill;
+                                            const rest = { ...editingSkill };
+                                            delete rest.mysticAbilityId;
                                             setEditingSkill(rest);
                                         }
                                     }}

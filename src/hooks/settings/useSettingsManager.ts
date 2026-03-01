@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CharacterSheetData } from '../../types';
-import { getInitialCharacterData, INITIAL_DATA } from '../../data/initialState';
+import { getInitialCharacterData } from '../../data/initialState';
 import { applyRulesToState } from '../../utils/rulesAdapter';
 import { RulesData } from '../../types/rules';
 
@@ -22,14 +22,14 @@ export const useSettingsManager = (
     // Helper to compare data excluding volatile/computed fields
     const getComparableData = useCallback((d: CharacterSheetData) => {
         const {
-            appLogs,
-            xpLogs,
-            experience,
-            syncInfo,
-            appVersion,
+            appLogs: _appLogs,
+            xpLogs: _xpLogs,
+            experience: _experience,
+            syncInfo: _syncInfo,
+            appVersion: _appVersion,
             _rulesVersion,
             _schemaVersion,
-            suggestions,
+            suggestions: _suggestions,
             ...rest
         } = d;
         return rest;

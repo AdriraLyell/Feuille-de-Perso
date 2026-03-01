@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Search, Plus, Eye, EyeOff, CheckCircle2, Globe, RefreshCw, Download, Layers, Edit2, Trash2, GraduationCap, Sparkles, X } from 'lucide-react';
 import { LibrarySkillEntry } from '../../types';
 import { MergedEntry } from '../../utils/libraryMerger';

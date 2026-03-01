@@ -29,7 +29,7 @@ export const PostItBoard: React.FC<PostItBoardProps> = ({ currentTab }) => {
         try {
             const saved = localStorage.getItem('postit-btn-pos');
             return saved ? JSON.parse(saved) : { x: 0, y: 0 };
-        } catch (e) { return { x: 0, y: 0 }; }
+        } catch { return { x: 0, y: 0 }; }
     });
 
     const handleBtnDragEnd = (e: any, info: any) => {

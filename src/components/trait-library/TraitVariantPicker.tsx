@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { X, Settings, Check, Sparkles } from 'lucide-react';
+import { X, Settings, Check } from 'lucide-react';
 import { LibraryEntry, LibraryFormulaEntry } from '../../types';
 import { normalizeString } from '../../utils/stringUtils';
 

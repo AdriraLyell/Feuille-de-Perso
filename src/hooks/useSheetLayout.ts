@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { CharacterSheetData, DotEntry } from '../types';
-import { RulesData, SkillBehavior } from '../types/rules';
+import { RulesData } from '../types/rules';
 
 export interface SkillBlock {
     title: string;

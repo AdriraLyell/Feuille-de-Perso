@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { CharacterSheetData } from '../types';
+
 import ThematicButton from './ui/ThematicButton';
 import ThematicModal from './ui/ThematicModal';
 import { useCharacter } from '../context/CharacterContext';
-import { useNotification } from '../context/NotificationContext';
+
 
 // Import sub-components
 import AttributesEditor from './settings/AttributesEditor';
@@ -17,7 +17,7 @@ import LibrarySidebar from './settings/LibrarySidebar';
 import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
 import LibraryView from './LibraryView';
 import AdminSuggestions from './settings/AdminSuggestions'; // NEW
-import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Lock, UploadCloud, Lightbulb, Calculator } from 'lucide-react';
+import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, AlertCircle, BookOpen, Lock, UploadCloud, Lightbulb } from 'lucide-react';
 
 // Rules Integration
 import { useRules } from '../context/RulesContext';
@@ -82,7 +82,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
     handleSave,
     handleLocalUpdate,
     performReset,
-    toggleAutoSync
+
   } = useSettingsManager(data, rules, isOnlineMode, expertMode, onUpdate, onAddLog, onDirtyChange);
 
   // Drag State (Shared between SkillsEditor and LibrarySidebar)

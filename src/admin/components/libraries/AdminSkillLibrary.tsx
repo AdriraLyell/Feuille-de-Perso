@@ -280,7 +280,8 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                                         setEditingSkill({ ...editingSkill, mysticAbilityId: firstId });
                                                     }
                                                 } else {
-                                                    const { mysticAbilityId: _maId, ...rest } = editingSkill;
+                                                    const rest = { ...editingSkill };
+                                                    delete rest.mysticAbilityId;
                                                     setEditingSkill(rest);
                                                 }
                                             }}

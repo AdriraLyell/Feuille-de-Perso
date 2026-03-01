@@ -16,7 +16,6 @@ interface AdminFormulaFormFieldsProps {
 
 export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
     formula,
-    rules,
     targetSuggestions,
     allVariables,
     onUpdate

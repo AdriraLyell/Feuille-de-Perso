@@ -1,6 +1,6 @@
 
 import { set, get, del } from 'idb-keyval';
-import { GZIP_MARKER } from './ImageCompressionService';
+
 
 /**
  * Checks the available storage quota using the Estimation API.

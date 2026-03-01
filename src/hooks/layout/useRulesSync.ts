@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { CharacterSheetData } from '../../types';
 import { RulesData } from '../../types/rules';
 import { CampaignService } from '../../services/CampaignService';
-import { ErrorService } from '../../services/ErrorService';
 import { loadRules } from '../../services/RulesLoader';
 import { logger } from '../../utils/logger';
 import { INITIAL_DATA } from '../../data/initialState';

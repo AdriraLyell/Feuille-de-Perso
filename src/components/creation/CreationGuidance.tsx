@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Sparkles, X } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';

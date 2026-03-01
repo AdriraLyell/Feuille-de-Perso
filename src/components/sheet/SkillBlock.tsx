@@ -4,7 +4,7 @@ import DotRating from '../ui/DotRating';
 import { SectionHeader } from './Shared';
 import { Info } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
+
 import { logger } from '../../utils/logger';
 import { useNotification } from '../../context/NotificationContext';
 import { PortalTooltip } from '../ui/PortalTooltip';
@@ -336,7 +336,7 @@ export const SkillBlock = React.memo<{
                     </div>
                 )}
 
-                {(items || []).map((item, idx) => {
+                {(items || []).map((item) => {
                     const iSpecs = imposedSpecs[item.id] || [];
                     const uSpecs = userSpecs[item.id] || [];
                     const normalizedName = item.name.trim().toLowerCase();

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle, RefreshCw, MessageSquare, UploadCloud } from 'lucide-react';
+import { AlertTriangle, CheckCircle, RefreshCw, MessageSquare } from 'lucide-react';
 import { GameSettingSummary } from '../../../services/CampaignService';
 import { CharacterSheetData } from '../../../types/character';
 import SyncHistoryTab from './SyncHistoryTab';

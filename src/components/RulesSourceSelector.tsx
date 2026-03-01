@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GameSettingSummary, CampaignService } from '../services/CampaignService';
 import { Cloud, Wifi, WifiOff, Loader2, ArrowRight, RotateCcw, BookOpen, Scroll, Sparkles, Clock } from 'lucide-react';
@@ -7,7 +7,7 @@ import { RulesData } from '../types/rules';
 import { ErrorService } from '../services/ErrorService';
 import { MotionFade } from './ui/motion/MotionFade';
 import { MotionCard } from './ui/motion/MotionCard';
-import ThematicButton from './ui/ThematicButton';
+
 
 interface RulesSourceSelectorProps {
     isOpen: boolean;

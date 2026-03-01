@@ -1,6 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { migrateData, migrateRulesToV2 } from '../utils/migrations';
-import { INITIAL_DATA } from '../data/initialState';
 import {
     LEGACY_V1_TERMINOLOGY,
     LEGACY_V1_STRING_TRAITS,

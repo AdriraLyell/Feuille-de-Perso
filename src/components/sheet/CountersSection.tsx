@@ -174,7 +174,7 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
                 parsedVars = getExpressionVariables(formula);
                 const zeroContext: Record<string, number> = parsedVars.reduce((acc, v: string) => ({ ...acc, [v]: 0 }), {});
                 baseValue = Number(expr.evaluate(zeroContext)) || 0;
-            } catch (e) {
+            } catch {
                 // Ignore parse errors for UI
             }
 
@@ -278,7 +278,6 @@ interface CountersSectionProps {
 export const CountersSection = React.memo<CountersSectionProps>(({
     data,
     updateCounter,
-    isLandscape,
     creationBonuses = {},
     xpBonuses = {},
     calculatedMaxes = {},

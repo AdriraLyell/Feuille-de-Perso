@@ -1,10 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { CharacterSheetData } from '../../../types';
 import { useNotification } from '../../../context/NotificationContext';
 import { useCharacter } from '../../../context/CharacterContext';
 import { APP_VERSION } from '../../../constants/app';
 import { createTemplateFromData, detectConflicts, smartMerge, DataConflict } from '../../../utils/importExportUtils';
-import { base64ToBlob, saveImage } from '../../../services/imageDB';
+
 import { ImageSyncResolver } from '../../../services/ImageSyncResolver';
 import { ErrorService } from '../../../services/ErrorService';
 

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useCharacterData, useCharacterActions } from '../../context/CharacterContext';
+import { useCharacterData } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';
 import {
     BookOpen,
@@ -21,7 +21,7 @@ interface EditionSidebarProps {
 const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
     const { rules } = useRules();
     const data = useCharacterData();
-    const { updateData: _updateData } = useCharacterActions();
+
 
     const [activeTab, setActiveTab] = useState<'skills' | 'backgrounds'>('skills');
     const [searchTerm, setSearchTerm] = useState('');

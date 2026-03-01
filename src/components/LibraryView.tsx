@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { CharacterSheetData, LibrarySkillEntry } from '../types';
+import { CharacterSheetData } from '../types';
 import { BookOpen, GraduationCap, Award } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import SpecializationLibraryView from './specialization-library/SpecializationLibraryView';
 import { useCharacter } from '../context/CharacterContext';
 import { useNotification } from '../context/NotificationContext';
 import { useRules } from '../context/RulesContext';
-import { MergedEntry } from '../utils/libraryMerger';
+
 import LibrarySkillForm from './library/LibrarySkillForm';
 import LibraryDeleteModal from './library/LibraryDeleteModal';
 import LibraryImportModal from './library/LibraryImportModal';
@@ -33,7 +33,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
     const addLog = useNotification();
 
     // OFFICIAL: Get Rules Context
-    const { rules, updateRules } = useRules();
+    const { rules } = useRules();
 
     // MERGE: Compute Hybrid Skill Library
     const {
@@ -41,7 +41,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         hideKnownSkills, setHideKnownSkills,
         isSkillModalOpen, setIsSkillModalOpen,
         editingSkill, setEditingSkill,
-        skillError, setSkillError,
+        skillError,
         showRenameConfirm, setShowRenameConfirm,
         showImportConfirm, setShowImportConfirm,
         skillToDelete, setSkillToDelete,
@@ -58,7 +58,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
     } = useSkillLibrary(data, rules, onUpdate, addLog);
 
     // OFFICIAL: Use local state for visibility for now (could be moved to hook too if shared)
-    const [showOfficialUpdateConfirm, setShowOfficialUpdateConfirm] = useState(false);
+
 
     // Dynamic Categories Source of Truth
     const availableCategories = useMemo(() => {
@@ -80,33 +80,9 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
     };
 
     const handleOfficialUpdateClick = () => {
-        setShowOfficialUpdateConfirm(true);
+        addLog("Option gérée par le MJ", "info");
     };
 
-    const executeOfficialUpdate = async () => {
-        try {
-            const res = await fetch('./data/skills.json?t=' + Date.now());
-            if (!res.ok) throw new Error("Fichier introuvable");
-
-            const json = await res.json();
-            const newSkills = json.data as LibrarySkillEntry[];
-
-            if (json.meta && json.meta.type !== 'skills') throw new Error("Format invalide");
-
-            // Update Rules Context
-            const updatedRules = {
-                ...rules!,
-                libraries: {
-                    ...rules!.libraries,
-                    skills: newSkills
-                }
-            };
-            updateRules(updatedRules);
-            addLog(`Bibliothèque officielle mise à jour (${newSkills.length} compétences).`, 'success', 'settings');
-        } catch (e) {
-            addLog("Échec de la mise à jour officielle : " + (e as Error).message, 'danger', 'settings');
-        }
-    };
 
     return (
         <div className="flex flex-col h-full bg-[#fdfbf7] rounded-sm shadow-sm border border-[#bfae85]/50 overflow-hidden relative">

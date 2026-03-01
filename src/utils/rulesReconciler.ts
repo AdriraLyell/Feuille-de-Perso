@@ -3,11 +3,11 @@ import { CharacterSheetData, DotEntry, AttributeEntry, TraitEntry } from '../typ
 import { RulesData } from '../types/rules';
 import { generateId } from './factories';
 import { normalizeString } from './stringUtils';
-import { getSkillCategory, getCounter, setCounter } from './stateAccessors';
+
 import { reconcileSkillsAndBackgrounds } from './reconcilers/skillsReconciler';
 import { migrateTraitLibrary } from './migrations/migrateTraitProperties';
 import { logger } from './logger';
-import { LibraryEntry, LibrarySpecializationEntry } from '../types';
+import { LibraryEntry } from '../types';
 import { mergeLibraries } from './libraryMerger';
 
 // --- Sub-functions ---
@@ -228,7 +228,7 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
                 // --- Migration Logic ---
                 // We ensure the character trait has the latest flags from the library
                 // and we also check if it has legacy effects that need migration.
-                const needsMigration = (libMatch.hasAutoCounter && !existing.hasAutoCounter) ||
+                const _needsMigration = (libMatch.hasAutoCounter && !existing.hasAutoCounter) ||
                     (libMatch.isXPUpgradeable && !existing.isXPUpgradeable);
 
                 return {
@@ -307,7 +307,7 @@ const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterS
 
             // Robust Effects Comparison (ignore IDs, ignore property order, drop empty)
             const simplifyEffects = (effects: any[]) => (effects || []).map(eff => {
-                const { id, definitionId, formulaId, ...rest } = eff; // skip IDs
+                const { id: _id, definitionId: _definitionId, formulaId: _formulaId, ...rest } = eff; // skip IDs
                 return JSON.stringify(Object.keys(rest).sort().reduce((obj: any, key) => {
                     // Only keep properties that have real value
                     if (rest[key] !== '' && rest[key] !== undefined && rest[key] !== null) {
@@ -373,7 +373,7 @@ const reconcileHeader = (newState: CharacterSheetData, rules: RulesData) => {
             const d = new Date(dateStr);
             if (isNaN(d.getTime())) return dateStr;
             return d.toLocaleDateString('fr-FR');
-        } catch (e) {
+        } catch {
             return dateStr;
         }
     };

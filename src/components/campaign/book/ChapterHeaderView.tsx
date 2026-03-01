@@ -32,7 +32,7 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
                         .focus()
                         .setTextSelection({ from, to })
                         .run();
-                } catch (err) {
+                } catch {
                     // Silently fail if pos is invalid during a concurrent update
                 }
             };

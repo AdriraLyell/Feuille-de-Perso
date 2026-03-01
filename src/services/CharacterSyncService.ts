@@ -67,7 +67,7 @@ export const CharacterSyncService = {
     generateDataHash(data: CharacterSheetData): string {
         try {
             // We ignore volatile fields for the hash
-            const { syncInfo: _s, appLogs: _a, xpLogs: _x, _rulesVersion: _r, ...stableData } = data;
+            const { syncInfo: _, appLogs: __, xpLogs: ___, _rulesVersion: ____, ...stableData } = data;
 
             // Fast hashing via string manipulation
             const str = JSON.stringify(stableData);
@@ -78,7 +78,7 @@ export const CharacterSyncService = {
                 hash = hash & hash; // Convert to 32bit integer
             }
             return Math.abs(hash).toString(36);
-        } catch (e) {
+        } catch {
             return "unknown";
         }
     },

@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
-import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../../types';
-import { Plus, Trash2, Award } from 'lucide-react';
+import React from 'react';
+import { CharacterSheetData, DotEntry } from '../../types';
+import { Plus, Trash2 } from 'lucide-react';
 import SpecializationOmnibar from '../specialization-library/SpecializationOmnibar';
 import { ErrorService } from '../../services/ErrorService';
 
@@ -12,7 +12,7 @@ interface SpecializationsEditorProps {
 }
 
 const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onUpdate, onAddLog }) => {
-  const [newlyAddedSpec, setNewlyAddedSpec] = useState<{ skillId: string; index: number } | null>(null);
+
 
   const getSkillContext = (skillId: string) => {
     if (!data.skills) return { name: "Inconnu" };
@@ -82,7 +82,7 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
         [skillId]: newSpecs
       }
     });
-    setNewlyAddedSpec({ skillId, index: currentSpecs.length });
+
     const { name } = getSkillContext(skillId);
     onAddLog(`Ajout : Spécialisation automatique pour "${name}"`, 'success', 'settings');
   };

@@ -122,7 +122,7 @@ const TraitCardItemCounter: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
     );
 };
 
-const TraitCardItemXP: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
+const TraitCardItemXP: React.FC<{ entry: LibraryEntry }> = () => {
     const [showTooltip, setShowTooltip] = useState(false);
     const anchorRef = useRef<HTMLDivElement>(null);
 
@@ -164,9 +164,7 @@ const TraitCard: React.FC<TraitCardProps> = ({
     usageDetails,
     onLoadUsageDetails
 }) => {
-    const [showDeleteTooltip, setShowDeleteTooltip] = useState(false);
     const [showLockTooltip, setShowLockTooltip] = useState(false);
-    const deleteBtnRef = useRef<HTMLDivElement>(null);
     const lockIconRef = useRef<HTMLDivElement>(null);
     if (!entry) return null;
 

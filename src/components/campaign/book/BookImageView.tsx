@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { NodeViewWrapper } from '@tiptap/react';
 import { BookImageAttributes } from '../../../extensions/bookImage';
@@ -25,7 +25,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
     const [isEditingCaption, setIsEditingCaption] = useState(false);
     const [isPanMode, setIsPanMode] = useState(false);
     const [showAdvanced, setShowAdvanced] = useState(false);
-    const [hudBelow] = useState(true);
+
 
     const containerRef = useRef<HTMLDivElement>(null);
     // wrapperRef pointe sur le NodeViewWrapper (.book-image-view) — résolu via DOM au montage.

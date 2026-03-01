@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Activity, Coins, Zap, Sparkles } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { MotionFade } from '../../../components/ui/motion/MotionFade';
 import { MotionCard } from '../../../components/ui/motion/MotionCard';
 import { RulesCreationConfig, RulesXPCosts } from '../../../types/rules';

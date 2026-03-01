@@ -1,6 +1,6 @@
 import React from 'react';
 import { History, RefreshCw, RotateCcw } from 'lucide-react';
-import { CharacterSyncService, CharacterHistoryEntry } from '../../../services/CharacterSyncService';
+import { CharacterHistoryEntry } from '../../../services/CharacterSyncService';
 
 interface SyncHistoryTabProps {
     history: CharacterHistoryEntry[];

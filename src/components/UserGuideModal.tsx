@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
 import {
-    X, HelpCircle, User, Book, MousePointer, Settings, Save,
-    LayoutGrid, Zap, Layers, TrendingUp, Image as ImageIcon,
-    Cloud, WifiOff, FileJson, PencilLine, Target, RefreshCw, Palette, Download, UploadCloud
+    X, Book, MousePointer,
+    LayoutGrid, Zap, Layers, TrendingUp,
+    Cloud, WifiOff, FileJson, PencilLine, Target, RefreshCw, Palette
 } from 'lucide-react';
 
 interface UserGuideModalProps {

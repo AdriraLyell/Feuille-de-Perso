@@ -2,7 +2,7 @@
 import React from 'react';
 import { CharacterSheetData, SuggestionEntry } from '../../types';
 import { useRules } from '../../context/RulesContext';
-import { Check, X, BookmarkPlus, type LucideIcon, Lightbulb } from 'lucide-react';
+import { Check, X, BookmarkPlus, Lightbulb } from 'lucide-react';
 import ThematicButton from '../ui/ThematicButton';
 
 interface Props {

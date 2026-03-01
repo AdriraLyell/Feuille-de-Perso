@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, RotateCcw, Check, FileJson, Download, X, ArrowRightLeft } from 'lucide-react';
+import { AlertTriangle, RotateCcw, Check, Download, ArrowRightLeft } from 'lucide-react';
 import ThematicModal from './ThematicModal';
 
 interface CampaignConflictModalProps {
@@ -15,7 +15,7 @@ interface CampaignConflictModalProps {
 
 const CampaignConflictModal: React.FC<CampaignConflictModalProps> = ({
     isOpen,
-    onClose,
+
     characterName,
     currentCampaignName,
     newCampaignName,

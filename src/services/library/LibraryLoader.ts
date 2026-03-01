@@ -132,7 +132,6 @@ export const LibraryLoader = {
             const skillRelMap = new Map<string, RelSettingSkill>(relSkills.map((r: RelSettingSkill) => [r.skill_id, r]));
             const bgDefaultMap = new Map<string, string>(relBackgrounds.map((r: RelSettingBackground) => [r.background_id, r.default_category]));
             const counterDefaultMap = new Map<string, string>(relCounters.map((r: RelSettingCounter) => [r.counter_id, r.default_category]));
-            const mysticRelMap = new Map<string, any>(relMysticAbilities.map((r: any) => [r.mystic_ability_id, r]));
             const mysticDefaultMap = new Map<string, string>(relMysticAbilities.map((r: any) => [r.mystic_ability_id, r.default_category]));
 
             return {

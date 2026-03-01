@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { Search, Award, Plus, ArrowUpCircle, Zap, Globe } from 'lucide-react';
+import { Award, ArrowUpCircle, Zap, Globe } from 'lucide-react';
 import { useCharacterData } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';
 import ConfirmationModal from '../ui/ConfirmationModal';

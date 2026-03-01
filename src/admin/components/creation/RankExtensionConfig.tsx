@@ -1,7 +1,6 @@
 import React from 'react';
 import { Activity } from 'lucide-react';
 import { MotionCard } from '../../../components/ui/motion/MotionCard';
-import { RulesCreationConfig } from '../../../types/rules';
 
 interface RankExtensionConfigProps {
     extendedSkills: boolean;

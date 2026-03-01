@@ -7,7 +7,7 @@ import { logger } from '../logger';
 import { MIGRATIONS, CURRENT_SCHEMA_VERSION } from './registry';
 import { LEGACY_SKILL_MAP } from './migrateSkills';
 import { migrateAttributeId } from './migrateAttributes';
-import { migrateFormulas } from './migrateFormulas';
+
 import { generateId } from '../factories';
 
 /**

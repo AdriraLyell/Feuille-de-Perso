@@ -10,7 +10,7 @@ interface SpecializationLibrarySidebarProps {
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings') => void;
 }
 
-const SpecializationLibrarySidebar: React.FC<SpecializationLibrarySidebarProps> = ({ data, onUpdate, onAddLog }) => {
+const SpecializationLibrarySidebar: React.FC<SpecializationLibrarySidebarProps> = ({ data }) => {
     const { rules } = useRules();
 
     const hybridLibrary = useMemo(() => {

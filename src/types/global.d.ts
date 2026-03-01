@@ -1,5 +1,5 @@
 
-import { RulesData } from '../types/rules';
+
 
 declare global {
     interface Window {

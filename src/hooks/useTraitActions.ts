@@ -36,7 +36,7 @@ export const useTraitActions = (
 
     const handleOpenEdit = useCallback((merged: MergedEntry<LibraryEntry> | LibraryEntry) => {
         const entry = 'entry' in merged ? merged.entry : merged;
-        const source = 'source' in merged ? merged.source : 'local';
+        const _source = 'source' in merged ? merged.source : 'local';
 
         setError(null);
         setTagInput('');

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ThematicModal from './ThematicModal';
-import { Layers, Save, PlusCircle, CheckCircle2, Circle } from 'lucide-react';
+import { Layers, Save, CheckCircle2, Circle } from 'lucide-react';
 
 interface Props {
     isOpen: boolean;

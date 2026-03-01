@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
-import { CharacterSheetData, LibraryEntry } from '../types';
+import { useMemo } from 'react';
+import { CharacterSheetData } from '../types';
 import { useRules } from '../context/RulesContext';
-import { mergeLibraries, MergedEntry } from '../utils/libraryMerger';
+import { mergeLibraries } from '../utils/libraryMerger';
 import { smartIncludes } from '../utils/stringUtils';
 
 export type SortOption = 'name' | 'cost' | 'type';

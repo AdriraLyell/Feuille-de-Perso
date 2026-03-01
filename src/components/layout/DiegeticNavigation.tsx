@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Book, Settings, FileText, Layout, Save, Upload, Feather, LogOut, Printer, Monitor, Smartphone, History, HelpCircle, ScrollText, ArrowRightLeft, BookOpen, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X, AlertTriangle } from 'lucide-react';
+import { Settings, FileText, Save, Printer, History, HelpCircle, ScrollText, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X, AlertTriangle } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';
 import { useStorageUsage } from '../../hooks/useStorageUsage';
-import { CharacterSheetData } from '../../types';
+
 import RulesStatus from '../ui/RulesStatus';
 import { motion, AnimatePresence } from 'framer-motion';
 

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowUpRight, ArrowDownRight, RotateCcw, ChevronDown, Activity, BookOpen, User, Maximize2, Sparkles, Database, Zap, Wrench, Shield, Swords, Bookmark } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, ChevronDown, Activity, BookOpen, User, Maximize2, Sparkles, Database, Zap, Wrench, Swords, Bookmark } from 'lucide-react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { ExperienceBreakdown } from '../../types';
@@ -27,7 +27,7 @@ interface GroupedTransaction {
     total: number;
 }
 
-export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGain, totalSpent, totalRest }) => {
+export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGain, totalSpent }) => {
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
     const getCategorizedData = useMemo(() => {

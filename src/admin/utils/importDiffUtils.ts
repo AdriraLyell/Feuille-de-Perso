@@ -1,6 +1,6 @@
 
 import { RulesData } from '../../types/rules';
-import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry } from '../../types/system';
+import { LibraryEntry } from '../../types/system';
 
 export interface FieldDifference {
     field: string;

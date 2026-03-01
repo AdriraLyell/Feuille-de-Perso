@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { RulesData, SkillCategoryConfig, SkillBehavior } from '../../types/rules';
-import { LibrarySkillEntry, DotEntry } from '../../types';
+import { LibrarySkillEntry } from '../../types';
 
 export function useSkillEditorActions(rules: RulesData, onUpdate: (newRules: RulesData) => void) {
     const [syncSuccess, setSyncSuccess] = useState<string | null>(null);

@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { ImageConfig } from '../../types';
 import { X, Move, Scaling, WrapText, BoxSelect, Maximize2, Minimize2, StretchHorizontal } from 'lucide-react';
 import { getImage } from '../../services/imageDB';
-import { ImageCompressionService, GZIP_MARKER } from '../../services/ImageCompressionService';
+
 import { ErrorService } from '../../services/ErrorService';
 
 interface NoteImageZoneProps {
@@ -14,7 +14,7 @@ interface NoteImageZoneProps {
     onDelete: () => void;
 }
 
-const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config, onUpdateConfig, onDelete }) => {
+const NoteImageZone: React.FC<NoteImageZoneProps> = ({ imageId, config, onUpdateConfig, onDelete }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     // Default Config Initialization

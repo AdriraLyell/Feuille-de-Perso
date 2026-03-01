@@ -1,4 +1,3 @@
-import { supabase } from './supabase';
 import { DatabaseService } from './DatabaseService';
 import { GameSetting, RulesData, GameSettingSummary } from '../types/rules';
 export type { GameSetting, RulesData, GameSettingSummary };
@@ -260,7 +259,7 @@ export const CampaignService = {
             if (!rules) return false;
             // loadSetting already performs Zod validation
             return true;
-        } catch (e) {
+        } catch {
             return false;
         }
     }

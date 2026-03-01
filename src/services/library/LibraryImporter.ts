@@ -1,6 +1,6 @@
 import { DatabaseService } from '../DatabaseService';
 import { LibraryEntry as LibraryTraitEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry } from '../../types/system';
-import { ErrorService } from '../ErrorService';
+
 
 import { normalizeString } from '../../utils/stringUtils';
 import { logger } from '../../utils/logger';

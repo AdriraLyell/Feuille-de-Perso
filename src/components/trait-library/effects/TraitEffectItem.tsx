@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, X, Star, GraduationCap, ChevronDown, Trophy, Calculator } from 'lucide-react';
+import { X, Star, GraduationCap, ChevronDown, Trophy, Calculator } from 'lucide-react';
 import { TraitEffect, LibraryFormulaEntry } from '../../../types';
 import { FormulaEffectFields } from './FormulaEffectFields';
 import { LegacyEffectFields } from './LegacyEffectFields';
@@ -18,7 +18,7 @@ interface TraitEffectItemProps {
 
 export const TraitEffectItem: React.FC<TraitEffectItemProps> = ({
     effect,
-    index,
+
     allSkills,
     allAttributes,
     allCounters,

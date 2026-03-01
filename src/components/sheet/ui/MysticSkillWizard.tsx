@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { CharacterSheetData, LibrarySkillEntry } from '../../../types';
+import { CharacterSheetData } from '../../../types';
 import { RulesData } from '../../../types/rules';
-import { Sparkles, CheckCircle2, ChevronRight, AlertCircle, Infinity as InfinityIcon } from 'lucide-react';
+import { Sparkles, CheckCircle2, AlertCircle, Infinity as InfinityIcon } from 'lucide-react';
 import { getMysticCapacity } from '../../../utils/mysticUtils';
 import ThematicModal from '../../ui/ThematicModal';
 

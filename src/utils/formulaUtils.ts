@@ -10,7 +10,7 @@ export const isFormulaSyntaxValid = (formula?: string): boolean => {
         const parser = new Parser();
         parser.parse(formula);
         return true;
-    } catch (e) {
+    } catch {
         return false;
     }
 };

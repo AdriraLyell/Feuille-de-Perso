@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, RefObject } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Editor } from '@tiptap/react';
 import { PAGE_WIDTH } from '../constants';
 import { TOCEntry } from './BookTableOfContents';

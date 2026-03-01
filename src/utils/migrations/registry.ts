@@ -1,4 +1,4 @@
-import { CharacterSheetData } from '../../types';
+
 
 // Import migration functions
 import { migrateTerminology } from './migrateTerminology';

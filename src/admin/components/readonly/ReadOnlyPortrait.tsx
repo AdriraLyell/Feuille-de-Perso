@@ -1,5 +1,4 @@
 import React from 'react';
-import { SyncedCharacter } from '../../../services/CharacterSyncService';
 import { logger } from '../../../utils/logger';
 
 interface ReadOnlyPortraitProps {
