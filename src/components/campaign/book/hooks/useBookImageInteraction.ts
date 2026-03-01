@@ -9,9 +9,9 @@ interface UseBookImageInteractionProps {
     node: { attrs: BookImageAttributes };
     updateAttributes: (attrs: Partial<BookImageAttributes>) => void;
     /** Ref sur le div interne (image container) — utilisé pour la hauteur et le pan */
-    containerRef: React.RefObject<HTMLDivElement>;
+    containerRef: React.RefObject<HTMLDivElement | null>;
     /** Ref sur le NodeViewWrapper (.book-image-view) — utilisé pour la largeur des images flottantes */
-    wrapperRef: React.RefObject<HTMLElement>;
+    wrapperRef: React.RefObject<HTMLElement | null>;
 }
 
 // Magnetic Snapping points

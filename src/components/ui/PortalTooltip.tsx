@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 interface PortalTooltipProps {
-    anchorRef: React.RefObject<HTMLElement | null>;
+    anchorRef: { readonly current: HTMLElement | null };
     isOpen: boolean;
     title?: string;
     children: React.ReactNode;

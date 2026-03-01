@@ -24,7 +24,7 @@ const AttributeRow: React.FC<{
     const baseTotal = v1 + v2 + v3;
     const total = baseTotal + bonusValue;
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, nextRef?: React.RefObject<HTMLInputElement>) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, nextRef?: React.RefObject<HTMLInputElement | null>) => {
         if (e.key === 'Enter') {
             e.preventDefault();
             if (nextRef && nextRef.current) {

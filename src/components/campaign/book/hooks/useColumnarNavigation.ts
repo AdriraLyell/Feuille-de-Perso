@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, RefObject } from 'react';
+import { useState, useEffect, useCallback, RefObject, useRef } from 'react';
 import { Editor } from '@tiptap/react';
 import { PAGE_WIDTH } from '../../constants';
 
@@ -13,6 +13,7 @@ export const useColumnarNavigation = ({
     containerRef,
     contentRef
 }: UseColumnarNavigationProps) => {
+    const scrollPosRef = useRef(0);
     const [pageCount, setPageCount] = useState(1);
     const [scrollPos, setScrollPos] = useState(0);
 
@@ -20,23 +21,43 @@ export const useColumnarNavigation = ({
         if (!contentRef.current || !containerRef.current) return;
 
         requestAnimationFrame(() => {
-            if (!contentRef.current || !containerRef.current) return;
+            const container = containerRef.current;
+            const content = contentRef.current;
+            if (!container || !content) return;
 
-            const scrollWidth = contentRef.current.scrollWidth;
+            const scrollWidth = content.scrollWidth;
+            const containerWidth = container.clientWidth;
+
+            // If the element is hidden (display: none), clientWidth is 0.
+            // We should NOT update state based on 0-dimensions or 0-scroll if we were previously non-zero.
+            if (containerWidth === 0) return;
+
             const stride = PAGE_WIDTH + 40;
-
             const contentPages = Math.max(1, Math.ceil(scrollWidth / stride));
             const totalPages = contentPages;
 
             setPageCount(prev => prev !== totalPages ? totalPages : prev);
-            setScrollPos(containerRef.current.scrollLeft);
+
+            const currentScroll = container.scrollLeft;
+            const lastScroll = scrollPosRef.current;
+
+            // Restoration logic: If the browser reset our scroll (due to visibility toggle) 
+            // but we have a saved position, force it back.
+            if (currentScroll === 0 && lastScroll > 0) {
+                container.scrollLeft = lastScroll;
+            } else {
+                scrollPosRef.current = currentScroll;
+                setScrollPos(currentScroll);
+            }
         });
     }, [containerRef, contentRef]);
 
     useEffect(() => {
         const handleScroll = () => {
             if (containerRef.current) {
-                setScrollPos(containerRef.current.scrollLeft);
+                const current = containerRef.current.scrollLeft;
+                scrollPosRef.current = current;
+                setScrollPos(current);
             }
         };
 

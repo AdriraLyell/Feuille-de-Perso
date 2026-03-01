@@ -4,7 +4,7 @@ import { PAGE_WIDTH } from '../../constants';
 
 interface CalendarSyncProps {
     editor: Editor | null;
-    containerRef: React.RefObject<HTMLDivElement>;
+    containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export const useColumnarCalendarSync = ({ editor, containerRef }: CalendarSyncProps) => {

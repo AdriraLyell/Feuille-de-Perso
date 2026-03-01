@@ -43,7 +43,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
         node,
         updateAttributes,
         containerRef,
-        wrapperRef: wrapperRef as React.RefObject<HTMLElement>,
+        wrapperRef,
     });
     // hudTick is intentionally unused in render output — it triggers re-renders for the HUD display
     void hudTick;
