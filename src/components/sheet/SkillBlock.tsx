@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { DotEntry } from '../../types';
 import DotRating from '../ui/DotRating';
 import { SectionHeader } from './Shared';
@@ -26,6 +26,21 @@ const DotRow: React.FC<{
     const [isOpen, setIsOpen] = useState(false);
     const anchorRef = useRef<HTMLSpanElement>(null);
     const addLog = useNotification();
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (anchorRef.current && !anchorRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen]);
 
     // Spacer logic
     if (!entry.name) {
@@ -80,7 +95,7 @@ const DotRow: React.FC<{
         if (isUndefinedVariable && onDefineVariant) {
             onDefineVariant(category, entry.id, entry.name);
         } else if (hasSpecs) {
-            setIsOpen(true);
+            setIsOpen(!isOpen);
         }
     };
 
@@ -153,8 +168,6 @@ const DotRow: React.FC<{
                 }}
                 onClick={handleClick}
                 ref={anchorRef}
-                onMouseEnter={() => hasSpecs && setIsOpen(true)}
-                onMouseLeave={() => setIsOpen(false)}
                 title={entry.description || (entry.variant ? `${entry.name} : ${entry.variant}` : entry.name)}
             >
                 {entry.variant !== undefined ? (

@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.35",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "UI : Activation du tooltip des spécialisations au clic (toggle) au lieu du survol, pour cohérence avec le reste de la fiche.",
+            "UI : Ajout d'un écouteur de clic extérieur pour fermer automatiquement l'infobulle."
+        ]
+    },
+    {
         "version": "2.97.34",
         "date": "2026-03-01",
         "type": "feat",
@@ -182,15 +191,6 @@
         "changes": [
             "CI : Mise en place d'un workflow de nettoyage automatique des anciens runs GitHub Actions pour optimiser le stockage.",
             "UI : Ajout d'un indicateur `cursor-pointer` sur les cartes interactives de la bibliothèque pour une meilleure affordance."
-        ]
-    },
-    {
-        "version": "2.97.15",
-        "date": "2026-02-28",
-        "type": "feat",
-        "changes": [
-            "UI (Admin bibliothèque) : Ajout d'icônes indicatives dans les vignettes de traits pour les compteurs associés (icône Activité) et l'amélioration par XP (icône Tendance).",
-            "UX : Ajout de tooltips informatifs sur ces nouvelles icônes pour clarifier le comportement du trait sans avoir à l'ouvrir."
         ]
     }
 ]

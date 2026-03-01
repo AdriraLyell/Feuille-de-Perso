@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.15",
+        "date": "2026-02-28",
+        "type": "feat",
+        "changes": [
+            "UI (Admin bibliothèque) : Ajout d'icônes indicatives dans les vignettes de traits pour les compteurs associés (icône Activité) et l'amélioration par XP (icône Tendance).",
+            "UX : Ajout de tooltips informatifs sur ces nouvelles icônes pour clarifier le comportement du trait sans avoir à l'ouvrir."
+        ]
+    },
+    {
         "version": "2.97.14",
         "date": "2026-02-28",
         "type": "chore",
@@ -650,11 +659,5 @@
         "date": "2026-02-23",
         "type": "feat",
         "description": "Fusion majeure du Compagnon Temporel et du Journal de Campagne : (1) Navigation chronologique par clic sur les dates. (2) Mode 'Timeline' synthétique. (3) Assistant de création de chapitre à date. (4) Indicateurs de météo et ambiances sur les chapitres et le calendrier. (5) Compte à rebours avant le prochain évènement majeur. (6) Nouveaux blocs narratifs flexibles (Moments de journée, Voyages)."
-    },
-    {
-        "version": "2.66.3",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Correction majeure de la visibilité du Compagnon Temporel : (1) Correction du chemin d'accès aux données (configurations.calendar). (2) Repositionnement du widget à gauche de la barre latérale pour éviter qu'il ne soit hors-écran sur les résolutions standards."
     }
 ]
