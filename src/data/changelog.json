@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.97.32",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "UI : libraryMerger détecte les copies locales ayant un équivalent officiel (même ID ou nom) et les marque 'official' — corrige l'absence du badge 🌐."
+        ]
+    },
+    {
         "version": "2.97.31",
         "date": "2026-03-01",
         "type": "fix",
