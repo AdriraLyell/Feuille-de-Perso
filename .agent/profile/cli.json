@@ -1,0 +1,15 @@
+{
+  "role": "executor",
+  "temperature": 0.0,
+  "max_tokens": 1500,
+  "quota_budget_percent": 10,
+  "allowed_commands": [
+    "git",
+    "gh",
+    "npm",
+    "supabase",
+    "eslint",
+    "tsc"
+  ],
+  "strict_mode": true
+}

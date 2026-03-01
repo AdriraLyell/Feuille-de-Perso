@@ -92,7 +92,7 @@ export const saveImage = async (file: File | Blob): Promise<string> => {
         await set(id, compressed);
     } catch (error) {
         if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-            throw new Error('Le stockage local est plein. Veuillez supprimer des images existantes.');
+            throw new Error('Le stockage local est plein. Veuillez supprimer des images existantes.', { cause: error });
         }
         throw error;
     }

@@ -58,20 +58,13 @@ export function useCreationBudget(): CreationBudgetResult {
                 const multiplier = cat?.costConfig?.factor ?? 1.0;
                 const isSecondary = behavior === 'Secondaire' || catId === 'competences2' || catId === 'Col_Comp_6';
 
-                let realCost = 0;
-
-                if (behavior === 'Arrière-plan') {
-                    const base = data.creationConfig?.backgroundCost ?? 2;
-                    realCost = val * base * multiplier;
-                } else if (behavior === 'Compteur') {
-                    const counterDef = rules?.definitions?.counters?.[skill.id];
-                    const base = Math.max(0, counterDef?.xpCost ?? 5);
-                    realCost = val * base * multiplier;
-                } else if (isSecondary) {
-                    realCost = (cost / 2) * multiplier;
-                } else {
-                    realCost = cost * multiplier;
-                }
+                const realCost = behavior === 'Arrière-plan'
+                    ? val * (data.creationConfig?.backgroundCost ?? 2) * multiplier
+                    : behavior === 'Compteur'
+                        ? val * Math.max(0, (rules?.definitions?.counters?.[skill.id]?.xpCost ?? 5)) * multiplier
+                        : isSecondary
+                            ? (cost / 2) * multiplier
+                            : cost * multiplier;
 
                 xpEquivalence += realCost;
 

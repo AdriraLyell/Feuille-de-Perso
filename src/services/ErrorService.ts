@@ -41,12 +41,15 @@ export class ErrorService {
         const isForbidden = technicalMessage.includes('403') || (error as any)?.status === 403 || (error as any)?.code === '42501';
 
         const timestamp = new Date().toLocaleTimeString();
+        // eslint-disable-next-line no-console
         console.groupCollapsed(`%c[${timestamp}] [${context}] Error`, 'color: red; font-weight: bold;');
         console.error('Original Error:', error);
+        // eslint-disable-next-line no-console
         if (userMessage) console.log('User Message:', userMessage);
         if (isForbidden) {
             console.warn('💡 Tip: This 403 error might be due to missing "admin" role in your Supabase app_metadata.');
         }
+        // eslint-disable-next-line no-console
         console.groupEnd();
 
         // 2. Notification Utilisateur

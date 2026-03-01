@@ -1,6 +1,42 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+    /* Colors */
+    --color-mystic-stone: #1c1917; /* Stone 900 */
+    --color-mystic-deep: #0c0a09;  /* Stone 950 */
+    --color-mystic-surface: #292524; /* Stone 800 */
+    --color-paper-cream: #fdfbf7; /* Original Paper */
+
+    /* Accents */
+    --color-amber-gold: #d97706; /* Primary Action */
+    --color-amber-glow: #f59e0b;
+    --color-crimson-blood: #9f1239; /* Rose 800 */
+    --color-void-indigo: #312e81; /* Indigo 900 */
+
+    /* Fonts */
+    --font-serif: "Cinzel", "Playfair Display", serif;
+    --font-sans: "Inter", "Lato", sans-serif;
+    --font-hand: "Patrick Hand", cursive;
+
+    /* Shadows */
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    --shadow-paper: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    --shadow-glow-gold: 0 0 15px rgba(217, 119, 6, 0.3);
+
+    /* Animations & Keyframes */
+    --animate-fade-in: fade-in 0.5s ease-out;
+    --animate-slide-up: slide-up 0.5s ease-out;
+    --animate-spin-slow: spin 3s linear infinite;
+
+    @keyframes fade-in {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    @keyframes slide-up {
+        0% { transform: translateY(20px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+}
 
 :root {
   /* Colors */

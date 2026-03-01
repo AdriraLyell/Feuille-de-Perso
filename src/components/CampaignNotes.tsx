@@ -8,7 +8,7 @@ const CampaignNotes: React.FC = () => {
     const { data, updateData: onChange, addLog } = useCharacter();
     const [activeTab, setActiveTab] = useState<'journal' | 'party'>('journal');
 
-    const handleUpdate = (content: any) => {
+    const handleUpdate = React.useCallback((content: any) => {
         onChange((prev: import('../types').CharacterSheetData) => {
             const now = new Date().toISOString();
             const existing = prev.bookDocument || {
@@ -29,7 +29,7 @@ const CampaignNotes: React.FC = () => {
                 }
             };
         });
-    };
+    }, [onChange]);
 
     return (
         <div className="w-full bg-[#121212] relative">
@@ -70,12 +70,13 @@ const CampaignNotes: React.FC = () => {
 
                 {/* Content Area - Exactly 50px top margin and 100px bottom margin */}
                 <div className="w-full pt-[50px] pb-[100px]">
-                    {activeTab === 'journal' ? (
+                    <div className={activeTab === 'journal' ? 'block' : 'hidden'}>
                         <ColumnarEditor
                             initialContent={data.bookDocument?.content}
                             onUpdate={handleUpdate}
                         />
-                    ) : (
+                    </div>
+                    <div className={activeTab === 'party' ? 'block' : 'hidden'}>
                         <div
                             className="mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500"
                             style={{ width: '1484px', height: '1000px' }}
@@ -84,7 +85,7 @@ const CampaignNotes: React.FC = () => {
                                 <PartyTable data={data} onChange={onChange} onAddLog={addLog} />
                             </div>
                         </div>
-                    )}
+                    </div>
                 </div>
             </div>
         </div>

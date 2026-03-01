@@ -331,9 +331,7 @@ const MainLayout: React.FC = () => {
                                         <div className={`${sheetTab === 'specs' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetSpecializations isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'p2' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetPage2 isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'xp' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetXP isLandscape={isLandscape} /></div>
-                                        {sheetTab === 'notes' && (
-                                            <div className="mx-auto block"><CampaignNotes /></div>
-                                        )}
+                                        <div className={`${sheetTab === 'notes' ? 'block' : 'hidden'} mx-auto`}><CampaignNotes /></div>
                                     </div>
 
                                     {data.creationConfig?.active && (<CreationHUD />)}

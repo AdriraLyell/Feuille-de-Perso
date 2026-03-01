@@ -1,9 +1,23 @@
-import { Parser } from 'expr-eval';
+import { Parser, Tokenizer } from 'safe-expr-eval';
 import { CharacterSheetData } from '../types';
 import { normalizeString, smartIncludes } from './stringUtils';
-import { logger } from './logger';
 
 const parser = new Parser();
+
+const getExpressionVariables = (formula: string): string[] => {
+    try {
+        const tokenizer = new Tokenizer(formula);
+        const tokens = tokenizer.tokenize();
+        return Array.from(new Set(
+            tokens
+                .filter(t => t.type === 'IDENTIFIER')
+                .map(t => String(t.value))
+                .filter(v => v !== 'true' && v !== 'false')
+        ));
+    } catch {
+        return [];
+    }
+};
 
 /**
  * Extracts a map of variable names to their values from the character sheet.
@@ -153,7 +167,7 @@ const evaluateWithContext = (formula: string, context: Record<string, number>, r
 
         // Custom resolver for missing variables if needed
         if (resolver) {
-            expr.variables().forEach(v => {
+            getExpressionVariables(formula).forEach(v => {
                 if (context[v] === undefined) {
                     context[v] = resolver(v);
                 }
@@ -293,16 +307,17 @@ export const calculateAggregate = (data: any, config: any): number => {
     const op = config.operation?.toLowerCase();
     const values = details.map(d => d.value);
 
-    let result = 0;
-    switch (op) {
-        case 'sum': result = values.reduce((a, b) => a + b, 0); break;
-        case 'count': result = values.filter(v => v > 0).length; break;
-        case 'max':
-        case 'highest': result = Math.max(...values); break;
-        case 'avg':
-        case 'average': result = values.reduce((a, b) => a + b, 0) / values.length; break;
-        default: result = 0;
-    }
+    const result = ((): number => {
+        switch (op) {
+            case 'sum': return values.reduce((a, b) => a + b, 0);
+            case 'count': return values.filter(v => v > 0).length;
+            case 'max':
+            case 'highest': return Math.max(...values);
+            case 'avg':
+            case 'average': return values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+            default: return 0;
+        }
+    })();
 
     return result;
 };
@@ -338,11 +353,11 @@ export const evaluateFormula = (
             context['SCENARIOS_COUNT'] = options.scenariosCount;
         }
 
-        // Use expr-eval parser
+        // Use safe-expr-eval parser
         const expr = parser.parse(formula);
 
         // Map undefined variables to 0 to prevent evaluation errors
-        expr.variables().forEach(v => {
+        getExpressionVariables(formula).forEach((v: string) => {
             if (context[v] === undefined) context[v] = 0;
         });
 

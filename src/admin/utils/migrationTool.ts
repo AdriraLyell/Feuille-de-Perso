@@ -32,7 +32,7 @@ export const migrationTool = {
                 if (effect.type === 'formula' && effect.formulaId) return effect;
 
                 // Identify if it's a legacy hardcoded effect
-                let targetFormulaId = '';
+                let targetFormulaId: string;
                 let formulaName = '';
                 let formulaString = '';
                 let effectType = '';

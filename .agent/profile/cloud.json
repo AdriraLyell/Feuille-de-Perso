@@ -1,0 +1,13 @@
+{
+  "role": "architect",
+  "base_temperature": 0.2,
+  "temperature_by_task": {
+    "planning": 0.3,
+    "validation": 0.1,
+    "documentation": 0.4
+  },
+  "max_tokens": 4000,
+  "quota_budget_percent": 40,
+  "decision_authority": true,
+  "enforce_validation": true
+}

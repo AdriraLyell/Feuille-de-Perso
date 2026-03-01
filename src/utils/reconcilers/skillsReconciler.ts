@@ -137,12 +137,10 @@ function processSkillCategories(
             !processedNames.has(e.name) &&
             ((e.value || 0) > 0 || e.variant !== undefined || (e.definitionId && rules.libraries?.skills?.find(s => s.id === e.definitionId)?.isVariable))
         ).map(e => {
-            let libMatch = null;
-            if (e.definitionId) {
-                libMatch = rules.libraries?.skills?.find(s => s.id === e.definitionId);
-            } else {
-                libMatch = rules.libraries?.skills?.find(s => normalizeString(s.name) === normalizeString(e.name));
-            }
+            const libMatch = e.definitionId
+                ? rules.libraries?.skills?.find(s => s.id === e.definitionId)
+                : rules.libraries?.skills?.find(s => normalizeString(s.name) === normalizeString(e.name));
+
             if (libMatch) {
                 return {
                     ...e,
@@ -165,12 +163,10 @@ function processSkillCategories(
         if (!newSkills[cat]) {
             newSkills[cat] = getSkillCategory(currentState, cat).map(e => {
                 if (!e) return e;
-                let libMatch = null;
-                if (e.definitionId) {
-                    libMatch = rules.libraries?.skills?.find(s => s.id === e.definitionId);
-                } else {
-                    libMatch = rules.libraries?.skills?.find(s => s.name && e.name && normalizeString(s.name) === normalizeString(e.name));
-                }
+                const libMatch = e.definitionId
+                    ? rules.libraries?.skills?.find(s => s.id === e.definitionId)
+                    : rules.libraries?.skills?.find(s => s.name && e.name && normalizeString(s.name) === normalizeString(e.name));
+
                 if (libMatch) {
                     return {
                         ...e,

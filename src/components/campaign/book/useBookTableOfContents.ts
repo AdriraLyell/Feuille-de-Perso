@@ -1,12 +1,11 @@
-import { useState, useEffect, useCallback, RefObject } from 'react';
+import React, { useState, useEffect, useCallback, RefObject } from 'react';
 import { Editor } from '@tiptap/react';
 import { PAGE_WIDTH } from '../constants';
 import { TOCEntry } from './BookTableOfContents';
 
 export function useBookTableOfContents(
     editor: Editor | null,
-    contentRef: RefObject<HTMLDivElement>,
-    pageOffset: number = 1 // TOC takes 1 page
+    contentRef: React.RefObject<HTMLDivElement | null>
 ) {
     const [entries, setEntries] = useState<TOCEntry[]>([]);
 
@@ -19,7 +18,7 @@ export function useBookTableOfContents(
 
         sections.forEach((section) => {
             const htmlSection = section as HTMLElement;
-            let title = 'Section sans titre';
+            let title: string;
             let dateText = '';
 
             if (htmlSection.classList.contains('chapter-header-wrapper')) {
@@ -42,7 +41,7 @@ export function useBookTableOfContents(
             }
 
             const left = htmlSection.offsetLeft;
-            const pageIndex = Math.floor(left / stride) + pageOffset + 1;
+            const pageIndex = Math.floor(left / stride) + 1; // Content starting at index 1 is Page 2 if TOC is Page 1
 
             newEntries.push({
                 title,
@@ -52,7 +51,7 @@ export function useBookTableOfContents(
         });
 
         setEntries(newEntries);
-    }, [contentRef, pageOffset]);
+    }, [contentRef]);
 
     useEffect(() => {
         if (!editor) return;

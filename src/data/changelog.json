@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.39",
+        "date": "2026-03-01",
+        "type": "chore",
+        "changes": [
+            "Maintenance : Mise à jour des dépendances npm (minor & moderate updates).",
+            "Maintenance : Correction des erreurs de lint introduites ou détectées après mise à jour (no-useless-assignment, preserve-caught-error).",
+            "Maintenance : Amélioration du typage du logger et de l'ErrorService pour réduire les usages de 'any'.",
+            "Audit : Identification d'une vulnérabilité haute sur expr-eval (2.0.2 est la dernière version, pas de correctif disponible)."
+        ]
+    },
+    {
         "version": "2.97.38",
         "date": "2026-03-01",
         "type": "feat",
@@ -182,26 +193,6 @@
             "Moteur : Meilleure résolution des configurations (formula/aggregateConfig) lorsque les compteurs pointent vers des IDs de formule.",
             "Robustesse : Amélioration de smartIncludes pour ignorer le préfixe '@' souvent utilisé dans les filtres de tags/catégories.",
             "Fix : Correction d'une erreur de schéma Zod sur le champ effectType des formules (nullable)."
-        ]
-    },
-    {
-        "version": "2.97.19",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Journal de Campagne : Correction du chevauchement du Sommaire et restauration des notes page 1 — le sommaire opaque a été déplacé dans sa propre page (physical shift), laissant les notes apparaître en Page 2.",
-            "Journal de Campagne : Correction de la couleur de texte — le texte ProseMirror est désormais forcé en `stone-900` (#1c1917) pour une lisibilité parfaite sur fond beige.",
-            "Journal de Campagne : Suppression d'un warning console Tiptap (Doublon d'extension Underline)."
-        ]
-    },
-    {
-        "version": "2.97.18",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Compteurs : Correction de l'affichage de Force Vitale (et autres compteurs à formule) qui s'affichait en mode points/cases au lieu du mode numérique.",
-            "Réconciliation : Propagation de formulaId, isNumeric, formula et appearance depuis la bibliothèque de compteurs vers les définitions de règles (campaignReconciler).",
-            "Fiche : Fallback vers rules.libraries.counters pour la détection du type de compteur quand la counterLibrary du personnage est incomplète."
         ]
     }
 ]
