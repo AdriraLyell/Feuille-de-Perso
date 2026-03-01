@@ -57,6 +57,7 @@ export interface DBSpecialization {
     description?: string;
     skill_ids: string[];
     default_min_level: number;
+    is_imposed?: boolean;
     created_at?: string;
     updated_at?: string;
 }

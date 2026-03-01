@@ -52,6 +52,7 @@ export const LibrarySpecializationEntrySchema = z.object({
     skillIds: z.array(z.string()).nullable().optional(),
     defaultMinLevel: z.number().nullable().optional(),
     description: z.string().nullable().optional(),
+    isImposed: z.boolean().nullable().optional(),
     isGlobal: z.boolean().nullable().optional(),
     isActive: z.boolean().nullable().optional(),
 });

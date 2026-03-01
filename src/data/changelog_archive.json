@@ -1,5 +1,41 @@
 [
     {
+        "version": "2.97.10",
+        "date": "2026-02-28",
+        "type": "feat",
+        "changes": [
+            "Ergonomie (Admin Formules) : Refonte du flux de création et d'édition des formules.",
+            "Remplacement de l'édition en ligne par une fenêtre modale unifiée (AdminFormulaEditorModal).",
+            "Extraction des champs de formulaire dans un composant réutilisable (AdminFormulaFormFields) garantissant la cohérence visuelle et technique.",
+            "Ajout d'un bouton d'édition direct sur chaque formule de la liste.",
+            "Amélioration de la sécurité : les modifications ne sont enregistrées en base de données qu'après validation explicite dans la modale.",
+            "Refactorisation du composant de liste (AdminFormulaEditorItem) pour une interface plus épurée centrée sur la lecture et les actions rapides."
+        ]
+    },
+    {
+        "version": "2.97.9",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Correction de la cause racine du bug Force Vitale : les avantages mystiques (tag ou mysticAbilityId) étaient invisibles au filtre d'agrégat car le champ 'tag' n'était pas propagé depuis 'mysticAbilityId'.",
+            "La fonction getAggregateDetails résout maintenant automatiquement le tag 'Mystique' à partir du champ mysticAbilityId si tag est absent sur le trait.",
+            "Les valeurs de traits (string '2' → number 2) sont normalisées en amont de l'agrégation pour garantir l'exactitude du calcul.",
+            "Réhydratation de mysticAbilityId et definitionId lors de la réconciliation des compétences et traits (skillsReconciler + rulesReconciler)."
+        ]
+    },
+    {
+        "version": "2.97.8",
+        "date": "2026-02-28",
+        "type": "patch",
+        "changes": [
+            "Correction du calcul de la Force Vitale suite à la perte de métadonnées mystiques.",
+            "Correction de la résolution des traits (avantages/désavantages) dans les formules de calcul.",
+            "Protection des champs 'mysticAbilityId' et 'isVariable' lors du nettoyage de la bibliothèque.",
+            "Migration V6 pour restaurer les liens mystiques cassés sur les fiches existantes.",
+            "Passage des règles par défaut en 1.0.4 pour forcer la réconciliation correcte."
+        ]
+    },
+    {
         "version": "2.97.7",
         "date": "2026-02-28",
         "type": "fix",
@@ -604,23 +640,5 @@
         "date": "2026-02-21",
         "type": "fix",
         "description": "Correction du calcul d'âge pour supporter les formats de date flexibles (français et fictif). Verrouillage des champs 'Début' et 'Date Fiction' lorsqu'ils sont gérés par le calendrier de campagne du MJ."
-    },
-    {
-        "version": "2.65.3",
-        "date": "2026-02-21",
-        "type": "fix",
-        "description": "Synchronisation automatique des dates de l'en-tête (Début et Date Fiction) avec le calendrier de campagne défini dans les paramètres. Amélioration de la détection des mises à jour des règles pour refléter immédiatement les changements du MJ sur les fiches joueurs."
-    },
-    {
-        "version": "2.65.2",
-        "date": "2026-02-21",
-        "type": "feat",
-        "description": "Amélioration de l'en-tête de la fiche personnage : Intégration des champs 'Date de début de campagne' et 'Date courante (fiction)'. Implémentation du calcul automatique de l'âge basé sur la date de naissance et la date de la fiction, avec fallback en saisie manuelle si les données sont absentes."
-    },
-    {
-        "version": "2.65.1",
-        "date": "2026-02-21",
-        "type": "refactor",
-        "description": "Amélioration de l'interface admin : Regroupement des widgets de coût XP (Arrière-Plans, Attributs, Traits) dans un seul bloc 'Facteurs de Coût' pour une meilleure lisibilité et aération de la vue configuration."
     }
 ]

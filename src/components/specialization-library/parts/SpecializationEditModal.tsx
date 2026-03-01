@@ -107,15 +107,31 @@ const SpecializationEditModal: React.FC<SpecializationEditModalProps> = ({
 
                     <div>
                         <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Seuil minimum par défaut (MJ)</label>
-                        <input
-                            type="number"
-                            min="0"
-                            max="5"
-                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm bg-white/50 focus:border-amber-500 outline-none shadow-sm"
-                            value={editingEntry.defaultMinLevel}
-                            onChange={(e) => setEditingEntry({ ...editingEntry, defaultMinLevel: parseInt(e.target.value) || 0 })}
-                        />
-                        <p className="text-[10px] text-[#5c4d41]/60 mt-1 italic">Ce seuil sera appliqué automatiquement lors de l'ajout en mode "Imposée".</p>
+                        <div className="flex gap-4 items-center">
+                            <input
+                                type="number"
+                                min="0"
+                                max="5"
+                                className="w-20 border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm bg-white/50 focus:border-amber-500 outline-none shadow-sm"
+                                value={editingEntry.defaultMinLevel}
+                                onChange={(e) => setEditingEntry({ ...editingEntry, defaultMinLevel: parseInt(e.target.value) || 0 })}
+                            />
+
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                                <div className="relative flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={editingEntry.isImposed}
+                                        onChange={(e) => setEditingEntry({ ...editingEntry, isImposed: e.target.checked })}
+                                        className="rounded border-[#bfae85]/50 text-amber-600 focus:ring-amber-500 w-4 h-4"
+                                    />
+                                </div>
+                                <span className="text-xs font-bold text-[#4a3b32] group-hover:text-amber-700 transition-colors flex items-center gap-1">
+                                    Spécialisation Imposée ?
+                                </span>
+                            </label>
+                        </div>
+                        <p className="text-[10px] text-[#5c4d41]/60 mt-1 italic">Si coché, elle sera ajoutée automatiquement dès que le seuil est atteint.</p>
                     </div>
 
                     <div>

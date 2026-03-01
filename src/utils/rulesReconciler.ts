@@ -408,58 +408,58 @@ const reconcileImposedSpecializations = (newState: CharacterSheetData, rules: Ru
     if (!rules.libraries?.specializations) return;
 
     const imposedLibrarySpecs = rules.libraries.specializations.filter(s => s.isImposed && s.isActive !== false);
-    if (imposedLibrarySpecs.length === 0) {
-        // Optionnel : On pourrait choisir de nettoyer les anciennes spécialisations auto qui ne sont plus dans la lib
-        // mais pour l'instant on se concentre sur l'ajout.
-        return;
-    }
 
-    // Ensure object exists
-    if (!newState.imposedSpecializations) {
-        newState.imposedSpecializations = {};
-    }
+    // Always clear and rebuild to avoid stale data
+    newState.imposedSpecializations = {};
+    if (imposedLibrarySpecs.length === 0) return;
 
-    // Get all character skill IDs and their levels
-    const characterSkills: Record<string, number> = {};
-    Object.values(newState.skills).flat().forEach(s => {
-        if (s.id && s.name) {
-            characterSkills[s.id] = s.value || 0;
-        }
-    });
+    const flatSkills = Object.values(newState.skills).flat().filter(s => s && s.name);
+    const librarySkills = rules.libraries?.skills || [];
 
-    // Process each skill
-    Object.keys(characterSkills).forEach(skillId => {
-        const level = characterSkills[skillId];
-        const currentImposed = newState.imposedSpecializations[skillId] || [];
+    logger.log(`[Reconciler] Reconciling ${imposedLibrarySpecs.length} imposed specs against ${flatSkills.length} skills`);
 
-        // 1. Find library specs applicable to this skill
-        const applicableLibrarySpecs = imposedLibrarySpecs.filter(ls =>
-            ls.skillIds.includes(skillId) && level >= ls.defaultMinLevel
-        );
+    imposedLibrarySpecs.forEach(ls => {
+        // Resolve target skill names from the library if they are provided as IDs
+        const targetSkillNamesNormal = librarySkills
+            .filter(s => ls.skillIds.includes(s.id))
+            .map(s => normalizeString(s.name));
 
-        // 2. Add missing ones
-        let modified = false;
-        const nextImposed = [...currentImposed];
+        // Also include any IDs that might be names directly (legacy/manual)
+        const targetIdsAndNamesNormal = [
+            ...ls.skillIds.map(id => normalizeString(id)),
+            ...targetSkillNamesNormal
+        ];
 
-        applicableLibrarySpecs.forEach(ls => {
-            const alreadyPresent = nextImposed.some(ci => ci.name.trim().toLowerCase() === ls.name.trim().toLowerCase());
-            if (!alreadyPresent) {
-                nextImposed.push({
-                    name: ls.name,
-                    minLevel: ls.defaultMinLevel
-                });
-                modified = true;
-                logger.log(`[Reconciler] Auto-adding imposed specialization "${ls.name}" for skill "${skillId}"`);
-            }
+        const matchingCharacterSkills = flatSkills.filter(cs => {
+            const normalizedCSName = normalizeString(cs.name);
+            const normalizedCSVariant = cs.variant ? normalizeString(cs.variant) : '';
+
+            return ls.skillIds.includes(cs.id) ||
+                (cs.definitionId && ls.skillIds.includes(cs.definitionId)) ||
+                targetIdsAndNamesNormal.includes(normalizedCSName) ||
+                (normalizedCSVariant && targetIdsAndNamesNormal.includes(normalizedCSVariant));
         });
 
-        // 3. (Optional) Remove ones that come from library but are no longer valid
-        // Identifying those accurately is hard without a library source flag on the character entry.
-        // For now, we only add. If the MJ removes "isImposed", it stays on the sheet until manual deletion.
+        matchingCharacterSkills.forEach(skill => {
+            const level = skill.value || 0;
+            if (level >= ls.defaultMinLevel) {
+                if (!newState.imposedSpecializations![skill.id]) {
+                    newState.imposedSpecializations![skill.id] = [];
+                }
 
-        if (modified) {
-            newState.imposedSpecializations[skillId] = nextImposed;
-        }
+                // Double check for duplicates (shouldn't happen with fresh reset but to be safe with name aliases)
+                const alreadyPresent = newState.imposedSpecializations![skill.id].some(
+                    ci => normalizeString(ci.name) === normalizeString(ls.name)
+                );
+
+                if (!alreadyPresent) {
+                    newState.imposedSpecializations![skill.id].push({
+                        name: ls.name,
+                        minLevel: ls.defaultMinLevel
+                    });
+                }
+            }
+        });
     });
 };
 

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Search, Plus, Award, CheckCircle2, Edit2, Trash2, Download, RefreshCw, Eye, EyeOff, Globe, X } from 'lucide-react';
+import { Search, Plus, Award, CheckCircle2, Edit2, Trash2, Download, RefreshCw, Eye, EyeOff, Globe, X, Zap } from 'lucide-react';
 import { CharacterSheetData } from '../../types';
 import { useSpecializationLibrary } from './hooks/useSpecializationLibrary';
 import SpecializationEditModal from './parts/SpecializationEditModal';
@@ -129,6 +129,11 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                                             {isUsed && (
                                                 <span className="text-[9px] bg-green-100/50 text-green-800/80 px-1.5 py-0.5 rounded-sm flex items-center gap-1 font-bold border border-green-200/50 uppercase tracking-tight">
                                                     <CheckCircle2 size={10} /> Utilisée
+                                                </span>
+                                            )}
+                                            {entry.isImposed && (
+                                                <span className="text-[9px] bg-blue-100/50 text-blue-800/80 px-1.5 py-0.5 rounded-sm flex items-center gap-1 font-bold border border-blue-200/50 uppercase tracking-tight" title="Spécialisation Imposée">
+                                                    <Zap size={10} className="fill-blue-500" /> Imposée
                                                 </span>
                                             )}
                                             {!isUsed && (

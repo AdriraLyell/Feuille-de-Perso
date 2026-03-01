@@ -71,6 +71,7 @@ export const LibraryPersistence = {
                     } else if (typeCfg.key === 'specializations') {
                         payload.skill_ids = item.skillIds;
                         payload.default_min_level = item.defaultMinLevel;
+                        payload.is_imposed = item.isImposed;
                     } else if (typeCfg.key === 'formulas') {
                         payload.formula = item.formula;
                         payload.type = item.type;
@@ -154,6 +155,7 @@ export const LibraryPersistence = {
                 } else if (typeCfg.key === 'specializations') {
                     payload.skill_ids = item.skillIds;
                     payload.default_min_level = item.defaultMinLevel;
+                    payload.is_imposed = item.isImposed;
                 } else if (typeCfg.key === 'formulas') {
                     payload.formula = item.formula;
                     payload.type = item.type;

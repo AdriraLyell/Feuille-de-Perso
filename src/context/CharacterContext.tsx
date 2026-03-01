@@ -11,6 +11,7 @@ import { ErrorService } from '../services/ErrorService';
 import { CharacterSyncService } from '../services/CharacterSyncService';
 import { migrateBookImages } from '../utils/migrations/migrateBookImages';
 import { logger } from '../utils/logger';
+import { APP_VERSION } from '../constants/app';
 
 
 // --- Context Definitions ---
@@ -351,7 +352,9 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         // Optimized Reconciliation:
         // Reconcile if either the version ID or the last updated timestamp has changed.
         // This ensures updates are caught even if the semantic version string isn't manually bumped.
-        if (data._rulesVersion === rules.version && data._rulesLastUpdated === rules.lastUpdated) {
+        if (data._rulesVersion === rules.version &&
+            data._rulesLastUpdated === rules.lastUpdated &&
+            data.appVersion === APP_VERSION) {
             return;
         }
 

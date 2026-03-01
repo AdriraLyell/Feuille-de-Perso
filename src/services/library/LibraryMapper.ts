@@ -73,6 +73,7 @@ export const LibraryMapper = {
         description: s.description,
         skillIds: s.skill_ids || [],
         defaultMinLevel: s.default_min_level || 1,
+        isImposed: s.is_imposed || false,
         isGlobal: s.setting_id == null,
         isActive: activeIds.has(s.id) || s.setting_id === sid
     }),

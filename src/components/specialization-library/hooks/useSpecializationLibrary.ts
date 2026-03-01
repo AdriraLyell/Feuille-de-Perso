@@ -111,7 +111,8 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
             name: '',
             skillIds: [],
             defaultMinLevel: 1,
-            description: ''
+            description: '',
+            isImposed: false
         });
         setSkillSearch('');
         setIsModalOpen(true);
@@ -197,7 +198,8 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
                         name: norm,
                         skillIds: [skillId],
                         defaultMinLevel: 1,
-                        description: ""
+                        description: "",
+                        isImposed: false
                     });
                     existingNames.add(norm.toLowerCase());
                     addedCount++;
@@ -214,7 +216,8 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
                         name: norm,
                         skillIds: [skillId],
                         defaultMinLevel: s.minLevel,
-                        description: ""
+                        description: "",
+                        isImposed: true
                     });
                     existingNames.add(norm.toLowerCase());
                     addedCount++;

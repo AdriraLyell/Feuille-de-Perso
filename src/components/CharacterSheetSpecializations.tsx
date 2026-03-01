@@ -4,7 +4,7 @@ import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../types';
 import SpecializationOmnibar from './specialization-library/SpecializationOmnibar';
 import SpecializationLibraryDrawer from './specialization-library/SpecializationLibraryDrawer';
 import ConfirmationModal from './ui/ConfirmationModal';
-import { Award, Book, Plus } from 'lucide-react';
+import { Award, Book, Plus, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { useRules } from '../context/RulesContext';
 import { logger } from '../utils/logger';
@@ -146,9 +146,8 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
     const renderSkillBox = (skill: DotEntry) => {
         const count = skill.value;
-        const imposedSpecs = skill.value > 0
-            ? (data.imposedSpecializations[skill.id] || []).filter((spec: any) => skill.value >= (spec.minLevel || 0))
-            : [];
+        const imposedSpecs = (data.imposedSpecializations[skill.id] || [])
+            .filter((spec: any) => skill.value >= (spec.minLevel || 0));
 
         if (count <= 0 && imposedSpecs.length === 0) return null;
 
@@ -179,7 +178,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                     {/* Render Imposed Specializations first (Read Only) */}
                     {imposedSpecs.map((spec: any, i: number) => (
                         <div key={`imp-${i}`} className="bg-slate-100 border border-slate-200 rounded-full py-0.5 px-2 flex items-center shadow-inner h-5">
-                            <div className="w-1 h-1 rounded-full bg-slate-400 mr-1.5 shrink-0"></div>
+                            <Zap size={10} className="text-blue-500 fill-blue-500 mr-1 shrink-0" />
                             <span className="text-[10px] font-bold text-slate-600 truncate leading-none" title={spec.name}>
                                 {spec.name}
                             </span>
@@ -226,8 +225,10 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         // Show skill if it has dots OR imposed specializations
         const skills = categoryData.filter((s: any) => {
             if (!s || !s.name || s.name.trim() === '') return false; // Skip spacers
-            // GLOBAL FIX: If skill value is 0, we don't show it (no specs visible at 0)
-            return s.value > 0;
+            const hasPoints = s.value > 0;
+            const hasImposed = data.imposedSpecializations[s.id] && data.imposedSpecializations[s.id].length > 0;
+            // Always show if it has points or if MJ imposed something
+            return hasPoints || hasImposed;
         });
 
         if (skills.length === 0) return null;
