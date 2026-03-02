@@ -18,8 +18,9 @@ export const migrateData = (parsed: MigratableData): CharacterSheetData => {
     // Default to version 0 if _schemaVersion is missing (Legacy data)
     const currentVersion = parsed._schemaVersion || 0;
 
-    // If up to date, return as is
+    // If up to date, ensure we still clean up and repair
     if (currentVersion >= CURRENT_SCHEMA_VERSION) {
+        repairAndCleanupData(parsed);
         return parsed as CharacterSheetData;
     }
 
@@ -63,7 +64,82 @@ export const migrateData = (parsed: MigratableData): CharacterSheetData => {
         logger.log(`[Migration] Successfully migrated data from v${currentVersion} to v${CURRENT_SCHEMA_VERSION}`);
     }
 
+    // NEW: Post-migration cleanup and repair
+    repairAndCleanupData(migrated);
+
     return migrated as CharacterSheetData;
+};
+
+/**
+ * Idempotent repair and cleanup function.
+ * - Converts 'null' properties to 'undefined' (Zod compatibility)
+ * - Ensures mandatory structures (counters, etc.)
+ * - Repairs legacy effect types that might have bypassed versioned migrations
+ */
+const repairAndCleanupData = (obj: any): void => {
+    if (!obj || typeof obj !== 'object') return;
+
+    // 1. Recursive Null Cleanup
+    const cleanupNullsRecursive = (item: any) => {
+        if (!item || typeof item !== 'object') return;
+        if (Array.isArray(item)) {
+            item.forEach(cleanupNullsRecursive);
+            return;
+        }
+        Object.keys(item).forEach(key => {
+            const val = item[key];
+            if (val === null) {
+                delete item[key];
+            } else if (typeof val === 'object') {
+                cleanupNullsRecursive(val);
+            }
+        });
+    };
+    cleanupNullsRecursive(obj);
+
+    // 2. Mandatory Structure Repair
+    if (!obj.counters) obj.counters = { custom: [] };
+    if (!obj.counters.volonte) obj.counters.volonte = { id: 'volonte', name: 'Volonté', value: 3, creationValue: 3, max: 10, current: 0 };
+    if (!obj.counters.confiance) obj.counters.confiance = { id: 'confiance', name: 'Confiance', value: 3, creationValue: 3, max: 10, current: 0 };
+    if (!Array.isArray(obj.counters.custom)) obj.counters.custom = [];
+
+    // 3. Effect Types Repair (Idempotent migrateFormulas)
+    const VALID_EFFECT_TYPES = ['free_skill_rank', 'master_skill', 'block_skill_increase', 'formula'];
+    const repairEffects = (entry: any) => {
+        if (entry && Array.isArray(entry.effects)) {
+            entry.effects.forEach((effect: any) => {
+                if (!effect) return;
+                if (!VALID_EFFECT_TYPES.includes(effect.type)) {
+                    // Migrate legacy or invalid type to formula
+                    if (effect.type === 'attribute_bonus' || effect.type === 'counter_max_bonus' || effect.type === 'xp_bonus') {
+                        const legacyType = effect.type;
+                        effect.type = 'formula';
+                        if (legacyType === 'attribute_bonus') {
+                            effect.formula = effect.value?.toString() || '0';
+                        } else if (legacyType === 'counter_max_bonus') {
+                            effect.formula = `${effect.value || 0} * TRAIT_LEVEL`;
+                        } else if (legacyType === 'xp_bonus') {
+                            effect.target = 'XP';
+                            effect.formula = effect.method === 'per_scenario' ? `${effect.value || 0} * SCENARIOS_COUNT` : (effect.value?.toString() || '0');
+                            delete effect.method;
+                        }
+                        delete effect.value;
+                    } else {
+                        // Unknown type, fallback to formula with value 0 to avoid crash
+                        effect.type = 'formula';
+                        effect.formula = '0';
+                        logger.warn(`Unknown effect type repaired: ${effect.type}`);
+                    }
+                }
+            });
+        }
+    };
+
+    if (Array.isArray(obj.library)) obj.library.forEach(repairEffects);
+    if (obj.page2) {
+        if (Array.isArray(obj.page2.avantages)) obj.page2.avantages.forEach(repairEffects);
+        if (Array.isArray(obj.page2.desavantages)) obj.page2.desavantages.forEach(repairEffects);
+    }
 };
 
 /**

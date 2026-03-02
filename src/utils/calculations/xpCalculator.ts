@@ -47,7 +47,7 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
                 normalizedSkillName === effectiveTarget.trim().toLowerCase();
         });
 
-        if (effect) return effect.value;
+        if (effect) return effect.value ?? 0;
 
         // 2. Compétence maîtrisée via master_skill : rang 5 entièrement gratuit
         const hasMasterEffect = activeEffects.some(e => {

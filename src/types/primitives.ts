@@ -94,7 +94,7 @@ export type EffectType = 'free_skill_rank' | 'master_skill' | 'block_skill_incre
 export interface TraitEffect {
   id: string;
   type: EffectType; // Note: 'free_skill_rank', 'master_skill', 'block_skill_increase' are being phased out in favor of 'formula' + operator
-  value: number; // Montant XP ou Rang Max Gratuit
+  value?: number; // Montant XP ou Rang Max Gratuit
   method?: 'fixed' | 'per_scenario';
   target?: string; // Nom de la compétence ciblée (pour free_skill_rank) ou cible de la formule
   source?: string; // Nom du trait d'origine (optionnel)

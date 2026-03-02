@@ -7,20 +7,28 @@ import { MigratableData } from './registry';
  * - Remove "Valets / Dames / Rois"
  */
 export const migrateCounters = (parsed: MigratableData): void => {
-    const counters = parsed.counters as Record<string, any> | undefined;
-    if (!counters) return;
+    if (!parsed.counters) {
+        parsed.counters = {
+            volonte: { id: 'volonte', name: 'Volonté', value: 3, creationValue: 3, max: 10, current: 0 },
+            confiance: { id: 'confiance', name: 'Confiance', value: 3, creationValue: 3, max: 10, current: 0 },
+            custom: []
+        };
+        return;
+    }
+
+    const counters = parsed.counters as Record<string, any>;
 
     // Convert old structure to new DotEntry structure
-    if (counters.volonte && !counters.volonte.id) {
-        const oldVolonte = counters.volonte;
-        const oldConfiance = counters.confiance;
+    if (!counters.volonte || !counters.volonte.id) {
+        const oldVolonte = counters.volonte || {};
+        const oldConfiance = counters.confiance || {};
 
         // Update standard ones in place
         counters.volonte = { id: 'volonte', name: 'Volonté', value: oldVolonte.max || oldVolonte.value || 3, creationValue: 3, max: 10, current: 0 };
         counters.confiance = { id: 'confiance', name: 'Confiance', value: oldConfiance.max || oldConfiance.value || 3, creationValue: 3, max: 10, current: 0 };
 
         if (!counters.custom) {
-            counters.custom = INITIAL_DATA.counters.custom;
+            counters.custom = INITIAL_DATA.counters.custom || [];
         }
     }
 

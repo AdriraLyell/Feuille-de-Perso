@@ -97,7 +97,7 @@ export const TraitEntrySchema = z.object({
 export const TraitEffectSchema = z.object({
     id: z.string().default(() => Math.random().toString(36).substr(2, 9)),
     type: z.enum(['free_skill_rank', 'master_skill', 'block_skill_increase', 'formula']),
-    value: z.number(),
+    value: z.number().optional(),
     method: z.enum(['fixed', 'per_scenario']).optional(),
     target: z.string().optional(),
     source: z.string().optional(),
