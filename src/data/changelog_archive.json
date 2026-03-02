@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.97.20",
+        "date": "2026-02-28",
+        "type": "feat",
+        "changes": [
+            "Tooltip : Affichage de l'expression de la formule calculée en haut de l'infobulle.",
+            "Tooltip : Détails récursifs pour les variables d'agrégation (ex: voir le détail des compétences mystiques dans le calcul de la Force Vitale).",
+            "Moteur : Meilleure résolution des configurations (formula/aggregateConfig) lorsque les compteurs pointent vers des IDs de formule.",
+            "Robustesse : Amélioration de smartIncludes pour ignorer le préfixe '@' souvent utilisé dans les filtres de tags/catégories.",
+            "Fix : Correction d'une erreur de schéma Zod sur le champ effectType des formules (nullable)."
+        ]
+    },
+    {
         "version": "2.97.19",
         "date": "2026-02-28",
         "type": "fix",
@@ -667,11 +679,5 @@
         "date": "2026-02-22",
         "type": "fix",
         "description": "Ergonomie : Augmentation de la hauteur de la fenêtre de synchronisation (modal) pour permettre une meilleure visibilité de l'historique des sauvegardes sans défilement excessif."
-    },
-    {
-        "version": "2.69.1",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Ergonomie : Mémorisation de la préférence d'affichage (mode portrait / paysage) dans le cache local (localStorage). Le mode choisi persiste désormais après rechargement de la page."
     }
 ]

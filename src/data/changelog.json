@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.40",
+        "date": "2026-03-02",
+        "type": "fix",
+        "changes": [
+            "Logic : Remplacement du tokenizer ASCII par un UnicodeTokenizer pour supporter les accents dans les formules (ex: Dextérité).",
+            "Logic : Ajout d'une normalisation pré-parsing pour assurer la compatibilité avec le moteur safe-expr-eval.",
+            "Database : Renforcement de la migration restoreMysticLinks pour supporter les correspondances indirectes (ex: Art de la Cartomancie -> Cartomancie).",
+            "Refactor : Éradication massive des 'any' dans les réconciliateurs et utilitaires de calcul."
+        ]
+    },
+    {
         "version": "2.97.39",
         "date": "2026-03-01",
         "type": "chore",
@@ -181,18 +192,6 @@
         "changes": [
             "Tooltip : Correction du lien avec les calculs globaux pour les compteurs perso (récupération forcée des métadonnées de formule).",
             "Moteur : Normalisation des clés de recherche (suppression d'espaces) pour correspondre aux définitions système."
-        ]
-    },
-    {
-        "version": "2.97.20",
-        "date": "2026-02-28",
-        "type": "feat",
-        "changes": [
-            "Tooltip : Affichage de l'expression de la formule calculée en haut de l'infobulle.",
-            "Tooltip : Détails récursifs pour les variables d'agrégation (ex: voir le détail des compétences mystiques dans le calcul de la Force Vitale).",
-            "Moteur : Meilleure résolution des configurations (formula/aggregateConfig) lorsque les compteurs pointent vers des IDs de formule.",
-            "Robustesse : Amélioration de smartIncludes pour ignorer le préfixe '@' souvent utilisé dans les filtres de tags/catégories.",
-            "Fix : Correction d'une erreur de schéma Zod sur le champ effectType des formules (nullable)."
         ]
     }
 ]

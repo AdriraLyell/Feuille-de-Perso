@@ -14,6 +14,7 @@ import { migrateCampaignNotes } from './migrateCampaignNotes';
 import { migrateHeaderDates } from './migrateHeaderDates';
 import { migrateFormulas } from './migrateFormulas';
 import { forceRulesReconciliation } from './forceRulesReconciliation';
+import { restoreMysticLinks } from './restoreMysticLinks';
 
 // Type for data being migrated (starts as raw JSON, ends as CharacterSheetData)
 export type MigratableData = Record<string, any>;
@@ -50,8 +51,11 @@ export const MIGRATIONS: Record<number, MigrationFunction[]> = {
     ],
     6: [
         forceRulesReconciliation  // Re-force after reconcileCleanup fix (re-injects skillLibrary with mysticAbilityId)
+    ],
+    7: [
+        restoreMysticLinks
     ]
 };
 
-export const CURRENT_SCHEMA_VERSION = 6;
+export const CURRENT_SCHEMA_VERSION = 7;
 

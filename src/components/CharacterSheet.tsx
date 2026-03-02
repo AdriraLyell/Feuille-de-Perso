@@ -124,12 +124,12 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
 
         // 1. Check Learning (0 -> 1)
         if (skill.value === 0 && newValue > 0) {
-            return canLearnNewMysticSkill(data, skill.name, rules, !!creationActive);
+            return canLearnNewMysticSkill(data, skill.name, rules, !!creationActive, id);
         }
 
         // 2. Check Increase (>0)
         if (skill.value > 0 && newValue > skill.value) {
-            return canIncreaseMysticSkill(data, skill.name, rules);
+            return canIncreaseMysticSkill(data, skill.name, rules, id);
         }
 
         return { allowed: true };

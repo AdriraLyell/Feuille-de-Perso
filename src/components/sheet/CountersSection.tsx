@@ -6,7 +6,8 @@ import { useRules } from '../../context/RulesContext';
 import { normalizeString } from '../../utils/stringUtils';
 import { evaluateFormula, getSheetVariables, getAggregateDetails } from '../../utils/formulaEvaluator';
 import { Minus, Plus, RefreshCw } from 'lucide-react';
-import { Parser, Tokenizer } from 'safe-expr-eval';
+import { Parser } from 'safe-expr-eval';
+import { UnicodeTokenizer, normalizeFormula } from '../../utils/unicodeTokenizer';
 import { PortalTooltip } from '../ui/PortalTooltip';
 import { RulesData, RulesCounterDefinition } from '../../types/rules';
 import { LibraryFormulaEntry, LibraryCounterEntry } from '../../types/system';
@@ -15,7 +16,7 @@ const parser = new Parser();
 
 const getExpressionVariables = (formula: string): string[] => {
     try {
-        const tokenizer = new Tokenizer(formula);
+        const tokenizer = new UnicodeTokenizer(normalizeFormula(formula));
         const tokens = tokenizer.tokenize();
         return Array.from(new Set(
             tokens
@@ -177,7 +178,7 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
             let parsedVars: string[] = [];
             let baseValue = 0;
             try {
-                const expr = parser.parse(formula);
+                const expr = parser.parse(normalizeFormula(formula));
                 parsedVars = getExpressionVariables(formula);
                 const zeroContext: Record<string, number> = parsedVars.reduce((acc, v) => ({ ...acc, [v]: 0 }), {} as Record<string, number>);
                 baseValue = Number(expr.evaluate(zeroContext)) || 0;

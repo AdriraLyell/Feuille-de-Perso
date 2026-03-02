@@ -216,14 +216,41 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
     const processTraitList = (list: TraitEntry[], type: 'avantage' | 'desavantage'): TraitEntry[] => {
         if (!list) return [];
         return list.map(existing => {
+            const normalizedName = normalizeString(existing.name);
             const libMatch = existing.definitionId
                 ? rules.libraries?.traits?.find(t => t.id === existing.definitionId)
                 : rules.libraries?.traits?.find(t =>
-                    t.type === type && normalizeString(t.name) === normalizeString(existing.name)
+                    t.type === type && normalizeString(t.name) === normalizedName
                 );
 
+            let mysticAbilityId = libMatch?.mysticAbilityId || existing.mysticAbilityId;
+
+            // Fallback: If no mysticAbilityId is linked, try to find an official Mystic Ability with the same name
+            // (Used because DB table libraries_traits doesn't host mystic_ability_id but names usually match)
+            if (!mysticAbilityId && rules.libraries?.mysticAbilities) {
+                const ultraName = normalizedName.split(' ').map(word => word.endsWith('s') ? word.slice(0, -1) : word).join(' ');
+                const abilityMatch = rules.libraries.mysticAbilities.find(a => {
+                    const normA = normalizeString(a.name);
+                    const ultraA = normA.split(' ').map(word => word.endsWith('s') ? word.slice(0, -1) : word).join(' ');
+                    return normA === normalizedName || ultraA === ultraName || normA === ultraName || ultraA === normalizedName;
+                });
+
+                if (abilityMatch) {
+                    mysticAbilityId = abilityMatch.id;
+                } else if (rules.libraries?.skills) {
+                    // INDIRECT Fallback: if trait name (e.g. "Don de Cartomancie") contains a mystic skill name ("Cartomancie")
+                    const skillMatch = rules.libraries.skills.find(s =>
+                        s.mysticAbilityId &&
+                        (normalizedName.includes(normalizeString(s.name)) || normalizeString(s.name).includes(normalizedName))
+                    );
+                    if (skillMatch) {
+                        mysticAbilityId = skillMatch.mysticAbilityId ?? undefined;
+                    }
+                }
+            }
+
             if (libMatch) {
-                const isMystic = libMatch.mysticAbilityId || libMatch.tags?.some(tag => normalizeString(tag) === 'mystique');
+                const isMystic = mysticAbilityId || libMatch.tags?.some(tag => normalizeString(tag) === 'mystique');
 
                 // --- Migration Logic ---
                 // We ensure the character trait has the latest flags from the library
@@ -234,13 +261,18 @@ const reconcileTraits = (newState: CharacterSheetData, currentState: CharacterSh
                 return {
                     ...existing,
                     definitionId: libMatch.id,
-                    mysticAbilityId: libMatch.mysticAbilityId || existing.mysticAbilityId,
+                    mysticAbilityId: mysticAbilityId,
                     tag: isMystic ? 'Mystique' : existing.tag,
                     // Copy native properties from library if missing
                     hasAutoCounter: libMatch.hasAutoCounter ?? existing.hasAutoCounter,
                     autoCounterName: libMatch.autoCounterName ?? existing.autoCounterName,
                     isXPUpgradeable: libMatch.isXPUpgradeable ?? existing.isXPUpgradeable
                 };
+            }
+
+            // Even if not in library, if we found a mystic link, preserve/inject it
+            if (mysticAbilityId && mysticAbilityId !== existing.mysticAbilityId) {
+                return { ...existing, mysticAbilityId, tag: 'Mystique' };
             }
 
             return existing;

@@ -1,54 +1,50 @@
 import { CharacterSheetData } from '../../types';
 import { normalizeString } from '../stringUtils';
 
+// Helper for fuzzy plural mapping: removes all 's' at end of words
+const ultraNormalize = (name: string): string => {
+    return normalizeString(name).split(' ').map(word => word.endsWith('s') ? word.slice(0, -1) : word).join(' ');
+};
+
 /**
- * Migration V6: Restaure les liens mysticAbilityId qui ont pu être perdus 
- * lors de la réconciliation trop agressive.
- * 
- * Stratégie :
- * - La skillLibrary du personnage est la source de vérité pour savoir quels 
- *   skills mystiques ont un mysticAbilityId.
- * - Les instances de compétences sur la fiche sont re-linkées depuis la skillLibrary
- *   (par id ou par nom normalisé).
- * - Les traits Avantages/Désavantages liés à une mysticAbility (via le chemin
- *   mysticAbilityId OU un tag "Mystique") sont aussi restaurés.
+ * Migration V7: Restaure les liens mysticAbilityId qui ont pu etre perdus.
+ * Version amelioree pour gerer les Talents Exceptionnels et les erreurs d'encodage.
  */
-export const restoreMysticLinks = (data: CharacterSheetData): void => {
+export const restoreMysticLinks = (data: CharacterSheetData | Record<string, any>): void => {
+    if (!data) return;
 
-    // 1. Construire la map skillLibrary : nom normalisé → mysticAbilityId
-    //    et defId → mysticAbilityId
-    const libByName = new Map<string, string>();
-    const libById = new Map<string, string>();
-
-    if (data.skillLibrary && Array.isArray(data.skillLibrary)) {
-        data.skillLibrary.forEach(libSkill => {
-            if (libSkill.mysticAbilityId) {
-                if (libSkill.name) {
-                    libByName.set(normalizeString(libSkill.name), libSkill.mysticAbilityId);
-                }
-                libById.set(libSkill.id, libSkill.mysticAbilityId);
+    // 1. Map des habilites par nom normalise (ultra-fuzzy)
+    const abilityByName = new Map<string, string>();
+    if (data.mysticAbilities && Array.isArray(data.mysticAbilities)) {
+        data.mysticAbilities.forEach(ability => {
+            if (ability.id && ability.name) {
+                const norm = normalizeString(ability.name);
+                const ultra = ultraNormalize(ability.name);
+                abilityByName.set(norm, ability.id);
+                abilityByName.set(ultra, ability.id);
             }
         });
     }
 
-    // 2. Réparer les instances de compétences sur la fiche depuis la skillLibrary
-    if (data.skills && (libByName.size > 0 || libById.size > 0)) {
+    // 2. Maps de la bibliotheque (Skill Name -> Mystic Ability ID)
+    const skillLibByName = new Map<string, string>();
+    if (data.skillLibrary && Array.isArray(data.skillLibrary)) {
+        data.skillLibrary.forEach(libSkill => {
+            if (libSkill.mysticAbilityId) {
+                skillLibByName.set(normalizeString(libSkill.name), libSkill.mysticAbilityId);
+            }
+        });
+    }
+
+    // 3. Reparer les competences
+    if (data.skills) {
         Object.values(data.skills).forEach(skillList => {
             if (Array.isArray(skillList)) {
                 skillList.forEach((skill: any) => {
-                    if (skill.mysticAbilityId) return; // déjà linké
-
-                    // Priorité 1 : match par definitionId
-                    if (skill.definitionId && libById.has(skill.definitionId)) {
-                        skill.mysticAbilityId = libById.get(skill.definitionId);
-                        return;
-                    }
-
-                    // Priorité 2 : match par nom normalisé
-                    if (skill.name) {
+                    if (skill && !skill.mysticAbilityId && skill.name) {
                         const norm = normalizeString(skill.name);
-                        if (libByName.has(norm)) {
-                            skill.mysticAbilityId = libByName.get(norm);
+                        if (skillLibByName.has(norm)) {
+                            skill.mysticAbilityId = skillLibByName.get(norm);
                         }
                     }
                 });
@@ -56,34 +52,43 @@ export const restoreMysticLinks = (data: CharacterSheetData): void => {
         });
     }
 
-    // 3. Construire la map abilities (id mysticAbility → true) 
-    //    pour valider les liens mystiques des traits
-    const validAbilityIds = new Set<string>();
-    if (data.mysticAbilities && Array.isArray(data.mysticAbilities)) {
-        data.mysticAbilities.forEach(ability => {
-            if (ability.id) validAbilityIds.add(ability.id);
-        });
-    }
+    // 4. Reparer les traits (Avantages)
+    const repairTraits = (traitList: any[]) => {
+        if (!traitList || !Array.isArray(traitList)) return;
 
-    // 4. Réparer les Avantages — s'assurer que tag = 'Mystique' si mysticAbilityId est présent
-    if (data.page2?.avantages && Array.isArray(data.page2.avantages)) {
-        data.page2.avantages.forEach(trait => {
-            if (trait.mysticAbilityId && validAbilityIds.has(trait.mysticAbilityId)) {
-                if (!trait.tag || trait.tag === '') {
-                    trait.tag = 'Mystique';
+        traitList.forEach(trait => {
+            if (!trait || !trait.name) return;
+            const norm = normalizeString(trait.name);
+            const ultra = ultraNormalize(trait.name);
+
+            // Match avec l'habilite (ex: "Talent(s) Exceptionnel(s)")
+            if (!trait.mysticAbilityId) {
+                if (abilityByName.has(norm)) {
+                    trait.mysticAbilityId = abilityByName.get(norm);
+                } else if (abilityByName.has(ultra)) {
+                    trait.mysticAbilityId = abilityByName.get(ultra);
                 }
             }
-        });
-    }
 
-    // 5. Idem pour les Désavantages
-    if (data.page2?.desavantages && Array.isArray(data.page2.desavantages)) {
-        data.page2.desavantages.forEach(trait => {
-            if (trait.mysticAbilityId && validAbilityIds.has(trait.mysticAbilityId)) {
-                if (!trait.tag || trait.tag === '') {
-                    trait.tag = 'Mystique';
+            // Match indirect avec un skill (ex: "Art de la Cartomancie" -> "Cartomancie")
+            if (!trait.mysticAbilityId) {
+                for (const [skillName, abilityId] of skillLibByName.entries()) {
+                    if (norm.includes(skillName)) {
+                        trait.mysticAbilityId = abilityId;
+                        break;
+                    }
                 }
             }
+
+            // Assurer le tag
+            if (trait.mysticAbilityId && (!trait.tag || trait.tag === '')) {
+                trait.tag = 'Mystique';
+            }
         });
+    };
+
+    if (data.page2) {
+        repairTraits(data.page2.avantages);
+        repairTraits(data.page2.desavantages);
     }
 };

@@ -201,7 +201,7 @@ function processBackgrounds(
         const allExistingSkills = Object.values(currentState.skills).flat() as DotEntry[];
         const namesAddedToBgs = new Set<string>();
 
-        const syncedBgs = ruleBackgrounds.flatMap(name => {
+        const syncedBgs: DotEntry[] = (ruleBackgrounds as string[]).flatMap(name => {
             namesAddedToBgs.add(name);
 
             const libBg = rules.libraries?.backgrounds?.find(b => normalizeString(b.name) === normalizeString(name));
@@ -221,6 +221,7 @@ function processBackgrounds(
                     ...existing,
                     name,
                     definitionId,
+                    mysticAbilityId: (libBg?.mysticAbilityId || existing.mysticAbilityId) ?? undefined,
                     max: 5,
                     description: description || existing.description
                 }));
@@ -233,14 +234,15 @@ function processBackgrounds(
                     creationValue: 0,
                     max: 5,
                     variant: isVariable ? "" : undefined,
-                    definitionId
+                    definitionId,
+                    mysticAbilityId: libBg?.mysticAbilityId ?? undefined
                 }];
             }
         });
 
         const remainingBgs = allExistingSkills.filter((e: DotEntry) => {
             if (!e || !e.name || namesAddedToBgs.has(e.name)) return false;
-            if (e.definitionId && syncedBgs.some(s => s.id === e.id)) return false;
+            if (e.definitionId && syncedBgs.some(s => (s as DotEntry).id === e.id)) return false;
 
             const wasInBackgroundCat = Object.keys(currentState.skills).some(catId => {
                 const catDef = rules.definitions.skillCategories?.find(c => c.id === catId);
@@ -257,7 +259,7 @@ function processBackgrounds(
 
         newSkills[dynamicBgCat] = [...syncedBgs, ...remainingBgs];
 
-        const allBgIds = new Set([...syncedBgs, ...remainingBgs].map(s => s.id));
+        const allBgIds = new Set([...syncedBgs, ...remainingBgs].map(s => (s as DotEntry).id));
 
         Object.keys(newSkills).forEach(catId => {
             if (catId !== dynamicBgCat && Array.isArray(newSkills[catId])) {

@@ -1,5 +1,6 @@
 import { RulesData } from '../types/rules';
 import { Parser } from 'safe-expr-eval';
+import { normalizeFormula } from './unicodeTokenizer';
 
 /**
  * Vérifie si la syntaxe d'une formule est valide via expr-eval
@@ -8,7 +9,7 @@ export const isFormulaSyntaxValid = (formula?: string): boolean => {
     if (!formula || formula.trim() === '') return true;
     try {
         const parser = new Parser();
-        parser.parse(formula);
+        parser.parse(normalizeFormula(formula));
         return true;
     } catch {
         return false;

@@ -74,10 +74,10 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
     if (!rules) return rules;
 
     const behaviorMap: Record<string, SkillBehavior> = {
-        'Col_Comp_1': 'Compétence',
-        'Col_Comp_2': 'Compétence',
-        'Col_Comp_3': 'Compétence',
-        'Col_Comp_4': 'Compétence',
+        'Col_Comp_1': 'Comp\u00e9tence',
+        'Col_Comp_2': 'Comp\u00e9tence',
+        'Col_Comp_3': 'Comp\u00e9tence',
+        'Col_Comp_4': 'Comp\u00e9tence',
         'Col_Comp_5': 'Secondaire',
         'Col_Comp_6': 'Secondaire',
         'Col_Comp_7': 'Secondaire',
@@ -95,7 +95,7 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
 
         Object.entries(LEGACY_SKILL_MAP).forEach(([oldKey, newId]) => {
             const label = (labels[oldKey] || labels[newId] || oldKey.charAt(0).toUpperCase() + oldKey.slice(1)) as string;
-            const behavior = (behaviorMap[newId] || 'Compétence') as SkillBehavior;
+            const behavior = (behaviorMap[newId] || 'Comp\u00e9tence') as SkillBehavior;
             const factor = behavior === 'Secondaire' ? 0.5 : 1;
             const type: 'linear' | 'triangular' = (behavior === 'Arrière-plan' || behavior === 'Compteur') ? 'linear' : 'triangular';
 
@@ -104,7 +104,7 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
                 label: label,
                 behavior: behavior,
                 description: "",
-                allowSpecializations: behavior === 'Compétence',
+                allowSpecializations: behavior === 'Comp\u00e9tence',
                 costConfig: { factor, type }
             });
         });

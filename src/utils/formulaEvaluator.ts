@@ -1,4 +1,5 @@
-import { Parser, Tokenizer } from 'safe-expr-eval';
+import { Parser } from 'safe-expr-eval';
+import { UnicodeTokenizer, normalizeFormula } from './unicodeTokenizer';
 import { CharacterSheetData } from '../types';
 import { normalizeString, smartIncludes } from './stringUtils';
 
@@ -6,7 +7,7 @@ const parser = new Parser();
 
 const getExpressionVariables = (formula: string): string[] => {
     try {
-        const tokenizer = new Tokenizer(formula);
+        const tokenizer = new UnicodeTokenizer(normalizeFormula(formula));
         const tokens = tokenizer.tokenize();
         return Array.from(new Set(
             tokens
@@ -163,7 +164,7 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
 const evaluateWithContext = (formula: string, context: Record<string, number>, resolver?: (name: string) => number): number => {
     if (!formula) return 0;
     try {
-        const expr = parser.parse(formula);
+        const expr = parser.parse(normalizeFormula(formula));
 
         // Custom resolver for missing variables if needed
         if (resolver) {
@@ -354,7 +355,7 @@ export const evaluateFormula = (
         }
 
         // Use safe-expr-eval parser
-        const expr = parser.parse(formula);
+        const expr = parser.parse(normalizeFormula(formula));
 
         // Map undefined variables to 0 to prevent evaluation errors
         getExpressionVariables(formula).forEach((v: string) => {

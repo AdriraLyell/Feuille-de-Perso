@@ -90,13 +90,25 @@ export const getMysticCapacity = (sheet: CharacterSheetData, mysticAbilityId: st
 export const canIncreaseMysticSkill = (
     sheet: CharacterSheetData,
     skillName: string,
-    rules: RulesData | null
+    rules: RulesData | null,
+    skillId?: string
 ): { allowed: boolean, reason?: string } => {
     const config = getMysticRules(rules);
     if (!config.active) return { allowed: true };
 
-    const libSkill = sheet.skillLibrary?.find(s => s.name === skillName);
-    const mysticAbilityId = libSkill?.mysticAbilityId;
+    // Try to find the specific instance first to get its mysticAbilityId
+    let mysticAbilityId: string | undefined;
+    if (skillId) {
+        const allSkills = Object.values(sheet.skills).flat();
+        const instance = allSkills.find(s => s.id === skillId);
+        mysticAbilityId = (instance as any)?.mysticAbilityId;
+    }
+
+    // Fallback to library if not found on instance
+    if (!mysticAbilityId) {
+        const libSkill = (sheet as any).skillLibrary?.find((s: any) => s.name === skillName);
+        mysticAbilityId = libSkill?.mysticAbilityId;
+    }
 
     if (!mysticAbilityId) return { allowed: true }; // Not a mystic skill
 
@@ -105,12 +117,6 @@ export const canIncreaseMysticSkill = (
     if (!trait) {
         return { allowed: false, reason: "Vous devez posséder l'Avantage lié pour augmenter cette compétence." };
     }
-
-    // 2. Check Capacity (Only affects NEW skills usually, but let's check intent)
-    // Logic: If I already have the skill (value > 0), I can increase it freely (assuming I have the trait).
-    // The capacity limits the NUMBER of skills, not their rank.
-    // So if I have the skill at 1, increasing to 2 is fine regardless of capacity limits.
-    // Capacity only matters when going from 0 to 1 (Learning).
 
     return { allowed: true };
 };
@@ -122,13 +128,23 @@ export const canLearnNewMysticSkill = (
     sheet: CharacterSheetData,
     skillName: string,
     rules: RulesData | null,
-    isCreationMode: boolean
+    isCreationMode: boolean,
+    skillId?: string
 ): { allowed: boolean, reason?: string } => {
     const config = getMysticRules(rules);
     if (!config.active) return { allowed: true };
 
-    const libSkill = sheet.skillLibrary?.find(s => s.name === skillName);
-    const mysticAbilityId = libSkill?.mysticAbilityId;
+    let mysticAbilityId: string | undefined;
+    if (skillId) {
+        const allSkills = Object.values(sheet.skills).flat();
+        const instance = allSkills.find(s => s.id === skillId);
+        mysticAbilityId = (instance as any)?.mysticAbilityId;
+    }
+
+    if (!mysticAbilityId) {
+        const libSkill = (sheet as any).skillLibrary?.find((s: any) => s.name === skillName);
+        mysticAbilityId = libSkill?.mysticAbilityId;
+    }
 
     if (!mysticAbilityId) return { allowed: true };
 
