@@ -1,17 +1,20 @@
+import { MigratableData } from './registry';
+
 /**
  * Migration: Terminology renaming
  * - vertus → avantages
  * - defauts → desavantages
  */
-export const migrateTerminology = (parsed: any): void => {
-    if (!parsed.page2) return;
+export const migrateTerminology = (parsed: MigratableData): void => {
+    const page2 = parsed.page2 as Record<string, unknown> | undefined;
+    if (!page2) return;
 
-    if (parsed.page2.vertus && !parsed.page2.avantages) {
-        parsed.page2.avantages = parsed.page2.vertus;
-        delete parsed.page2.vertus;
+    if ('vertus' in page2 && !('avantages' in page2)) {
+        page2.avantages = page2.vertus;
+        delete (page2 as any).vertus;
     }
-    if (parsed.page2.defauts && !parsed.page2.desavantages) {
-        parsed.page2.desavantages = parsed.page2.defauts;
-        delete parsed.page2.defauts;
+    if ('defauts' in page2 && !('desavantages' in page2)) {
+        page2.desavantages = page2.defauts;
+        delete (page2 as any).defauts;
     }
 };

@@ -61,6 +61,7 @@ export const useAutoSave = (
 
     return {
         countdown: (data.syncInfo?.isAutoSyncEnabled && isDirty) ? timeLeft : undefined,
-        isDirty
+        isDirty,
+        setLastSavedState: () => setIsDirty(false)
     };
 };

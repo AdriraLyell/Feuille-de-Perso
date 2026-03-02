@@ -1,5 +1,6 @@
 import { INITIAL_DATA } from '../../data/initialState';
 import { LibrarySkillEntry } from '../../types';
+import { MigratableData } from './registry';
 
 /**
  * Migration: Libraries (skills, traits)
@@ -9,30 +10,31 @@ import { LibrarySkillEntry } from '../../types';
  * - Migrate library type names (vertu → avantage)
  * - Ensure isVariable flag is set correctly
  */
-export const migrateLibrary = (parsed: any): void => {
+export const migrateLibrary = (parsed: MigratableData): void => {
     // Fix key casing typo
     if (parsed.skilllibrary && !parsed.skillLibrary) {
         parsed.skillLibrary = parsed.skilllibrary;
-        delete parsed.skilllibrary;
+        delete (parsed as any).skilllibrary;
     }
 
     // Pre-fill skillLibrary
-    if (!parsed.skillLibrary || parsed.skillLibrary.length === 0) {
+    if (!parsed.skillLibrary || !Array.isArray(parsed.skillLibrary) || parsed.skillLibrary.length === 0) {
         const initialSkillList: LibrarySkillEntry[] = [...INITIAL_DATA.skillLibrary];
         const seenNames = new Set<string>(initialSkillList.map(s => s.name.trim().toLowerCase()));
 
         // Harvest skills from sheet data
-        if (parsed.skills) {
-            Object.keys(parsed.skills).forEach(cat => {
+        const skillsData = parsed.skills as Record<string, any[]> | undefined;
+        if (skillsData) {
+            Object.keys(skillsData).forEach(cat => {
                 if (cat === 'arrieres_plans') return;
-                const skills = parsed.skills[cat] || [];
+                const skills = skillsData[cat] || [];
                 skills.forEach((skill: any) => {
-                    if (skill.name && skill.name.trim() !== '') {
+                    if (skill && skill.name && skill.name.trim() !== '') {
                         const normalized = skill.name.trim().toLowerCase();
                         if (!seenNames.has(normalized)) {
                             seenNames.add(normalized);
                             initialSkillList.push({
-                                id: Math.random().toString(36).substr(2, 9),
+                                id: Math.random().toString(36).substring(2, 11),
                                 name: skill.name,
                                 defaultCategory: cat,
                                 description: "",
@@ -48,7 +50,7 @@ export const migrateLibrary = (parsed: any): void => {
     }
 
     // Update isVariable flag from INITIAL_DATA
-    if (parsed.skillLibrary) {
+    if (Array.isArray(parsed.skillLibrary)) {
         const defaultVariableStatus = new Map<string, boolean>();
         INITIAL_DATA.skillLibrary.forEach(s => {
             if (s.isVariable) {
@@ -57,8 +59,8 @@ export const migrateLibrary = (parsed: any): void => {
         });
 
         parsed.skillLibrary.forEach((s: any) => {
-            const normalized = s.name.trim().toLowerCase();
-            if (defaultVariableStatus.has(normalized) && typeof s.isVariable === 'undefined') {
+            const normalized = s.name?.trim().toLowerCase();
+            if (normalized && defaultVariableStatus.has(normalized) && typeof s.isVariable === 'undefined') {
                 s.isVariable = true;
             }
         });
@@ -70,7 +72,7 @@ export const migrateLibrary = (parsed: any): void => {
     }
 
     // Migrate library type names
-    if (parsed.library) {
+    if (Array.isArray(parsed.library)) {
         parsed.library = parsed.library.map((l: any) => ({
             ...l,
             type: l.type === 'vertu' ? 'avantage' : (l.type === 'defaut' ? 'desavantage' : l.type),

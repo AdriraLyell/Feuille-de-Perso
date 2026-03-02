@@ -15,7 +15,7 @@ interface CampaignConflictModalProps {
 
 const CampaignConflictModal: React.FC<CampaignConflictModalProps> = ({
     isOpen,
-
+    onClose,
     characterName,
     currentCampaignName,
     newCampaignName,

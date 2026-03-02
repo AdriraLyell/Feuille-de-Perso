@@ -9,7 +9,7 @@
 ## Procédure
 
 1. Cloud écrit plan minimal
-2. Local génère code sur disque
+2. Local (MCP) génère code sur disque
 3. Cloud valide uniquement la diff
 4. CLI commit
 

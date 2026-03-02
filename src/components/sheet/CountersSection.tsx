@@ -278,12 +278,14 @@ interface CountersSectionProps {
 export const CountersSection = React.memo<CountersSectionProps>(({
     data,
     updateCounter,
+    isLandscape,
     creationBonuses = {},
     xpBonuses = {},
     calculatedMaxes = {},
     activeReserves = []
 }) => {
     const { rules } = useRules();
+
 
     const renderCounterItem = (counter: DotEntry, isCustom: boolean) => {
         const isSquaresOnly = counter.variant === 'squares_only';

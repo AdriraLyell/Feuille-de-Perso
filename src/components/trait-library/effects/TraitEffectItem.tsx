@@ -18,7 +18,7 @@ interface TraitEffectItemProps {
 
 export const TraitEffectItem: React.FC<TraitEffectItemProps> = ({
     effect,
-
+    index,
     allSkills,
     allAttributes,
     allCounters,

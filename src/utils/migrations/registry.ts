@@ -15,8 +15,12 @@ import { migrateHeaderDates } from './migrateHeaderDates';
 import { migrateFormulas } from './migrateFormulas';
 import { forceRulesReconciliation } from './forceRulesReconciliation';
 
+// Type for data being migrated (starts as raw JSON, ends as CharacterSheetData)
+export type MigratableData = Record<string, any>;
+
 // Type for a migration function
-type MigrationFunction = (data: any) => void;
+type MigrationFunction = (data: MigratableData) => void;
+
 
 // Registry of migrations by version
 // Version 1 corresponds to "Legacy to Current" massive migration

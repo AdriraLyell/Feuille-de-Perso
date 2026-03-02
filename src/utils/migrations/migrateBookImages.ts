@@ -13,7 +13,7 @@ export const migrateBookImages = async (content: any): Promise<any> => {
         if (!node) return node;
 
         // If it's a standard Tiptap Image with Base64
-        if (node.type === 'image' && node.attrs?.src?.startsWith('data:image')) {
+        if (node.type === 'image' && node.attrs?.src && typeof node.attrs.src === 'string' && node.attrs.src.startsWith('data:image')) {
             try {
                 const blob = await base64ToBlob(node.attrs.src);
                 const imageId = await saveImage(blob);
@@ -25,7 +25,7 @@ export const migrateBookImages = async (content: any): Promise<any> => {
                         imageId,
                         width: '100%',
                         align: 'center',
-                        caption: node.attrs.title || node.attrs.alt || ''
+                        caption: (node.attrs.title || node.attrs.alt || '') as string
                     }
                 };
             } catch (err) {

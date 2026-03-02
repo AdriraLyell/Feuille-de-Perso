@@ -34,12 +34,13 @@ export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (
                 try {
                     const blob = await getImage(note.imageId);
                     if (blob) {
-                        (note as any).base64Cover = await blobToBase64(blob);
+                        const typedNote = note as any;
+                        typedNote.base64Cover = await blobToBase64(blob);
                     }
                 } catch (e) {
                     ErrorService.handleError(e, { context: 'ExportCharacter', userMessage: `Impossible d'exporter l'image de couverture de la note ${note.id}` });
                 }
-                delete note.imageId;
+                delete (note as any).imageId;
             }
 
             // Gallery Images
@@ -74,8 +75,8 @@ export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (
         }
     };
 
-    if (!(dataToProcess as any).appVersion) {
-        (dataToProcess as any).appVersion = APP_VERSION;
+    if (!dataToProcess.appVersion) {
+        dataToProcess.appVersion = APP_VERSION;
     }
 
     // 2. Compression
@@ -136,8 +137,9 @@ export const createTemplateFromData = (source: CharacterSheetData): CharacterShe
     // Reset Attributes Values
     if (clean.attributes) {
         Object.keys(clean.attributes).forEach(cat => {
-            if (Array.isArray(clean.attributes[cat])) {
-                clean.attributes[cat].forEach((attr: AttributeEntry) => {
+            const attrs = clean.attributes[cat] as AttributeEntry[] | undefined;
+            if (Array.isArray(attrs)) {
+                attrs.forEach((attr: AttributeEntry) => {
                     attr.val1 = ""; attr.val2 = ""; attr.val3 = "";
                     attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
                 });

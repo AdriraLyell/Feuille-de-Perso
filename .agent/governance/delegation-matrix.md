@@ -4,8 +4,8 @@
 |-------|------------|
 | Architecture | Cloud |
 | Plan d'implémentation | Cloud |
-| Génération massive | Local |
-| Refactor global | Local |
+| Génération massive | Local (MCP) |
+| Refactor global | Local (MCP) |
 | Commandes Git | CLI |
 | CI Debug | CLI |
 | Migration DB | CLI + MCP |

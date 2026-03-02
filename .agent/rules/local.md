@@ -1,4 +1,8 @@
-# AGENT LOCAL (LM STUDIO)
+---
+trigger: always_on
+---
+
+# AGENT LOCAL (LM STUDIO via MCP)
 
 ## RÔLE
 

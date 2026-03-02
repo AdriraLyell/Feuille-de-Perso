@@ -294,10 +294,10 @@ const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterS
             }
 
             // Normalise traits tags into a sorted array for comparison
-            const offTagsList = Array.isArray(off.tags) ? off.tags.map(normalizeString).sort() : [];
-            const locTagsList = Array.isArray(local.tags)
+            const offTagsList = (Array.isArray(off.tags) ? off.tags.map(normalizeString).sort() : []) as string[];
+            const locTagsList = (Array.isArray(local.tags)
                 ? local.tags.map(normalizeString).sort()
-                : (local.tag ? [normalizeString(local.tag)] : []);
+                : (local.tag ? [normalizeString(local.tag)] : [])) as string[];
 
             if (JSON.stringify(offTagsList) !== JSON.stringify(locTagsList)) return false;
 
@@ -308,7 +308,7 @@ const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterS
             // Robust Effects Comparison (ignore IDs, ignore property order, drop empty)
             const simplifyEffects = (effects: any[]) => (effects || []).map(eff => {
                 const { id: _id, definitionId: _definitionId, formulaId: _formulaId, ...rest } = eff; // skip IDs
-                return JSON.stringify(Object.keys(rest).sort().reduce((obj: any, key) => {
+                return JSON.stringify(Object.keys(rest).sort().reduce((obj: Record<string, string>, key) => {
                     // Only keep properties that have real value
                     if (rest[key] !== '' && rest[key] !== undefined && rest[key] !== null) {
                         obj[key] = String(rest[key]); // Force string to bypass 1 vs "1"
@@ -379,7 +379,7 @@ const reconcileHeader = (newState: CharacterSheetData, rules: RulesData) => {
     };
 
     // Helper to format fictional date
-    const formatFictionalDate = (year: number, monthIndex: number, day: number, months: any[]) => {
+    const formatFictionalDate = (year: number, monthIndex: number, day: number, months: { name: string }[]) => {
         const monthName = months[monthIndex]?.name || `Mois ${monthIndex + 1}`;
         return `${day} ${monthName} ${year}`;
     };

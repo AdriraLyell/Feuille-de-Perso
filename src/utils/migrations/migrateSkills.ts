@@ -1,5 +1,6 @@
 import { INITIAL_DATA } from '../../data/initialState';
 import { LibrarySkillEntry } from '../../types';
+import { MigratableData } from './registry';
 
 /**
  * Map of legacy skill category IDs to generic IDs
@@ -31,67 +32,68 @@ export const REQUIRED_SKILL_CATS = [
  * - Add creationValue property to skills
  * - Fix variable skills using skillLibrary
  */
-export const migrateSkills = (parsed: any): void => {
+export const migrateSkills = (parsed: MigratableData): void => {
     // Initialize skills object
     if (!parsed.skills) {
         parsed.skills = {};
     }
 
-    // STEP 1: Migrate legacy skill category keys FIRST (before adding defaults)
-    // This renames the keys without merging
+    const rawSkills = parsed.skills as Record<string, any[]>;
+
+    // STEP 1: Migrate legacy skill category keys FIRST
     Object.keys(LEGACY_SKILL_MAP).forEach(oldKey => {
-        if (parsed.skills[oldKey]) {
+        if (rawSkills[oldKey]) {
             const newKey = LEGACY_SKILL_MAP[oldKey];
-            // Only move if the new key doesn't exist - don't merge!
-            if (!parsed.skills[newKey]) {
-                parsed.skills[newKey] = parsed.skills[oldKey];
+            if (!rawSkills[newKey]) {
+                rawSkills[newKey] = rawSkills[oldKey];
             }
-            delete parsed.skills[oldKey];
+            delete rawSkills[oldKey];
         }
     });
 
     // STEP 2: Inject from INITIAL_DATA only for truly missing categories
     Object.keys(INITIAL_DATA.skills).forEach(key => {
-        if (!parsed.skills[key]) {
-            parsed.skills[key] = INITIAL_DATA.skills[key];
+        if (!rawSkills[key]) {
+            rawSkills[key] = INITIAL_DATA.skills[key];
         }
     });
 
     // STEP 3: Ensure all required categories exist
     REQUIRED_SKILL_CATS.forEach(cat => {
-        if (!parsed.skills[cat]) {
-            parsed.skills[cat] = INITIAL_DATA.skills[cat] || [];
+        if (!rawSkills[cat]) {
+            rawSkills[cat] = INITIAL_DATA.skills[cat] || [];
         }
     });
 
     // STEP 4: Ensure all skills have creationValue
     const ensureCreationValue = (list: any[]) => {
         return list.map(item => {
-            if (typeof item.creationValue === 'undefined') {
+            if (item && typeof item.creationValue === 'undefined') {
                 return { ...item, creationValue: 0 };
             }
             return item;
         });
     };
 
-    Object.keys(parsed.skills).forEach(key => {
-        if (Array.isArray(parsed.skills[key])) {
-            parsed.skills[key] = ensureCreationValue(parsed.skills[key]);
+    Object.keys(rawSkills).forEach(key => {
+        if (Array.isArray(rawSkills[key])) {
+            rawSkills[key] = ensureCreationValue(rawSkills[key]);
         }
     });
 
     // STEP 5: Fix variable skills using skillLibrary as Source of Truth
-    if (parsed.skills && parsed.skillLibrary) {
+    const skillLibrary = parsed.skillLibrary as LibrarySkillEntry[] | undefined;
+    if (skillLibrary) {
         const variableSkillNames = new Set<string>();
-        parsed.skillLibrary.forEach((s: LibrarySkillEntry) => {
+        skillLibrary.forEach((s: LibrarySkillEntry) => {
             if (s.isVariable) {
                 variableSkillNames.add(s.name.trim().toLowerCase());
             }
         });
 
-        Object.keys(parsed.skills).forEach(key => {
-            if (Array.isArray(parsed.skills[key])) {
-                parsed.skills[key] = parsed.skills[key].map((skill: any) => {
+        Object.keys(rawSkills).forEach(key => {
+            if (Array.isArray(rawSkills[key])) {
+                rawSkills[key] = rawSkills[key].map((skill: any) => {
                     if (!skill || !skill.name) return skill;
                     const normalized = skill.name.trim().toLowerCase();
                     if (variableSkillNames.has(normalized) && typeof skill.variant === 'undefined') {

@@ -14,7 +14,7 @@ interface NoteImageZoneProps {
     onDelete: () => void;
 }
 
-const NoteImageZone: React.FC<NoteImageZoneProps> = ({ imageId, config, onUpdateConfig, onDelete }) => {
+const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config, onUpdateConfig, onDelete }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     // Default Config Initialization

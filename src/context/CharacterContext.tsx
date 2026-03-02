@@ -112,8 +112,9 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
 
                 // Force reconciliation if skillLibrary was emptied (fixes mysticAbilityId loss)
                 if (!validated.skillLibrary || validated.skillLibrary.length === 0) {
-                    delete (validated as any)._rulesVersion;
-                    delete (validated as any)._rulesLastUpdated;
+                    const typedValidated = validated as Record<string, any>;
+                    delete typedValidated._rulesVersion;
+                    delete typedValidated._rulesLastUpdated;
                 }
 
                 return validated;
@@ -155,7 +156,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
             }
 
             const newLog: LogEntry = {
-                id: Math.random().toString(36).substr(2, 9),
+                id: Math.random().toString(36).substring(2, 11),
                 timestamp: new Date().toLocaleTimeString(),
                 message,
                 type,
@@ -171,7 +172,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         setData(prev => {
             const newTransaction: XPTransaction = {
                 ...transaction,
-                id: Math.random().toString(36).substr(2, 9),
+                id: Math.random().toString(36).substring(2, 11),
                 timestamp: new Date().toISOString()
             };
             return {
@@ -212,7 +213,9 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
             if (finalData.syncInfo?.localSettings) {
                 const { expertMode, activeRulesId } = finalData.syncInfo.localSettings;
                 if (expertMode !== undefined) localStorage.setItem('rpg-sheet-expert-mode', String(expertMode));
-                if (activeRulesId !== undefined) localStorage.setItem('rules-source-id', activeRulesId);
+                if (activeRulesId !== undefined) {
+                    localStorage.setItem('rules-source-id', activeRulesId as string);
+                }
             }
 
             setData(finalData);

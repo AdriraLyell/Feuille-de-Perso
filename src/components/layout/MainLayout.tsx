@@ -12,6 +12,12 @@ import { useRules } from '../../context/RulesContext';
 import { CampaignService } from '../../services/CampaignService';
 import { ErrorService } from '../../services/ErrorService';
 
+interface VersionManifest {
+    version: string;
+    downloadUrl?: string;
+}
+
+
 import { logger } from '../../utils/logger';
 import { useCloudSyncCheck } from '../../hooks/useCloudSyncCheck';
 import { useAutoSave } from '../../hooks/useAutoSave';
@@ -70,8 +76,9 @@ const MainLayout: React.FC = () => {
         sheetTab, setSheetTab,
         showDiscardConfirm, setShowDiscardConfirm,
 
-        handleSwitchMode,
-        confirmDiscard
+        confirmDiscard,
+        isSettingsDirty, setIsSettingsDirty,
+        handleSwitchMode
     } = useNavigationState();
 
     const {
@@ -100,7 +107,7 @@ const MainLayout: React.FC = () => {
     });
 
     // Auto-Save Logic
-    const { countdown } = useAutoSave(data, false, (mode) => sync(mode));
+    const { countdown, setLastSavedState } = useAutoSave(data, false, (mode) => sync(mode));
 
     // Other UI States
 
@@ -109,6 +116,9 @@ const MainLayout: React.FC = () => {
     const [showUserGuide, setShowUserGuide] = useState(false);
     const [showLogs, setShowLogs] = useState(false);
     const [historyTab, setHistoryTab] = useState<'sheet' | 'settings'>('sheet');
+    const [updateAvailable, setUpdateAvailable] = useState<VersionManifest | null>(null);
+    const [isVisible, setIsVisible] = useState(true);
+    const [isChecking, setIsChecking] = useState(false);
     const [showAppearance, setShowAppearance] = useState(false);
     const [showSync, setShowSync] = useState(false);
     const [showCampaignInfo, setShowCampaignInfo] = useState(false);

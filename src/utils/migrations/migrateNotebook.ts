@@ -1,64 +1,67 @@
+import { MigratableData } from './registry';
+
 /**
  * Migration: Notebook fields
  * - Convert array fields to newline-separated strings
  * - Pad reputation to 7 entries
  * - Initialize characterImage, notes, equipement, armes_list
  */
-export const migrateNotebook = (parsed: any): void => {
-    if (!parsed.page2) return;
+export const migrateNotebook = (parsed: MigratableData): void => {
+    const page2 = parsed.page2 as Record<string, any> | undefined;
+    if (!page2) return;
 
     // Convert array fields to newline-separated strings
     const notebookFields = ['lieux_importants', 'contacts', 'connaissances', 'valeurs_monetaires'];
     notebookFields.forEach(field => {
-        if (Array.isArray(parsed.page2[field])) {
-            parsed.page2[field] = parsed.page2[field].filter((x: any) => x && x.trim() !== '').join('\n');
+        if (Array.isArray(page2[field])) {
+            page2[field] = page2[field].filter((x: any) => x && typeof x === 'string' && x.trim() !== '').join('\n');
         }
-        else if (typeof parsed.page2[field] !== 'string') {
-            parsed.page2[field] = '';
+        else if (typeof page2[field] !== 'string') {
+            page2[field] = '';
         }
     });
 
     // Remove deprecated personalite field
-    if (parsed.page2.personalite) {
-        delete parsed.page2.personalite;
+    if ('personalite' in page2) {
+        delete page2.personalite;
     }
 
     // Pad reputation to 7 entries
-    if (parsed.page2.reputation) {
-        if (parsed.page2.reputation.length < 7) {
-            const diff = 7 - parsed.page2.reputation.length;
-            parsed.page2.reputation = [
-                ...parsed.page2.reputation,
-                ...Array(diff).fill({ reputation: '', lieu: '', valeur: '' })
+    if (Array.isArray(page2.reputation)) {
+        if (page2.reputation.length < 7) {
+            const diff = 7 - page2.reputation.length;
+            page2.reputation = [
+                ...page2.reputation,
+                ...Array(diff).fill(null).map(() => ({ reputation: '', lieu: '', valeur: '' }))
             ];
         }
     } else {
-        parsed.page2.reputation = Array(7).fill({ reputation: '', lieu: '', valeur: '' });
+        page2.reputation = Array(7).fill(null).map(() => ({ reputation: '', lieu: '', valeur: '' }));
     }
 
     // Convert notes array to string
-    if (Array.isArray(parsed.page2.notes)) {
-        parsed.page2.notes = parsed.page2.notes.filter((n: string) => n && n.trim() !== '').join('\n');
-    } else if (typeof parsed.page2.notes !== 'string') {
-        parsed.page2.notes = '';
+    if (Array.isArray(page2.notes)) {
+        page2.notes = page2.notes.filter((n: any) => n && typeof n === 'string' && n.trim() !== '').join('\n');
+    } else if (typeof page2.notes !== 'string') {
+        page2.notes = '';
     }
 
     // Convert equipement array to string
-    if (Array.isArray(parsed.page2.equipement)) {
-        parsed.page2.equipement = parsed.page2.equipement.filter((n: string) => n && n.trim() !== '').join('\n');
-    } else if (typeof parsed.page2.equipement !== 'string') {
-        parsed.page2.equipement = '';
+    if (Array.isArray(page2.equipement)) {
+        page2.equipement = page2.equipement.filter((n: any) => n && typeof n === 'string' && n.trim() !== '').join('\n');
+    } else if (typeof page2.equipement !== 'string') {
+        page2.equipement = '';
     }
 
     // Initialize characterImage
-    if (typeof parsed.page2.characterImage === 'undefined') {
-        parsed.page2.characterImage = '';
+    if (typeof page2.characterImage === 'undefined') {
+        page2.characterImage = '';
     }
 
     // Convert armes_list array to string
-    if (Array.isArray(parsed.page2.armes_list)) {
-        parsed.page2.armes_list = parsed.page2.armes_list.filter((n: string) => n && n.trim() !== '').join('\n');
-    } else if (typeof parsed.page2.armes_list !== 'string') {
-        parsed.page2.armes_list = '';
+    if (Array.isArray(page2.armes_list)) {
+        page2.armes_list = page2.armes_list.filter((n: any) => n && typeof n === 'string' && n.trim() !== '').join('\n');
+    } else if (typeof page2.armes_list !== 'string') {
+        page2.armes_list = '';
     }
 };

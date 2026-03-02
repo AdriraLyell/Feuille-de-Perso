@@ -1,19 +1,25 @@
+import { MigratableData } from './registry';
+
 /**
  * Migration: Campaign Notes to Book Document (Tiptap)
  * - Converts campaignNotes array to bookDocument format
  */
-export const migrateCampaignNotes = (parsed: any): void => {
-    if (!parsed.campaignNotes || parsed.campaignNotes.length === 0) return;
+export const migrateCampaignNotes = (parsed: MigratableData): void => {
+    const campaignNotes = parsed.campaignNotes as any[] | undefined;
+    if (!Array.isArray(campaignNotes) || campaignNotes.length === 0) return;
 
     // If bookDocument already exists and has content, we don't overwrite
-    if (parsed.bookDocument && parsed.bookDocument.content &&
-        Object.keys(parsed.bookDocument.content).length > 0) {
+    const existingBook = parsed.bookDocument as Record<string, any> | undefined;
+    if (existingBook && existingBook.content &&
+        typeof existingBook.content === 'object' &&
+        Object.keys(existingBook.content).length > 0) {
         return;
     }
 
     const tiptapContent: any[] = [];
 
-    parsed.campaignNotes.forEach((note: any) => {
+    campaignNotes.forEach((note: any) => {
+        if (!note) return;
         // Add chapter heading
         tiptapContent.push({
             type: 'chapterHeading',
@@ -22,7 +28,7 @@ export const migrateCampaignNotes = (parsed: any): void => {
         });
 
         // Add content
-        if (note.content) {
+        if (typeof note.content === 'string' && note.content) {
             // Very simple HTML to Text conversion for JSON nodes
             const cleanContent = note.content
                 .replace(/<br\s*\/?>/gi, '\n')
@@ -40,9 +46,9 @@ export const migrateCampaignNotes = (parsed: any): void => {
         }
 
         // Add images if any
-        if (note.images && Array.isArray(note.images)) {
+        if (Array.isArray(note.images)) {
             note.images.forEach((img: any) => {
-                if (img.imageId) {
+                if (img && img.imageId) {
                     tiptapContent.push({
                         type: 'bookImage',
                         attrs: {
@@ -62,7 +68,7 @@ export const migrateCampaignNotes = (parsed: any): void => {
 
     const now = new Date().toISOString();
     parsed.bookDocument = {
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substring(2, 11),
         createdAt: now,
         updatedAt: now,
         formatVersion: 2,
