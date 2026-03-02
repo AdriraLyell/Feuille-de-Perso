@@ -47,7 +47,7 @@ interface NumericCounterItemProps {
 
 const translateAggregateConfig = (config?: AggregateConfigDetails): string => {
     if (!config) return '';
-    let targetLabel = '';
+    let targetLabel: string;
     const target = config.targetType;
     switch (target) {
         case 'skills': targetLabel = 'Compétences'; break;
