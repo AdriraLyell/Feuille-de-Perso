@@ -289,7 +289,7 @@ const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterS
                 if (offCostNum !== locCostNum) return false;
             } else {
                 // If either is NaN (e.g. "1-3 pts"), fallback to stripped string comparison
-                const stripText = (s: any) => String(s || '').replace(/\s|pts?/gi, '').toLowerCase();
+                const stripText = (s: string | number | null | undefined) => String(s || '').replace(/\s|pts?/gi, '').toLowerCase();
                 if (stripText(offCostVal) !== stripText(locCostVal)) return false;
             }
 
@@ -309,12 +309,13 @@ const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterS
             const simplifyEffects = (effects: any[]) => (effects || []).map(eff => {
                 const { id: _id, definitionId: _definitionId, formulaId: _formulaId, ...rest } = eff; // skip IDs
                 return JSON.stringify(Object.keys(rest).sort().reduce((obj: Record<string, string>, key) => {
+                    const typedRest = rest as Record<string, any>;
                     // Only keep properties that have real value
-                    if (rest[key] !== '' && rest[key] !== undefined && rest[key] !== null) {
-                        obj[key] = String(rest[key]); // Force string to bypass 1 vs "1"
+                    if (typedRest[key] !== '' && typedRest[key] !== undefined && typedRest[key] !== null) {
+                        obj[key] = String(typedRest[key]); // Force string to bypass 1 vs "1"
                     }
                     return obj;
-                }, {}));
+                }, {} as Record<string, string>));
             }).sort();
 
             const offEff = simplifyEffects(off.effects);

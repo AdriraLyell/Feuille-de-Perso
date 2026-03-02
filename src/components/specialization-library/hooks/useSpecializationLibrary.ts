@@ -185,8 +185,8 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
     }, [rules, updateRules, addLog]);
 
     const executeImportFromSheet = useCallback(() => {
-        const currentLib = JSON.parse(JSON.stringify(data.specializationLibrary || []));
-        const existingNames = new Set(currentLib.map((e: any) => e.name.trim().toLowerCase()));
+        const currentLib: LibrarySpecializationEntry[] = JSON.parse(JSON.stringify(data.specializationLibrary || []));
+        const existingNames = new Set(currentLib.map((e) => e.name.trim().toLowerCase()));
         let addedCount = 0;
 
         Object.entries(data.specializations || {}).forEach(([skillId, spes]) => {
@@ -226,7 +226,7 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
         });
 
         if (addedCount > 0) {
-            currentLib.sort((a: any, b: any) => a.name.localeCompare(b.name));
+            currentLib.sort((a, b) => a.name.localeCompare(b.name));
             onUpdate({ ...data, specializationLibrary: currentLib });
             addLog(`${addedCount} spécialisation(s) importée(s) depuis la fiche.`, 'success', 'settings');
         } else {

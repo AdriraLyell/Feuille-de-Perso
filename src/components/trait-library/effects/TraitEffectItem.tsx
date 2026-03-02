@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Star, GraduationCap, ChevronDown, Trophy, Calculator } from 'lucide-react';
-import { TraitEffect, LibraryFormulaEntry } from '../../../types';
+import { TraitEffect, LibraryFormulaEntry, EffectType } from '../../../types';
 import { FormulaEffectFields } from './FormulaEffectFields';
 import { LegacyEffectFields } from './LegacyEffectFields';
 
@@ -61,7 +61,7 @@ export const TraitEffectItem: React.FC<TraitEffectItemProps> = ({
                         <select
                             className={`appearance-none bg-white border border-gray-300 font-bold text-xs text-gray-900 w-full focus:outline-none focus:ring-1 focus:ring-blue-300 cursor-pointer pr-4 py-1 pl-2 rounded shadow-sm`}
                             value={effect.type}
-                            onChange={(e) => onUpdate(effect.id, 'type', e.target.value as any)}
+                            onChange={(e) => onUpdate(effect.id, 'type', e.target.value as EffectType)}
                         >
                             <option value="formula" className="text-gray-900 bg-white font-bold bg-indigo-50">Calcul par Formule</option>
 

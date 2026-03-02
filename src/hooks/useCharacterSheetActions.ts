@@ -1,23 +1,10 @@
 import { useCallback } from 'react';
-import { DotEntry, SuggestionEntry, XPTransaction } from '../types';
+import { DotEntry, SuggestionEntry, XPTransaction, DropPayload } from '../types';
 import { normalizeString } from '../utils/stringUtils';
 import { generateId } from '../utils/factories';
 import { RulesData } from '../types/rules';
 import { CharacterSheetData } from '../types/character';
 import { getSkillCategory, getCounter, setCounter } from '../utils/stateAccessors';
-
-interface DropPayload {
-    type: string;
-    data: {
-        id?: string;
-        name: string;
-        description?: string;
-        isVariable?: boolean;
-        categoryType?: string;
-        [key: string]: any;
-    };
-    categoryType?: string;
-}
 
 export const useCharacterSheetActions = (
     data: CharacterSheetData,
@@ -198,7 +185,7 @@ export const useCharacterSheetActions = (
             const numValue = parseInt(value) || 0;
             const isCreationMode = prev.creationConfig && prev.creationConfig.active;
 
-            const updateInList = <T extends { id: string; name?: string; val1?: string; val2?: string; val3?: string;[key: string]: any }>(list: T[]) => {
+            const updateInList = <T extends { id: string; name?: string; val1?: string; val2?: string; val3?: string; }>(list: T[]) => {
                 const idx = list.findIndex(item => item.id === id);
                 if (idx === -1) return null;
                 const newList = [...list];

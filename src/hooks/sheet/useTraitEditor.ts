@@ -121,13 +121,13 @@ export const useTraitEditor = (
 
             if (listIndex < currentList.length) {
                 // Helper to resolve effective effect properties from global library
-                const resolveEffect = (e: any) => {
+                const resolveEffect = (e: import('../../types').TraitEffect) => {
                     const res = { ...e };
                     if (e.formulaId && _rules?.libraries?.formulas) {
                         const global = _rules.libraries.formulas.find(f => f.id === e.formulaId);
                         if (global) {
                             if (global.target) res.target = global.target;
-                            if (global.effectType) res.effectType = global.effectType;
+                            if (global.effectType) res.effectType = global.effectType as any;
                         }
                     }
                     return res;
@@ -151,7 +151,7 @@ export const useTraitEditor = (
                     }
 
                     associatedCounterId = Math.random().toString(36).substring(2, 9);
-                    const newCounter: any = {
+                    const newCounter: import('../../types').DotEntry = {
                         id: associatedCounterId,
                         name: finalCounterName,
                         value: 0,

@@ -126,7 +126,7 @@ const MainLayout: React.FC = () => {
     // Guidance Logic
     const shouldHighlightMystic = React.useMemo(() => {
         const active = rules?.configurations?.creation?.mysticAbilities?.active;
-        const hasTrait = data?.page2?.avantages?.some((t: any) => t.mysticAbilityId);
+        const hasTrait = data?.page2?.avantages?.some((t) => t.mysticAbilityId);
         return !!(active && !hasTrait && data?.creationConfig?.active);
     }, [rules, data]);
 
@@ -149,11 +149,11 @@ const MainLayout: React.FC = () => {
     const clearCurrentLogs = () => {
         setData((prev: CharacterSheetData) => ({
             ...prev,
-            appLogs: prev.appLogs.filter((log: any) => log.category !== historyTab)
+            appLogs: prev.appLogs.filter((log) => log.category !== historyTab)
         }));
     };
 
-    const filteredLogs = (data.appLogs || []).filter((log: any) => {
+    const filteredLogs = (data.appLogs || []).filter((log) => {
         if (log.category === 'both') return true;
         return log.category === historyTab;
     });
@@ -385,7 +385,7 @@ const MainLayout: React.FC = () => {
                             isOpen={showSync}
                             onClose={() => setShowSync(false)}
                             characterData={data}
-                            onSyncComplete={(syncInfo: any) => {
+                            onSyncComplete={(syncInfo: CharacterSheetData['syncInfo']) => {
                                 setData((prev: CharacterSheetData) => ({ ...prev, syncInfo }));
                                 addLog(`Fiche synchronisée avec ${syncInfo?.settingName}`, 'success', 'sheet');
                             }}

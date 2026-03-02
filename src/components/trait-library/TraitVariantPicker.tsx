@@ -8,8 +8,8 @@ interface TraitVariantPickerProps {
     onClose: () => void;
     onSelect: (entry: LibraryEntry, variant: string, cost?: string) => void;
     allFormulas?: LibraryFormulaEntry[];
-    allSkills?: any[];
-    allAttributes?: any[];
+    allSkills?: { id: string; name: string; category?: string }[];
+    allAttributes?: { id: string; name: string }[];
 }
 
 const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({
@@ -17,22 +17,22 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({
     allFormulas = [], allSkills = [], allAttributes = []
 }) => {
     const [customVariant, setCustomVariant] = useState('');
-    const [selectedCost, setSelectedCost] = useState(variantPicker.pointsLabel || (variantPicker as any).points_label || variantPicker.cost);
+    const [selectedCost, setSelectedCost] = useState<string>(variantPicker.pointsLabel || variantPicker.points_label || variantPicker.cost || '');
 
     // Unified variable cost detection (hyphen, en-dash, em-dash, comma, semicolon, dots)
     const isVariableCost = useMemo(() => {
-        if (variantPicker.isVariableCost || (variantPicker as any).is_variable_cost) return true;
-        const label = variantPicker.pointsLabel || (variantPicker as any).points_label || variantPicker.cost;
+        if (variantPicker.isVariableCost || variantPicker.is_variable_cost) return true;
+        const label = variantPicker.pointsLabel || variantPicker.points_label || variantPicker.cost;
         if (!label) return false;
         return /[-,–—,;]/.test(label) || label.includes('..');
     }, [variantPicker]);
 
-    const isVariable = variantPicker.isVariable || (variantPicker as any).is_variable;
+    const isVariable = variantPicker.isVariable || variantPicker.is_variable;
 
     // Suggestions for costs if it's a range (1-3) or list (1, 3, 5)
     const costSuggestions = useMemo(() => {
         if (!isVariableCost) return [];
-        const label = variantPicker.pointsLabel || (variantPicker as any).points_label || variantPicker.cost;
+        const label = variantPicker.pointsLabel || variantPicker.points_label || variantPicker.cost;
         if (!label) return [];
 
         const numbers = label.match(/\d+/g);
@@ -49,7 +49,7 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({
 
         // Handle List: 1, 3, 5
         return numbers;
-    }, [isVariableCost, variantPicker.cost, variantPicker.pointsLabel, (variantPicker as any).points_label]);
+    }, [isVariableCost, variantPicker.cost, variantPicker.pointsLabel, variantPicker.points_label]);
 
     // New: Dynamic suggestions based on Force Variant formulas
     const dynamicSuggestions = useMemo(() => {
@@ -87,7 +87,7 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({
         let finalCost = selectedCost;
 
         // If user didn't change the range string (e.g. "1-3"), try to pick the first number
-        const originalLabel = variantPicker.pointsLabel || (variantPicker as any).points_label || variantPicker.cost;
+        const originalLabel = variantPicker.pointsLabel || variantPicker.points_label || variantPicker.cost;
         if (isVariableCost && finalCost === originalLabel) {
             const match = finalCost.match(/\d+/);
             if (match) finalCost = match[0];

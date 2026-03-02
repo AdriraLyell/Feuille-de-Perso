@@ -425,6 +425,7 @@ export const CharacterSheetDataSchema = z.object({
     formulaLibrary: z.array(LibraryFormulaEntrySchema).optional().default([]), // Nouveau : Dictionnaire central
     suggestions: z.array(z.any()).optional().default([]),
     _rulesVersion: z.string().optional(),
+    _rulesLastUpdated: z.number().optional(),
     _schemaVersion: z.number().optional()
 });
 

@@ -1,4 +1,0 @@
---- TEST VISUEL AGENT CLI ---
-Action executee le : 03/01/2026 19:52:30
-Statut : OPERATIONNEL
----------------------------

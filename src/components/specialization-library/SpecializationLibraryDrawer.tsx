@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { X, Search, Award, Info, GripVertical } from 'lucide-react';
 import { useCharacterData } from '../../context/CharacterContext';
+import { LibrarySpecializationEntry } from '../../types';
 import { smartIncludes } from '../../utils/stringUtils';
 
 interface SpecializationLibraryDrawerProps {
@@ -27,7 +28,7 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
         ).sort((a, b) => a.name.localeCompare(b.name));
     }, [library, searchTerm]);
 
-    const handleDragStart = (e: React.DragEvent, entry: any) => {
+    const handleDragStart = (e: React.DragEvent, entry: LibrarySpecializationEntry) => {
         // Store both name and default level in the drag data
         e.dataTransfer.setData('text/plain', entry.name);
         e.dataTransfer.setData('application/json', JSON.stringify({

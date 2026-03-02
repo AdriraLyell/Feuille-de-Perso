@@ -10,6 +10,7 @@ export interface DotEntry {
   definitionId?: string; // ID de la définition parente (pour lien solide)
   mysticAbilityId?: string; // Link to Mystic Ability ID
   description?: string; // New: Description info-bubble
+  isVariable?: boolean; // New: For dynamic styling in UI
 }
 
 export interface AttributeEntry {
@@ -101,6 +102,7 @@ export interface TraitEffect {
   formula?: string; // (Legacy/Transitoire) La formule à évaluer (ex: "+2", "Volonté / 2")
   formulaId?: string; // NEW: Le lien vers la formule globale du Dictionnaire
   operator?: FormulaOperator; // NEW: Comment appliquer le résultat (Défaut: ADD)
+  effectType?: EffectType; // Legacy alias for type
 }
 
 export interface PostItData {

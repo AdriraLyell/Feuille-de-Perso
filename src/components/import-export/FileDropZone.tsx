@@ -3,7 +3,7 @@ import { Upload } from 'lucide-react';
 import { logger } from '../../utils/logger';
 
 interface FileDropZoneProps {
-    onFileSelect: (json: any) => void;
+    onFileSelect: (json: Record<string, unknown>) => void;
 }
 
 export const FileDropZone: React.FC<FileDropZoneProps> = ({ onFileSelect }) => {

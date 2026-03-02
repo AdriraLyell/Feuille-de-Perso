@@ -151,7 +151,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                     {!lockFilter && (
                         <div className="flex bg-[#bfae85]/20 rounded-sm p-0.5 shrink-0">
                             {['all', 'avantage', 'desavantage'].map((t) => (
-                                <button key={t} onClick={() => setFilterType(t as any)} className={`px-3 py-1 text-xs font-bold rounded-sm transition-colors ${filterType === t ? 'bg-white text-[#5c4d41] shadow-sm' : 'text-[#5c4d41]/70 hover:text-[#5c4d41]'}`}>
+                                <button key={t} onClick={() => setFilterType(t as 'all' | 'avantage' | 'desavantage')} className={`px-3 py-1 text-xs font-bold rounded-sm transition-colors ${filterType === t ? 'bg-white text-[#5c4d41] shadow-sm' : 'text-[#5c4d41]/70 hover:text-[#5c4d41]'}`}>
                                     {t === 'all' ? 'Tout' : t === 'avantage' ? 'Avantages' : 'Désavantages'}
                                 </button>
                             ))}

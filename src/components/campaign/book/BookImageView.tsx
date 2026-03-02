@@ -133,7 +133,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
             style={{
                 float: isFree
                     ? (node.attrs.wrapSide === 'right' ? 'right' : 'left')
-                    : (isLateral ? (node.attrs.align as any) : 'none'),
+                    : (isLateral ? (node.attrs.align as 'left' | 'right' | 'none') : 'none'),
                 width: isFree ? (node.attrs.width || 'fit-content') : (isLateral ? node.attrs.width : undefined),
                 display: isFloating ? 'inline-block' : 'block',
                 margin: isFloating

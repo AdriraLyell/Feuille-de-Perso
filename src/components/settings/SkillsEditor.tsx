@@ -1,6 +1,7 @@
 import React from 'react';
 import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../../types';
 import { Save, GraduationCap } from 'lucide-react';
+import { DragItemType } from '../SettingsView';
 import ThematicModal from '../ui/ThematicModal';
 import { useRules } from '../../context/RulesContext';
 import { useSkillsEditorActions } from './hooks/useSkillsEditorActions';
@@ -10,8 +11,8 @@ interface SkillsEditorProps {
     data: CharacterSheetData;
     onUpdate: (newData: CharacterSheetData) => void;
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings') => void;
-    draggedItem: { type: 'sheet_skill' | 'lib_skill', category?: string, index?: number, id?: string, data?: any } | null;
-    setDraggedItem: (item: any) => void;
+    draggedItem: DragItemType | null;
+    setDraggedItem: (item: DragItemType | null) => void;
 }
 
 const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, draggedItem, setDraggedItem }) => {

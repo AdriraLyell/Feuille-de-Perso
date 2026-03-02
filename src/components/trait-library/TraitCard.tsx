@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { LibraryEntry } from '../../types';
+import { LibraryEntry, TraitEffect } from '../../types';
 import { Zap, Edit2, Trash2, Plus, CheckSquare, Square, Lock, Globe, Layers, Activity, TrendingUp } from 'lucide-react';
 import { PortalTooltip } from '../ui/PortalTooltip';
 import { ItemUsageDetail } from '../../types/usageTypes';
@@ -60,8 +60,9 @@ const TraitCardItemEffects: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
     const [showTooltip, setShowTooltip] = useState(false);
     const anchorRef = useRef<HTMLDivElement>(null);
 
-    const getEffectLabel = (eff: any) => {
-        switch (eff.type || eff.effectType) {
+    const getEffectLabel = (eff: TraitEffect) => {
+        const type = eff.type || eff.effectType;
+        switch (type) {
             case 'formula': return `Equation : ${eff.target || '?'} = ${eff.formula}`;
             case 'free_skill_rank': return `Rang gratuit : ${eff.target || '?'} (+${eff.value})`;
             case 'master_skill': return `Maître : compétence au rang 5 (choix joueur)`;

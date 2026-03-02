@@ -75,13 +75,11 @@ function processSkillCategories(
                 if (matchingExisting.length > 0) {
                     return matchingExisting.map(existing => {
                         consumedIds.add(existing.id);
-                        const typedLibSkill = libSkill as Record<string, any>;
-                        const typedExisting = existing as any; // DotEntry doesn't have mysticAbilityId in type yet
                         return {
                             ...existing,
                             name,
                             definitionId,
-                            mysticAbilityId: typedLibSkill?.mysticAbilityId || typedExisting.mysticAbilityId,
+                            mysticAbilityId: libSkill?.mysticAbilityId || existing.mysticAbilityId,
                             max,
                             description: description || existing.description,
                             variant: existing.variant !== undefined ? existing.variant : ""
@@ -116,7 +114,7 @@ function processSkillCategories(
                         name,
                         description: description || existing.description,
                         definitionId,
-                        mysticAbilityId: (libSkill as Record<string, any>)?.mysticAbilityId || (existing as any).mysticAbilityId,
+                        mysticAbilityId: libSkill?.mysticAbilityId || existing.mysticAbilityId,
                         variant: (existing.variant === "" || existing.variant === undefined) ? undefined : existing.variant
                     }];
                 } else {

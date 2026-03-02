@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { DotEntry } from '../../types';
+import { DotEntry, ThemeConfig, LibrarySpecializationEntry, DropPayload } from '../../types';
 import DotRating from '../ui/DotRating';
 import { SectionHeader } from './Shared';
 import { Info } from 'lucide-react';
@@ -46,7 +46,7 @@ const DotRow: React.FC<{
     if (!entry.name) {
         return (
             <div
-                className={`h-5 border-b border-dotted transition-colors relative group ${isEditing ? 'border-[#bfae85]/40 bg-[#bfae85]/5 hover:bg-[#bfae85]/10 cursor-grab active:cursor-grabbing' : 'border-transparent'}`}
+                className={`h-5 border-b border-dotted transition-colors relative group ${isEditing ? 'border-[#bfae85]/40 bg-[#bfae85]/5 hover:bg-[#bfae85]/10 cursor-grab active:cursor-grabbing' : 'border-transparent'} `}
                 draggable={isEditing}
                 onDragStart={isEditing ? (e) => {
                     const payload = {
@@ -100,7 +100,7 @@ const DotRow: React.FC<{
     };
 
     const getTextColor = (): string | undefined => {
-        const skill = entry as any;
+        const skill = entry;
         const colors = theme?.skillColors;
 
         // 1. Surcharge spécifique Habilité Mystique
@@ -131,7 +131,7 @@ const DotRow: React.FC<{
             const check = validateIncrease(entry.id, val);
             if (!check.allowed) {
                 if (check.reason) {
-                    addLog(check.reason, 'danger', 'sheet', `block-${entry.id}`);
+                    addLog(check.reason, 'danger', 'sheet', `block - ${entry.id} `);
                 }
                 return;
             }
@@ -141,7 +141,7 @@ const DotRow: React.FC<{
 
     return (
         <div
-            className={`flex justify-between items-center px-2 border-b border-dotted border-stone-300 h-5 hover:bg-stone-50 transition-colors relative group ${isEditing ? 'cursor-grab active:cursor-grabbing select-none' : ''}`}
+            className={`flex justify-between items-center px-2 border-b border-dotted border-stone-300 h-5 hover:bg-stone-50 transition-colors relative group ${isEditing ? 'cursor-grab active:cursor-grabbing select-none' : ''} `}
             draggable={isEditing}
             onDragStart={isEditing ? (e) => {
                 const payload = {
@@ -160,7 +160,7 @@ const DotRow: React.FC<{
                     : hasSpecs
                         ? 'font-semibold cursor-help underline underline-offset-2 decoration-blue-300' // Removed text-blue-900
                         : 'cursor-default'
-                    } ${isBlocked ? 'line-through opacity-60 italic' : ''}`}
+                    } ${isBlocked ? 'line-through opacity-60 italic' : ''} `}
                 // Dynamic width adjustment to avoid overlap with extra bubbles
                 style={{
                     width: effectiveMax > 5 ? '45%' : '65%',
@@ -168,12 +168,12 @@ const DotRow: React.FC<{
                 }}
                 onClick={handleClick}
                 ref={anchorRef}
-                title={entry.description || (entry.variant ? `${entry.name} : ${entry.variant}` : entry.name)}
+                title={entry.description || (entry.variant ? `${entry.name} : ${entry.variant} ` : entry.name)}
             >
                 {entry.variant !== undefined ? (
                     <>
                         <span style={{ color: isBlocked ? '#71717a' : (textColor || '#d97706') }} className="font-bold">{entry.name}{' : '}</span>
-                        <span className={`${isUndefinedVariable ? 'italic opacity-60' : 'font-normal'}`} style={{ color: isBlocked ? '#71717a' : (textColor ? textColor : (isUndefinedVariable ? 'inherit' : '#78716c')) }}>
+                        <span className={`${isUndefinedVariable ? 'italic opacity-60' : 'font-normal'} `} style={{ color: isBlocked ? '#71717a' : (textColor ? textColor : (isUndefinedVariable ? 'inherit' : '#78716c')) }}>
                             {entry.variant || '...'}
                         </span>
                     </>
@@ -242,7 +242,7 @@ export const SkillBlock = React.memo<{
     description?: string;
     isEditing?: boolean;
     categoryBehavior?: 'Compétence' | 'Secondaire' | 'Arrière-plan' | 'Compteur';
-    onDrop?: (category: string, item: any, targetIndex: number) => void;
+    onDrop?: (category: string, payload: DropPayload, targetIndex: number) => void;
     onRemove?: (category: string, id: string) => void;
     validateIncrease?: (id: string, newValue: number) => { allowed: boolean; reason?: string };
     blockedSkills?: Record<string, { isBlocked: boolean, sourceName: string }>;
@@ -293,7 +293,7 @@ export const SkillBlock = React.memo<{
 
     return (
         <div
-            className={`flex flex-col transition-all duration-200 ${isEditing ? 'relative' : ''} ${isDragOver ? 'bg-[#bfae85]/10 ring-2 ring-[#bfae85]/40 rounded-sm scale-[1.02] shadow-lg z-10' : ''}`}
+            className={`flex flex-col transition-all duration-200 ${isEditing ? 'relative' : ''} ${isDragOver ? 'bg-[#bfae85]/10 ring-2 ring-[#bfae85]/40 rounded-sm scale-[1.02] shadow-lg z-10' : ''} `}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -329,7 +329,7 @@ export const SkillBlock = React.memo<{
                 {isEditing && isDragOver && dropIndex !== -1 && (
                     <div
                         className="absolute left-0 right-0 h-0.5 bg-[#bfae85] z-20 pointer-events-none"
-                        style={{ top: `${(dropIndex * 20) + 4}px` }} // 4px padding in py-1? No, py-1 is 4px top/bottom.
+                        style={{ top: `${(dropIndex * 20) + 4} px` }} // 4px padding in py-1? No, py-1 is 4px top/bottom.
                     >
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-[#bfae85] rotate-45"></div>
                         <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-2 h-2 bg-[#bfae85] rotate-45"></div>

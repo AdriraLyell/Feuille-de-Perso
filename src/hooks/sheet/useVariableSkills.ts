@@ -5,13 +5,22 @@ import { generateId } from '../../utils/factories';
 import { CharacterSheetData } from '../../types/character';
 import { RulesData } from '../../types/rules';
 
+export interface VariantModalState {
+    isOpen: boolean;
+    category: string;
+    id: string;
+    skillName: string;
+    definitionId?: string;
+    variants: string[];
+}
+
 export const useVariableSkills = (
     data: CharacterSheetData,
     onChange: (update: (prev: CharacterSheetData) => CharacterSheetData) => void,
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both') => void,
     rules: RulesData | null,
-    setVariantModalState: (state: any) => void,
-    variantModalState: any
+    setVariantModalState: React.Dispatch<React.SetStateAction<VariantModalState>>,
+    variantModalState: VariantModalState
 ) => {
     const handleDefineVariant = useCallback((category: string, id: string, name: string) => {
         const existingEntry = data.skills[category]?.find(s => s.id === id);
@@ -110,7 +119,7 @@ export const useVariableSkills = (
             return newState;
         });
 
-        setVariantModalState((prev: any) => ({ ...prev, isOpen: false }));
+        setVariantModalState(prev => ({ ...prev, isOpen: false }));
     };
 
     return {

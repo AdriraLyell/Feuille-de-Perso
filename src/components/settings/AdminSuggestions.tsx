@@ -24,12 +24,12 @@ const AdminSuggestions: React.FC<Props> = ({ data, onUpdate, onAddLog }) => {
     const handlePromote = (suggestion: SuggestionEntry) => {
         if (!rules) return;
 
-        const newRules = JSON.parse(JSON.stringify(rules)); // Deep clone
+        const newRules = JSON.parse(JSON.stringify(rules)) as import('../../types/rules').RulesData; // Deep clone
         let promoted = false;
 
         if (suggestion.type === 'variant' && suggestion.parentId) {
             // Logic for Variants: Add to parent skill's variants list
-            const skill = newRules.libraries.skills.find((s: any) => s.id === suggestion.parentId);
+            const skill = newRules.libraries.skills.find((s) => s.id === suggestion.parentId);
             if (skill) {
                 if (!skill.variants) skill.variants = [];
                 if (!skill.variants.includes(suggestion.name)) {

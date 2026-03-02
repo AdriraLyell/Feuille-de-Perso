@@ -110,8 +110,8 @@ const CloudPanel: React.FC<CloudPanelProps> = ({ data, onLoadSuccess, onClose })
                     type: 'skill', // Fake conflict to trigger resolver
                     key: 'force_conflict_root',
                     name: 'Données Personnelles',
-                    current: { name: 'Version Locale (Modifiée)', description: 'Vos changements non synchronisés' } as any,
-                    incoming: { name: 'Version Cloud', description: 'Version du Gardien / Dernier backup' } as any
+                    current: { name: 'Version Locale (Modifiée)', description: 'Vos changements non synchronisés' } as unknown as import('../../types').LibraryEntry,
+                    incoming: { name: 'Version Cloud', description: 'Version du Gardien / Dernier backup' } as unknown as import('../../types').LibraryEntry
                 }]);
                 setPendingData(incomingData);
                 setIsResolvingConflicts(true);

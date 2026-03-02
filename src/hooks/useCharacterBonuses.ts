@@ -159,7 +159,7 @@ export const useCharacterBonuses = (
 
             // Handle Standard Counters (those in data.counters)
             if (characterData.counters) {
-                const processCounter = (counter: any) => {
+                const processCounter = (counter: import('../types').DotEntry) => {
                     if (!counter || !counter.name) return;
                     const nameKey = normalizeString(counter.name);
                     const libEntry = rules.libraries.counters.find(c => normalizeString(c.name) === nameKey);
@@ -195,7 +195,7 @@ export const useCharacterBonuses = (
                     if (Array.isArray(value)) {
                         value.forEach(processCounter);
                     } else {
-                        processCounter(value);
+                        processCounter(value as import('../types').DotEntry);
                     }
                 });
             }

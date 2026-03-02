@@ -21,7 +21,7 @@ interface SheetHeaderProps {
         fictionCurrentDate?: string;
     };
     creationActive: boolean;
-    onUpdateHeader: (field: any, value: string) => void;
+    onUpdateHeader: (field: keyof SheetHeaderProps['headerData'], value: string) => void;
     onToggleCreationMode: () => void;
     editModeActive: boolean;
     onToggleEditMode: () => void;

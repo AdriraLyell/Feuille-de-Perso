@@ -62,7 +62,7 @@ export interface DragItemType {
   category?: string;
   index?: number;
   id?: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) => {

@@ -112,9 +112,8 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
 
                 // Force reconciliation if skillLibrary was emptied (fixes mysticAbilityId loss)
                 if (!validated.skillLibrary || validated.skillLibrary.length === 0) {
-                    const typedValidated = validated as Record<string, any>;
-                    delete typedValidated._rulesVersion;
-                    delete typedValidated._rulesLastUpdated;
+                    validated._rulesVersion = undefined;
+                    validated._rulesLastUpdated = undefined;
                 }
 
                 return validated;

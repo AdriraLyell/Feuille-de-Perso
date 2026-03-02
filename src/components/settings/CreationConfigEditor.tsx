@@ -13,7 +13,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
     const config = data.creationConfig;
     if (!config) return null;
 
-    const updateCreationConfig = (field: string, value: any) => {
+    const updateCreationConfig = (field: string, value: string | number | boolean) => {
         onUpdate({
             ...data,
             creationConfig: {
@@ -37,7 +37,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
         });
     };
 
-    const updateCardConfig = (field: string, value: any) => {
+    const updateCardConfig = (field: string, value: string | number | boolean) => {
         onUpdate({
             ...data,
             creationConfig: {

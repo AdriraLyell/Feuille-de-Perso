@@ -30,7 +30,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
     }, [variant]);
 
     const handleExport = async () => {
-        let exportData: any = {};
+        let exportData: CharacterSheetData | Record<string, unknown> = {};
         let filename = "Sauvegarde";
 
         const dataToProcess = JSON.parse(JSON.stringify(data));
@@ -57,7 +57,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                     try {
                         const blob = await getImage(note.imageId);
                         if (blob) {
-                            (note as any).base64Cover = await blobToBase64(blob);
+                            (note as { base64Cover?: string }).base64Cover = await blobToBase64(blob);
                         }
                     } catch (e) {
                         ErrorService.handleError(e, { context: 'ExportPanel.exportNoteCover', silent: true });
@@ -72,7 +72,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                             try {
                                 const blob = await getImage(img.imageId);
                                 if (blob) {
-                                    (img as any).base64Data = await blobToBase64(blob);
+                                    (img as { base64Data?: string }).base64Data = await blobToBase64(blob);
                                 }
                             } catch (e) {
                                 ErrorService.handleError(e, { context: 'ExportPanel.exportNoteImage', silent: true });
@@ -101,8 +101,8 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
         }
 
         const template = createTemplateFromData(dataToProcess);
-        if (!(template as any).appVersion) {
-            (template as any).appVersion = APP_VERSION;
+        if (!(template as CharacterSheetData).appVersion) {
+            (template as CharacterSheetData).appVersion = APP_VERSION;
         }
 
         const now = new Date();
@@ -128,9 +128,9 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                 break;
             case 'template':
                 exportData = template;
-                delete exportData.library;
-                delete exportData.skillLibrary;
-                delete exportData.specializationLibrary;
+                delete (exportData as any).library;
+                delete (exportData as any).skillLibrary;
+                delete (exportData as any).specializationLibrary;
                 filename = `${timestamp}_Template_Structure`;
                 break;
             case 'library_traits':
@@ -142,7 +142,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                 filename = `${timestamp}_Biblio_Competences`;
                 break;
             case 'library_specs':
-                exportData = { specializationLibrary: data.specializationLibrary, appVersion: APP_VERSION };
+                exportData = { specializationLibrary: data.specializationLibrary, appVersion: APP_VERSION } as Record<string, unknown>;
                 filename = `${timestamp}_Biblio_Specialisations`;
                 break;
         }
@@ -153,7 +153,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
             // resolveImagesForSync is more comprehensive than simple processImages
             // because it handles bookImage nodes too.
             const portableData = await ImageSyncResolver.resolveImagesForSync(exportData);
-            exportData = portableData;
+            exportData = portableData as CharacterSheetData | Record<string, unknown>;
             addLog("Images compressées avec succès.", 'success', 'sheet', 'img-compress');
         } catch (e) {
             ErrorService.handleError(e, { context: 'ExportPanel.compression', silent: true });

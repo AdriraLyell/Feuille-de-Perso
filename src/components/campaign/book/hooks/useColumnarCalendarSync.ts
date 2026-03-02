@@ -20,15 +20,16 @@ export const useColumnarCalendarSync = ({ editor, containerRef }: CalendarSyncPr
 
     // Handle external toggle/pick events
     useEffect(() => {
-        const handleToggle = (e: any) => {
-            if (e.detail?.visible !== undefined) {
-                setIsCalendarVisible(e.detail.visible);
+        const handleToggle = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            if (customEvent.detail?.visible !== undefined) {
+                setIsCalendarVisible(customEvent.detail.visible);
             } else {
                 setIsCalendarVisible(v => !v);
             }
         };
-        const handlePickRequest = (e: any) => {
-            setPickingTarget(e.detail);
+        const handlePickRequest = (e: Event) => {
+            setPickingTarget((e as CustomEvent).detail);
             setIsCalendarVisible(true);
         };
         const handleEscape = (e: KeyboardEvent) => {

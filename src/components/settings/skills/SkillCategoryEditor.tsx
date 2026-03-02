@@ -2,12 +2,13 @@ import React from 'react';
 import { DotEntry, SkillCategoryKey } from '../../../types';
 import { Minus, Plus, GripVertical, Trash2 } from 'lucide-react';
 import { useSkillsEditorActions } from '../hooks/useSkillsEditorActions';
+import { DragItemType } from '../../SettingsView';
 
 interface SkillCategoryEditorProps {
     title: string;
     category: string;
     list: DotEntry[];
-    draggedItem: any;
+    draggedItem: DragItemType | null;
     actions: ReturnType<typeof useSkillsEditorActions>;
     heightClass?: string;
     defaultItemName?: string;

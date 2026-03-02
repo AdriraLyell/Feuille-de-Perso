@@ -108,11 +108,14 @@ export interface LibraryEntry {
   description?: string | null;
   tags?: string[] | null;
   isVariable?: boolean; // Si vrai, demande une précision (variant) à l'ajout
+  is_variable?: boolean; // Legacy alias
   hasAutoCounter?: boolean;
   autoCounterName?: string;
   isXPUpgradeable?: boolean;
   variants?: string[] | null; // Liste des variantes suggérées (ex: "Chats", "Pollen" pour Allergie)
   effects?: TraitEffect[] | null; // New Effects System
+  points_label?: string; // Legacy alias
+  is_variable_cost?: boolean; // Legacy alias
   isGlobal?: boolean;
   isActive?: boolean;
   isLocked?: boolean;

@@ -54,8 +54,8 @@ const NarrativeSectionView: React.FC<NodeViewProps> = ({ node, updateAttributes 
     }, [id]);
 
     useEffect(() => {
-        const handler = (e: any) => {
-            const { date, nodeId, field } = e.detail;
+        const handler = (e: Event) => {
+            const { date, nodeId, field } = (e as CustomEvent).detail;
             if (nodeId === id) {
                 let formattedDate = date;
                 if (isReal && date && date.includes('-')) {

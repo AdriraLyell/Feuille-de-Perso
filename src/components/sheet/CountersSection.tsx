@@ -8,6 +8,8 @@ import { evaluateFormula, getSheetVariables, getAggregateDetails } from '../../u
 import { Minus, Plus, RefreshCw } from 'lucide-react';
 import { Parser, Tokenizer } from 'safe-expr-eval';
 import { PortalTooltip } from '../ui/PortalTooltip';
+import { RulesData, RulesCounterDefinition } from '../../types/rules';
+import { LibraryFormulaEntry, LibraryCounterEntry } from '../../types/system';
 
 const parser = new Parser();
 
@@ -26,25 +28,32 @@ const getExpressionVariables = (formula: string): string[] => {
     }
 };
 
+interface AggregateConfigDetails {
+    operation: 'sum' | 'count' | 'max' | 'avg';
+    targetType: 'skills' | 'attributes' | 'traits';
+    filterTarget: 'category' | 'tag' | 'name';
+    filterValue: string;
+}
+
 interface NumericCounterItemProps {
     counter: DotEntry;
-    entryOrFormula: any;
+    entryOrFormula: RulesCounterDefinition | LibraryFormulaEntry | LibraryCounterEntry | Partial<DotEntry>;
     isCustom: boolean;
     data: CharacterSheetData;
-    rules: any;
+    rules: RulesData;
     calculatedMaxes: Record<string, number>;
     updateCounter: (id: string, value: number, isCustom: boolean, field: 'value' | 'current') => void;
 }
 
-const translateAggregateConfig = (config: any): string => {
+const translateAggregateConfig = (config?: AggregateConfigDetails): string => {
     if (!config) return '';
-    let target = config.targetType || config.target || '';
+    let targetLabel = '';
+    const target = config.targetType;
     switch (target) {
-        case 'skills': target = 'Compétences'; break;
-        case 'attributes': target = 'Attributs'; break;
-        case 'secondaryAttributes': target = 'Attributs Sec.'; break;
-        case 'traits': target = 'Traits'; break;
-        case 'mysticAbilities': target = 'Cap. Mystiques'; break;
+        case 'skills': targetLabel = 'Compétences'; break;
+        case 'attributes': targetLabel = 'Attributs'; break;
+        case 'traits': targetLabel = 'Traits'; break;
+        default: targetLabel = target;
     }
 
     let op = config.operation?.toLowerCase() || '';
@@ -63,7 +72,7 @@ const translateAggregateConfig = (config: any): string => {
         filter = ` (${typeF}: ${config.filterValue})`;
     }
 
-    return `${op} de : ${target}${filter}`;
+    return op ? `${op} de : ${targetLabel}${filter}` : '';
 };
 
 const translateVariableName = (v: string): string => {
@@ -106,25 +115,23 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
     const nameKey = normalizedName.replace(/\s+/g, '');
     const calculatedMax = calculatedMaxes[counter.name] || calculatedMaxes[normalizedName] || calculatedMaxes[nameKey];
 
-    // Metadata recovery: if entryOrFormula is a "dumb" character entry, 
-    // try to find the full definition in the rules libraries.
-    const globalDef = rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === normalizedName)
-        || Object.values(rules?.definitions?.counters || {}).find((c: any) => normalizeString(c.name) === normalizedName);
+    const globalDef = rules.libraries?.counters?.find((l) => normalizeString(l.name) === normalizedName)
+        || Object.values(rules.definitions?.counters || {}).find((c) => normalizeString(c.name) === normalizedName);
 
-    const effectiveEntryOrFormula = { ...globalDef, ...entryOrFormula };
+    const effectiveEntryOrFormula = { ...globalDef, ...entryOrFormula } as RulesCounterDefinition | LibraryFormulaEntry;
 
-    const resolvedFormula = !effectiveEntryOrFormula.formula && effectiveEntryOrFormula.formulaId
-        ? rules?.libraries?.formulas?.find((f: any) => f.id === effectiveEntryOrFormula.formulaId)
+    const resolvedFormula = !effectiveEntryOrFormula.formula && 'formulaId' in effectiveEntryOrFormula && effectiveEntryOrFormula.formulaId
+        ? rules?.libraries?.formulas?.find((f: LibraryFormulaEntry) => f.id === effectiveEntryOrFormula.formulaId)
         : null;
 
     const formula = effectiveEntryOrFormula.formula || resolvedFormula?.formula || '';
-    const aggregateConfig = effectiveEntryOrFormula.aggregateConfig || resolvedFormula?.aggregateConfig;
+    const aggregateConfig = (('aggregateConfig' in effectiveEntryOrFormula ? effectiveEntryOrFormula.aggregateConfig : undefined) || resolvedFormula?.aggregateConfig) as AggregateConfigDetails | undefined;
     const effectiveEntry = resolvedFormula ? { ...effectiveEntryOrFormula, ...resolvedFormula } : effectiveEntryOrFormula;
 
     const computedMax = calculatedMax ?? evaluateFormula(
         formula,
         { ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary },
-        aggregateConfig ? { ...effectiveEntry, aggregateConfig } : undefined
+        { entry: effectiveEntry }
     );
 
     const currentSpent = counter.current || 0;
@@ -172,7 +179,7 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
             try {
                 const expr = parser.parse(formula);
                 parsedVars = getExpressionVariables(formula);
-                const zeroContext: Record<string, number> = parsedVars.reduce((acc, v: string) => ({ ...acc, [v]: 0 }), {});
+                const zeroContext: Record<string, number> = parsedVars.reduce((acc, v) => ({ ...acc, [v]: 0 }), {} as Record<string, number>);
                 baseValue = Number(expr.evaluate(zeroContext)) || 0;
             } catch {
                 // Ignore parse errors for UI
@@ -189,15 +196,14 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
                     <div className="columns-2 gap-x-6">
                         {parsedVars.map(v => {
                             const val = sheetVars[v] || 0;
-                            // Essayer de trouver le nom humain dans la bibliothèque de formules
-                            const formulaEntry = rules?.libraries?.formulas?.find((f: any) =>
+                            const formulaEntry = rules?.libraries?.formulas?.find((f: LibraryFormulaEntry) =>
                                 f.code === v || f.id === v || normalizeString(f.name) === normalizeString(v)
                             );
                             const displayName = formulaEntry?.name || translateVariableName(v);
 
                             const hasAggregateDetails = formulaEntry?.aggregateConfig && val !== 0;
                             const aggDetails = hasAggregateDetails
-                                ? getAggregateDetails({ ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary }, formulaEntry.aggregateConfig)
+                                ? getAggregateDetails({ ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary }, formulaEntry!.aggregateConfig!)
                                 : [];
 
                             return (
@@ -285,22 +291,22 @@ export const CountersSection = React.memo<CountersSectionProps>(({
     activeReserves = []
 }) => {
     const { rules } = useRules();
-
+    if (!rules) return null;
 
     const renderCounterItem = (counter: DotEntry, isCustom: boolean) => {
         const isSquaresOnly = counter.variant === 'squares_only';
         const normalizedName = normalizeString(counter.name);
         const nameKey = normalizedName.replace(/\s+/g, '');
         const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === normalizedName)
-            || rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === normalizedName);
-        const sysDef = rules?.definitions?.counters?.[nameKey] || Object.values(rules?.definitions?.counters || {}).find(c => normalizeString(c.name) === normalizedName);
+            || (rules.libraries?.counters?.find((l) => normalizeString(l.name) === normalizedName));
+        const sysDef = rules.definitions?.counters?.[nameKey] || Object.values(rules.definitions?.counters || {}).find((c: RulesCounterDefinition) => normalizeString(c.name) === normalizedName);
         const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId || sysDef?.isNumeric;
         if (isNumeric) {
             return (
                 <NumericCounterItem
                     key={counter.id}
                     counter={counter}
-                    entryOrFormula={libEntry || sysDef}
+                    entryOrFormula={libEntry || sysDef || {}}
                     isCustom={isCustom}
                     data={data}
                     rules={rules}
@@ -335,7 +341,7 @@ export const CountersSection = React.memo<CountersSectionProps>(({
                                     value={effectiveValue}
                                     creationValue={effectiveCreationValue}
                                     max={effectiveMax}
-                                    onChange={(v) => {
+                                    onChange={(v: number) => {
                                         const newBaseValue = Math.max(0, v - creationBonus - xpBonus);
                                         updateCounter(counter.id, newBaseValue, isCustom, 'value');
                                     }}
@@ -372,11 +378,11 @@ export const CountersSection = React.memo<CountersSectionProps>(({
                         </div>
                     </div>
                 </div>
-            </div >
+            </div>
         );
     };
 
-    const counterCat = rules?.definitions?.skillCategories?.find((c: any) => c.behavior === 'Compteur');
+    const counterCat = rules?.definitions?.skillCategories?.find((c: { behavior: string }) => c.behavior === 'Compteur');
     const sortedIds = counterCat ? (rules?.definitions?.skills?.[counterCat.id] || []) : [];
     const allKeys = Object.keys(data.counters).filter(k => k !== 'custom');
     const customCounters = data.counters.custom || [];
@@ -408,15 +414,15 @@ export const CountersSection = React.memo<CountersSectionProps>(({
         const normalizedName = normalizeString(counter.name);
         const nameKey = normalizedName.replace(/\s+/g, '');
         const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === normalizedName)
-            || rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === normalizedName);
-        const sysDef = rules?.definitions?.counters?.[nameKey] || Object.values(rules?.definitions?.counters || {}).find(c => normalizeString(c.name) === normalizedName);
+            || (rules.libraries?.counters?.find((l) => normalizeString(l.name) === normalizedName));
+        const sysDef = rules.definitions?.counters?.[nameKey] || Object.values(rules.definitions?.counters || {}).find((c: RulesCounterDefinition) => normalizeString(c.name) === normalizedName);
         const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId || sysDef?.isNumeric;
         if (isNumeric) {
             numericItems.push(
                 <NumericCounterItem
                     key={`numeric-${counter.id}`}
                     counter={counter}
-                    entryOrFormula={libEntry || sysDef}
+                    entryOrFormula={libEntry || sysDef || {}}
                     isCustom={false}
                     data={data}
                     rules={rules}
@@ -434,7 +440,7 @@ export const CountersSection = React.memo<CountersSectionProps>(({
         .forEach(c => {
             const nameKey = normalizeString(c.name);
             const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === nameKey)
-                || rules?.libraries?.counters?.find((l: any) => normalizeString(l.name) === nameKey);
+                || rules?.libraries?.counters?.find((l: LibraryCounterEntry) => normalizeString(l.name) === nameKey);
             const sysDef = rules?.definitions?.counters?.[nameKey];
             const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId || sysDef?.isNumeric;
             if (isNumeric) {
@@ -442,7 +448,7 @@ export const CountersSection = React.memo<CountersSectionProps>(({
                     <NumericCounterItem
                         key={`custom-numeric-${c.id}`}
                         counter={c}
-                        entryOrFormula={libEntry || sysDef}
+                        entryOrFormula={libEntry || sysDef || {}}
                         isCustom={true}
                         data={data}
                         rules={rules}
@@ -456,7 +462,7 @@ export const CountersSection = React.memo<CountersSectionProps>(({
         });
 
     activeReserves.forEach(formulaId => {
-        const formulaEntry = rules?.libraries?.formulas?.find(f => f.id === formulaId);
+        const formulaEntry = rules.libraries?.formulas?.find((f: LibraryFormulaEntry) => f.id === formulaId);
         if (!formulaEntry) return;
         const existingCustom = customCounters.find(c => normalizeString(c.name) === normalizeString(formulaEntry.name));
         const counterToRender: DotEntry = existingCustom || {

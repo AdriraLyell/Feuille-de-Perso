@@ -15,7 +15,7 @@ export const useTraitSelection = (
 ) => {
     const [selection, setSelection] = useState<SelectedInstance[]>([]);
     const [variantPicker, setVariantPicker] = useState<LibraryEntry | null>(null);
-    const isVariableCost = (entry: any) => {
+    const isVariableCost = (entry: LibraryEntry & { isVariableCost?: boolean, is_variable_cost?: boolean, pointsLabel?: string, points_label?: string }) => {
         if (entry.isVariableCost || entry.is_variable_cost) return true;
         const label = entry.pointsLabel || entry.points_label || entry.cost;
         if (!label) return false;
@@ -41,7 +41,7 @@ export const useTraitSelection = (
             return (formula?.effectType === 'master_skill' || (formula as any)?.type === 'master_skill');
         });
 
-        if (!isMasterSkill && (entry.isVariable || (entry as any).is_variable || isVariableCost(entry) || hasForceVariantFormula)) {
+        if (!isMasterSkill && (entry.isVariable || (entry as LibraryEntry & { is_variable?: boolean }).is_variable || isVariableCost(entry) || hasForceVariantFormula)) {
             setVariantPicker(entry);
         } else {
             setSelection(prev => {

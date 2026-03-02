@@ -65,7 +65,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
             if (!specName || specName.trim() === '') return;
 
             // 1. Identifier la catégorie cible "Secondaire"
-            const secondaryCat = rules?.definitions?.skillCategories?.find((cat: any) => cat.behavior === 'Secondaire' || cat.label.toLowerCase().includes('secondaire'))?.id || 'competences_secondaires';
+            const secondaryCat = rules?.definitions?.skillCategories?.find(cat => cat.behavior === 'Secondaire' || cat.label.toLowerCase().includes('secondaire'))?.id || 'competences_secondaires';
 
             // 2. Vérifier si la compétence n'existe pas déjà
             const existingSkills = data.skills[secondaryCat] || [];
@@ -115,7 +115,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
             if (!specName || specName.trim() === '') return;
 
             // 1. Identifier la catégorie cible "Secondaire"
-            const secondaryCat = rules?.definitions?.skillCategories?.find((cat: any) => cat.behavior === 'Secondaire' || cat.label.toLowerCase().includes('secondaire'))?.id || 'competences_secondaires';
+            const secondaryCat = rules?.definitions?.skillCategories?.find(cat => cat.behavior === 'Secondaire' || cat.label.toLowerCase().includes('secondaire'))?.id || 'competences_secondaires';
 
             // 2. Vérifier si la compétence n'existe pas déjà
             const existingSkills = data.skills[secondaryCat] || [];
@@ -186,7 +186,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
     const renderSkillBox = (skill: DotEntry) => {
         const count = skill.value;
         const imposedSpecs = (data.imposedSpecializations[skill.id] || [])
-            .filter((spec: any) => skill.value >= (spec.minLevel || 0));
+            .filter((spec: { minLevel?: number }) => skill.value >= (spec.minLevel || 0));
 
         if (count <= 0 && imposedSpecs.length === 0) return null;
 
@@ -215,7 +215,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                     {/* Render Imposed Specializations first (avec bouton de promotion) */}
-                    {imposedSpecs.map((spec: any, i: number) => (
+                    {imposedSpecs.map((spec: { name: string }, i: number) => (
                         <div key={`imp-${i}`} className="group/imposed bg-slate-100 border border-slate-200 rounded-full py-0.5 px-2 flex items-center shadow-inner h-5 hover:border-indigo-300 hover:bg-indigo-50 transition-colors">
                             <Zap size={10} className="text-blue-500 fill-blue-500 mr-1 shrink-0" />
                             <span className="text-[10px] font-bold text-slate-600 truncate leading-none flex-1" title={spec.name}>
@@ -264,12 +264,12 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         );
     };
 
-    const renderCategory = (title: string, categoryKey: SkillCategoryKey) => {
+    const renderCategory = (title: string, categoryKey: string) => {
         const categoryData = data.skills[categoryKey];
         if (!categoryData || !Array.isArray(categoryData)) return null;
 
         // Show skill if it has dots OR imposed specializations
-        const skills = categoryData.filter((s: any) => {
+        const skills = categoryData.filter((s: DotEntry) => {
             if (!s || !s.name || s.name.trim() === '') return false; // Skip spacers
             const hasPoints = s.value > 0;
             const hasImposed = data.imposedSpecializations[s.id] && data.imposedSpecializations[s.id].length > 0;
@@ -332,22 +332,22 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                     <div className="space-y-0.5 overflow-auto">
                         {/* Dynamic Rendering from Rules */}
                         {rules?.definitions?.skillCategories
-                            ?.filter((cat: any) => cat.behavior === 'Compétence')
-                            ?.map((cat: any) => (
+                            ?.filter(cat => cat.behavior === 'Compétence')
+                            ?.map(cat => (
                                 <div key={cat.id}>
-                                    {renderCategory(cat.label, cat.id as any)}
+                                    {renderCategory(cat.label, cat.id)}
                                 </div>
                             ))}
 
                         {/* Fallback Rendering if no rules / legacy keys */}
                         {(!rules || !rules.definitions?.skillCategories) && (
                             <>
-                                {renderCategory("Talents", "talents" as any)}
-                                {renderCategory("Compétences", "competences" as any)}
-                                {renderCategory("Compétences (Suite)", "competences_col_2" as any)}
-                                {renderCategory("Connaissances", "connaissances" as any)}
-                                {renderCategory("Autres Compétences", "autres_competences" as any)}
-                                {renderCategory("Autres", "autres" as any)}
+                                {renderCategory("Talents", "talents")}
+                                {renderCategory("Compétences", "competences")}
+                                {renderCategory("Compétences (Suite)", "competences_col_2")}
+                                {renderCategory("Connaissances", "connaissances")}
+                                {renderCategory("Autres Compétences", "autres_competences")}
+                                {renderCategory("Autres", "autres")}
                             </>
                         )}
                     </div>

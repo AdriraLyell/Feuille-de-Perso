@@ -6,7 +6,7 @@ import { logger } from '../logger';
 // Import migration modules
 import { MIGRATIONS, CURRENT_SCHEMA_VERSION, MigratableData } from './registry';
 import { generateId } from '../factories';
-import { LEGACY_SKILL_MAP, migrateAttributeId } from './migrateSkills';
+import { LEGACY_SKILL_MAP } from './migrateSkills';
 import { migrateAttributeId as migrateAttributeIdBase } from './migrateAttributes';
 
 /**

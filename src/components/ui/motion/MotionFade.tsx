@@ -23,9 +23,9 @@ export const MotionFade: React.FC<MotionFadeProps> = ({
     tag = "div",
     usePresence = true
 }) => {
-    // We use any here to avoid "union type too complex" and "infinite instantiation" errors 
+    // We use ElementType here to avoid "union type too complex" and "infinite instantiation" errors 
     // when dynamically accessing motion components.
-    const DynamicMotion: any = (motion as any)[tag] || motion.div;
+    const DynamicMotion = ((motion as unknown as Record<string, React.ElementType>)[tag] || motion.div) as React.ElementType;
 
     const content = (
         <DynamicMotion

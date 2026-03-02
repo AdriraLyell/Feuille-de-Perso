@@ -1,7 +1,7 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, PanInfo } from 'framer-motion';
 import { useCharacter } from '../../context/CharacterContext';
-import { PostItData } from '../../types';
+import { PostItData, CharacterSheetData } from '../../types';
 import { StickyNote, X, Plus } from 'lucide-react';
 // import { v4 as uuidv4 } from 'uuid'; replaced by crypto.randomUUID()
 
@@ -32,7 +32,7 @@ export const PostItBoard: React.FC<PostItBoardProps> = ({ currentTab }) => {
         } catch { return { x: 0, y: 0 }; }
     });
 
-    const handleBtnDragEnd = (e: any, info: any) => {
+    const handleBtnDragEnd = (e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
         const newPos = { x: btnPos.x + info.offset.x, y: btnPos.y + info.offset.y };
         setBtnPos(newPos);
         localStorage.setItem('postit-btn-pos', JSON.stringify(newPos));
@@ -49,21 +49,21 @@ export const PostItBoard: React.FC<PostItBoardProps> = ({ currentTab }) => {
             height: 200,
             tabId: currentTab
         };
-        updateData((prev: any) => ({
+        updateData((prev: CharacterSheetData) => ({
             ...prev,
             postIts: [...(prev.postIts || []), newPostIt]
         }));
     };
 
     const handleUpdate = (id: string, updates: Partial<PostItData>) => {
-        updateData((prev: any) => ({
+        updateData((prev: CharacterSheetData) => ({
             ...prev,
             postIts: (prev.postIts || []).map((p: PostItData) => p.id === id ? { ...p, ...updates } : p)
         }));
     };
 
     const handleDelete = (id: string) => {
-        updateData((prev: any) => ({
+        updateData((prev: CharacterSheetData) => ({
             ...prev,
             postIts: (prev.postIts || []).filter((p: PostItData) => p.id !== id)
         }));

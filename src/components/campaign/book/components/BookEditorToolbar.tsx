@@ -67,7 +67,7 @@ export const BookEditorToolbar: React.FC<BookEditorToolbarProps> = ({
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="4" x2="10" y2="4" /><line x1="14" y1="20" x2="5" y2="20" /><line x1="15" y1="4" x2="9" y2="20" /></svg>
                 </button>
                 <button
-                    onClick={() => (editor.chain().focus() as any).toggleUnderline().run()}
+                    onClick={() => (editor.chain().focus() as unknown as { toggleUnderline: () => { run: () => void } }).toggleUnderline().run()}
                     className={`p-2 rounded hover:bg-stone-700 transition-colors ${editor.isActive('underline') ? 'text-amber-400 bg-stone-800' : 'text-stone-300'}`}
                     title="Souligner (Ctrl+U)"
                 >

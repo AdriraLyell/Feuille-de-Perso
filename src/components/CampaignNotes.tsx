@@ -8,7 +8,7 @@ const CampaignNotes: React.FC = () => {
     const { data, updateData: onChange, addLog } = useCharacter();
     const [activeTab, setActiveTab] = useState<'journal' | 'party'>('journal');
 
-    const handleUpdate = React.useCallback((content: any) => {
+    const handleUpdate = React.useCallback((content: Record<string, unknown>) => {
         onChange((prev: import('../types').CharacterSheetData) => {
             const now = new Date().toISOString();
             const existing = prev.bookDocument || {
@@ -52,7 +52,7 @@ const CampaignNotes: React.FC = () => {
                         ].map(tab => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id as any)}
+                                onClick={() => setActiveTab(tab.id as 'journal' | 'party')}
                                 className={`group flex items-center gap-3 transition-all ${activeTab === tab.id ? 'text-stone-100' : 'text-stone-500 hover:text-stone-300'}`}
                             >
                                 <tab.icon size={20} className={activeTab === tab.id ? 'text-amber-500' : ''} />

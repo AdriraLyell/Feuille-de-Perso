@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { CharacterSheetData, LibraryEntry, TraitEffect } from '../types';
+import { CharacterSheetData, LibraryEntry, TraitEffect, DotEntry } from '../types';
 import { MergedEntry } from '../utils/libraryMerger';
 import { useRules } from '../context/RulesContext';
 
@@ -148,7 +148,7 @@ export const useTraitActions = (
         setEditForm({ ...editForm, effects: [...(editForm.effects || []), newEffect] });
     }, [editForm]);
 
-    const updateEffect = useCallback((id: string, field: keyof TraitEffect, value: any) => {
+    const updateEffect = useCallback((id: string, field: keyof TraitEffect, value: string | number | boolean | undefined) => {
         if (!editForm) return;
 
         const newEffects = (editForm.effects || []).map(e => e.id === id ? { ...e, [field]: value } : e);
@@ -251,10 +251,13 @@ export const useTraitActions = (
 
         // System counters
         Object.keys(data.counters).forEach(key => {
-            if (key !== 'custom' && !Array.isArray(data.counters[key])) {
-                const c = data.counters[key] as any;
-                if (c && c.name && c.name.trim() !== '') {
-                    counters.push({ id: c.id || key, name: c.name });
+            if (key !== 'custom') {
+                const rawEntry = data.counters[key];
+                if (!Array.isArray(rawEntry)) {
+                    const c = rawEntry as DotEntry;
+                    if (c && c.name && c.name.trim() !== '') {
+                        counters.push({ id: c.id || key, name: c.name });
+                    }
                 }
             }
         });

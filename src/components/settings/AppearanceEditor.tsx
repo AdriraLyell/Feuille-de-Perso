@@ -21,7 +21,7 @@ interface AppearanceEditorProps {
 const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onAddLog, rules }) => {
     const theme: ThemeConfig = data.theme || DEFAULT_THEME;
 
-    const updateTheme = (field: keyof ThemeConfig, value: any) => {
+    const updateTheme = (field: keyof ThemeConfig, value: string) => {
         onUpdate({
             ...data,
             theme: {

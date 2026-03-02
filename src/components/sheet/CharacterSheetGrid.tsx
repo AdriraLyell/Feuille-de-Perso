@@ -1,6 +1,6 @@
 import React from 'react';
 import { SheetColumn, SkillBlock as SkillBlockType } from '../../hooks/useSheetLayout';
-import { CharacterSheetData } from '../../types';
+import { CharacterSheetData, DropPayload } from '../../types';
 import { RulesData } from '../../types/rules';
 import { ThemeConfig } from '../../types/system';
 import { SkillBlock } from './SkillBlock';
@@ -17,7 +17,7 @@ interface CharacterSheetGridProps {
     imposedSpecializations: CharacterSheetData['imposedSpecializations'];
     onUpdateDot: (section: 'skills', category: string, id: string, value: number) => void;
     onDefineVariant: (category: string, id: string, skillName: string, definitionId?: string) => void;
-    onDropItem: (category: string, payload: any, targetIndex?: number) => void;
+    onDropItem: (category: string, payload: DropPayload, targetIndex?: number) => void;
     onRemoveItem: (category: string, id: string) => void;
     // For Landscape extra column
     renderExtraColumn?: () => React.ReactNode;

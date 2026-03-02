@@ -1,5 +1,5 @@
 import React from 'react';
-import { CharacterSheetData, TraitEntry, LibraryEntry } from '../types';
+import { CharacterSheetData, TraitEntry, LibraryEntry, DotEntry } from '../types';
 import { BookOpen, X } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import { useCharacter } from '../context/CharacterContext';
@@ -178,7 +178,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     description: skillDef.description || undefined,
                     definitionId: skillDef.id, // Lien vers la bibliothèque pour l'enrichissement des couleurs
                     mysticAbilityId: skillDef.mysticAbilityId || wizardState.mysticAbilityId || undefined
-                } as any);
+                } as DotEntry);
 
                 // Add to local library if not present
                 if (!newLibrary.find(l => l.id === skillDef.id)) {
@@ -311,7 +311,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     creationValue: 5,
                     max: 5,
                     definitionId: skillDef.id
-                } as any);
+                } as DotEntry);
 
                 finalSheet = { ...updated, skills: newSkills };
             }

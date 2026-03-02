@@ -116,11 +116,11 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                             <FileText size={16} /> <span className="hidden sm:inline">Fiche</span>
                         </button>
 
-                        {(rules as any)?.settingName && (
+                        {rules?.settingName && (
                             <div className="flex items-center gap-1.5 pl-2.5 pr-1 py-1 bg-slate-700/50 border border-slate-600 rounded-full text-[10px] md:text-xs font-medium text-slate-300 animate-in fade-in slide-in-from-left-2 duration-300">
                                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
                                 <span className="font-bold text-white truncate max-w-[80px] md:max-w-[150px]">
-                                    {(rules as any).settingName}
+                                    {rules.settingName}
                                 </span>
                                 {rules?.showMetadataToPlayers && (
                                     <button
