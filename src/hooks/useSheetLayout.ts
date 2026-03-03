@@ -20,6 +20,7 @@ export interface SheetLayout {
     columns: SheetColumn[];
     columnCount: number;
     backgrounds: SkillBlock[];
+    autres?: SkillBlock[];
     counters: { title: string; id: string; description?: string }[];
 }
 
@@ -78,7 +79,8 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
         if (skillCats.length === 0) return fallback;
 
         // 1. Separate by behavior
-        const skillsSet = skillCats.filter(c => c.behavior === 'Compétence' || c.behavior === 'Secondaire');
+        const skillsSet = skillCats.filter(c => (c.behavior === 'Compétence' && (!isLandscape || c.id !== 'Col_Comp_7')) || c.behavior === 'Secondaire');
+        const autresSet = isLandscape ? skillCats.filter(c => c.id === 'Col_Comp_7') : [];
         const backgroundsSet = skillCats.filter(c => c.behavior === 'Arrière-plan');
         const countersSet = skillCats.filter(c => c.behavior === 'Compteur');
 
@@ -177,6 +179,33 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
                     if (!def && item.name) {
                         const nameLower = item.name.trim().toLowerCase();
                         def = skillsMapByName.get(nameLower) || backgroundsMapByName.get(nameLower);
+                    }
+
+                    if (def) {
+                        return {
+                            ...item,
+                            mysticAbilityId: def.mysticAbilityId || (mysticMapById.has(targetId) ? targetId : undefined),
+                            isVariable: def.isVariable
+                        };
+                    }
+                    return item;
+                });
+                return {
+                    title: cat.label,
+                    items: enrichedItems,
+                    cat: cat.id,
+                    description: cat.description
+                };
+            }),
+            autres: autresSet.map(cat => {
+                const items = data.skills[cat.id] || [];
+                const enrichedItems = items.map(item => {
+                    const targetId = item.definitionId || item.id;
+                    let def = skillsMapById.get(targetId) || mysticMapById.get(targetId);
+
+                    if (!def && item.name) {
+                        const nameLower = item.name.trim().toLowerCase();
+                        def = skillsMapByName.get(nameLower);
                     }
 
                     if (def) {

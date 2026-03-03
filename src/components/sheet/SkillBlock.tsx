@@ -37,17 +37,27 @@ export const SkillBlock = React.memo<{
         setIsDragOver(true);
         e.dataTransfer.dropEffect = 'copy';
 
-        // Calculate drop index based on mouse position
-        const rect = e.currentTarget.getBoundingClientRect();
+        // Calculate drop index based on mouse position relative to potential drop targets (the rows)
+        const container = e.currentTarget;
+        const rect = container.getBoundingClientRect();
         const y = e.clientY - rect.top;
-        const rowHeight = 20; // h-5 is 20px
-        const headerPadding = 24; // approx height of SectionHeader + padding
-        const relativeY = y - headerPadding;
 
-        // Items start after header padding
-        let index = Math.round(relativeY / rowHeight);
-        index = Math.max(0, Math.min(index, items.length));
-        setDropIndex(index);
+        // Find the index by looking at all rows child positions
+        const rows = Array.from(container.querySelectorAll('.dot-row-container'));
+        let foundIndex = items.length;
+
+        for (let i = 0; i < rows.length; i++) {
+            const rowRect = rows[i].getBoundingClientRect();
+            const rowMid = rowRect.top + rowRect.height / 2 - rect.top;
+            if (y < rowMid) {
+                foundIndex = i;
+                break;
+            }
+        }
+
+        if (foundIndex !== dropIndex) {
+            setDropIndex(foundIndex);
+        }
     };
 
     const handleDragLeave = () => {
@@ -71,7 +81,7 @@ export const SkillBlock = React.memo<{
 
     return (
         <div
-            className={`flex flex-col transition duration-200 ${isEditing ? 'relative' : ''} ${isDragOver ? 'bg-[#bfae85]/10 ring-2 ring-[#bfae85]/40 rounded-sm scale-[1.02] shadow-lg z-10' : ''} `}
+            className={`flex flex-col transition-all duration-200 ${isEditing ? 'relative' : ''} ${isDragOver ? 'bg-amber-50/30 ring-2 ring-amber-500/30 rounded-sm z-10' : ''} `}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -106,11 +116,15 @@ export const SkillBlock = React.memo<{
                 {/* Drop Indicator Logic */}
                 {isEditing && isDragOver && dropIndex !== -1 && (
                     <div
-                        className="absolute left-0 right-0 h-0.5 bg-[#bfae85] z-20 pointer-events-none"
-                        style={{ top: `${(dropIndex * 20) + 4} px` }} // 4px padding in py-1? No, py-1 is 4px top/bottom.
+                        className="absolute left-0 right-0 h-0.5 bg-amber-500 z-20 pointer-events-none transition-all duration-150"
+                        style={{
+                            top: dropIndex < items.length
+                                ? `${(dropIndex * 20) + 4}px`
+                                : `${(items.length * 20) + 4}px`
+                        }}
                     >
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-[#bfae85] rotate-45"></div>
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-2 h-2 bg-[#bfae85] rotate-45"></div>
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1.5 w-2.5 h-2.5 bg-amber-500 rotate-45 rounded-sm"></div>
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1.5 w-2.5 h-2.5 bg-amber-500 rotate-45 rounded-sm"></div>
                     </div>
                 )}
 

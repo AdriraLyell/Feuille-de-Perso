@@ -8,7 +8,6 @@ import { APP_VERSION } from '../../constants/app';
 import { migrateData } from '../../utils/migrations';
 import { useRules } from '../../context/RulesContext';
 
-
 import { CampaignService } from '../../services/CampaignService';
 import { ErrorService } from '../../services/ErrorService';
 
@@ -16,7 +15,6 @@ interface VersionManifest {
     version: string;
     downloadUrl?: string;
 }
-
 
 import { logger } from '../../utils/logger';
 import { useCloudSyncCheck } from '../../hooks/useCloudSyncCheck';
@@ -31,6 +29,7 @@ import CharacterSheetInventaire from '../CharacterSheetInventaire';
 import CharacterSheetSpecializations from '../CharacterSheetSpecializations';
 import CharacterSheetXP from '../CharacterSheetXP';
 import CampaignNotes from '../CampaignNotes';
+import CreationHUD from '../CreationHUD';
 
 // Lazy Loaded Components
 const RulesSourceSelector = lazy(() => import('../RulesSourceSelector'));
@@ -329,8 +328,8 @@ const MainLayout: React.FC = () => {
                                                 </button>
                                                 <button onClick={() => setSheetTab('inventaire')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'inventaire' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Package size={16} /> Inventaire</button>
                                                 <button onClick={() => setSheetTab('specs')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'specs' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><List size={16} /> Spécialisations</button>
-                                                <button onClick={() => setSheetTab('xp')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'xp' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><TrendingUp size={16} /> XP</button>
-                                                <button onClick={() => setSheetTab('notes')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'notes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Book size={16} /> Notes</button>
+                                                <button onClick={() => setSheetTab('xp')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'xp' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><TrendingUp size={16} /> Gestion XP</button>
+                                                <button onClick={() => setSheetTab('notes')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'notes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Book size={16} /> Journal</button>
                                             </div>
                                         </div>
                                     </nav>
@@ -338,7 +337,7 @@ const MainLayout: React.FC = () => {
 
 
                                     <div className={`w-full flex px-2 md:px-0 pb-8 ${sheetTab === 'notes' ? 'overflow-visible' : sheetTab === 'prototype' ? 'overflow-hidden' : 'overflow-x-auto'}`}>
-                                        <div className={`${sheetTab === 'p1' ? 'block' : 'hidden'} mx-auto`}><CharacterSheet isLandscape={isLandscape} /></div>
+                                        <div className={`${sheetTab === 'p1' ? 'block' : 'hidden'} mx-auto`}><CharacterSheet isLandscape={isLandscape} onToggleEditMode={handleToggleEditMode} /></div>
                                         <div className={`${sheetTab === 'specs' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetSpecializations isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'p2' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetPage2 isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'inventaire' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetInventaire isLandscape={isLandscape} /></div>
@@ -351,7 +350,7 @@ const MainLayout: React.FC = () => {
                             ) : (
                                 <SettingsView
                                     onClose={() => handleSwitchMode('sheet')}
-
+                                    onDirtyChange={setIsSettingsDirty}
                                 />
                             )}
                         </Suspense>
@@ -408,6 +407,8 @@ const MainLayout: React.FC = () => {
                         setIsEditMode={setIsEditMode}
                         handleImportSuccess={handleImportSuccess}
                     />
+
+                    {data.creationConfig?.active && (<CreationHUD />)}
                 </div>
             </div>
         </NotificationProvider>

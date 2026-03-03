@@ -102,7 +102,9 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
             {/* Search & Custom */}
             <div className="p-3 space-y-3 bg-slate-800/30">
                 <div className="relative">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <Search size={14} className="text-slate-500 pointer-events-none" />
+                    </span>
                     <input
                         type="text"
                         placeholder="Rechercher..."

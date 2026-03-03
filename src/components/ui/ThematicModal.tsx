@@ -102,39 +102,68 @@ const ThematicModal: React.FC<ThematicModalProps> = ({
                         role="dialog"
                         aria-modal="true"
                         aria-label={typeof title === 'string' ? title : "Modale"}
-                        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                        initial={{ scale: 0.9, opacity: 0, y: 30 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                        transition={{ duration: 0.2, type: 'spring', damping: 25, stiffness: 300 }}
+                        exit={{ scale: 0.9, opacity: 0, y: 30 }}
+                        transition={{ duration: 0.4, type: 'spring', damping: 25, stiffness: 300 }}
                         className={`
                             relative w-full ${sizeClasses[size]} 
                             ${bgClass}
                             rounded-sm border-2
                             flex flex-col max-h-[90vh]
+                            animate-unroll
                             ${className}
                         `}
                     >
                         {/* Paper Texture Overlay (Only for Paper theme) */}
                         {!isMystic && (
-                            <div className="absolute inset-0 pointer-events-none opacity-40 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] rounded-sm mix-blend-multiply z-0" />
+                            <div className="absolute inset-0 pointer-events-none opacity-50 modal-paper-texture rounded-sm mix-blend-multiply z-0" />
                         )}
 
                         {/* Mystic Glow (Only for Mystic theme) */}
                         {isMystic && (
-                            <div className="absolute inset-0 pointer-events-none rounded-sm shadow-[inset_0_0_60px_rgba(0,0,0,0.5)] z-0" />
+                            <div className="absolute inset-0 pointer-events-none rounded-sm shadow-[inset_0_0_80px_rgba(0,0,0,0.8)] z-0" />
                         )}
 
-                        {/* Decorative Corners */}
-                        <svg className={`absolute top-0 left-0 w-8 h-8 ${cornerColorClass}`} viewBox="0 0 24 24" fill="currentColor"><path d="M0 0v8h2V2h6V0H0z" /></svg>
-                        <svg className={`absolute top-0 right-0 w-8 h-8 ${cornerColorClass} rotate-90`} viewBox="0 0 24 24" fill="currentColor"><path d="M0 0v8h2V2h6V0H0z" /></svg>
-                        <svg className={`absolute bottom-0 right-0 w-8 h-8 ${cornerColorClass} rotate-180`} viewBox="0 0 24 24" fill="currentColor"><path d="M0 0v8h2V2h6V0H0z" /></svg>
-                        <svg className={`absolute bottom-0 left-0 w-8 h-8 ${cornerColorClass} -rotate-90`} viewBox="0 0 24 24" fill="currentColor"><path d="M0 0v8h2V2h6V0H0z" /></svg>
+                        {/* Noise Filter SVG (Hidden) */}
+                        <svg className="hidden">
+                            <filter id="noise-filter">
+                                <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+                                <feColorMatrix type="saturate" values="0" />
+                            </filter>
+                        </svg>
+
+                        {/* Noise Overlay */}
+                        <div className="absolute inset-0 pointer-events-none modal-noise z-0 rounded-sm" />
+
+                        {/* Double Border Frame (Only for Paper theme) */}
+                        {!isMystic && (
+                            <div className="absolute inset-1.5 pointer-events-none border border-amber-gold/20 rounded-sm z-10" />
+                        )}
+
+                        {/* Decorative Corners (Simplified and Fixed) */}
+                        <div className={`absolute top-0 left-0 w-8 h-8 z-20 ${cornerColorClass}`}>
+                            <div className="absolute top-0 left-0 w-full h-1 border-t-4 border-l-4 border-current opacity-80" />
+                            <div className="absolute top-2 left-2 w-2 h-2 border-t-2 border-l-2 border-current opacity-40" />
+                        </div>
+                        <div className={`absolute top-0 right-0 w-8 h-8 z-20 ${cornerColorClass}`}>
+                            <div className="absolute top-0 right-0 w-full h-1 border-t-4 border-r-4 border-current opacity-80" />
+                            <div className="absolute top-2 right-2 w-2 h-2 border-t-2 border-r-2 border-current opacity-40" />
+                        </div>
+                        <div className={`absolute bottom-0 right-0 w-8 h-8 z-20 ${cornerColorClass}`}>
+                            <div className="absolute bottom-0 right-0 w-full h-1 border-b-4 border-r-4 border-current opacity-80" />
+                            <div className="absolute bottom-2 right-2 w-2 h-2 border-b-2 border-r-2 border-current opacity-40" />
+                        </div>
+                        <div className={`absolute bottom-0 left-0 w-8 h-8 z-20 ${cornerColorClass}`}>
+                            <div className="absolute bottom-0 left-0 w-full h-1 border-b-4 border-l-4 border-current opacity-80" />
+                            <div className="absolute bottom-2 left-2 w-2 h-2 border-b-2 border-l-2 border-current opacity-40" />
+                        </div>
 
                         {/* Header */}
-                        <div className={`relative z-10 px-6 py-4 border-b ${headerBorderClass} flex items-center justify-between ${headerBgClass}`}>
-                            <div className="flex items-center gap-3">
-                                {icon && <span className={`${isMystic ? 'text-amber-500' : 'text-[#8b2e2e]'} drop-shadow-sm`}>{icon}</span>}
-                                <h2 className={`text-2xl font-serif font-black tracking-wide uppercase drop-shadow-sm ${isMystic ? 'text-stone-300' : 'text-[#4a3b32]'}`}>
+                        <div className={`relative z-10 px-8 py-6 border-b ${headerBorderClass} flex items-center justify-between ${headerBgClass} shadow-inner-soft`}>
+                            <div className="flex items-center gap-4 flex-grow">
+                                {icon && <span className={`${isMystic ? 'text-amber-500' : 'text-[#8b2e2e]'}`}>{icon}</span>}
+                                <h2 className={`text-xl md:text-2xl font-serif font-black tracking-widest uppercase leading-tight ${isMystic ? 'text-stone-300' : 'text-[#4a3b32]'}`}>
                                     {title}
                                 </h2>
                             </div>
@@ -142,8 +171,9 @@ const ThematicModal: React.FC<ThematicModalProps> = ({
                                 onClick={onClose}
                                 aria-label="Fermer la modale"
                                 className={`
-                                    w-10 h-10 rounded-full flex items-center justify-center 
-                                    transition-colors focus:outline-none focus:ring-2
+                                    ml-4 w-10 h-10 shrink-0 rounded-full flex items-center justify-center 
+                                    transition-all duration-200 focus:outline-none focus:ring-2
+                                    hover:bg-black/5 active:bg-black/10
                                     ${closeBtnClass}
                                 `}
                             >
@@ -152,13 +182,13 @@ const ThematicModal: React.FC<ThematicModalProps> = ({
                         </div>
 
                         {/* Body */}
-                        <div className="relative z-10 p-6 overflow-y-auto custom-scrollbar flex-grow">
+                        <div className="relative z-10 p-8 overflow-y-auto custom-scrollbar flex-grow text-lg">
                             {children}
                         </div>
 
                         {/* Footer */}
                         {footer && (
-                            <div className={`relative z-10 px-6 py-4 border-t ${headerBorderClass} ${headerBgClass} flex justify-end gap-3 rounded-b-sm`}>
+                            <div className={`relative z-10 px-8 py-5 border-t-2 ${headerBorderClass} ${headerBgClass} flex justify-end gap-4 rounded-b-sm shadow-[inset_0_2px_10px_rgba(0,0,0,0.05)]`}>
                                 {footer}
                             </div>
                         )}

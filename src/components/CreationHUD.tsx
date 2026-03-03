@@ -162,12 +162,14 @@ const CreationHUD: React.FC = () => {
                             onClick={handleValidateClick}
                             className={`group relative flex items-center gap-3 px-8 py-4 rounded font-bold shadow-xl transform transition-all hover:scale-105 active:scale-95 overflow-hidden ${hasErrors
                                 ? 'bg-red-800 text-red-100 hover:bg-red-700 ring-2 ring-red-500 ring-offset-2 ring-offset-stone-900'
-                                : 'bg-green-700 text-green-100 hover:bg-green-600 ring-2 ring-green-500 ring-offset-2 ring-offset-stone-900'
+                                : messages.length > 0
+                                    ? 'bg-amber-600 text-amber-50 hover:bg-amber-500 ring-2 ring-amber-500 ring-offset-2 ring-offset-stone-900'
+                                    : 'bg-green-700 text-green-100 hover:bg-green-600 ring-2 ring-green-500 ring-offset-2 ring-offset-stone-900'
                                 }`}
                         >
                             <div className="relative z-10 flex items-center gap-2 text-lg font-serif tracking-wide">
-                                {hasErrors ? <AlertOctagon size={24} /> : <Feather size={24} />}
-                                {hasErrors ? 'Incomplet' : 'Valider'}
+                                {hasErrors ? <AlertOctagon size={24} /> : (messages.length > 0 ? <AlertTriangle size={24} /> : <Feather size={24} />)}
+                                {hasErrors ? 'Incomplet' : (messages.length > 0 ? 'Il reste des points' : 'Valider')}
                             </div>
                             {/* Shine Effect */}
                             <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine" />

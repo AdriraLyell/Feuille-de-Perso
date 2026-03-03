@@ -246,7 +246,9 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
             {/* Toolbar */}
             <div className="p-4 bg-stone-100/30 border-b border-[#bfae85]/30 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0">
                 <div className="relative flex-grow max-w-md w-full">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <Search size={16} className="text-[#4a3b32]/50" />
+                    </span>
                     <input
                         className="w-full pl-9 pr-9 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
                         placeholder="Rechercher une spécialisation..."

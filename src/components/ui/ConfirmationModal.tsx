@@ -28,20 +28,23 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     const isMystic = scheme === 'mystic';
 
     const getIcon = () => {
+        const iconClass = `drop-shadow-sm ${type === 'danger' || type === 'warning' ? 'animate-pulse-subtle' : ''}`;
         switch (type) {
-            case 'danger': return <AlertTriangle size={24} className={isMystic ? "text-crimson-blood" : "text-[#8b2e2e]"} />;
-            case 'warning': return <AlertTriangle size={24} className={isMystic ? "text-amber-500" : "text-[#d97706]"} />;
-            case 'success': return <CheckCircle2 size={24} className={isMystic ? "text-emerald-500" : "text-[#65a30d]"} />;
-            default: return <HelpCircle size={24} className={isMystic ? "text-stone-400" : "text-[#bfae85]"} />;
+            case 'danger': return <AlertTriangle size={28} className={`${isMystic ? "text-crimson-blood" : "text-[#8b2e2e]"} ${iconClass}`} />;
+            case 'warning': return <AlertTriangle size={28} className={`${isMystic ? "text-amber-500" : "text-[#d97706]"} ${iconClass}`} />;
+            case 'success': return <CheckCircle2 size={28} className={`${isMystic ? "text-emerald-500" : "text-[#65a30d]"} ${iconClass}`} />;
+            default: return <HelpCircle size={28} className={`${isMystic ? "text-stone-400" : "text-[#bfae85]"} ${iconClass}`} />;
         }
     };
 
     const getBtnColor = () => {
         switch (type) {
-            case 'danger': return 'bg-crimson-blood hover:bg-rose-700 text-white';
-            case 'warning': return 'bg-amber-600 hover:bg-amber-500 text-stone-900';
-            case 'success': return 'bg-emerald-600 hover:bg-emerald-500 text-stone-900';
-            default: return isMystic ? 'bg-stone-700 hover:bg-stone-600 text-stone-200' : 'bg-stone-700 hover:bg-stone-600 text-white';
+            case 'danger': return 'bg-[#8b2e2e] hover:bg-[#a83a3a] text-white shadow-md transition-all duration-300';
+            case 'warning': return 'bg-amber-600 hover:bg-amber-500 text-stone-900 shadow-md transition-all duration-300';
+            case 'success': return 'bg-emerald-600 hover:bg-emerald-500 text-stone-900 shadow-md transition-all duration-300';
+            default: return isMystic
+                ? 'bg-stone-700 hover:bg-stone-600 text-stone-200 shadow-md transition-all duration-300'
+                : 'bg-stone-700 hover:bg-stone-600 text-white shadow-md transition-all duration-300';
         }
     };
 
@@ -51,12 +54,12 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     };
 
     const cancelBtnClass = isMystic
-        ? "px-4 py-2 text-stone-500 hover:text-stone-300 hover:bg-stone-800 rounded-sm font-bold transition-colors uppercase text-xs tracking-wider"
-        : "px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold transition-colors uppercase text-xs tracking-wider";
+        ? "px-5 py-2.5 text-stone-500 hover:text-stone-300 hover:bg-stone-800 rounded-sm font-bold transition-all uppercase text-xs tracking-widest"
+        : "px-5 py-2.5 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold transition-all uppercase text-xs tracking-widest";
 
     const messageClass = isMystic
-        ? "text-stone-300 text-sm leading-relaxed italic"
-        : "text-[#5c4d41] text-sm leading-relaxed italic";
+        ? "text-stone-300 text-lg leading-relaxed italic"
+        : "text-[#5c4d41] text-lg leading-relaxed italic font-medium";
 
     return (
         <ThematicModal
@@ -67,7 +70,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             size="sm"
             scheme={scheme}
             footer={
-                <>
+                <div className="flex items-center gap-6">
                     {cancelLabel && (
                         <button
                             onClick={onClose}
@@ -79,15 +82,15 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     )}
                     <button
                         onClick={handleConfirm}
-                        className={`px-6 py-2 rounded-sm font-bold shadow-md flex items-center gap-2 transition uppercase leading-none tracking-wider text-xs ${getBtnColor()}`}
+                        className={`px-8 py-3 rounded-sm font-black shadow-lg flex items-center gap-3 transition-all duration-200 active:translate-y-0.5 uppercase leading-none tracking-widest text-xs ${getBtnColor()}`}
                         aria-label={confirmLabel}
                     >
                         {confirmLabel}
                     </button>
-                </>
+                </div>
             }
         >
-            <div className="text-center">
+            <div className="text-center py-4 px-2">
                 {typeof message === 'string' ? (
                     <p className={messageClass}>{message}</p>
                 ) : (

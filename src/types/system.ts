@@ -121,6 +121,10 @@ export interface LibraryEntry {
   isLocked?: boolean;
   globalUsage?: number;
   mysticAbilityId?: string | null; // ID of the linked Mystic Ability
+  isMystic?: boolean; // NOUVEAU: Flag mécanique pour la magie
+  isVariant?: boolean; // NOUVEAU: Est-ce une variante d'un autre trait ?
+  variantOf?: string; // NOUVEAU: ID du trait parent
+  isCustomized?: boolean; // NOUVEAU: Garder trace d'une modification locale
 }
 
 // Nouveau : Entrée pour la réserve de compétences
@@ -136,6 +140,9 @@ export interface LibrarySkillEntry {
   isLocked?: boolean;
   globalUsage?: number;
   mysticAbilityId?: string | null; // Links this skill to a specific mystic ability
+  isMystic?: boolean; // NOUVEAU: Flag mécanique pour la magie
+  isVariant?: boolean; // NOUVEAU: Est-ce une variante ?
+  variantOf?: string; // NOUVEAU: ID parent
   isCustomized?: boolean; // Vrai si la compétence a été modifiée localement pour ce setting
   masterDefinition?: { // Pour le bouton "Reset"
     name: string;
@@ -158,6 +165,7 @@ export interface LibrarySpecializationEntry {
   isLocked?: boolean;
   isImposed?: boolean;
   globalUsage?: number;
+  isCustomized?: boolean; // NOUVEAU: Garder trace d'une modification locale
 }
 
 export type LibraryBackgroundEntry = LibrarySkillEntry;
@@ -178,6 +186,7 @@ export interface LibraryCounterEntry {
   isNumeric?: boolean;
   formula?: string;
   formulaId?: string; // ID de la formule globale à utiliser pour le Max
+  isCustomized?: boolean; // NOUVEAU
 }
 
 export interface LibraryFormulaEntry {

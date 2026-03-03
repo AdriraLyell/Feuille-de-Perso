@@ -12,7 +12,9 @@ interface LibrarySkillFormProps {
     onSkillChange: (skill: LibrarySkillEntry) => void;
     onSave: () => void;
     error: string | null;
+    isOfficial?: boolean;
     categories?: { code: string, label: string, loc?: string }[];
+    isEditable?: boolean;
 }
 
 const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
@@ -23,7 +25,9 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
     onSkillChange,
     onSave,
     error,
-    categories = CATEGORY_HELP
+    isOfficial = false,
+    categories = CATEGORY_HELP,
+    isEditable = true
 }) => {
     const [showCategoryHelp, setShowCategoryHelp] = useState(false);
     const [variantDraft, setVariantDraft] = useState(skill.variants?.join(', ') || '');
@@ -50,16 +54,32 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
             size={showCategoryHelp ? 'lg' : 'md'}
             footer={
                 <>
-                    <button onClick={onClose} className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold">Annuler</button>
-                    <button onClick={handleSave} className="px-6 py-2 bg-[#5c4d41] text-white rounded-sm font-bold shadow-md hover:bg-[#4a3b32] flex items-center gap-2">
-                        <Save size={16} /> Enregistrer
+                    <button onClick={onClose} className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold">
+                        {isEditable ? 'Annuler' : 'Fermer'}
                     </button>
+                    {isEditable && (
+                        <button onClick={handleSave} className="px-6 py-2 bg-[#5c4d41] text-white rounded-sm font-bold shadow-md hover:bg-[#4a3b32] flex items-center gap-2">
+                            <Save size={16} /> Enregistrer
+                        </button>
+                    )}
                 </>
             }
         >
             <div className="flex flex-col lg:flex-row gap-8 py-2">
                 {/* Editor Form */}
                 <div className="flex-grow flex flex-col gap-5">
+                    {isOfficial && (
+                        <div className="bg-blue-50/50 border border-blue-200 text-blue-800 px-4 py-3 rounded-sm flex items-start gap-3 text-sm shadow-sm -mb-2">
+                            <AlertOctagon size={18} className="shrink-0 mt-0.5" />
+                            <div>
+                                <p className="font-bold">Compétence Officielle (Autorité Partagée)</p>
+                                <p className="text-xs opacity-80 mt-1">
+                                    Vous pouvez modifier la description et vos variantes suggérées personnelles.
+                                    Les règles (catégorie, type variable, statut mystique) sont contrôlées par le {`MJ`} et ne peuvent être modifiées ici.
+                                </p>
+                            </div>
+                        </div>
+                    )}
                     <div>
                         <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Nom de la compétence</label>
                         <input
@@ -90,8 +110,9 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
                             )}
                         </div>
                         <select
-                            className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm font-bold"
+                            className={`w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm font-bold outline-none shadow-sm ${isOfficial ? 'bg-stone-100 text-stone-500 cursor-not-allowed' : 'text-[#1c1917] bg-white/50 focus:border-amber-500'}`}
                             value={skill.defaultCategory || ''}
+                            disabled={isOfficial}
                             onChange={(e) => onSkillChange({ ...skill, defaultCategory: e.target.value })}
                         >
                             <option value="">-- Placement libre --</option>
@@ -101,17 +122,33 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
                         </select>
                         <p className="text-[10px] text-[#5c4d41] mt-1.5 italic px-1">Définit dans quelle section de la fiche cette compétence sera rangée lors de l'importation.</p>
                     </div>
-                    <div className="bg-amber-50/50 border border-amber-200/50 rounded-sm p-3 flex items-center gap-3">
+                    <div className={`border rounded-sm p-3 flex items-center gap-3 border-amber-200/50 ${isOfficial ? 'bg-stone-50 opacity-70' : 'bg-amber-50/50'}`}>
                         <input
                             type="checkbox"
                             id="isVariableSkill"
-                            className="w-4 h-4 accent-amber-600 cursor-pointer"
+                            className={`w-4 h-4 accent-amber-600 ${isOfficial ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                             checked={skill.isVariable || false}
+                            disabled={isOfficial}
                             onChange={(e) => onSkillChange({ ...skill, isVariable: e.target.checked })}
                         />
-                        <label htmlFor="isVariableSkill" className="cursor-pointer select-none">
+                        <label htmlFor="isVariableSkill" className={`${isOfficial ? 'cursor-not-allowed' : 'cursor-pointer'} select-none`}>
                             <span className="block text-xs font-bold text-[#5c4d41] uppercase tracking-wide">Compétence à Spécialité / Variable</span>
                             <span className="block text-[10px] text-[#5c4d41]/70 italic mt-0.5">Cochez si le joueur doit préciser quelque chose (ex: "Artisanat : Forge"). Permet d'avoir plusieurs fois cette compétence.</span>
+                        </label>
+                    </div>
+
+                    <div className={`border rounded-sm p-3 flex items-center gap-3 border-purple-200/50 ${isOfficial ? 'bg-purple-50/30 opacity-70' : 'bg-purple-50/50'}`}>
+                        <input
+                            type="checkbox"
+                            id="isMysticSkill"
+                            className={`w-4 h-4 accent-purple-600 ${isOfficial ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                            checked={skill.isMystic || false}
+                            disabled={isOfficial}
+                            onChange={(e) => onSkillChange({ ...skill, isMystic: e.target.checked })}
+                        />
+                        <label htmlFor="isMysticSkill" className={`${isOfficial ? 'cursor-not-allowed' : 'cursor-pointer'} select-none`}>
+                            <span className="block text-xs font-bold text-purple-900 uppercase tracking-wide">Compétence Mystique</span>
+                            <span className="block text-[10px] text-purple-800/70 italic mt-0.5">Cochez si cette compétence est liée à l'utilisation de la magie.</span>
                         </label>
                     </div>
 

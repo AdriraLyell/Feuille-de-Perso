@@ -35,8 +35,8 @@ export const CountersSection = React.memo<CountersSectionProps>(({
         const normalizedName = normalizeString(counter.name);
         const nameKey = normalizedName.replace(/\s+/g, '');
         const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === normalizedName)
-            || (rules.libraries?.counters?.find((l) => normalizeString(l.name) === normalizedName));
-        const sysDef = rules.definitions?.counters?.[nameKey] || Object.values(rules.definitions?.counters || {}).find((c: RulesCounterDefinition) => normalizeString(c.name) === normalizedName);
+            || (rules.libraries?.counters?.find((l: LibraryCounterEntry) => normalizeString(l.name) === normalizedName));
+        const sysDef = rules.definitions?.counters?.[nameKey] || (Object.values(rules.definitions?.counters || {}) as RulesCounterDefinition[]).find((c: RulesCounterDefinition) => normalizeString(c.name) === normalizedName);
         const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId || sysDef?.isNumeric;
         if (isNumeric) {
             return (
@@ -151,8 +151,8 @@ export const CountersSection = React.memo<CountersSectionProps>(({
         const normalizedName = normalizeString(counter.name);
         const nameKey = normalizedName.replace(/\s+/g, '');
         const libEntry = data.counterLibrary?.find(l => normalizeString(l.name) === normalizedName)
-            || (rules.libraries?.counters?.find((l) => normalizeString(l.name) === normalizedName));
-        const sysDef = rules.definitions?.counters?.[nameKey] || Object.values(rules.definitions?.counters || {}).find((c: RulesCounterDefinition) => normalizeString(c.name) === normalizedName);
+            || (rules.libraries?.counters?.find((l: LibraryCounterEntry) => normalizeString(l.name) === normalizedName));
+        const sysDef = rules.definitions?.counters?.[nameKey] || (Object.values(rules.definitions?.counters || {}) as RulesCounterDefinition[]).find((c: RulesCounterDefinition) => normalizeString(c.name) === normalizedName);
         const isNumeric = libEntry?.isNumeric || libEntry?.formulaId || sysDef?.formulaId || sysDef?.isNumeric;
         if (isNumeric) {
             numericItems.push(
@@ -228,8 +228,8 @@ export const CountersSection = React.memo<CountersSectionProps>(({
     return (
         <div className="flex flex-col h-full">
             <SectionHeader title="Compteurs & Réserves" />
-            <div className="p-1 flex-grow overflow-y-auto bg-stone-50/30">
-                <div className="grid grid-cols-4 sm:grid-cols-8 gap-x-1.5 gap-y-1">
+            <div className={`p-1 flex-grow overflow-y-auto bg-stone-50/30`}>
+                <div className={`grid gap-x-1.5 gap-y-1 ${isLandscape ? 'grid-cols-10' : 'grid-cols-4 sm:grid-cols-8'}`}>
                     {standardItems}
                     {numericItems}
                 </div>

@@ -12,6 +12,7 @@ export const useTraitActions = (
     const allFormulas = useMemo(() => rules?.libraries?.formulas || [], [rules]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editForm, setEditForm] = useState<LibraryEntry | null>(null);
+    const [formSource, setFormSource] = useState<'local' | 'official' | 'modified'>('local');
     const [tagInput, setTagInput] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
@@ -31,6 +32,7 @@ export const useTraitActions = (
             tags: [],
             effects: []
         });
+        setFormSource('local');
         setIsModalOpen(true);
     }, [defaultType]);
 
@@ -46,11 +48,16 @@ export const useTraitActions = (
             tags: [...(entry.tags || [])],
             effects: (entry.effects || []).map(e => ({ ...e }))
         });
+        setFormSource(_source as 'local' | 'official' | 'modified');
         setIsModalOpen(true);
     }, []);
 
     const handleDelete = useCallback((id: string, source: string) => {
-        if (source === 'official') return;
+        if (source === 'official') {
+            // Un trait purement officiel ne peut pas être supprimé du JSON, 
+            // mais un trait 'modified' peut être supprimé pour revenir à l'état officiel.
+            return;
+        }
         setShowDeleteConfirm(id);
     }, []);
 
@@ -83,6 +90,7 @@ export const useTraitActions = (
         onUpdate({ ...data, library: newLibrary });
         setIsModalOpen(false);
         setEditForm(null);
+        setFormSource('local');
     }, [data, editForm, onUpdate]);
 
     const executeOfficialUpdate = async () => {
@@ -290,6 +298,7 @@ export const useTraitActions = (
         setIsModalOpen,
         editForm,
         setEditForm,
+        formSource,
         tagInput,
         setTagInput,
         error,

@@ -211,7 +211,7 @@ const AdminApp: React.FC = () => {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex-1 py-4 text-center font-bold uppercase tracking-widest text-xs border-b-2 transition-all ${activeTab === tab.id ? 'border-amber-gold text-amber-gold bg-amber-900/10' : 'border-transparent text-stone-500 hover:text-stone-300 hover:bg-stone-800'}`}
+                            className={`flex-1 py-4 text-center font-bold uppercase tracking-widest text-xs border-b-2 transition-all ${activeTab === tab.id ? 'border-amber-500 text-amber-500 bg-amber-900/20 shadow-[inset_0_-2px_0_rgba(245,158,11,0.5)]' : 'border-transparent text-stone-400 hover:text-stone-200 hover:bg-stone-800'}`}
                         >
                             {tab.label}
                         </button>
@@ -232,7 +232,7 @@ const AdminApp: React.FC = () => {
                 {activeTab === 'skills' && <AdminSkillsEditor rules={rules} onUpdate={handleUpdateRules} />}
                 {activeTab === 'libraries' && (
                     <div className="animate-in fade-in slide-in-from-bottom-4">
-                        <div className="flex gap-2 mb-6 bg-mystic-surface p-2 rounded-sm shadow-md border border-stone-700 w-fit mx-auto overflow-x-auto">
+                        <div className="flex gap-2 mb-6 bg-mystic-surface p-2 rounded-sm shadow-md border border-stone-700 w-fit mx-auto overflow-x-auto scrollbar-hide">
                             {([
                                 { id: 'traits', label: 'Traits' },
                                 { id: 'skills', label: 'Compétences' },
@@ -244,7 +244,7 @@ const AdminApp: React.FC = () => {
                                 <button
                                     key={lt.id}
                                     onClick={() => setActiveLibraryTab(lt.id as typeof activeLibraryTab)}
-                                    className={`px-6 py-2 rounded-sm font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap ${activeLibraryTab === lt.id ? 'bg-amber-gold text-stone-900 shadow-glow-gold' : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800'}`}
+                                    className={`px-6 py-2 rounded-sm font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap shadow-sm ${activeLibraryTab === lt.id ? 'bg-amber-500 text-stone-950 shadow-glow-gold scale-105 ring-1 ring-amber-400' : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800'}`}
                                 >
                                     {lt.label}
                                 </button>

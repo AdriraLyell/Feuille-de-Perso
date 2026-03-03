@@ -14,6 +14,7 @@ export const useSkillLibrary = (
     const [hideKnownSkills, setHideKnownSkills] = useState(true);
     const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
     const [editingSkill, setEditingSkill] = useState<LibrarySkillEntry | null>(null);
+    const [skillFormSource, setSkillFormSource] = useState<'local' | 'official'>('local');
     const [skillError, setSkillError] = useState<string | null>(null);
     const [showRenameConfirm, setShowRenameConfirm] = useState<{ oldName: string, newSkill: LibrarySkillEntry } | null>(null);
     const [showImportConfirm, setShowImportConfirm] = useState(false);
@@ -57,12 +58,14 @@ export const useSkillLibrary = (
             name: '',
             description: ''
         });
+        setSkillFormSource('local');
         setIsSkillModalOpen(true);
     };
 
     const handleOpenEditSkill = (merged: MergedEntry<LibrarySkillEntry>) => {
         setSkillError(null);
         setEditingSkill({ ...merged.entry });
+        setSkillFormSource(merged.source === 'official' ? 'official' : 'local');
         setIsSkillModalOpen(true);
     };
 
@@ -100,6 +103,7 @@ export const useSkillLibrary = (
         addLog(`Compétence "${skillToSave.name}" enregistrée dans la réserve.`, 'success', 'settings');
         setIsSkillModalOpen(false);
         setEditingSkill(null);
+        setSkillFormSource('local');
         setShowRenameConfirm(null);
     };
 
@@ -193,6 +197,7 @@ export const useSkillLibrary = (
         hideKnownSkills, setHideKnownSkills,
         isSkillModalOpen, setIsSkillModalOpen,
         editingSkill, setEditingSkill,
+        skillFormSource,
         skillError, setSkillError,
         showRenameConfirm, setShowRenameConfirm,
         showImportConfirm, setShowImportConfirm,

@@ -95,11 +95,19 @@ export const BookImage = Node.create({
         return {
             setBookImage:
                 attributes =>
-                    ({ commands }) => {
-                        return commands.insertContent({
-                            type: this.name,
-                            attrs: attributes,
-                        });
+                    ({ chain }) => {
+                        return chain()
+                            .insertContent([
+                                {
+                                    type: this.name,
+                                    attrs: attributes,
+                                },
+                                {
+                                    type: 'paragraph',
+                                }
+                            ])
+                            .focus()
+                            .run();
                     },
             deleteBookImage:
                 () =>

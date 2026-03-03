@@ -13,7 +13,7 @@ interface TraitRowProps {
 
 const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onManageMystic }) => {
     const isEmpty = !item.name.trim();
-    const isResolved = item.value === '0' && item.creationValue !== undefined;
+    const isResolved = item.value === '0' && item.creationValue !== undefined && item.creationValue !== '0';
 
     const isPostCreation = item.isPostCreation && !isResolved;
 

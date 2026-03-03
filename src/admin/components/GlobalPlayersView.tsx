@@ -124,7 +124,9 @@ const GlobalPlayersView: React.FC = () => {
 
                 <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
                     <div className="relative flex-grow md:w-80 group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-900/50 group-focus-within:text-amber-500 transition-colors" size={16} />
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                            <Search className="text-amber-900/50 group-focus-within:text-amber-500 transition-colors pointer-events-none" size={16} />
+                        </span>
                         <input
                             type="text"
                             placeholder="RECHERCHER UNE ÂME OU UN GARDIEN..."

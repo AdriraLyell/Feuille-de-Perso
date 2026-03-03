@@ -87,7 +87,7 @@ const DotRating: React.FC<DotRatingProps> = ({
         }
 
         const activeColor = isCreationDot ? (creationColor || '#2563eb') : (xpColor || '#292524');
-        const inactiveColor = '#d6d3d1'; // stone-300
+        const inactiveColor = '#a8a29e'; // stone-400 (was stone-300)
 
         const handleClick = () => {
           if (readOnly || !onChange) return;
@@ -117,7 +117,7 @@ const DotRating: React.FC<DotRatingProps> = ({
               size={12}
               stroke={filled ? activeColor : inactiveColor}
               fill={filled ? activeColor : 'transparent'}
-              strokeWidth={filled ? 2.5 : 1.5}
+              strokeWidth={filled ? 2.5 : 2.2}
             />
           </button>
         );

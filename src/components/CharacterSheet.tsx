@@ -10,7 +10,7 @@ import ExperienceSummary from './sheet/ExperienceSummary';
 import CharacterSheetGrid from './sheet/CharacterSheetGrid';
 
 // Hooks
-import { useCharacterData, useCharacterActions } from '../context/CharacterContext';
+import { useCharacterData, useCharacterActions, useCharacterState } from '../context/CharacterContext';
 import { useCharacterSheetActions } from '../hooks/useCharacterSheetActions';
 import { useCharacterBonuses } from '../hooks/useCharacterBonuses';
 import { useCreationMode } from '../hooks/useCreationMode';
@@ -25,19 +25,16 @@ import { PencilLine, Check, UserPlus } from 'lucide-react';
 
 interface Props {
     isLandscape?: boolean;
+    onToggleEditMode?: () => void;
 }
 
-const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
+const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode }) => {
     const data = useCharacterData();
     const dataRef = React.useRef(data);
     React.useEffect(() => { dataRef.current = data; }, [data]);
 
-    const { updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacterActions();
-
-    const {
-        isEditMode,
-        setEditMode: setIsEditMode,
-    } = useCharacterActions() as any; // Using any because of the slightly different return of useCharacterActions in some hooks
+    const { updateData: onChange, addLog: onAddLog, recordXPTransaction, setEditMode: setIsEditMode } = useCharacterActions();
+    const { isEditMode } = useCharacterState();
 
     // Variable Skill State
     const [variantModalState, setVariantModalState] = useState<{
@@ -94,7 +91,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
     const creationActive = data.creationConfig?.active;
     const allowExtendedSkills = data.creationConfig?.extendedSkills || false;
 
-    const { columns, backgrounds } = isLandscape ? landscapeLayout : portraitLayout;
+    const { columns, backgrounds, autres } = isLandscape ? landscapeLayout : portraitLayout;
 
     const validateSkillIncrease = useCallback((id: string, newValue: number) => {
         const currentData = dataRef.current;
@@ -139,7 +136,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                     onUpdateHeader={updateHeader}
                     isDateLocked={!!rules?.configurations?.calendar}
                     isEditMode={isEditMode}
-                    onToggleEditMode={handleToggleEditMode}
+                    onToggleEditMode={onToggleEditMode || handleToggleEditMode}
                     onToggleCreationMode={handleToggleCreationMode}
                 />
 
@@ -167,6 +164,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 <CharacterSheetGrid
                     columns={columns}
                     backgrounds={backgrounds}
+                    autres={autres}
                     isLandscape={isLandscape}
                     isEditMode={isEditMode}
                     allowExtendedSkills={allowExtendedSkills}

@@ -10,6 +10,34 @@ interface Props {
     isLandscape?: boolean;
 }
 
+const WeaponTableWithFixedLines: React.FC<{
+    weapons: any[];
+    updateCombatWeapon: (id: string, field: any, value: string) => void;
+}> = ({ weapons, updateCombatWeapon }) => {
+    // Force precisely 6 lines
+    const displayWeapons = [...(weapons || [])];
+    while (displayWeapons.length < 6) {
+        displayWeapons.push({ id: `placeholder-weapon-${displayWeapons.length}`, weapon: '', level: '', init: '', attack: '', damage: '', parry: '' });
+    }
+    const finalWeapons = displayWeapons.slice(0, 6);
+
+    return <WeaponTable weapons={finalWeapons} updateCombatWeapon={updateCombatWeapon} />;
+};
+
+const ArmorTableWithFixedLines: React.FC<{
+    armor: any[];
+    updateArmor: (index: number, field: any, value: string) => void;
+}> = ({ armor, updateArmor }) => {
+    // Force precisely 4 lines
+    const displayArmor = [...(armor || [])];
+    while (displayArmor.length < 4) {
+        displayArmor.push({ type: '', protection: '', weight: '' });
+    }
+    const finalArmor = displayArmor.slice(0, 4);
+
+    return <ArmorTable armor={finalArmor} updateArmor={updateArmor} />;
+};
+
 const CharacterSheetInventaire: React.FC<Props> = ({ isLandscape = false }) => {
     const { data, updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacter();
     const { rules } = useRules();
@@ -34,33 +62,50 @@ const CharacterSheetInventaire: React.FC<Props> = ({ isLandscape = false }) => {
 
     return (
         <div className={`sheet-container ${isLandscape ? 'landscape' : ''} flex flex-col gap-0`}>
-            {/* Top Section: Weapons & Money */}
-            <div className="grid grid-cols-12 border-b-2 border-stone-800">
-                {/* Weapons (Combat) */}
-                <div className="col-span-8 border-r-2 border-stone-800 bg-stone-50/30">
-                    <WeaponTable weapons={data.combat.weapons} updateCombatWeapon={updateCombatWeapon} />
+            {/* Top Container: Combines Left (Weapons+Armor) and Right (Money) to sync heights */}
+            <div className="grid grid-cols-12 shrink-0">
+                {/* Left Side: Weapons & Armor */}
+                <div className="col-span-8 border-r-2 border-stone-800 flex flex-col">
+                    {/* Weapons */}
+                    <div className="bg-stone-50/30 border-b-2 border-stone-800">
+                        <WeaponTableWithFixedLines weapons={data.combat.weapons} updateCombatWeapon={updateCombatWeapon} />
+                    </div>
+
+                    {/* Armor */}
+                    <div className="bg-stone-100/50 border-b-2 border-stone-800">
+                        <ArmorTableWithFixedLines armor={data.combat.armor} updateArmor={updateArmor} />
+                    </div>
                 </div>
 
-                {/* Money */}
+                {/* Right Side: Money (height will naturally match Left Side) */}
                 <div className="col-span-4 flex flex-col bg-white">
-                    <Box title="Valeurs Monétaires" value={data.page2.valeurs_monetaires} field="valeurs_monetaires" className="h-1/2 border-b border-stone-400" />
-                    <Box title="Armes (Détails)" value={data.page2.armes_list} field="armes_list" className="h-1/2" />
+                    <Box
+                        title="Valeurs Monétaires"
+                        value={data.page2.valeurs_monetaires}
+                        field="valeurs_monetaires"
+                        className="flex-grow border-b-2 border-stone-800"
+                    />
                 </div>
             </div>
 
-            {/* Bottom Section: Armor & Equipment */}
+            {/* Bottom Container: Equipment & Weapon Details */}
             <div className="grid grid-cols-12 flex-grow">
-                {/* Armor & Defense */}
-                <div className="col-span-4 border-r-2 border-stone-800 bg-stone-100/50">
-                    <ArmorTable armor={data.combat.armor} updateArmor={updateArmor} />
-                </div>
-
-                {/* Equipment */}
-                <div className="col-span-8 bg-white flex flex-col">
+                {/* Left: Equipment */}
+                <div className="col-span-8 border-r-2 border-stone-800 bg-white flex flex-col">
                     <Page2SectionHeader title="Équipement" />
                     <div className="flex-grow p-1.5 min-h-[300px]">
                         <NotebookInput value={data.page2.equipement} onChange={(v: string) => updateStringField('equipement', v)} />
                     </div>
+                </div>
+
+                {/* Right: Weapon Details */}
+                <div className="col-span-4 bg-white flex flex-col">
+                    <Box
+                        title="Armes (Détails)"
+                        value={data.page2.armes_list}
+                        field="armes_list"
+                        className="flex-grow"
+                    />
                 </div>
             </div>
         </div>

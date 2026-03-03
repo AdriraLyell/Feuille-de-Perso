@@ -34,7 +34,9 @@ export const SpecModalContent: React.FC<SpecModalContentProps> = ({
             <div>
                 <label htmlFor="spec-skills" className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Compétences associées</label>
                 <div className="relative mb-2">
-                    <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-[#5c4d41]/60" />
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-2">
+                        <Search size={12} className="text-[#5c4d41]/60 pointer-events-none" />
+                    </span>
                     <input
                         className="w-full pl-7 pr-2 py-1 text-[11px] border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none bg-white/50"
                         placeholder="Filtrer les compétences..."

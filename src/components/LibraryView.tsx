@@ -18,9 +18,10 @@ import { useSkillLibrary } from '../hooks/library/useSkillLibrary';
 interface LibraryViewProps {
     data?: CharacterSheetData; // Optional to support standalone use if needed, but we will pass it
     onUpdate?: (newData: CharacterSheetData) => void;
+    isEditable?: boolean;
 }
 
-const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: propUpdate }) => {
+const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: propUpdate, isEditable = true }) => {
     // Fallback to context if not provided (for backward compatibility if used elsewhere)
     const { data: contextData, updateData: contextUpdate } = useCharacter();
 
@@ -54,7 +55,8 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         finalizeSaveSkill,
         handleDeleteRequest,
         executeDeleteSkill,
-        executeImportFromSheet
+        executeImportFromSheet,
+        skillFormSource
     } = useSkillLibrary(data, rules, onUpdate, addLog);
 
     // OFFICIAL: Use local state for visibility for now (could be moved to hook too if shared)
@@ -126,7 +128,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                 {activeTab === 'traits' && (
                     // Use existing component logic, wrapped to fit height
                     <div className="absolute inset-0">
-                        <TraitLibrary data={data} onUpdate={onUpdate} isEditable={true} />
+                        <TraitLibrary data={data} onUpdate={onUpdate} isEditable={isEditable} />
                     </div>
                 )}
 
@@ -145,12 +147,13 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                         handleOpenEditSkill={handleOpenEditSkill}
                         handleDeleteRequest={handleDeleteRequest}
                         getCategoryLabel={getCategoryLabel}
+                        isEditable={isEditable}
                     />
                 )}
 
                 {activeTab === 'specializations' && (
                     <div className="absolute inset-0">
-                        <SpecializationLibraryView data={data} onUpdate={onUpdate} />
+                        <SpecializationLibraryView data={data} onUpdate={onUpdate} isEditable={isEditable} />
                     </div>
                 )}
             </div>
@@ -174,13 +177,15 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
             {isSkillModalOpen && editingSkill && (
                 <LibrarySkillForm
                     isOpen={isSkillModalOpen}
+                    isOfficial={skillFormSource === 'official'}
                     onClose={() => setIsSkillModalOpen(false)}
-                    title={data.skillLibrary?.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence (Copie)'}
+                    title={!isEditable ? 'Détails Compétence' : data.skillLibrary?.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence (Copie)'}
                     skill={editingSkill}
                     onSkillChange={setEditingSkill}
                     onSave={() => handleSaveSkill(editingSkill)} // Passing editingSkill here
                     error={skillError}
                     categories={availableCategories.length > 0 ? availableCategories : undefined}
+                    isEditable={isEditable}
                 />
             )}
 
