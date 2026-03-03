@@ -42,6 +42,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
         setIsModalOpen,
         editForm,
         setEditForm,
+        formSource,
         tagInput,
         setTagInput,
         error,
@@ -132,7 +133,9 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
 
                 <div className="flex gap-2 items-center flex-wrap md:flex-nowrap">
                     <div className="relative flex-grow min-w-[150px]">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                            <Search size={16} className="text-[#4a3b32]/50 pointer-events-none" />
+                        </span>
                         <input
                             className="w-full pl-9 pr-9 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
                             placeholder="Rechercher..."
@@ -292,6 +295,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                 isModalOpen && editForm && (
                     <TraitForm
                         editForm={editForm}
+                        isOfficial={formSource === 'official'}
                         library={[]}
                         allSkills={allSkills}
                         allAttributes={allAttributes}
@@ -308,6 +312,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                         addEffect={addEffect}
                         updateEffect={updateEffect}
                         removeEffect={removeEffect}
+                        isEditable={isEditable}
                     />
                 )
             }

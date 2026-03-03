@@ -17,6 +17,7 @@ interface SkillLibraryTabProps {
     handleOpenEditSkill: (merged: MergedEntry<LibrarySkillEntry>) => void;
     handleDeleteRequest: (merged: MergedEntry<LibrarySkillEntry>) => void;
     getCategoryLabel: (code: string) => string;
+    isEditable?: boolean;
 }
 
 const SkillLibraryTab: React.FC<SkillLibraryTabProps> = ({
@@ -32,7 +33,8 @@ const SkillLibraryTab: React.FC<SkillLibraryTabProps> = ({
     handleOpenNewSkill,
     handleOpenEditSkill,
     handleDeleteRequest,
-    getCategoryLabel
+    getCategoryLabel,
+    isEditable = true
 }) => {
     return (
         <div className="absolute inset-0 flex flex-col bg-[#fdfbf7]">
@@ -41,7 +43,9 @@ const SkillLibraryTab: React.FC<SkillLibraryTabProps> = ({
                 {/* Search Bar - Left */}
                 <div className="relative w-full max-w-sm flex gap-2">
                     <div className="relative flex-grow">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                            <Search size={16} className="text-[#4a3b32]/50 pointer-events-none" />
+                        </span>
                         <input
                             className="w-full pl-9 pr-9 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
                             placeholder="Rechercher une compétence..."
@@ -87,28 +91,30 @@ const SkillLibraryTab: React.FC<SkillLibraryTabProps> = ({
                 </div>
 
                 {/* Actions - Right */}
-                <div className="flex gap-2 justify-end">
-                    <button
-                        onClick={handleOfficialUpdateClick}
-                        className="bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
-                        title="Mettre à jour depuis le serveur officiel"
-                    >
-                        <RefreshCw size={14} /> Officiel
-                    </button>
-                    <button
-                        onClick={() => setShowImportConfirm(true)}
-                        className="bg-white/80 border border-[#bfae85]/50 text-[#5c4d41] hover:bg-stone-50 hover:text-[#1c1917] px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
-                        title="Ajouter toutes les compétences de la fiche à la réserve"
-                    >
-                        <Download size={14} /> Importer
-                    </button>
-                    <button
-                        onClick={handleOpenNewSkill}
-                        className="bg-[#5c4d41] hover:bg-[#4a3b32] text-white px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
-                    >
-                        <Plus size={14} /> Créer
-                    </button>
-                </div>
+                {isEditable && (
+                    <div className="flex gap-2 justify-end">
+                        <button
+                            onClick={handleOfficialUpdateClick}
+                            className="bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
+                            title="Mettre à jour depuis le serveur officiel"
+                        >
+                            <RefreshCw size={14} /> Officiel
+                        </button>
+                        <button
+                            onClick={() => setShowImportConfirm(true)}
+                            className="bg-white/80 border border-[#bfae85]/50 text-[#5c4d41] hover:bg-stone-50 hover:text-[#1c1917] px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
+                            title="Ajouter toutes les compétences de la fiche à la réserve"
+                        >
+                            <Download size={14} /> Importer
+                        </button>
+                        <button
+                            onClick={handleOpenNewSkill}
+                            className="bg-[#5c4d41] hover:bg-[#4a3b32] text-white px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap"
+                        >
+                            <Plus size={14} /> Créer
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Skill List */}
@@ -168,8 +174,10 @@ const SkillLibraryTab: React.FC<SkillLibraryTabProps> = ({
                                             </div>
 
                                             <div className="flex gap-1 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => handleOpenEditSkill(merged)} className="text-blue-500 hover:bg-blue-50 p-1 rounded" title="Éditer/Voir"><Edit2 size={12} /></button>
-                                                {!isUsed && !isOfficial && (
+                                                <button onClick={() => handleOpenEditSkill(merged)} className="text-blue-500 hover:bg-blue-50 p-1 rounded" title={isEditable ? "Éditer/Voir" : "Voir"} >
+                                                    {isEditable ? <Edit2 size={12} /> : <Eye size={12} />}
+                                                </button>
+                                                {isEditable && !isUsed && !isOfficial && (
                                                     <button onClick={() => handleDeleteRequest(merged)} className="text-red-500 hover:bg-red-50 p-1 rounded" title="Supprimer"><Trash2 size={12} /></button>
                                                 )}
                                             </div>

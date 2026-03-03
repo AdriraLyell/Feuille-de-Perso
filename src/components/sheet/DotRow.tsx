@@ -66,7 +66,7 @@ export const DotRow: React.FC<DotRowProps> = ({
     if (!entry.name) {
         return (
             <div
-                className={`h-5 border-b border-dotted transition-colors relative group ${isEditing ? 'border-[#bfae85]/40 bg-[#bfae85]/5 hover:bg-[#bfae85]/10 cursor-grab active:cursor-grabbing' : 'border-transparent'} `}
+                className={`h-5 border-b border-dotted transition-all relative group dot-row-container ${isEditing ? 'border-[#bfae85]/40 bg-[#bfae85]/5 hover:bg-[#bfae85]/15 cursor-grab active:cursor-grabbing touch-none' : 'border-transparent'} `}
                 draggable={isEditing}
                 onDragStart={isEditing ? (e) => {
                     const payload = {
@@ -81,9 +81,10 @@ export const DotRow: React.FC<DotRowProps> = ({
                 {isEditing && (
                     <button
                         onClick={(e) => { e.stopPropagation(); onRemove?.(category, entry.id); }}
-                        className="absolute -right-1 top-1/2 -translate-y-1/2 p-0.5 text-red-400 opacity-0 group-hover:opacity-100 bg-white/80 rounded-full shadow-sm hover:text-red-600 transition z-10"
+                        className="absolute -right-4 top-0 bottom-0 my-auto flex items-center justify-center w-6 h-6 text-red-500 opacity-0 group-hover:opacity-100 bg-white shadow-md rounded-full hover:bg-red-50 hover:text-red-700 transition-all z-10"
+                        title="Supprimer la ligne"
                     >
-                        <LucideIcons.Trash2 size={10} />
+                        <LucideIcons.Trash2 size={14} />
                     </button>
                 )}
             </div>
@@ -108,6 +109,7 @@ export const DotRow: React.FC<DotRowProps> = ({
         : 5;
 
     const handleClick = () => {
+        if (isEditing) return;
         if (isUndefinedVariable && onDefineVariant) {
             onDefineVariant(category, entry.id, entry.name);
         } else if (hasSpecs) {
@@ -152,7 +154,7 @@ export const DotRow: React.FC<DotRowProps> = ({
 
     return (
         <div
-            className={`flex justify-between items-center px-2 border-b border-dotted border-stone-300 h-5 hover:bg-stone-50 transition-colors relative group ${isEditing ? 'cursor-grab active:cursor-grabbing select-none' : ''} `}
+            className={`flex justify-between items-center px-2 border-b border-dotted border-stone-300 h-5 transition-all relative group dot-row-container ${isEditing ? 'cursor-grab active:cursor-grabbing select-none bg-stone-50/50 hover:bg-stone-100 touch-none' : 'hover:bg-stone-50'} `}
             draggable={isEditing}
             onDragStart={isEditing ? (e) => {
                 const payload = {
@@ -166,11 +168,13 @@ export const DotRow: React.FC<DotRowProps> = ({
             onMouseLeave={() => setIsOpen(false)}
         >
             <span
-                className={`text-xs truncate font-medium transition ${isUndefinedVariable
-                    ? 'font-bold cursor-pointer hover:underline'
-                    : hasSpecs
-                        ? 'font-semibold cursor-help underline underline-offset-2 decoration-blue-300'
-                        : 'cursor-default'
+                className={`text-xs truncate font-medium transition ${isEditing
+                    ? ''
+                    : isUndefinedVariable
+                        ? 'font-bold cursor-pointer hover:underline'
+                        : hasSpecs
+                            ? 'font-semibold cursor-help underline underline-offset-2 decoration-blue-300'
+                            : 'cursor-default'
                     } ${isBlocked ? 'line-through opacity-60 italic' : ''} `}
                 style={{
                     width: effectiveMax > 5 ? '45%' : '65%',
@@ -217,7 +221,7 @@ export const DotRow: React.FC<DotRowProps> = ({
                 value={entry.value}
                 creationValue={entry.creationValue}
                 onChange={handleUpdate}
-                className="scale-90 origin-right ml-auto"
+                className={`scale-90 origin-right ml-auto ${isEditing ? 'pointer-events-none' : ''}`}
                 creationColor={theme?.creationColor}
                 xpColor={theme?.xpColor}
                 symbol={theme?.dotSymbol}
@@ -229,9 +233,10 @@ export const DotRow: React.FC<DotRowProps> = ({
             {isEditing && (entry.value === 0 || !entry.name) && (
                 <button
                     onClick={(e) => { e.stopPropagation(); onRemove?.(category, entry.id); }}
-                    className="absolute -right-1 top-1/2 -translate-y-1/2 p-0.5 text-red-400 opacity-0 group-hover:opacity-100 bg-white/80 rounded-full shadow-sm hover:text-red-600 transition z-10"
+                    className="absolute -right-4 top-0 bottom-0 my-auto flex items-center justify-center w-6 h-6 text-red-500 opacity-0 group-hover:opacity-100 bg-white shadow-md rounded-full hover:bg-red-50 hover:text-red-700 transition-all z-10"
+                    title="Supprimer la compétence"
                 >
-                    <LucideIcons.Trash2 size={10} />
+                    <LucideIcons.Trash2 size={14} />
                 </button>
             )}
         </div >

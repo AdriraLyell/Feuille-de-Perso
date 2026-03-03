@@ -163,7 +163,7 @@ const UserGuideModal: React.FC<UserGuideModalProps> = ({ isOpen, onClose }) => {
                     {activeTab === 'tools' && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <GuideSection title="Journal & Notes" icon={<Book size={18} className="text-stone-600" />}>
-                                <p>L'onglet <strong>Notes de Campagne</strong> est votre journal de bord interactif.</p>
+                                <p>L'onglet <strong>Journal</strong> est votre journal de bord interactif.</p>
                                 <ul className="list-disc list-inside mt-2 text-xs space-y-1">
                                     <li><strong>Images :</strong> Dessinez un rectangle avec la souris pour insérer une image (redimensionnable).</li>
                                     <li><strong>Groupe :</strong> Suivez les informations essentielles du reste de l'équipe.</li>

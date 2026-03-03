@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { Check } from 'lucide-react';
+import { Check, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useEditor, EditorContent, JSONContent } from '@tiptap/react';
 import { getBookExtensions } from './extensions/bookExtensions';
 import { PAGE_WIDTH, PAGE_HEIGHT } from '../constants';
@@ -172,29 +172,42 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                 </div>
             )}
 
-            {!readOnly && (
-                <BookEditorToolbar
-                    editor={editor}
-                    isDrawingMode={isDrawingMode}
-                    setIsDrawingMode={setIsDrawingMode}
-                    showHighlightPalette={showHighlightPalette}
-                    setShowHighlightPalette={setShowHighlightPalette}
-                    showColorPalette={showColorPalette}
-                    setShowColorPalette={setShowColorPalette}
-                    handleQuickInsertImage={handleQuickInsertImage}
-                    highlightColors={HIGHLIGHT_COLORS}
-                    inkColors={INK_COLORS}
-                />
-            )}
-
             {/* Spread Wrapper: Fixed width for exact button anchoring */}
             <div className="relative" style={{ width: `${PAGE_WIDTH * 2 + 40}px` }}>
 
                 {!readOnly && (
                     <BookChapterSidebar
                         onInsertMoment={() => (editor.commands as unknown as { insertNarrativeSection: (opts: { type: string, timeSlot: string }) => boolean }).insertNarrativeSection({ type: 'moment', timeSlot: 'matin' })}
+                        onInsertChapterAtCursor={() => {
+                            const cal = rules?.configurations?.calendar;
+                            const today = cal?.type === 'real'
+                                ? (cal.currentDate || new Date().toISOString()).split('T')[0]
+                                : `${cal?.currentYear}-${cal?.currentMonthIndex !== undefined ? cal.currentMonthIndex + 1 : 1}-${cal?.currentDay || 1}`;
+                            (editor.commands as any).insertChapterAtDate(today, undefined, true);
+                        }}
+                        onInsertChapterAtEnd={() => {
+                            const cal = rules?.configurations?.calendar;
+                            const today = cal?.type === 'real'
+                                ? (cal.currentDate || new Date().toISOString()).split('T')[0]
+                                : `${cal?.currentYear}-${cal?.currentMonthIndex !== undefined ? cal.currentMonthIndex + 1 : 1}-${cal?.currentDay || 1}`;
+                            (editor.commands as any).insertChapterAtDate(today, undefined, false);
+                        }}
                         isCalendarVisible={isCalendarVisible}
                         onToggleCalendar={() => setIsCalendarVisible(!isCalendarVisible)}
+                        toolbar={(
+                            <BookEditorToolbar
+                                editor={editor}
+                                isDrawingMode={isDrawingMode}
+                                setIsDrawingMode={setIsDrawingMode}
+                                showHighlightPalette={showHighlightPalette}
+                                setShowHighlightPalette={setShowHighlightPalette}
+                                showColorPalette={showColorPalette}
+                                setShowColorPalette={setShowColorPalette}
+                                handleQuickInsertImage={handleQuickInsertImage}
+                                highlightColors={HIGHLIGHT_COLORS}
+                                inkColors={INK_COLORS}
+                            />
+                        )}
                     >
                         {rules?.configurations?.calendar && (
                             <TimeCompanionWidget
@@ -228,6 +241,29 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                         title="Page Suivante"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                    </button>
+                )}
+
+                {/* Quick Navigation: Start / End */}
+                {pageCount > 4 && scrollPos > 10 && (
+                    <button
+                        onClick={() => navigateToPage(1)}
+                        className="absolute z-50 p-2.5 bg-stone-900/80 text-amber-500/70 rounded-full shadow-md hover:bg-stone-800 hover:text-amber-400 transition-all border border-stone-700/50 hover:border-amber-600/30 animate-in fade-in duration-500"
+                        style={{ left: '-55px', top: '155px', transform: 'translateY(-50%)' }}
+                        title="Retour au début"
+                    >
+                        <ChevronsLeft size={20} />
+                    </button>
+                )}
+
+                {pageCount > 4 && scrollPos < ((Math.ceil(pageCount / 2) - 1) * (PAGE_WIDTH + 40) * 2 - 10) && (
+                    <button
+                        onClick={() => navigateToPage(pageCount)}
+                        className="absolute z-50 p-2.5 bg-stone-900/80 text-amber-500/70 rounded-full shadow-md hover:bg-stone-800 hover:text-amber-400 transition-all border border-stone-700/50 hover:border-amber-600/30 animate-in fade-in duration-500"
+                        style={{ right: '-55px', top: '155px', transform: 'translateY(-50%)' }}
+                        title="Aller à la fin"
+                    >
+                        <ChevronsRight size={20} />
                     </button>
                 )}
 

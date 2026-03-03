@@ -253,7 +253,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
             const matchesEffects = !filterEffects || (entry.effects && entry.effects.length > 0);
             const matchesCounter = !filterCounter || !!entry.hasAutoCounter;
             const matchesXP = !filterXP || !!entry.isXPUpgradeable;
-            const matchesVariants = !filterVariants || (entry.variants && entry.variants.length > 0);
+            const matchesVariants = !filterVariants || (entry.variants && entry.variants.length > 0) || !!entry.isVariable || !!entry.is_variable;
 
             // Audit mode
             let matchesAudit = true;

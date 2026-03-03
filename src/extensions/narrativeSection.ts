@@ -70,17 +70,27 @@ export const NarrativeSection = Node.create({
         return {
             insertNarrativeSection:
                 (attrs) =>
-                    ({ chain }: CommandProps) => {
+                    ({ chain, state }: CommandProps) => {
                         const finalAttrs = {
                             ...attrs,
                             id: attrs.id || crypto.randomUUID(),
                         };
+                        const { selection } = state;
+                        const pos = selection.$to.pos;
+
                         return chain()
-                            .insertContent({
-                                type: this.name,
-                                attrs: finalAttrs,
-                                content: [{ type: 'paragraph' }],
-                            })
+                            .insertContentAt(pos, [
+                                {
+                                    type: this.name,
+                                    attrs: finalAttrs,
+                                    content: [{ type: 'paragraph' }],
+                                },
+                                {
+                                    type: 'paragraph',
+                                }
+                            ])
+                            // Place cursor right after the narrative block
+                            .setTextSelection(pos + 2) // Typically inside the created paragraph
                             .focus()
                             .run();
                     },

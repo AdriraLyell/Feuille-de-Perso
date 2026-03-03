@@ -32,21 +32,33 @@ export const PostItBoard: React.FC<PostItBoardProps> = ({ currentTab }) => {
         } catch { return { x: 0, y: 0 }; }
     });
 
+    const dragLock = React.useRef(false);
+
+    const handleBtnDragStart = () => {
+        dragLock.current = true;
+    };
+
     const handleBtnDragEnd = (e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
         const newPos = { x: btnPos.x + info.offset.x, y: btnPos.y + info.offset.y };
         setBtnPos(newPos);
         localStorage.setItem('postit-btn-pos', JSON.stringify(newPos));
+
+        // Mantain lock for 100ms to swallow any trailing tap/click events
+        setTimeout(() => {
+            dragLock.current = false;
+        }, 100);
     };
 
     const handleAddPostIt = () => {
+        const id = crypto.randomUUID();
         const newPostIt: PostItData = {
-            id: crypto.randomUUID(),
+            id,
             text: '',
             color: '#FEF08A',
-            x: 100,
-            y: 100,
-            width: 200,
-            height: 200,
+            x: 150 + Math.random() * 100,
+            y: 150 + Math.random() * 100,
+            width: 250,
+            height: 250,
             tabId: currentTab
         };
         updateData((prev: CharacterSheetData) => ({
@@ -69,25 +81,39 @@ export const PostItBoard: React.FC<PostItBoardProps> = ({ currentTab }) => {
         }));
     };
 
+    const handleTap = () => {
+        if (!dragLock.current) {
+            handleAddPostIt();
+        }
+    };
+
     return (
         <>
             {/* Floating Add Button */}
             <motion.div
                 drag
                 dragMomentum={false}
+                onDragStart={handleBtnDragStart}
                 onDragEnd={handleBtnDragEnd}
-                initial={btnPos}
-                animate={btnPos}
-                className="fixed bottom-6 right-6 z-50 flex items-center justify-center no-print"
+                onTap={handleTap}
+                animate={{ x: btnPos.x, y: btnPos.y }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="fixed bottom-6 right-6 z-50 flex items-center justify-center no-print cursor-grab active:cursor-grabbing"
             >
-                <button
-                    onClick={handleAddPostIt}
-                    className="p-4 bg-amber-400 hover:bg-amber-500 text-amber-900 rounded-full shadow-lg transition-transform hover:scale-110 flex items-center justify-center cursor-grab active:cursor-grabbing"
-                    title="Ajouter un Post-it (Glissez pour déplacer le bouton)"
+                <div
+                    className="p-4 bg-amber-400 hover:bg-amber-500 text-amber-900 rounded-full shadow-lg transition-colors flex items-center justify-center relative border-2 border-amber-300 group"
+                    title="Cliquer pour ajouter un Post-it / Glisser pour déplacer"
                 >
                     <StickyNote size={24} />
-                    <Plus size={14} className="absolute bottom-3 right-3 bg-white rounded-full bg-opacity-70 pointer-events-none" />
-                </button>
+                    <Plus size={14} className="absolute bottom-3 right-3 bg-white rounded-full bg-opacity-80 border border-amber-200 pointer-events-none" />
+
+                    {/* Tooltip highlighting the drag functionality */}
+                    <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-stone-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap pointer-events-none shadow-xl border border-stone-600">
+                        Cliquer: +Note | Glisser: Déplacer
+                    </div>
+                </div>
             </motion.div>
 
             {/* Render Post-its */}
@@ -112,6 +138,12 @@ interface PostItNoteProps {
 }
 
 const PostItNote: React.FC<PostItNoteProps> = ({ data, onUpdate, onDelete }) => {
+    // Stable random seed for rotation based on ID
+    const rotation = React.useMemo(() => {
+        const hash = data.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        return (hash % 6) - 3; // -3 to 3 degrees
+    }, [data.id]);
+
     return (
         <motion.div
             drag
@@ -119,15 +151,16 @@ const PostItNote: React.FC<PostItNoteProps> = ({ data, onUpdate, onDelete }) => 
             onDragEnd={(e, info) => {
                 onUpdate({ x: data.x + info.offset.x, y: data.y + info.offset.y });
             }}
-            initial={{ x: data.x, y: data.y, opacity: 0, scale: 0.8 }}
-            animate={{ x: data.x, y: data.y, opacity: 1, scale: 1 }}
+            initial={{ x: data.x, y: data.y, opacity: 0, scale: 0.8, rotate: rotation }}
+            animate={{ x: data.x, y: data.y, opacity: 1, scale: 1, rotate: rotation }}
             exit={{ opacity: 0, scale: 0.8 }}
             style={{
                 backgroundColor: data.color,
                 position: 'absolute',
-                width: 'max-content'
+                width: 'max-content',
+                zIndex: 45
             }}
-            className="pointer-events-auto shadow-md border border-black/10 rounded-sm flex flex-col group"
+            className="pointer-events-auto shadow-[2px_2px_10px_rgba(0,0,0,0.15)] border border-black/5 rounded-sm flex flex-col group transition-shadow hover:shadow-xl"
         >
             <div className="h-6 w-full cursor-grab active:cursor-grabbing flex justify-between items-center px-1 bg-black/5">
                 <div className="flex gap-1 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">

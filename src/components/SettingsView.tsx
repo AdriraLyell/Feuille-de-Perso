@@ -223,7 +223,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
 
           {activeTab === 'library' && (
             <div className="h-[calc(100vh-250px)] min-h-[600px] border border-[#bfae85]/30 rounded-sm overflow-hidden shadow-sm">
-              <LibraryView data={localData} onUpdate={handleLocalUpdate} />
+              <LibraryView data={localData} onUpdate={handleLocalUpdate} isEditable={expertMode} />
             </div>
           )}
 

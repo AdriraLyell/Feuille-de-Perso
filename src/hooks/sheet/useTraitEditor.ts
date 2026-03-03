@@ -194,7 +194,7 @@ export const useTraitEditor = (
                     type: multiSelectTarget === 'avantages' ? 'avantage' : 'desavantage',
                     mysticAbilityId: entry.mysticAbilityId || undefined,
                     isPostCreation: isPostCreation ? true : undefined,
-                    creationValue: isPostCreation ? "0" : undefined,
+                    creationValue: isPostCreation ? costValue : costValue,
                     associatedCounterId: associatedCounterId,
                     hasAutoCounter: entry.hasAutoCounter,
                     autoCounterName: entry.autoCounterName,

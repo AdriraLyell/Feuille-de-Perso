@@ -14,6 +14,7 @@ interface SpecializationEditModalProps {
     setSkillSearch: (s: string) => void;
     error: string | null;
     isExisting: boolean;
+    isEditable?: boolean;
 }
 
 const SpecializationEditModal: React.FC<SpecializationEditModalProps> = ({
@@ -26,7 +27,8 @@ const SpecializationEditModal: React.FC<SpecializationEditModalProps> = ({
     skillSearch,
     setSkillSearch,
     error,
-    isExisting
+    isExisting,
+    isEditable = true
 }) => {
     const filteredSkillsForModal = useMemo(() => {
         return allSkills.filter(s =>
@@ -42,7 +44,7 @@ const SpecializationEditModal: React.FC<SpecializationEditModalProps> = ({
                 <div className="p-4 border-b border-[#bfae85]/50 flex justify-between items-center text-white bg-amber-700/90">
                     <h3 className="font-bold text-lg flex items-center gap-2 font-serif tracking-wide">
                         <Award size={20} />
-                        {isExisting ? 'Éditer Spécialisation' : 'Nouvelle Spécialisation (Copie)'}
+                        {!isEditable ? 'Détails Spécialisation' : isExisting ? 'Éditer Spécialisation' : 'Nouvelle Spécialisation (Copie)'}
                     </h3>
                     <button onClick={onClose} className="hover:bg-white/20 p-1 rounded transition-colors">
                         <X size={24} />
@@ -62,7 +64,9 @@ const SpecializationEditModal: React.FC<SpecializationEditModalProps> = ({
                     <div>
                         <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Compétences associées</label>
                         <div className="relative mb-2">
-                            <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-[#5c4d41]/60" />
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-2">
+                                <Search size={12} className="text-[#5c4d41]/60 pointer-events-none" />
+                            </span>
                             <input
                                 className="w-full pl-7 pr-2 py-1 text-[11px] border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none bg-white/50"
                                 placeholder="Filtrer les compétences..."
@@ -151,10 +155,14 @@ const SpecializationEditModal: React.FC<SpecializationEditModalProps> = ({
                 </div>
 
                 <div className="p-4 border-t border-[#bfae85]/30 bg-stone-100/30 flex justify-end gap-3">
-                    <button onClick={onClose} className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold">Annuler</button>
-                    <button onClick={handleSave} className="px-6 py-2 bg-[#5c4d41] text-white rounded-sm font-bold shadow-md hover:bg-[#4a3b32] flex items-center gap-2">
-                        <Save size={16} /> Enregistrer
+                    <button onClick={onClose} className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold">
+                        {isEditable ? 'Annuler' : 'Fermer'}
                     </button>
+                    {isEditable && (
+                        <button onClick={handleSave} className="px-6 py-2 bg-[#5c4d41] text-white rounded-sm font-bold shadow-md hover:bg-[#4a3b32] flex items-center gap-2">
+                            <Save size={16} /> Enregistrer
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

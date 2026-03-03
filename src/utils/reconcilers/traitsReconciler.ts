@@ -48,7 +48,7 @@ export const reconcileTraits = (newState: CharacterSheetData, currentState: Char
             }
 
             if (libMatch) {
-                const isMystic = mysticAbilityId || libMatch.tags?.some(tag => normalizeString(tag) === 'mystique');
+                const isMystic = mysticAbilityId || libMatch.isMystic;
 
                 // --- Migration Logic ---
                 // We ensure the character trait has the latest flags from the library
@@ -84,97 +84,92 @@ export const reconcileTraits = (newState: CharacterSheetData, currentState: Char
 }
 
 /**
- * Cleanup redundant local library entries that are exact matches of official ones.
+ * Cleanup or Merge local library entries against official ones.
+ * Implements the "Shared Authority" model: MJ forces mechanics, Player forces narration.
  */
 export const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterSheetData, rules: RulesData) => {
     if (!rules.libraries) return;
 
-    const isRedundant = (local: any, officialList: any[]) => {
-        // Un élément explicitement marqué comme "customisé" ne doit jamais être supprimé
-        if (local.isCustomized) return false;
+    // Type-agnostic merge function for traits, skills, etc.
+    const mergeAndCleanLocalList = (localList: any[], officialList: any[], isSpecialization = false) => {
+        return localList.map(local => {
+            const off = officialList.find(o => o.id === local.id || normalizeString(o.name) === normalizeString(local.name));
+            if (!off) return local; // No official match, keep local custom item
 
-        return officialList.some(off => {
-            if (normalizeString(off.name) !== normalizeString(local.name)) return false;
+            // Check if local has any narrative differences compared to official
+            const hasDescOverride = local.description !== undefined && local.description !== off.description;
 
-            // Types mapping: vertu == avantage, tare == desavantage
-            if (off.type && local.type) {
-                const mapType = (t: string) => {
-                    const low = t.toLowerCase();
-                    if (low === 'vertu') return 'avantage';
-                    if (low === 'tare' || low === 'défaut' || low === 'defaut') return 'desavantage';
-                    return low;
-                };
-                if (mapType(off.type) !== mapType(local.type)) return false;
+            const localTags = Array.isArray(local.tags) ? local.tags.map(normalizeString).sort() : (local.tag ? [normalizeString(local.tag)] : []);
+            const offTags = Array.isArray(off.tags) ? off.tags.map(normalizeString).sort() : [];
+            const hasTagsOverride = JSON.stringify(localTags) !== JSON.stringify(offTags) && localTags.length > 0;
+
+            const localVars = Array.isArray(local.variants) ? [...local.variants].sort() : [];
+            const offVars = Array.isArray(off.variants) ? [...off.variants].sort() : [];
+            const hasVarsOverride = JSON.stringify(localVars) !== JSON.stringify(offVars) && localVars.length > 0;
+
+            const hasNarrativeOverride = hasDescOverride || hasTagsOverride || hasVarsOverride || local.isCustomized;
+
+            if (!hasNarrativeOverride) {
+                return null; // Exact same narrative, can be safely purged so the game uses the official one
             }
 
-            // Robust cost/value match (treat '2' and 2 as equal, fallback to string if NaN)
-            const offCostVal = off.cost !== undefined ? off.cost : off.value;
-            const locCostVal = local.cost !== undefined ? local.cost : local.value;
-            const offCostNum = Number(offCostVal);
-            const locCostNum = Number(locCostVal);
+            // Merge: Override local mechanical fields with official ones, keep local narrative ones
+            const merged = { ...local };
 
-            if (!isNaN(offCostNum) && !isNaN(locCostNum)) {
-                if (offCostNum !== locCostNum) return false;
+            // Apply Narrative overrides (or fallback to official if empty)
+            merged.description = local.description !== undefined ? local.description : off.description;
+            merged.tags = local.tags && local.tags.length > 0 ? local.tags : off.tags;
+            merged.variants = local.variants && local.variants.length > 0 ? local.variants : off.variants;
+
+            // Apply MJ Mechanical Overrides
+            const overrideMechanic = (field: string) => {
+                if (off[field] !== undefined) merged[field] = off[field];
+            };
+
+            if (isSpecialization) {
+                overrideMechanic('skillIds');
+                overrideMechanic('defaultMinLevel');
+                overrideMechanic('isActive');
+                overrideMechanic('isImposed');
             } else {
-                // If either is NaN (e.g. "1-3 pts"), fallback to stripped string comparison
-                const stripText = (s: string | number | null | undefined) => String(s || '').replace(/\s|pts?/gi, '').toLowerCase();
-                if (stripText(offCostVal) !== stripText(locCostVal)) return false;
+                overrideMechanic('type');
+                overrideMechanic('cost');
+                overrideMechanic('pointsLabel');
+                overrideMechanic('isVariableCost');
+                overrideMechanic('effects');
+                overrideMechanic('isMystic');
+                overrideMechanic('mysticAbilityId');
+                overrideMechanic('isVariant');
+                overrideMechanic('variantOf');
+                overrideMechanic('isVariable');
+                overrideMechanic('hasAutoCounter');
+                overrideMechanic('autoCounterName');
+                overrideMechanic('isXPUpgradeable');
+                overrideMechanic('defaultCategory');
             }
 
-            // Normalise traits tags into a sorted array for comparison
-            const offTagsList = (Array.isArray(off.tags) ? off.tags.map(normalizeString).sort() : []) as string[];
-            const locTagsList = (Array.isArray(local.tags)
-                ? local.tags.map(normalizeString).sort()
-                : (local.tag ? [normalizeString(local.tag)] : [])) as string[];
-
-            if (JSON.stringify(offTagsList) !== JSON.stringify(locTagsList)) return false;
-
-            // Robust pointsLabel match (strip non-digits to handle "2 pts" vs "2")
-            const normalizeLabel = (l?: string) => String(l || '').replace(/\D/g, '');
-            if (normalizeLabel(off.pointsLabel) !== normalizeLabel(local.pointsLabel)) return false;
-
-            // Robust Effects Comparison (ignore IDs, ignore property order, drop empty)
-            const simplifyEffects = (effects: any[]) => (effects || []).map(eff => {
-                const { id: _id, definitionId: _definitionId, formulaId: _formulaId, ...rest } = eff; // skip IDs
-                return JSON.stringify(Object.keys(rest).sort().reduce((obj: Record<string, string>, key) => {
-                    const typedRest = rest as Record<string, any>;
-                    // Only keep properties that have real value
-                    if (typedRest[key] !== '' && typedRest[key] !== undefined && typedRest[key] !== null) {
-                        obj[key] = String(typedRest[key]); // Force string to bypass 1 vs "1"
-                    }
-                    return obj;
-                }, {} as Record<string, string>));
-            }).sort();
-
-            const offEff = simplifyEffects(off.effects);
-            const locEff = simplifyEffects(local.effects);
-
-            // Protect metadata: if local has mysticAbilityId or isVariable, and official doesn't match, keep it
-            if (local.mysticAbilityId && off.mysticAbilityId !== local.mysticAbilityId) return false;
-            if (Boolean(local.isVariable) !== Boolean(off.isVariable)) return false;
-
-            return JSON.stringify(offEff) === JSON.stringify(locEff);
-        });
+            return merged;
+        }).filter(Boolean); // Remove nulls
     };
 
-    // 1. Clean Traits Library
+    // 1. Clean & Merge Traits Library
     if (currentState.library && rules.libraries.traits) {
-        newState.library = currentState.library.filter(l => !isRedundant(l, rules.libraries.traits!));
+        newState.library = mergeAndCleanLocalList(currentState.library, rules.libraries.traits);
     }
 
-    // 2. Clean Skill Library (remove local copies of official skills)
+    // 2. Clean & Merge Skill Library
     if (currentState.skillLibrary && rules.libraries.skills) {
-        newState.skillLibrary = currentState.skillLibrary.filter(l => !isRedundant(l, rules.libraries.skills!));
+        newState.skillLibrary = mergeAndCleanLocalList(currentState.skillLibrary, rules.libraries.skills);
     }
 
-    // 3. Clean Specialization Library
+    // 3. Clean & Merge Specialization Library
     if (currentState.specializationLibrary && rules.libraries.specializations) {
-        newState.specializationLibrary = currentState.specializationLibrary.filter(l => !isRedundant(l, rules.libraries.specializations!));
+        newState.specializationLibrary = mergeAndCleanLocalList(currentState.specializationLibrary, rules.libraries.specializations, true);
     }
 
-    // 4. Clean Background Library
+    // 4. Clean & Merge Background Library
     if (currentState.backgroundLibrary && rules.libraries.backgrounds) {
-        newState.backgroundLibrary = currentState.backgroundLibrary.filter(l => !isRedundant(l, rules.libraries.backgrounds!));
+        newState.backgroundLibrary = mergeAndCleanLocalList(currentState.backgroundLibrary, rules.libraries.backgrounds);
     }
 
     // 5. Re-inject official libraries (needed by getAggregateDetails for mysticAbilityId fallback)

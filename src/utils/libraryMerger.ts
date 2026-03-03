@@ -40,7 +40,7 @@ export const mergeLibraries = <T extends { id: string, name: string }>(
         const isAlsoOfficial = officialIds.has(item.id) || officialNames.has(normalizeString(item.name));
         mergedMap.set(item.id, {
             entry: item,
-            source: isAlsoOfficial ? 'official' : 'local',
+            source: isAlsoOfficial ? 'modified' : 'local',
             originalId: item.id
         });
         localIds.add(item.id);

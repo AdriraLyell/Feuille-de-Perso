@@ -55,7 +55,9 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
             {/* Search */}
             <div className="p-3 border-b bg-gray-50 shrink-0">
                 <div className="relative">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <Search size={14} className="text-gray-400 pointer-events-none" />
+                    </span>
                     <input
                         className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded focus:border-amber-500 outline-none"
                         placeholder="Chercher..."

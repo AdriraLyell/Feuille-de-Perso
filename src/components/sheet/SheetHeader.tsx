@@ -126,13 +126,13 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
                     {onToggleEditMode && (
                         <button
                             onClick={onToggleEditMode}
-                            className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-black transition-all shadow-sm transform hover:scale-105 active:scale-95 ${isEditMode
-                                ? 'bg-amber-500 text-white border border-amber-300'
-                                : 'bg-stone-50 text-stone-500 border border-stone-200 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300'
+                            className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-[11px] font-black transition-all shadow-md transform hover:scale-105 active:scale-95 ${isEditMode
+                                ? 'bg-red-600 text-white border-2 border-white ring-4 ring-red-500/40 animate-pulse shadow-[0_0_20px_rgba(220,38,38,0.6)]'
+                                : 'bg-stone-50 text-stone-500 border border-stone-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300'
                                 }`}
                         >
-                            {isEditMode ? <Check size={14} /> : <PencilLine size={14} />}
-                            <span className="uppercase tracking-tight">{isEditMode ? 'Valider Disposition' : 'Editer Compétences'}</span>
+                            {isEditMode ? <Check size={16} className="animate-bounce" /> : <PencilLine size={14} />}
+                            <span className="uppercase tracking-wider">{isEditMode ? 'Valider Disposition' : 'Editer Compétences'}</span>
                         </button>
                     )}
                 </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { CharacterSheetData } from '../../types';
 import { getInitialCharacterData } from '../../data/initialState';
 import { applyRulesToState } from '../../utils/rulesAdapter';
@@ -19,6 +19,8 @@ export const useSettingsManager = (
     const [showResetConfirm, setShowResetConfirm] = useState(false);
     const [showExpertWarning, setShowExpertWarning] = useState(false);
 
+    const isSaving = useRef(false);
+
     // Helper to compare data excluding volatile/computed fields
     const getComparableData = useCallback((d: CharacterSheetData) => {
         const {
@@ -34,6 +36,20 @@ export const useSettingsManager = (
         } = d;
         return rest;
     }, []);
+
+    // Effect to adopt incoming data right after we triggered a save
+    // This resolves the issue where context data reconciliation slightly mutates data
+    // making isDirty permanently stuck to true after hitting "Save"
+    useEffect(() => {
+        if (isSaving.current) {
+            setLocalData(initialData);
+            // We give it a tiny delay to ensure all context effects settled
+            const timer = setTimeout(() => {
+                isSaving.current = false;
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [initialData]);
 
     // Effect to detect unsaved changes
     useEffect(() => {
@@ -53,6 +69,7 @@ export const useSettingsManager = (
     }, [isOnlineMode, expertMode, activeTab]);
 
     const handleSave = useCallback(() => {
+        isSaving.current = true;
         onUpdate(localData);
         onAddLog('Modifications de la structure sauvegardées', 'success', 'settings');
     }, [localData, onUpdate, onAddLog]);
@@ -64,6 +81,12 @@ export const useSettingsManager = (
     const performReset = useCallback(() => {
         // Use factory to get fresh IDs
         const base = getInitialCharacterData();
+
+        // Ensure creation mode is active upon starting fresh
+        if (base.creationConfig) {
+            base.creationConfig.active = true;
+        }
+
         const newState = rules ? applyRulesToState(base, rules) : base;
 
         setLocalData(newState);
