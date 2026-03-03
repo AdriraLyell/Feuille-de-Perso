@@ -61,7 +61,7 @@ const DotRow: React.FC<{
                 {isEditing && (
                     <button
                         onClick={(e) => { e.stopPropagation(); onRemove?.(category, entry.id); }}
-                        className="absolute -right-1 top-1/2 -translate-y-1/2 p-0.5 text-red-400 opacity-0 group-hover:opacity-100 bg-white/80 rounded-full shadow-sm hover:text-red-600 transition-all z-10"
+                        className="absolute -right-1 top-1/2 -translate-y-1/2 p-0.5 text-red-400 opacity-0 group-hover:opacity-100 bg-white/80 rounded-full shadow-sm hover:text-red-600 transition z-10"
                     >
                         <LucideIcons.Trash2 size={10} />
                     </button>
@@ -155,7 +155,7 @@ const DotRow: React.FC<{
             onMouseLeave={() => setIsOpen(false)}
         >
             <span
-                className={`text-xs truncate font-medium transition-all ${isUndefinedVariable
+                className={`text-xs truncate font-medium transition ${isUndefinedVariable
                     ? 'font-bold cursor-pointer hover:underline' // Removed text-color classes to let style override
                     : hasSpecs
                         ? 'font-semibold cursor-help underline underline-offset-2 decoration-blue-300' // Removed text-blue-900
@@ -220,7 +220,7 @@ const DotRow: React.FC<{
             {isEditing && (entry.value === 0 || !entry.name) && (
                 <button
                     onClick={(e) => { e.stopPropagation(); onRemove?.(category, entry.id); }}
-                    className="absolute -right-1 top-1/2 -translate-y-1/2 p-0.5 text-red-400 opacity-0 group-hover:opacity-100 bg-white/80 rounded-full shadow-sm hover:text-red-600 transition-all z-10"
+                    className="absolute -right-1 top-1/2 -translate-y-1/2 p-0.5 text-red-400 opacity-0 group-hover:opacity-100 bg-white/80 rounded-full shadow-sm hover:text-red-600 transition z-10"
                 >
                     <LucideIcons.Trash2 size={10} />
                 </button>
@@ -293,7 +293,7 @@ export const SkillBlock = React.memo<{
 
     return (
         <div
-            className={`flex flex-col transition-all duration-200 ${isEditing ? 'relative' : ''} ${isDragOver ? 'bg-[#bfae85]/10 ring-2 ring-[#bfae85]/40 rounded-sm scale-[1.02] shadow-lg z-10' : ''} `}
+            className={`flex flex-col transition duration-200 ${isEditing ? 'relative' : ''} ${isDragOver ? 'bg-[#bfae85]/10 ring-2 ring-[#bfae85]/40 rounded-sm scale-[1.02] shadow-lg z-10' : ''} `}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -369,4 +369,56 @@ export const SkillBlock = React.memo<{
             </div>
         </div>
     );
+}, (prevProps, nextProps) => {
+    if (prevProps.title !== nextProps.title) return false;
+    if (prevProps.cat !== nextProps.cat) return false;
+    if (prevProps.allowExtendedSkills !== nextProps.allowExtendedSkills) return false;
+    if (prevProps.isEditing !== nextProps.isEditing) return false;
+    if (prevProps.categoryBehavior !== nextProps.categoryBehavior) return false;
+    if (prevProps.description !== nextProps.description) return false;
+
+    const pItems = prevProps.items || [];
+    const nItems = nextProps.items || [];
+    if (pItems.length !== nItems.length) return false;
+
+    for (let i = 0; i < pItems.length; i++) {
+        const p = pItems[i];
+        const n = nItems[i];
+        if (
+            p.id !== n.id ||
+            p.value !== n.value ||
+            p.name !== n.name ||
+            p.variant !== n.variant ||
+            p.isVariable !== n.isVariable ||
+            p.mysticAbilityId !== n.mysticAbilityId ||
+            p.creationValue !== n.creationValue ||
+            p.max !== n.max
+        ) {
+            return false;
+        }
+
+        const itemId = p.id;
+        const pUs = prevProps.userSpecs?.[itemId];
+        const nUs = nextProps.userSpecs?.[itemId];
+        if (pUs !== nUs && JSON.stringify(pUs) !== JSON.stringify(nUs)) return false;
+
+        const pIs = prevProps.imposedSpecs?.[itemId];
+        const nIs = nextProps.imposedSpecs?.[itemId];
+        if (pIs !== nIs && JSON.stringify(pIs) !== JSON.stringify(nIs)) return false;
+
+        if (p.name) {
+            const normalized = p.name.trim().toLowerCase();
+            const pBs = prevProps.blockedSkills?.[normalized];
+            const nBs = nextProps.blockedSkills?.[normalized];
+            if (pBs?.isBlocked !== nBs?.isBlocked || pBs?.sourceName !== nBs?.sourceName) {
+                return false;
+            }
+        }
+    }
+
+    if (prevProps.theme !== nextProps.theme && JSON.stringify(prevProps.theme) !== JSON.stringify(nextProps.theme)) {
+        return false;
+    }
+
+    return true;
 });

@@ -47,6 +47,8 @@ const AttributeRow: React.FC<{
             <div className="flex items-center gap-1 flex-grow justify-end">
                 <input
                     ref={ref1}
+                    id={`attr-${category}-${entry.id}-val1`}
+                    name={`attr-${category}-${entry.id}-val1`}
                     className={`w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50 no-spinner ${!isCreationMode ? 'opacity-70 cursor-not-allowed border-stone-200' : ''}`}
                     value={entry.val1}
                     onChange={(e) => isCreationMode && onUpdate(category, entry.id, 'val1', e.target.value)}
@@ -60,6 +62,8 @@ const AttributeRow: React.FC<{
                 <span className="text-stone-400 font-handwriting">+</span>
                 <input
                     ref={ref2}
+                    id={`attr-${category}-${entry.id}-val2`}
+                    name={`attr-${category}-${entry.id}-val2`}
                     className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50 no-spinner"
                     value={entry.val2}
                     onChange={(e) => onUpdate(category, entry.id, 'val2', e.target.value)}
@@ -72,6 +76,8 @@ const AttributeRow: React.FC<{
                 <span className="text-stone-400 font-handwriting">+</span>
                 <input
                     ref={ref3}
+                    id={`attr-${category}-${entry.id}-val3`}
+                    name={`attr-${category}-${entry.id}-val3`}
                     className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50 no-spinner"
                     value={entry.val3}
                     onChange={(e) => onUpdate(category, entry.id, 'val3', e.target.value)}
@@ -140,4 +146,55 @@ export const AttributeBlock = React.memo<{
             </div>
         </div>
     );
+}, (prevProps, nextProps) => {
+    if (prevProps.title !== nextProps.title) return false;
+    if (prevProps.cat !== nextProps.cat) return false;
+    if (prevProps.isCreationMode !== nextProps.isCreationMode) return false;
+
+    const checkItemsEquality = (pItems?: AttributeEntry[], nItems?: AttributeEntry[]) => {
+        if (!pItems && !nItems) return true;
+        if (!pItems || !nItems) return false;
+        if (pItems.length !== nItems.length) return false;
+
+        for (let i = 0; i < pItems.length; i++) {
+            const p = pItems[i];
+            const n = nItems[i];
+
+            if (
+                p.id !== n.id ||
+                p.val1 !== n.val1 ||
+                p.val2 !== n.val2 ||
+                p.val3 !== n.val3 ||
+                p.name !== n.name ||
+                p.creationVal1 !== n.creationVal1 ||
+                p.creationVal2 !== n.creationVal2 ||
+                p.creationVal3 !== n.creationVal3
+            ) {
+                return false;
+            }
+
+            if (p.name) {
+                const normName = p.name.trim().toLowerCase();
+                const pBonus = prevProps.bonuses?.[normName];
+                const nBonus = nextProps.bonuses?.[normName];
+
+                if (pBonus?.value !== nBonus?.value) return false;
+
+                if (pBonus?.sources && nBonus?.sources) {
+                    if (pBonus.sources.length !== nBonus.sources.length) return false;
+                    for (let j = 0; j < pBonus.sources.length; j++) {
+                        if (pBonus.sources[j] !== nBonus.sources[j]) return false;
+                    }
+                } else if (pBonus?.sources || nBonus?.sources) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
+    if (!checkItemsEquality(prevProps.items, nextProps.items)) return false;
+    if (!checkItemsEquality(prevProps.secondaryItems, nextProps.secondaryItems)) return false;
+
+    return true;
 });

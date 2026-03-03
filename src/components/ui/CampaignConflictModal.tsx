@@ -80,7 +80,7 @@ const CampaignConflictModal: React.FC<CampaignConflictModalProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <button
                         onClick={onStay}
-                        className="group flex flex-col items-center p-5 rounded-xl border-2 border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-center"
+                        className="group flex flex-col items-center p-5 rounded-xl border-2 border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition text-center"
                     >
                         <div className="bg-stone-100 p-3 rounded-full text-stone-500 mb-3 group-hover:bg-stone-200 group-hover:text-stone-700 transition-colors">
                             <Check size={28} />
@@ -91,7 +91,7 @@ const CampaignConflictModal: React.FC<CampaignConflictModalProps> = ({
 
                     <button
                         onClick={onConfirmReset}
-                        className="group flex flex-col items-center p-5 rounded-xl border-2 border-red-100 hover:border-red-400 hover:bg-red-50 transition-all text-center"
+                        className="group flex flex-col items-center p-5 rounded-xl border-2 border-red-100 hover:border-red-400 hover:bg-red-50 transition text-center"
                     >
                         <div className="bg-red-50 p-3 rounded-full text-red-600 mb-3 group-hover:bg-red-100 transition-colors">
                             <RotateCcw size={28} />

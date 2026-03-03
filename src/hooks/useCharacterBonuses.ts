@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useEffect, useDeferredValue } from 'react';
 import { TraitEntry, LibraryEntry, BonusInfo } from '../types';
 import { normalizeString } from '../utils/stringUtils';
 import { logger } from '../utils/logger';
@@ -16,9 +16,10 @@ export const useCharacterBonuses = (
     rulesTraits: LibraryEntry[] = []
 ) => {
     const { data: characterData } = useCharacter();
+    const deferredData = useDeferredValue(characterData);
     const { rules } = useRules();
 
-    return useMemo(() => {
+    const calculated = useMemo(() => {
         const attributeBonuses: Record<string, BonusInfo> = {};
         const blockedSkills: Record<string, { isBlocked: boolean, sourceName: string }> = {};
         const counterCreationBonuses: Record<string, number> = {};
@@ -74,7 +75,7 @@ export const useCharacterBonuses = (
 
                     // Formula Evaluation
                     const isFormulaLike = effectiveType === 'formula' || effectiveType === 'xp_bonus';
-                    if (isFormulaLike && formulaString && characterData) {
+                    if (isFormulaLike && formulaString && deferredData) {
                         // Skip evaluation for raw reserves (they don't target/modify existing stats, they ARE stats)
                         if (isReserve) return;
 
@@ -85,8 +86,8 @@ export const useCharacterBonuses = (
 
                         try {
                             const result = evaluateFormula(formulaString, {
-                                ...characterData,
-                                formulaLibrary: rules?.libraries?.formulas || characterData.formulaLibrary
+                                ...deferredData,
+                                formulaLibrary: rules?.libraries?.formulas || deferredData.formulaLibrary
                             }, { traitLevel: traitValue });
 
                             // Handle special semantic effects even for formulas
@@ -95,8 +96,8 @@ export const useCharacterBonuses = (
                                 return;
                             }
 
-                            const isAttribute = Object.keys(characterData.attributes).some(
-                                cat => characterData.attributes[cat].some(attr => normalizeString(attr.name) === targetName)
+                            const isAttribute = Object.keys(deferredData.attributes).some(
+                                cat => deferredData.attributes[cat].some(attr => normalizeString(attr.name) === targetName)
                             );
 
                             const operator = effect.operator || (rules?.libraries?.formulas?.find(f => f.id === effect.formulaId)?.operator) || 'ADD';
@@ -136,8 +137,8 @@ export const useCharacterBonuses = (
             }
         });
         // Calculate Dynamic Maxes for Counters
-        if (characterData && rules?.libraries?.counters) {
-            Object.values(characterData.skills || {}).flat().forEach(skill => {
+        if (deferredData && rules?.libraries?.counters) {
+            Object.values(deferredData.skills || {}).flat().forEach(skill => {
                 // We only care about skills that are actually "Counters" 
                 // (This is determined by their category behavior, but checking library here is more direct)
                 const counterLibEntry = rules.libraries.counters.find(c => c.name === skill.name);
@@ -146,7 +147,7 @@ export const useCharacterBonuses = (
                     if (formulaEntry) {
                         try {
                             const maxVal = evaluateFormula(formulaEntry.formula, {
-                                ...characterData,
+                                ...deferredData,
                                 formulaLibrary: rules.libraries.formulas
                             });
                             calculatedMaxes[skill.name] = maxVal;
@@ -158,7 +159,7 @@ export const useCharacterBonuses = (
             });
 
             // Handle Standard Counters (those in data.counters)
-            if (characterData.counters) {
+            if (deferredData.counters) {
                 const processCounter = (counter: import('../types').DotEntry) => {
                     if (!counter || !counter.name) return;
                     const nameKey = normalizeString(counter.name);
@@ -169,7 +170,7 @@ export const useCharacterBonuses = (
                         if (formulaEntry) {
                             try {
                                 const maxVal = evaluateFormula(formulaEntry.formula, {
-                                    ...characterData,
+                                    ...deferredData,
                                     formulaLibrary: rules.libraries.formulas
                                 });
                                 calculatedMaxes[counter.name] = maxVal;
@@ -180,7 +181,7 @@ export const useCharacterBonuses = (
                     } else if (libEntry?.formula) {
                         try {
                             const maxVal = evaluateFormula(libEntry.formula, {
-                                ...characterData,
+                                ...deferredData,
                                 formulaLibrary: rules.libraries.formulas
                             });
                             calculatedMaxes[counter.name] = maxVal;
@@ -190,8 +191,8 @@ export const useCharacterBonuses = (
                     }
                 };
 
-                Object.keys(characterData.counters).forEach(key => {
-                    const value = characterData.counters[key as keyof typeof characterData.counters];
+                Object.keys(deferredData.counters).forEach(key => {
+                    const value = deferredData.counters[key as keyof typeof deferredData.counters];
                     if (Array.isArray(value)) {
                         value.forEach(processCounter);
                     } else {
@@ -202,5 +203,15 @@ export const useCharacterBonuses = (
         }
 
         return { attributeBonuses, blockedSkills, counterCreationBonuses, counterXPBonuses, calculatedMaxes, activeReserves: Array.from(activeReserves) };
-    }, [avantages, desavantages, library, rulesTraits, characterData, rules]);
+    }, [avantages, desavantages, library, rulesTraits, deferredData, rules]);
+
+    // Deep comparison ref to avoid breaking memoization in children
+    const prevRef = useRef(calculated);
+
+    return useMemo(() => {
+        if (JSON.stringify(prevRef.current) !== JSON.stringify(calculated)) {
+            prevRef.current = calculated;
+        }
+        return prevRef.current;
+    }, [calculated]);
 };

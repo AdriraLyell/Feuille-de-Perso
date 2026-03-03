@@ -79,7 +79,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     )}
                     <button
                         onClick={handleConfirm}
-                        className={`px-6 py-2 rounded-sm font-bold shadow-md flex items-center gap-2 transition-all uppercase leading-none tracking-wider text-xs ${getBtnColor()}`}
+                        className={`px-6 py-2 rounded-sm font-bold shadow-md flex items-center gap-2 transition uppercase leading-none tracking-wider text-xs ${getBtnColor()}`}
                         aria-label={confirmLabel}
                     >
                         {confirmLabel}

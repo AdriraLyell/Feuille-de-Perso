@@ -55,7 +55,7 @@ const VariantSelectionModal: React.FC<Props> = ({
             <button
                 onClick={handleConfirm}
                 disabled={selectionMode === 'custom' && !customValue.trim()}
-                className={`px-6 py-2 rounded-sm font-bold shadow-md flex items-center gap-2 transition-all
+                className={`px-6 py-2 rounded-sm font-bold shadow-md flex items-center gap-2 transition
                     ${(selectionMode === 'custom' && !customValue.trim())
                         ? 'bg-stone-400 text-stone-200 cursor-not-allowed'
                         : 'bg-[#5c4d41] text-white hover:bg-[#4a3b32]'}`}
@@ -102,7 +102,7 @@ const VariantSelectionModal: React.FC<Props> = ({
                                     <button
                                         key={v}
                                         onClick={() => setSelectedSuggestion(v)}
-                                        className={`text-left text-xs px-3 py-2 rounded border transition-all ${selectedSuggestion === v
+                                        className={`text-left text-xs px-3 py-2 rounded border transition ${selectedSuggestion === v
                                             ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
                                             : 'bg-white border-stone-200 text-stone-600 hover:border-amber-400 hover:text-amber-800'
                                             }`}

@@ -45,7 +45,7 @@ const SyncHistoryTab: React.FC<SyncHistoryTabProps> = ({
                             <button
                                 onClick={() => onRestore(entry)}
                                 disabled={isRestoring}
-                                className="px-3 py-1.5 bg-stone-100 hover:bg-[#8b2e2e] hover:text-white text-[#8b2e2e] text-xs font-bold rounded flex items-center gap-1.5 transition-all disabled:opacity-50"
+                                className="px-3 py-1.5 bg-stone-100 hover:bg-[#8b2e2e] hover:text-white text-[#8b2e2e] text-xs font-bold rounded flex items-center gap-1.5 transition disabled:opacity-50"
                             >
                                 <RotateCcw size={12} />
                                 Restaurer

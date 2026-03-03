@@ -95,7 +95,7 @@ const UpdateNotifier: React.FC = () => {
                                     href={updateAvailable.downloadUrl || "#"}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="flex items-center justify-center gap-2 bg-stone-800 hover:bg-stone-900 text-white px-3 py-1.5 rounded text-xs font-bold transition-all shadow-sm"
+                                    className="flex items-center justify-center gap-2 bg-stone-800 hover:bg-stone-900 text-white px-3 py-1.5 rounded text-xs font-bold transition shadow-sm"
                                 >
                                     <Download size={14} /> Télécharger
                                 </a>
@@ -103,7 +103,7 @@ const UpdateNotifier: React.FC = () => {
                         ) : (
                             <button
                                 onClick={() => window.location.reload()}
-                                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-all shadow-sm w-full"
+                                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold transition shadow-sm w-full"
                             >
                                 <RefreshCw size={14} /> Actualiser la page
                             </button>

@@ -124,13 +124,13 @@ const TraitForm: React.FC<TraitFormProps> = ({
                     <div className="bg-stone-200/50 p-1 rounded-sm flex shadow-inner border border-[#bfae85]/30">
                         <button
                             onClick={() => setEditForm({ ...editForm, type: 'avantage' })}
-                            className={`px-6 py-2 rounded-sm text-xs font-serif font-black uppercase tracking-widest transition-all ${editForm.type === 'avantage' ? 'bg-[#2d5a27] text-white shadow-md' : 'text-[#5c4d41] hover:text-stone-800'}`}
+                            className={`px-6 py-2 rounded-sm text-xs font-serif font-black uppercase tracking-widest transition ${editForm.type === 'avantage' ? 'bg-[#2d5a27] text-white shadow-md' : 'text-[#5c4d41] hover:text-stone-800'}`}
                         >
                             Avantage
                         </button>
                         <button
                             onClick={() => setEditForm({ ...editForm, type: 'desavantage' })}
-                            className={`px-6 py-2 rounded-sm text-xs font-serif font-black uppercase tracking-widest transition-all ${editForm.type === 'desavantage' ? 'bg-[#8b2e2e] text-white shadow-md' : 'text-[#5c4d41] hover:text-stone-800'}`}
+                            className={`px-6 py-2 rounded-sm text-xs font-serif font-black uppercase tracking-widest transition ${editForm.type === 'desavantage' ? 'bg-[#8b2e2e] text-white shadow-md' : 'text-[#5c4d41] hover:text-stone-800'}`}
                         >
                             Désavantage
                         </button>
@@ -283,7 +283,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
                     });
 
                     return (
-                        <div className={`border rounded-sm p-3 flex items-center gap-3 transition-all ${isForcedByFormula ? 'bg-indigo-50/50 border-indigo-200 shadow-sm' : 'bg-[#bfae85]/10 border-[#bfae85]/30'}`}>
+                        <div className={`border rounded-sm p-3 flex items-center gap-3 transition ${isForcedByFormula ? 'bg-indigo-50/50 border-indigo-200 shadow-sm' : 'bg-[#bfae85]/10 border-[#bfae85]/30'}`}>
                             <div className="relative flex items-center">
                                 <input
                                     type="checkbox"

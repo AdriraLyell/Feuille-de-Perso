@@ -109,7 +109,7 @@ const CreationHUD: React.FC = () => {
                                     </div>
                                     {/* Background Progress Effect */}
                                     <div
-                                        className={`absolute bottom-0 left-0 top-0 opacity-10 transition-all duration-500 ${xpRemainingGlobal < 0 ? 'bg-red-500' : 'bg-blue-500'}`}
+                                        className={`absolute bottom-0 left-0 top-0 opacity-10 transition duration-500 ${xpRemainingGlobal < 0 ? 'bg-red-500' : 'bg-blue-500'}`}
                                         style={{ width: `${Math.min(100, (xpSpentTotal / startingXP) * 100)}%` }}
                                     />
                                 </div>

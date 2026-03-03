@@ -78,7 +78,7 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
                             draggable
                             onDragStart={(e) => handleDragStart(e, entry)}
                             onClick={() => onSelect && onSelect(entry.name, entry.defaultMinLevel)}
-                            className="bg-white border border-gray-200 rounded-lg p-3 hover:border-amber-400 hover:shadow-sm cursor-grab active:cursor-grabbing transition-all group relative"
+                            className="bg-white border border-gray-200 rounded-lg p-3 hover:border-amber-400 hover:shadow-sm cursor-grab active:cursor-grabbing transition group relative"
                         >
                             <div className="flex justify-between items-start mb-1">
                                 <div className="flex items-center gap-2">
@@ -90,7 +90,7 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
                                 </span>
                             </div>
                             {entry.description && (
-                                <p className="text-[10px] text-gray-500 line-clamp-1 group-hover:line-clamp-none transition-all">
+                                <p className="text-[10px] text-gray-500 line-clamp-1 group-hover:line-clamp-none transition">
                                     {entry.description}
                                 </p>
                             )}

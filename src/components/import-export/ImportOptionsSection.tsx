@@ -60,14 +60,14 @@ const ImportOptionsSection: React.FC<ImportOptionsSectionProps> = ({
             <div key="group_struct" className="mb-4">
                 <div className="text-xs font-bold text-gray-400 uppercase mb-2">Structure & Personnage</div>
                 <div className="space-y-2">
-                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'replace_all' ? 'bg-red-50 border-red-500 ring-1 ring-red-500' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${importAction === 'replace_all' ? 'bg-red-50 border-red-500 ring-1 ring-red-500' : 'border-gray-200 hover:bg-gray-50'}`}>
                         <input type="radio" name="importAction" checked={importAction === 'replace_all'} onChange={() => onActionChange('replace_all')} className="mt-1" />
                         <div>
                             <span className="font-bold text-gray-800 flex items-center gap-2"><User size={16} /> Tout remplacer (Clone)</span>
                             <span className="text-xs text-red-600 block mt-1"><AlertTriangle size={12} className="inline mr-1" />Toutes vos données actuelles seront perdues.</span>
                         </div>
                     </label>
-                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'system' ? 'bg-orange-50 border-orange-500 ring-1 ring-orange-500' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${importAction === 'system' ? 'bg-orange-50 border-orange-500 ring-1 ring-orange-500' : 'border-gray-200 hover:bg-gray-50'}`}>
                         <input type="radio" name="importAction" checked={importAction === 'system'} onChange={() => onActionChange('system')} className="mt-1" />
                         <div>
                             <span className="font-bold text-gray-800 flex items-center gap-2"><FileBox size={16} /> Système de Jeu (MJ)</span>
@@ -75,7 +75,7 @@ const ImportOptionsSection: React.FC<ImportOptionsSectionProps> = ({
                         </div>
                     </label>
                     {!analysis.hasLibrary && !analysis.hasSkillLibrary && (
-                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'template' ? 'bg-orange-50 border-orange-500 ring-1 ring-orange-500' : 'border-gray-200 hover:bg-gray-50'}`}>
+                        <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${importAction === 'template' ? 'bg-orange-50 border-orange-500 ring-1 ring-orange-500' : 'border-gray-200 hover:bg-gray-50'}`}>
                             <input type="radio" name="importAction" checked={importAction === 'template'} onChange={() => onActionChange('template')} className="mt-1" />
                             <div>
                                 <span className="font-bold text-gray-800 flex items-center gap-2"><LayoutTemplate size={16} /> Structure Seule</span>
@@ -94,14 +94,14 @@ const ImportOptionsSection: React.FC<ImportOptionsSectionProps> = ({
             <div key="group_all_libs" className="mb-4">
                 <div className="text-xs font-bold text-gray-400 uppercase mb-2">Toutes les Bibliothèques</div>
                 <div className="space-y-2">
-                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'all_libs_merge' ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${importAction === 'all_libs_merge' ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : 'border-gray-200 hover:bg-gray-50'}`}>
                         <input type="radio" name="importAction" checked={importAction === 'all_libs_merge'} onChange={() => onActionChange('all_libs_merge')} className="mt-1" />
                         <div>
                             <span className="font-bold text-gray-800 flex items-center gap-2"><Merge size={16} /> Tout Fusionner (Bibliothèques)</span>
                             <span className="text-xs text-gray-600 block mt-1">Ajoute le contenu sans toucher à votre fiche.</span>
                         </div>
                     </label>
-                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'all_libs_replace' ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${importAction === 'all_libs_replace' ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'border-gray-200 hover:bg-gray-50'}`}>
                         <input type="radio" name="importAction" checked={importAction === 'all_libs_replace'} onChange={() => onActionChange('all_libs_replace')} className="mt-1" />
                         <div>
                             <span className="font-bold text-gray-800 flex items-center gap-2"><RefreshCw size={16} /> Tout Remplacer (Bibliothèques)</span>
@@ -119,14 +119,14 @@ const ImportOptionsSection: React.FC<ImportOptionsSectionProps> = ({
             <div key="group_skill_lib" className="mb-4">
                 <div className="text-xs font-bold text-gray-400 uppercase mb-2">Réserve de Compétences</div>
                 <div className="space-y-2">
-                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'skill_lib_merge' ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${importAction === 'skill_lib_merge' ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : 'border-gray-200 hover:bg-gray-50'}`}>
                         <input type="radio" name="importAction" checked={importAction === 'skill_lib_merge'} onChange={() => onActionChange('skill_lib_merge')} className="mt-1" />
                         <div>
                             <span className="font-bold text-gray-800 flex items-center gap-2"><Merge size={16} /> Fusionner Compétences</span>
                             <span className="text-xs text-gray-600 block mt-1">Ajoute les nouvelles compétences à votre réserve.</span>
                         </div>
                     </label>
-                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'skill_lib_replace' ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${importAction === 'skill_lib_replace' ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'border-gray-200 hover:bg-gray-50'}`}>
                         <input type="radio" name="importAction" checked={importAction === 'skill_lib_replace'} onChange={() => onActionChange('skill_lib_replace')} className="mt-1" />
                         <div>
                             <span className="font-bold text-gray-800 flex items-center gap-2"><RefreshCw size={16} /> Remplacer Compétences</span>
@@ -144,14 +144,14 @@ const ImportOptionsSection: React.FC<ImportOptionsSectionProps> = ({
             <div key="group_trait_lib" className="mb-4">
                 <div className="text-xs font-bold text-gray-400 uppercase mb-2">Bibliothèque de Traits</div>
                 <div className="space-y-2">
-                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'lib_merge' ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${importAction === 'lib_merge' ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : 'border-gray-200 hover:bg-gray-50'}`}>
                         <input type="radio" name="importAction" checked={importAction === 'lib_merge'} onChange={() => onActionChange('lib_merge')} className="mt-1" />
                         <div>
                             <span className="font-bold text-gray-800 flex items-center gap-2"><Merge size={16} /> Fusionner Traits</span>
                             <span className="text-xs text-gray-600 block mt-1">Ajoute les nouveaux Avantages/Désavantages.</span>
                         </div>
                     </label>
-                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${importAction === 'lib_replace' ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${importAction === 'lib_replace' ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'border-gray-200 hover:bg-gray-50'}`}>
                         <input type="radio" name="importAction" checked={importAction === 'lib_replace'} onChange={() => onActionChange('lib_replace')} className="mt-1" />
                         <div>
                             <span className="font-bold text-gray-800 flex items-center gap-2"><RefreshCw size={16} /> Remplacer Traits</span>

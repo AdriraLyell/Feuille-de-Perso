@@ -108,7 +108,7 @@ const DotRating: React.FC<DotRatingProps> = ({
             type="button"
             disabled={readOnly}
             onClick={handleClick}
-            className={`w-3 h-3 flex items-center justify-center transition-all ${readOnly ? 'cursor-default' : 'cursor-pointer hover:scale-125'
+            className={`w-3 h-3 flex items-center justify-center transition ${readOnly ? 'cursor-default' : 'cursor-pointer hover:scale-125'
               }`}
             aria-label={`Set rating to ${index + 1}`}
             title={isBlocked ? `Bloqué par : ${blockedReason}` : (isCreationDot ? "Acquis à la création (Coût: 0 XP)" : "Acquis par XP")}

@@ -101,7 +101,6 @@ export interface DBGameSetting {
     id: string;
     name: string;
     version: string;
-    last_updated: string;
     configurations: Record<string, any>; // JSONB
     definitions: Record<string, any>; // JSONB
     is_public: boolean;

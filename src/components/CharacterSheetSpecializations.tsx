@@ -195,7 +195,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         return (
             <div
                 key={skill.id}
-                className="border border-stone-300 p-1.5 bg-white/50 backdrop-blur-sm shadow-sm flex flex-col gap-1.5 rounded-md group/skill hover:border-amber-400 hover:bg-white transition-all duration-200"
+                className="border border-stone-300 p-1.5 bg-white/50 backdrop-blur-sm shadow-sm flex flex-col gap-1.5 rounded-md group/skill hover:border-amber-400 hover:bg-white transition duration-200"
                 onDragOver={(e) => {
                     e.preventDefault();
                     e.currentTarget.classList.add('bg-amber-50', 'border-amber-400');
@@ -237,7 +237,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                         return (
                             <div
                                 key={`user-${i}`}
-                                className={`relative flex items-center h-5 transition-all duration-200 ${hasValue
+                                className={`relative flex items-center h-5 transition duration-200 ${hasValue
                                     ? 'bg-amber-50 border border-amber-200 rounded-full shadow-sm'
                                     : 'border-b border-dashed border-stone-300 hover:border-amber-400'
                                     }`}
@@ -279,13 +279,12 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
         if (skills.length === 0) return null;
 
-        // Adapt columns based on landscape mode (6 for portrait, 8 for landscape)
-
+        const gridCols = isLandscape ? 'grid-cols-7' : 'grid-cols-5';
 
         return (
             <div className="mb-1 break-inside-avoid">
                 <SectionHeader title={title} />
-                <div className="grid grid-cols-6 gap-2">
+                <div className={`grid ${gridCols} gap-2`}>
                     {skills.map(renderSkillBox)}
                 </div>
             </div>
@@ -306,7 +305,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
     });
 
     return (
-        <div className={`flex justify-center transition-all duration-300 ${isDrawerOpen ? 'pr-80' : ''}`}>
+        <div className={`flex justify-center transition duration-300 ${isDrawerOpen ? 'pr-80' : ''}`}>
             <div className={`sheet-container p-6 ${isLandscape ? 'landscape' : ''}`}>
 
                 <h1 className="text-3xl font-black text-center uppercase py-2 tracking-widest border-b-2 border-stone-800 mb-4 text-indigo-950 font-serif relative">

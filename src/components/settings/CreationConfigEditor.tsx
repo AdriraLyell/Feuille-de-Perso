@@ -95,13 +95,13 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                             <div className="flex bg-stone-200/50 p-1 rounded-sm border border-stone-300/30">
                                 <button
                                     onClick={() => updateCreationConfig('mode', 'rangs')}
-                                    className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-sm transition-all ${config.mode === 'rangs' ? 'bg-[#8b2e2e] text-white shadow-md' : 'text-[#5c4d41]/60 hover:text-[#5c4d41]'}`}
+                                    className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-sm transition ${config.mode === 'rangs' ? 'bg-[#8b2e2e] text-white shadow-md' : 'text-[#5c4d41]/60 hover:text-[#5c4d41]'}`}
                                 >
                                     Par Rangs
                                 </button>
                                 <button
                                     onClick={() => updateCreationConfig('mode', 'points')}
-                                    className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-sm transition-all ${config.mode === 'points' ? 'bg-[#8b2e2e] text-white shadow-md' : 'text-[#5c4d41]/60 hover:text-[#5c4d41]'}`}
+                                    className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-sm transition ${config.mode === 'points' ? 'bg-[#8b2e2e] text-white shadow-md' : 'text-[#5c4d41]/60 hover:text-[#5c4d41]'}`}
                                 >
                                     Par Points (XP)
                                 </button>
@@ -116,13 +116,13 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                     <div className="flex bg-stone-200/50 p-1 rounded-sm border border-stone-300/30">
                                         <button
                                             onClick={() => updateCreationConfig('pointsDistributionMode', 'global')}
-                                            className={`flex-1 py-1 text-[9px] font-bold uppercase rounded-sm transition-all ${(!config.pointsDistributionMode || config.pointsDistributionMode === 'global') ? 'bg-[#5c4d41] text-white shadow-sm' : 'text-[#5c4d41]/60 hover:text-[#5c4d41]'}`}
+                                            className={`flex-1 py-1 text-[9px] font-bold uppercase rounded-sm transition ${(!config.pointsDistributionMode || config.pointsDistributionMode === 'global') ? 'bg-[#5c4d41] text-white shadow-sm' : 'text-[#5c4d41]/60 hover:text-[#5c4d41]'}`}
                                         >
                                             Pot Commun
                                         </button>
                                         <button
                                             onClick={() => updateCreationConfig('pointsDistributionMode', 'buckets')}
-                                            className={`flex-1 py-1 text-[9px] font-bold uppercase rounded-sm transition-all ${config.pointsDistributionMode === 'buckets' ? 'bg-[#5c4d41] text-white shadow-sm' : 'text-[#5c4d41]/60 hover:text-[#5c4d41]'}`}
+                                            className={`flex-1 py-1 text-[9px] font-bold uppercase rounded-sm transition ${config.pointsDistributionMode === 'buckets' ? 'bg-[#5c4d41] text-white shadow-sm' : 'text-[#5c4d41]/60 hover:text-[#5c4d41]'}`}
                                         >
                                             Budgets Séparés
                                         </button>

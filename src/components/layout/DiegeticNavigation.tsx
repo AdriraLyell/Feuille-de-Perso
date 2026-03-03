@@ -84,7 +84,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                 <div className="flex items-center gap-2 md:gap-4 mr-4 z-10">
                     <button
                         onClick={onToggleLandscape}
-                        className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all ${isLandscape
+                        className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition ${isLandscape
                             ? 'bg-indigo-600 text-white border border-indigo-400'
                             : 'bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600'
                             }`}
@@ -96,7 +96,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                     <button
                         onClick={onOpenAppearance}
-                        className="px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600 hover:text-white"
+                        className="px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600 hover:text-white"
                         title="Changer l'apparence"
                         aria-label="Changer l'apparence"
                     >
@@ -125,7 +125,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                                 {rules?.showMetadataToPlayers && (
                                     <button
                                         onClick={onShowCampaignInfo}
-                                        className="ml-2 p-1 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-all active:scale-90"
+                                        className="ml-2 p-1 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition active:scale-90"
                                         title="Voir les infos de campagne"
                                         aria-label="Voir les infos de campagne"
                                     >
@@ -154,7 +154,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                         <div className="flex items-center gap-2 mr-4 border-r border-gray-600 pr-4">
                             <button
                                 onClick={() => onModeChange('settings')}
-                                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all flex items-center gap-2 relative ${currentMode === 'settings'
+                                className={`px-4 py-1.5 rounded-md text-sm font-bold transition flex items-center gap-2 relative ${currentMode === 'settings'
                                     ? 'bg-blue-600 text-white shadow-sm'
                                     : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
                                 title="Réglages"
@@ -179,7 +179,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                         <button
                             onClick={onOpenImportExport}
-                            className="bg-amber-700/20 hover:bg-amber-700/40 text-amber-500 hover:text-amber-400 border border-amber-700/50 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all text-sm font-bold"
+                            className="bg-amber-700/20 hover:bg-amber-700/40 text-amber-500 hover:text-amber-400 border border-amber-700/50 px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-sm font-bold"
                             title="Sauvegarder / Charger"
                         >
                             <Save size={18} />
@@ -187,7 +187,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                         <button
                             onClick={onOpenSync}
-                            className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all text-sm font-bold border relative ${syncStatus === 'synced'
+                            className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-sm font-bold border relative ${syncStatus === 'synced'
                                 ? 'bg-green-700/20 text-green-500 border-green-700/50'
                                 : syncStatus === 'update-available'
                                     ? 'bg-amber-700/30 text-amber-400 border-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.2)] animate-pulse'
@@ -250,7 +250,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                                 <button
                                     key={idx}
                                     onClick={() => { item.onClick(); setIsMobileMenuOpen(false); }}
-                                    className={`flex flex-col items-center justify-center p-6 rounded-xl border transition-all gap-3 ${item.active
+                                    className={`flex flex-col items-center justify-center p-6 rounded-xl border transition gap-3 ${item.active
                                         ? 'bg-blue-600 border-blue-400 text-white'
                                         : 'bg-gray-800 border-gray-700 text-gray-300 active:bg-gray-700'
                                         } ${item.highlight ? 'ring-2 ring-purple-500' : ''}`}

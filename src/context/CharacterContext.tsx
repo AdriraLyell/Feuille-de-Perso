@@ -9,6 +9,7 @@ import { applyRulesToState } from '../utils/rulesAdapter';
 import { reconcileRulesWithState } from '../utils/rulesReconciler';
 import { ErrorService } from '../services/ErrorService';
 import { CharacterSyncService } from '../services/CharacterSyncService';
+import { BookSyncService } from '../services/BookSyncService';
 import { migrateBookImages } from '../utils/migrations/migrateBookImages';
 import { logger } from '../utils/logger';
 import { APP_VERSION } from '../constants/app';
@@ -19,6 +20,7 @@ import { APP_VERSION } from '../constants/app';
 interface CharacterStateContextType {
     data: CharacterSheetData;
     isSyncing: boolean;
+    isEditMode: boolean;
 }
 
 interface CharacterActionsContextType {
@@ -28,6 +30,7 @@ interface CharacterActionsContextType {
     importData: (newData: CharacterSheetData) => void;
     sync: (mode?: 'manual' | 'auto') => Promise<void>;
     recordXPTransaction: (transaction: Omit<XPTransaction, 'id' | 'timestamp'>) => void;
+    setEditMode: (active: boolean) => void;
 }
 
 const CharacterStateContext = createContext<CharacterStateContextType | undefined>(undefined);
@@ -68,14 +71,15 @@ export const useCharacterActions = () => {
  * Regroupe données et actions.
  */
 export const useCharacter = () => {
-    const { data, isSyncing } = useCharacterState();
+    const { data, isSyncing, isEditMode } = useCharacterState();
     const actions = useCharacterActions();
 
     return useMemo(() => ({
         data,
         isSyncing,
+        isEditMode,
         ...actions
-    }), [data, isSyncing, actions]);
+    }), [data, isSyncing, isEditMode, actions]);
 };
 
 // --- Provider ---
@@ -134,6 +138,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
     });
 
     const [isSyncing, setIsSyncing] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
 
     // 2. Actions (Stable references via useCallback) - Moved up to avoid TS2448
     const updateData = useCallback((newData: CharacterSheetData | ((prev: CharacterSheetData) => CharacterSheetData)) => {
@@ -256,6 +261,10 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
 
             if (result.success && result.syncId) {
                 const newHash = result.hash;
+
+                // Fetch the book from character_books to stay in sync with server
+                const remoteBook = await BookSyncService.getBook(result.syncId);
+
                 setData(prev => {
                     if (prev.syncInfo?.syncId === syncInfo.syncId) {
                         return {
@@ -264,8 +273,18 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
                                 ...prev.syncInfo,
                                 lastSynced: Date.now(),
                                 lastSyncedHash: newHash,
-                                syncMode: mode // Update local state too
-                            }
+                                syncMode: mode
+                            },
+                            // Inject remote book if available (keeps local in sync with server)
+                            ...(remoteBook ? {
+                                bookDocument: {
+                                    id: remoteBook.id,
+                                    content: remoteBook.content,
+                                    formatVersion: remoteBook.format_version,
+                                    createdAt: remoteBook.created_at,
+                                    updatedAt: remoteBook.updated_at
+                                }
+                            } : {})
                         };
                     }
                     return prev;
@@ -442,15 +461,16 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
     // Actions were moved up
 
     // 5. Providers Wrapper
-    const stateValue = useMemo(() => ({ data, isSyncing }), [data, isSyncing]);
+    const stateValue = useMemo(() => ({ data, isSyncing, isEditMode }), [data, isSyncing, isEditMode]);
     const actionsValue = useMemo(() => ({
         updateData,
         addLog,
         resetData,
         importData,
         sync,
-        recordXPTransaction
-    }), [updateData, addLog, resetData, importData, sync, recordXPTransaction]);
+        recordXPTransaction,
+        setEditMode: setIsEditMode
+    }), [updateData, addLog, resetData, importData, sync, recordXPTransaction, setIsEditMode]);
 
     return (
         <CharacterStateContext.Provider value={stateValue}>

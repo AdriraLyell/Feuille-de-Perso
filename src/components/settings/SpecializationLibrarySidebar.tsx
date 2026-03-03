@@ -46,7 +46,7 @@ const SpecializationLibrarySidebar: React.FC<SpecializationLibrarySidebarProps> 
                                 key={item.entry.id}
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, item.entry)}
-                                className="bg-white p-2 rounded border border-gray-300 shadow-sm cursor-grab active:cursor-grabbing hover:border-amber-400 hover:shadow-md transition-all flex justify-between items-center group"
+                                className="bg-white p-2 rounded border border-gray-300 shadow-sm cursor-grab active:cursor-grabbing hover:border-amber-400 hover:shadow-md transition flex justify-between items-center group"
                             >
                                 <div className="flex items-center gap-2">
                                     <GripVertical size={14} className="text-gray-300 group-hover:text-amber-500" />

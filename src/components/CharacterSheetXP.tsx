@@ -95,7 +95,7 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
       <div className="flex gap-4 mb-4 border-b border-stone-200">
         <button
           onClick={() => setActiveTab('sessions')}
-          className={`px-6 py-2 font-bold uppercase tracking-wider transition-all flex items-center gap-2 border-b-2 ${activeTab === 'sessions'
+          className={`px-6 py-2 font-bold uppercase tracking-wider transition flex items-center gap-2 border-b-2 ${activeTab === 'sessions'
             ? 'border-blue-600 text-blue-700 bg-blue-50/50'
             : 'border-transparent text-stone-400 hover:text-stone-600'
             }`}
@@ -104,7 +104,7 @@ const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
         </button>
         <button
           onClick={() => setActiveTab('history')}
-          className={`px-6 py-2 font-bold uppercase tracking-wider transition-all flex items-center gap-2 border-b-2 ${activeTab === 'history'
+          className={`px-6 py-2 font-bold uppercase tracking-wider transition flex items-center gap-2 border-b-2 ${activeTab === 'history'
             ? 'border-indigo-600 text-indigo-700 bg-indigo-50/50'
             : 'border-transparent text-stone-400 hover:text-stone-600'
             }`}

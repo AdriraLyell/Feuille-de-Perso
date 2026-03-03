@@ -112,7 +112,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                             return (
                                 <div
                                     key={entry.id}
-                                    className={`border rounded-sm p-3 transition-all bg-white/60 group flex flex-col justify-between ${isUsed
+                                    className={`border rounded-sm p-3 transition bg-white/60 group flex flex-col justify-between ${isUsed
                                         ? 'border-green-300/40 bg-green-50/10'
                                         : isOfficial ? 'border-blue-300/40 bg-blue-50/5' : 'border-[#bfae85]/30 hover:border-amber-400/50 hover:shadow-sm'
                                         }`}

@@ -43,21 +43,40 @@ const AppearanceModal = lazy(() => import('../AppearanceModal'));
 const RulesSourceSelector = lazy(() => import('../RulesSourceSelector'));
 const SyncModal = lazy(() => import('../SyncModal'));
 const CampaignConflictModal = lazy(() => import('../ui/CampaignConflictModal'));
-const CampaignInfoModal = lazy(() => import('../ui/CampaignInfoModal'));
-import ConfirmationModal from '../ui/ConfirmationModal';
-
+import { Layers, FileType, List, TrendingUp, Clock, X, Trash2, Book, UserPlus, PencilLine, Check } from 'lucide-react';
+import { useEditMode } from '../../hooks/sheet/useEditMode';
+import { useCreationMode } from '../../hooks/useCreationMode';
+import CreationModeModal from '../sheet/CreationModeModal';
+import EditionSidebar from '../sheet/EditionSidebar';
 import { exportCharacterAsJSON } from '../../utils/importExportUtils';
 import { useNavigationState } from '../../hooks/layout/useNavigationState';
 import { usePrintManager } from '../../hooks/layout/usePrintManager';
 import { useRulesSync } from '../../hooks/layout/useRulesSync';
 import PostItBoard from '../ui/PostItBoard';
-
-// Icons
-import { Layers, FileType, List, TrendingUp, Clock, X, Trash2, Book } from 'lucide-react';
+const CampaignInfoModal = lazy(() => import('../ui/CampaignInfoModal'));
+import ThematicModal from '../ui/ThematicModal';
+import ConfirmationModal from '../ui/ConfirmationModal';
 
 const MainLayout: React.FC = () => {
-    const { data, updateData: setData, addLog, importData, isSyncing, sync } = useCharacter();
+    const { data, updateData: setData, addLog, importData, isSyncing, sync, isEditMode, setEditMode: setIsEditMode } = useCharacter();
     const { rules, updateRules, isOnlineMode, reloadRules } = useRules();
+
+    // Sheet Modes Hooks
+    const {
+        isEditMode: _, // We use context instead
+        setIsEditMode: __,
+        showEditWarning,
+        setShowEditWarning,
+        handleToggleEditMode,
+        executeEditModeActivation
+    } = useEditMode(isEditMode, setIsEditMode);
+
+    const {
+        showCreationWarning,
+        handleToggleCreationMode,
+        executeCreationActivation,
+        setShowCreationWarning
+    } = useCreationMode(data, setData as any, addLog);
 
     // Custom Hooks
     const [isLandscape, setIsLandscape] = useState(() => {
@@ -308,27 +327,60 @@ const MainLayout: React.FC = () => {
                                         className="sticky top-14 z-40 mb-2 no-print w-full flex justify-center pointer-events-none"
                                         aria-label="Navigation des onglets de personnage"
                                     >
-                                        <div className="pointer-events-auto flex gap-4 bg-white/90 backdrop-blur p-1.5 rounded-full shadow-lg border border-gray-200 flex-wrap justify-center">
-                                            <button onClick={() => setSheetTab('p1')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'p1' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Layers size={16} /> Personnage</button>
-                                            <button onClick={() => setSheetTab('specs')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'specs' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><List size={16} /> Spécialisations</button>
-                                            <button
-                                                onClick={() => setSheetTab('p2')}
-                                                className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all 
-                                                    ${sheetTab === 'p2'
-                                                        ? 'bg-blue-600 text-white shadow-md'
-                                                        : shouldHighlightMystic
-                                                            ? 'bg-amber-100/30 text-amber-600 border border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.2)] animate-pulse'
-                                                            : 'text-gray-600 hover:bg-gray-100'
-                                                    }`}
-                                            >
-                                                <FileType size={16} />
-                                                Détails & Equipement
-                                                {shouldHighlightMystic && sheetTab !== 'p2' && (
-                                                    <span className="ml-1 w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                                        <div className="pointer-events-auto flex gap-4 bg-white/95 backdrop-blur-md p-2 rounded-full shadow-2xl border border-gray-200 flex-wrap justify-center items-center">
+                                            {/* Primary Tabs */}
+                                            <div className="flex gap-2">
+                                                <button onClick={() => setSheetTab('p1')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'p1' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Layers size={16} /> Personnage</button>
+                                                <button onClick={() => setSheetTab('specs')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'specs' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><List size={16} /> Spécialisations</button>
+                                                <button
+                                                    onClick={() => setSheetTab('p2')}
+                                                    className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition 
+                                                        ${sheetTab === 'p2'
+                                                            ? 'bg-blue-600 text-white shadow-md'
+                                                            : shouldHighlightMystic
+                                                                ? 'bg-amber-100/30 text-amber-600 border border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.2)] animate-pulse'
+                                                                : 'text-gray-600 hover:bg-gray-100'
+                                                        }`}
+                                                >
+                                                    <FileType size={16} />
+                                                    Détails
+                                                </button>
+                                                <button onClick={() => setSheetTab('xp')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'xp' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><TrendingUp size={16} /> XP</button>
+                                                <button onClick={() => setSheetTab('notes')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'notes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Book size={16} /> Notes</button>
+                                            </div>
+
+                                            <div className="w-px h-6 bg-gray-200 mx-2 hidden sm:block"></div>
+
+                                            {/* Action Modes */}
+                                            <div className="flex gap-2">
+                                                {!isEditMode && (
+                                                    <button
+                                                        onClick={handleToggleCreationMode}
+                                                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition shadow-sm ${data.creationConfig?.active
+                                                            ? 'bg-green-100 text-green-700 border border-green-300'
+                                                            : 'bg-stone-100 text-stone-500 border border-stone-200 hover:bg-green-50 hover:text-green-600'
+                                                            }`}
+                                                        title={data.creationConfig?.active ? "Désactiver le Mode Création" : "Activer le Mode Création"}
+                                                    >
+                                                        <UserPlus size={16} />
+                                                        <span className="hidden lg:inline">{data.creationConfig?.active ? 'Création active' : 'Créer'}</span>
+                                                        <div className={`w-1.5 h-1.5 rounded-full ${data.creationConfig?.active ? 'bg-green-500 animate-pulse' : 'bg-stone-300'}`} />
+                                                    </button>
                                                 )}
-                                            </button>
-                                            <button onClick={() => setSheetTab('xp')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'xp' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><TrendingUp size={16} /> Gestion XP</button>
-                                            <button onClick={() => setSheetTab('notes')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'notes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Book size={16} /> Notes de Campagne</button>
+
+                                                <button
+                                                    onClick={handleToggleEditMode}
+                                                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition shadow-sm ${isEditMode
+                                                        ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                                                        : 'bg-stone-100 text-stone-500 border border-stone-200 hover:bg-amber-50 hover:text-amber-600'
+                                                        }`}
+                                                    title={isEditMode ? "Valider les modifications" : "Mode Édition"}
+                                                >
+                                                    {isEditMode ? <Check size={16} /> : <PencilLine size={16} />}
+                                                    <span className="hidden lg:inline">{isEditMode ? 'Édition active' : 'Éditer'}</span>
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${isEditMode ? 'bg-amber-500 animate-pulse' : 'bg-stone-300'}`} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </nav>
 
@@ -424,6 +476,56 @@ const MainLayout: React.FC = () => {
                             cancelLabel="Rester ici"
                             type="warning"
                         />
+
+                        {/* Mode Modals moved from CharacterSheet */}
+                        {showEditWarning && (
+                            <ThematicModal
+                                isOpen={showEditWarning}
+                                onClose={() => setShowEditWarning(false)}
+                                title="Activer le Mode Édition ?"
+                                icon={<PencilLine size={24} />}
+                                size="md"
+                                footer={
+                                    <>
+                                        <button
+                                            onClick={() => setShowEditWarning(false)}
+                                            className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold"
+                                        >
+                                            Annuler
+                                        </button>
+                                        <button
+                                            onClick={executeEditModeActivation}
+                                            className="px-6 py-2 bg-amber-600 text-white rounded-sm font-bold shadow-md hover:bg-amber-700 flex items-center gap-2"
+                                        >
+                                            <Check size={16} /> Compris, j'active
+                                        </button>
+                                    </>
+                                }
+                            >
+                                <div className="flex flex-col gap-4 py-2 text-[#5c4d41]">
+                                    <div className="bg-amber-50 border border-amber-200 p-4 rounded-sm text-sm leading-relaxed">
+                                        <p className="font-bold mb-2">Qu'est-ce que le Mode Édition ?</p>
+                                        <ul className="list-disc list-inside space-y-2 text-xs">
+                                            <li><strong>Ajout direct</strong> : Glissez des compétences depuis la barre latérale.</li>
+                                            <li><strong>Réorganisation</strong> : Déplacez vos compétences d'un bloc à l'autre.</li>
+                                            <li><strong>Nettoyage</strong> : Supprimez des éléments inutiles via l'icône poubelle.</li>
+                                            <li><strong>Suggestions</strong> : Les nouveaux éléments sont suggérés au MJ.</li>
+                                        </ul>
+                                        <p className="mt-4 text-[10px] italic opacity-70">Note : Ce mode est réservé aux ajustements de structure. Pour remplir vos points, utilisez le mode standard ou le mode création.</p>
+                                    </div>
+                                </div>
+                            </ThematicModal>
+                        )}
+
+                        {showCreationWarning && (
+                            <CreationModeModal
+                                data={data}
+                                onClose={() => setShowCreationWarning(false)}
+                                onConfirm={executeCreationActivation}
+                            />
+                        )}
+
+                        {isEditMode && <EditionSidebar onClose={() => setIsEditMode(false)} />}
                     </Suspense>
                 </div>
             </div>

@@ -21,7 +21,7 @@ const ThematicButton: React.FC<ThematicButtonProps> = ({
     ...props
 }) => {
     // Base styles
-    const baseStyles = "relative inline-flex items-center justify-center font-serif transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdfbf7]";
+    const baseStyles = "relative inline-flex items-center justify-center font-serif transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#fdfbf7]";
 
     // Size styles
     const sizeStyles = {

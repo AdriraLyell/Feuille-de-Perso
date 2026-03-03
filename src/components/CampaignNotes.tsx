@@ -3,6 +3,7 @@ import { Book, Users, PenTool } from 'lucide-react';
 import { useCharacter } from '../context/CharacterContext';
 import PartyTable from './campaign/PartyTable';
 import { ColumnarEditor } from './campaign/book/ColumnarEditor';
+import { BookSyncService } from '../services/BookSyncService';
 
 const CampaignNotes: React.FC = () => {
     const { data, updateData: onChange, addLog } = useCharacter();
@@ -18,6 +19,15 @@ const CampaignNotes: React.FC = () => {
                 content: {},
                 updatedAt: now
             };
+
+            // Fire-and-forget save to character_books if already synced
+            if (prev.syncInfo?.syncId) {
+                BookSyncService.saveBook(
+                    prev.syncInfo.syncId,
+                    content as import('@tiptap/core').JSONContent,
+                    2
+                ).catch(() => { /* errors handled inside BookSyncService */ });
+            }
 
             return {
                 ...prev,

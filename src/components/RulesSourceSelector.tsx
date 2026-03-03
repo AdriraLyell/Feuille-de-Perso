@@ -152,7 +152,7 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
                                     onClick={handleResumeClick}
                                     className="p-8 border-indigo-900/30 bg-indigo-950/10 flex flex-col items-center text-center group"
                                 >
-                                    <div className="w-16 h-16 rounded-full bg-indigo-900/20 flex items-center justify-center mb-6 border border-indigo-500/30 group-hover:bg-indigo-600/40 transition-all shadow-[0_0_20px_rgba(79,70,229,0.2)]">
+                                    <div className="w-16 h-16 rounded-full bg-indigo-900/20 flex items-center justify-center mb-6 border border-indigo-500/30 group-hover:bg-indigo-600/40 transition shadow-[0_0_20px_rgba(79,70,229,0.2)]">
                                         <RotateCcw className="text-indigo-400" size={32} />
                                     </div>
                                     <h3 className="text-2xl font-serif font-bold text-indigo-300 mb-2">Reprendre</h3>
@@ -171,7 +171,7 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
                                 onClick={handleOnlineClick}
                                 className={`p-8 border-amber-900/30 bg-amber-950/10 flex flex-col items-center text-center group ${!resumeInfo ? 'md:col-span-1 md:col-start-1' : ''}`}
                             >
-                                <div className="w-16 h-16 rounded-full bg-amber-900/20 flex items-center justify-center mb-6 border border-amber-500/30 group-hover:bg-amber-600/40 transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                                <div className="w-16 h-16 rounded-full bg-amber-900/20 flex items-center justify-center mb-6 border border-amber-500/30 group-hover:bg-amber-600/40 transition shadow-[0_0_20px_rgba(245,158,11,0.2)]">
                                     <Wifi className="text-amber-400" size={32} />
                                 </div>
                                 <h3 className="text-2xl font-serif font-bold text-amber-300 mb-2">Chroniques</h3>
@@ -189,7 +189,7 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
                                 onClick={handleOfflineClick}
                                 className={`p-8 border-stone-800 bg-stone-900/20 flex flex-col items-center text-center group ${!resumeInfo ? 'md:col-span-1' : ''}`}
                             >
-                                <div className="w-16 h-16 rounded-full bg-stone-800/40 flex items-center justify-center mb-6 border border-stone-700 group-hover:bg-stone-700 transition-all">
+                                <div className="w-16 h-16 rounded-full bg-stone-800/40 flex items-center justify-center mb-6 border border-stone-700 group-hover:bg-stone-700 transition">
                                     <WifiOff className="text-stone-400" size={32} />
                                 </div>
                                 <h3 className="text-2xl font-serif font-bold text-stone-300 mb-2">Hors Ligne</h3>
@@ -240,7 +240,7 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: idx * 0.05 }}
                                                 onClick={() => handleSettingClick(setting)}
-                                                className="w-full group flex items-center justify-between p-4 rounded-sm border border-stone-800 bg-stone-950/40 hover:border-amber-500/50 hover:bg-amber-950/20 transition-all text-left"
+                                                className="w-full group flex items-center justify-between p-4 rounded-sm border border-stone-800 bg-stone-950/40 hover:border-amber-500/50 hover:bg-amber-950/20 transition text-left"
                                             >
                                                 <div>
                                                     <div className="font-serif font-bold text-stone-200 group-hover:text-amber-400 transition-colors text-lg">
@@ -248,10 +248,10 @@ const RulesSourceSelector: React.FC<RulesSourceSelectorProps> = ({ isOpen, onSel
                                                     </div>
                                                     <div className="text-[10px] font-bold text-amber-900 uppercase tracking-widest flex gap-3 mt-1">
                                                         <span className="bg-stone-900 px-1.5 py-0.5 rounded border border-stone-800">v{setting.version}</span>
-                                                        <span className="flex items-center gap-1"><Clock size={10} /> {new Date(setting.last_updated).toLocaleDateString()}</span>
+                                                        <span className="flex items-center gap-1"><Clock size={10} /> {new Date(setting.updated_at).toLocaleDateString()}</span>
                                                     </div>
                                                 </div>
-                                                <ArrowRight size={20} className="text-stone-700 group-hover:text-amber-500 group-hover:translate-x-1 transition-all" />
+                                                <ArrowRight size={20} className="text-stone-700 group-hover:text-amber-500 group-hover:translate-x-1 transition" />
                                             </motion.button>
                                         ))
                                     )}

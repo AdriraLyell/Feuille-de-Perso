@@ -31,7 +31,7 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
     return (
         <div
             onClick={onClick}
-            className={`flex gap-1 items-center h-[22px] px-1 transition-all rounded-sm cursor-pointer group select-none ${isEmpty
+            className={`flex gap-1 items-center h-[22px] px-1 transition rounded-sm cursor-pointer group select-none ${isEmpty
                 ? 'hover:bg-slate-50 border-b border-dotted border-stone-200'
                 : (isPostCreationAdvantage || isImproved)
                     ? 'bg-emerald-50 hover:bg-emerald-100 border-b border-emerald-200 shadow-sm'
@@ -67,7 +67,7 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
                         e.stopPropagation();
                         onManageMystic(e);
                     }}
-                    className="opacity-100 sm:opacity-0 group-hover:opacity-100 text-purple-400 hover:text-purple-600 scale-75 transition-all shrink-0 p-1 hover:bg-purple-50 rounded"
+                    className="opacity-100 sm:opacity-0 group-hover:opacity-100 text-purple-400 hover:text-purple-600 scale-75 transition shrink-0 p-1 hover:bg-purple-50 rounded"
                     title="Gérer les compétences mystiques"
                 >
                     <Wand2 size={14} />
@@ -77,7 +77,7 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
             {!isEmpty && (
                 <div
                     onClick={onRemove}
-                    className="opacity-0 group-hover:opacity-100 text-stone-400 hover:text-red-500 scale-75 transition-all shrink-0 p-1 hover:bg-red-50 rounded"
+                    className="opacity-0 group-hover:opacity-100 text-stone-400 hover:text-red-500 scale-75 transition shrink-0 p-1 hover:bg-red-50 rounded"
                     title="Supprimer"
                 >
                     <Trash2 size={14} />

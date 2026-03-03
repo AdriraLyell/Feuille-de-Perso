@@ -195,7 +195,7 @@ const SyncModal: React.FC<SyncModalProps> = ({
                             <button
                                 onClick={handleSync}
                                 disabled={!canSync}
-                                className={`px-6 py-2 rounded-md font-bold flex items-center gap-2 transition-all ${canSync
+                                className={`px-6 py-2 rounded-md font-bold flex items-center gap-2 transition ${canSync
                                     ? 'bg-[#2d5a27] hover:bg-[#3d7a37] text-white'
                                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}

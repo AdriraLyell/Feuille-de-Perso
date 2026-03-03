@@ -75,7 +75,7 @@ const TriStateChip: React.FC<TriStateChipProps> = ({
     return (
         <button
             onClick={handleClick}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[11px] font-bold transition-all select-none ${currentStyle}`}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[11px] font-bold transition select-none ${currentStyle}`}
             title={`${label}: ${value === null ? 'Tout' : value === true ? 'Inclure' : 'Exclure'}`}
         >
             {Icon && value !== false && <Icon size={12} className={value === true ? 'text-white' : ''} />}

@@ -93,6 +93,33 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
 
         const mapping = isLandscape ? LANDSCAPE_MAP : PORTRAIT_MAP;
 
+        // OPTIMIZATION: Create Maps for fast O(1) lookups instead of O(N) Array.find runs inside loops
+        const skillsLibRaw = rules?.libraries?.skills || [];
+        const mysticAbilitiesLibRaw = rules?.libraries?.mysticAbilities || [];
+        const backgroundsLibRaw = rules?.libraries?.backgrounds || [];
+
+        const skillsMapById = new Map<string, any>();
+        const skillsMapByName = new Map<string, any>();
+        const mysticMapById = new Map<string, any>();
+        const backgroundsMapById = new Map<string, any>();
+        const backgroundsMapByName = new Map<string, any>();
+
+        skillsLibRaw.forEach(s => {
+            skillsMapById.set(s.id, s);
+            if (s.name) skillsMapByName.set(s.name.trim().toLowerCase(), s);
+        });
+
+        mysticAbilitiesLibRaw.forEach(m => {
+            mysticMapById.set(m.id, m);
+            // Mystic abilities might be referenced by name in some old sheets, just in case
+            if (m.name) skillsMapByName.set(m.name.trim().toLowerCase(), m);
+        });
+
+        backgroundsLibRaw.forEach(b => {
+            backgroundsMapById.set(b.id, b);
+            if (b.name) backgroundsMapByName.set(b.name.trim().toLowerCase(), b);
+        });
+
         skillsSet.forEach(cat => {
             const items = data.skills[cat.id] || [];
 
@@ -100,20 +127,18 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
             const enrichedItems = items.map(item => {
                 const targetId = item.definitionId || item.id;
                 // 1. Lookup by ID (definitionId ou item.id)
-                let def =
-                    rules?.libraries?.skills.find(s => s.id === targetId) ||
-                    rules?.libraries?.mysticAbilities.find(s => s.id === targetId);
+                let def = skillsMapById.get(targetId) || mysticMapById.get(targetId);
 
                 // 2. Fallback par nom pour compatibilité fiches existantes (pas de definitionId)
                 if (!def && item.name) {
                     const nameLower = item.name.trim().toLowerCase();
-                    def = rules?.libraries?.skills.find(s => s.name.trim().toLowerCase() === nameLower);
+                    def = skillsMapByName.get(nameLower);
                 }
 
                 if (def) {
                     return {
                         ...item,
-                        mysticAbilityId: def.mysticAbilityId || (rules?.libraries?.mysticAbilities.some(ma => ma.id === targetId) ? targetId : undefined),
+                        mysticAbilityId: def.mysticAbilityId || (mysticMapById.has(targetId) ? targetId : undefined),
                         isVariable: def.isVariable
                     };
                 }
@@ -146,22 +171,18 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
                 const enrichedItems = items.map(item => {
                     const targetId = item.definitionId || item.id;
                     // 1. Lookup par ID
-                    let def =
-                        rules?.libraries?.skills.find(s => s.id === targetId) ||
-                        rules?.libraries?.mysticAbilities.find(s => s.id === targetId) ||
-                        rules?.libraries?.backgrounds.find(s => s.id === targetId);
+                    let def = skillsMapById.get(targetId) || mysticMapById.get(targetId) || backgroundsMapById.get(targetId);
 
                     // 2. Fallback par nom pour rétrocompatibilité
                     if (!def && item.name) {
                         const nameLower = item.name.trim().toLowerCase();
-                        def = rules?.libraries?.skills.find(s => s.name.trim().toLowerCase() === nameLower)
-                            || rules?.libraries?.backgrounds.find(s => s.name.trim().toLowerCase() === nameLower);
+                        def = skillsMapByName.get(nameLower) || backgroundsMapByName.get(nameLower);
                     }
 
                     if (def) {
                         return {
                             ...item,
-                            mysticAbilityId: def.mysticAbilityId || (rules?.libraries?.mysticAbilities.some(ma => ma.id === targetId) ? targetId : undefined),
+                            mysticAbilityId: def.mysticAbilityId || (mysticMapById.has(targetId) ? targetId : undefined),
                             isVariable: def.isVariable
                         };
                     }
@@ -180,11 +201,16 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
                 description: cat.description
             }))
         };
-    }, [data.skills, rules?.definitions?.skillCategories]);
+    }, [data.skills, rules?.definitions?.skillCategories, rules?.libraries?.skills, rules?.libraries?.mysticAbilities, rules?.libraries?.backgrounds]);
+
+    const portraitLayout = useMemo(() => getDynamicColumns(false), [getDynamicColumns]);
+    const landscapeLayout = useMemo(() => getDynamicColumns(true), [getDynamicColumns]);
 
     return {
         attributeCategories,
         getAttributesGridClass,
-        getDynamicColumns
+        getDynamicColumns,
+        portraitLayout,
+        landscapeLayout
     };
 };

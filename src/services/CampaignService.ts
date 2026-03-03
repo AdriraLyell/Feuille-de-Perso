@@ -14,7 +14,7 @@ interface DBGameSetting {
     id: string;
     name: string;
     version: string;
-    last_updated: string;
+    updated_at: string;
     configurations: RulesData['configurations']; // JSONB
     definitions: RulesData['definitions']; // JSONB
     is_public: boolean;
@@ -31,8 +31,8 @@ export const CampaignService = {
      */
     async listSettings(): Promise<GameSettingSummary[] | null> {
         return await DatabaseService.fetchAll<GameSettingSummary>(TABLE_GAME_SETTINGS, {
-            select: 'id, name, version, last_updated, is_public, is_archived',
-            order: { column: 'last_updated', ascending: false }
+            select: 'id, name, version, updated_at, is_public, is_archived',
+            order: { column: 'updated_at', ascending: false }
         }, 'CampaignService.listSettings');
     },
 
@@ -43,9 +43,9 @@ export const CampaignService = {
         return await DatabaseService.fetchAll<GameSettingSummary>(
             TABLE_GAME_SETTINGS,
             {
-                select: 'id, name, version, last_updated, is_public',
+                select: 'id, name, version, updated_at, is_public',
                 eq: { is_public: true },
-                order: { column: 'last_updated', ascending: false }
+                order: { column: 'updated_at', ascending: false }
             },
             'CampaignService.listPublicSettings'
         ) || [];
@@ -138,7 +138,7 @@ export const CampaignService = {
 
             const rulesRaw = migrateRulesToV2({
                 version: settingData.version,
-                lastUpdated: new Date(settingData.last_updated).getTime(),
+                lastUpdated: new Date(settingData.updated_at).getTime(),
                 configurations: settingData.configurations,
                 definitions: settingData.definitions,
                 theme: (settingData.configurations as Record<string, unknown>)?.theme as { creationColor: string; xpColor: string } || { creationColor: "#000", xpColor: "#000" },
@@ -185,7 +185,7 @@ export const CampaignService = {
         // 1. Update Root
         const rootUpdate: Partial<DBGameSetting> = {
             version: rules.version,
-            last_updated: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
             configurations: rules.configurations,
             definitions: rules.definitions,
             description: rules.description || null,

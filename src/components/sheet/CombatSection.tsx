@@ -77,4 +77,4 @@ export const CombatSection = React.memo<CombatSectionProps>(({ data, updateComba
                </div>
           </div>
      );
-});
+}, (prev, next) => prev.data.combat === next.data.combat);

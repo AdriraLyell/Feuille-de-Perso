@@ -95,7 +95,7 @@ const CloudConflictResolver: React.FC<CloudConflictResolverProps> = ({
                                 <div className="grid grid-cols-2 gap-px bg-stone-800">
                                     {/* Option: Current */}
                                     <div
-                                        className={`p-5 cursor-pointer transition-all duration-300 relative group ${choice === 'keep_current'
+                                        className={`p-5 cursor-pointer transition duration-300 relative group ${choice === 'keep_current'
                                             ? 'bg-blue-900/10'
                                             : 'bg-stone-900/40 opacity-60 grayscale hover:opacity-100 hover:grayscale-0'
                                             }`}
@@ -146,7 +146,7 @@ const CloudConflictResolver: React.FC<CloudConflictResolverProps> = ({
 
                                     {/* Option: Incoming */}
                                     <div
-                                        className={`p-5 cursor-pointer transition-all duration-300 relative group ${choice === 'replace'
+                                        className={`p-5 cursor-pointer transition duration-300 relative group ${choice === 'replace'
                                             ? 'bg-amber-900/10'
                                             : 'bg-stone-900/40 opacity-60 grayscale hover:opacity-100 hover:grayscale-0'
                                             }`}

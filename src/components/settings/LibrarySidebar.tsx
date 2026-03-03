@@ -121,7 +121,7 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ data, onUpdate, onAddLo
                                 key={item.id}
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, 'lib_skill', { data: (item as unknown) as Record<string, unknown> })}
-                                className={`p-2 rounded border shadow-sm cursor-grab active:cursor-grabbing transition-all flex justify-between items-center group ${isPresent
+                                className={`p-2 rounded border shadow-sm cursor-grab active:cursor-grabbing transition flex justify-between items-center group ${isPresent
                                     ? 'bg-green-50/30 border-green-200/60 hover:border-green-400'
                                     : 'bg-white border-gray-300 hover:border-purple-400 hover:shadow-md'
                                     }`}

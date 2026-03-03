@@ -111,7 +111,7 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                                         <button
                                             key={v}
                                             onClick={() => setVariantInput(v)}
-                                            className={`px-2 py-1 text-xs rounded-full border transition-all ${variantInput === v ? 'bg-[#8b2e2e] text-white border-[#8b2e2e]' : 'bg-white text-[#5c4d41] border-[#bfae85]/30 hover:border-[#8b2e2e] hover:shadow-sm'}`}
+                                            className={`px-2 py-1 text-xs rounded-full border transition ${variantInput === v ? 'bg-[#8b2e2e] text-white border-[#8b2e2e]' : 'bg-white text-[#5c4d41] border-[#bfae85]/30 hover:border-[#8b2e2e] hover:shadow-sm'}`}
                                         >
                                             {v}
                                         </button>

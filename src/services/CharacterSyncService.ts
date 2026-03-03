@@ -1,8 +1,11 @@
 /**
  * CharacterSyncService
- * 
+ *
  * Handles synchronization of player character sheets to Supabase.
  * Players can sync their sheets manually; Admin can read them.
+ *
+ * NOTE: bookDocument is intentionally excluded from the main sync payload.
+ * It is stored separately in the `character_books` table via BookSyncService.
  */
 
 import { DatabaseService } from './DatabaseService';
@@ -10,6 +13,7 @@ import { CharacterSheetData } from '../types/character';
 
 import { ImageSyncResolver } from './ImageSyncResolver';
 import { ErrorService } from './ErrorService';
+import { BookSyncService } from './BookSyncService';
 
 // Types for sync operations
 export interface SyncedCharacter {
@@ -63,11 +67,12 @@ export const CharacterSyncService = {
     /**
      * Generate a short digital signature of the character data.
      * Used for conflict detection and 'dirty' checking.
+     * bookDocument is excluded: it lives in character_books, not in the main data.
      */
     generateDataHash(data: CharacterSheetData): string {
         try {
-            // We ignore volatile fields for the hash
-            const { syncInfo: _, appLogs: __, xpLogs: ___, _rulesVersion: ____, ...stableData } = data;
+            // Exclude volatile and externalized fields from the hash
+            const { syncInfo: _, appLogs: __, xpLogs: ___, _rulesVersion: ____, bookDocument: _____, ...stableData } = data;
 
             // Fast hashing via string manipulation
             const str = JSON.stringify(stableData);
@@ -96,11 +101,18 @@ export const CharacterSyncService = {
         mode: 'manual' | 'auto' = 'manual'
     ): Promise<SyncResult> {
         try {
-            // Step 0: Inject sync mode
-            data.syncInfo = { ...data.syncInfo, syncMode: mode };
+            // Step 0: Inject sync mode and strip redundant SQL fields from JSONB
+            const cleanSyncInfo = { ...data.syncInfo, syncMode: mode };
+            delete cleanSyncInfo.settingId;
+            delete cleanSyncInfo.lastSynced;
 
-            // Step 1: Resolve and compress images for portable sync
-            const dataToStore = await ImageSyncResolver.resolveImagesForSync(data);
+            data.syncInfo = cleanSyncInfo;
+
+            // Step 1: Exclude bookDocument from the main payload — stored in character_books
+            const { bookDocument, ...dataWithoutBook } = data;
+
+            // Step 2: Resolve and compress images for portable sync
+            const dataToStore = await ImageSyncResolver.resolveImagesForSync(dataWithoutBook as CharacterSheetData);
 
             const result = await DatabaseService.upsert<{ id: string }>(
                 'characters',
@@ -120,6 +132,15 @@ export const CharacterSyncService = {
 
             if (!result) {
                 return { success: false, error: "Erreur de synchronisation (DatabaseService)." };
+            }
+
+            // Step 3: Sync bookDocument separately if present
+            if (bookDocument?.content) {
+                await BookSyncService.saveBook(
+                    result.id,
+                    bookDocument.content,
+                    bookDocument.formatVersion ?? 2
+                );
             }
 
             return {
@@ -181,7 +202,7 @@ export const CharacterSyncService = {
      * Get all FULL characters synced to a specific campaign (for Roster view).
      */
     async getFullCharactersBySettingId(settingId: string): Promise<SyncedCharacter[]> {
-        return await DatabaseService.fetchAll<SyncedCharacter>(
+        const characters = await DatabaseService.fetchAll<SyncedCharacter>(
             'characters',
             {
                 select: '*',
@@ -190,17 +211,41 @@ export const CharacterSyncService = {
             },
             'CharacterSyncService.getFullCharactersBySettingId'
         );
+
+        return characters.map(c => this._enrichCharacterData(c));
     },
 
     /**
      * Get a single character by ID (for Admin or Player detail view).
      */
     async getCharacterById(id: string): Promise<SyncedCharacter | null> {
-        return await DatabaseService.fetchOne<SyncedCharacter>(
+        const character = await DatabaseService.fetchOne<SyncedCharacter>(
             'characters',
             id,
             'CharacterSyncService.getCharacterById'
         );
+
+        return character ? this._enrichCharacterData(character) : null;
+    },
+
+    /**
+     * Internal helper to merge SQL columns into the JSONB syncInfo for app compatibility.
+     */
+    _enrichCharacterData(character: SyncedCharacter): SyncedCharacter {
+        if (!character.data) return character;
+
+        return {
+            ...character,
+            data: {
+                ...character.data,
+                syncInfo: {
+                    ...(character.data.syncInfo || {}),
+                    syncId: character.id,
+                    settingId: character.setting_id || 'orphan',
+                    lastSynced: new Date(character.last_synced).getTime()
+                }
+            }
+        };
     },
 
     /**
@@ -241,8 +286,8 @@ export const CharacterSyncService = {
                 ...character.data,
                 syncInfo: {
                     ...(character.data.syncInfo || {}),
-                    mjMessage: message,
-                    lastSynced: Date.now()
+                    mjMessage: message
+                    // lastSynced is handled by the SQL column in updateCharacterData
                 }
             };
 

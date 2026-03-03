@@ -161,7 +161,7 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
             return (
               <div
                 key={skill.id}
-                className="border border-gray-200 rounded p-2.5 bg-gray-50/50 hover:bg-white hover:shadow-sm transition-all group/skill"
+                className="border border-gray-200 rounded p-2.5 bg-gray-50/50 hover:bg-white hover:shadow-sm transition group/skill"
                 onDragOver={(e) => {
                   e.preventDefault();
                   e.currentTarget.classList.add('bg-amber-50');

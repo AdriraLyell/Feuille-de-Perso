@@ -239,7 +239,7 @@ const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
     };
 
     return (
-        <div className="col-span-1 border border-[#bfae85]/40 bg-gradient-to-br from-[#fdfbf7] to-[#f4f2eb] rounded-sm shadow-[inset_0_1px_4px_rgba(0,0,0,0.05)] flex items-center justify-between px-1 overflow-visible h-9 group transition-all relative">
+        <div className="col-span-1 border border-[#bfae85]/40 bg-gradient-to-br from-[#fdfbf7] to-[#f4f2eb] rounded-sm shadow-[inset_0_1px_4px_rgba(0,0,0,0.05)] flex items-center justify-between px-1 overflow-visible h-9 group transition relative">
             <div
                 className="flex flex-col items-start justify-center flex-grow cursor-help h-full w-full"
                 ref={anchorRef}
@@ -499,5 +499,22 @@ export const CountersSection = React.memo<CountersSectionProps>(({
                 </div>
             </div>
         </div>
+    );
+}, (prev, next) => {
+    return (
+        prev.data.counters === next.data.counters &&
+        prev.data.theme === next.data.theme &&
+        prev.data.skills === next.data.skills &&
+        prev.data.attributes === next.data.attributes &&
+        prev.data.secondaryAttributes === next.data.secondaryAttributes &&
+        prev.data.page2 === next.data.page2 &&
+        prev.data.experience === next.data.experience &&
+        prev.data.creationConfig === next.data.creationConfig &&
+        prev.data.combat === next.data.combat &&
+        prev.isLandscape === next.isLandscape &&
+        prev.creationBonuses === next.creationBonuses &&
+        prev.xpBonuses === next.xpBonuses &&
+        prev.calculatedMaxes === next.calculatedMaxes &&
+        prev.activeReserves === next.activeReserves
     );
 });

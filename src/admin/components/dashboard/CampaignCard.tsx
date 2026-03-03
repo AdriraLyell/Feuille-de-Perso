@@ -49,7 +49,7 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
                 <div className="flex items-center gap-3 text-[10px] text-amber-700/60 font-bold uppercase tracking-widest mb-6 border-b border-stone-800/50 pb-4">
                     <span className="bg-stone-950/30 px-2 py-1 rounded border border-stone-800/50">v{setting.version}</span>
                     <span className="text-stone-700">•</span>
-                    <span className="text-stone-500">{new Date(setting.last_updated).toLocaleDateString()}</span>
+                    <span className="text-stone-500">{new Date(setting.updated_at).toLocaleDateString()}</span>
                 </div>
 
                 <div className="mt-auto flex justify-between items-center pt-2">

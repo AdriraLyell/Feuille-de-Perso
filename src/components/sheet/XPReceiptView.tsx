@@ -161,7 +161,7 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGa
     const renderGroup = (group: GroupedTransaction) => {
         const isExpanded = expandedCategory === group.category;
         return (
-            <div key={group.category} className={`border border-stone-200 rounded-lg overflow-hidden transition-all duration-200 ${isExpanded ? 'bg-white shadow-md my-2 ring-1 ring-stone-300' : 'bg-white/60 hover:bg-white mb-2'}`}>
+            <div key={group.category} className={`border border-stone-200 rounded-lg overflow-hidden transition duration-200 ${isExpanded ? 'bg-white shadow-md my-2 ring-1 ring-stone-300' : 'bg-white/60 hover:bg-white mb-2'}`}>
                 <Tippy
                     content={renderTooltipContent(group)}
                     placement="left"
