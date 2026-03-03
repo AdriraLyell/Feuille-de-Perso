@@ -138,10 +138,11 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                 </div>
 
-                {/* Center: Character Name (Hidden on very small) */}
-                <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 hidden sm:flex flex-col items-center pointer-events-none z-0">
-                    <span className="text-[9px] text-gray-400 uppercase font-bold leading-none text-center">Personnage</span>
-                    <span className="text-xs font-bold text-gray-200 max-w-[200px] truncate leading-tight text-center">
+                {/* Center: Character Name (Compact & Impactful Typography) */}
+                <div className="absolute inset-0 hidden sm:flex items-center justify-center pointer-events-none z-0 px-4">
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black font-serif tracking-tighter uppercase select-none
+                        bg-gradient-to-b from-white via-white to-gray-400 bg-clip-text text-transparent
+                        drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] text-center leading-none whitespace-nowrap">
                         {data.header?.name || 'Sans Nom'}
                     </span>
                 </div>

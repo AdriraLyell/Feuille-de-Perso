@@ -1,110 +1,41 @@
 import { z } from 'zod';
+import {
+    DotEntrySchema,
+    AttributeEntrySchema,
+    AttributeCategoryDefSchema,
+    HeaderInfoSchema,
+    SyncInfoSchema,
+    CombatEntrySchema,
+    ReputationEntrySchema,
+    TraitEntrySchema,
+    ExperienceDataSchema,
+    XPEntrySchema,
+    XPTransactionSchema,
+    LogEntrySchema,
+    ImposedSpecializationSchema
+} from './character/base';
 
-// --- Primitives ---
+import {
+    LibraryEntrySchema,
+    LibrarySkillEntrySchema,
+    LibrarySpecializationEntrySchema,
+    LibraryCounterEntrySchema,
+    LibraryFormulaEntrySchema
+} from './character/libraries';
 
-export const DotEntrySchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    value: z.number(),
-    creationValue: z.number().optional(),
-    current: z.number().optional(),
-    max: z.number(),
-    variant: z.string().optional(),
-    definitionId: z.string().optional(),
-    mysticAbilityId: z.string().optional(),
-    description: z.string().optional(),
-    tag: z.string().optional()
-});
+import {
+    BookDocumentSchema,
+    CampaignNoteEntrySchema,
+    FormulaMacroSchema,
+    FormulaVariableSchema,
+    PartyColumnSchema,
+    PartyMemberEntrySchema
+} from './character/campaign';
 
-export const AttributeEntrySchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    val1: z.string(),
-    val2: z.string(),
-    val3: z.string(),
-    creationVal1: z.number().optional(),
-    creationVal2: z.number().optional(),
-    creationVal3: z.number().optional()
-});
-
-export const AttributeCategoryDefSchema = z.object({
-    id: z.string(),
-    label: z.string()
-});
-
-export const HeaderInfoSchema = z.object({
-    name: z.string(),
-    age: z.string(),
-    sex: z.string(),
-    player: z.string(),
-    born: z.string(),
-    height: z.string(),
-    chronicle: z.string(),
-    nature: z.string(),
-    hair: z.string(),
-    status: z.string(),
-    conduct: z.string(),
-    eyes: z.string(),
-    campaignStartDate: z.string().optional(),
-    fictionCurrentDate: z.string().optional()
-});
-
-export const SyncInfoSchema = z.object({
-    settingId: z.string().optional(),
-    settingName: z.string().optional(),
-    syncId: z.string().optional(),
-    lastSynced: z.number().optional(),
-    isAutoSyncEnabled: z.boolean().optional(),
-    localSettings: z.object({
-        expertMode: z.boolean().optional(),
-        activeRulesId: z.string().optional()
-    }).optional()
-});
-
-export const CombatEntrySchema = z.object({
-    id: z.string(),
-    weapon: z.string(),
-    level: z.string(),
-    init: z.string(),
-    attack: z.string(),
-    damage: z.string(),
-    parry: z.string()
-});
-
-export const ReputationEntrySchema = z.object({
-    reputation: z.string(),
-    lieu: z.string(),
-    valeur: z.string()
-});
-
-export const TraitEntrySchema = z.object({
-    name: z.string(),
-    value: z.string(),
-    description: z.string().optional(),
-    tag: z.string().optional(),
-    variant: z.string().optional(),
-    definitionId: z.string().optional(),
-    mysticAbilityId: z.string().optional(),
-    associatedCounterId: z.string().optional(),
-    hasAutoCounter: z.boolean().optional(),
-    autoCounterName: z.string().optional(),
-    isXPUpgradeable: z.boolean().optional(),
-    masterSkillTarget: z.string().optional(),
-    isPostCreation: z.boolean().optional(),
-    creationValue: z.string().optional()
-});
-
-export const TraitEffectSchema = z.object({
-    id: z.string().default(() => Math.random().toString(36).substr(2, 9)),
-    type: z.enum(['free_skill_rank', 'master_skill', 'block_skill_increase', 'formula']),
-    value: z.number().optional(),
-    method: z.enum(['fixed', 'per_scenario']).optional(),
-    target: z.string().optional(),
-    source: z.string().optional(),
-    associatedCounterId: z.string().optional(),
-    formula: z.string().optional(),
-    formulaId: z.string().optional()
-});
+// Re-exports
+export * from './character/base';
+export * from './character/libraries';
+export * from './character/campaign';
 
 // --- System ---
 
@@ -150,201 +81,6 @@ export const ThemeConfigSchema = z.object({
         mysticOverrides: z.record(z.string(), z.string()).optional()
     }).optional()
 });
-
-export const ExperienceDataSchema = z.object({
-    gain: z.string(),
-    spent: z.string(),
-    rest: z.string()
-});
-
-export const XPEntrySchema = z.object({
-    id: z.string(),
-    date: z.string().nullable().optional(),
-    scenario: z.string().nullable().optional(),
-    spendingLocation: z.string().nullable().optional(),
-    amount: z.preprocess((val) => Number(val), z.number()),
-    mj: z.string().nullable().optional(),
-    countsAsScenario: z.boolean().optional()
-});
-
-export const XPTransactionSchema = z.object({
-    id: z.string(),
-    timestamp: z.string(), // ISO string with time
-    type: z.enum(['earn', 'spend', 'refund']),
-    description: z.string(),
-    amount: z.number(),
-    source: z.string().optional(),
-    relatedId: z.string().optional()
-});
-
-
-export const LibraryEntrySchema = z.object({
-    id: z.string(),
-    type: z.enum(['avantage', 'desavantage', 'vertu', 'defaut']), // Added legacy support
-    name: z.string(),
-    cost: z.string().nullable().optional(),
-    pointsLabel: z.string().optional().default(''),
-    isVariableCost: z.boolean().optional(),
-    description: z.string().nullable().optional(),
-    tags: z.array(z.string()).nullable().optional(),
-    isVariable: z.boolean().optional(),
-    hasAutoCounter: z.boolean().optional(),
-    autoCounterName: z.string().optional(),
-    isXPUpgradeable: z.boolean().optional(),
-    variants: z.array(z.string()).nullable().optional(),
-    effects: z.array(TraitEffectSchema).nullable().optional(),
-    isGlobal: z.boolean().optional(),
-    isActive: z.boolean().optional(),
-    isLocked: z.boolean().optional(),
-    globalUsage: z.number().optional(),
-    mysticAbilityId: z.string().optional()
-});
-
-export const LibrarySkillEntrySchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    description: z.string().nullable().optional(),
-    defaultCategory: z.string().nullable().optional(),
-    isVariable: z.boolean().optional(),
-    variants: z.array(z.string()).nullable().optional(),
-    isGlobal: z.boolean().optional(),
-    isActive: z.boolean().optional(),
-    isLocked: z.boolean().optional(),
-    globalUsage: z.number().optional(),
-    mysticAbilityId: z.string().nullable().optional(),
-    isCustomized: z.boolean().optional(),
-    masterDefinition: z.any().optional()
-});
-
-export const LibrarySpecializationEntrySchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    skillIds: z.array(z.string()),
-    defaultMinLevel: z.number(),
-    description: z.string().optional(),
-    isImposed: z.boolean().optional()
-});
-
-export const LibraryCounterEntrySchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    description: z.string().nullable().optional(),
-    maxValue: z.number().nullable().optional(),
-    defaultValue: z.number().nullable().optional(),
-    xpCost: z.number().nullable().optional(),
-    isGlobal: z.boolean().optional(),
-    isActive: z.boolean().optional(),
-    defaultCategory: z.string().nullable().optional(),
-    isNumeric: z.boolean().optional(),
-    formula: z.string().optional(),
-    formulaId: z.string().optional() // ID de la formule globale à utiliser pour le Max
-});
-
-export const LibraryBackgroundEntrySchema = LibrarySkillEntrySchema;
-
-
-export const LogEntrySchema = z.object({
-    id: z.string(),
-    timestamp: z.string(),
-    message: z.string(),
-    type: z.enum(['success', 'danger', 'info']),
-    category: z.enum(['sheet', 'settings', 'both']),
-    deduplicationId: z.string().optional()
-});
-
-// --- Campaign ---
-
-export const BookDocumentSchema = z.object({
-    id: z.string().optional(),
-    content: z.any(), // Tiptap JSONContent is too complex for strict Zod validation
-    formatVersion: z.number(),
-    createdAt: z.string().optional(),
-    updatedAt: z.string().optional()
-});
-
-export const ImageConfigSchema = z.object({
-    width: z.number(),
-    height: z.number(),
-    marginTop: z.number(),
-    align: z.enum(['left', 'right']),
-    x: z.number().optional(),
-    y: z.number().optional(),
-    mode: z.enum(['flow', 'absolute']).optional(),
-    fit: z.enum(['cover', 'contain', 'fill']).optional()
-});
-
-export const NoteImageSchema = z.object({
-    id: z.string(),
-    imageId: z.string(),
-    config: ImageConfigSchema
-});
-
-export const CampaignNoteEntrySchema = z.object({
-    id: z.string(),
-    date: z.string(),
-    title: z.string(),
-    content: z.string(),
-    imageId: z.string().optional(),
-    imageConfig: ImageConfigSchema.optional(),
-    images: z.array(NoteImageSchema).optional()
-});
-
-export const PartyColumnSchema = z.object({
-    id: z.string(),
-    label: z.string(),
-    width: z.number().optional()
-});
-
-export const PartyMemberEntrySchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    player: z.string(),
-    data: z.record(z.string(), z.string())
-});
-
-export const ImposedSpecializationSchema = z.object({
-    name: z.string(),
-    minLevel: z.number()
-});
-
-// --- Formulas ---
-
-export const FormulaMacroSchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    formula: z.string(),
-    description: z.string().optional()
-});
-
-export const FormulaVariableSchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    operation: z.enum(['sum', 'count', 'highest', 'average']),
-    target: z.enum(['skills', 'attributes', 'traits', 'specializations', 'mysticAbilities']),
-    filterTarget: z.string().optional(), // 'category', 'tag', 'name'
-    filterValue: z.string().optional(),  // e.g. "Habiletés Mystiques" or "Artisanat"
-    description: z.string().optional()
-});
-
-export const LibraryFormulaEntrySchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    formula: z.string(),
-    type: z.enum(['modifier', 'variable']), // 'modifier' = Affecte une carac, 'variable' = Calcul pur
-    target: z.string().optional(),
-    effectType: z.string().nullable().optional(),
-    description: z.string().optional(),
-    isGlobal: z.boolean().optional(),
-    isActive: z.boolean().optional(),
-    aggregateConfig: z.object({
-        operation: z.enum(['sum', 'count', 'max', 'avg']),
-        targetType: z.enum(['skills', 'attributes', 'traits']),
-        filterTarget: z.enum(['category', 'tag', 'name']),
-        filterValue: z.string()
-    }).optional()
-});
-
-// --- Main Schema ---
 
 export const Page2DataSchema = z.object({
     lieux_importants: z.string(),
@@ -422,7 +158,7 @@ export const CharacterSheetDataSchema = z.object({
     mysticAbilities: z.array(LibrarySkillEntrySchema).optional().default([]),
     formulaMacros: z.array(FormulaMacroSchema).optional().default([]),
     formulaVariables: z.array(FormulaVariableSchema).optional().default([]),
-    formulaLibrary: z.array(LibraryFormulaEntrySchema).optional().default([]), // Nouveau : Dictionnaire central
+    formulaLibrary: z.array(LibraryFormulaEntrySchema).optional().default([]),
     suggestions: z.array(z.any()).optional().default([]),
     _rulesVersion: z.string().optional(),
     _rulesLastUpdated: z.number().optional(),
@@ -431,16 +167,10 @@ export const CharacterSheetDataSchema = z.object({
 
 export type ValidatedCharacterData = z.infer<typeof CharacterSheetDataSchema>;
 
-/**
- * Valide les données et retourne l'objet validé ou lance une erreur détaillée.
- */
 export const validateCharacterData = (data: unknown): ValidatedCharacterData => {
     return CharacterSheetDataSchema.parse(data);
 };
 
-/**
- * Tentative de validation silencieuse.
- */
 export const safeValidateCharacterData = (data: unknown) => {
     return CharacterSheetDataSchema.safeParse(data);
 };

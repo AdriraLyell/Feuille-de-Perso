@@ -35,7 +35,7 @@ export const TraitsColumn: React.FC<TraitsColumnProps> = ({
             onOpenLibrary={onOpenLibrary}
             totalColor={totalColor}
         />
-        <div className="space-y-0.5 flex-grow overflow-auto min-h-0 custom-scrollbar">
+        <div className="space-y-0.5 flex-grow overflow-auto min-h-0 scrollbar-hide pb-1.5">
             {traits.map((item, i) => (
                 <TraitRow
                     key={i}

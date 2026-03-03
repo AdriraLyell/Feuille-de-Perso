@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 
 export const useNavigationState = () => {
     const [mode, setMode] = useState<'sheet' | 'settings'>('sheet');
-    const [sheetTab, setSheetTab] = useState<'p1' | 'specs' | 'p2' | 'xp' | 'notes' | 'prototype'>('p1');
+    const [sheetTab, setSheetTab] = useState<'p1' | 'specs' | 'p2' | 'xp' | 'notes' | 'prototype' | 'inventaire'>('p1');
     const [pendingMode, setPendingMode] = useState<'sheet' | 'settings' | null>(null);
     const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
     const [isSettingsDirty, setIsSettingsDirty] = useState(false);

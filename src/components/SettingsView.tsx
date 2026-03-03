@@ -154,9 +154,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
           <ThematicButton
             variant="danger"
             onClick={() => setShowResetConfirm(true)}
-            leftIcon={<AlertTriangle size={18} />}
+            leftIcon={<UserPlus size={18} />}
           >
-            Réinitialiser
+            Nouveau Personnage / Réinitialiser
           </ThematicButton>
 
           <div className="flex gap-4">

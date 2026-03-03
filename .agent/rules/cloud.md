@@ -93,3 +93,13 @@ User: "[TÂCHE]: {description courte}
 5. **Context Squeeze** : Filtrer drastiquement les anciens messages. Fournir uniquement le code source cible.
 6. **JSON Mode** : Forcer systématiquement un output formaté (JSON) lorsqu'une structure de données est attendue.
 7. **Délégation des Outils MCP Locaux** : Donner explicitement l'ordre au Local d'utiliser ses propres outils plutôt que de tout lire soi-même.
+
+## INTÉGRATIONS MCP ET AUTO-CORRECTION (NOUVEAU WORKFLOW)
+
+En raison d'un conflit technique (collision du nom d'outil `move_file` entre les serveurs `mcp/filesystem` et `mcp/typescript`), l'Agent Local **ne peut pas** être chargé avec ces deux serveurs simultanément.
+Par conséquent, voici le nouveau workflow strict pour les modifications de code via le Local :
+
+1. L'Agent Cloud appelle le Local via `mcp_lm-studio_lmstudio_chat` en activant **uniquement** les intégrations `mcp/typescript` et `mcp/eslint`.
+2. L'Agent Local génère le code en mémoire, appelle les outils de diagnostic (`get_diagnostics` ou `mcp_eslint_lint-files`), et s'auto-corrige jusqu'à produire un code conforme.
+3. L'Agent Local **retourne le code final validé** à l'Agent Cloud sous forme de réponse brute.
+4. L'Agent Cloud récupère cette réponse et **applique lui-même** la modification sur le disque via ses propres outils (`replace_file_content`, `multi_replace_file_content`, etc.).

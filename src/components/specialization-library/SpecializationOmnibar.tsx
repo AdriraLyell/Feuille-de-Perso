@@ -19,6 +19,7 @@ interface SpecializationOmnibarProps {
     skillId?: string; // Si fourni, filtre les suggestions pour cette compétence
     variant?: 'default' | 'sheet';
     showPlaceholder?: boolean;
+    isDuplicate?: boolean;
 }
 
 const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
@@ -31,7 +32,8 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
     className = "",
     skillId,
     variant = 'default',
-    showPlaceholder = true
+    showPlaceholder = true,
+    isDuplicate = false
 }) => {
     const data = useCharacterData();
     const { rules } = useRules();
@@ -110,7 +112,7 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
                     onKeyDown={handleKeyDown}
                     placeholder={showPlaceholder ? placeholder : ""}
                     className={variant === 'sheet'
-                        ? "w-full bg-transparent border-none text-[10px] h-4 px-1 focus:outline-none font-handwriting text-amber-900 placeholder-transparent"
+                        ? `w-full bg-transparent border-none text-[10px] h-4 px-1 focus:outline-none font-bold placeholder-transparent ${isDuplicate ? 'text-pink-900' : 'text-amber-900'}`
                         : "w-full border border-[#bfae85]/50 bg-[#fefaf2] rounded-sm px-2 py-1 text-sm text-[#1c1917] font-bold focus:border-amber-600 outline-none transition-colors shadow-sm placeholder-[#bfae85]/60"
                     }
                 />

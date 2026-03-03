@@ -4,7 +4,6 @@ import { canIncreaseMysticSkill, canLearnNewMysticSkill } from '../utils/mysticU
 
 // Imports des sous-composants refactorisés
 import { AttributeBlock } from './sheet/AttributeBlock';
-import { CombatSection } from './sheet/CombatSection';
 import { CountersSection } from './sheet/CountersSection';
 import SheetHeader from './sheet/SheetHeader';
 import ExperienceSummary from './sheet/ExperienceSummary';
@@ -74,8 +73,6 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         handleDropItem,
         handleRemoveItem,
         updateAttribute,
-        updateCombatWeapon,
-        updateArmor,
         updateCounter
     } = useCharacterSheetActions(data, onChange, onAddLog, recordXPTransaction, rules);
 
@@ -129,6 +126,9 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         return { allowed: true };
     }, [rules, creationActive, blockedSkills]);
 
+    const { handleToggleEditMode } = useEditMode(isEditMode, setIsEditMode);
+    const { handleToggleCreationMode } = useCreationMode(data, onChange as any, onAddLog);
+
     return (
         <div className={`flex justify-center transition-all duration-300 ${isEditMode ? 'pr-80' : ''}`}>
             <div className={`sheet-container ${isLandscape ? 'landscape' : ''}`}>
@@ -138,6 +138,9 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                     creationActive={!!creationActive}
                     onUpdateHeader={updateHeader}
                     isDateLocked={!!rules?.configurations?.calendar}
+                    isEditMode={isEditMode}
+                    onToggleEditMode={handleToggleEditMode}
+                    onToggleCreationMode={handleToggleCreationMode}
                 />
 
                 {/* Edition mode logic and sidebar moved to MainLayout */}
@@ -177,40 +180,18 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                     onRemoveItem={handleRemoveItem}
                     validateSkillIncrease={validateSkillIncrease}
                     blockedSkills={blockedSkills}
-                    renderExtraColumn={() => (
-                        <>
-                            <div className="flex-none border-b border-stone-400 overflow-hidden">
-                                <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
-                            </div>
-                            <div className="flex-grow overflow-hidden">
-                                <CountersSection
-                                    data={data}
-                                    updateCounter={updateCounter}
-                                    isLandscape={isLandscape}
-                                    creationBonuses={counterCreationBonuses}
-                                    xpBonuses={counterXPBonuses}
-                                    calculatedMaxes={calculatedMaxes}
-                                    activeReserves={activeReserves}
-                                />
-                            </div>
-                        </>
-                    )}
+                    renderExtraColumn={() => null}
                     renderBottomSection={() => (
-                        <div className="grid grid-cols-2">
-                            <div className="border-r-2 border-stone-800 flex flex-col">
-                                <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
-                            </div>
-                            <div className="flex-col overflow-hidden">
-                                <CountersSection
-                                    data={data}
-                                    updateCounter={updateCounter}
-                                    isLandscape={isLandscape}
-                                    creationBonuses={counterCreationBonuses}
-                                    xpBonuses={counterXPBonuses}
-                                    calculatedMaxes={calculatedMaxes}
-                                    activeReserves={activeReserves}
-                                />
-                            </div>
+                        <div className="w-full h-[200px] overflow-hidden">
+                            <CountersSection
+                                data={data}
+                                updateCounter={updateCounter}
+                                isLandscape={isLandscape}
+                                creationBonuses={counterCreationBonuses}
+                                xpBonuses={counterXPBonuses}
+                                calculatedMaxes={calculatedMaxes}
+                                activeReserves={activeReserves}
+                            />
                         </div>
                     )}
                 />

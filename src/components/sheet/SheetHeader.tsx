@@ -21,14 +21,20 @@ interface SheetHeaderProps {
         fictionCurrentDate?: string;
     };
     creationActive: boolean;
+    isEditMode?: boolean;
     onUpdateHeader: (field: keyof SheetHeaderProps['headerData'], value: string) => void;
+    onToggleEditMode?: () => void;
+    onToggleCreationMode?: () => void;
     isDateLocked?: boolean;
 }
 
 const SheetHeader: React.FC<SheetHeaderProps> = ({
     headerData,
     creationActive,
+    isEditMode = false,
     onUpdateHeader,
+    onToggleEditMode,
+    onToggleCreationMode,
     isDateLocked = false
 }) => {
     // Helper pour parser les dates de manière flexible (FR, ISO, ou Fictif)
@@ -92,11 +98,44 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
 
     return (
         <>
-            {/* Main Title */}
-            <div className="py-3 border-b-2 border-stone-800 bg-white relative flex justify-center items-center">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-center uppercase tracking-[0.1em] sm:tracking-[0.2em] text-indigo-950 font-serif px-4">
+            {/* Main Title Area with Action Buttons */}
+            <div className="py-2 border-b-2 border-stone-800 bg-white relative flex justify-between items-center px-6 gap-2">
+                {/* Left Side: Creation Button (Only if active) */}
+                <div className="flex-shrink-0 min-w-[150px] flex justify-start">
+                    {creationActive && onToggleCreationMode && (
+                        <button
+                            onClick={onToggleCreationMode}
+                            className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-black transition-all shadow-sm transform hover:scale-105 active:scale-95 ${creationActive
+                                ? 'bg-green-600 text-white border border-green-400'
+                                : 'bg-stone-50 text-stone-500 border border-stone-200'
+                                }`}
+                        >
+                            <UserPlus size={14} />
+                            <span className="uppercase tracking-tight">Mode Création Active</span>
+                        </button>
+                    )}
+                </div>
+
+                {/* Center: Title */}
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-center uppercase tracking-[0.1em] text-indigo-950 font-serif flex-grow whitespace-nowrap overflow-hidden text-ellipsis">
                     Seigneurs des Mystères
                 </h1>
+
+                {/* Right Side: Edit Mode Button */}
+                <div className="flex-shrink-0 min-w-[150px] flex justify-end">
+                    {onToggleEditMode && (
+                        <button
+                            onClick={onToggleEditMode}
+                            className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-black transition-all shadow-sm transform hover:scale-105 active:scale-95 ${isEditMode
+                                ? 'bg-amber-500 text-white border border-amber-300'
+                                : 'bg-stone-50 text-stone-500 border border-stone-200 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300'
+                                }`}
+                        >
+                            {isEditMode ? <Check size={14} /> : <PencilLine size={14} />}
+                            <span className="uppercase tracking-tight">{isEditMode ? 'Valider Disposition' : 'Editer Compétences'}</span>
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Revised 2-Line Header Layout */}

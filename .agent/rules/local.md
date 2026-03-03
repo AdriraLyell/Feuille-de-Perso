@@ -31,3 +31,9 @@ Aucune autorité décisionnelle.
 - Respect Zod
 - Pas de console.log
 - Logger si requis
+
+## OUTILLAGE ET AUTO-CORRECTION (MCP)
+
+- **Outils obligatoires :** Utiliser activement les outils MCP `eslint` et `typescript` (ex: `get_diagnostics`, `mcp_eslint_lint-files`) mis à disposition par l'agent Cloud.
+- **Self-Healing :** Avant de considérer la tâche terminée, valider le code généré en appelant ces outils.
+- **Auto-Correction :** En cas d'erreur de typage ou de linting, corriger silencieusement le fichier jusqu'à obtenir un code propre avant de transmettre la réponse finale.

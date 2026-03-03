@@ -87,6 +87,13 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
                     {backgrounds.map(renderSkillBlock)}
                     {renderExtraColumn && renderExtraColumn()}
                 </div>
+
+                {/* Full Width Bottom Section for Landscape */}
+                {renderBottomSection && (
+                    <div className="col-span-6 border-t-2 border-stone-800">
+                        {renderBottomSection()}
+                    </div>
+                )}
             </div>
         );
     }

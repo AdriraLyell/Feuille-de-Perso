@@ -192,6 +192,19 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
         const userSpecs = data.specializations[skill.id] || [];
 
+        // Détection des doublons (insensible à la casse)
+        const allSpecNames = [
+            ...imposedSpecs.map((s: { name: string }) => s.name.trim().toLowerCase()),
+            ...userSpecs.filter(Boolean).map((s: string) => s.trim().toLowerCase())
+        ];
+
+        const nameCounts = allSpecNames.reduce((acc: Record<string, number>, name: string) => {
+            acc[name] = (acc[name] || 0) + 1;
+            return acc;
+        }, {});
+
+        const isNameDuplicate = (name: string): boolean => !!(name && nameCounts[name.trim().toLowerCase()] > 1);
+
         return (
             <div
                 key={skill.id}
@@ -215,41 +228,53 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                     {/* Render Imposed Specializations first (avec bouton de promotion) */}
-                    {imposedSpecs.map((spec: { name: string }, i: number) => (
-                        <div key={`imp-${i}`} className="group/imposed bg-slate-100 border border-slate-200 rounded-full py-0.5 px-2 flex items-center shadow-inner h-5 hover:border-indigo-300 hover:bg-indigo-50 transition-colors">
-                            <Zap size={10} className="text-blue-500 fill-blue-500 mr-1 shrink-0" />
-                            <span className="text-[10px] font-bold text-slate-600 truncate leading-none flex-1" title={spec.name}>
-                                {spec.name}
-                            </span>
-                            <button
-                                onClick={() => setPromoteImposedModal({ skillId: skill.id, specName: spec.name })}
-                                className="opacity-0 group-hover/imposed:opacity-100 transition-opacity ml-0.5 text-indigo-500 hover:text-indigo-700"
-                                title="Transformer en compétence secondaire"
-                            >
-                                <ArrowUpCircle size={10} />
-                            </button>
-                        </div>
-                    ))}
+                    {imposedSpecs.map((spec: { name: string }, i: number) => {
+                        const isDup = isNameDuplicate(spec.name);
+                        return (
+                            <div key={`imp-${i}`} className={`group/imposed rounded-full py-0.5 px-2 flex items-center shadow-inner h-5 transition-colors border ${isDup
+                                ? 'bg-pink-100 border-pink-400 text-pink-900'
+                                : 'bg-slate-100 border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-indigo-50'
+                                }`}>
+                                <Zap size={10} className={`${isDup ? 'text-pink-600 fill-pink-600' : 'text-blue-500 fill-blue-500'} mr-1 shrink-0`} />
+                                <span className="text-[10px] font-bold truncate leading-none flex-1" title={spec.name}>
+                                    {spec.name}
+                                </span>
+                                <button
+                                    onClick={() => setPromoteImposedModal({ skillId: skill.id, specName: spec.name })}
+                                    className="opacity-0 group-hover/imposed:opacity-100 transition-opacity ml-0.5 text-indigo-500 hover:text-indigo-700"
+                                    title="Transformer en compétence secondaire"
+                                >
+                                    <ArrowUpCircle size={10} />
+                                </button>
+                            </div>
+                        );
+                    })}
 
                     {/* Render User Specializations */}
                     {Array.from({ length: count }).map((_, i) => {
-                        const hasValue = !!userSpecs[i];
+                        const val = userSpecs[i] || '';
+                        const hasValue = !!val;
+                        const isDup = isNameDuplicate(val);
+
                         return (
                             <div
                                 key={`user-${i}`}
                                 className={`relative flex items-center h-5 transition duration-200 ${hasValue
-                                    ? 'bg-amber-50 border border-amber-200 rounded-full shadow-sm'
+                                    ? isDup
+                                        ? 'bg-pink-100 border border-pink-400 rounded-full shadow-sm'
+                                        : 'bg-amber-50 border border-amber-200 rounded-full shadow-sm'
                                     : 'border-b border-dashed border-stone-300 hover:border-amber-400'
                                     }`}
                             >
                                 <SpecializationOmnibar
-                                    value={userSpecs[i] || ''}
-                                    onChange={(val: string) => updateSpecialization(skill.id, i, val)}
-                                    onPromote={(val: string) => handlePromote(skill.id, i, val)}
+                                    value={val}
+                                    onChange={(newVal: string) => updateSpecialization(skill.id, i, newVal)}
+                                    onPromote={(newVal: string) => handlePromote(skill.id, i, newVal)}
                                     skillId={skill.id}
                                     className="w-full"
                                     variant="sheet"
                                     showPlaceholder={false}
+                                    isDuplicate={isDup}
                                 />
                                 {!hasValue && (
                                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-0 group-hover/skill:opacity-20">
