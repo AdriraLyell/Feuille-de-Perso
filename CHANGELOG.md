@@ -1,4 +1,22 @@
-# Historique Ancien (Legacy Changelog)
+# Changelog
+
+## [2.98.0] - 2026-03-04 [FEAT/REFACTOR]
+
+### 📖 Grimoire (Journal de Campagne)
+- **Design Parchemin :** Refonte complète de l'esthétique des pages avec textures de vieux papier et bords irréguliers.
+- **Pagination Intelligente :** Correction de la visibilité du texte et gestion automatique des colonnes pour éviter les coupures.
+- **Barre d'outils Latérale :** Migration de la toolbar vers une barre latérale verticale ergonomique.
+
+### 🎭 UI/UX
+- **Spécialisations :** Promotion automatique des spécialisations imposées.
+- **Compteurs XP :** Refonte du système de calcul et de progression des traits.
+
+### 🛠️ Core & Qualité
+- **Typage Strict :** Éradication massive des types `any`.
+- **Stabilité :** Optimisation des dépendances et corrections des types `RefObject`.
+- **Git :** Fusion de `develop` vers `main` et stabilisation de la release.
+
+---
 
 ## [2.69.1] - 2026-02-23 [FEAT]
 

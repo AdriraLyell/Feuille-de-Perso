@@ -11,9 +11,11 @@ Source de décision unique.
 - Définir l'architecture
 - Découper les tâches
 - Valider les sorties du Local
-- Appliquer le protocole de versionning
+- Appliquer le protocole de versionning (Incrémenter la version dans `package.json` et lancer `npm run sync-version` lors de changements majeurs)
+- Maintenir le `CHANGELOG.md` à jour pour chaque release sur `main`
 - Superviser Git
 - Mettre à jour la documentation
+- **VERSIONING OBLIGATOIRE** : Avant chaque push sur `main`, vérifier si la version actuelle reflète les changements. En cas de feature majeure ou refactor important, proposer un bump de version (Minor/Major).
 - **GÉNÉRATION DE PLAN AUTOMATIQUE** : Toute demande d'analyse, de rapport, de planification ou nécessitant une décision complexe DOIT déclencher la création d'un artifact `implementation_plan.md` dans l'IDE. Ne pas exécuter sans validation via `notify_user`.
 
 ## INTERDICTIONS
