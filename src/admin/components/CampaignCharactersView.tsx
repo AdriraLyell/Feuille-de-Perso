@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Users, RefreshCw, User, Clock, Eye, MessageSquare } from 'lucide-react';
+import { Users, RefreshCw, User, Clock, Eye } from 'lucide-react';
 import { CharacterSyncService, SyncedCharacter, SyncedCharacterSummary } from '../../services/CharacterSyncService';
 import CharacterReadOnlyView from './CharacterReadOnlyView';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
@@ -15,7 +15,6 @@ import { RotateCcw } from 'lucide-react';
 import RecreationModal from './RecreationModal';
 import { RecreationService } from '../services/RecreationService';
 import { CampaignService } from '../../services/CampaignService';
-import { MessageService } from '../../services/MessageService';
 
 interface CampaignCharactersViewProps {
     settingId: string;
@@ -29,24 +28,9 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
     const [isLoadingCharacter, setIsLoadingCharacter] = useState(false);
     const [characterToRecreate, setCharacterToRecreate] = useState<SyncedCharacter | null>(null);
     const [isRecreating, setIsRecreating] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(0);
-
 
     useEffect(() => {
         loadCharacters();
-    }, [settingId]);
-
-    // Compteur de messages non lus pour le MJ
-    useEffect(() => {
-        if (!settingId) return;
-        const fetchUnread = () => {
-            MessageService.countUnread(settingId, 'GM')
-                .then(setUnreadCount)
-                .catch(() => { /* non bloquant */ });
-        };
-        fetchUnread();
-        const interval = setInterval(fetchUnread, 15000);
-        return () => clearInterval(interval);
     }, [settingId]);
 
     const loadCharacters = async () => {
