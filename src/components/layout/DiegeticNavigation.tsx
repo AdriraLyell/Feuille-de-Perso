@@ -174,30 +174,6 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                     <div className="hidden md:flex items-center gap-2">
                         <div className="flex items-center gap-2 mr-4 border-r border-gray-600 pr-4">
                             <button
-                                onClick={() => onModeChange('settings')}
-                                className={`px-4 py-1.5 rounded-md text-sm font-bold transition flex items-center gap-2 relative ${currentMode === 'settings'
-                                    ? 'bg-blue-600 text-white shadow-sm'
-                                    : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
-                                title="Réglages"
-                            >
-                                <div className="relative">
-                                    <Settings size={16} />
-                                    {(stats?.isCritical || stats?.isWarning) && (
-                                        <div className="absolute -top-1.5 -right-1.5 flex items-center justify-center">
-                                            {stats.isCritical && <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-red-400 opacity-75"></span>}
-                                            <span className={`relative inline-flex rounded-full h-2 w-2 border border-gray-900 ${stats.isCritical ? 'bg-red-500' : 'bg-amber-500'}`}></span>
-                                        </div>
-                                    )}
-                                </div>
-                                {stats?.isCritical && (
-                                    <AlertTriangle size={14} className="text-red-400 animate-pulse ml-0.5" />
-                                )}
-                                {stats?.isWarning && !stats?.isCritical && (
-                                    <AlertTriangle size={14} className="text-amber-400 ml-0.5" />
-                                )}
-                            </button>
-
-                            <button
                                 onClick={onToggleMessaging}
                                 className={`px-4 py-1.5 rounded-md text-sm font-bold transition flex items-center gap-2 relative ${isMessagingOpen
                                     ? 'bg-amber-600 text-white shadow-sm'
@@ -214,6 +190,30 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                                 </div>
                             </button>
                         </div>
+
+                        <button
+                            onClick={() => onModeChange('settings')}
+                            className={`px-4 py-1.5 rounded-md text-sm font-bold transition flex items-center gap-2 relative ${currentMode === 'settings'
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
+                            title="Réglages"
+                        >
+                            <div className="relative">
+                                <Settings size={16} />
+                                {(stats?.isCritical || stats?.isWarning) && (
+                                    <div className="absolute -top-1.5 -right-1.5 flex items-center justify-center">
+                                        {stats.isCritical && <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-red-400 opacity-75"></span>}
+                                        <span className={`relative inline-flex rounded-full h-2 w-2 border border-gray-900 ${stats.isCritical ? 'bg-red-500' : 'bg-amber-500'}`}></span>
+                                    </div>
+                                )}
+                            </div>
+                            {stats?.isCritical && (
+                                <AlertTriangle size={14} className="text-red-400 animate-pulse ml-0.5" />
+                            )}
+                            {stats?.isWarning && !stats?.isCritical && (
+                                <AlertTriangle size={14} className="text-amber-400 ml-0.5" />
+                            )}
+                        </button>
 
                         <button
                             onClick={onOpenImportExport}
