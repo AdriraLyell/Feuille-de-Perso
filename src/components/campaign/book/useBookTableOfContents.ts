@@ -20,7 +20,7 @@ export function useBookTableOfContents(
             const htmlSection = section as HTMLElement;
             let title: string;
             let dateText = '';
-            let entryType: 'act' | 'chapter' | 'section' = 'section';
+            let entryType: 'act' | 'chapter' | 'section';
 
             if (htmlSection.classList.contains('act-header-wrapper')) {
                 const titleElement = htmlSection.querySelector('.font-serif.font-black.text-4xl');
