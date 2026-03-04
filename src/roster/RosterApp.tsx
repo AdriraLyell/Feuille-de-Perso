@@ -10,7 +10,11 @@ import MessageWidget from '../components/messaging/MessageWidget';
 import { useMessagingContacts } from '../hooks/messaging/useMessagingContacts';
 
 /** Wrapper pour le widget MJ dans le Roster (besoin d'appeler le hook) */
-const RosterMessageWidget: React.FC<{ settingId: string }> = ({ settingId }) => {
+const RosterMessageWidget: React.FC<{
+    settingId: string;
+    isOpen: boolean;
+    onToggle: (open: boolean) => void;
+}> = ({ settingId, isOpen, onToggle }) => {
     const contacts = useMessagingContacts({ settingId, viewerId: 'GM', isGM: true });
     return (
         <MessageWidget
@@ -18,6 +22,8 @@ const RosterMessageWidget: React.FC<{ settingId: string }> = ({ settingId }) => 
             viewerId="GM"
             viewerName="Meneur de Jeu"
             contacts={contacts}
+            isOpen={isOpen}
+            onToggle={onToggle}
         />
     );
 };
@@ -40,6 +46,7 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
     } = useRosterData(settingId);
 
     const [showTimeManagement, setShowTimeManagement] = useState(true);
+    const [isMessagingOpen, setIsMessagingOpen] = useState(false);
 
     if (isLoading) {
         return (
@@ -64,6 +71,8 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
             <RosterHeader
                 settingName={rules.settingName || "Inconnue"}
                 characterCount={characters.length}
+                isMessagingOpen={isMessagingOpen}
+                onToggleMessaging={() => setIsMessagingOpen(!isMessagingOpen)}
             />
 
             {characters.length === 0 ? (
@@ -96,8 +105,12 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                 </main>
             )}
 
-            {/* Widget Messagerie MJ flottant (toujours disponible dans le Roster) */}
-            <RosterMessageWidget settingId={settingId} />
+            {/* Widget Messagerie MJ avec contrôle externe */}
+            <RosterMessageWidget
+                settingId={settingId}
+                isOpen={isMessagingOpen}
+                onToggle={setIsMessagingOpen}
+            />
         </div>
     );
 };
