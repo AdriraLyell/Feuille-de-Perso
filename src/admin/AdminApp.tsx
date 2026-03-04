@@ -59,6 +59,7 @@ const AdminApp: React.FC = () => {
     const [showChangelog, setShowChangelog] = useState(false);
     const [wizardOpen, setWizardOpen] = useState(false);
     const [candidateRules, setCandidateRules] = useState<RulesData | null>(null);
+    const [isMessagingOpen, setIsMessagingOpen] = useState(false);
 
     // Badge de messages non lus sur l'onglet Joueurs
     React.useEffect(() => {
@@ -193,7 +194,7 @@ const AdminApp: React.FC = () => {
                 onSave={handleSaveToCloud}
                 onImport={() => fileInputRef.current?.click()}
                 onExport={handleExport}
-                onPublish={() => { }} // TODO: Connect to publish logic if needed, or remove param if unused in AdminHeader
+                onPublish={() => { }}
                 onLogout={logout}
                 onShowChangelog={() => setShowChangelog(true)}
                 onCheckSchema={() => currentSettingId && CampaignService.checkSchema?.(currentSettingId)}
@@ -216,6 +217,9 @@ const AdminApp: React.FC = () => {
                         alert("Aucun effet à migrer trouvé.");
                     }
                 }}
+                isMessagingOpen={isMessagingOpen}
+                onToggleMessaging={() => setIsMessagingOpen(!isMessagingOpen)}
+                unreadCount={playersTabUnread}
             />
 
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".json" />
@@ -325,6 +329,20 @@ const AdminApp: React.FC = () => {
                 type={confirmState.type}
             />
             <DeploymentMonitor />
+
+            {/* Messagerie MJ avec contrôle externe */}
+            {currentSettingId && (
+                <div className="no-print">
+                    <MessageWidget
+                        settingId={currentSettingId}
+                        viewerId="GM"
+                        viewerName="Meneur de Jeu"
+                        isOpen={isMessagingOpen}
+                        onToggle={setIsMessagingOpen}
+                        contacts={useMessagingContacts({ settingId: currentSettingId, viewerId: 'GM', isGM: true })}
+                    />
+                </div>
+            )}
         </div>
     );
 };

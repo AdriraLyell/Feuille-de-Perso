@@ -1,5 +1,4 @@
-import React from 'react';
-import { Settings, ArrowLeft, UploadCloud, Download, Upload, LogOut, AlertTriangle, Cloud } from 'lucide-react';
+import { Settings, ArrowLeft, UploadCloud, Download, Upload, LogOut, AlertTriangle, Cloud, MessageSquare } from 'lucide-react';
 import { APP_VERSION } from '../../constants/app';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
 
@@ -17,6 +16,9 @@ interface AdminHeaderProps {
     onCheckSchema?: () => void;
     onMigrate?: () => void;
     legacyEffectsCount?: number;
+    isMessagingOpen?: boolean;
+    onToggleMessaging?: () => void;
+    unreadCount?: number;
 }
 
 const AdminHeader: React.FC<AdminHeaderProps> = ({
@@ -32,7 +34,10 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
     onShowChangelog,
     onCheckSchema,
     onMigrate,
-    legacyEffectsCount = 0
+    legacyEffectsCount = 0,
+    isMessagingOpen,
+    onToggleMessaging,
+    unreadCount = 0
 }) => {
     return (
         <header className="bg-mystic-deep/95 text-stone-200 p-4 shadow-glass sticky top-0 z-50 border-b border-stone-800 backdrop-blur-md">
@@ -104,8 +109,8 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                             onClick={onSave}
                             disabled={isSaving}
                             className={`flex items-center gap-2 px-5 py-2 rounded-sm font-black uppercase tracking-widest text-[10px] transition-all shadow-lg hover:scale-105 active:scale-95 ${hasUnsavedChanges
-                                    ? "bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-amber-900/20 animate-pulse ring-2 ring-amber-500/50"
-                                    : "bg-stone-800 hover:bg-stone-700 text-stone-400 opacity-80"
+                                ? "bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-amber-900/20 animate-pulse ring-2 ring-amber-500/50"
+                                : "bg-stone-800 hover:bg-stone-700 text-stone-400 opacity-80"
                                 } disabled:opacity-50 disabled:grayscale`}
                             title="Sauvegarder en BDD"
                         >
@@ -146,6 +151,25 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
 
                     <div className="h-6 w-px bg-stone-800 mx-1" />
 
+                    <MotionFade delay={0.58}>
+                        <button
+                            onClick={onToggleMessaging}
+                            className={`p-2 rounded-sm transition-all border shadow-md relative group ${isMessagingOpen
+                                ? 'bg-amber-600 text-stone-950 border-amber-400'
+                                : 'bg-stone-900/50 text-stone-400 border-stone-800 hover:text-amber-500 hover:border-amber-900/50 hover:bg-stone-800'
+                                }`}
+                            title="Messagerie"
+                        >
+                            <MessageSquare size={18} className="group-hover:scale-110 transition-transform" />
+                            {unreadCount > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-rose-600 text-white text-[9px] font-black rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 border border-stone-950 shadow-sm animate-pulse">
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
+                        </button>
+                    </MotionFade>
+
+                    <div className="h-6 w-px bg-stone-800 mx-1" />
                     <MotionFade delay={0.6}>
                         <button
                             onClick={onLogout}
