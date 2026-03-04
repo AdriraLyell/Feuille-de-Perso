@@ -63,6 +63,13 @@ const AdminApp: React.FC = () => {
     const [candidateRules, setCandidateRules] = useState<RulesData | null>(null);
     const [isMessagingOpen, setIsMessagingOpen] = useState(false);
 
+    // Initialisation des contacts pour la messagerie MJ
+    const gmContacts = useMessagingContacts({
+        settingId: currentSettingId || '',
+        viewerId: 'GM',
+        isGM: true
+    });
+
     // Badge de messages non lus sur l'onglet Joueurs
     React.useEffect(() => {
         if (!currentSettingId) return;
@@ -341,7 +348,7 @@ const AdminApp: React.FC = () => {
                         viewerName="Meneur de Jeu"
                         isOpen={isMessagingOpen}
                         onToggle={setIsMessagingOpen}
-                        contacts={useMessagingContacts({ settingId: currentSettingId, viewerId: 'GM', isGM: true })}
+                        contacts={gmContacts}
                     />
                 </div>
             )}
