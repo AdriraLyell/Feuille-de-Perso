@@ -34,7 +34,9 @@ export const SpecModalContent: React.FC<SpecModalContentProps> = ({
             <div>
                 <label htmlFor="spec-skills" className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Compétences associées</label>
                 <div className="relative mb-2">
-                    <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-[#5c4d41]/60" />
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-2">
+                        <Search size={12} className="text-[#5c4d41]/60 pointer-events-none" />
+                    </span>
                     <input
                         className="w-full pl-7 pr-2 py-1 text-[11px] border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none bg-white/50"
                         placeholder="Filtrer les compétences..."
@@ -89,6 +91,22 @@ export const SpecModalContent: React.FC<SpecModalContentProps> = ({
                     onChange={(e) => setEditingEntry({ ...editingEntry, defaultMinLevel: parseInt(e.target.value) || 0 })}
                 />
                 <p className="text-[10px] text-[#5c4d41]/60 mt-1 italic">Niveau de compétence requis pour débloquer cette spécialisation.</p>
+            </div>
+
+            <div className="flex items-start gap-3 bg-amber-50/50 p-3 rounded border border-amber-200/50">
+                <input
+                    id="spec-imposed"
+                    type="checkbox"
+                    className="mt-1 rounded border-[#bfae85]/50 text-amber-600 focus:ring-amber-500 w-4 h-4"
+                    checked={editingEntry.isImposed || false}
+                    onChange={(e) => setEditingEntry({ ...editingEntry, isImposed: e.target.checked })}
+                />
+                <div className="flex flex-col">
+                    <label htmlFor="spec-imposed" className="text-xs font-bold text-amber-900 cursor-pointer">Spécialisation Imposée ?</label>
+                    <p className="text-[10px] text-amber-800/70 italic leading-tight mt-0.5">
+                        Si coché, cette spécialisation s'ajoutera automatiquement sur la fiche de tous les personnages si le seuil est atteint.
+                    </p>
+                </div>
             </div>
 
             <div>

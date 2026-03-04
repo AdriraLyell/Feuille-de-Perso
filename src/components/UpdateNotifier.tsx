@@ -24,13 +24,13 @@ const isNewer = (remote: string, local: string) => {
 const UpdateNotifier: React.FC = () => {
     const [updateAvailable, setUpdateAvailable] = useState<VersionManifest | null>(null);
     const [isVisible, setIsVisible] = useState(true);
-    const [isChecking, setIsChecking] = useState(false);
+
 
     useEffect(() => {
         const checkVersion = async () => {
             if (!REMOTE_MANIFEST_URL || REMOTE_MANIFEST_URL.includes("votre-site-web")) return;
 
-            setIsChecking(true);
+
             try {
                 // Add timestamp to prevent caching
                 const response = await fetch(`${REMOTE_MANIFEST_URL}?t=${Date.now()}`);
@@ -42,8 +42,7 @@ const UpdateNotifier: React.FC = () => {
                 }
             } catch (error) {
                 logger.warn("Impossible de vérifier la mise à jour", error);
-            } finally {
-                setIsChecking(false);
+
             }
         };
 
@@ -96,7 +95,7 @@ const UpdateNotifier: React.FC = () => {
                                     href={updateAvailable.downloadUrl || "#"}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="flex items-center justify-center gap-2 bg-stone-800 hover:bg-stone-900 text-white px-3 py-1.5 rounded text-xs font-bold transition-all shadow-sm"
+                                    className="flex items-center justify-center gap-2 bg-stone-800 hover:bg-stone-900 text-white px-3 py-1.5 rounded text-xs font-bold transition shadow-sm"
                                 >
                                     <Download size={14} /> Télécharger
                                 </a>
@@ -104,7 +103,7 @@ const UpdateNotifier: React.FC = () => {
                         ) : (
                             <button
                                 onClick={() => window.location.reload()}
-                                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-all shadow-sm w-full"
+                                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold transition shadow-sm w-full"
                             >
                                 <RefreshCw size={14} /> Actualiser la page
                             </button>

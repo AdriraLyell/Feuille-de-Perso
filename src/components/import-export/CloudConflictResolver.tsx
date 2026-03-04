@@ -3,7 +3,7 @@ import { AlertCircle, GraduationCap, BookOpen, CheckCircle2, Zap, ArrowRight, XC
 import { motion, AnimatePresence } from 'framer-motion';
 import { DataConflict } from '../../utils/importExportUtils';
 import ThematicButton from '../ui/ThematicButton';
-import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry } from '../../types';
+import { LibraryEntry } from '../../types';
 
 interface CloudConflictResolverProps {
     conflicts: DataConflict[];
@@ -62,8 +62,7 @@ const CloudConflictResolver: React.FC<CloudConflictResolverProps> = ({
                         // Helper to cast types for safe access
                         const currentAsTrait = conflict.current as LibraryEntry;
                         const incomingAsTrait = conflict.incoming as LibraryEntry;
-                        const currentAsSkill = conflict.current as LibrarySkillEntry;
-                        const incomingAsSkill = conflict.incoming as LibrarySkillEntry;
+
 
                         return (
                             <motion.div
@@ -96,9 +95,9 @@ const CloudConflictResolver: React.FC<CloudConflictResolverProps> = ({
                                 <div className="grid grid-cols-2 gap-px bg-stone-800">
                                     {/* Option: Current */}
                                     <div
-                                        className={`p-5 cursor-pointer transition-all duration-300 relative group ${choice === 'keep_current'
-                                                ? 'bg-blue-900/10'
-                                                : 'bg-stone-900/40 opacity-60 grayscale hover:opacity-100 hover:grayscale-0'
+                                        className={`p-5 cursor-pointer transition duration-300 relative group ${choice === 'keep_current'
+                                            ? 'bg-blue-900/10'
+                                            : 'bg-stone-900/40 opacity-60 grayscale hover:opacity-100 hover:grayscale-0'
                                             }`}
                                         onClick={() => onResolutionChoice(conflict.key, 'keep_current')}
                                     >
@@ -147,9 +146,9 @@ const CloudConflictResolver: React.FC<CloudConflictResolverProps> = ({
 
                                     {/* Option: Incoming */}
                                     <div
-                                        className={`p-5 cursor-pointer transition-all duration-300 relative group ${choice === 'replace'
-                                                ? 'bg-amber-900/10'
-                                                : 'bg-stone-900/40 opacity-60 grayscale hover:opacity-100 hover:grayscale-0'
+                                        className={`p-5 cursor-pointer transition duration-300 relative group ${choice === 'replace'
+                                            ? 'bg-amber-900/10'
+                                            : 'bg-stone-900/40 opacity-60 grayscale hover:opacity-100 hover:grayscale-0'
                                             }`}
                                         onClick={() => onResolutionChoice(conflict.key, 'replace')}
                                     >

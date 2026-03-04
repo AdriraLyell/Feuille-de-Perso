@@ -1,6 +1,6 @@
 
 import { set, get, del } from 'idb-keyval';
-import { GZIP_MARKER } from './ImageCompressionService';
+
 
 /**
  * Checks the available storage quota using the Estimation API.
@@ -86,13 +86,13 @@ export const saveImage = async (file: File | Blob): Promise<string> => {
         throw new Error(`Espace de stockage insuffisant. Taille: ${sizeKo} Ko, Disponible: ${availKo} Ko.`);
     }
 
-    const id = `img_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`;
+    const id = `img_${Math.random().toString(36).substring(2, 11)}_${Date.now()}`;
 
     try {
         await set(id, compressed);
     } catch (error) {
         if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-            throw new Error('Le stockage local est plein. Veuillez supprimer des images existantes.');
+            throw new Error('Le stockage local est plein. Veuillez supprimer des images existantes.', { cause: error });
         }
         throw error;
     }

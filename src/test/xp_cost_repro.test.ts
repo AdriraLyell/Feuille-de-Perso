@@ -1,6 +1,6 @@
 
 import { describe, it, expect } from 'vitest';
-import { CharacterSheetData, DotEntry, RulesData } from '../types';
+import { CharacterSheetData, RulesData } from '../types';
 import { RuleCalculationsService } from '../services/RuleCalculationsService';
 
 describe('XP Cost & Blocking Reproduction', () => {

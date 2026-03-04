@@ -4,7 +4,7 @@ import { PortalTooltip } from '../../../components/ui/PortalTooltip';
 import { ItemUsageDetail } from '../../../types/usageTypes';
 
 interface UsageLockedTooltipProps {
-    anchorRef: React.RefObject<HTMLElement>;
+    anchorRef: { readonly current: HTMLElement | null };
     isOpen: boolean;
     isLocked: boolean;
     isPlaced: boolean;

@@ -1,10 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { CharacterSheetData } from '../../../types';
 import { useNotification } from '../../../context/NotificationContext';
 import { useCharacter } from '../../../context/CharacterContext';
 import { APP_VERSION } from '../../../constants/app';
 import { createTemplateFromData, detectConflicts, smartMerge, DataConflict } from '../../../utils/importExportUtils';
-import { base64ToBlob, saveImage } from '../../../services/imageDB';
+
 import { ImageSyncResolver } from '../../../services/ImageSyncResolver';
 import { ErrorService } from '../../../services/ErrorService';
 
@@ -42,7 +42,7 @@ export function useImportLogic({ data, variant, onImportSuccess, onClose }: UseI
     // Migration Status
     const [migrationReport, setMigrationReport] = useState<{ oldVersion: string; newVersion: string } | null>(null);
 
-    const checkFileCompatibility = (json: any) => {
+    const checkFileCompatibility = (json: Record<string, unknown>) => {
         const hasHeader = !!json.header;
         const hasStructure = !!(json.skills && json.attributes);
         const hasLibrary = !!(json.library && Array.isArray(json.library) && json.library.length > 0);
@@ -51,7 +51,7 @@ export function useImportLogic({ data, variant, onImportSuccess, onClose }: UseI
 
         const fileVersion = json.appVersion;
         const versionMismatch = fileVersion !== APP_VERSION;
-        const isFilled = (json.header && json.header.name) || (json.experience && parseInt(json.experience.spent) > 0);
+        const isFilled = !!((json.header && (json.header as { name?: string }).name) || (json.experience && parseInt((json.experience as { spent?: string }).spent || '0') > 0));
         const hasAnyLib = hasLibrary || hasSkillLibrary || hasSpecLibrary;
 
         if (!hasStructure && !hasAnyLib) {
@@ -59,10 +59,10 @@ export function useImportLogic({ data, variant, onImportSuccess, onClose }: UseI
             return null;
         }
 
-        return { hasHeader, hasStructure, hasLibrary, hasSkillLibrary, hasSpecLibrary, isFilled, fileVersion, versionMismatch };
+        return { hasHeader, hasStructure, hasLibrary, hasSkillLibrary, hasSpecLibrary, isFilled, fileVersion: fileVersion as string | undefined, versionMismatch };
     };
 
-    const handleFileLoad = (json: any) => {
+    const handleFileLoad = (json: Record<string, unknown>) => {
         try {
             const analysisResult = checkFileCompatibility(json);
             if (!analysisResult) return;
@@ -96,7 +96,7 @@ export function useImportLogic({ data, variant, onImportSuccess, onClose }: UseI
     const executeImport = async () => {
         if (!pendingFile || !importAction) return;
 
-        const importedFile: any = pendingFile;
+        const importedFile = pendingFile as CharacterSheetData;
         // --- CONFLICT CHECK FOR MERGES ---
         if ((['skill_lib_merge', 'lib_merge', 'all_libs_merge'].includes(importAction)) && !isResolvingConflicts) {
             const checkSkills = importAction.includes('skill') || importAction.includes('all');
@@ -141,11 +141,11 @@ export function useImportLogic({ data, variant, onImportSuccess, onClose }: UseI
         else if (importAction === 'system') {
             const template = createTemplateFromData(importedFile);
             finalData = template;
-            if (importedFile.library) finalData.library = importedFile.library as any;
+            if (importedFile.library) finalData.library = importedFile.library;
             else finalData.library = [];
-            if (importedFile.skillLibrary) finalData.skillLibrary = importedFile.skillLibrary as any;
+            if (importedFile.skillLibrary) finalData.skillLibrary = importedFile.skillLibrary;
             else finalData.skillLibrary = [];
-            if (importedFile.specializationLibrary) finalData.specializationLibrary = importedFile.specializationLibrary as any;
+            if (importedFile.specializationLibrary) finalData.specializationLibrary = importedFile.specializationLibrary;
             else finalData.specializationLibrary = [];
 
             logMsg = "Chargement du Système (Template + Bibliothèques).";
@@ -161,50 +161,50 @@ export function useImportLogic({ data, variant, onImportSuccess, onClose }: UseI
 
         // TRAITS ACTIONS
         else if (importAction === 'lib_replace') {
-            finalData.library = importedFile.library as any || [];
+            finalData.library = importedFile.library || [];
             logMsg = "Remplacement de la Bibliothèque de Traits.";
         }
         else if (importAction === 'lib_merge') {
-            finalData.library = smartMerge(data.library || [], (importedFile.library || []) as any[], resolutionMap, 'trait');
+            finalData.library = smartMerge(data.library || [], (importedFile.library || []), resolutionMap, 'trait');
             logMsg = "Fusion de la Bibliothèque de Traits.";
         }
 
         // SKILLS ACTIONS
         else if (importAction === 'skill_lib_replace') {
-            finalData.skillLibrary = importedFile.skillLibrary as any || [];
+            finalData.skillLibrary = importedFile.skillLibrary || [];
             logMsg = "Remplacement de la Réserve de Compétences.";
         }
         else if (importAction === 'skill_lib_merge') {
-            finalData.skillLibrary = smartMerge(data.skillLibrary || [], (importedFile.skillLibrary || []) as any[], resolutionMap, 'skill');
+            finalData.skillLibrary = smartMerge(data.skillLibrary || [], (importedFile.skillLibrary || []), resolutionMap, 'skill');
             logMsg = "Fusion de la Réserve de Compétences.";
         }
 
         // SPECIALIZATION ACTIONS
         else if (importAction === 'spec_lib_replace') {
-            finalData.specializationLibrary = importedFile.specializationLibrary as any || [];
+            finalData.specializationLibrary = importedFile.specializationLibrary || [];
             logMsg = "Remplacement du Catalogue de Spécialisations.";
         }
         else if (importAction === 'spec_lib_merge') {
-            finalData.specializationLibrary = smartMerge(data.specializationLibrary || [], (importedFile.specializationLibrary || []) as any[], resolutionMap, 'specialization');
+            finalData.specializationLibrary = smartMerge(data.specializationLibrary || [], (importedFile.specializationLibrary || []), resolutionMap, 'specialization');
             logMsg = "Fusion du Catalogue de Spécialisations.";
         }
 
         // COMBINED ACTIONS
         else if (importAction === 'all_libs_replace') {
-            if (importedFile.library) finalData.library = importedFile.library as any;
-            if (importedFile.skillLibrary) finalData.skillLibrary = importedFile.skillLibrary as any;
-            if (importedFile.specializationLibrary) finalData.specializationLibrary = importedFile.specializationLibrary as any;
+            if (importedFile.library) finalData.library = importedFile.library;
+            if (importedFile.skillLibrary) finalData.skillLibrary = importedFile.skillLibrary;
+            if (importedFile.specializationLibrary) finalData.specializationLibrary = importedFile.specializationLibrary;
             logMsg = "Remplacement de toutes les bibliothèques.";
         }
         else if (importAction === 'all_libs_merge') {
             if (importedFile.library) {
-                finalData.library = smartMerge(data.library || [], (importedFile.library || []) as any[], resolutionMap, 'trait');
+                finalData.library = smartMerge(data.library || [], (importedFile.library || []), resolutionMap, 'trait');
             }
             if (importedFile.skillLibrary) {
-                finalData.skillLibrary = smartMerge(data.skillLibrary || [], (importedFile.skillLibrary || []) as any[], resolutionMap, 'skill');
+                finalData.skillLibrary = smartMerge(data.skillLibrary || [], (importedFile.skillLibrary || []), resolutionMap, 'skill');
             }
             if (importedFile.specializationLibrary) {
-                finalData.specializationLibrary = smartMerge(data.specializationLibrary || [], (importedFile.specializationLibrary || []) as any[], resolutionMap, 'specialization');
+                finalData.specializationLibrary = smartMerge(data.specializationLibrary || [], (importedFile.specializationLibrary || []), resolutionMap, 'specialization');
             }
             logMsg = "Fusion de toutes les bibliothèques.";
         }

@@ -1,12 +1,12 @@
 import React from 'react';
-import { ChevronDown, GraduationCap, Trophy } from 'lucide-react';
+import { ChevronDown, Trophy } from 'lucide-react';
 import { TraitEffect } from '../../../types';
 
 interface LegacyEffectFieldsProps {
     effect: TraitEffect;
     allSkills: { id: string, name: string }[];
     allAttributes: { id: string, name: string }[];
-    onUpdate: (id: string, field: keyof TraitEffect, value: any) => void;
+    onUpdate: (id: string, field: keyof TraitEffect, value: string | number | undefined) => void;
 }
 
 export const LegacyEffectFields: React.FC<LegacyEffectFieldsProps> = ({

@@ -6,8 +6,9 @@ export const logger = {
     /**
      * Dev-only log - suppressed in production
      */
-    log: (...args: any[]) => {
+    log: (...args: unknown[]) => {
         if (import.meta.env.DEV) {
+            // eslint-disable-next-line no-console
             console.log('[APP]', ...args);
         }
     },
@@ -15,7 +16,7 @@ export const logger = {
     /**
      * Dev-only warning - suppressed in production
      */
-    warn: (...args: any[]) => {
+    warn: (...args: unknown[]) => {
         if (import.meta.env.DEV) {
             console.warn('[WARN]', ...args);
         }
@@ -24,15 +25,16 @@ export const logger = {
     /**
      * Always visible error logging
      */
-    error: (...args: any[]) => {
+    error: (...args: unknown[]) => {
         console.error('[ERROR]', ...args);
     },
 
     /**
      * Dev-only info - suppressed in production
      */
-    info: (...args: any[]) => {
+    info: (...args: unknown[]) => {
         if (import.meta.env.DEV) {
+            // eslint-disable-next-line no-console
             console.info('[INFO]', ...args);
         }
     }

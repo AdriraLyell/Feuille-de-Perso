@@ -1,6 +1,6 @@
 import React from 'react';
 import { SheetColumn, SkillBlock as SkillBlockType } from '../../hooks/useSheetLayout';
-import { CharacterSheetData } from '../../types';
+import { CharacterSheetData, DropPayload } from '../../types';
 import { RulesData } from '../../types/rules';
 import { ThemeConfig } from '../../types/system';
 import { SkillBlock } from './SkillBlock';
@@ -8,6 +8,7 @@ import { SkillBlock } from './SkillBlock';
 interface CharacterSheetGridProps {
     columns: SheetColumn[];
     backgrounds: SkillBlockType[];
+    autres?: SkillBlockType[];
     isLandscape: boolean;
     isEditMode: boolean;
     allowExtendedSkills: boolean;
@@ -17,7 +18,7 @@ interface CharacterSheetGridProps {
     imposedSpecializations: CharacterSheetData['imposedSpecializations'];
     onUpdateDot: (section: 'skills', category: string, id: string, value: number) => void;
     onDefineVariant: (category: string, id: string, skillName: string, definitionId?: string) => void;
-    onDropItem: (category: string, payload: any, targetIndex?: number) => void;
+    onDropItem: (category: string, payload: DropPayload, targetIndex?: number) => void;
     onRemoveItem: (category: string, id: string) => void;
     // For Landscape extra column
     renderExtraColumn?: () => React.ReactNode;
@@ -30,6 +31,7 @@ interface CharacterSheetGridProps {
 const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
     columns,
     backgrounds,
+    autres = [],
     isLandscape,
     isEditMode,
     allowExtendedSkills,
@@ -71,7 +73,7 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
 
     if (isLandscape) {
         return (
-            <div className="flex-grow grid grid-cols-6 border-b-2 border-stone-800">
+            <div className="flex-grow grid grid-cols-6 grid-rows-[1fr_auto] border-b-2 border-stone-800">
                 {columns.map((col, idx) => (
                     <div key={idx} className="border-r border-stone-400 flex flex-col">
                         {col.blocks.map((block) => (
@@ -84,9 +86,25 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
 
                 {/* 6th Column */}
                 <div className="flex flex-col h-full">
-                    {backgrounds.map(renderSkillBlock)}
+                    {autres.map((block) => (
+                        <div key={block.cat} className="flex-grow border-b border-stone-300 last:border-b-0">
+                            {renderSkillBlock(block)}
+                        </div>
+                    ))}
+                    {backgrounds.map((block) => (
+                        <div key={block.cat} className="flex-grow border-b border-stone-300 last:border-b-0">
+                            {renderSkillBlock(block)}
+                        </div>
+                    ))}
                     {renderExtraColumn && renderExtraColumn()}
                 </div>
+
+                {/* Full Width Bottom Section for Landscape */}
+                {renderBottomSection && (
+                    <div className="col-span-6 border-t-2 border-stone-800">
+                        {renderBottomSection()}
+                    </div>
+                )}
             </div>
         );
     }

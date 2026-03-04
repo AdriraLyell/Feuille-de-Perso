@@ -9,8 +9,16 @@ interface ChangelogModalProps {
     onClose: () => void;
 }
 
+interface ChangelogEntry {
+    version: string;
+    date: string;
+    type?: string;
+    description?: string;
+    changes?: (string | { type: string, text: string, category?: string })[];
+}
+
 const ChangelogModal: React.FC<ChangelogModalProps> = ({ isOpen, onClose }) => {
-    const [displayEntries, setDisplayEntries] = useState<any[]>(CHANGELOG_DATA);
+    const [displayEntries, setDisplayEntries] = useState<ChangelogEntry[]>(CHANGELOG_DATA);
     const [isLoadingArchive, setIsLoadingArchive] = useState(false);
     const [hasLoadedArchive, setHasLoadedArchive] = useState(false);
 
@@ -88,7 +96,7 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ isOpen, onClose }) => {
                                     )}
 
                                     <ul className="space-y-2">
-                                        {(entry.changes || []).map((change: string | { type: string, text: string, category: string }, i: number) => {
+                                        {(entry.changes || []).map((change: string | { type: string, text: string, category?: string }, i: number) => {
                                             const text = typeof change === 'string' ? change : change.text;
                                             const type = typeof change === 'object' ? change.type : 'default';
 

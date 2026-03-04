@@ -15,7 +15,13 @@ import { logger } from '../../utils/logger';
 
 export { triangular, getXPCost } from './xp/xpCore';
 
-interface ActiveEffect extends TraitEffect {
+interface EnrichedTraitEffect extends TraitEffect {
+    inferredTarget?: string;
+    inferredEffectType?: string;
+    source?: string;
+}
+
+interface ActiveEffect extends EnrichedTraitEffect {
     traitLevel: number;
 }
 
@@ -32,8 +38,8 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 
         // 1. Bonus via trait effects (including formula-derived ones)
         const effect = activeEffects.find(e => {
-            const effectiveType = (e as any).inferredEffectType || e.type;
-            const effectiveTarget = e.target || (e as any).inferredTarget;
+            const effectiveType = e.inferredEffectType || e.type;
+            const effectiveTarget = e.target || e.inferredTarget;
 
             return (effectiveType === 'free_skill_rank' ||
                 (effectiveType === 'formula' && effectiveTarget === skillName)) &&
@@ -41,12 +47,12 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
                 normalizedSkillName === effectiveTarget.trim().toLowerCase();
         });
 
-        if (effect) return effect.value;
+        if (effect) return effect.value ?? 0;
 
         // 2. Compétence maîtrisée via master_skill : rang 5 entièrement gratuit
         const hasMasterEffect = activeEffects.some(e => {
-            const effectiveType = (e as any).inferredEffectType || e.type;
-            const effectiveTarget = e.target || (e as any).inferredTarget;
+            const effectiveType = e.inferredEffectType || e.type;
+            const effectiveTarget = e.target || e.inferredTarget;
 
             return effectiveType === 'master_skill' &&
                 effectiveTarget &&
@@ -69,8 +75,8 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 
     // Calcul des bonus XP via Formules
     const xpFormulaEffects = activeEffects.filter(e => {
-        const effectiveType = (e as any).inferredEffectType || e.type;
-        const effectiveTarget = e.target || (e as any).inferredTarget;
+        const effectiveType = e.inferredEffectType || e.type;
+        const effectiveTarget = e.target || e.inferredTarget;
         return (effectiveType === 'formula' || effectiveType === 'xp_bonus') &&
             effectiveTarget && effectiveTarget.trim().toUpperCase() === 'XP';
     });
@@ -185,7 +191,7 @@ function getActiveTraitEffects(data: CharacterSheetData, rules?: RulesData): Act
 
         // helper to enrich effect with global formula data
         const enrichEffect = (e: TraitEffect, source: string): ActiveEffect => {
-            const active: any = { ...e, source, traitLevel };
+            const active: ActiveEffect = { ...e, source, traitLevel };
             if (e.formulaId && rules?.libraries?.formulas) {
                 const global = rules.libraries.formulas.find(f => f.id === e.formulaId);
                 if (global) {

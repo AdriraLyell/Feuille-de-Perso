@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { LibraryFormulaEntry } from '../../../types';
 import { generateId } from '../../../utils/factories';
-import { evaluateFormula } from '../../../utils/formulaEvaluator';
 import { Plus, Calculator, User, Loader2 } from 'lucide-react';
 import { CharacterSyncService, SyncedCharacterSummary } from '../../../services/CharacterSyncService';
 import { MotionCard } from '../../../components/ui/motion/MotionCard';

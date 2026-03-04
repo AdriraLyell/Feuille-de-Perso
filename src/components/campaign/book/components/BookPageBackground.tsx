@@ -16,7 +16,7 @@ export const BookPageBackground: React.FC<BookPageBackgroundProps> = ({ pageCoun
             {Array.from({ length: visualPageCount }).map((_, i) => (
                 <div
                     key={i}
-                    className="bg-[#fbf4e9] shadow-xl rounded-sm journal-page"
+                    className="bg-[#fbf4e9] shadow-xl rounded-sm"
                     style={{
                         width: `${PAGE_WIDTH}px`,
                         height: `${PAGE_HEIGHT}px`,

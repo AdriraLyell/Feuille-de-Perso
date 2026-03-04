@@ -14,6 +14,7 @@ export const useSkillLibrary = (
     const [hideKnownSkills, setHideKnownSkills] = useState(true);
     const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
     const [editingSkill, setEditingSkill] = useState<LibrarySkillEntry | null>(null);
+    const [skillFormSource, setSkillFormSource] = useState<'local' | 'official'>('local');
     const [skillError, setSkillError] = useState<string | null>(null);
     const [showRenameConfirm, setShowRenameConfirm] = useState<{ oldName: string, newSkill: LibrarySkillEntry } | null>(null);
     const [showImportConfirm, setShowImportConfirm] = useState(false);
@@ -30,7 +31,7 @@ export const useSkillLibrary = (
         if (data.skills) {
             Object.keys(data.skills).forEach(key => {
                 const list = data.skills[key] || [];
-                list.forEach((s: any) => {
+                list.forEach((s: import('../../types').DotEntry) => {
                     if (s.name && s.name.trim() !== '') {
                         names.add(s.name.trim().toLowerCase());
                     }
@@ -57,12 +58,14 @@ export const useSkillLibrary = (
             name: '',
             description: ''
         });
+        setSkillFormSource('local');
         setIsSkillModalOpen(true);
     };
 
     const handleOpenEditSkill = (merged: MergedEntry<LibrarySkillEntry>) => {
         setSkillError(null);
         setEditingSkill({ ...merged.entry });
+        setSkillFormSource(merged.source === 'official' ? 'official' : 'local');
         setIsSkillModalOpen(true);
     };
 
@@ -86,7 +89,7 @@ export const useSkillLibrary = (
             const updatedSkills = { ...data.skills };
             Object.keys(updatedSkills).forEach(cat => {
                 if (Array.isArray(updatedSkills[cat])) {
-                    updatedSkills[cat] = updatedSkills[cat].map((s: any) =>
+                    updatedSkills[cat] = updatedSkills[cat].map((s: import('../../types').DotEntry) =>
                         (s.name && s.name.trim().toLowerCase() === oldName)
                             ? { ...s, name: newName }
                             : s
@@ -100,6 +103,7 @@ export const useSkillLibrary = (
         addLog(`Compétence "${skillToSave.name}" enregistrée dans la réserve.`, 'success', 'settings');
         setIsSkillModalOpen(false);
         setEditingSkill(null);
+        setSkillFormSource('local');
         setShowRenameConfirm(null);
     };
 
@@ -157,13 +161,13 @@ export const useSkillLibrary = (
 
     const executeImportFromSheet = () => {
         const currentLib = JSON.parse(JSON.stringify(data.skillLibrary || []));
-        const existingNames = new Set(currentLib.map((s: any) => s.name.trim().toLowerCase()));
+        const existingNames = new Set(currentLib.map((s: LibrarySkillEntry) => s.name.trim().toLowerCase()));
         let addedCount = 0;
 
         Object.keys(data.skills).forEach(key => {
             if (key === 'arrieres_plans') return;
             const sheetSkills = data.skills[key] || [];
-            sheetSkills.forEach((skill: any) => {
+            sheetSkills.forEach((skill: import('../../types').DotEntry) => {
                 const normalized = skill.name ? skill.name.trim() : "";
                 if (normalized && !existingNames.has(normalized.toLowerCase())) {
                     currentLib.push({
@@ -179,7 +183,7 @@ export const useSkillLibrary = (
         });
 
         if (addedCount > 0) {
-            currentLib.sort((a: any, b: any) => a.name.localeCompare(b.name));
+            currentLib.sort((a: LibrarySkillEntry, b: LibrarySkillEntry) => a.name.localeCompare(b.name));
             onUpdate({ ...data, skillLibrary: currentLib });
             addLog(`${addedCount} compétence(s) importée(s) depuis la fiche.`, 'success', 'settings');
         } else {
@@ -193,6 +197,7 @@ export const useSkillLibrary = (
         hideKnownSkills, setHideKnownSkills,
         isSkillModalOpen, setIsSkillModalOpen,
         editingSkill, setEditingSkill,
+        skillFormSource,
         skillError, setSkillError,
         showRenameConfirm, setShowRenameConfirm,
         showImportConfirm, setShowImportConfirm,

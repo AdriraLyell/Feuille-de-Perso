@@ -1,5 +1,173 @@
 [
     {
+        "version": "2.97.40",
+        "date": "2026-03-02",
+        "type": "fix",
+        "changes": [
+            "Logic : Remplacement du tokenizer ASCII par un UnicodeTokenizer pour supporter les accents dans les formules (ex: Dextérité).",
+            "Logic : Ajout d'une normalisation pré-parsing pour assurer la compatibilité avec le moteur safe-expr-eval.",
+            "Database : Renforcement de la migration restoreMysticLinks pour supporter les correspondances indirectes (ex: Art de la Cartomancie -> Cartomancie).",
+            "Refactor : Éradication massive des 'any' dans les réconciliateurs et utilitaires de calcul."
+        ]
+    },
+    {
+        "version": "2.97.39",
+        "date": "2026-03-01",
+        "type": "chore",
+        "changes": [
+            "Maintenance : Mise à jour des dépendances npm (minor & moderate updates).",
+            "Maintenance : Correction des erreurs de lint introduites ou détectées après mise à jour (no-useless-assignment, preserve-caught-error).",
+            "Maintenance : Amélioration du typage du logger et de l'ErrorService pour réduire les usages de 'any'.",
+            "Audit : Identification d'une vulnérabilité haute sur expr-eval (2.0.2 est la dernière version, pas de correctif disponible)."
+        ]
+    },
+    {
+        "version": "2.97.38",
+        "date": "2026-03-01",
+        "type": "feat",
+        "changes": [
+            "Admin Traits : Ajout de 4 pills iconiques (Effets/Zap, Compteur/Activity, XP/TrendingUp, Variantes/Layers) pour filtrer par propriétés de trait en un clic.",
+            "Admin Traits : Ajout d'un sélecteur Audit avec 5 modes intelligents (À compléter, Mécaniques formules, Favoris, Jamais utilisés, Doublons potentiels).",
+            "Admin Traits : Bouton RESET unifié réinitialisant l'ensemble des filtres (chips, pills, audit).",
+            "Admin Traits : Réorganisation de la barre de filtres en 2 lignes (recherche+audit+tri / chips+pills) pour plus de clarté."
+        ]
+    },
+    {
+        "version": "2.97.37",
+        "date": "2026-03-01",
+        "type": "feat",
+        "changes": [
+            "UI : Les spécialisations imposées (⚡) affichent un bouton de promotion au survol dans l'onglet Spécialisations.",
+            "Logic : Une spécialisation imposée peut être transformée en compétence secondaire (valeur 0) sans être supprimée — elle reste pilotée par les règles MJ."
+        ]
+    },
+    {
+        "version": "2.97.36",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "Logic : Prise en compte des modifications du seuil MJ (defaultMinLevel) dans la bibliothèque locale pour les spécialisations imposées.",
+            "System : Déclenchement automatique de la réconciliation dès qu'une bibliothèque locale (spécialisations, compétences, traits) est modifiée."
+        ]
+    },
+    {
+        "version": "2.97.35",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "UI : Activation du tooltip des spécialisations au clic (toggle) au lieu du survol, pour cohérence avec le reste de la fiche.",
+            "UI : Ajout d'un écouteur de clic extérieur pour fermer automatiquement l'infobulle."
+        ]
+    },
+    {
+        "version": "2.97.34",
+        "date": "2026-03-01",
+        "type": "feat",
+        "changes": [
+            "UI : Refonte de l'infobulle des spécialisations pour correspondre au style premium des compteurs (ex: Force Vitale).",
+            "UI : Passage au composant PortalTooltip pour éviter les débordements et améliorer le positionnement.",
+            "UI : Support de l'affichage en deux colonnes quand le nombre de spécialisations dépasse 5.",
+            "UI : Amélioration visuelle avec puces dorées et bordures de séparation subtiles."
+        ]
+    },
+    {
+        "version": "2.97.33",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "UI : Filtre 'hideKnown' par défaut à false — la bibliothèque affiche maintenant le catalogue complet au lieu de cacher les spécialisations acquises.",
+            "UI : Message contextuel quand toutes les spécialisations sont filtrées, avec bouton de réactivation."
+        ]
+    },
+    {
+        "version": "2.97.32",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "UI : libraryMerger détecte les copies locales ayant un équivalent officiel (même ID ou nom) et les marque 'official' — corrige l'absence du badge 🌐."
+        ]
+    },
+    {
+        "version": "2.97.31",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "Logic : Séparation stricte entre bibliothèque locale et officielle pour les spécialisations.",
+            "UI : Support du mode hybride dans la Sidebar et l'Omnibar de spécialisation (badge Officiel 🌐).",
+            "Logic : Suppression de l'injection corrompue dans le réconciliateur qui transformait l'officiel en local."
+        ]
+    },
+    {
+        "version": "2.97.30",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "Logic : Support du matching des spécialisations via les 'variantes' de compétences (ex: Art Martial -> Zanji).",
+            "Logic : Nettoyage automatique des spécialisations imposées obsolètes lors de la réconciliation.",
+            "System : Force la réconciliation lors d'une montée de version applicative."
+        ]
+    },
+    {
+        "version": "2.97.29",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "Logic : Matching tri-critères (ID, DefID, Nom) pour les spécialisations imposées.",
+            "UI : Correction de l'affichage des compétences sur la fiche spécialisation (visibles même à 0 pts si imposées).",
+            "Logic : Synchronisation forcée de la bibliothèque officielle pour garantir la visibilité du catalogue."
+        ]
+    },
+    {
+        "version": "2.97.28",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "Logic : Correction du matching des spécialisations imposées via definitionId (compatibilité migration).",
+            "UI : Ajout de l'icône ⚡ (éclair) sur les spécialisations imposées (fiche perso et catalogue).",
+            "UI : Ajout de l'option 'Imposée' dans l'édition de spécialisation côté joueur/catalogue.",
+            "UI : Correction de l'affichage des catégories dans l'onglet des réglages de spécialisation."
+        ]
+    },
+    {
+        "version": "2.97.27",
+        "date": "2026-03-01",
+        "type": "feat",
+        "changes": [
+            "Système de spécialisations imposées dans la bibliothèque d'administration",
+            "Ajout d'une option 'Spécialisation Imposée' pour les MJ dans le catalogue",
+            "Réconciliation automatique : les spécialisations s'ajoutent seules sur les fiches si le seuil est atteint",
+            "Indicateur visuel (éclair) pour les spécialisations automatiques dans la liste admin"
+        ]
+    },
+    {
+        "version": "2.97.26",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Joueur : Correction chirurgicale de l'affichage des compétences parentes dans la bibliothèque de spécialisations (résolution via les bibliothèques globales).",
+            "Traits : Amélioration de la résolution des noms de compétences pour les effets de traits."
+        ]
+    },
+    {
+        "version": "2.97.25",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Admin : Correction du lien brisé entre spécialisations et compétences parentes dans la bibliothèque.",
+            "Library : Le chargeur de bibliothèque récupère désormais automatiquement les compétences référencées par les spécialisations, garantissant l'affichage des noms au lieu des IDs.",
+            "UI : Enrichissement de la résolution des noms de compétences pour inclure les Habiletés Mystiques et Historiques."
+        ]
+    },
+    {
+        "version": "2.97.24",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Campagne : Correction d'une erreur de validation Zod bloquant le chargement des règles après l'ajout de spécialisations.",
+            "Système : Mise à jour des schémas de validation des compteurs et de configuration de création pour supporter les valeurs nullables provenant de JSONB."
+        ]
+    },
+    {
         "version": "2.97.23",
         "date": "2026-02-28",
         "type": "fix",
@@ -24,180 +192,6 @@
         "changes": [
             "Tooltip : Correction du lien avec les calculs globaux pour les compteurs perso (récupération forcée des métadonnées de formule).",
             "Moteur : Normalisation des clés de recherche (suppression d'espaces) pour correspondre aux définitions système."
-        ]
-    },
-    {
-        "version": "2.97.20",
-        "date": "2026-02-28",
-        "type": "feat",
-        "changes": [
-            "Tooltip : Affichage de l'expression de la formule calculée en haut de l'infobulle.",
-            "Tooltip : Détails récursifs pour les variables d'agrégation (ex: voir le détail des compétences mystiques dans le calcul de la Force Vitale).",
-            "Moteur : Meilleure résolution des configurations (formula/aggregateConfig) lorsque les compteurs pointent vers des IDs de formule.",
-            "Robustesse : Amélioration de smartIncludes pour ignorer le préfixe '@' souvent utilisé dans les filtres de tags/catégories.",
-            "Fix : Correction d'une erreur de schéma Zod sur le champ effectType des formules (nullable)."
-        ]
-    },
-    {
-        "version": "2.97.19",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Journal de Campagne : Correction du chevauchement du Sommaire et restauration des notes page 1 — le sommaire opaque a été déplacé dans sa propre page (physical shift), laissant les notes apparaître en Page 2.",
-            "Journal de Campagne : Correction de la couleur de texte — le texte ProseMirror est désormais forcé en `stone-900` (#1c1917) pour une lisibilité parfaite sur fond beige.",
-            "Journal de Campagne : Suppression d'un warning console Tiptap (Doublon d'extension Underline)."
-        ]
-    },
-    {
-        "version": "2.97.18",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Compteurs : Correction de l'affichage de Force Vitale (et autres compteurs à formule) qui s'affichait en mode points/cases au lieu du mode numérique.",
-            "Réconciliation : Propagation de formulaId, isNumeric, formula et appearance depuis la bibliothèque de compteurs vers les définitions de règles (campaignReconciler).",
-            "Fiche : Fallback vers rules.libraries.counters pour la détection du type de compteur quand la counterLibrary du personnage est incomplète."
-        ]
-    },
-    {
-        "version": "2.97.17",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Journal de Campagne : Correction du chevauchement du Sommaire — ajout d'un fond opaque (#fbf4e9) sur le TOC overlay pour masquer le contenu éditeur visible en transparence.",
-            "Journal de Campagne : Correction de la couleur de police quasi-invisible — le texte ProseMirror héritait de `text-stone-200` (thème sombre global). Ajout d'un `color: #1c1917` explicite pour garantir la lisibilité sur fond papier beige."
-        ]
-    },
-    {
-        "version": "2.97.16",
-        "date": "2026-02-28",
-        "type": "chore",
-        "changes": [
-            "CI : Mise en place d'un workflow de nettoyage automatique des anciens runs GitHub Actions pour optimiser le stockage.",
-            "UI : Ajout d'un indicateur `cursor-pointer` sur les cartes interactives de la bibliothèque pour une meilleure affordance."
-        ]
-    },
-    {
-        "version": "2.97.15",
-        "date": "2026-02-28",
-        "type": "feat",
-        "changes": [
-            "UI (Admin bibliothèque) : Ajout d'icônes indicatives dans les vignettes de traits pour les compteurs associés (icône Activité) et l'amélioration par XP (icône Tendance).",
-            "UX : Ajout de tooltips informatifs sur ces nouvelles icônes pour clarifier le comportement du trait sans avoir à l'ouvrir."
-        ]
-    },
-    {
-        "version": "2.97.14",
-        "date": "2026-02-28",
-        "type": "chore",
-        "changes": [
-            "Système : Suppression définitive des anciens types d'effets `auto_counter` et `xp_upgradeable` du codebase (Nettoyage post-migration).",
-            "UI (Admin) : Retrait des champs et icônes associés dans l'éditeur d'effets de traits.",
-            "UI (Fiche) : Simplification de l'affichage des cartes de traits et de la modale d'édition, utilisant désormais exclusivement les propriétés natives.",
-            "Maintenance : Suppression du script de migration `migrate-traits.js` devenu obsolète."
-        ]
-    },
-    {
-        "version": "2.97.13",
-        "date": "2026-02-28",
-        "type": "feat",
-        "changes": [
-            "Traits : Introduction des propriétés directes `hasAutoCounter`, `autoCounterName` et `isXPUpgradeable` pour standardiser les mécaniques de jeu.",
-            "Admin (Bibliothèque) : Ajout des options de configuration 'Compteur Auto' et 'Améliorable via XP' dans le formulaire de trait.",
-            "Système : Mise en place d'un outil de migration (`migrateTraitProperties`) pour convertir les anciens effets hérités en propriétés natives.",
-            "Hook (TraitEditor) : Support natif de la création automatique de compteurs lors de l'ajout d'un trait, avec gestion de la suppression associée.",
-            "UI : Masquage des types d'effets dépréciés (`auto_counter`, `xp_upgradeable`, `free_skill_rank`, `master_skill`) pour les nouveaux traits afin d'encourager l'usage du moteur de formules."
-        ]
-    },
-    {
-        "version": "2.97.12",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "UI (Admin Formules) : Équilibrage de la largeur des champs Nom et Code (50/50)."
-        ]
-    },
-    {
-        "version": "2.97.11",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "UI (Admin Formules) : Ajustement du layout dans la modale d'édition. La description occupe désormais toute la largeur sous le Nom et le Code.",
-            "UI (Admin Formules) : Normalisation de la taille du champ Code pour correspondre au champ Nom."
-        ]
-    },
-    {
-        "version": "2.97.10",
-        "date": "2026-02-28",
-        "type": "feat",
-        "changes": [
-            "Ergonomie (Admin Formules) : Refonte du flux de création et d'édition des formules.",
-            "Remplacement de l'édition en ligne par une fenêtre modale unifiée (AdminFormulaEditorModal).",
-            "Extraction des champs de formulaire dans un composant réutilisable (AdminFormulaFormFields) garantissant la cohérence visuelle et technique.",
-            "Ajout d'un bouton d'édition direct sur chaque formule de la liste.",
-            "Amélioration de la sécurité : les modifications ne sont enregistrées en base de données qu'après validation explicite dans la modale.",
-            "Refactorisation du composant de liste (AdminFormulaEditorItem) pour une interface plus épurée centrée sur la lecture et les actions rapides."
-        ]
-    },
-    {
-        "version": "2.97.9",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Correction de la cause racine du bug Force Vitale : les avantages mystiques (tag ou mysticAbilityId) étaient invisibles au filtre d'agrégat car le champ 'tag' n'était pas propagé depuis 'mysticAbilityId'.",
-            "La fonction getAggregateDetails résout maintenant automatiquement le tag 'Mystique' à partir du champ mysticAbilityId si tag est absent sur le trait.",
-            "Les valeurs de traits (string '2' → number 2) sont normalisées en amont de l'agrégation pour garantir l'exactitude du calcul.",
-            "Réhydratation de mysticAbilityId et definitionId lors de la réconciliation des compétences et traits (skillsReconciler + rulesReconciler)."
-        ]
-    },
-    {
-        "version": "2.97.8",
-        "date": "2026-02-28",
-        "type": "patch",
-        "changes": [
-            "Correction du calcul de la Force Vitale suite à la perte de métadonnées mystiques.",
-            "Correction de la résolution des traits (avantages/désavantages) dans les formules de calcul.",
-            "Protection des champs 'mysticAbilityId' et 'isVariable' lors du nettoyage de la bibliothèque.",
-            "Migration V6 pour restaurer les liens mystiques cassés sur les fiches existantes.",
-            "Passage des règles par défaut en 1.0.4 pour forcer la réconciliation correcte."
-        ]
-    },
-    {
-        "version": "2.97.7",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Ajout de la migration V5 pour forcer explicitement la réconciliation des règles au chargement du personnage",
-            "Mise à jour du bouton 'Officiel' pour forcer la réconciliation immédiate des bibliothèques locales"
-        ]
-    },
-    {
-        "version": "2.97.6",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Correction du bug d'évaluation `NaN` empêchant le nettoyage des traits à coût de points variable",
-            "Mise en correspondance des anciens types ('Vertu'/'Tare') avec la casse stricte",
-            "Stringification des valeurs d'effets pour prévenir les faux-positifs de mismatch JSON",
-            "Montée de la version rules à v1.0.3 pour déclenchement garanti du nettoyage de `library` local"
-        ]
-    },
-    {
-        "version": "2.97.5",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Normalisation des coûts (texte/nombre) et du format 'pointsLabel' lors de la comparaison pour résoudre la perte du statut 'Officiel'",
-            "Montée de version des règles internes à v1.0.2 pour déclencher la mise à jour et nettoyer la fiche locale"
-        ]
-    },
-    {
-        "version": "2.97.4",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Amélioration de la détection des traits redondants (ignore les IDs d'effets)",
-            "Forçage de la réconciliation via montée de version des règles par défaut (v1.0.1)",
-            "Restauration effective du statut 'Officiel' pour les traits importés ou pollués"
         ]
     }
 ]

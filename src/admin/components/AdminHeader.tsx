@@ -90,7 +90,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                     <MotionFade delay={0.3}>
                         <button
                             onClick={onShowChangelog}
-                            className="bg-stone-900/50 px-3 py-1.5 rounded text-[10px] font-black font-mono text-stone-500 hover:text-amber-gold hover:bg-stone-800 transition-colors border border-stone-800"
+                            className="bg-stone-900/50 px-3 py-1.5 rounded text-[10px] font-black font-mono text-stone-400 hover:text-amber-gold hover:bg-stone-800 transition-colors border border-stone-800"
                             title="Voir le journal des versions"
                         >
                             v{APP_VERSION}
@@ -103,7 +103,10 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                         <button
                             onClick={onSave}
                             disabled={isSaving}
-                            className="flex items-center gap-2 bg-amber-gold hover:bg-amber-glow disabled:opacity-50 disabled:grayscale text-stone-950 px-5 py-2 rounded-sm font-black uppercase tracking-widest text-[10px] transition-all shadow-glow-gold hover:scale-105 active:scale-95"
+                            className={`flex items-center gap-2 px-5 py-2 rounded-sm font-black uppercase tracking-widest text-[10px] transition-all shadow-lg hover:scale-105 active:scale-95 ${hasUnsavedChanges
+                                    ? "bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-amber-900/20 animate-pulse ring-2 ring-amber-500/50"
+                                    : "bg-stone-800 hover:bg-stone-700 text-stone-400 opacity-80"
+                                } disabled:opacity-50 disabled:grayscale`}
                             title="Sauvegarder en BDD"
                         >
                             <UploadCloud size={16} />
@@ -114,7 +117,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                     <MotionFade delay={0.45}>
                         <button
                             onClick={onImport}
-                            className="flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-stone-400 px-4 py-2 rounded-sm font-black uppercase tracking-widest text-[10px] transition-all border border-stone-800 hover:border-stone-700"
+                            className="flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-stone-300 px-4 py-2 rounded-sm font-black uppercase tracking-widest text-[10px] transition-all border border-stone-800 hover:border-stone-700"
                             title="Importer un JSON (Personnage ou Règles)"
                         >
                             <UploadCloud size={16} className="rotate-180" /> <span className="hidden xl:inline">Importer</span>
@@ -124,7 +127,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                     <MotionFade delay={0.5}>
                         <button
                             onClick={onExport}
-                            className="flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-stone-400 px-4 py-2 rounded-sm font-black uppercase tracking-widest text-[10px] transition-all border border-stone-800 hover:border-stone-700"
+                            className="flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-stone-300 px-4 py-2 rounded-sm font-black uppercase tracking-widest text-[10px] transition-all border border-stone-800 hover:border-stone-700"
                             title="Exporter le fichier JSON"
                         >
                             <Download size={16} /> <span className="hidden xl:inline">Exporter</span>
@@ -134,7 +137,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                     <MotionFade delay={0.55}>
                         <button
                             onClick={onPublish}
-                            className="flex items-center gap-2 bg-indigo-900/30 hover:bg-indigo-900/50 text-indigo-400 px-4 py-2 rounded-sm font-black uppercase tracking-widest text-[10px] transition-all shadow-lg hover:shadow-indigo-900/20 border border-indigo-900/50"
+                            className="flex items-center gap-2 bg-indigo-900/50 hover:bg-indigo-900/70 text-indigo-300 px-4 py-2 rounded-sm font-black uppercase tracking-widest text-[10px] transition-all shadow-lg hover:shadow-indigo-900/20 border border-indigo-900/50"
                             title="Publier sur GitHub"
                         >
                             <Upload size={16} /> <span className="hidden lg:inline">Publier</span>

@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { CharacterSheetData } from '../types';
+
 import ThematicButton from './ui/ThematicButton';
 import ThematicModal from './ui/ThematicModal';
 import { useCharacter } from '../context/CharacterContext';
-import { useNotification } from '../context/NotificationContext';
+
 
 // Import sub-components
 import AttributesEditor from './settings/AttributesEditor';
@@ -17,7 +17,7 @@ import LibrarySidebar from './settings/LibrarySidebar';
 import SpecializationLibrarySidebar from './settings/SpecializationLibrarySidebar';
 import LibraryView from './LibraryView';
 import AdminSuggestions from './settings/AdminSuggestions'; // NEW
-import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, X, AlertCircle, BookOpen, Lock, UploadCloud, Lightbulb, Calculator } from 'lucide-react';
+import { Save, AlertTriangle, List, Tag, UserPlus, LayoutGrid, RefreshCw, AlertCircle, BookOpen, Lock, UploadCloud, Lightbulb } from 'lucide-react';
 
 // Rules Integration
 import { useRules } from '../context/RulesContext';
@@ -62,7 +62,7 @@ export interface DragItemType {
   category?: string;
   index?: number;
   id?: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) => {
@@ -82,7 +82,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
     handleSave,
     handleLocalUpdate,
     performReset,
-    toggleAutoSync
+
   } = useSettingsManager(data, rules, isOnlineMode, expertMode, onUpdate, onAddLog, onDirtyChange);
 
   // Drag State (Shared between SkillsEditor and LibrarySidebar)
@@ -154,9 +154,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
           <ThematicButton
             variant="danger"
             onClick={() => setShowResetConfirm(true)}
-            leftIcon={<AlertTriangle size={18} />}
+            leftIcon={<UserPlus size={18} />}
           >
-            Réinitialiser
+            Nouveau Personnage / Réinitialiser
           </ThematicButton>
 
           <div className="flex gap-4">
@@ -223,7 +223,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
 
           {activeTab === 'library' && (
             <div className="h-[calc(100vh-250px)] min-h-[600px] border border-[#bfae85]/30 rounded-sm overflow-hidden shadow-sm">
-              <LibraryView data={localData} onUpdate={handleLocalUpdate} />
+              <LibraryView data={localData} onUpdate={handleLocalUpdate} isEditable={expertMode} />
             </div>
           )}
 

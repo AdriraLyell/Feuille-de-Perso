@@ -43,30 +43,55 @@ export const LibraryLoader = {
             const mysticIds = relMysticAbilities.map(r => r.mystic_ability_id);
             const formulaIds = relFormulas.map(r => r.formula_id);
 
-            // 2. Build filters for reference tables
-            // We load items that are linked OR explicitly belong to this setting (legacy/local bypass)
+            // 2. Fetch Reference Tables (First pass: items that don't depend on others being loaded)
             const buildFilter = (ids: string[]) => {
                 const parts = [`setting_id.eq.${settingId}`];
-                if (ids.length > 0) parts.push(`id.in.(${ids.join(',')})`);
+                if (ids && ids.length > 0) {
+                    // Filter out invalid or duplicate IDs to keep the query string safe
+                    const validIds = Array.from(new Set(ids.filter(id => id && id.length === 36)));
+                    if (validIds.length > 0) {
+                        parts.push(`id.in.(${validIds.join(',')})`);
+                    }
+                }
                 return parts.join(',');
             };
 
             const [
-                traits, skills, specs,
-                backgrounds, counters,
-                traitVariants, skillVariants, bgVariants,
-                mysticAbilities, formulas
+                traits, specs, backgrounds, counters, mysticAbilities, formulas
             ] = await Promise.all([
                 DatabaseService.fetchAll<DBTrait>(TABLE_LIBRARIES_TRAITS, { or: buildFilter(traitIds) }, 'LibraryLoader.loadTraits'),
-                DatabaseService.fetchAll<DBSkill>(TABLE_LIBRARIES_SKILLS, { or: buildFilter(skillIdsList) }, 'LibraryLoader.loadSkills'),
                 DatabaseService.fetchAll<DBSpecialization>(TABLE_LIBRARIES_SPECIALIZATIONS, { or: buildFilter(specIds) }, 'LibraryLoader.loadSpecs'),
                 DatabaseService.fetchAll<DBBackground>(TABLE_LIBRARIES_BACKGROUNDS, { or: buildFilter(bgIds) }, 'LibraryLoader.loadBackgrounds'),
                 DatabaseService.fetchAll<DBCounter>(TABLE_LIBRARIES_COUNTERS, { or: buildFilter(counterIds) }, 'LibraryLoader.loadCounters'),
-                DatabaseService.fetchAll<DBTraitVariant>(TABLE_LIBRARIES_TRAITS_VARIANTS, { or: buildFilter(traitIds), select: 'trait_id, name' }, 'LibraryLoader.loadTraitsVariants'),
-                DatabaseService.fetchAll<DBSkillVariant>(TABLE_LIBRARIES_SKILLS_VARIANTS, { or: buildFilter(skillIdsList), select: 'skill_id, name' }, 'LibraryLoader.loadSkillsVariants'),
-                DatabaseService.fetchAll<DBBackgroundVariant>(TABLE_LIBRARIES_BACKGROUNDS_VARIANTS, { or: buildFilter(bgIds), select: 'background_id, name' }, 'LibraryLoader.loadBgVariants'),
                 DatabaseService.fetchAll<DBMysticAbility>(TABLE_LIBRARIES_MYSTIC_ABILITIES, { or: buildFilter(mysticIds) }, 'LibraryLoader.loadMystic'),
                 DatabaseService.fetchAll<DBFormula>(TABLE_LIBRARIES_FORMULAS, { or: buildFilter(formulaIds) }, 'LibraryLoader.loadFormulas')
+            ]);
+
+            // 3. Second pass: Load Skills (merge explicitly linked skills AND skills referenced by loaded specializations)
+            const allNeededSkillIds = new Set(skillIdsList);
+            specs.forEach(s => {
+                if (s.skill_ids && Array.isArray(s.skill_ids)) {
+                    s.skill_ids.forEach(id => {
+                        if (id) allNeededSkillIds.add(id);
+                    });
+                }
+            });
+
+            // Also check if some mystic abilities were referenced as skills (unlikely but safe)
+            // If they are regular skills, we need them in the skills fetch.
+
+            const skillIdsToFetch = Array.from(allNeededSkillIds);
+
+            const [
+                skills,
+                traitVariants,
+                skillVariants,
+                bgVariants
+            ] = await Promise.all([
+                DatabaseService.fetchAll<DBSkill>(TABLE_LIBRARIES_SKILLS, { or: buildFilter(skillIdsToFetch) }, 'LibraryLoader.loadSkills'),
+                DatabaseService.fetchAll<DBTraitVariant>(TABLE_LIBRARIES_TRAITS_VARIANTS, { or: buildFilter(traitIds), select: 'trait_id, name' }, 'LibraryLoader.loadTraitsVariants'),
+                DatabaseService.fetchAll<DBSkillVariant>(TABLE_LIBRARIES_SKILLS_VARIANTS, { or: buildFilter(skillIdsToFetch), select: 'skill_id, name' }, 'LibraryLoader.loadSkillsVariants'),
+                DatabaseService.fetchAll<DBBackgroundVariant>(TABLE_LIBRARIES_BACKGROUNDS_VARIANTS, { or: buildFilter(bgIds), select: 'background_id, name' }, 'LibraryLoader.loadBgVariants')
             ]);
 
             const traitVarMap = new Map<string, string[]>();
@@ -107,7 +132,6 @@ export const LibraryLoader = {
             const skillRelMap = new Map<string, RelSettingSkill>(relSkills.map((r: RelSettingSkill) => [r.skill_id, r]));
             const bgDefaultMap = new Map<string, string>(relBackgrounds.map((r: RelSettingBackground) => [r.background_id, r.default_category]));
             const counterDefaultMap = new Map<string, string>(relCounters.map((r: RelSettingCounter) => [r.counter_id, r.default_category]));
-            const mysticRelMap = new Map<string, any>(relMysticAbilities.map((r: any) => [r.mystic_ability_id, r]));
             const mysticDefaultMap = new Map<string, string>(relMysticAbilities.map((r: any) => [r.mystic_ability_id, r.default_category]));
 
             return {

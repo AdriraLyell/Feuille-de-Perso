@@ -2,7 +2,7 @@
 import React from 'react';
 
 export const SectionHeader: React.FC<{ title: React.ReactNode }> = ({ title }) => (
-  <div className="bg-slate-200 text-slate-800 text-center font-bold text-xs border-y border-stone-400 uppercase py-0.5 tracking-wide shadow-sm">
+  <div className="bg-slate-200 text-slate-800 flex items-center justify-center text-center font-bold text-xs border-b border-stone-500 uppercase py-0.5 tracking-wide shadow-sm min-h-[1.5rem] shrink-0">
     {title}
   </div>
 );

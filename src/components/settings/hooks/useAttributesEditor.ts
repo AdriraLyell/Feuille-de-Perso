@@ -9,7 +9,7 @@ interface UseAttributesEditorProps {
 }
 
 export const useAttributesEditor = ({ data, onUpdate, onAddLog }: UseAttributesEditorProps) => {
-    const [pendingPreset, setPendingPreset] = useState<any>(null);
+    const [pendingPreset, setPendingPreset] = useState<typeof ATTRIBUTE_PRESETS[number] | null>(null);
     const [showPresetConfirm, setShowPresetConfirm] = useState(false);
 
     const categories = data.attributeSettings || [];
@@ -28,10 +28,10 @@ export const useAttributesEditor = ({ data, onUpdate, onAddLog }: UseAttributesE
     const executePresetLoad = () => {
         if (!pendingPreset) return;
 
-        const newSettings: any[] = [];
-        const newAttributes: any = {};
+        const newSettings: CharacterSheetData['attributeSettings'] = [];
+        const newAttributes: CharacterSheetData['attributes'] = {};
 
-        pendingPreset.structure.forEach((cat: any) => {
+        pendingPreset.structure.forEach((cat) => {
             newSettings.push({ id: cat.id, label: cat.label });
             newAttributes[cat.id] = cat.attrs.map((name: string) => ({
                 id: Math.random().toString(36).substr(2, 9),

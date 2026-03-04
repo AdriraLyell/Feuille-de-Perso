@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { CharacterSheetData, LibraryEntry, TraitEffect } from '../types';
+import { CharacterSheetData, LibraryEntry, TraitEffect, DotEntry } from '../types';
 import { MergedEntry } from '../utils/libraryMerger';
 import { useRules } from '../context/RulesContext';
 
@@ -12,6 +12,7 @@ export const useTraitActions = (
     const allFormulas = useMemo(() => rules?.libraries?.formulas || [], [rules]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editForm, setEditForm] = useState<LibraryEntry | null>(null);
+    const [formSource, setFormSource] = useState<'local' | 'official' | 'modified'>('local');
     const [tagInput, setTagInput] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
@@ -31,12 +32,13 @@ export const useTraitActions = (
             tags: [],
             effects: []
         });
+        setFormSource('local');
         setIsModalOpen(true);
     }, [defaultType]);
 
     const handleOpenEdit = useCallback((merged: MergedEntry<LibraryEntry> | LibraryEntry) => {
         const entry = 'entry' in merged ? merged.entry : merged;
-        const source = 'source' in merged ? merged.source : 'local';
+        const _source = 'source' in merged ? merged.source : 'local';
 
         setError(null);
         setTagInput('');
@@ -46,11 +48,16 @@ export const useTraitActions = (
             tags: [...(entry.tags || [])],
             effects: (entry.effects || []).map(e => ({ ...e }))
         });
+        setFormSource(_source as 'local' | 'official' | 'modified');
         setIsModalOpen(true);
     }, []);
 
     const handleDelete = useCallback((id: string, source: string) => {
-        if (source === 'official') return;
+        if (source === 'official') {
+            // Un trait purement officiel ne peut pas être supprimé du JSON, 
+            // mais un trait 'modified' peut être supprimé pour revenir à l'état officiel.
+            return;
+        }
         setShowDeleteConfirm(id);
     }, []);
 
@@ -83,6 +90,7 @@ export const useTraitActions = (
         onUpdate({ ...data, library: newLibrary });
         setIsModalOpen(false);
         setEditForm(null);
+        setFormSource('local');
     }, [data, editForm, onUpdate]);
 
     const executeOfficialUpdate = async () => {
@@ -148,7 +156,7 @@ export const useTraitActions = (
         setEditForm({ ...editForm, effects: [...(editForm.effects || []), newEffect] });
     }, [editForm]);
 
-    const updateEffect = useCallback((id: string, field: keyof TraitEffect, value: any) => {
+    const updateEffect = useCallback((id: string, field: keyof TraitEffect, value: string | number | boolean | undefined) => {
         if (!editForm) return;
 
         const newEffects = (editForm.effects || []).map(e => e.id === id ? { ...e, [field]: value } : e);
@@ -189,17 +197,46 @@ export const useTraitActions = (
     }, [editForm, allFormulas]);
 
     const allSkills = useMemo(() => {
-        if (!data || !data.skills) return [];
         const skills: { id: string, name: string }[] = [];
-        Object.values(data.skills).forEach(skillList => {
-            skillList.forEach(s => {
-                if (s.name && s.name.trim() !== '') {
-                    skills.push({ id: s.id, name: s.name });
-                }
+
+        // 1. From Character Sheet (Local)
+        if (data?.skills) {
+            Object.values(data.skills).forEach(skillList => {
+                skillList.forEach(s => {
+                    if (s.name && s.name.trim() !== '') {
+                        skills.push({ id: s.id, name: s.name });
+                    }
+                });
             });
-        });
+        }
+
+        // 2. From Official Campaign Libraries
+        if (rules?.libraries) {
+            if (rules.libraries.skills) {
+                rules.libraries.skills.forEach(skill => {
+                    if (!skills.some(s => s.id === skill.id)) {
+                        skills.push({ id: skill.id, name: skill.name });
+                    }
+                });
+            }
+            if (rules.libraries.mysticAbilities) {
+                rules.libraries.mysticAbilities.forEach(ma => {
+                    if (!skills.some(s => s.id === ma.id)) {
+                        skills.push({ id: ma.id, name: ma.name });
+                    }
+                });
+            }
+            if (rules.libraries.backgrounds) {
+                rules.libraries.backgrounds.forEach(bg => {
+                    if (!skills.some(s => s.id === bg.id)) {
+                        skills.push({ id: bg.id, name: bg.name });
+                    }
+                });
+            }
+        }
+
         return skills.sort((a, b) => a.name.localeCompare(b.name));
-    }, [data.skills]);
+    }, [data.skills, rules?.libraries]);
 
     const allAttributes = useMemo(() => {
         if (!data || !data.attributes) return [];
@@ -222,10 +259,13 @@ export const useTraitActions = (
 
         // System counters
         Object.keys(data.counters).forEach(key => {
-            if (key !== 'custom' && !Array.isArray(data.counters[key])) {
-                const c = data.counters[key] as any;
-                if (c && c.name && c.name.trim() !== '') {
-                    counters.push({ id: c.id || key, name: c.name });
+            if (key !== 'custom') {
+                const rawEntry = data.counters[key];
+                if (!Array.isArray(rawEntry)) {
+                    const c = rawEntry as DotEntry;
+                    if (c && c.name && c.name.trim() !== '') {
+                        counters.push({ id: c.id || key, name: c.name });
+                    }
                 }
             }
         });
@@ -258,6 +298,7 @@ export const useTraitActions = (
         setIsModalOpen,
         editForm,
         setEditForm,
+        formSource,
         tagInput,
         setTagInput,
         error,

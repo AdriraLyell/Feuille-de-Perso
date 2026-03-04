@@ -1,10 +1,12 @@
-export const forceRulesReconciliation = (parsed: any): void => {
+import { MigratableData } from './registry';
+
+export const forceRulesReconciliation = (parsed: MigratableData): void => {
     // Supprimer la trace de la dernière version des règles pour forcer
     // le useEffect de CharacterContext à lancer reconcileRulesWithState
-    if (parsed._rulesLastUpdated) {
-        delete parsed._rulesLastUpdated;
+    if ('_rulesLastUpdated' in parsed) {
+        delete (parsed as any)._rulesLastUpdated;
     }
-    if (parsed._rulesVersion) {
-        delete parsed._rulesVersion;
+    if ('_rulesVersion' in parsed) {
+        delete (parsed as any)._rulesVersion;
     }
 };

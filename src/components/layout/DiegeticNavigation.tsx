@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Book, Settings, FileText, Layout, Save, Upload, Feather, LogOut, Printer, Monitor, Smartphone, History, HelpCircle, ScrollText, ArrowRightLeft, BookOpen, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X, AlertTriangle } from 'lucide-react';
+import { Settings, FileText, Save, Printer, History, HelpCircle, ScrollText, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X, AlertTriangle } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';
 import { useStorageUsage } from '../../hooks/useStorageUsage';
-import { CharacterSheetData } from '../../types';
+
 import RulesStatus from '../ui/RulesStatus';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -84,7 +84,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                 <div className="flex items-center gap-2 md:gap-4 mr-4 z-10">
                     <button
                         onClick={onToggleLandscape}
-                        className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all ${isLandscape
+                        className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition ${isLandscape
                             ? 'bg-indigo-600 text-white border border-indigo-400'
                             : 'bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600'
                             }`}
@@ -96,7 +96,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                     <button
                         onClick={onOpenAppearance}
-                        className="px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600 hover:text-white"
+                        className="px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600 hover:text-white"
                         title="Changer l'apparence"
                         aria-label="Changer l'apparence"
                     >
@@ -116,16 +116,16 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                             <FileText size={16} /> <span className="hidden sm:inline">Fiche</span>
                         </button>
 
-                        {(rules as any)?.settingName && (
+                        {rules?.settingName && (
                             <div className="flex items-center gap-1.5 pl-2.5 pr-1 py-1 bg-slate-700/50 border border-slate-600 rounded-full text-[10px] md:text-xs font-medium text-slate-300 animate-in fade-in slide-in-from-left-2 duration-300">
                                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
                                 <span className="font-bold text-white truncate max-w-[80px] md:max-w-[150px]">
-                                    {(rules as any).settingName}
+                                    {rules.settingName}
                                 </span>
                                 {rules?.showMetadataToPlayers && (
                                     <button
                                         onClick={onShowCampaignInfo}
-                                        className="ml-2 p-1 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-all active:scale-90"
+                                        className="ml-2 p-1 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition active:scale-90"
                                         title="Voir les infos de campagne"
                                         aria-label="Voir les infos de campagne"
                                     >
@@ -138,10 +138,11 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                 </div>
 
-                {/* Center: Character Name (Hidden on very small) */}
-                <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 hidden sm:flex flex-col items-center pointer-events-none z-0">
-                    <span className="text-[9px] text-gray-400 uppercase font-bold leading-none text-center">Personnage</span>
-                    <span className="text-xs font-bold text-gray-200 max-w-[200px] truncate leading-tight text-center">
+                {/* Center: Character Name (Compact & Impactful Typography) */}
+                <div className="absolute inset-0 hidden sm:flex items-center justify-center pointer-events-none z-0 px-4">
+                    <span className="text-2xl md:text-3xl lg:text-4xl font-black font-serif tracking-tighter uppercase select-none
+                        bg-gradient-to-b from-white via-white to-gray-400 bg-clip-text text-transparent
+                        drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] text-center leading-none whitespace-nowrap">
                         {data.header?.name || 'Sans Nom'}
                     </span>
                 </div>
@@ -154,7 +155,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                         <div className="flex items-center gap-2 mr-4 border-r border-gray-600 pr-4">
                             <button
                                 onClick={() => onModeChange('settings')}
-                                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all flex items-center gap-2 relative ${currentMode === 'settings'
+                                className={`px-4 py-1.5 rounded-md text-sm font-bold transition flex items-center gap-2 relative ${currentMode === 'settings'
                                     ? 'bg-blue-600 text-white shadow-sm'
                                     : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
                                 title="Réglages"
@@ -179,7 +180,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                         <button
                             onClick={onOpenImportExport}
-                            className="bg-amber-700/20 hover:bg-amber-700/40 text-amber-500 hover:text-amber-400 border border-amber-700/50 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all text-sm font-bold"
+                            className="bg-amber-700/20 hover:bg-amber-700/40 text-amber-500 hover:text-amber-400 border border-amber-700/50 px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-sm font-bold"
                             title="Sauvegarder / Charger"
                         >
                             <Save size={18} />
@@ -187,7 +188,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                         <button
                             onClick={onOpenSync}
-                            className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all text-sm font-bold border relative ${syncStatus === 'synced'
+                            className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-sm font-bold border relative ${syncStatus === 'synced'
                                 ? 'bg-green-700/20 text-green-500 border-green-700/50'
                                 : syncStatus === 'update-available'
                                     ? 'bg-amber-700/30 text-amber-400 border-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.2)] animate-pulse'
@@ -250,7 +251,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                                 <button
                                     key={idx}
                                     onClick={() => { item.onClick(); setIsMobileMenuOpen(false); }}
-                                    className={`flex flex-col items-center justify-center p-6 rounded-xl border transition-all gap-3 ${item.active
+                                    className={`flex flex-col items-center justify-center p-6 rounded-xl border transition gap-3 ${item.active
                                         ? 'bg-blue-600 border-blue-400 text-white'
                                         : 'bg-gray-800 border-gray-700 text-gray-300 active:bg-gray-700'
                                         } ${item.highlight ? 'ring-2 ring-purple-500' : ''}`}

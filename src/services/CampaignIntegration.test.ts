@@ -57,7 +57,7 @@ describe('Integration: CampaignService & OfflineStorage', () => {
             id: campaignId,
             name: 'Test Campaign',
             version: '1.0.0',
-            last_updated: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
             configurations: { ...defaultRules.configurations },
             definitions: { ...defaultRules.definitions },
             is_public: false,
@@ -147,7 +147,7 @@ describe('Integration: CampaignService & OfflineStorage', () => {
             id: campaignId,
             name: 'Updated Campaign',
             version: '2.0',
-            last_updated: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
             configurations: { ...defaultRules.configurations },
             definitions: { ...defaultRules.definitions },
             is_public: true

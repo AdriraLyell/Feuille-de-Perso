@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 
-export const useEditMode = () => {
-    const [isEditMode, setIsEditMode] = useState(false);
+export const useEditMode = (isEditMode: boolean, setIsEditMode: (v: boolean) => void) => {
     const [showEditWarning, setShowEditWarning] = useState(false);
 
     const handleToggleEditMode = useCallback(() => {
@@ -10,7 +9,7 @@ export const useEditMode = () => {
         } else {
             setIsEditMode(false);
         }
-    }, [isEditMode]);
+    }, [isEditMode, setIsEditMode]);
 
     const executeEditModeActivation = () => {
         setIsEditMode(true);

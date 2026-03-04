@@ -1,50 +1,57 @@
-import { useState, useEffect, useCallback, RefObject } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Editor } from '@tiptap/react';
 import { PAGE_WIDTH } from '../constants';
 import { TOCEntry } from './BookTableOfContents';
 
 export function useBookTableOfContents(
     editor: Editor | null,
-    contentRef: RefObject<HTMLDivElement>,
-    pageOffset: number = 1 // TOC takes 1 page
+    contentRef: React.RefObject<HTMLDivElement | null>
 ) {
     const [entries, setEntries] = useState<TOCEntry[]>([]);
 
     const updateTOC = useCallback(() => {
         if (!contentRef.current) return;
 
-        const sections = contentRef.current.querySelectorAll('.chapter-header-wrapper, .narrative-section-container[data-is-section="true"]');
+        const sections = contentRef.current.querySelectorAll('.act-header-wrapper, .chapter-header-wrapper, .narrative-section-container[data-is-section="true"]');
         const newEntries: TOCEntry[] = [];
         const stride = PAGE_WIDTH + 40;
 
         sections.forEach((section) => {
             const htmlSection = section as HTMLElement;
-            let title = 'Section sans titre';
+            let title: string;
             let dateText = '';
+            let entryType: 'act' | 'chapter' | 'section';
 
-            if (htmlSection.classList.contains('chapter-header-wrapper')) {
+            if (htmlSection.classList.contains('act-header-wrapper')) {
+                const titleElement = htmlSection.querySelector('.font-serif.font-black.text-4xl');
+                title = titleElement?.textContent || 'Nouvel Acte';
+                entryType = 'act';
+            } else if (htmlSection.classList.contains('chapter-header-wrapper')) {
                 const titleElement = htmlSection.querySelector('.font-serif.font-bold.text-3xl');
                 const dateElement = htmlSection.querySelector('.text-xs.text-center');
                 title = titleElement?.textContent || 'Chapitre sans titre';
                 dateText = dateElement?.textContent || '';
+                entryType = 'chapter';
             } else {
                 // It's a narrative section
                 // Priority to the custom title attribute
                 const customTitle = htmlSection.getAttribute('data-section-title');
                 if (customTitle && customTitle.trim()) {
-                    title = `• ${customTitle}`;
+                    title = customTitle;
                 } else {
                     // Fallback to first line of content
                     const contentElement = htmlSection.querySelector('.NodeViewContent');
                     const firstLine = contentElement?.textContent?.split('\n')[0]?.trim();
-                    title = firstLine ? `• ${firstLine.slice(0, 30)}${firstLine.length > 30 ? '...' : ''}` : '• Section';
+                    title = firstLine ? `${firstLine.slice(0, 30)}${firstLine.length > 30 ? '...' : ''}` : 'Section';
                 }
+                entryType = 'section';
             }
 
             const left = htmlSection.offsetLeft;
-            const pageIndex = Math.floor(left / stride) + pageOffset + 1;
+            const pageIndex = Math.floor(left / stride) + 1; // Content starting at index 1 is Page 2 if TOC is Page 1
 
             newEntries.push({
+                type: entryType,
                 title,
                 date: dateText,
                 page: pageIndex
@@ -52,7 +59,7 @@ export function useBookTableOfContents(
         });
 
         setEntries(newEntries);
-    }, [contentRef, pageOffset]);
+    }, [contentRef]);
 
     useEffect(() => {
         if (!editor) return;

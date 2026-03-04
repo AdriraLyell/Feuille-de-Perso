@@ -20,21 +20,28 @@ export const CreationValidationModal: React.FC<CreationValidationModalProps> = (
 }) => {
     if (!isOpen) return null;
 
+    const hasWarnings = !hasErrors && messages.length > 0;
+
     return (
         <div className="fixed inset-0 bg-stone-950/90 z-[110] flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-200">
-            <div className={`bg-[#fdfbf7] rounded-sm shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] border-4 ${hasErrors ? 'border-red-700' : 'border-green-700'} relative`}>
+            <div className={`bg-[#fdfbf7] rounded-sm shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] border-4 ${hasErrors ? 'border-red-700' : hasWarnings ? 'border-amber-500' : 'border-green-700'} relative`}>
 
                 {/* Paper Texture Overlay */}
                 <div className="absolute inset-0 pointer-events-none opacity-5 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]"></div>
 
                 {/* Modal Header */}
-                <div className={`p-6 border-b-2 flex justify-between items-center relative z-10 ${hasErrors ? 'bg-red-50 border-red-200 text-red-900' : 'bg-green-50 border-green-200 text-green-900'}`}>
+                <div className={`p-6 border-b-2 flex justify-between items-center relative z-10 ${hasErrors ? 'bg-red-50 border-red-200 text-red-900' : hasWarnings ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-green-50 border-green-200 text-green-900'}`}>
                     <div>
                         <h3 className="font-black text-3xl font-serif tracking-tight flex items-center gap-3 uppercase">
                             {hasErrors ? (
                                 <>
                                     <ShieldAlert size={32} />
                                     Rapport d'Erreur
+                                </>
+                            ) : hasWarnings ? (
+                                <>
+                                    <AlertTriangle size={32} />
+                                    Avertissement
                                 </>
                             ) : (
                                 <>
@@ -44,7 +51,7 @@ export const CreationValidationModal: React.FC<CreationValidationModalProps> = (
                             )}
                         </h3>
                         <p className="text-sm font-medium opacity-80 mt-1">
-                            {hasErrors ? "La création ne respecte pas les contraintes définies." : "Le personnage semble prêt à l'aventure."}
+                            {hasErrors ? "La création ne respecte pas les contraintes définies." : hasWarnings ? "Il reste des ressources non dépensées sur cette fiche." : "Le personnage semble prêt à l'aventure."}
                         </p>
                     </div>
                     <button onClick={onClose} className="text-stone-400 hover:text-stone-800 p-2 rounded-full transition-colors hover:bg-stone-200/50">
@@ -124,7 +131,16 @@ export const CreationValidationModal: React.FC<CreationValidationModalProps> = (
                                 Ignorer et Valider
                             </button>
                         )}
-                        {(!hasErrors) && (
+                        {hasWarnings && (
+                            <button
+                                onClick={onConfirm}
+                                className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded shadow-lg transition-transform hover:scale-105 font-bold text-lg flex items-center gap-2 font-serif tracking-wide"
+                            >
+                                <CheckSquare size={20} />
+                                Valider tout de même
+                            </button>
+                        )}
+                        {(!hasErrors && !hasWarnings) && (
                             <button
                                 onClick={onConfirm}
                                 className="bg-green-700 hover:bg-green-800 text-white px-8 py-3 rounded shadow-lg transition-transform hover:scale-105 font-bold text-lg flex items-center gap-2 font-serif tracking-wide"

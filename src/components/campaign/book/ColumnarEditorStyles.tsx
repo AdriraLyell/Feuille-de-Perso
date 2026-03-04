@@ -183,5 +183,40 @@ export const ColumnarEditorStyles = () => (
             0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
         }
+
+        /* Gapcursor for inserting text between blocks */
+        .ProseMirror-gapcursor {
+            display: none;
+            pointer-events: none;
+            position: absolute;
+        }
+        .ProseMirror-gapcursor:after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: -2px;
+            width: 20px;
+            border-top: 1px solid black;
+            animation: ProseMirror-cursor-blink 1.1s steps(2, start) infinite;
+        }
+        @keyframes ProseMirror-cursor-blink {
+            to { visibility: hidden; }
+        }
+        .ProseMirror-focused .ProseMirror-gapcursor { display: block; }
+
+        /* Font Size Balancing for Cursive Fonts */
+        .ProseMirror span[style*="Dancing Script"] { 
+            font-size: 1.2em; 
+            line-height: normal;
+        }
+        .ProseMirror span[style*="Great Vibes"] { 
+            font-size: 1.5em; 
+            line-height: 0.8;
+            display: inline-block; /* Helps with extreme descenders */
+        }
+        .ProseMirror span[style*="Pinyon Script"] { 
+            font-size: 1.4em; 
+            line-height: 0.9;
+        }
     `}</style>
 );

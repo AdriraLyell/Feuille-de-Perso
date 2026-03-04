@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Search, Plus, Award, CheckCircle2, Edit2, Trash2, Download, RefreshCw, Eye, EyeOff, Globe, X } from 'lucide-react';
+import { Search, Plus, Award, CheckCircle2, Edit2, Trash2, Download, RefreshCw, Eye, EyeOff, Globe, X, Zap } from 'lucide-react';
 import { CharacterSheetData } from '../../types';
 import { useSpecializationLibrary } from './hooks/useSpecializationLibrary';
 import SpecializationEditModal from './parts/SpecializationEditModal';
@@ -8,9 +8,10 @@ import ConfirmationModal from '../ui/ConfirmationModal';
 interface SpecializationLibraryViewProps {
     data: CharacterSheetData;
     onUpdate: (newData: CharacterSheetData) => void;
+    isEditable?: boolean;
 }
 
-const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ data, onUpdate }) => {
+const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ data, onUpdate, isEditable = true }) => {
     const {
         searchTerm, setSearchTerm,
         hideKnown, setHideKnown,
@@ -30,7 +31,8 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
         executeOfficialUpdate,
         executeImportFromSheet,
         handleDeleteRequest,
-        executeDelete
+        executeDelete,
+        hasItems
     } = useSpecializationLibrary({ data, onUpdate });
 
     const isExisting = useMemo(() => {
@@ -43,7 +45,9 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
             <div className="p-4 bg-stone-100/30 border-b border-[#bfae85]/30 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0">
                 <div className="relative flex-grow max-w-md w-full flex gap-2">
                     <div className="relative flex-grow">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                            <Search size={16} className="text-[#4a3b32]/50 pointer-events-none" />
+                        </span>
                         <input
                             className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
                             placeholder="Rechercher une spécialisation..."
@@ -67,27 +71,29 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                         {hideKnown ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                 </div>
-                <div className="flex gap-2 w-full sm:w-auto">
-                    <button
-                        onClick={() => setShowOfficialUpdateConfirm(true)}
-                        className="bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
-                        title="Mettre à jour depuis le serveur officiel"
-                    >
-                        <RefreshCw size={14} /> Officiel
-                    </button>
-                    <button
-                        onClick={() => setShowImportConfirm(true)}
-                        className="bg-white/80 border border-[#bfae85]/50 text-[#5c4d41] hover:bg-stone-50 hover:text-[#1c1917] px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
-                    >
-                        <Download size={14} /> Importer
-                    </button>
-                    <button
-                        onClick={handleOpenNew}
-                        className="bg-[#5c4d41] hover:bg-[#4a3b32] text-white px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
-                    >
-                        <Plus size={14} /> Créer
-                    </button>
-                </div>
+                {isEditable && (
+                    <div className="flex gap-2 w-full sm:w-auto">
+                        <button
+                            onClick={() => setShowOfficialUpdateConfirm(true)}
+                            className="bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
+                            title="Mettre à jour depuis le serveur officiel"
+                        >
+                            <RefreshCw size={14} /> Officiel
+                        </button>
+                        <button
+                            onClick={() => setShowImportConfirm(true)}
+                            className="bg-white/80 border border-[#bfae85]/50 text-[#5c4d41] hover:bg-stone-50 hover:text-[#1c1917] px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
+                        >
+                            <Download size={14} /> Importer
+                        </button>
+                        <button
+                            onClick={handleOpenNew}
+                            className="bg-[#5c4d41] hover:bg-[#4a3b32] text-white px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1 transition-colors shadow-sm whitespace-nowrap flex-1 sm:flex-initial justify-center"
+                        >
+                            <Plus size={14} /> Créer
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* List */}
@@ -95,8 +101,11 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                 {filteredLibrary.length === 0 ? (
                     <div className="text-center text-[#5c4d41]/60 py-10 italic px-4 text-sm flex flex-col items-center">
                         <Award size={48} className="opacity-20 mb-2" />
-                        <p>{searchTerm ? "Aucun résultat." : "La bibliothèque de spécialisations est vide."}</p>
-                        {!searchTerm && <p className="text-xs mt-2 text-[#5c4d41]/80 italic">Peuplez-la manuellement ou importez l'existant.</p>}
+                        <p>{searchTerm ? "Aucun résultat." : hasItems ? "Toutes les spécialisations sont déjà sur votre fiche." : "La bibliothèque de spécialisations est vide."}</p>
+                        {!searchTerm && hasItems && hideKnown && (
+                            <button onClick={() => setHideKnown(false)} className="mt-2 text-xs text-amber-700 underline hover:text-amber-900 transition-colors">Afficher les spécialisations acquises</button>
+                        )}
+                        {!searchTerm && !hasItems && <p className="text-xs mt-2 text-[#5c4d41]/80 italic">Peuplez-la manuellement ou importez l'existant.</p>}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -108,7 +117,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                             return (
                                 <div
                                     key={entry.id}
-                                    className={`border rounded-sm p-3 transition-all bg-white/60 group flex flex-col justify-between ${isUsed
+                                    className={`border rounded-sm p-3 transition bg-white/60 group flex flex-col justify-between ${isUsed
                                         ? 'border-green-300/40 bg-green-50/10'
                                         : isOfficial ? 'border-blue-300/40 bg-blue-50/5' : 'border-[#bfae85]/30 hover:border-amber-400/50 hover:shadow-sm'
                                         }`}
@@ -131,11 +140,18 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                                                     <CheckCircle2 size={10} /> Utilisée
                                                 </span>
                                             )}
+                                            {entry.isImposed && (
+                                                <span className="text-[9px] bg-blue-100/50 text-blue-800/80 px-1.5 py-0.5 rounded-sm flex items-center gap-1 font-bold border border-blue-200/50 uppercase tracking-tight" title="Spécialisation Imposée">
+                                                    <Zap size={10} className="fill-blue-500" /> Imposée
+                                                </span>
+                                            )}
                                             {!isUsed && (
                                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={() => handleOpenEdit(merged)} className="text-blue-500 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
-                                                    {!isOfficial && (
-                                                        <button onClick={() => handleDeleteRequest(merged)} className="text-red-500 hover:bg-red-50 p-1 rounded"><Trash2 size={14} /></button>
+                                                    <button onClick={() => handleOpenEdit(merged)} className="text-blue-500 hover:bg-blue-50 p-1 rounded" title={isEditable ? "Éditer/Voir" : "Voir"}>
+                                                        {isEditable ? <Edit2 size={14} /> : <Eye size={14} />}
+                                                    </button>
+                                                    {isEditable && !isOfficial && (
+                                                        <button onClick={() => handleDeleteRequest(merged)} className="text-red-500 hover:bg-red-50 p-1 rounded" title="Supprimer"><Trash2 size={14} /></button>
                                                     )}
                                                 </div>
                                             )}
@@ -177,6 +193,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                     setSkillSearch={setSkillSearch}
                     error={error}
                     isExisting={isExisting}
+                    isEditable={isEditable}
                 />
             )}
 

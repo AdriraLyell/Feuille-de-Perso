@@ -181,7 +181,9 @@ const AdminMysticLibrary: React.FC<AdminMysticLibraryProps> = ({ rules, onUpdate
             </div>
 
             <div className="relative mb-4">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Search size={16} className="text-slate-400" />
+                </span>
                 <input
                     className="w-full pl-9 pr-9 py-2 text-sm border border-slate-300 rounded focus:border-amber-500 outline-none"
                     placeholder="Rechercher..."

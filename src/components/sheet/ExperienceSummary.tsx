@@ -12,7 +12,7 @@ interface ExperienceSummaryProps {
     cardValue: number | string | null;
 }
 
-const ExperienceSummary: React.FC<ExperienceSummaryProps> = ({ experience, cardValue }) => {
+const ExperienceSummary = React.memo<ExperienceSummaryProps>(({ experience, cardValue }) => {
     return (
         <div className="col-span-2 border-l border-stone-400 flex flex-col h-full bg-slate-50/50">
             <SectionHeader title="Experience" />
@@ -55,6 +55,6 @@ const ExperienceSummary: React.FC<ExperienceSummaryProps> = ({ experience, cardV
             </div>
         </div>
     );
-};
+});
 
 export default ExperienceSummary;

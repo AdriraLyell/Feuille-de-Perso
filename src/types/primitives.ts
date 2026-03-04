@@ -10,6 +10,7 @@ export interface DotEntry {
   definitionId?: string; // ID de la définition parente (pour lien solide)
   mysticAbilityId?: string; // Link to Mystic Ability ID
   description?: string; // New: Description info-bubble
+  isVariable?: boolean; // New: For dynamic styling in UI
 }
 
 export interface AttributeEntry {
@@ -93,7 +94,7 @@ export type EffectType = 'free_skill_rank' | 'master_skill' | 'block_skill_incre
 export interface TraitEffect {
   id: string;
   type: EffectType; // Note: 'free_skill_rank', 'master_skill', 'block_skill_increase' are being phased out in favor of 'formula' + operator
-  value: number; // Montant XP ou Rang Max Gratuit
+  value?: number; // Montant XP ou Rang Max Gratuit
   method?: 'fixed' | 'per_scenario';
   target?: string; // Nom de la compétence ciblée (pour free_skill_rank) ou cible de la formule
   source?: string; // Nom du trait d'origine (optionnel)
@@ -101,6 +102,7 @@ export interface TraitEffect {
   formula?: string; // (Legacy/Transitoire) La formule à évaluer (ex: "+2", "Volonté / 2")
   formulaId?: string; // NEW: Le lien vers la formule globale du Dictionnaire
   operator?: FormulaOperator; // NEW: Comment appliquer le résultat (Défaut: ADD)
+  effectType?: EffectType; // Legacy alias for type
 }
 
 export interface PostItData {

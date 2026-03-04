@@ -1,6 +1,5 @@
 import React from 'react';
 import { Package } from 'lucide-react';
-import { CharacterSheetData } from '../../../types/character';
 import { MotionFade } from '../../../components/ui/motion/MotionFade';
 
 interface ReadOnlyInventoryProps {

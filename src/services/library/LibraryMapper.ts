@@ -73,12 +73,13 @@ export const LibraryMapper = {
         description: s.description,
         skillIds: s.skill_ids || [],
         defaultMinLevel: s.default_min_level || 1,
+        isImposed: s.is_imposed || false,
         isGlobal: s.setting_id == null,
         isActive: activeIds.has(s.id) || s.setting_id === sid
     }),
 
     mapBackground: (b: DBBackground, activeIds: Set<string>, sid: string, variants: string[] = [], localDefaultCategory?: string): LibraryBackgroundEntry => {
-        const isCustomized = false; // Backgrounds customization not yet fully enabled in UI similarly to skills
+        const _isCustomized = false; // Backgrounds customization not yet fully enabled in UI similarly to skills
         return {
             id: b.id,
             name: b.name,

@@ -21,7 +21,7 @@ interface AppearanceEditorProps {
 const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onAddLog, rules }) => {
     const theme: ThemeConfig = data.theme || DEFAULT_THEME;
 
-    const updateTheme = (field: keyof ThemeConfig, value: any) => {
+    const updateTheme = (field: keyof ThemeConfig, value: string) => {
         onUpdate({
             ...data,
             theme: {
@@ -273,7 +273,7 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                             <button
                                 key={name}
                                 onClick={() => updateTheme('dotSymbol', name)}
-                                className={`p-2.5 rounded-sm border transition-all ${(theme.dotSymbol || 'circle') === name
+                                className={`p-2.5 rounded-sm border transition ${(theme.dotSymbol || 'circle') === name
                                     ? 'bg-[#8b2e2e] border-[#5c1e1e] text-white shadow-inner scale-105'
                                     : 'bg-white/50 border-[#bfae85]/30 text-[#5c4d41]/40 hover:border-[#8b2e2e]/40 hover:text-[#8b2e2e]/60'
                                     }`}

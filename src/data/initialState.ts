@@ -143,7 +143,7 @@ export const getInitialCharacterData = (): CharacterSheetData => {
   const skills = getInitialSkills();
   return {
     creationConfig: {
-      active: false,
+      active: true, // Le mode création est activé par défaut sur une feuille vierge
       mode: defaultRules.configurations.creation.mode,
       pointsDistributionMode: 'global',
       startingXP: defaultRules.configurations.creation.startingXP,
@@ -229,8 +229,11 @@ export const getInitialCharacterData = (): CharacterSheetData => {
         createCombatEntry(),
         createCombatEntry(),
         createCombatEntry(),
+        createCombatEntry(),
       ],
       armor: [
+        { type: '', protection: '', weight: '' },
+        { type: '', protection: '', weight: '' },
         { type: '', protection: '', weight: '' },
         { type: '', protection: '', weight: '' }
       ],

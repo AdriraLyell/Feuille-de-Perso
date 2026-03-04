@@ -1,0 +1,17 @@
+{
+  "role": "generator",
+  "base_temperature": 0.1,
+  "temperature_by_task": {
+    "mass_generation": 0.15,
+    "refactor_large": 0.05,
+    "json_output": 0.0
+  },
+  "max_tokens": 10000,
+  "quota_budget_percent": 50,
+  "strict_output": true,
+  "forbidden_patterns": [
+    "console.log",
+    "@ts-ignore",
+    "any"
+  ]
+}

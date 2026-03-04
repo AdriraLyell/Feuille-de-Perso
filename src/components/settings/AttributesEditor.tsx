@@ -49,7 +49,7 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
                         <button
                             key={idx}
                             onClick={() => requestPresetLoad(preset)}
-                            className="bg-[#fdfbf7] border border-[#bfae85]/30 hover:border-amber-400 hover:bg-amber-50/30 hover:shadow-md rounded-sm p-3 text-left transition-all group flex items-start gap-3"
+                            className="bg-[#fdfbf7] border border-[#bfae85]/30 hover:border-amber-400 hover:bg-amber-50/30 hover:shadow-md rounded-sm p-3 text-left transition group flex items-start gap-3"
                         >
                             <div className="bg-white p-2 rounded-full border border-[#bfae85]/20 group-hover:border-amber-400 group-hover:text-amber-700 text-[#bfae85]/50">
                                 <Play size={14} className="ml-0.5" />
@@ -92,7 +92,7 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
                             <button
                                 key={n}
                                 onClick={() => handleCategoryCountChange(n)}
-                                className={`w-10 h-10 rounded-full font-black text-base transition-all ${count === n
+                                className={`w-10 h-10 rounded-full font-black text-base transition ${count === n
                                     ? 'bg-[#8b2e2e] text-white shadow-lg ring-2 ring-[#8b2e2e]/20 scale-110'
                                     : 'bg-white border border-[#bfae85]/30 text-[#5c4d41]/50 hover:bg-[#8b2e2e]/5 hover:text-[#8b2e2e]'
                                     }`}
@@ -111,7 +111,7 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
                             <button
                                 key={n}
                                 onClick={() => handleGlobalAttributeCountChange(n)}
-                                className={`w-10 h-10 rounded-full font-black text-base transition-all ${globalAttrCount === n
+                                className={`w-10 h-10 rounded-full font-black text-base transition ${globalAttrCount === n
                                     ? 'bg-[#8b2e2e] text-white shadow-lg ring-2 ring-[#8b2e2e]/20 scale-110'
                                     : 'bg-white border border-[#bfae85]/30 text-[#5c4d41]/50 hover:bg-[#8b2e2e]/5 hover:text-[#8b2e2e]'
                                     }`}
@@ -156,7 +156,7 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
                                     value={cat.label}
                                     onChange={(e) => updateCategoryLabel(cat.id, e.target.value)}
                                     onFocus={(e) => e.target.select()}
-                                    className="w-full font-bold text-lg bg-white border border-gray-300 rounded px-2 py-1 shadow-inner focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-gray-900 transition-all"
+                                    className="w-full font-bold text-lg bg-white border border-gray-300 rounded px-2 py-1 shadow-inner focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-gray-900 transition"
                                     placeholder="Nom du pavé"
                                 />
                             </div>

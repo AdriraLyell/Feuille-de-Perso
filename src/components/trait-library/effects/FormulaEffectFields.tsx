@@ -7,7 +7,7 @@ interface FormulaEffectFieldsProps {
     allFormulas: LibraryFormulaEntry[];
     allAttributes: { id: string; name: string }[];
     allCounters: { id: string; name: string }[];
-    onUpdate: (id: string, field: keyof TraitEffect, value: any) => void;
+    onUpdate: (id: string, field: keyof TraitEffect, value: string | number | undefined) => void;
     onUpdateFields?: (id: string, updates: Partial<TraitEffect>) => void;
 }
 
@@ -151,7 +151,7 @@ export const FormulaEffectFields: React.FC<FormulaEffectFieldsProps> = ({
                                         <select
                                             className="w-full text-xs border border-amber-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-amber-500 outline-none bg-amber-50/20 font-bold text-stone-800 shadow-sm"
                                             value={effect.operator || 'ADD'}
-                                            onChange={(e) => onUpdate(effect.id, 'operator', e.target.value as any)}
+                                            onChange={(e) => onUpdate(effect.id, 'operator', e.target.value as TraitEffect['operator'])}
                                         >
                                             <option value="ADD">Ajoûter (+)</option>
                                             <option value="SET">Remplacer (=)</option>

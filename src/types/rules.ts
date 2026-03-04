@@ -167,7 +167,7 @@ export interface GameSettingSummary {
     id: string;
     name: string;
     version: string;
-    last_updated: string;
+    updated_at: string;
     is_public: boolean;
     is_archived: boolean;
 }

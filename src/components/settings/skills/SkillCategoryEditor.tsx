@@ -2,12 +2,13 @@ import React from 'react';
 import { DotEntry, SkillCategoryKey } from '../../../types';
 import { Minus, Plus, GripVertical, Trash2 } from 'lucide-react';
 import { useSkillsEditorActions } from '../hooks/useSkillsEditorActions';
+import { DragItemType } from '../../SettingsView';
 
 interface SkillCategoryEditorProps {
     title: string;
     category: string;
     list: DotEntry[];
-    draggedItem: any;
+    draggedItem: DragItemType | null;
     actions: ReturnType<typeof useSkillsEditorActions>;
     heightClass?: string;
     defaultItemName?: string;
@@ -43,7 +44,7 @@ export const SkillCategoryEditor: React.FC<SkillCategoryEditorProps> = ({
 
     return (
         <div
-            className={`bg-[#fdfbf7]/80 backdrop-blur-sm p-4 rounded-sm shadow-md flex flex-col ${heightClass} border border-[#bfae85]/30 transition-all duration-300 ${draggedItem && !isCounters ? 'border-dashed border-amber-400 bg-amber-50/50 scale-[1.01]' : ''}`}
+            className={`bg-[#fdfbf7]/80 backdrop-blur-sm p-4 rounded-sm shadow-md flex flex-col ${heightClass} border border-[#bfae85]/30 transition duration-300 ${draggedItem && !isCounters ? 'border-dashed border-amber-400 bg-amber-50/50 scale-[1.01]' : ''}`}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDropOnSheet(e, category, list.length)}
         >
@@ -76,7 +77,7 @@ export const SkillCategoryEditor: React.FC<SkillCategoryEditorProps> = ({
                     return (
                         <div
                             key={item.id}
-                            className={`flex items-center gap-2 text-sm group transition-all duration-200 p-1 rounded-sm ${isDragging ? 'opacity-50 bg-[#bfae85]/10' : 'hover:bg-[#bfae85]/5'}`}
+                            className={`flex items-center gap-2 text-sm group transition duration-200 p-1 rounded-sm ${isDragging ? 'opacity-50 bg-[#bfae85]/10' : 'hover:bg-[#bfae85]/5'}`}
                             draggable
                             onDragStart={(e) => handleDragStart(e, 'sheet_skill', { category, index, item })}
                             onDragOver={handleDragOver}
@@ -123,7 +124,7 @@ export const SkillCategoryEditor: React.FC<SkillCategoryEditorProps> = ({
                                             }
                                         }}
                                         onChange={(e) => updateSkillName(category as SkillCategoryKey, item.id, e.target.value)}
-                                        className={`border border-[#bfae85]/30 p-1 rounded-sm w-full focus:border-[#8b2e2e] outline-none bg-white/50 text-xs font-bold text-[#2c241b] transition-all ${item.variant ? 'bg-stone-100 text-stone-500 italic' : ''}`}
+                                        className={`border border-[#bfae85]/30 p-1 rounded-sm w-full focus:border-[#8b2e2e] outline-none bg-white/50 text-xs font-bold text-[#2c241b] transition ${item.variant ? 'bg-stone-100 text-stone-500 italic' : ''}`}
                                     />
                                     {item.variant !== undefined && (
                                         <>
@@ -133,7 +134,7 @@ export const SkillCategoryEditor: React.FC<SkillCategoryEditorProps> = ({
                                                 value={item.variant}
                                                 placeholder="Spécialité..."
                                                 onChange={(e) => updateSkillVariant(category as SkillCategoryKey, item.id, e.target.value)}
-                                                className="border border-[#bfae85]/30 p-1 rounded-sm w-full focus:border-[#8b2e2e] outline-none bg-white/50 text-xs font-bold text-[#8b2e2e] transition-all"
+                                                className="border border-[#bfae85]/30 p-1 rounded-sm w-full focus:border-[#8b2e2e] outline-none bg-white/50 text-xs font-bold text-[#8b2e2e] transition"
                                             />
                                         </>
                                     )}

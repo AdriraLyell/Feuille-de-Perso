@@ -110,8 +110,8 @@ const CloudPanel: React.FC<CloudPanelProps> = ({ data, onLoadSuccess, onClose })
                     type: 'skill', // Fake conflict to trigger resolver
                     key: 'force_conflict_root',
                     name: 'Données Personnelles',
-                    current: { name: 'Version Locale (Modifiée)', description: 'Vos changements non synchronisés' } as any,
-                    incoming: { name: 'Version Cloud', description: 'Version du Gardien / Dernier backup' } as any
+                    current: { name: 'Version Locale (Modifiée)', description: 'Vos changements non synchronisés' } as unknown as import('../../types').LibraryEntry,
+                    incoming: { name: 'Version Cloud', description: 'Version du Gardien / Dernier backup' } as unknown as import('../../types').LibraryEntry
                 }]);
                 setPendingData(incomingData);
                 setIsResolvingConflicts(true);
@@ -227,7 +227,7 @@ const CloudPanel: React.FC<CloudPanelProps> = ({ data, onLoadSuccess, onClose })
                     <button
                         onClick={handleSearch}
                         disabled={isSearching || !playerName.trim()}
-                        className={`px-6 py-2 rounded-md font-bold flex items-center gap-2 transition-all ${isSearching || !playerName.trim()
+                        className={`px-6 py-2 rounded-md font-bold flex items-center gap-2 transition ${isSearching || !playerName.trim()
                             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                             : 'bg-[#2d5a27] hover:bg-[#3d7a37] text-white'
                             }`}
@@ -280,7 +280,7 @@ const CloudPanel: React.FC<CloudPanelProps> = ({ data, onLoadSuccess, onClose })
                                     <button
                                         onClick={() => handleLoadCharacter(char)}
                                         disabled={loadStatus === 'loading'}
-                                        className={`px-4 py-2 rounded-md font-bold flex items-center gap-2 transition-all ${selectedCharId === char.id && loadStatus === 'loading'
+                                        className={`px-4 py-2 rounded-md font-bold flex items-center gap-2 transition ${selectedCharId === char.id && loadStatus === 'loading'
                                             ? 'bg-gray-300 text-gray-500'
                                             : selectedCharId === char.id && loadStatus === 'success'
                                                 ? 'bg-green-600 text-white'

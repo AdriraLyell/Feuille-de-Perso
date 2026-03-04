@@ -2,18 +2,19 @@
 import React from 'react';
 import { CharacterSheetData, LibrarySkillEntry, SkillCategoryKey } from '../../types';
 import { BookOpen, Archive, GripVertical, ArrowRight, Layers, CheckCircle2 } from 'lucide-react';
+import { DragItemType } from '../SettingsView';
 
 interface LibrarySidebarProps {
     data: CharacterSheetData;
     onUpdate: (newData: CharacterSheetData) => void;
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings') => void;
-    draggedItem: { type: 'sheet_skill' | 'lib_skill', category?: string, index?: number, id?: string, data?: any } | null;
-    setDraggedItem: (item: any) => void;
+    draggedItem: DragItemType | null;
+    setDraggedItem: (item: DragItemType | null) => void;
 }
 
 const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ data, onUpdate, onAddLog, draggedItem, setDraggedItem }) => {
 
-    const handleDragStart = (e: React.DragEvent, type: 'lib_skill', dataPayload: any) => {
+    const handleDragStart = (e: React.DragEvent, type: 'lib_skill', dataPayload: Partial<DragItemType>) => {
         setDraggedItem({ type, ...dataPayload });
         e.dataTransfer.effectAllowed = "move";
         e.dataTransfer.setData("application/json", JSON.stringify({ type, ...dataPayload }));
@@ -119,10 +120,10 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ data, onUpdate, onAddLo
                             <div
                                 key={item.id}
                                 draggable
-                                onDragStart={(e) => handleDragStart(e, 'lib_skill', { data: item })}
-                                className={`p-2 rounded border shadow-sm cursor-grab active:cursor-grabbing transition-all flex justify-between items-center group ${isPresent
-                                        ? 'bg-green-50/30 border-green-200/60 hover:border-green-400'
-                                        : 'bg-white border-gray-300 hover:border-purple-400 hover:shadow-md'
+                                onDragStart={(e) => handleDragStart(e, 'lib_skill', { data: (item as unknown) as Record<string, unknown> })}
+                                className={`p-2 rounded border shadow-sm cursor-grab active:cursor-grabbing transition flex justify-between items-center group ${isPresent
+                                    ? 'bg-green-50/30 border-green-200/60 hover:border-green-400'
+                                    : 'bg-white border-gray-300 hover:border-purple-400 hover:shadow-md'
                                     }`}
                             >
                                 <div className="flex items-center gap-2 overflow-hidden">

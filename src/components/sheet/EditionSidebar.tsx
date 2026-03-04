@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useCharacterData, useCharacterActions } from '../../context/CharacterContext';
+import { useCharacterData } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';
 import {
     BookOpen,
@@ -21,7 +21,7 @@ interface EditionSidebarProps {
 const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
     const { rules } = useRules();
     const data = useCharacterData();
-    const { updateData: _updateData } = useCharacterActions();
+
 
     const [activeTab, setActiveTab] = useState<'skills' | 'backgrounds'>('skills');
     const [searchTerm, setSearchTerm] = useState('');
@@ -81,7 +81,7 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
             <div className="flex border-b border-[#bfae85]/10">
                 <button
                     onClick={() => setActiveTab('skills')}
-                    className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all ${activeTab === 'skills'
+                    className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition ${activeTab === 'skills'
                         ? 'text-[#bfae85] border-b-2 border-[#bfae85] bg-[#bfae85]/5'
                         : 'text-slate-500 hover:text-slate-300'
                         }`}
@@ -90,7 +90,7 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                 </button>
                 <button
                     onClick={() => setActiveTab('backgrounds')}
-                    className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all ${activeTab === 'backgrounds'
+                    className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition ${activeTab === 'backgrounds'
                         ? 'text-[#bfae85] border-b-2 border-[#bfae85] bg-[#bfae85]/5'
                         : 'text-slate-500 hover:text-slate-300'
                         }`}
@@ -102,7 +102,9 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
             {/* Search & Custom */}
             <div className="p-3 space-y-3 bg-slate-800/30">
                 <div className="relative">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <Search size={14} className="text-slate-500 pointer-events-none" />
+                    </span>
                     <input
                         type="text"
                         placeholder="Rechercher..."
@@ -147,7 +149,7 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                             e.dataTransfer.setData('application/json', JSON.stringify(payload));
                         }}
                         title={customName.trim() ? "Glissez pour ajouter" : "Entrez un nom"}
-                        className={`p-2 rounded-md flex items-center justify-center transition-all ${customName.trim()
+                        className={`p-2 rounded-md flex items-center justify-center transition ${customName.trim()
                             ? 'bg-green-600/20 text-green-400 border border-green-500/30 cursor-grab active:cursor-grabbing hover:bg-green-600/30'
                             : 'bg-slate-800 text-slate-600 border border-slate-700 cursor-not-allowed'
                             }`}
@@ -165,7 +167,7 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                             e.dataTransfer.setData('application/json', JSON.stringify(payload));
                         }}
                         title="Glissez un espaceur vide"
-                        className="p-2 rounded-md flex items-center justify-center transition-all bg-slate-700 text-slate-300 border border-slate-600 cursor-grab active:cursor-grabbing hover:bg-slate-600 hover:text-white"
+                        className="p-2 rounded-md flex items-center justify-center transition bg-slate-700 text-slate-300 border border-slate-600 cursor-grab active:cursor-grabbing hover:bg-slate-600 hover:text-white"
                     >
                         <X size={18} className="rotate-45" />
                     </div>
@@ -190,7 +192,7 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                             key={item.id}
                             draggable
                             onDragStart={(e) => handleDragStart(e, item)}
-                            className="group bg-slate-800/40 border border-slate-700/50 rounded-md p-3 cursor-grab active:cursor-grabbing hover:border-[#bfae85]/40 hover:bg-slate-800/80 transition-all flex items-center justify-between"
+                            className="group bg-slate-800/40 border border-slate-700/50 rounded-md p-3 cursor-grab active:cursor-grabbing hover:border-[#bfae85]/40 hover:bg-slate-800/80 transition flex items-center justify-between"
                         >
                             <div className="flex items-center gap-3 overflow-hidden">
                                 <GripVertical size={14} className="text-slate-600 shrink-0 group-hover:text-[#bfae85]/60 transition-colors" />
@@ -226,7 +228,7 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                                     </div>
                                 </div>
                             </div>
-                            <Plus size={14} className="text-slate-600 group-hover:text-[#bfae85] opacity-0 group-hover:opacity-100 transition-all" />
+                            <Plus size={14} className="text-slate-600 group-hover:text-[#bfae85] opacity-0 group-hover:opacity-100 transition" />
                         </div>
                     ))
                 )}

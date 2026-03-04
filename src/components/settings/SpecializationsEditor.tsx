@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
-import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../../types';
-import { Plus, Trash2, Award } from 'lucide-react';
+import React from 'react';
+import { CharacterSheetData, DotEntry } from '../../types';
+import { Plus, Trash2 } from 'lucide-react';
 import SpecializationOmnibar from '../specialization-library/SpecializationOmnibar';
 import { ErrorService } from '../../services/ErrorService';
 
@@ -12,7 +12,7 @@ interface SpecializationsEditorProps {
 }
 
 const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onUpdate, onAddLog }) => {
-  const [newlyAddedSpec, setNewlyAddedSpec] = useState<{ skillId: string; index: number } | null>(null);
+
 
   const getSkillContext = (skillId: string) => {
     if (!data.skills) return { name: "Inconnu" };
@@ -82,7 +82,7 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
         [skillId]: newSpecs
       }
     });
-    setNewlyAddedSpec({ skillId, index: currentSpecs.length });
+
     const { name } = getSkillContext(skillId);
     onAddLog(`Ajout : Spécialisation automatique pour "${name}"`, 'success', 'settings');
   };
@@ -128,7 +128,18 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
   };
 
   const renderSpecializationEditor = (title: string, category: string) => {
-    const list: DotEntry[] = data.skills[category] || [];
+    // Migration safety: support both legacy and new category keys
+    const legacyToNew: Record<string, string> = {
+      'talents': 'Col_Comp_1',
+      'competences': 'Col_Comp_2',
+      'competences_col_2': 'Col_Comp_3',
+      'connaissances': 'Col_Comp_4',
+      'autres_competences': 'Col_Comp_5',
+      'autres': 'Col_Comp_7',
+      'arrieres_plans': 'Col_Comp_8'
+    };
+
+    const list: DotEntry[] = data.skills[category] || (legacyToNew[category] ? data.skills[legacyToNew[category]] : []) || [];
 
     return (
       <div className="bg-white p-4 rounded shadow flex flex-col h-full animate-in fade-in duration-300">
@@ -150,7 +161,7 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
             return (
               <div
                 key={skill.id}
-                className="border border-gray-200 rounded p-2.5 bg-gray-50/50 hover:bg-white hover:shadow-sm transition-all group/skill"
+                className="border border-gray-200 rounded p-2.5 bg-gray-50/50 hover:bg-white hover:shadow-sm transition group/skill"
                 onDragOver={(e) => {
                   e.preventDefault();
                   e.currentTarget.classList.add('bg-amber-50');
@@ -176,9 +187,11 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
                   </button>
                 </div>
 
-                <div className="text-[10px] text-gray-400 italic px-1 pb-1">
-                  Aucune spécialisation automatique.
-                </div>
+                {imposedSpecs.length === 0 && (
+                  <div className="text-[10px] text-gray-400 italic px-1 pb-1">
+                    Aucune spécialisation automatique.
+                  </div>
+                )}
 
                 <div className="space-y-1.5">
                   {imposedSpecs.map((spec, idx) => (

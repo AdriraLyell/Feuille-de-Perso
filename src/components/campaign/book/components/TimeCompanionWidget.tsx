@@ -11,7 +11,7 @@ interface TimeCompanionWidgetProps {
     onClose?: () => void;
 }
 
-const WEATHER_ICONS_SMALL: Record<string, any> = {
+const WEATHER_ICONS_SMALL: Record<string, { icon: React.ElementType, color: string }> = {
     'sun': { icon: Sun, color: 'text-amber-500' },
     'rain': { icon: CloudRain, color: 'text-blue-500' },
     'snow': { icon: Snowflake, color: 'text-slate-300' },
@@ -121,7 +121,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
         if (!config.events || config.events.length === 0) return null;
 
         const currentDt = isReal
-            ? new Date((config as any).currentDate || new Date().toISOString())
+            ? new Date((config as import('../../../../types/rules').CalendarConfigReal).currentDate || new Date().toISOString())
             : null;
 
         if (isReal && currentDt) {
@@ -147,12 +147,12 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
             return upcoming[0] || null;
         }
         return null;
-    }, [config.events, (config as any).currentDate, (config as any).currentYear, (config as any).currentMonthIndex, (config as any).currentDay, isReal]);
+    }, [config.events, (config as import('../../../../types/rules').CalendarConfigReal).currentDate, (config as import('../../../../types/rules').CalendarConfigFictional).currentYear, (config as import('../../../../types/rules').CalendarConfigFictional).currentMonthIndex, (config as import('../../../../types/rules').CalendarConfigFictional).currentDay, isReal]);
 
     const daysToNextEvent = useMemo(() => {
         if (!nextEvent) return null;
         if (isReal) {
-            const now = new Date((config as any).currentDate || new Date().toISOString());
+            const now = new Date((config as import('../../../../types/rules').CalendarConfigReal).currentDate || new Date().toISOString());
             const target = new Date(nextEvent.date);
             const diff = target.getTime() - now.getTime();
             return Math.ceil(diff / (1000 * 60 * 60 * 24));
@@ -161,7 +161,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
             // For now, just show the date
             return null;
         }
-    }, [nextEvent, (config as any).currentDate, isReal]);
+    }, [nextEvent, (config as import('../../../../types/rules').CalendarConfigReal).currentDate, isReal]);
 
     const prevMonth = () => {
         if (viewMonth === 0) {

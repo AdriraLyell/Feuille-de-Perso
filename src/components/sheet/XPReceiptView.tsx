@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowUpRight, ArrowDownRight, RotateCcw, ChevronDown, Activity, BookOpen, User, Maximize2, Sparkles, Database, Zap, Wrench, Shield, Swords, Bookmark } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, ChevronDown, Activity, BookOpen, User, Maximize2, Sparkles, Database, Zap, Wrench, Swords, Bookmark } from 'lucide-react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
-import { ExperienceBreakdown } from '../../types';
+import { ExperienceBreakdown, ExperienceBreakdownItem } from '../../types';
 
 interface XPReceiptViewProps {
     breakdown?: ExperienceBreakdown;
@@ -33,7 +33,7 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGa
     const getCategorizedData = useMemo(() => {
         if (!breakdown) return { gains: [], spends: [] };
 
-        const finalize = (key: string, label: string, icon: React.ReactNode, colorClass: string, items: any[] = [], type: 'earn' | 'spend' | 'refund'): GroupedTransaction => {
+        const finalize = (key: string, label: string, icon: React.ReactNode, colorClass: string, items: ExperienceBreakdownItem[] = [], type: 'earn' | 'spend' | 'refund'): GroupedTransaction => {
             const entries: AggregatedEntry[] = items.map(item => ({
                 name: item.name,
                 amount: Math.abs(item.amount),
@@ -62,7 +62,7 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGa
             finalize('other_gain', 'Autres Gains', <Sparkles size={16} />, 'text-indigo-600', otherGains, 'earn')
         ].filter(c => c.entries.length > 0);
 
-        const skillGroupsMap = new Map<string, any[]>();
+        const skillGroupsMap = new Map<string, ExperienceBreakdownItem[]>();
         breakdown.skills.forEach(skill => {
             const catName = skill.category || 'Autres Compétences';
             if (!skillGroupsMap.has(catName)) {
@@ -161,7 +161,7 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGa
     const renderGroup = (group: GroupedTransaction) => {
         const isExpanded = expandedCategory === group.category;
         return (
-            <div key={group.category} className={`border border-stone-200 rounded-lg overflow-hidden transition-all duration-200 ${isExpanded ? 'bg-white shadow-md my-2 ring-1 ring-stone-300' : 'bg-white/60 hover:bg-white mb-2'}`}>
+            <div key={group.category} className={`border border-stone-200 rounded-lg overflow-hidden transition duration-200 ${isExpanded ? 'bg-white shadow-md my-2 ring-1 ring-stone-300' : 'bg-white/60 hover:bg-white mb-2'}`}>
                 <Tippy
                     content={renderTooltipContent(group)}
                     placement="left"

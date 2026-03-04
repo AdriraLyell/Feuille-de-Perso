@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle, RefreshCw, MessageSquare, UploadCloud } from 'lucide-react';
+import { AlertTriangle, CheckCircle, RefreshCw, MessageSquare } from 'lucide-react';
 import { GameSettingSummary } from '../../../services/CampaignService';
 import { CharacterSheetData } from '../../../types/character';
 import SyncHistoryTab from './SyncHistoryTab';
@@ -165,7 +165,7 @@ const SyncViewTab: React.FC<SyncViewTabProps> = ({
                         checked={isAutoSync}
                         onChange={(e) => setIsAutoSync(e.target.checked)}
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition peer-checked:bg-indigo-600"></div>
                 </label>
             </div>
 

@@ -24,6 +24,9 @@ export default {
                 serif: ['"Cinzel"', '"Playfair Display"', 'serif'],
                 sans: ['"Inter"', '"Lato"', 'sans-serif'],
                 hand: ['"Patrick Hand"', 'cursive'],
+                dancing: ['"Dancing Script"', 'cursive'],
+                vibes: ['"Great Vibes"', 'cursive'],
+                pinyon: ['"Pinyon Script"', 'cursive'],
             },
             boxShadow: {
                 'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',

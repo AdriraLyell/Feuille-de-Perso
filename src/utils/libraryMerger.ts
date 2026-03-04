@@ -1,5 +1,5 @@
 
-import { LibraryEntry, LibrarySkillEntry } from '../types';
+
 
 export type EntrySource = 'local' | 'official' | 'modified';
 
@@ -29,11 +29,18 @@ export const mergeLibraries = <T extends { id: string, name: string }>(
     const localNames = new Set<string>();
     const localIds = new Set<string>();
 
+    // Pre-compute official IDs and names for fast lookup
+    const officialIds = new Set<string>(officialList.map(o => o.id));
+    const officialNames = new Set<string>(officialList.map(o => normalizeString(o.name)));
+
     // 1. Add all local items first (Priority)
+    // If a local item has the same ID as an official one, it is marked 'official'
+    // (it's a stale copy from a previous reconciler injection — content stays, badge is corrected)
     localList.forEach(item => {
+        const isAlsoOfficial = officialIds.has(item.id) || officialNames.has(normalizeString(item.name));
         mergedMap.set(item.id, {
             entry: item,
-            source: 'local',
+            source: isAlsoOfficial ? 'modified' : 'local',
             originalId: item.id
         });
         localIds.add(item.id);

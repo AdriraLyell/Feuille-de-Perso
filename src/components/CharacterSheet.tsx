@@ -4,16 +4,13 @@ import { canIncreaseMysticSkill, canLearnNewMysticSkill } from '../utils/mysticU
 
 // Imports des sous-composants refactorisés
 import { AttributeBlock } from './sheet/AttributeBlock';
-import { CombatSection } from './sheet/CombatSection';
 import { CountersSection } from './sheet/CountersSection';
 import SheetHeader from './sheet/SheetHeader';
 import ExperienceSummary from './sheet/ExperienceSummary';
-import CreationModeModal from './sheet/CreationModeModal';
-import EditionSidebar from './sheet/EditionSidebar';
 import CharacterSheetGrid from './sheet/CharacterSheetGrid';
 
 // Hooks
-import { useCharacterData, useCharacterActions } from '../context/CharacterContext';
+import { useCharacterData, useCharacterActions, useCharacterState } from '../context/CharacterContext';
 import { useCharacterSheetActions } from '../hooks/useCharacterSheetActions';
 import { useCharacterBonuses } from '../hooks/useCharacterBonuses';
 import { useCreationMode } from '../hooks/useCreationMode';
@@ -24,24 +21,20 @@ import { useVariableSkills } from '../hooks/sheet/useVariableSkills';
 
 import ThematicModal from './ui/ThematicModal';
 import VariantSelectionModal from './ui/VariantSelectionModal';
-import { PencilLine, Check } from 'lucide-react';
+import { PencilLine, Check, UserPlus } from 'lucide-react';
 
 interface Props {
     isLandscape?: boolean;
+    onToggleEditMode?: () => void;
 }
 
-const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
+const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode }) => {
     const data = useCharacterData();
-    const { updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacterActions();
+    const dataRef = React.useRef(data);
+    React.useEffect(() => { dataRef.current = data; }, [data]);
 
-    const {
-        isEditMode,
-        setIsEditMode,
-        showEditWarning,
-        setShowEditWarning,
-        handleToggleEditMode,
-        executeEditModeActivation
-    } = useEditMode();
+    const { updateData: onChange, addLog: onAddLog, recordXPTransaction, setEditMode: setIsEditMode } = useCharacterActions();
+    const { isEditMode } = useCharacterState();
 
     // Variable Skill State
     const [variantModalState, setVariantModalState] = useState<{
@@ -69,12 +62,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         rules?.libraries?.traits || []
     );
 
-    const {
-        showCreationWarning,
-        handleToggleCreationMode,
-        executeCreationActivation,
-        setShowCreationWarning
-    } = useCreationMode(data, onChange, onAddLog);
+    // Logic removed because it's now in MainLayout
 
     const {
         updateHeader,
@@ -82,8 +70,6 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
         handleDropItem,
         handleRemoveItem,
         updateAttribute,
-        updateCombatWeapon,
-        updateArmor,
         updateCounter
     } = useCharacterSheetActions(data, onChange, onAddLog, recordXPTransaction, rules);
 
@@ -95,7 +81,8 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
     const {
         attributeCategories,
         getAttributesGridClass,
-        getDynamicColumns
+        portraitLayout,
+        landscapeLayout
     } = useSheetLayout(data, rules);
 
     // --- CharacterSheet Logic handlers (now managed by useCharacterSheetActions) ---
@@ -104,11 +91,12 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
     const creationActive = data.creationConfig?.active;
     const allowExtendedSkills = data.creationConfig?.extendedSkills || false;
 
-    const { columns, backgrounds } = getDynamicColumns(isLandscape);
+    const { columns, backgrounds, autres } = isLandscape ? landscapeLayout : portraitLayout;
 
     const validateSkillIncrease = useCallback((id: string, newValue: number) => {
+        const currentData = dataRef.current;
         // Find the skill by ID
-        const allSkills = Object.values(data.skills).flat();
+        const allSkills = Object.values(currentData.skills).flat();
         const skill = allSkills.find(s => s.id === id);
         if (!skill) return { allowed: true };
 
@@ -124,16 +112,19 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
 
         // 1. Check Learning (0 -> 1)
         if (skill.value === 0 && newValue > 0) {
-            return canLearnNewMysticSkill(data, skill.name, rules, !!creationActive);
+            return canLearnNewMysticSkill(currentData, skill.name, rules, !!creationActive, id);
         }
 
         // 2. Check Increase (>0)
         if (skill.value > 0 && newValue > skill.value) {
-            return canIncreaseMysticSkill(data, skill.name, rules);
+            return canIncreaseMysticSkill(currentData, skill.name, rules, id);
         }
 
         return { allowed: true };
-    }, [data, rules, creationActive, blockedSkills]);
+    }, [rules, creationActive, blockedSkills]);
+
+    const { handleToggleEditMode } = useEditMode(isEditMode, setIsEditMode);
+    const { handleToggleCreationMode } = useCreationMode(data, onChange as any, onAddLog);
 
     return (
         <div className={`flex justify-center transition-all duration-300 ${isEditMode ? 'pr-80' : ''}`}>
@@ -143,33 +134,13 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                     headerData={data.header}
                     creationActive={!!creationActive}
                     onUpdateHeader={updateHeader}
-                    onToggleCreationMode={handleToggleCreationMode}
-                    editModeActive={isEditMode}
-                    onToggleEditMode={handleToggleEditMode}
                     isDateLocked={!!rules?.configurations?.calendar}
+                    isEditMode={isEditMode}
+                    onToggleEditMode={onToggleEditMode || handleToggleEditMode}
+                    onToggleCreationMode={handleToggleCreationMode}
                 />
 
-                {isEditMode && (
-                    <div className="bg-amber-600 text-white py-2 px-4 flex justify-between items-center shadow-md animate-in slide-in-from-top duration-300 no-print">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-white/20 p-1.5 rounded-full">
-                                <PencilLine size={18} />
-                            </div>
-                            <div>
-                                <p className="font-bold text-sm">Mode Édition Actif</p>
-                                <p className="text-[10px] opacity-90">Glissez-déposez pour réorganiser ou supprimer. Vos changements sont enregistrés localement.</p>
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => setIsEditMode(false)}
-                            className="bg-white text-amber-700 px-4 py-1.5 rounded-sm font-black text-xs uppercase hover:bg-amber-50 transition-colors shadow-sm flex items-center gap-2"
-                        >
-                            <Check size={14} /> Valider mes changements
-                        </button>
-                    </div>
-                )}
-
-                {isEditMode && <EditionSidebar onClose={() => setIsEditMode(false)} />}
+                {/* Edition mode logic and sidebar moved to MainLayout */}
 
                 {/* Attributes Section */}
                 <div className="grid grid-cols-12 border-b-2 border-stone-800">
@@ -193,6 +164,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                 <CharacterSheetGrid
                     columns={columns}
                     backgrounds={backgrounds}
+                    autres={autres}
                     isLandscape={isLandscape}
                     isEditMode={isEditMode}
                     allowExtendedSkills={allowExtendedSkills}
@@ -206,91 +178,23 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false }) => {
                     onRemoveItem={handleRemoveItem}
                     validateSkillIncrease={validateSkillIncrease}
                     blockedSkills={blockedSkills}
-                    renderExtraColumn={() => (
-                        <>
-                            <div className="flex-none border-b border-stone-400 overflow-hidden">
-                                <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
-                            </div>
-                            <div className="flex-grow overflow-hidden">
-                                <CountersSection
-                                    data={data}
-                                    updateCounter={updateCounter}
-                                    isLandscape={isLandscape}
-                                    creationBonuses={counterCreationBonuses}
-                                    xpBonuses={counterXPBonuses}
-                                    calculatedMaxes={calculatedMaxes}
-                                    activeReserves={activeReserves}
-                                />
-                            </div>
-                        </>
-                    )}
+                    renderExtraColumn={() => null}
                     renderBottomSection={() => (
-                        <div className="grid grid-cols-2">
-                            <div className="border-r-2 border-stone-800 flex flex-col">
-                                <CombatSection data={data} updateCombatWeapon={updateCombatWeapon} updateArmor={updateArmor} />
-                            </div>
-                            <div className="flex-col overflow-hidden">
-                                <CountersSection
-                                    data={data}
-                                    updateCounter={updateCounter}
-                                    isLandscape={isLandscape}
-                                    creationBonuses={counterCreationBonuses}
-                                    xpBonuses={counterXPBonuses}
-                                    calculatedMaxes={calculatedMaxes}
-                                    activeReserves={activeReserves}
-                                />
-                            </div>
+                        <div className="w-full h-[200px] overflow-hidden">
+                            <CountersSection
+                                data={data}
+                                updateCounter={updateCounter}
+                                isLandscape={isLandscape}
+                                creationBonuses={counterCreationBonuses}
+                                xpBonuses={counterXPBonuses}
+                                calculatedMaxes={calculatedMaxes}
+                                activeReserves={activeReserves}
+                            />
                         </div>
                     )}
                 />
 
-                {showEditWarning && (
-                    <ThematicModal
-                        isOpen={showEditWarning}
-                        onClose={() => setShowEditWarning(false)}
-                        title="Activer le Mode Édition ?"
-                        icon={<PencilLine size={24} />}
-                        size="md"
-                        footer={
-                            <>
-                                <button
-                                    onClick={() => setShowEditWarning(false)}
-                                    className="px-4 py-2 text-[#5c4d41] hover:bg-stone-200/50 rounded-sm font-bold"
-                                >
-                                    Annuler
-                                </button>
-                                <button
-                                    onClick={executeEditModeActivation}
-                                    className="px-6 py-2 bg-amber-600 text-white rounded-sm font-bold shadow-md hover:bg-amber-700 flex items-center gap-2"
-                                >
-                                    <Check size={16} /> Compris, j'active
-                                </button>
-                            </>
-                        }
-                    >
-                        <div className="flex flex-col gap-4 py-2">
-                            <div className="bg-amber-50 border border-amber-200 p-4 rounded-sm text-sm text-[#5c4d41] leading-relaxed">
-                                <p className="font-bold mb-2">Qu'est-ce que le Mode Édition ?</p>
-                                <ul className="list-disc list-inside space-y-2 text-xs">
-                                    <li><strong>Ajout direct</strong> : Glissez des compétences depuis la barre latérale.</li>
-                                    <li><strong>Réorganisation</strong> : Déplacez vos compétences d'un bloc à l'autre.</li>
-                                    <li><strong>Nettoyage</strong> : Supprimez des éléments inutiles via l'icône poubelle.</li>
-                                    <li><strong>Suggestions</strong> : Les nouveaux éléments sont suggérés au MJ.</li>
-                                </ul>
-                                <p className="mt-4 text-[10px] italic opacity-70">Note : Ce mode est réservé aux ajustements de structure. Pour remplir vos points, utilisez le mode standard ou le mode création.</p>
-                            </div>
-                        </div>
-                    </ThematicModal>
-                )}
-
-                {/* Creation Mode Activation Warning Modal */}
-                {showCreationWarning && (
-                    <CreationModeModal
-                        data={data}
-                        onClose={() => setShowCreationWarning(false)}
-                        onConfirm={executeCreationActivation}
-                    />
-                )}
+                {/* Warnings moved to MainLayout */}
 
                 {/* Variable Skill Definition Modal */}
                 {/* Variable Skill Definition Modal */}

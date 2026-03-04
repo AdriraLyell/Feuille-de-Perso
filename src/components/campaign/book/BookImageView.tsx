@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { NodeViewWrapper } from '@tiptap/react';
 import { BookImageAttributes } from '../../../extensions/bookImage';
@@ -25,7 +25,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
     const [isEditingCaption, setIsEditingCaption] = useState(false);
     const [isPanMode, setIsPanMode] = useState(false);
     const [showAdvanced, setShowAdvanced] = useState(false);
-    const [hudBelow] = useState(true);
+
 
     const containerRef = useRef<HTMLDivElement>(null);
     // wrapperRef pointe sur le NodeViewWrapper (.book-image-view) — résolu via DOM au montage.
@@ -43,7 +43,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
         node,
         updateAttributes,
         containerRef,
-        wrapperRef: wrapperRef as React.RefObject<HTMLElement>,
+        wrapperRef,
     });
     // hudTick is intentionally unused in render output — it triggers re-renders for the HUD display
     void hudTick;
@@ -133,7 +133,7 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
             style={{
                 float: isFree
                     ? (node.attrs.wrapSide === 'right' ? 'right' : 'left')
-                    : (isLateral ? (node.attrs.align as any) : 'none'),
+                    : (isLateral ? (node.attrs.align as 'left' | 'right' | 'none') : 'none'),
                 width: isFree ? (node.attrs.width || 'fit-content') : (isLateral ? node.attrs.width : undefined),
                 display: isFloating ? 'inline-block' : 'block',
                 margin: isFloating

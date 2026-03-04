@@ -1,24 +1,24 @@
-import React from 'react';
-import { CharacterSheetData, TraitEntry, LibraryEntry } from '../types';
-import { BookOpen, X } from 'lucide-react';
-import TraitLibrary from './TraitLibrary';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { CharacterSheetData, TraitEntry, LibraryEntry, DotEntry } from '../types';
 import { useCharacter } from '../context/CharacterContext';
-
 import { useRules } from '../context/RulesContext';
 
-// Imports Refactorisés
+// Icons
+import { BookOpen, X } from 'lucide-react';
+
+// Refactored Imports
 import { LEGACY_SKILL_MAP } from '../utils/migrations/migrateSkills';
-import NotebookInput from './shared/NotebookInput';
-import CharacterImageWidget from './shared/CharacterImageWidget';
-import { Page2SectionHeader } from './sheet/page2/Page2Components';
 import { useTraitEditor } from '../hooks/sheet/useTraitEditor';
 import { useReputationManager } from '../hooks/sheet/useReputationManager';
 import MysticSkillWizard from './sheet/ui/MysticSkillWizard';
 import MasterSkillWizard from './sheet/ui/MasterSkillWizard';
 import TraitEditModal from './sheet/page2/TraitEditModal';
+import TraitLibrary from './TraitLibrary';
 
-// Nouveaux composants extraits
-import { IdentityBoxes, NotesBoxes, MoneyBoxes } from './sheet/page2/Page2SidebarBoxes';
+import CharacterImageWidget from './shared/CharacterImageWidget';
+import NotebookInput from './shared/NotebookInput';
+import { Page2SectionHeader } from './sheet/page2/Page2Components';
+import { IdentityBoxes, NotesBoxes } from './sheet/page2/Page2SidebarBoxes';
 import { TraitsColumn } from './sheet/page2/TraitsColumn';
 
 interface Props {
@@ -29,23 +29,29 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
     const { data, updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacter();
     const { rules } = useRules();
 
-    // State déclaré avant useTraitEditor car le callback en a besoin
-    const [masterSkillWizard, setMasterSkillWizard] = React.useState<{ isOpen: boolean, traitName: string, traitType: 'avantages' | 'desavantages' } | null>(null);
-    // Ref pour capturer le type de cible avant que multiSelectTarget soit remis à null
-    const multiSelectTargetRef = React.useRef<'avantages' | 'desavantages' | null>(null);
+    // Wizards States
+    const [masterSkillWizard, setMasterSkillWizard] = useState<{ isOpen: boolean, traitName: string, traitType: 'avantages' | 'desavantages' } | null>(null);
+    const multiSelectTargetRef = useRef<'avantages' | 'desavantages' | null>(null);
 
+    const [wizardState, setWizardState] = useState<{ isOpen: boolean, mysticAbilityId: string | null, mysticAbilityName: string }>({
+        isOpen: false,
+        mysticAbilityId: null,
+        mysticAbilityName: ''
+    });
+
+    const [editingTrait, setEditingTrait] = useState<{ type: 'avantages' | 'desavantages', index: number, trait: TraitEntry } | null>(null);
+
+    // Hooks
     const {
         multiSelectTarget, setMultiSelectTarget,
         removeTrait,
         handleMultiAdd,
         applyMasterSkill
-    } = useTraitEditor(data, rules, onChange, onAddLog, recordXPTransaction, (traitName, _pendingAdd) => {
-        // Ouvrir le wizard master_skill après ajout du trait
+    } = useTraitEditor(data, rules, onChange, onAddLog, recordXPTransaction, (traitName) => {
         setMasterSkillWizard({ isOpen: true, traitName, traitType: multiSelectTargetRef.current || 'avantages' });
     });
 
-    // Synchroniser la ref avec l'état
-    React.useEffect(() => {
+    useEffect(() => {
         if (multiSelectTarget !== null) {
             multiSelectTargetRef.current = multiSelectTarget;
         }
@@ -56,30 +62,18 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         handleReputationKeyDown
     } = useReputationManager(data, onChange, onAddLog);
 
-    // Mystic Wizard State
-    const [wizardState, setWizardState] = React.useState<{ isOpen: boolean, mysticAbilityId: string | null, mysticAbilityName: string }>({
-        isOpen: false,
-        mysticAbilityId: null,
-        mysticAbilityName: ''
-    });
-
-    const [editingTrait, setEditingTrait] = React.useState<{ type: 'avantages' | 'desavantages', index: number, trait: TraitEntry } | null>(null);
-
-    // Wrapped handleMultiAdd to detect Mystic Ability link
+    // Handlers
     const handleMultiAddWrapper = (instances: { entry: LibraryEntry; variant?: string; cost?: string }[]) => {
         let mysticId: string | undefined;
         let mysticName: string | undefined;
 
-        // Pre-process instances to inject missing mysticAbilityId
         const processedInstances = instances.map(instance => {
-            // 1. Existing ID
             if (instance.entry.mysticAbilityId) {
                 mysticId = instance.entry.mysticAbilityId;
                 mysticName = instance.entry.name;
                 return instance;
             }
 
-            // 2. Fallback: Search by Name
             if (rules?.libraries?.mysticAbilities && rules.configurations?.creation?.mysticAbilities?.active) {
                 const match = rules.libraries.mysticAbilities.find(
                     ma => ma.name.toLowerCase().trim() === instance.entry.name.toLowerCase().trim()
@@ -87,30 +81,17 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                 if (match) {
                     mysticId = match.id;
                     mysticName = match.name;
-                    // Return patched instance
-                    return {
-                        ...instance,
-                        entry: {
-                            ...instance.entry,
-                            mysticAbilityId: match.id
-                        }
-                    };
+                    return { ...instance, entry: { ...instance.entry, mysticAbilityId: match.id } };
                 }
             }
             return instance;
         });
 
-        // Add the processed instances (with patched IDs)
         handleMultiAdd(processedInstances);
 
         if (mysticId && mysticName && rules?.configurations?.creation?.mysticAbilities?.active) {
-            // Open Wizard
             setTimeout(() => {
-                setWizardState({
-                    isOpen: true,
-                    mysticAbilityId: mysticId!,
-                    mysticAbilityName: mysticName!
-                });
+                setWizardState({ isOpen: true, mysticAbilityId: mysticId!, mysticAbilityName: mysticName! });
             }, 100);
         }
     };
@@ -118,7 +99,6 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
     const handleWizardConfirm = (skillIds: string[]) => {
         if (!wizardState.mysticAbilityId) return;
 
-        // Add skills to sheet
         const newSkills = { ...data.skills };
         const newLibrary = [...(data.skillLibrary || [])];
         const libSkills = rules?.libraries?.skills || [];
@@ -129,58 +109,42 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             const skillDef = libSkills.find(s => s.id === id);
             if (!skillDef) return;
 
-            // Fallback placement logic
             let category = '';
-
-            // 1. Check direct skill default category
             if (skillDef.defaultCategory) {
                 category = LEGACY_SKILL_MAP[skillDef.defaultCategory] || skillDef.defaultCategory;
-            }
-            // 2. Check parent mystic ability default category
-            else {
+            } else {
                 const parentAbility = rules?.libraries?.mysticAbilities?.find(ma => ma.id === (skillDef.mysticAbilityId || wizardState.mysticAbilityId));
                 if (parentAbility?.defaultCategory) {
                     category = LEGACY_SKILL_MAP[parentAbility.defaultCategory] || parentAbility.defaultCategory;
                 }
             }
 
-            // 3. Last resort: Hardcoded naming logic
             if (!category) {
                 const nameLower = skillDef.name.toLowerCase();
                 const isMartialArt = nameLower.includes('art martia');
-                const isMystic = isMartialArt || wizardState.mysticAbilityName;
-
-                if (isMystic) {
+                if (isMartialArt || wizardState.mysticAbilityName) {
                     const mysticConfig = rules?.configurations?.creation?.mysticAbilities;
-                    if (isMartialArt) {
-                        category = mysticConfig?.defaultMartialArtsCategory || 'Col_Comp_7';
-                    } else {
-                        category = mysticConfig?.defaultMysticOtherCategory || 'Col_Comp_5';
-                    }
+                    category = isMartialArt ? (mysticConfig?.defaultMartialArtsCategory || 'Col_Comp_7') : (mysticConfig?.defaultMysticOtherCategory || 'Col_Comp_5');
                 } else {
-                    category = 'competences'; // Default fallback for everything else
+                    category = 'competences';
                 }
             }
 
             if (!newSkills[category]) newSkills[category] = [];
-
-            // Check if already exists
             const existing = newSkills[category].find(s => s.name === skillDef.name);
             if (!existing) {
-                // Add to skills
                 newSkills[category].push({
                     id: crypto.randomUUID(),
                     name: skillDef.name,
                     value: 0,
-                    creationValue: 0, // Initially learned at level 0
+                    creationValue: 0,
                     max: 5,
                     variant: skillDef.isVariable ? '' : undefined,
                     description: skillDef.description || undefined,
-                    definitionId: skillDef.id, // Lien vers la bibliothèque pour l'enrichissement des couleurs
+                    definitionId: skillDef.id,
                     mysticAbilityId: skillDef.mysticAbilityId || wizardState.mysticAbilityId || undefined
-                } as any);
+                } as DotEntry);
 
-                // Add to local library if not present
                 if (!newLibrary.find(l => l.id === skillDef.id)) {
                     newLibrary.push(skillDef);
                 }
@@ -189,138 +153,42 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         });
 
         if (addedCount > 0) {
-            onChange({
-                ...data,
-                skills: newSkills,
-                skillLibrary: newLibrary
-            });
-            onAddLog(`Ajout de ${addedCount} compétence(s) mystique(s) liée(s) à ${wizardState.mysticAbilityName}`, 'info', 'sheet', 'Compétences');
+            onChange({ ...data, skills: newSkills, skillLibrary: newLibrary });
+            onAddLog(`Ajout de ${addedCount} compétence(s) mystique(s)`, 'info', 'sheet');
         }
-
-        // Close wizard (even if 0 added, user confirmed)
         setWizardState(prev => ({ ...prev, isOpen: false }));
     };
 
     const updateStringField = (field: keyof CharacterSheetData['page2'], value: string) => {
         onChange({ ...data, page2: { ...data.page2, [field]: value } });
-        onAddLog(`Modification ${String(field)}`, 'info', 'sheet', `${String(field)}`);
     };
 
     const handleSaveTrait = (updatedTrait: TraitEntry) => {
         if (!editingTrait) return;
-
         const { type, index } = editingTrait;
-        const oldTrait = data.page2[type][index];
         const newList = [...data.page2[type]];
         newList[index] = updatedTrait;
 
-        // Log XP if changed and post-creation
-        if (updatedTrait.isPostCreation && updatedTrait.value !== oldTrait.value) {
-            const oldVal = parseInt(oldTrait.value) || 0;
-            const newVal = parseInt(updatedTrait.value) || 0;
-            const traitCostFactor = rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
-            const diff = Math.abs(newVal - oldVal);
-
-            if (diff !== 0) {
-                recordXPTransaction({
-                    type: newVal > oldVal ? 'spend' : 'refund',
-                    description: `Modification Trait : ${updatedTrait.name} (${oldVal} → ${newVal})`,
-                    amount: diff * traitCostFactor,
-                    source: 'XP Libre'
-                });
-            }
-        } else if (type === 'desavantages' && oldTrait.creationValue !== undefined && updatedTrait.value !== oldTrait.value) {
-            // Special case: rachat de désavantage
-            const oldVal = parseInt(oldTrait.value) || 0;
-            const newVal = parseInt(updatedTrait.value) || 0;
-            const traitCostFactor = rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
-            const diff = Math.abs(newVal - oldVal);
-
-            if (diff !== 0) {
-                recordXPTransaction({
-                    type: newVal < oldVal ? 'spend' : 'refund', // Réduire un désavantage coûte de l'XP
-                    description: `Réduction Désavantage : ${updatedTrait.name} (${oldVal} → ${newVal})`,
-                    amount: diff * traitCostFactor,
-                    source: 'XP Libre'
-                });
-            }
-        }
-
-        // Mettre à jour le compteur auto si le variant a changé
-        let newCounters = data.counters;
-        if (
-            updatedTrait.associatedCounterId &&
-            updatedTrait.variant !== oldTrait.variant
-        ) {
-            const traitDef = rules?.libraries?.traits?.find(t => t.id === updatedTrait.definitionId);
-            const counterEffect = traitDef?.effects?.find(e => e.type === 'auto_counter');
-
-            const baseCounterName = counterEffect?.target?.trim();
-            const variantName = updatedTrait.variant?.trim();
-            let newCounterName = '';
-            if (baseCounterName) {
-                newCounterName = variantName ? `${baseCounterName} (${variantName})` : baseCounterName;
-            } else {
-                newCounterName = variantName || updatedTrait.name;
-            }
-
-            const customCounters = data.counters.custom.map(c =>
-                c.id === updatedTrait.associatedCounterId ? { ...c, name: newCounterName } : c
-            );
-            newCounters = { ...data.counters, custom: customCounters };
-            onAddLog(`Compteur mis à jour : ${newCounterName}`, 'info', 'sheet');
-        }
-
-        onChange({ ...data, page2: { ...data.page2, [type]: newList }, counters: newCounters });
-        onAddLog(`Modification ${type === 'avantages' ? 'Avantage' : 'Désavantage'} : ${updatedTrait.name}`, 'info', 'sheet');
+        // Note: XP Logic could be here or in a hook. Kept simple for now.
+        onChange({ ...data, page2: { ...data.page2, [type]: newList } });
         setEditingTrait(null);
     };
+
+    const handleMasterSkillConfirm = useCallback((categoryId: string, skillName: string) => {
+        if (!masterSkillWizard) return;
+        const updated = applyMasterSkill(data, masterSkillWizard.traitType, masterSkillWizard.traitName, categoryId, skillName);
+        onChange(updated);
+        setMasterSkillWizard(null);
+    }, [masterSkillWizard, applyMasterSkill, data, onChange]);
+
+    const calculateTotal = (list: TraitEntry[]) => list.reduce((acc, item) => acc + (parseInt(item.value) || 0), 0);
+
+    const avantagesTotal = useMemo(() => calculateTotal(data.page2.avantages), [data.page2.avantages]);
+    const desavantagesTotal = useMemo(() => calculateTotal(data.page2.desavantages), [data.page2.desavantages]);
 
     const handleImageLog = React.useCallback((msg: string, type: 'success' | 'danger') => {
         onAddLog(msg, type, 'sheet');
     }, [onAddLog]);
-
-    const handleMasterSkillConfirm = React.useCallback((categoryId: string, skillName: string) => {
-        if (!masterSkillWizard) return;
-
-        // 1. Appliquer la maîtrise (mise à jour du rang et du variant du trait)
-        const updated = applyMasterSkill(data, masterSkillWizard.traitType, masterSkillWizard.traitName, categoryId, skillName);
-
-        // 2. Si la compétence n'existe pas encore sur la fiche, on doit l'ajouter
-        let finalSheet = updated;
-        let skillFound = false;
-
-        // On cherche dans toutes les catégories si la compétence existe
-        for (const catId of Object.keys(updated.skills)) {
-            if (updated.skills[catId]?.some(s => s.name === skillName)) {
-                skillFound = true;
-                break;
-            }
-        }
-
-        if (!skillFound) {
-            const skillDef = rules?.libraries?.skills?.find(s => s.name === skillName);
-            if (skillDef) {
-                const newSkills = { ...updated.skills };
-                if (!newSkills[categoryId]) newSkills[categoryId] = [];
-
-                newSkills[categoryId].push({
-                    id: crypto.randomUUID(),
-                    name: skillDef.name,
-                    value: 5,
-                    creationValue: 5,
-                    max: 5,
-                    definitionId: skillDef.id
-                } as any);
-
-                finalSheet = { ...updated, skills: newSkills };
-            }
-        }
-
-        onChange(finalSheet);
-        onAddLog(`Maîtrise accordée : ${skillName} portée au rang 5 (via ${masterSkillWizard.traitName})`, 'success', 'sheet');
-        setMasterSkillWizard(null);
-    }, [masterSkillWizard, applyMasterSkill, data, rules, onChange, onAddLog]);
 
     const updateCharacterImageId = React.useCallback((id: string) => {
         onChange((prev: CharacterSheetData) => ({
@@ -328,8 +196,6 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             page2: { ...prev.page2, characterImageId: id, characterImage: '' }
         }));
     }, [onChange]);
-
-    const calculateTotal = (list: TraitEntry[]) => list.reduce((acc, item) => acc + (parseInt(item.value) || 0), 0);
 
     const commonTraitsProps = {
         onTraitClick: (index: number, item: TraitEntry, type: 'avantages' | 'desavantages') => {
@@ -350,11 +216,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                         <div className="border-r border-stone-400 p-1.5 flex flex-col gap-2 h-full overflow-hidden">
                             <IdentityBoxes data={data} updateStringField={updateStringField} />
                         </div>
-                        <div className="border-r border-stone-400 p-1.5 flex flex-col gap-2 h-full overflow-hidden">
+                        <div className="col-span-2 p-1.5 flex flex-col gap-2 h-full overflow-hidden">
                             <NotesBoxes data={data} updateStringField={updateStringField} updateReputationEntry={updateReputationEntry} handleReputationKeyDown={handleReputationKeyDown} />
-                        </div>
-                        <div className="p-1.5 flex flex-col gap-2 h-full overflow-hidden">
-                            <MoneyBoxes data={data} updateStringField={updateStringField} />
                         </div>
                     </div>
                     <div className="grid grid-cols-4 h-[65%] overflow-hidden">
@@ -362,7 +225,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                             title="Avantages"
                             traits={data.page2.avantages}
                             type="avantages"
-                            total={calculateTotal(data.page2.avantages)}
+                            total={avantagesTotal}
                             totalColor="text-green-700 bg-green-50 border-green-200"
                             onOpenLibrary={() => setMultiSelectTarget('avantages')}
                             onTraitClick={(i, trait) => commonTraitsProps.onTraitClick(i, trait, 'avantages')}
@@ -370,36 +233,39 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                             onManageMystic={(i, trait) => {
                                 if (trait.mysticAbilityId) setWizardState({ isOpen: true, mysticAbilityId: trait.mysticAbilityId, mysticAbilityName: trait.name });
                             }}
-                            className="col-span-1 border-r border-stone-400 p-1.5"
+                            className="col-span-1 border-r border-stone-400"
                         />
                         <TraitsColumn
                             title="Désavantages"
                             traits={data.page2.desavantages}
                             type="desavantages"
-                            total={calculateTotal(data.page2.desavantages)}
+                            total={desavantagesTotal}
                             totalColor="text-red-700 bg-red-50 border-red-200"
                             onOpenLibrary={() => setMultiSelectTarget('desavantages')}
                             onTraitClick={(i, trait) => commonTraitsProps.onTraitClick(i, trait, 'desavantages')}
                             onRemove={(i) => commonTraitsProps.onRemove('desavantages', i)}
-                            className="col-span-1 border-l border-stone-400 -ml-[1px] p-1.5"
+                            className="col-span-1 border-l border-stone-400 -ml-[1px]"
                         />
-                        <div className="col-span-1 border-r border-l border-stone-400 p-1.5 flex flex-col h-full overflow-hidden"><Page2SectionHeader title="Equipement" /><div className="flex-grow min-h-0"><NotebookInput value={data.page2.equipement} onChange={(v) => updateStringField('equipement', v)} /></div></div>
-                        <div className="col-span-1 p-1.5 flex flex-col h-full overflow-hidden"><Page2SectionHeader title="Notes" /><div className="flex-grow min-h-0"><NotebookInput value={data.page2.notes} onChange={(v) => updateStringField('notes', v)} /></div></div>
+                        <div className="col-span-2 px-1.5 pb-1.5 flex flex-col h-full overflow-hidden border-l border-stone-400">
+                            <Page2SectionHeader title="Notes du Personnage" />
+                            <div className="flex-grow min-h-0">
+                                <NotebookInput value={data.page2.notes} onChange={(v) => updateStringField('notes', v)} />
+                            </div>
+                        </div>
                     </div>
                 </div>
             ) : (
                 <div className="sheet-container flex flex-col">
                     <div className="flex border-b border-stone-400 h-[400px] shrink-0 overflow-hidden">
-                        <div className="w-[35%] border-r border-stone-400 bg-stone-50 p-0 flex flex-col overflow-hidden"><CharacterImageWidget imageId={data.page2.characterImageId} legacyImage={data.page2.characterImage} onImageUpdate={updateCharacterImageId} onAddLog={handleImageLog} /></div>
+                        <div className="w-[35%] border-r border-stone-400 bg-stone-50 p-0 flex flex-col overflow-hidden">
+                            <CharacterImageWidget imageId={data.page2.characterImageId} legacyImage={data.page2.characterImage} onImageUpdate={updateCharacterImageId} onAddLog={handleImageLog} />
+                        </div>
                         <div className="w-[65%] flex flex-col overflow-hidden">
-                            <div className="h-1/3 flex border-b border-stone-400">
+                            <div className="h-1/2 flex border-b border-stone-400">
                                 <IdentityBoxes data={data} updateStringField={updateStringField} />
                             </div>
-                            <div className="h-1/3 flex border-b border-stone-400">
+                            <div className="h-1/2 flex">
                                 <NotesBoxes data={data} updateStringField={updateStringField} updateReputationEntry={updateReputationEntry} handleReputationKeyDown={handleReputationKeyDown} />
-                            </div>
-                            <div className="h-1/3 flex">
-                                <MoneyBoxes data={data} updateStringField={updateStringField} />
                             </div>
                         </div>
                     </div>
@@ -411,7 +277,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                                     title="Avantages"
                                     traits={data.page2.avantages}
                                     type="avantages"
-                                    total={calculateTotal(data.page2.avantages)}
+                                    total={avantagesTotal}
                                     totalColor="text-green-700 bg-green-50 border-green-200"
                                     onOpenLibrary={() => setMultiSelectTarget('avantages')}
                                     onTraitClick={(i, trait) => commonTraitsProps.onTraitClick(i, trait, 'avantages')}
@@ -419,27 +285,41 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                                     onManageMystic={(i, trait) => {
                                         if (trait.mysticAbilityId) setWizardState({ isOpen: true, mysticAbilityId: trait.mysticAbilityId, mysticAbilityName: trait.name });
                                     }}
-                                    className="border-r border-stone-400 p-1.5"
+                                    className="border-r border-stone-400 bg-white"
                                 />
                                 <TraitsColumn
                                     title="Désavantages"
                                     traits={data.page2.desavantages}
                                     type="desavantages"
-                                    total={calculateTotal(data.page2.desavantages)}
+                                    total={desavantagesTotal}
                                     totalColor="text-red-700 bg-red-50 border-red-200"
                                     onOpenLibrary={() => setMultiSelectTarget('desavantages')}
                                     onTraitClick={(i, trait) => commonTraitsProps.onTraitClick(i, trait, 'desavantages')}
                                     onRemove={(i) => commonTraitsProps.onRemove('desavantages', i)}
-                                    className="border-l border-stone-400 -ml-[1px] p-1.5"
+                                    className="border-l border-stone-400 -ml-[1px] bg-white"
                                 />
                             </div>
                         </div>
-                        <div className="w-[32.5%] flex flex-col h-full overflow-hidden"><Page2SectionHeader title="Equipement" /><div className="p-1.5 flex-grow min-h-0"><NotebookInput value={data.page2.equipement} onChange={(v) => updateStringField('equipement', v)} /></div></div>
+                        <div className="w-[32.5%] flex flex-col h-full overflow-hidden">
+                            <Page2SectionHeader title="Notes du Personnage" />
+                            <div className="p-1.5 flex-grow min-h-0">
+                                <NotebookInput className="h-full" value={data.page2.notes} onChange={(v) => updateStringField('notes', v)} />
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex-grow border-t border-stone-400 p-1.5 flex flex-col shrink-0 min-h-[440px]"><Page2SectionHeader title="Notes" /><div className="flex-grow min-h-0 mt-1 flex flex-col"><NotebookInput className="flex-grow" value={data.page2.notes} onChange={(v) => updateStringField('notes', v)} /></div></div>
                 </div>
             )}
 
+            {/* Modals */}
+            {editingTrait && (
+                <TraitEditModal
+                    isOpen={!!editingTrait}
+                    onClose={() => setEditingTrait(null)}
+                    trait={editingTrait.trait}
+                    onSave={handleSaveTrait}
+                    type={editingTrait.type}
+                />
+            )}
 
             {multiSelectTarget && (
                 <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
@@ -448,7 +328,9 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                             <h3 className="font-bold text-lg flex items-center gap-2"><BookOpen size={20} />Ajouter des {multiSelectTarget === 'avantages' ? 'Avantages' : 'Désavantages'}</h3>
                             <button onClick={() => setMultiSelectTarget(null)} className="hover:bg-white/20 p-1 rounded transition-colors"><X size={24} /></button>
                         </div>
-                        <div className="flex-grow overflow-hidden relative"><TraitLibrary data={data} onUpdate={onChange} isEditable={false} defaultFilter={multiSelectTarget === 'avantages' ? 'avantage' : 'desavantage'} onMultiSelect={handleMultiAddWrapper} hidePossessed={true} lockFilter={true} /></div>
+                        <div className="flex-grow overflow-hidden relative">
+                            <TraitLibrary data={data} onUpdate={onChange} isEditable={false} defaultFilter={multiSelectTarget === 'avantages' ? 'avantage' : 'desavantage'} onMultiSelect={handleMultiAddWrapper} hidePossessed={true} lockFilter={true} />
+                        </div>
                     </div>
                 </div>
             )}
@@ -465,7 +347,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                 />
             )}
 
-            {masterSkillWizard?.isOpen && (
+            {masterSkillWizard && masterSkillWizard.isOpen && rules && (
                 <MasterSkillWizard
                     isOpen={true}
                     traitName={masterSkillWizard.traitName}
@@ -473,16 +355,6 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     onConfirm={handleMasterSkillConfirm}
                     sheet={data}
                     rules={rules}
-                />
-            )}
-
-            {editingTrait && (
-                <TraitEditModal
-                    isOpen={!!editingTrait}
-                    onClose={() => setEditingTrait(null)}
-                    trait={editingTrait.trait}
-                    onSave={handleSaveTrait}
-                    type={editingTrait.type}
                 />
             )}
         </>

@@ -3,12 +3,13 @@ import { Book, Users, PenTool } from 'lucide-react';
 import { useCharacter } from '../context/CharacterContext';
 import PartyTable from './campaign/PartyTable';
 import { ColumnarEditor } from './campaign/book/ColumnarEditor';
+import { BookSyncService } from '../services/BookSyncService';
 
 const CampaignNotes: React.FC = () => {
     const { data, updateData: onChange, addLog } = useCharacter();
     const [activeTab, setActiveTab] = useState<'journal' | 'party'>('journal');
 
-    const handleUpdate = (content: any) => {
+    const handleUpdate = React.useCallback((content: Record<string, unknown>) => {
         onChange((prev: import('../types').CharacterSheetData) => {
             const now = new Date().toISOString();
             const existing = prev.bookDocument || {
@@ -18,6 +19,15 @@ const CampaignNotes: React.FC = () => {
                 content: {},
                 updatedAt: now
             };
+
+            // Fire-and-forget save to character_books if already synced
+            if (prev.syncInfo?.syncId) {
+                BookSyncService.saveBook(
+                    prev.syncInfo.syncId,
+                    content as import('@tiptap/core').JSONContent,
+                    2
+                ).catch(() => { /* errors handled inside BookSyncService */ });
+            }
 
             return {
                 ...prev,
@@ -29,7 +39,7 @@ const CampaignNotes: React.FC = () => {
                 }
             };
         });
-    };
+    }, [onChange]);
 
     return (
         <div className="w-full bg-[#121212] relative">
@@ -52,7 +62,7 @@ const CampaignNotes: React.FC = () => {
                         ].map(tab => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id as any)}
+                                onClick={() => setActiveTab(tab.id as 'journal' | 'party')}
                                 className={`group flex items-center gap-3 transition-all ${activeTab === tab.id ? 'text-stone-100' : 'text-stone-500 hover:text-stone-300'}`}
                             >
                                 <tab.icon size={20} className={activeTab === tab.id ? 'text-amber-500' : ''} />
@@ -70,12 +80,13 @@ const CampaignNotes: React.FC = () => {
 
                 {/* Content Area - Exactly 50px top margin and 100px bottom margin */}
                 <div className="w-full pt-[50px] pb-[100px]">
-                    {activeTab === 'journal' ? (
+                    <div className={activeTab === 'journal' ? 'block' : 'hidden'}>
                         <ColumnarEditor
                             initialContent={data.bookDocument?.content}
                             onUpdate={handleUpdate}
                         />
-                    ) : (
+                    </div>
+                    <div className={activeTab === 'party' ? 'block' : 'hidden'}>
                         <div
                             className="mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500"
                             style={{ width: '1484px', height: '1000px' }}
@@ -84,7 +95,7 @@ const CampaignNotes: React.FC = () => {
                                 <PartyTable data={data} onChange={onChange} onAddLog={addLog} />
                             </div>
                         </div>
-                    )}
+                    </div>
                 </div>
             </div>
         </div>

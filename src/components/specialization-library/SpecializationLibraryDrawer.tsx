@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { X, Search, Award, Info, GripVertical } from 'lucide-react';
 import { useCharacterData } from '../../context/CharacterContext';
+import { LibrarySpecializationEntry } from '../../types';
 import { smartIncludes } from '../../utils/stringUtils';
 
 interface SpecializationLibraryDrawerProps {
@@ -27,7 +28,7 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
         ).sort((a, b) => a.name.localeCompare(b.name));
     }, [library, searchTerm]);
 
-    const handleDragStart = (e: React.DragEvent, entry: any) => {
+    const handleDragStart = (e: React.DragEvent, entry: LibrarySpecializationEntry) => {
         // Store both name and default level in the drag data
         e.dataTransfer.setData('text/plain', entry.name);
         e.dataTransfer.setData('application/json', JSON.stringify({
@@ -54,7 +55,9 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
             {/* Search */}
             <div className="p-3 border-b bg-gray-50 shrink-0">
                 <div className="relative">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <Search size={14} className="text-gray-400 pointer-events-none" />
+                    </span>
                     <input
                         className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded focus:border-amber-500 outline-none"
                         placeholder="Chercher..."
@@ -77,7 +80,7 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
                             draggable
                             onDragStart={(e) => handleDragStart(e, entry)}
                             onClick={() => onSelect && onSelect(entry.name, entry.defaultMinLevel)}
-                            className="bg-white border border-gray-200 rounded-lg p-3 hover:border-amber-400 hover:shadow-sm cursor-grab active:cursor-grabbing transition-all group relative"
+                            className="bg-white border border-gray-200 rounded-lg p-3 hover:border-amber-400 hover:shadow-sm cursor-grab active:cursor-grabbing transition group relative"
                         >
                             <div className="flex justify-between items-start mb-1">
                                 <div className="flex items-center gap-2">
@@ -89,7 +92,7 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
                                 </span>
                             </div>
                             {entry.description && (
-                                <p className="text-[10px] text-gray-500 line-clamp-1 group-hover:line-clamp-none transition-all">
+                                <p className="text-[10px] text-gray-500 line-clamp-1 group-hover:line-clamp-none transition">
                                     {entry.description}
                                 </p>
                             )}

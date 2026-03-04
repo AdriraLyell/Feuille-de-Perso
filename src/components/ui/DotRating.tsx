@@ -87,7 +87,7 @@ const DotRating: React.FC<DotRatingProps> = ({
         }
 
         const activeColor = isCreationDot ? (creationColor || '#2563eb') : (xpColor || '#292524');
-        const inactiveColor = '#d6d3d1'; // stone-300
+        const inactiveColor = '#a8a29e'; // stone-400 (was stone-300)
 
         const handleClick = () => {
           if (readOnly || !onChange) return;
@@ -108,7 +108,7 @@ const DotRating: React.FC<DotRatingProps> = ({
             type="button"
             disabled={readOnly}
             onClick={handleClick}
-            className={`w-3 h-3 flex items-center justify-center transition-all ${readOnly ? 'cursor-default' : 'cursor-pointer hover:scale-125'
+            className={`w-3 h-3 flex items-center justify-center transition ${readOnly ? 'cursor-default' : 'cursor-pointer hover:scale-125'
               }`}
             aria-label={`Set rating to ${index + 1}`}
             title={isBlocked ? `Bloqué par : ${blockedReason}` : (isCreationDot ? "Acquis à la création (Coût: 0 XP)" : "Acquis par XP")}
@@ -117,7 +117,7 @@ const DotRating: React.FC<DotRatingProps> = ({
               size={12}
               stroke={filled ? activeColor : inactiveColor}
               fill={filled ? activeColor : 'transparent'}
-              strokeWidth={filled ? 2.5 : 1.5}
+              strokeWidth={filled ? 2.5 : 2.2}
             />
           </button>
         );

@@ -88,7 +88,7 @@ const ImportPanel: React.FC<ImportPanelProps> = ({ data, variant, onImportSucces
                         <button
                             onClick={executeImport}
                             disabled={!importAction}
-                            className="w-full py-3 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transition-all"
+                            className="w-full py-3 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 transition"
                         >
                             <CheckCircle2 size={20} />
                             {variant === 'player' ? 'Confirmer le chargement' : "Confirmer le chargement"}

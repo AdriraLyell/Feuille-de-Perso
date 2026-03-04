@@ -1,4 +1,5 @@
 import { INITIAL_DATA } from '../../data/initialState';
+import { MigratableData } from './registry';
 
 /**
  * Migration: Default values
@@ -8,19 +9,19 @@ import { INITIAL_DATA } from '../../data/initialState';
  * - Handle xpLogs mj and spendingLocation fields
  * - Campaign notes image migration (imageId → images[])
  */
-export const migrateDefaults = (parsed: any): void => {
+export const migrateDefaults = (parsed: MigratableData): void => {
     // Initialize header
     if (!parsed.header) {
         parsed.header = INITIAL_DATA.header;
     }
 
     // Initialize xpLogs
-    if (!parsed.xpLogs) {
+    if (!Array.isArray(parsed.xpLogs)) {
         parsed.xpLogs = [];
     }
 
     // Migrate xpLogs entries
-    if (parsed.xpLogs && parsed.xpLogs.length > 0) {
+    if (parsed.xpLogs.length > 0) {
         parsed.xpLogs = parsed.xpLogs.map((log: any) => {
             const newLog = { ...log };
             if (typeof newLog.mj === 'undefined') {
@@ -34,9 +35,9 @@ export const migrateDefaults = (parsed: any): void => {
     }
 
     // Initialize appLogs
-    if (!parsed.appLogs) {
+    if (!Array.isArray(parsed.appLogs)) {
         parsed.appLogs = [];
-    } else if (Array.isArray(parsed.appLogs) && parsed.appLogs.length > 50) {
+    } else if (parsed.appLogs.length > 50) {
         // Purge old logs if the array has grown too large
         parsed.appLogs = parsed.appLogs.slice(0, 50);
     }
@@ -45,17 +46,19 @@ export const migrateDefaults = (parsed: any): void => {
     if (!parsed.creationConfig) {
         parsed.creationConfig = INITIAL_DATA.creationConfig;
     }
-    if (typeof parsed.creationConfig.attributeMin === 'undefined') {
-        parsed.creationConfig.attributeMin = INITIAL_DATA.creationConfig.attributeMin;
+
+    const creationConfig = parsed.creationConfig as Record<string, any>;
+    if (typeof creationConfig.attributeMin === 'undefined') {
+        creationConfig.attributeMin = INITIAL_DATA.creationConfig.attributeMin;
     }
-    if (typeof parsed.creationConfig.attributeMax === 'undefined') {
-        parsed.creationConfig.attributeMax = INITIAL_DATA.creationConfig.attributeMax;
+    if (typeof creationConfig.attributeMax === 'undefined') {
+        creationConfig.attributeMax = INITIAL_DATA.creationConfig.attributeMax;
     }
-    if (typeof parsed.creationConfig.attributeCost === 'undefined') {
-        parsed.creationConfig.attributeCost = INITIAL_DATA.creationConfig.attributeCost;
+    if (typeof creationConfig.attributeCost === 'undefined') {
+        creationConfig.attributeCost = INITIAL_DATA.creationConfig.attributeCost;
     }
-    if (!parsed.creationConfig.cardConfig) {
-        parsed.creationConfig.cardConfig = INITIAL_DATA.creationConfig.cardConfig;
+    if (!creationConfig.cardConfig) {
+        creationConfig.cardConfig = INITIAL_DATA.creationConfig.cardConfig;
     }
 
     // Initialize theme
@@ -64,23 +67,21 @@ export const migrateDefaults = (parsed: any): void => {
     }
 
     // Initialize campaign notes
-    if (!parsed.campaignNotes) {
+    if (!Array.isArray(parsed.campaignNotes)) {
         parsed.campaignNotes = [];
-    }
-
-    // Migrate campaign notes images
-    if (parsed.campaignNotes) {
+    } else {
+        // Migrate campaign notes images
         parsed.campaignNotes = parsed.campaignNotes.map((note: any) => {
-            if (note.imageId && (!note.images || note.images.length === 0)) {
+            if (note.imageId && (!Array.isArray(note.images) || note.images.length === 0)) {
                 note.images = [{
-                    id: Math.random().toString(36).substr(2, 9),
+                    id: Math.random().toString(36).substring(2, 11),
                     imageId: note.imageId,
                     config: note.imageConfig || { width: 200, height: 200, marginTop: 0, align: 'right' }
                 }];
                 delete note.imageId;
                 delete note.imageConfig;
             }
-            if (!note.images) note.images = [];
+            if (!Array.isArray(note.images)) note.images = [];
             return note;
         });
     }
@@ -88,8 +89,10 @@ export const migrateDefaults = (parsed: any): void => {
     // Initialize party notes
     if (!parsed.partyNotes) {
         parsed.partyNotes = INITIAL_DATA.partyNotes;
-    }
-    if (parsed.partyNotes && !parsed.partyNotes.staticColWidths) {
-        parsed.partyNotes.staticColWidths = INITIAL_DATA.partyNotes?.staticColWidths;
+    } else {
+        const partyNotes = parsed.partyNotes as Record<string, any>;
+        if (!partyNotes.staticColWidths) {
+            partyNotes.staticColWidths = INITIAL_DATA.partyNotes?.staticColWidths;
+        }
     }
 };

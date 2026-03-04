@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { CharacterSheetData } from '../types';
 import { CharacterSyncService } from '../services/CharacterSyncService';
 
@@ -12,7 +12,6 @@ export const useAutoSave = (
 ) => {
     const [timeLeft, setTimeLeft] = useState(AUTO_SAVE_INTERVAL);
     const [isDirty, setIsDirty] = useState(false);
-    const lastHashRef = useRef<string>("");
 
     // Detect changes with debounce to avoid heavy hashing on every keystroke
     useEffect(() => {
@@ -62,6 +61,7 @@ export const useAutoSave = (
 
     return {
         countdown: (data.syncInfo?.isAutoSyncEnabled && isDirty) ? timeLeft : undefined,
-        isDirty
+        isDirty,
+        setLastSavedState: () => setIsDirty(false)
     };
 };

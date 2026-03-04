@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { CharacterSheetData, LibrarySkillEntry } from '../types';
+import { CharacterSheetData } from '../types';
 import { BookOpen, GraduationCap, Award } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import SpecializationLibraryView from './specialization-library/SpecializationLibraryView';
 import { useCharacter } from '../context/CharacterContext';
 import { useNotification } from '../context/NotificationContext';
 import { useRules } from '../context/RulesContext';
-import { MergedEntry } from '../utils/libraryMerger';
+
 import LibrarySkillForm from './library/LibrarySkillForm';
 import LibraryDeleteModal from './library/LibraryDeleteModal';
 import LibraryImportModal from './library/LibraryImportModal';
@@ -18,9 +18,10 @@ import { useSkillLibrary } from '../hooks/library/useSkillLibrary';
 interface LibraryViewProps {
     data?: CharacterSheetData; // Optional to support standalone use if needed, but we will pass it
     onUpdate?: (newData: CharacterSheetData) => void;
+    isEditable?: boolean;
 }
 
-const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: propUpdate }) => {
+const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: propUpdate, isEditable = true }) => {
     // Fallback to context if not provided (for backward compatibility if used elsewhere)
     const { data: contextData, updateData: contextUpdate } = useCharacter();
 
@@ -33,7 +34,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
     const addLog = useNotification();
 
     // OFFICIAL: Get Rules Context
-    const { rules, updateRules } = useRules();
+    const { rules } = useRules();
 
     // MERGE: Compute Hybrid Skill Library
     const {
@@ -41,7 +42,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         hideKnownSkills, setHideKnownSkills,
         isSkillModalOpen, setIsSkillModalOpen,
         editingSkill, setEditingSkill,
-        skillError, setSkillError,
+        skillError,
         showRenameConfirm, setShowRenameConfirm,
         showImportConfirm, setShowImportConfirm,
         skillToDelete, setSkillToDelete,
@@ -54,11 +55,12 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         finalizeSaveSkill,
         handleDeleteRequest,
         executeDeleteSkill,
-        executeImportFromSheet
+        executeImportFromSheet,
+        skillFormSource
     } = useSkillLibrary(data, rules, onUpdate, addLog);
 
     // OFFICIAL: Use local state for visibility for now (could be moved to hook too if shared)
-    const [showOfficialUpdateConfirm, setShowOfficialUpdateConfirm] = useState(false);
+
 
     // Dynamic Categories Source of Truth
     const availableCategories = useMemo(() => {
@@ -80,33 +82,9 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
     };
 
     const handleOfficialUpdateClick = () => {
-        setShowOfficialUpdateConfirm(true);
+        addLog("Option gérée par le MJ", "info");
     };
 
-    const executeOfficialUpdate = async () => {
-        try {
-            const res = await fetch('./data/skills.json?t=' + Date.now());
-            if (!res.ok) throw new Error("Fichier introuvable");
-
-            const json = await res.json();
-            const newSkills = json.data as LibrarySkillEntry[];
-
-            if (json.meta && json.meta.type !== 'skills') throw new Error("Format invalide");
-
-            // Update Rules Context
-            const updatedRules = {
-                ...rules!,
-                libraries: {
-                    ...rules!.libraries,
-                    skills: newSkills
-                }
-            };
-            updateRules(updatedRules);
-            addLog(`Bibliothèque officielle mise à jour (${newSkills.length} compétences).`, 'success', 'settings');
-        } catch (e) {
-            addLog("Échec de la mise à jour officielle : " + (e as Error).message, 'danger', 'settings');
-        }
-    };
 
     return (
         <div className="flex flex-col h-full bg-[#fdfbf7] rounded-sm shadow-sm border border-[#bfae85]/50 overflow-hidden relative">
@@ -150,7 +128,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                 {activeTab === 'traits' && (
                     // Use existing component logic, wrapped to fit height
                     <div className="absolute inset-0">
-                        <TraitLibrary data={data} onUpdate={onUpdate} isEditable={true} />
+                        <TraitLibrary data={data} onUpdate={onUpdate} isEditable={isEditable} />
                     </div>
                 )}
 
@@ -169,12 +147,13 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                         handleOpenEditSkill={handleOpenEditSkill}
                         handleDeleteRequest={handleDeleteRequest}
                         getCategoryLabel={getCategoryLabel}
+                        isEditable={isEditable}
                     />
                 )}
 
                 {activeTab === 'specializations' && (
                     <div className="absolute inset-0">
-                        <SpecializationLibraryView data={data} onUpdate={onUpdate} />
+                        <SpecializationLibraryView data={data} onUpdate={onUpdate} isEditable={isEditable} />
                     </div>
                 )}
             </div>
@@ -198,13 +177,15 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
             {isSkillModalOpen && editingSkill && (
                 <LibrarySkillForm
                     isOpen={isSkillModalOpen}
+                    isOfficial={skillFormSource === 'official'}
                     onClose={() => setIsSkillModalOpen(false)}
-                    title={data.skillLibrary?.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence (Copie)'}
+                    title={!isEditable ? 'Détails Compétence' : data.skillLibrary?.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence (Copie)'}
                     skill={editingSkill}
                     onSkillChange={setEditingSkill}
                     onSave={() => handleSaveSkill(editingSkill)} // Passing editingSkill here
                     error={skillError}
                     categories={availableCategories.length > 0 ? availableCategories : undefined}
+                    isEditable={isEditable}
                 />
             )}
 

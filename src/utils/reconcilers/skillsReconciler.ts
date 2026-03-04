@@ -79,7 +79,7 @@ function processSkillCategories(
                             ...existing,
                             name,
                             definitionId,
-                            mysticAbilityId: (libSkill as any)?.mysticAbilityId || (existing as any).mysticAbilityId,
+                            mysticAbilityId: libSkill?.mysticAbilityId || existing.mysticAbilityId,
                             max,
                             description: description || existing.description,
                             variant: existing.variant !== undefined ? existing.variant : ""
@@ -114,7 +114,7 @@ function processSkillCategories(
                         name,
                         description: description || existing.description,
                         definitionId,
-                        mysticAbilityId: (libSkill as any)?.mysticAbilityId || (existing as any).mysticAbilityId,
+                        mysticAbilityId: libSkill?.mysticAbilityId || existing.mysticAbilityId,
                         variant: (existing.variant === "" || existing.variant === undefined) ? undefined : existing.variant
                     }];
                 } else {
@@ -137,12 +137,10 @@ function processSkillCategories(
             !processedNames.has(e.name) &&
             ((e.value || 0) > 0 || e.variant !== undefined || (e.definitionId && rules.libraries?.skills?.find(s => s.id === e.definitionId)?.isVariable))
         ).map(e => {
-            let libMatch = null;
-            if (e.definitionId) {
-                libMatch = rules.libraries?.skills?.find(s => s.id === e.definitionId);
-            } else {
-                libMatch = rules.libraries?.skills?.find(s => normalizeString(s.name) === normalizeString(e.name));
-            }
+            const libMatch = e.definitionId
+                ? rules.libraries?.skills?.find(s => s.id === e.definitionId)
+                : rules.libraries?.skills?.find(s => normalizeString(s.name) === normalizeString(e.name));
+
             if (libMatch) {
                 return {
                     ...e,
@@ -165,12 +163,10 @@ function processSkillCategories(
         if (!newSkills[cat]) {
             newSkills[cat] = getSkillCategory(currentState, cat).map(e => {
                 if (!e) return e;
-                let libMatch = null;
-                if (e.definitionId) {
-                    libMatch = rules.libraries?.skills?.find(s => s.id === e.definitionId);
-                } else {
-                    libMatch = rules.libraries?.skills?.find(s => s.name && e.name && normalizeString(s.name) === normalizeString(e.name));
-                }
+                const libMatch = e.definitionId
+                    ? rules.libraries?.skills?.find(s => s.id === e.definitionId)
+                    : rules.libraries?.skills?.find(s => s.name && e.name && normalizeString(s.name) === normalizeString(e.name));
+
                 if (libMatch) {
                     return {
                         ...e,
@@ -205,7 +201,7 @@ function processBackgrounds(
         const allExistingSkills = Object.values(currentState.skills).flat() as DotEntry[];
         const namesAddedToBgs = new Set<string>();
 
-        const syncedBgs = ruleBackgrounds.flatMap(name => {
+        const syncedBgs: DotEntry[] = (ruleBackgrounds as string[]).flatMap(name => {
             namesAddedToBgs.add(name);
 
             const libBg = rules.libraries?.backgrounds?.find(b => normalizeString(b.name) === normalizeString(name));
@@ -225,6 +221,7 @@ function processBackgrounds(
                     ...existing,
                     name,
                     definitionId,
+                    mysticAbilityId: (libBg?.mysticAbilityId || existing.mysticAbilityId) ?? undefined,
                     max: 5,
                     description: description || existing.description
                 }));
@@ -237,14 +234,15 @@ function processBackgrounds(
                     creationValue: 0,
                     max: 5,
                     variant: isVariable ? "" : undefined,
-                    definitionId
+                    definitionId,
+                    mysticAbilityId: libBg?.mysticAbilityId ?? undefined
                 }];
             }
         });
 
         const remainingBgs = allExistingSkills.filter((e: DotEntry) => {
             if (!e || !e.name || namesAddedToBgs.has(e.name)) return false;
-            if (e.definitionId && syncedBgs.some(s => s.id === e.id)) return false;
+            if (e.definitionId && syncedBgs.some(s => (s as DotEntry).id === e.id)) return false;
 
             const wasInBackgroundCat = Object.keys(currentState.skills).some(catId => {
                 const catDef = rules.definitions.skillCategories?.find(c => c.id === catId);
@@ -261,7 +259,7 @@ function processBackgrounds(
 
         newSkills[dynamicBgCat] = [...syncedBgs, ...remainingBgs];
 
-        const allBgIds = new Set([...syncedBgs, ...remainingBgs].map(s => s.id));
+        const allBgIds = new Set([...syncedBgs, ...remainingBgs].map(s => (s as DotEntry).id));
 
         Object.keys(newSkills).forEach(catId => {
             if (catId !== dynamicBgCat && Array.isArray(newSkills[catId])) {

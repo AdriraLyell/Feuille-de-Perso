@@ -1,17 +1,21 @@
 
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { useNotification } from '../../context/NotificationContext';
+
 import { useCharacter } from '../../context/CharacterContext';
 import { NotificationProvider } from '../../context/NotificationContext';
 import { CharacterSheetData } from '../../types';
 import { APP_VERSION } from '../../constants/app';
 import { migrateData } from '../../utils/migrations';
 import { useRules } from '../../context/RulesContext';
-import { loadRules } from '../../services/RulesLoader';
-import { RulesData } from '../../types/rules';
+
 import { CampaignService } from '../../services/CampaignService';
 import { ErrorService } from '../../services/ErrorService';
-import { INITIAL_DATA } from '../../data/initialState';
+
+interface VersionManifest {
+    version: string;
+    downloadUrl?: string;
+}
+
 import { logger } from '../../utils/logger';
 import { useCloudSyncCheck } from '../../hooks/useCloudSyncCheck';
 import { useAutoSave } from '../../hooks/useAutoSave';
@@ -21,37 +25,46 @@ import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 import DiegeticNavigation from './DiegeticNavigation';
 import CharacterSheet from '../CharacterSheet';
 import CharacterSheetPage2 from '../CharacterSheetPage2';
+import CharacterSheetInventaire from '../CharacterSheetInventaire';
 import CharacterSheetSpecializations from '../CharacterSheetSpecializations';
 import CharacterSheetXP from '../CharacterSheetXP';
+import CampaignNotes from '../CampaignNotes';
+import CreationHUD from '../CreationHUD';
 
 // Lazy Loaded Components
-const SettingsView = lazy(() => import('../SettingsView'));
-const CampaignNotes = lazy(() => import('../CampaignNotes'));
-const ImportExportModal = lazy(() => import('../ImportExportModal'));
-const PrintSelectionModal = lazy(() => import('../PrintSelectionModal'));
-const ChangelogModal = lazy(() => import('../ChangelogModal'));
-const UserGuideModal = lazy(() => import('../UserGuideModal'));
-const CreationHUD = lazy(() => import('../CreationHUD'));
-const UpdateNotifier = lazy(() => import('../UpdateNotifier'));
-const AppearanceModal = lazy(() => import('../AppearanceModal'));
 const RulesSourceSelector = lazy(() => import('../RulesSourceSelector'));
-const SyncModal = lazy(() => import('../SyncModal'));
 const CampaignConflictModal = lazy(() => import('../ui/CampaignConflictModal'));
-const CampaignInfoModal = lazy(() => import('../ui/CampaignInfoModal'));
-import ConfirmationModal from '../ui/ConfirmationModal';
-
+const SettingsView = lazy(() => import('../SettingsView'));
+import { Layers, FileType, List, TrendingUp, Book, Package, Clock, X, Trash2, UserPlus, PencilLine, Check } from 'lucide-react';
+import { useEditMode } from '../../hooks/sheet/useEditMode';
+import { useCreationMode } from '../../hooks/useCreationMode';
 import { exportCharacterAsJSON } from '../../utils/importExportUtils';
 import { useNavigationState } from '../../hooks/layout/useNavigationState';
 import { usePrintManager } from '../../hooks/layout/usePrintManager';
 import { useRulesSync } from '../../hooks/layout/useRulesSync';
 import PostItBoard from '../ui/PostItBoard';
-
-// Icons
-import { Settings, Printer, FileText, Layers, FileType, AlertTriangle, List, TrendingUp, History, Clock, X, Trash2, Save, Book, LogOut, Menu, Upload } from 'lucide-react';
+import LayoutModals from './LayoutModals';
 
 const MainLayout: React.FC = () => {
-    const { data, updateData: setData, addLog, importData, isSyncing, sync } = useCharacter();
+    const { data, updateData: setData, addLog, importData, isSyncing, sync, isEditMode, setEditMode: setIsEditMode } = useCharacter();
     const { rules, updateRules, isOnlineMode, reloadRules } = useRules();
+
+    // Sheet Modes Hooks
+    const {
+        isEditMode: _, // We use context instead
+        setIsEditMode: __,
+        showEditWarning,
+        setShowEditWarning,
+        handleToggleEditMode,
+        executeEditModeActivation
+    } = useEditMode(isEditMode, setIsEditMode);
+
+    const {
+        showCreationWarning,
+        handleToggleCreationMode,
+        executeCreationActivation,
+        setShowCreationWarning
+    } = useCreationMode(data, setData as any, addLog);
 
     // Custom Hooks
     const [isLandscape, setIsLandscape] = useState(() => {
@@ -69,9 +82,10 @@ const MainLayout: React.FC = () => {
         mode, setMode,
         sheetTab, setSheetTab,
         showDiscardConfirm, setShowDiscardConfirm,
+
+        confirmDiscard,
         isSettingsDirty, setIsSettingsDirty,
-        handleSwitchMode,
-        confirmDiscard
+        handleSwitchMode
     } = useNavigationState();
 
     const {
@@ -100,10 +114,10 @@ const MainLayout: React.FC = () => {
     });
 
     // Auto-Save Logic
-    const { countdown } = useAutoSave(data, false, (mode) => sync(mode));
+    const { countdown, setLastSavedState } = useAutoSave(data, false, (mode) => sync(mode));
 
     // Other UI States
-    const [lastSavedState, setLastSavedState] = useState<string>("");
+
     const [showImportExport, setShowImportExport] = useState(false);
     const [showChangelog, setShowChangelog] = useState(false);
     const [showUserGuide, setShowUserGuide] = useState(false);
@@ -116,13 +130,13 @@ const MainLayout: React.FC = () => {
     // Guidance Logic
     const shouldHighlightMystic = React.useMemo(() => {
         const active = rules?.configurations?.creation?.mysticAbilities?.active;
-        const hasTrait = data?.page2?.avantages?.some((t: any) => t.mysticAbilityId);
+        const hasTrait = data?.page2?.avantages?.some((t) => t.mysticAbilityId);
         return !!(active && !hasTrait && data?.creationConfig?.active);
     }, [rules, data]);
 
     // Initialize Reference State & Error Service
     useEffect(() => {
-        if (data) setLastSavedState(JSON.stringify(data));
+
         ErrorService.init(addLog);
 
         // Show welcome message if available and not shown in this session
@@ -139,11 +153,11 @@ const MainLayout: React.FC = () => {
     const clearCurrentLogs = () => {
         setData((prev: CharacterSheetData) => ({
             ...prev,
-            appLogs: prev.appLogs.filter((log: any) => log.category !== historyTab)
+            appLogs: prev.appLogs.filter((log) => log.category !== historyTab)
         }));
     };
 
-    const filteredLogs = (data.appLogs || []).filter((log: any) => {
+    const filteredLogs = (data.appLogs || []).filter((log) => {
         if (log.category === 'both') return true;
         return log.category === historyTab;
     });
@@ -180,8 +194,6 @@ const MainLayout: React.FC = () => {
         }
 
         setMode('sheet');
-        setIsSettingsDirty(false);
-        setLastSavedState(JSON.stringify(newData));
     };
 
     useEffect(() => {
@@ -228,9 +240,6 @@ const MainLayout: React.FC = () => {
     return (
         <NotificationProvider value={addLog}>
             <div className={`min-h-screen bg-[#1c1c1c] text-stone-200 font-sans selection:bg-red-900 selection:text-white ${isLandscape ? 'landscape-mode' : ''}`}>
-                <Suspense fallback={null}>
-                    <UpdateNotifier />
-                </Suspense>
 
                 {/* Background Texture (Parchemin Global) */}
                 <div className="fixed inset-0 pointer-events-none z-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')]"></div>
@@ -300,43 +309,42 @@ const MainLayout: React.FC = () => {
                                         className="sticky top-14 z-40 mb-2 no-print w-full flex justify-center pointer-events-none"
                                         aria-label="Navigation des onglets de personnage"
                                     >
-                                        <div className="pointer-events-auto flex gap-4 bg-white/90 backdrop-blur p-1.5 rounded-full shadow-lg border border-gray-200 flex-wrap justify-center">
-                                            <button onClick={() => setSheetTab('p1')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'p1' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Layers size={16} /> Personnage</button>
-                                            <button onClick={() => setSheetTab('specs')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'specs' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><List size={16} /> Spécialisations</button>
-                                            <button
-                                                onClick={() => setSheetTab('p2')}
-                                                className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all 
-                                                    ${sheetTab === 'p2'
-                                                        ? 'bg-blue-600 text-white shadow-md'
-                                                        : shouldHighlightMystic
-                                                            ? 'bg-amber-100/30 text-amber-600 border border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.2)] animate-pulse'
-                                                            : 'text-gray-600 hover:bg-gray-100'
-                                                    }`}
-                                            >
-                                                <FileType size={16} />
-                                                Détails & Equipement
-                                                {shouldHighlightMystic && sheetTab !== 'p2' && (
-                                                    <span className="ml-1 w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-                                                )}
-                                            </button>
-                                            <button onClick={() => setSheetTab('xp')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'xp' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><TrendingUp size={16} /> Gestion XP</button>
-                                            <button onClick={() => setSheetTab('notes')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${sheetTab === 'notes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Book size={16} /> Notes de Campagne</button>
+                                        <div className="pointer-events-auto flex gap-4 bg-white/95 backdrop-blur-md p-2 rounded-full shadow-2xl border border-gray-200 flex-wrap justify-center items-center">
+                                            {/* Primary Tabs */}
+                                            <div className="flex gap-2">
+                                                <button onClick={() => setSheetTab('p1')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'p1' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Layers size={16} /> Personnage</button>
+                                                <button
+                                                    onClick={() => setSheetTab('p2')}
+                                                    className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition
+                                                        ${sheetTab === 'p2'
+                                                            ? 'bg-blue-600 text-white shadow-md'
+                                                            : shouldHighlightMystic
+                                                                ? 'bg-amber-100/30 text-amber-600 border border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.2)] animate-pulse'
+                                                                : 'text-gray-600 hover:bg-gray-100'
+                                                        }`}
+                                                >
+                                                    <FileType size={16} />
+                                                    Détails
+                                                </button>
+                                                <button onClick={() => setSheetTab('inventaire')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'inventaire' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Package size={16} /> Inventaire</button>
+                                                <button onClick={() => setSheetTab('specs')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'specs' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><List size={16} /> Spécialisations</button>
+                                                <button onClick={() => setSheetTab('xp')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'xp' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><TrendingUp size={16} /> Gestion XP</button>
+                                                <button onClick={() => setSheetTab('notes')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'notes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Book size={16} /> Journal</button>
+                                            </div>
                                         </div>
                                     </nav>
 
 
 
                                     <div className={`w-full flex px-2 md:px-0 pb-8 ${sheetTab === 'notes' ? 'overflow-visible' : sheetTab === 'prototype' ? 'overflow-hidden' : 'overflow-x-auto'}`}>
-                                        <div className={`${sheetTab === 'p1' ? 'block' : 'hidden'} mx-auto`}><CharacterSheet isLandscape={isLandscape} /></div>
+                                        <div className={`${sheetTab === 'p1' ? 'block' : 'hidden'} mx-auto`}><CharacterSheet isLandscape={isLandscape} onToggleEditMode={handleToggleEditMode} /></div>
                                         <div className={`${sheetTab === 'specs' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetSpecializations isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'p2' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetPage2 isLandscape={isLandscape} /></div>
+                                        <div className={`${sheetTab === 'inventaire' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetInventaire isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'xp' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetXP isLandscape={isLandscape} /></div>
-                                        {sheetTab === 'notes' && (
-                                            <div className="mx-auto block"><CampaignNotes /></div>
-                                        )}
+                                        <div className={`${sheetTab === 'notes' ? 'block' : 'hidden'} mx-auto`}><CampaignNotes /></div>
                                     </div>
 
-                                    {data.creationConfig?.active && (<CreationHUD />)}
                                     <PostItBoard currentTab={sheetTab} />
                                 </>
                             ) : (
@@ -352,73 +360,55 @@ const MainLayout: React.FC = () => {
                         {pagesToPrint.p1 && (<div className="print-sheet-wrapper"><CharacterSheet isLandscape={isLandscape} /></div>)}
                         {pagesToPrint.specs && (<div className="print-sheet-wrapper"><CharacterSheetSpecializations isLandscape={isLandscape} /></div>)}
                         {pagesToPrint.p2 && (<div className="print-sheet-wrapper"><CharacterSheetPage2 isLandscape={isLandscape} /></div>)}
+                        {pagesToPrint.inventaire && (<div className="print-sheet-wrapper"><CharacterSheetInventaire isLandscape={isLandscape} /></div>)}
                         {pagesToPrint.xp && (<div className="print-sheet-wrapper"><CharacterSheetXP isLandscape={isLandscape} /></div>)}
                         {pagesToPrint.notes && (<div className="print-sheet-wrapper"><CampaignNotes /></div>)}
                     </div>
 
-                    <Suspense fallback={null}>
-                        <ImportExportModal
-                            isOpen={showImportExport}
-                            onClose={() => setShowImportExport(false)}
-                            onImportSuccess={handleImportSuccess}
-                            onExportSuccess={() => { setLastSavedState(JSON.stringify(data)); }}
-                            variant={mode === 'settings' ? 'gm' : 'player'}
-                        />
-                        <PrintSelectionModal isOpen={showPrintModal} onClose={() => setShowPrintModal(false)} onConfirm={(s: Record<string, boolean>) => handlePrintConfirm(s as any)} />
+                    <LayoutModals
+                        data={data}
+                        rules={rules}
+                        setData={setData}
+                        addLog={addLog}
+                        isSyncing={isSyncing}
+                        hasUpdate={hasUpdate}
+                        mode={mode}
+                        showImportExport={showImportExport}
+                        setShowImportExport={setShowImportExport}
+                        showPrintModal={showPrintModal}
+                        setShowPrintModal={setShowPrintModal}
+                        pagesToPrint={pagesToPrint}
+                        handlePrintConfirm={handlePrintConfirm}
+                        showChangelog={showChangelog}
+                        setShowChangelog={setShowChangelog}
+                        showUserGuide={showUserGuide}
+                        setShowUserGuide={setShowUserGuide}
+                        showAppearance={showAppearance}
+                        setShowAppearance={setShowAppearance}
+                        showSync={showSync}
+                        setShowSync={setShowSync}
+                        showCampaignInfo={showCampaignInfo}
+                        setShowCampaignInfo={setShowCampaignInfo}
+                        showConflict={showConflict}
+                        setShowConflict={setShowConflict}
+                        pendingRules={pendingRules}
+                        handleConfirmReset={handleConfirmReset}
+                        handleConfirmBackup={handleConfirmBackup}
+                        showDiscardConfirm={showDiscardConfirm}
+                        setShowDiscardConfirm={setShowDiscardConfirm}
+                        confirmDiscard={confirmDiscard}
+                        showEditWarning={showEditWarning}
+                        setShowEditWarning={setShowEditWarning}
+                        executeEditModeActivation={executeEditModeActivation}
+                        showCreationWarning={showCreationWarning}
+                        setShowCreationWarning={setShowCreationWarning}
+                        executeCreationActivation={executeCreationActivation}
+                        isEditMode={isEditMode}
+                        setIsEditMode={setIsEditMode}
+                        handleImportSuccess={handleImportSuccess}
+                    />
 
-                        <ChangelogModal isOpen={showChangelog} onClose={() => setShowChangelog(false)} />
-                        <UserGuideModal isOpen={showUserGuide} onClose={() => setShowUserGuide(false)} />
-                        <AppearanceModal
-                            isOpen={showAppearance}
-                            onClose={() => setShowAppearance(false)}
-                            data={data}
-                            rules={rules}
-                            onUpdate={(newData) => setData(newData)}
-                        />
-                        <SyncModal
-                            isOpen={showSync}
-                            onClose={() => setShowSync(false)}
-                            characterData={data}
-                            onSyncComplete={(syncInfo: any) => {
-                                setData((prev: CharacterSheetData) => ({ ...prev, syncInfo }));
-                                addLog(`Fiche synchronisée avec ${syncInfo?.settingName}`, 'success', 'sheet');
-                            }}
-                            onRestore={(restoredData) => {
-                                setData(restoredData);
-                                addLog("Version historique restaurée avec succès", 'success', 'sheet');
-                            }}
-                        />
-
-                        <CampaignConflictModal
-                            isOpen={showConflict}
-                            onClose={() => setShowConflict(false)}
-                            characterName={data.header?.name}
-                            currentCampaignName={data.syncInfo?.settingName || 'Indépendante'}
-                            newCampaignName={pendingRules?.name || ''}
-                            onConfirmReset={handleConfirmReset}
-                            onStay={() => setShowConflict(false)}
-                            onBackup={handleConfirmBackup}
-                        />
-
-                        <CampaignInfoModal
-                            isOpen={showCampaignInfo}
-                            onClose={() => setShowCampaignInfo(false)}
-                            campaignName={rules?.settingName || 'Ma Campagne'}
-                            description={rules?.description}
-                            welcomeMessage={rules?.welcomeMessage}
-                        />
-
-                        <ConfirmationModal
-                            isOpen={showDiscardConfirm}
-                            onClose={() => setShowDiscardConfirm(false)}
-                            onConfirm={confirmDiscard}
-                            title="Abandonner les modifications ?"
-                            message="Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter sans sauvegarder ?"
-                            confirmLabel="Quitter sans sauvegarder"
-                            cancelLabel="Rester ici"
-                            type="warning"
-                        />
-                    </Suspense>
+                    {data.creationConfig?.active && (<CreationHUD />)}
                 </div>
             </div>
         </NotificationProvider>

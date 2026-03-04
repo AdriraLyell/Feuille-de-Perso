@@ -15,7 +15,7 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
     const { rules, updateRules } = useRules();
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [hideKnown, setHideKnown] = useState(true);
+    const [hideKnown, setHideKnown] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEntry, setEditingEntry] = useState<LibrarySpecializationEntry | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -34,6 +34,8 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
     // Liste plate de toutes les compétences pour le mapping
     const allSkills = useMemo(() => {
         const skills: { id: string, name: string }[] = [];
+
+        // 1. From Character Sheet (Local)
         if (data.skills) {
             Object.values(data.skills).forEach(category => {
                 category.forEach(skill => {
@@ -43,8 +45,39 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
                 });
             });
         }
+
+        // 2. From Official Campaign Libraries (for names of skills not yet on sheet)
+        if (rules?.libraries) {
+            // Regular Skills
+            if (rules.libraries.skills) {
+                rules.libraries.skills.forEach(skill => {
+                    if (!skills.some(s => s.id === skill.id)) {
+                        skills.push({ id: skill.id, name: skill.name });
+                    }
+                });
+            }
+
+            // Mystic Abilities
+            if (rules.libraries.mysticAbilities) {
+                rules.libraries.mysticAbilities.forEach(ma => {
+                    if (!skills.some(s => s.id === ma.id)) {
+                        skills.push({ id: ma.id, name: ma.name });
+                    }
+                });
+            }
+
+            // Backgrounds
+            if (rules.libraries.backgrounds) {
+                rules.libraries.backgrounds.forEach(bg => {
+                    if (!skills.some(s => s.id === bg.id)) {
+                        skills.push({ id: bg.id, name: bg.name });
+                    }
+                });
+            }
+        }
+
         return skills.sort((a, b) => a.name.localeCompare(b.name));
-    }, [data.skills]);
+    }, [data.skills, rules?.libraries]);
 
     // Déterminer quelles spécialisations sont déjà utilisées sur la fiche
     const usedSpecializations = useMemo(() => {
@@ -78,7 +111,8 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
             name: '',
             skillIds: [],
             defaultMinLevel: 1,
-            description: ''
+            description: '',
+            isImposed: false
         });
         setSkillSearch('');
         setIsModalOpen(true);
@@ -151,8 +185,8 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
     }, [rules, updateRules, addLog]);
 
     const executeImportFromSheet = useCallback(() => {
-        const currentLib = JSON.parse(JSON.stringify(data.specializationLibrary || []));
-        const existingNames = new Set(currentLib.map((e: any) => e.name.trim().toLowerCase()));
+        const currentLib: LibrarySpecializationEntry[] = JSON.parse(JSON.stringify(data.specializationLibrary || []));
+        const existingNames = new Set(currentLib.map((e) => e.name.trim().toLowerCase()));
         let addedCount = 0;
 
         Object.entries(data.specializations || {}).forEach(([skillId, spes]) => {
@@ -164,7 +198,8 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
                         name: norm,
                         skillIds: [skillId],
                         defaultMinLevel: 1,
-                        description: ""
+                        description: "",
+                        isImposed: false
                     });
                     existingNames.add(norm.toLowerCase());
                     addedCount++;
@@ -181,7 +216,8 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
                         name: norm,
                         skillIds: [skillId],
                         defaultMinLevel: s.minLevel,
-                        description: ""
+                        description: "",
+                        isImposed: true
                     });
                     existingNames.add(norm.toLowerCase());
                     addedCount++;
@@ -190,7 +226,7 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
         });
 
         if (addedCount > 0) {
-            currentLib.sort((a: any, b: any) => a.name.localeCompare(b.name));
+            currentLib.sort((a, b) => a.name.localeCompare(b.name));
             onUpdate({ ...data, specializationLibrary: currentLib });
             addLog(`${addedCount} spécialisation(s) importée(s) depuis la fiche.`, 'success', 'settings');
         } else {
@@ -218,6 +254,8 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
         setEntryToDelete(null);
     }, [entryToDelete, data, onUpdate, addLog]);
 
+    const hasItems = hybridSpecializations.length > 0;
+
     return {
         searchTerm, setSearchTerm,
         hideKnown, setHideKnown,
@@ -232,6 +270,7 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
         allSkills,
         usedSpecializations,
         filteredLibrary,
+        hasItems,
         handleOpenNew,
         handleOpenEdit,
         handleSave,

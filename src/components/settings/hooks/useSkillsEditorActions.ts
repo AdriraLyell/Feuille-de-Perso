@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { CharacterSheetData, DotEntry, LibrarySkillEntry, SkillCategoryKey, RulesData, SkillCategoryConfig } from '../../../types';
+import { DragItemType } from '../../SettingsView';
 
 interface UseSkillsEditorActionsProps {
     data: CharacterSheetData;
     onUpdate: (newData: CharacterSheetData) => void;
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings') => void;
-    draggedItem: any;
-    setDraggedItem: (item: any) => void;
+    draggedItem: DragItemType | null;
+    setDraggedItem: (item: DragItemType | null) => void;
     rules: RulesData | null;
 }
 
@@ -188,7 +189,7 @@ export function useSkillsEditorActions({ data, onUpdate, onAddLog, draggedItem, 
 
         // 2. Dropping from Library to Sheet
         else if (draggedItem.type === 'lib_skill') {
-            const libItem = draggedItem.data as LibrarySkillEntry;
+            const libItem = (draggedItem.data as unknown) as LibrarySkillEntry;
 
             // Handle Variable Skills (Option 1)
             if (libItem.isVariable) {

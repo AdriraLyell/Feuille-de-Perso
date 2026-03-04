@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 interface PortalTooltipProps {
-    anchorRef: React.RefObject<HTMLElement | null>;
+    anchorRef: { readonly current: HTMLElement | null };
     isOpen: boolean;
     title?: string;
     children: React.ReactNode;
@@ -27,7 +27,7 @@ export const PortalTooltip: React.FC<PortalTooltipProps> = ({
         if (isOpen && anchorRef.current) {
             const rect = anchorRef.current.getBoundingClientRect();
             const scrollY = window.scrollY;
-            const viewportHeight = window.innerHeight;
+
 
             // Estimated height of tooltip (approximate if not yet rendered)
             // We use a safe margin of 100px or measure if possible next render

@@ -6,7 +6,7 @@ import { APP_VERSION } from '../../constants/app';
 import { createTemplateFromData } from '../../utils/importExportUtils';
 import { getImage, blobToBase64 } from '../../services/imageDB';
 import { useNotification } from '../../context/NotificationContext';
-import { ImageCompressionService } from '../../services/ImageCompressionService';
+
 import { ImageSyncResolver } from '../../services/ImageSyncResolver';
 import { ErrorService } from '../../services/ErrorService';
 
@@ -30,7 +30,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
     }, [variant]);
 
     const handleExport = async () => {
-        let exportData: any = {};
+        let exportData: CharacterSheetData | Record<string, unknown> = {};
         let filename = "Sauvegarde";
 
         const dataToProcess = JSON.parse(JSON.stringify(data));
@@ -57,7 +57,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                     try {
                         const blob = await getImage(note.imageId);
                         if (blob) {
-                            (note as any).base64Cover = await blobToBase64(blob);
+                            (note as { base64Cover?: string }).base64Cover = await blobToBase64(blob);
                         }
                     } catch (e) {
                         ErrorService.handleError(e, { context: 'ExportPanel.exportNoteCover', silent: true });
@@ -72,7 +72,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                             try {
                                 const blob = await getImage(img.imageId);
                                 if (blob) {
-                                    (img as any).base64Data = await blobToBase64(blob);
+                                    (img as { base64Data?: string }).base64Data = await blobToBase64(blob);
                                 }
                             } catch (e) {
                                 ErrorService.handleError(e, { context: 'ExportPanel.exportNoteImage', silent: true });
@@ -101,8 +101,8 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
         }
 
         const template = createTemplateFromData(dataToProcess);
-        if (!(template as any).appVersion) {
-            (template as any).appVersion = APP_VERSION;
+        if (!(template as CharacterSheetData).appVersion) {
+            (template as CharacterSheetData).appVersion = APP_VERSION;
         }
 
         const now = new Date();
@@ -128,9 +128,9 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                 break;
             case 'template':
                 exportData = template;
-                delete exportData.library;
-                delete exportData.skillLibrary;
-                delete exportData.specializationLibrary;
+                delete (exportData as any).library;
+                delete (exportData as any).skillLibrary;
+                delete (exportData as any).specializationLibrary;
                 filename = `${timestamp}_Template_Structure`;
                 break;
             case 'library_traits':
@@ -142,7 +142,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                 filename = `${timestamp}_Biblio_Competences`;
                 break;
             case 'library_specs':
-                exportData = { specializationLibrary: data.specializationLibrary, appVersion: APP_VERSION };
+                exportData = { specializationLibrary: data.specializationLibrary, appVersion: APP_VERSION } as Record<string, unknown>;
                 filename = `${timestamp}_Biblio_Specialisations`;
                 break;
         }
@@ -153,7 +153,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
             // resolveImagesForSync is more comprehensive than simple processImages
             // because it handles bookImage nodes too.
             const portableData = await ImageSyncResolver.resolveImagesForSync(exportData);
-            exportData = portableData;
+            exportData = portableData as CharacterSheetData | Record<string, unknown>;
             addLog("Images compressées avec succès.", 'success', 'sheet', 'img-compress');
         } catch (e) {
             ErrorService.handleError(e, { context: 'ExportPanel.compression', silent: true });
@@ -196,7 +196,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                         {/* Character & System */}
                         <div className="space-y-3 mb-6">
                             <h4 className="text-xs font-bold text-gray-400 uppercase">Données Principales</h4>
-                            <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${exportType === 'full' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
+                            <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition ${exportType === 'full' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
                                 <input type="radio" name="exportType" checked={exportType === 'full'} onChange={() => setExportType('full')} className="mt-1 accent-blue-600" />
                                 <div>
                                     <span className="font-bold text-slate-800 flex items-center gap-2"><User size={16} /> Personnage Complet</span>
@@ -204,7 +204,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                                 </div>
                             </label>
 
-                            <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${exportType === 'system' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
+                            <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition ${exportType === 'system' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
                                 <input type="radio" name="exportType" checked={exportType === 'system'} onChange={() => setExportType('system')} className="mt-1 accent-blue-600" />
                                 <div>
                                     <span className="font-bold text-slate-800 flex items-center gap-2"><Shield size={16} /> Système de Jeu (MJ)</span>
@@ -212,7 +212,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                                 </div>
                             </label>
 
-                            <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${exportType === 'template' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
+                            <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition ${exportType === 'template' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
                                 <input type="radio" name="exportType" checked={exportType === 'template'} onChange={() => setExportType('template')} className="mt-1 accent-blue-600" />
                                 <div>
                                     <span className="font-bold text-slate-800 flex items-center gap-2"><LayoutTemplate size={16} /> Structure Seule</span>
@@ -224,7 +224,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                         {/* Libraries */}
                         <div className="space-y-3">
                             <h4 className="text-xs font-bold text-gray-400 uppercase">Bibliothèques</h4>
-                            <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${exportType === 'library_all' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
+                            <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition ${exportType === 'library_all' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
                                 <input type="radio" name="exportType" checked={exportType === 'library_all'} onChange={() => setExportType('library_all')} className="mt-1 accent-blue-600" />
                                 <div>
                                     <span className="font-bold text-slate-800 flex items-center gap-2"><Layers size={16} /> Bibliothèques Complètes</span>
@@ -233,7 +233,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                             </label>
 
                             <div className="grid grid-cols-2 gap-3">
-                                <label className={`flex items-start gap-2 p-3 rounded-lg border cursor-pointer transition-all ${exportType === 'library_traits' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
+                                <label className={`flex items-start gap-2 p-3 rounded-lg border cursor-pointer transition ${exportType === 'library_traits' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
                                     <input type="radio" name="exportType" checked={exportType === 'library_traits'} onChange={() => setExportType('library_traits')} className="mt-1 accent-blue-600" />
                                     <div>
                                         <span className="font-bold text-slate-800 flex items-center gap-1 text-sm"><BookOpen size={14} /> Traits</span>
@@ -241,7 +241,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                                     </div>
                                 </label>
 
-                                <label className={`flex items-start gap-2 p-3 rounded-lg border cursor-pointer transition-all ${exportType === 'library_skills' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
+                                <label className={`flex items-start gap-2 p-3 rounded-lg border cursor-pointer transition ${exportType === 'library_skills' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
                                     <input type="radio" name="exportType" checked={exportType === 'library_skills'} onChange={() => setExportType('library_skills')} className="mt-1 accent-blue-600" />
                                     <div>
                                         <span className="font-bold text-slate-800 flex items-center gap-1 text-sm"><GraduationCap size={14} /> Skills</span>
@@ -249,7 +249,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                                     </div>
                                 </label>
 
-                                <label className={`flex items-start gap-2 p-3 rounded-lg border cursor-pointer transition-all ${exportType === 'library_specs' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
+                                <label className={`flex items-start gap-2 p-3 rounded-lg border cursor-pointer transition ${exportType === 'library_specs' ? 'bg-white border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-slate-200 hover:bg-white'}`}>
                                     <input type="radio" name="exportType" checked={exportType === 'library_specs'} onChange={() => setExportType('library_specs')} className="mt-1 accent-blue-600" />
                                     <div>
                                         <span className="font-bold text-slate-800 flex items-center gap-1 text-sm"><Award size={14} /> Spés</span>
@@ -265,7 +265,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
             <div className="mt-4 pt-4 border-t border-slate-200">
                 <button
                     onClick={handleExport}
-                    className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-all font-bold flex items-center justify-center gap-2 shadow-lg hover:-translate-y-0.5"
+                    className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition font-bold flex items-center justify-center gap-2 shadow-lg hover:-translate-y-0.5"
                 >
                     <Download size={20} />
                     Sauvegarder

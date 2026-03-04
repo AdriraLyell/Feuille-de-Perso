@@ -1,4 +1,4 @@
-import { PAGE_WIDTH, PAGE_CONTENT_HEIGHT, PAGE_CONTENT_WIDTH } from '../../components/campaign/constants';
+import { PAGE_WIDTH, PAGE_CONTENT_HEIGHT } from '../../components/campaign/constants';
 import { logger } from '../logger';
 
 const BUDGET_BUFFER = 0; // Removing safety margin to match editor exactly

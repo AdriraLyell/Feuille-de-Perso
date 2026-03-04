@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRules } from '../../context/RulesContext';
 import { checkForUpdate } from '../../services/RulesLoader';
-import { RefreshCw, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
+import { RefreshCw, AlertTriangle } from 'lucide-react';
 
 const RulesStatus: React.FC = () => {
     const { rules, isLoading, reloadRules } = useRules();

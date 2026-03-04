@@ -76,7 +76,7 @@ const CampaignInfoModal: React.FC<CampaignInfoModalProps> = ({
                 <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-center">
                     <button
                         onClick={onClose}
-                        className="px-8 py-2.5 bg-amber-900 hover:bg-amber-800 text-amber-50 rounded-full font-bold shadow-lg transition-all active:scale-95"
+                        className="px-8 py-2.5 bg-amber-900 hover:bg-amber-800 text-amber-50 rounded-full font-bold shadow-lg transition active:scale-95"
                     >
                         Compris
                     </button>

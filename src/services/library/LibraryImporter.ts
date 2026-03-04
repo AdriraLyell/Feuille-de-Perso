@@ -1,6 +1,6 @@
 import { DatabaseService } from '../DatabaseService';
 import { LibraryEntry as LibraryTraitEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry } from '../../types/system';
-import { ErrorService } from '../ErrorService';
+
 
 import { normalizeString } from '../../utils/stringUtils';
 import { logger } from '../../utils/logger';
@@ -122,7 +122,8 @@ export const LibraryImporter = {
             name: s.name,
             description: s.description,
             skill_ids: s.skillIds || [],
-            default_min_level: s.defaultMinLevel || 1
+            default_min_level: s.defaultMinLevel || 1,
+            is_imposed: s.isImposed || false
         }));
 
         const uniquePayload = await filterDuplicates('libraries_specializations', targetId, payload);

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { CharacterSheetData, LibrarySkillEntry } from '../../../types';
+import { CharacterSheetData } from '../../../types';
 import { RulesData } from '../../../types/rules';
-import { Sparkles, CheckCircle2, ChevronRight, AlertCircle, Infinity as InfinityIcon } from 'lucide-react';
+import { Sparkles, CheckCircle2, AlertCircle, Infinity as InfinityIcon } from 'lucide-react';
 import { getMysticCapacity } from '../../../utils/mysticUtils';
 import ThematicModal from '../../ui/ThematicModal';
 
@@ -79,7 +79,7 @@ const MysticSkillWizard: React.FC<MysticSkillWizardProps> = ({
                     <button
                         onClick={handleConfirm}
                         disabled={selectedIds.size === 0}
-                        className={`px-6 py-2 rounded font-bold shadow-lg flex items-center gap-2 transition-all ${selectedIds.size > 0 ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-stone-700 text-stone-500 cursor-not-allowed'}`}
+                        className={`px-6 py-2 rounded font-bold shadow-lg flex items-center gap-2 transition ${selectedIds.size > 0 ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-stone-700 text-stone-500 cursor-not-allowed'}`}
                     >
                         <CheckCircle2 size={16} />
                         Valider la sélection
@@ -146,7 +146,7 @@ const MysticSkillWizard: React.FC<MysticSkillWizardProps> = ({
                                     key={skill.id}
                                     onClick={() => !isDisabled && handleToggle(skill.id)}
                                     className={`
-                                        relative group flex items-center gap-3 p-3 rounded border transition-all cursor-pointer
+                                        relative group flex items-center gap-3 p-3 rounded border transition cursor-pointer
                                         ${isSelected
                                             ? 'bg-purple-600/20 border-purple-500 shadow-[0_0_15px_-3px_rgba(147,51,234,0.3)]'
                                             : isDisabled
@@ -166,7 +166,7 @@ const MysticSkillWizard: React.FC<MysticSkillWizardProps> = ({
                                             {skill.name}
                                         </div>
                                         {skill.description && (
-                                            <div className="text-xs text-stone-500 line-clamp-1 group-hover:line-clamp-none transition-all">
+                                            <div className="text-xs text-stone-500 line-clamp-1 group-hover:line-clamp-none transition">
                                                 {skill.description}
                                             </div>
                                         )}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ThematicModal from '../../ui/ThematicModal';
 import ThematicButton from '../../ui/ThematicButton';
 import { TraitEntry } from '../../../types';
-import { Save, X, Edit, Sparkles } from 'lucide-react';
+import { Save, X, Edit, Sparkles, RotateCcw } from 'lucide-react';
 import { useCharacter } from '../../../context/CharacterContext';
 import { useRules } from '../../../context/RulesContext';
 import { normalizeString } from '../../../utils/stringUtils';
@@ -17,7 +17,7 @@ interface TraitEditModalProps {
 
 const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait, onSave, type }) => {
     const [editedTrait, setEditedTrait] = useState<TraitEntry | null>(null);
-    const { data, updateData: onChange, addLog: onAddLog } = useCharacter();
+    const { data, addLog: onAddLog } = useCharacter();
     const { rules } = useRules();
 
     useEffect(() => {
@@ -78,6 +78,19 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
         onAddLog(`Amélioration du trait ${editedTrait.name} pour ${traitCostFactor} XP.`, 'success', 'sheet');
     };
 
+    const handleRevertXP = () => {
+        if (!editedTrait || !editedTrait.creationValue) return;
+        const creationVal = parseInt(editedTrait.creationValue) || 0;
+        const levelsRefunded = (parseInt(editedTrait.value) || 0) - creationVal;
+        if (levelsRefunded <= 0) return;
+        const xpRefund = levelsRefunded * traitCostFactor;
+
+        const updatedTrait = { ...editedTrait, value: creationVal.toString() };
+        setEditedTrait(updatedTrait);
+        onSave(updatedTrait);
+        onAddLog(`Annulation de ${levelsRefunded} amélioration(s) XP sur "${editedTrait.name}" : +${xpRefund} XP remboursés.`, 'success', 'sheet');
+    };
+
     if (!editedTrait) return null;
 
     const currentValue = parseInt(editedTrait.value) || 0;
@@ -97,6 +110,8 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
     const libCost = libEntry?.pointsLabel || libEntry?.cost || '';
     const maxValue = extractMaxFromCost(libCost);
     const isActuallyVariable = maxValue > 0;
+    // Is the trait flagged as variant-requiring in the library?
+    const isVariantTrait = !!libEntry?.isVariable || !!editedTrait.variant;
 
     const isImproved = !editedTrait.isPostCreation && editedTrait.creationValue !== undefined && currentValue > (parseInt(editedTrait.creationValue) || 0);
 
@@ -106,6 +121,7 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
 
     const canReduce = isPostCreation && type === 'desavantages' && currentValue > 0;
     const canIncrease = isPostCreation && type === 'avantages' && (isActuallyVariable || isUpgradeable) && currentValue > 0;
+    const canRevertXP = isPostCreation && type === 'avantages' && isImproved;
 
     return (
         <ThematicModal
@@ -115,38 +131,54 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
             icon={<Edit size={24} />}
             size="md"
             footer={
-                <div className="flex justify-between items-center w-full">
-                    <div className="flex gap-2">
-                        {canReduce && (
-                            <ThematicButton
-                                onClick={handleReduceTrait}
-                                variant="primary"
-                                size="sm"
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                                leftIcon={<Sparkles size={16} />}
-                            >
-                                {isFixedCost
-                                    ? `Racheter totalement (${currentValue * traitCostFactor} XP)`
-                                    : `Réduire d'un niveau (${traitCostFactor} XP)`}
-                            </ThematicButton>
-                        )}
-                        {canIncrease && (
-                            <ThematicButton
-                                onClick={handleIncreaseTrait}
-                                variant="primary"
-                                size="sm"
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                                leftIcon={<Sparkles size={16} />}
-                            >
-                                Améliorer d'un niveau ({traitCostFactor} XP)
-                            </ThematicButton>
-                        )}
-                    </div>
-                    <div className="flex gap-2">
-                        <ThematicButton onClick={onClose} variant="secondary" size="sm" leftIcon={<X size={16} />}>
-                            Annuler
+                <div className="flex items-center w-full gap-3">
+                    {/* Zone XP — gauche */}
+                    {(canReduce || canIncrease || canRevertXP) && (
+                        <div className="flex items-center gap-2 flex-1">
+                            {canReduce && (
+                                <button
+                                    onClick={handleReduceTrait}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
+                                >
+                                    <Sparkles size={12} />
+                                    {isFixedCost
+                                        ? `Racheter (${currentValue * traitCostFactor} XP)`
+                                        : `Réduire (${traitCostFactor} XP)`}
+                                </button>
+                            )}
+                            {canIncrease && (
+                                <button
+                                    onClick={handleIncreaseTrait}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
+                                >
+                                    <Sparkles size={12} />
+                                    Améliorer ({traitCostFactor} XP)
+                                </button>
+                            )}
+                            {canRevertXP && (
+                                <>
+                                    {(canReduce || canIncrease) && (
+                                        <div className="w-px h-5 bg-stone-300" />
+                                    )}
+                                    <button
+                                        onClick={handleRevertXP}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-300 transition-colors"
+                                        title="Annuler toutes les améliorations XP sur ce trait"
+                                    >
+                                        <RotateCcw size={12} />
+                                        Annuler (+{((currentValue - (parseInt(editedTrait!.creationValue!) || 0)) * traitCostFactor)} XP)
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Zone formulaire — droite */}
+                    <div className="flex items-center gap-2 ml-auto shrink-0">
+                        <ThematicButton onClick={onClose} variant="secondary" size="sm" leftIcon={<X size={14} />}>
+                            Fermer
                         </ThematicButton>
-                        <ThematicButton onClick={handleSave} variant="primary" size="sm" leftIcon={<Save size={16} />}>
+                        <ThematicButton onClick={handleSave} variant="primary" size="sm" leftIcon={<Save size={14} />}>
                             Sauvegarder
                         </ThematicButton>
                     </div>
@@ -164,27 +196,33 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
                         <Sparkles size={14} /> Trait amélioré post-création via XP
                     </div>
                 )}
+
+                {/* Nom — lecture seule, défini par la règle */}
                 <div>
                     <label className="block text-sm font-bold text-slate-700 mb-1">Nom du trait</label>
                     <input
                         type="text"
                         value={editedTrait.name || ''}
-                        onChange={(e) => handleChange('name', e.target.value)}
-                        className="w-full border-2 border-stone-200 rounded-lg p-2 focus:border-stone-400 focus:outline-none bg-white font-handwriting text-lg"
-                        placeholder="Ex: Chance..."
+                        readOnly
+                        className="w-full border-2 border-stone-100 rounded-lg p-2 bg-stone-50 text-stone-600 font-handwriting text-lg cursor-not-allowed"
                     />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-1">Coût / Valeur</label>
-                        <input
-                            type="text"
-                            value={editedTrait.value || ''}
-                            onChange={(e) => handleChange('value', e.target.value)}
-                            className="w-full border-2 border-stone-200 rounded-lg p-2 focus:border-stone-400 focus:outline-none bg-white"
-                            placeholder="Ex: 5 PTS, 1/rang..."
-                        />
-                    </div>
+
+                {/* Coût — lecture seule, fixé par la bibliothèque */}
+                <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">
+                        Coût / Valeur <span className="text-[10px] font-normal text-slate-400">(défini par les règles)</span>
+                    </label>
+                    <input
+                        type="text"
+                        value={editedTrait.value || ''}
+                        readOnly
+                        className="w-full border-2 border-stone-100 rounded-lg p-2 bg-stone-50 text-stone-500 font-mono cursor-not-allowed"
+                    />
+                </div>
+
+                {/* Variante — uniquement si le trait est à variante */}
+                {isVariantTrait && (
                     <div>
                         <label className="block text-sm font-bold text-slate-700 mb-1">Variante / Spécialité</label>
                         <input
@@ -195,14 +233,16 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
                             placeholder="Ex: Épée longue..."
                         />
                     </div>
-                </div>
+                )}
+
+                {/* Description — modifiable par le joueur (notes perso) */}
                 <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Description / Effet</label>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">Description / Notes personnelles</label>
                     <textarea
                         value={editedTrait.description || ''}
                         onChange={(e) => handleChange('description', e.target.value)}
                         className="w-full border-2 border-stone-200 rounded-lg p-2 focus:border-stone-400 focus:outline-none bg-white min-h-[100px] resize-y"
-                        placeholder="Saisissez la description du trait..."
+                        placeholder="Ajoutez vos notes ou la description narrative du trait..."
                     />
                 </div>
             </div>

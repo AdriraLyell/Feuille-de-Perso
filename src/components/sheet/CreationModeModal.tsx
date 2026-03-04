@@ -108,7 +108,7 @@ const CreationModeModal: React.FC<CreationModeModalProps> = ({ data, onClose, on
                     </button>
                     <button
                         onClick={onConfirm}
-                        className="px-8 py-3 bg-green-700 text-green-50 font-bold rounded shadow-lg hover:bg-green-800 hover:shadow-xl transition-all uppercase tracking-wide text-sm flex items-center gap-2"
+                        className="px-8 py-3 bg-green-700 text-green-50 font-bold rounded shadow-lg hover:bg-green-800 hover:shadow-xl transition uppercase tracking-wide text-sm flex items-center gap-2"
                     >
                         <Check size={18} />
                         Confirmer et Réinitialiser

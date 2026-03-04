@@ -1,9 +1,11 @@
 
 import React from 'react';
-import { CharacterSheetData, SuggestionEntry } from '../../types';
+import { CharacterSheetData, SuggestionEntry, LibraryEntry, LibrarySkillEntry } from '../../types';
 import { useRules } from '../../context/RulesContext';
-import { Check, X, BookmarkPlus, type LucideIcon, Lightbulb } from 'lucide-react';
+import { Check, X, BookmarkPlus, Lightbulb, User } from 'lucide-react';
 import ThematicButton from '../ui/ThematicButton';
+import AdminTraitIntegrator from './AdminTraitIntegrator';
+import AdminSkillIntegrator from './AdminSkillIntegrator';
 
 interface Props {
     data: CharacterSheetData;
@@ -15,6 +17,10 @@ const AdminSuggestions: React.FC<Props> = ({ data, onUpdate, onAddLog }) => {
     const { rules, updateRules } = useRules();
     const suggestions = data.suggestions || [];
 
+    // States for displaying modals when the MJ clicks "Integrer" on a full Element
+    const [traitToIntegrate, setTraitToIntegrate] = React.useState<{ suggestionId: string, entry: LibraryEntry } | null>(null);
+    const [skillToIntegrate, setSkillToIntegrate] = React.useState<{ suggestionId: string, entry: LibrarySkillEntry } | null>(null);
+
     const handleReject = (id: string) => {
         const newSuggestions = suggestions.filter(s => s.id !== id);
         onUpdate({ ...data, suggestions: newSuggestions });
@@ -24,39 +30,67 @@ const AdminSuggestions: React.FC<Props> = ({ data, onUpdate, onAddLog }) => {
     const handlePromote = (suggestion: SuggestionEntry) => {
         if (!rules) return;
 
-        const newRules = JSON.parse(JSON.stringify(rules)); // Deep clone
-        let promoted = false;
+        const newRules = JSON.parse(JSON.stringify(rules)) as import('../../types/rules').RulesData;
 
+        // --- 1. Variante Spécifique : Ajout Automatique ---
         if (suggestion.type === 'variant' && suggestion.parentId) {
-            // Logic for Variants: Add to parent skill's variants list
-            const skill = newRules.libraries.skills.find((s: any) => s.id === suggestion.parentId);
+            const skill = newRules.libraries.skills.find((s) => s.id === suggestion.parentId);
             if (skill) {
                 if (!skill.variants) skill.variants = [];
                 if (!skill.variants.includes(suggestion.name)) {
                     skill.variants.push(suggestion.name);
-                    skill.variants.sort((a: string, b: string) => a.localeCompare(b)); // Keep sorted
-                    promoted = true;
+                    skill.variants.sort((a: string, b: string) => a.localeCompare(b));
                     onAddLog(`Variante "${suggestion.name}" ajoutée à la compétence "${skill.name}".`, 'success', 'settings');
                 } else {
                     onAddLog("Cette variante existe déjà dans la définition.", 'info', 'settings');
-                    // Mark as promoted anyway to remove it
-                    promoted = true;
                 }
             } else {
                 onAddLog("Erreur : Compétence parente introuvable.", 'danger', 'settings');
             }
-        }
-        /* 
-        // Future logic for Traits/Skills promotion
-        else if (suggestion.type === 'trait') {
-             // ... create new trait entry in library ...
-        }
-        */
-
-        if (promoted) {
             updateRules(newRules);
-            handleReject(suggestion.id); // Remove from list after promotion
+            handleReject(suggestion.id);
+            return;
         }
+
+        // --- 2. Nouvel Élément Complet : Ouvrir le Modal d'Ajustement ---
+        if (suggestion.type === 'trait') {
+            const localEntry = (data.library || []).find(l => l.name === suggestion.name);
+            if (localEntry) {
+                setTraitToIntegrate({ suggestionId: suggestion.id, entry: localEntry });
+            } else {
+                onAddLog("Impossible de trouver les données du trait proposé dans la fiche du joueur.", "danger", "settings");
+            }
+        }
+        else if (suggestion.type === 'skill') {
+            const localEntry = (data.skillLibrary || []).find(s => s.name === suggestion.name);
+            if (localEntry) {
+                setSkillToIntegrate({ suggestionId: suggestion.id, entry: localEntry });
+            } else {
+                onAddLog("Impossible de trouver les données de la compétence proposée dans la fiche du joueur.", "danger", "settings");
+            }
+        }
+    };
+
+    const handleConfirmIntegration = (finalEntry: any, originalSuggestionId: string, listType: 'traits' | 'skills' | 'backgrounds') => {
+        if (!rules) return;
+        const newRules = JSON.parse(JSON.stringify(rules)) as import('../../types/rules').RulesData;
+
+        // Push the finalized element to the official rules library
+        if (!newRules.libraries[listType]) {
+            newRules.libraries[listType] = [];
+        }
+        newRules.libraries[listType].push(finalEntry);
+
+        // Sort
+        newRules.libraries[listType].sort((a: any, b: any) => a.name.localeCompare(b.name));
+
+        updateRules(newRules);
+        handleReject(originalSuggestionId);
+        onAddLog(`L'élément "${finalEntry.name}" a été officialisé !`, 'success', 'settings');
+
+        // Close modal
+        setTraitToIntegrate(null);
+        setSkillToIntegrate(null);
     };
 
     if (suggestions.length === 0) {
@@ -83,15 +117,25 @@ const AdminSuggestions: React.FC<Props> = ({ data, onUpdate, onAddLog }) => {
             <div className="grid gap-3">
                 {suggestions.map(s => (
                     <div key={s.id} className="bg-white border border-stone-200 p-4 rounded-sm shadow-sm flex items-center justify-between hover:border-amber-300 transition-colors">
-                        <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-full ${s.type === 'variant' ? 'bg-indigo-100 text-indigo-700' : 'bg-stone-100 text-stone-600'}`}>
-                                {s.type === 'variant' ? <BookmarkPlus size={18} /> : <Lightbulb size={18} />}
+                        <div className="flex items-center gap-4 flex-grow">
+                            <div className={`p-2.5 rounded-full ${s.type === 'variant' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                                {s.type === 'variant' ? <BookmarkPlus size={20} /> : <Lightbulb size={20} />}
                             </div>
                             <div>
-                                <div className="font-bold text-[#2c241b]">{s.name}</div>
-                                <div className="text-xs text-stone-500 uppercase tracking-widest flex items-center gap-2">
-                                    <span>{s.type === 'variant' ? 'Nouvelle Variante' : 'Nouvel Élément'}</span>
-                                    {s.category && <span className="px-1.5 py-0.5 bg-stone-100 rounded text-[10px]">{s.category}</span>}
+                                <div className="font-bold text-[#2c241b] text-base">{s.name}</div>
+                                <div className="text-xs text-stone-500 flex items-center gap-2 mt-0.5">
+                                    <span className="font-bold uppercase tracking-widest text-[#8b2e2e]">
+                                        {s.type === 'variant' ? 'Nouvelle Variante' : 'Nouvel Élément'}
+                                    </span>
+                                    {s.category && <span className="px-1.5 py-0.5 bg-stone-100/80 rounded text-[10px] font-mono">{s.category}</span>}
+                                    <span className="flex items-center gap-1 ml-1 opacity-70">
+                                        • <User size={10} /> {data.header?.player || 'Joueur Inconnu'}
+                                    </span>
+                                    {s.timestamp && (
+                                        <span className="opacity-70 italic text-[10px] ml-1">
+                                            • le {new Date(s.timestamp).toLocaleDateString()} à {new Date(s.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -107,6 +151,24 @@ const AdminSuggestions: React.FC<Props> = ({ data, onUpdate, onAddLog }) => {
                     </div>
                 ))}
             </div>
+
+            {/* INTEGRATOR MODALS */}
+            {traitToIntegrate && (
+                <AdminTraitIntegrator
+                    initialData={traitToIntegrate.entry}
+                    data={data}
+                    onClose={() => setTraitToIntegrate(null)}
+                    onIntegrate={(finalEntry) => handleConfirmIntegration(finalEntry, traitToIntegrate.suggestionId, 'traits')}
+                />
+            )}
+
+            {skillToIntegrate && (
+                <AdminSkillIntegrator
+                    initialData={skillToIntegrate.entry}
+                    onClose={() => setSkillToIntegrate(null)}
+                    onIntegrate={(finalEntry) => handleConfirmIntegration(finalEntry, skillToIntegrate.suggestionId, 'skills')}
+                />
+            )}
         </div>
     );
 };

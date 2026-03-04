@@ -21,20 +21,20 @@ interface SheetHeaderProps {
         fictionCurrentDate?: string;
     };
     creationActive: boolean;
-    onUpdateHeader: (field: any, value: string) => void;
-    onToggleCreationMode: () => void;
-    editModeActive: boolean;
-    onToggleEditMode: () => void;
+    isEditMode?: boolean;
+    onUpdateHeader: (field: keyof SheetHeaderProps['headerData'], value: string) => void;
+    onToggleEditMode?: () => void;
+    onToggleCreationMode?: () => void;
     isDateLocked?: boolean;
 }
 
 const SheetHeader: React.FC<SheetHeaderProps> = ({
     headerData,
     creationActive,
+    isEditMode = false,
     onUpdateHeader,
-    onToggleCreationMode,
-    editModeActive,
     onToggleEditMode,
+    onToggleCreationMode,
     isDateLocked = false
 }) => {
     // Helper pour parser les dates de manière flexible (FR, ISO, ou Fictif)
@@ -98,40 +98,43 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
 
     return (
         <>
-            {/* Main Title */}
-            <div className="py-3 border-b-2 border-stone-800 bg-white relative flex justify-center items-center">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-center uppercase tracking-[0.1em] sm:tracking-[0.2em] text-indigo-950 font-serif px-4">
-                    Seigneurs des Mystères
-                </h1>
-                {/* Action Buttons */}
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-1 no-print">
-                    {!editModeActive && (
+            {/* Main Title Area with Action Buttons */}
+            <div className="py-2 border-b-2 border-stone-800 bg-white relative flex justify-between items-center px-6 gap-2">
+                {/* Left Side: Creation Button (Only if active) */}
+                <div className="flex-shrink-0 min-w-[150px] flex justify-start">
+                    {creationActive && onToggleCreationMode && (
                         <button
                             onClick={onToggleCreationMode}
-                            className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold transition-all shadow-sm ${creationActive
-                                ? 'bg-green-100 text-green-700 border border-green-300'
-                                : 'bg-stone-100 text-stone-500 border border-stone-300 hover:bg-stone-200'
+                            className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-black transition-all shadow-sm transform hover:scale-105 active:scale-95 ${creationActive
+                                ? 'bg-green-600 text-white border border-green-400'
+                                : 'bg-stone-50 text-stone-500 border border-stone-200'
                                 }`}
-                            title={creationActive ? "Désactiver le Mode Création" : "Activer le Mode Création (Réinitialise la fiche !)"}
                         >
                             <UserPlus size={14} />
-                            <span>Creation</span>
-                            <div className={`w-1.5 h-1.5 rounded-full ${creationActive ? 'bg-green-500 animate-pulse' : 'bg-stone-300'}`} />
+                            <span className="uppercase tracking-tight">Mode Création Active</span>
                         </button>
                     )}
+                </div>
 
-                    <button
-                        onClick={onToggleEditMode}
-                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold transition-all shadow-sm ${editModeActive
-                            ? 'bg-amber-100 text-amber-700 border border-amber-300'
-                            : 'bg-stone-100 text-stone-500 border border-stone-300 hover:bg-stone-200'
-                            }`}
-                        title={editModeActive ? "Valider les modifications" : "Mode Édition (Ajout/Déplacement de compétences)"}
-                    >
-                        {editModeActive ? <Check size={14} /> : <PencilLine size={14} />}
-                        <span>{editModeActive ? 'Édition' : 'Éditer'}</span>
-                        <div className={`w-1.5 h-1.5 rounded-full ${editModeActive ? 'bg-amber-500 animate-pulse' : 'bg-stone-300'}`} />
-                    </button>
+                {/* Center: Title */}
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-center uppercase tracking-[0.1em] text-indigo-950 font-serif flex-grow whitespace-nowrap overflow-hidden text-ellipsis">
+                    Seigneurs des Mystères
+                </h1>
+
+                {/* Right Side: Edit Mode Button */}
+                <div className="flex-shrink-0 min-w-[150px] flex justify-end">
+                    {onToggleEditMode && (
+                        <button
+                            onClick={onToggleEditMode}
+                            className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-[11px] font-black transition-all shadow-md transform hover:scale-105 active:scale-95 ${isEditMode
+                                ? 'bg-red-600 text-white border-2 border-white ring-4 ring-red-500/40 animate-pulse shadow-[0_0_20px_rgba(220,38,38,0.6)]'
+                                : 'bg-stone-50 text-stone-500 border border-stone-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300'
+                                }`}
+                        >
+                            {isEditMode ? <Check size={16} className="animate-bounce" /> : <PencilLine size={14} />}
+                            <span className="uppercase tracking-wider">{isEditMode ? 'Valider Disposition' : 'Editer Compétences'}</span>
+                        </button>
+                    )}
                 </div>
             </div>
 

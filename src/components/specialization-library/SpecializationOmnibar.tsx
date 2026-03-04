@@ -1,10 +1,12 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Search, Award, Plus, ArrowUpCircle } from 'lucide-react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Award, ArrowUpCircle, Zap, Globe } from 'lucide-react';
 import { useCharacterData } from '../../context/CharacterContext';
+import { useRules } from '../../context/RulesContext';
 import ConfirmationModal from '../ui/ConfirmationModal';
 import { LibrarySpecializationEntry } from '../../types';
 import { smartIncludes } from '../../utils/stringUtils';
+import { mergeLibraries } from '../../utils/libraryMerger';
 
 interface SpecializationOmnibarProps {
     value: string;
@@ -17,6 +19,7 @@ interface SpecializationOmnibarProps {
     skillId?: string; // Si fourni, filtre les suggestions pour cette compétence
     variant?: 'default' | 'sheet';
     showPlaceholder?: boolean;
+    isDuplicate?: boolean;
 }
 
 const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
@@ -29,18 +32,26 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
     className = "",
     skillId,
     variant = 'default',
-    showPlaceholder = true
+    showPlaceholder = true,
+    isDuplicate = false
 }) => {
     const data = useCharacterData();
+    const { rules } = useRules();
     const [isOpen, setIsOpen] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
     const [showPromoteConfirm, setShowPromoteConfirm] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const library = data.specializationLibrary || [];
+    // MERGE: Local + Official
+    const hybridLibrary = useMemo(() => {
+        const local = data.specializationLibrary || [];
+        const official = rules?.libraries?.specializations || [];
+        return mergeLibraries(local, official);
+    }, [data.specializationLibrary, rules]);
 
     // Filtrer les suggestions
-    const suggestions = library.filter((entry: LibrarySpecializationEntry) => {
+    const suggestions = hybridLibrary.filter((merged) => {
+        const entry = merged.entry;
         // Filtrage par texte
         const matchText = smartIncludes(entry.name, value);
         // Filtrage par compétence (optionnel)
@@ -70,7 +81,7 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
             setHighlightedIndex(prev => (prev - 1 + suggestions.length) % suggestions.length);
         } else if (e.key === 'Enter' && highlightedIndex >= 0) {
             e.preventDefault();
-            handleSelect(suggestions[highlightedIndex]);
+            handleSelect(suggestions[highlightedIndex].entry);
         } else if (e.key === 'Escape') {
             setIsOpen(false);
         }
@@ -101,7 +112,7 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
                     onKeyDown={handleKeyDown}
                     placeholder={showPlaceholder ? placeholder : ""}
                     className={variant === 'sheet'
-                        ? "w-full bg-transparent border-none text-[10px] h-4 px-1 focus:outline-none font-handwriting text-amber-900 placeholder-transparent"
+                        ? `w-full bg-transparent border-none text-[10px] h-4 px-1 focus:outline-none font-bold placeholder-transparent ${isDuplicate ? 'text-pink-900' : 'text-amber-900'}`
                         : "w-full border border-[#bfae85]/50 bg-[#fefaf2] rounded-sm px-2 py-1 text-sm text-[#1c1917] font-bold focus:border-amber-600 outline-none transition-colors shadow-sm placeholder-[#bfae85]/60"
                     }
                 />
@@ -124,17 +135,27 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
                         <div className="p-1 bg-amber-50 text-[10px] font-bold text-amber-700 border-b flex items-center gap-1 uppercase tracking-wider">
                             <Award size={10} /> Catalogue
                         </div>
-                        {suggestions.map((entry, index) => (
+                        {suggestions.map((merged, index) => (
                             <button
-                                key={entry.id}
-                                onClick={() => handleSelect(entry)}
+                                key={merged.entry.id}
+                                onClick={() => handleSelect(merged.entry)}
                                 onMouseEnter={() => setHighlightedIndex(index)}
                                 className={`w-full text-left px-3 py-2 text-sm flex flex-col gap-0.5 transition-colors ${index === highlightedIndex ? 'bg-amber-100' : 'hover:bg-gray-50'
                                     }`}
                             >
-                                <span className="font-bold text-gray-800">{entry.name}</span>
-                                {entry.description && (
-                                    <span className="text-[10px] text-gray-400 truncate">{entry.description}</span>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="font-bold text-gray-800">{merged.entry.name}</span>
+                                    {merged.source === 'official' && (
+                                        <span title="Officiel">
+                                            <Globe size={10} className="text-slate-400" />
+                                        </span>
+                                    )}
+                                    {merged.entry.isImposed && (
+                                        <Zap size={10} className="text-blue-500 fill-blue-500" />
+                                    )}
+                                </div>
+                                {merged.entry.description && (
+                                    <span className="text-[10px] text-gray-400 truncate">{merged.entry.description}</span>
                                 )}
                             </button>
                         ))}
@@ -142,7 +163,6 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
                 )}
             </div>
 
-            {/* Modal de confirmation de promotion */}
             {showPromoteConfirm && (
                 <ConfirmationModal
                     isOpen={showPromoteConfirm}

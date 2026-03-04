@@ -1,6 +1,93 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-mystic-stone: #1c1917;
+  /* Stone 900 */
+  --color-mystic-deep: #0c0a09;
+  /* Stone 950 */
+  --color-mystic-surface: #292524;
+  /* Stone 800 */
+  --color-paper-cream: #fdfbf7;
+  /* Original Paper */
+
+  /* Accents */
+  --color-amber-gold: #d97706;
+  /* Primary Action */
+  --color-amber-glow: #f59e0b;
+  --color-crimson-blood: #9f1239;
+  /* Rose 800 */
+  --color-void-indigo: #312e81;
+  /* Indigo 900 */
+
+  /* Fonts */
+  --font-serif: "Cinzel", "Playfair Display", serif;
+  --font-sans: "Inter", "Lato", sans-serif;
+  --font-hand: "Patrick Hand", cursive;
+  --font-dancing: "Dancing Script", cursive;
+  --font-vibes: "Great Vibes", cursive;
+  --font-pinyon: "Pinyon Script", cursive;
+
+  /* Shadows */
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --shadow-paper: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  --shadow-glow-gold: 0 0 15px rgba(217, 119, 6, 0.3);
+
+  /* Animations & Keyframes */
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-slide-up: slide-up 0.5s ease-out;
+  --animate-spin-slow: spin 3s linear infinite;
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-up {
+    0% {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse-subtle {
+
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes unroll {
+    0% {
+      transform: scaleY(0);
+      opacity: 0;
+      transform-origin: top;
+    }
+
+    100% {
+      transform: scaleY(1);
+      opacity: 1;
+      transform-origin: top;
+    }
+  }
+}
 
 :root {
   /* Colors */
@@ -42,13 +129,14 @@
   --sheet-width-portrait: 1100px;
   --sheet-height-portrait: 1560px;
   --sheet-width-landscape: 1560px;
-  --sheet-height-landscape: 1100px;
+  --sheet-height-landscape: 1205px;
   --print-zoom-portrait: 0.65;
   --print-zoom-landscape: 0.48;
 }
 
 /* Global Styles (Migrated from HTML for consistency) */
-html, body {
+html,
+body {
   overflow-y: auto;
 }
 
@@ -255,4 +343,53 @@ body {
   box-shadow: var(--shadow-glass);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
+}
+
+/* Scrollbar Hide Utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}
+
+/* Modal Specific Styles */
+.modal-paper-texture {
+  background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+  background-blend-mode: multiply;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s infinite ease-in-out;
+}
+
+.animate-unroll {
+  animation: unroll 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shadow-inner-soft {
+  box-shadow: inset 0 2px 15px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-crimson-glow {
+  box-shadow: 0 0 20px rgba(159, 18, 57, 0.3);
+}
+
+.double-border-container {
+  position: relative;
+  padding: 4px;
+}
+
+.double-border-container::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px solid rgba(191, 174, 133, 0.3);
+  pointer-events: none;
+  border-radius: 1px;
 }

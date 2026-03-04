@@ -36,7 +36,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
     const allSkills = useMemo(() => {
         const skills: { id: string, name: string }[] = [];
 
-        // 1. From Categories (Base Skills Definitions)
+        // 1. From Categories (Base Skills Definitions - Legacy)
         if (rules.definitions && rules.definitions.skills) {
             Object.values(rules.definitions.skills).forEach(categorySkills => {
                 categorySkills.forEach(skillName => {
@@ -48,16 +48,37 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         }
 
         // 2. From Official Library (Reserve)
-        if (rules.libraries && rules.libraries.skills) {
-            rules.libraries.skills.forEach(skill => {
-                if (!skills.some(s => s.id === skill.id)) {
-                    skills.push({ id: skill.id, name: skill.name });
-                }
-            });
+        if (rules.libraries) {
+            // Regular Skills
+            if (rules.libraries.skills) {
+                rules.libraries.skills.forEach(skill => {
+                    if (!skills.some(s => s.id === skill.id)) {
+                        skills.push({ id: skill.id, name: skill.name });
+                    }
+                });
+            }
+
+            // Mystic Abilities (Often used as parents for styles/specializations)
+            if (rules.libraries.mysticAbilities) {
+                rules.libraries.mysticAbilities.forEach(ma => {
+                    if (!skills.some(s => s.id === ma.id)) {
+                        skills.push({ id: ma.id, name: ma.name });
+                    }
+                });
+            }
+
+            // Backgrounds & Counters (Just in case)
+            if (rules.libraries.backgrounds) {
+                rules.libraries.backgrounds.forEach(bg => {
+                    if (!skills.some(s => s.id === bg.id)) {
+                        skills.push({ id: bg.id, name: bg.name });
+                    }
+                });
+            }
         }
 
         return skills.sort((a, b) => a.name.localeCompare(b.name));
-    }, [rules.definitions, rules.libraries.skills]);
+    }, [rules.definitions, rules.libraries.skills, rules.libraries.mysticAbilities, rules.libraries.backgrounds]);
 
     const filteredSkillsForModal = useMemo(() => {
         return allSkills.filter(s =>
@@ -94,7 +115,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         setIsModalOpen(true);
     };
 
-    const handleDelete = (id: string, name: string) => {
+    const handleDelete = (id: string) => {
         setShowDeleteConfirm(id);
     };
 
@@ -225,7 +246,9 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
             {/* Toolbar */}
             <div className="p-4 bg-stone-100/30 border-b border-[#bfae85]/30 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0">
                 <div className="relative flex-grow max-w-md w-full">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a3b32]/50" />
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <Search size={16} className="text-[#4a3b32]/50" />
+                    </span>
                     <input
                         className="w-full pl-9 pr-9 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
                         placeholder="Rechercher une spécialisation..."

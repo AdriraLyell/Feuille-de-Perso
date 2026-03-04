@@ -1,4 +1,3 @@
-import { CharacterSheetData, ExperienceData, RulesData } from '../types';
 import {
     triangular,
     getXPCost,

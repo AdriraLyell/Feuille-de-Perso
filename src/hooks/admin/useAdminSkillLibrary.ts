@@ -13,7 +13,7 @@ import { publishFileToGitHub } from '../../services/githubService';
 export const useAdminSkillLibrary = (
     rules: RulesData,
     onUpdate: (newRules: RulesData) => void,
-    globalUsage: Record<string, number> = {},
+    _globalUsage: Record<string, number> = {},
     mode: 'global' | 'override' = 'global'
 ) => {
     const list = rules.libraries?.skills || [];

@@ -28,7 +28,7 @@ export const BudgetGauge: React.FC<BudgetGaugeProps> = ({ label, current, max, f
     }
 
     return (
-        <div className={`flex flex-col bg-stone-800 rounded-lg border ${cardBorder} p-4 min-w-[180px] shadow-lg relative overflow-hidden group transition-all hover:-translate-y-1`}>
+        <div className={`flex flex-col bg-stone-800 rounded-lg border ${cardBorder} p-4 min-w-[180px] shadow-lg relative overflow-hidden group transition hover:-translate-y-1`}>
             <div className="flex justify-between items-end mb-3 relative z-10">
                 <span className="text-[11px] text-stone-400 font-bold uppercase tracking-wider font-serif">{label}</span>
                 <span className={`font-mono font-bold text-lg leading-none ${valueColor}`}>
@@ -37,7 +37,7 @@ export const BudgetGauge: React.FC<BudgetGaugeProps> = ({ label, current, max, f
             </div>
             <div className="h-2 w-full bg-stone-900 rounded-full overflow-hidden relative z-10">
                 <div
-                    className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+                    className={`h-full rounded-full transition duration-500 ${barColor}`}
                     style={{ width: `${percentage}%` }}
                 ></div>
             </div>

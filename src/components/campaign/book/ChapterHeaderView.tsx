@@ -32,7 +32,7 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
                         .focus()
                         .setTextSelection({ from, to })
                         .run();
-                } catch (err) {
+                } catch {
                     // Silently fail if pos is invalid during a concurrent update
                 }
             };
@@ -66,7 +66,7 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
         e.stopPropagation();
         if (dateInputRef.current) {
             if ('showPicker' in dateInputRef.current) {
-                (dateInputRef.current as any).showPicker();
+                (dateInputRef.current as unknown as { showPicker: () => void }).showPicker();
             } else {
                 (dateInputRef.current as HTMLInputElement).click();
             }

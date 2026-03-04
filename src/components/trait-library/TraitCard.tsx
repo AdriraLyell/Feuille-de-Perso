@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { LibraryEntry } from '../../types';
-import { Zap, Edit2, Trash2, Plus, CheckSquare, Square, Lock, Globe, Layers, Activity, TrendingUp } from 'lucide-react';
+import { LibraryEntry, TraitEffect } from '../../types';
+import { Zap, Edit2, Trash2, Plus, CheckSquare, Square, Lock, Globe, Layers, Activity, TrendingUp, Eye } from 'lucide-react';
 import { PortalTooltip } from '../ui/PortalTooltip';
 import { ItemUsageDetail } from '../../types/usageTypes';
 import { UsageLockedTooltip } from '../../admin/components/libraries/UsageLockedTooltip';
@@ -60,8 +60,9 @@ const TraitCardItemEffects: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
     const [showTooltip, setShowTooltip] = useState(false);
     const anchorRef = useRef<HTMLDivElement>(null);
 
-    const getEffectLabel = (eff: any) => {
-        switch (eff.type || eff.effectType) {
+    const getEffectLabel = (eff: TraitEffect) => {
+        const type = eff.type || eff.effectType;
+        switch (type) {
             case 'formula': return `Equation : ${eff.target || '?'} = ${eff.formula}`;
             case 'free_skill_rank': return `Rang gratuit : ${eff.target || '?'} (+${eff.value})`;
             case 'master_skill': return `Maître : compétence au rang 5 (choix joueur)`;
@@ -122,7 +123,7 @@ const TraitCardItemCounter: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
     );
 };
 
-const TraitCardItemXP: React.FC<{ entry: LibraryEntry }> = ({ entry }) => {
+const TraitCardItemXP: React.FC<{ entry: LibraryEntry }> = () => {
     const [showTooltip, setShowTooltip] = useState(false);
     const anchorRef = useRef<HTMLDivElement>(null);
 
@@ -164,9 +165,7 @@ const TraitCard: React.FC<TraitCardProps> = ({
     usageDetails,
     onLoadUsageDetails
 }) => {
-    const [showDeleteTooltip, setShowDeleteTooltip] = useState(false);
     const [showLockTooltip, setShowLockTooltip] = useState(false);
-    const deleteBtnRef = useRef<HTMLDivElement>(null);
     const lockIconRef = useRef<HTMLDivElement>(null);
     if (!entry) return null;
 
@@ -197,7 +196,11 @@ const TraitCard: React.FC<TraitCardProps> = ({
             {/* 2. Status Icons (Fixed width) */}
             <div className="w-16 flex items-center gap-1 shrink-0">
                 {entry.isVariable && <TraitCardItemVariants entry={entry} hasVariants={!!hasVariants} />}
-                {source === 'official' && <div title="Trait Officiel"><Globe size={14} className="text-indigo-500" /></div>}
+                {(source === 'official' || source === 'modified') && (
+                    <div title={source === 'modified' ? "Trait Officiel (modifié localement)" : "Trait Officiel"}>
+                        <Globe size={14} className={source === 'modified' ? "text-amber-500" : "text-indigo-500"} />
+                    </div>
+                )}
                 {entry.effects && entry.effects.length > 0 && <TraitCardItemEffects entry={entry} />}
                 {entry.hasAutoCounter && <TraitCardItemCounter entry={entry} />}
                 {entry.isXPUpgradeable && <TraitCardItemXP entry={entry} />}
@@ -253,26 +256,23 @@ const TraitCard: React.FC<TraitCardProps> = ({
                 )}
             </div>
 
-            {/* 4. Actions (Fixed width) */}
-            <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+            <div className="w-16 flex justify-end gap-1 opacity-40 group-hover:opacity-100 transition-opacity shrink-0">
+                <button
+                    onClick={(e) => { e.stopPropagation(); onEdit(entry); }}
+                    className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                    title={isEditable ? "Éditer" : "Voir"}
+                >
+                    {isEditable ? <Edit2 size={14} /> : <Eye size={14} />}
+                </button>
                 {isEditable && (
-                    <>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onEdit(entry); }}
-                            className="p-1 text-blue-600 hover:bg-blue-50 rounded"
-                            title="Éditer"
-                        >
-                            <Edit2 size={14} />
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onDelete(entry.id); }}
-                            disabled={isLocked}
-                            className={`p-1 rounded ${isLocked ? 'text-stone-300' : 'text-red-600 hover:bg-red-50'}`}
-                            title={!isLocked ? "Supprimer" : undefined}
-                        >
-                            <Trash2 size={14} />
-                        </button>
-                    </>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onDelete(entry.id); }}
+                        disabled={isLocked}
+                        className={`p-1 rounded ${isLocked ? 'text-stone-300' : 'text-red-600 hover:bg-red-50'}`}
+                        title={!isLocked ? "Supprimer" : undefined}
+                    >
+                        <Trash2 size={14} />
+                    </button>
                 )}
                 {onSelect && !showMultiSelect && (
                     <button

@@ -4,7 +4,7 @@ import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../types';
 import SpecializationOmnibar from './specialization-library/SpecializationOmnibar';
 import SpecializationLibraryDrawer from './specialization-library/SpecializationLibraryDrawer';
 import ConfirmationModal from './ui/ConfirmationModal';
-import { Award, Book, Plus } from 'lucide-react';
+import { Award, ArrowUpCircle, Plus, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { useRules } from '../context/RulesContext';
 import { logger } from '../utils/logger';
@@ -26,6 +26,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
     const { rules } = useRules();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [duplicateErrorModal, setDuplicateErrorModal] = useState<string | null>(null);
+    const [promoteImposedModal, setPromoteImposedModal] = useState<{ skillId: string; specName: string } | null>(null);
 
     const getSkillName = (skillId: string): string => {
         for (const cat of Object.keys(data.skills)) {
@@ -64,11 +65,11 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
             if (!specName || specName.trim() === '') return;
 
             // 1. Identifier la catégorie cible "Secondaire"
-            const secondaryCat = rules?.definitions?.skillCategories?.find((cat: any) => cat.behavior === 'Secondaire' || cat.label.toLowerCase().includes('secondaire'))?.id || 'competences_secondaires';
+            const secondaryCat = rules?.definitions?.skillCategories?.find(cat => cat.behavior === 'Secondaire' || cat.label.toLowerCase().includes('secondaire'))?.id || 'competences_secondaires';
 
             // 2. Vérifier si la compétence n'existe pas déjà
             const existingSkills = data.skills[secondaryCat] || [];
-            const isDuplicate = existingSkills.some(s => s.name.trim().toLowerCase() === specName.trim().toLowerCase());
+            const isDuplicate = existingSkills.some((s: DotEntry) => s.name.trim().toLowerCase() === specName.trim().toLowerCase());
 
             if (isDuplicate) {
                 onAddLog(`La compétence secondaire "${specName}" existe déjà.`, 'danger', 'sheet');
@@ -109,6 +110,44 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         }
     };
 
+    const handlePromoteImposed = (skillId: string, specName: string) => {
+        try {
+            if (!specName || specName.trim() === '') return;
+
+            // 1. Identifier la catégorie cible "Secondaire"
+            const secondaryCat = rules?.definitions?.skillCategories?.find(cat => cat.behavior === 'Secondaire' || cat.label.toLowerCase().includes('secondaire'))?.id || 'competences_secondaires';
+
+            // 2. Vérifier si la compétence n'existe pas déjà
+            const existingSkills = data.skills[secondaryCat] || [];
+            const isDuplicate = existingSkills.some((s: DotEntry) => s.name.trim().toLowerCase() === specName.trim().toLowerCase());
+
+            if (isDuplicate) {
+                onAddLog(`La compétence secondaire "${specName}" existe déjà.`, 'danger', 'sheet');
+                setDuplicateErrorModal(specName);
+                return;
+            }
+
+            logger.info(`[PromotionImposée] Promouvoir "${specName}" vers ${secondaryCat} (Skill ID: ${skillId})`);
+
+            // 3. Créer la nouvelle compétence (valeur 0)
+            const newSkill = createDotEntry(specName, 0);
+
+            // 4. Ajouter la compétence sans toucher aux specs imposées (le MJ reste maître)
+            onChange((prev: CharacterSheetData) => ({
+                ...prev,
+                skills: {
+                    ...prev.skills,
+                    [secondaryCat]: [...(prev.skills[secondaryCat] || []), newSkill]
+                }
+            }));
+
+            onAddLog(`Spécialisation imposée "${specName}" convertie en compétence secondaire.`, 'success', 'sheet');
+        } catch (err) {
+            logger.error(`[PromotionImposée] Error:`, err);
+            ErrorService.handleError(err, { context: 'CharacterSheetSpecializations.handlePromoteImposed' });
+        }
+    };
+
     const handleDrop = (e: React.DragEvent, skillId: string) => {
         e.preventDefault();
         try {
@@ -146,18 +185,30 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
     const renderSkillBox = (skill: DotEntry) => {
         const count = skill.value;
-        const imposedSpecs = skill.value > 0
-            ? (data.imposedSpecializations[skill.id] || []).filter((spec: any) => skill.value >= (spec.minLevel || 0))
-            : [];
+        const imposedSpecs = (data.imposedSpecializations[skill.id] || [])
+            .filter((spec: { minLevel?: number }) => skill.value >= (spec.minLevel || 0));
 
         if (count <= 0 && imposedSpecs.length === 0) return null;
 
         const userSpecs = data.specializations[skill.id] || [];
 
+        // Détection des doublons (insensible à la casse)
+        const allSpecNames = [
+            ...imposedSpecs.map((s: { name: string }) => s.name.trim().toLowerCase()),
+            ...userSpecs.filter(Boolean).map((s: string) => s.trim().toLowerCase())
+        ];
+
+        const nameCounts = allSpecNames.reduce((acc: Record<string, number>, name: string) => {
+            acc[name] = (acc[name] || 0) + 1;
+            return acc;
+        }, {});
+
+        const isNameDuplicate = (name: string): boolean => !!(name && nameCounts[name.trim().toLowerCase()] > 1);
+
         return (
             <div
                 key={skill.id}
-                className="border border-stone-300 p-1.5 bg-white/50 backdrop-blur-sm shadow-sm flex flex-col gap-1.5 rounded-md group/skill hover:border-amber-400 hover:bg-white transition-all duration-200"
+                className="border border-stone-300 p-1.5 bg-white/50 backdrop-blur-sm shadow-sm flex flex-col gap-1.5 rounded-md group/skill hover:border-amber-400 hover:bg-white transition duration-200"
                 onDragOver={(e) => {
                     e.preventDefault();
                     e.currentTarget.classList.add('bg-amber-50', 'border-amber-400');
@@ -176,35 +227,54 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                 </div>
 
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
-                    {/* Render Imposed Specializations first (Read Only) */}
-                    {imposedSpecs.map((spec: any, i: number) => (
-                        <div key={`imp-${i}`} className="bg-slate-100 border border-slate-200 rounded-full py-0.5 px-2 flex items-center shadow-inner h-5">
-                            <div className="w-1 h-1 rounded-full bg-slate-400 mr-1.5 shrink-0"></div>
-                            <span className="text-[10px] font-bold text-slate-600 truncate leading-none" title={spec.name}>
-                                {spec.name}
-                            </span>
-                        </div>
-                    ))}
+                    {/* Render Imposed Specializations first (avec bouton de promotion) */}
+                    {imposedSpecs.map((spec: { name: string }, i: number) => {
+                        const isDup = isNameDuplicate(spec.name);
+                        return (
+                            <div key={`imp-${i}`} className={`group/imposed rounded-full py-0.5 px-2 flex items-center shadow-inner h-5 transition-colors border ${isDup
+                                ? 'bg-pink-100 border-pink-400 text-pink-900'
+                                : 'bg-slate-100 border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-indigo-50'
+                                }`}>
+                                <Zap size={10} className={`${isDup ? 'text-pink-600 fill-pink-600' : 'text-blue-500 fill-blue-500'} mr-1 shrink-0`} />
+                                <span className="text-[10px] font-bold truncate leading-none flex-1" title={spec.name}>
+                                    {spec.name}
+                                </span>
+                                <button
+                                    onClick={() => setPromoteImposedModal({ skillId: skill.id, specName: spec.name })}
+                                    className="opacity-0 group-hover/imposed:opacity-100 transition-opacity ml-0.5 text-indigo-500 hover:text-indigo-700"
+                                    title="Transformer en compétence secondaire"
+                                >
+                                    <ArrowUpCircle size={10} />
+                                </button>
+                            </div>
+                        );
+                    })}
 
                     {/* Render User Specializations */}
                     {Array.from({ length: count }).map((_, i) => {
-                        const hasValue = !!userSpecs[i];
+                        const val = userSpecs[i] || '';
+                        const hasValue = !!val;
+                        const isDup = isNameDuplicate(val);
+
                         return (
                             <div
                                 key={`user-${i}`}
-                                className={`relative flex items-center h-5 transition-all duration-200 ${hasValue
-                                    ? 'bg-amber-50 border border-amber-200 rounded-full shadow-sm'
+                                className={`relative flex items-center h-5 transition duration-200 ${hasValue
+                                    ? isDup
+                                        ? 'bg-pink-100 border border-pink-400 rounded-full shadow-sm'
+                                        : 'bg-amber-50 border border-amber-200 rounded-full shadow-sm'
                                     : 'border-b border-dashed border-stone-300 hover:border-amber-400'
                                     }`}
                             >
                                 <SpecializationOmnibar
-                                    value={userSpecs[i] || ''}
-                                    onChange={(val: string) => updateSpecialization(skill.id, i, val)}
-                                    onPromote={(val: string) => handlePromote(skill.id, i, val)}
+                                    value={val}
+                                    onChange={(newVal: string) => updateSpecialization(skill.id, i, newVal)}
+                                    onPromote={(newVal: string) => handlePromote(skill.id, i, newVal)}
                                     skillId={skill.id}
                                     className="w-full"
                                     variant="sheet"
                                     showPlaceholder={false}
+                                    isDuplicate={isDup}
                                 />
                                 {!hasValue && (
                                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-0 group-hover/skill:opacity-20">
@@ -219,28 +289,27 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         );
     };
 
-    const renderCategory = (title: string, categoryKey: SkillCategoryKey) => {
+    const renderCategory = (title: string, categoryKey: string) => {
         const categoryData = data.skills[categoryKey];
         if (!categoryData || !Array.isArray(categoryData)) return null;
 
         // Show skill if it has dots OR imposed specializations
-        const skills = categoryData.filter((s: any) => {
+        const skills = categoryData.filter((s: DotEntry) => {
             if (!s || !s.name || s.name.trim() === '') return false; // Skip spacers
-            // GLOBAL FIX: If skill value is 0, we don't show it (no specs visible at 0)
-            return s.value > 0;
+            const hasPoints = s.value > 0;
+            const hasImposed = data.imposedSpecializations[s.id] && data.imposedSpecializations[s.id].length > 0;
+            // Always show if it has points or if MJ imposed something
+            return hasPoints || hasImposed;
         });
 
         if (skills.length === 0) return null;
 
-        // Adapt columns based on landscape mode (6 for portrait, 8 for landscape)
-        const gridClass = isLandscape
-            ? "grid grid-cols-8 gap-1"
-            : "grid grid-cols-6 gap-1";
+        const gridCols = isLandscape ? 'grid-cols-7' : 'grid-cols-5';
 
         return (
             <div className="mb-1 break-inside-avoid">
                 <SectionHeader title={title} />
-                <div className="grid grid-cols-6 gap-2">
+                <div className={`grid ${gridCols} gap-2`}>
                     {skills.map(renderSkillBox)}
                 </div>
             </div>
@@ -261,7 +330,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
     });
 
     return (
-        <div className={`flex justify-center transition-all duration-300 ${isDrawerOpen ? 'pr-80' : ''}`}>
+        <div className={`flex justify-center transition duration-300 ${isDrawerOpen ? 'pr-80' : ''}`}>
             <div className={`sheet-container p-6 ${isLandscape ? 'landscape' : ''}`}>
 
                 <h1 className="text-3xl font-black text-center uppercase py-2 tracking-widest border-b-2 border-stone-800 mb-4 text-indigo-950 font-serif relative">
@@ -287,22 +356,22 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                     <div className="space-y-0.5 overflow-auto">
                         {/* Dynamic Rendering from Rules */}
                         {rules?.definitions?.skillCategories
-                            ?.filter((cat: any) => cat.behavior === 'Compétence')
-                            ?.map((cat: any) => (
+                            ?.filter(cat => cat.behavior === 'Compétence')
+                            ?.map(cat => (
                                 <div key={cat.id}>
-                                    {renderCategory(cat.label, cat.id as any)}
+                                    {renderCategory(cat.label, cat.id)}
                                 </div>
                             ))}
 
                         {/* Fallback Rendering if no rules / legacy keys */}
                         {(!rules || !rules.definitions?.skillCategories) && (
                             <>
-                                {renderCategory("Talents", "talents" as any)}
-                                {renderCategory("Compétences", "competences" as any)}
-                                {renderCategory("Compétences (Suite)", "competences_col_2" as any)}
-                                {renderCategory("Connaissances", "connaissances" as any)}
-                                {renderCategory("Autres Compétences", "autres_competences" as any)}
-                                {renderCategory("Autres", "autres" as any)}
+                                {renderCategory("Talents", "talents")}
+                                {renderCategory("Compétences", "competences")}
+                                {renderCategory("Compétences (Suite)", "competences_col_2")}
+                                {renderCategory("Connaissances", "connaissances")}
+                                {renderCategory("Autres Compétences", "autres_competences")}
+                                {renderCategory("Autres", "autres")}
                             </>
                         )}
                     </div>
@@ -331,6 +400,31 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                         confirmLabel="Compris"
                         cancelLabel=""
                         type="danger"
+                        scheme="paper"
+                    />
+                )}
+
+                {promoteImposedModal && (
+                    <ConfirmationModal
+                        isOpen={!!promoteImposedModal}
+                        onClose={() => setPromoteImposedModal(null)}
+                        onConfirm={() => {
+                            handlePromoteImposed(promoteImposedModal.skillId, promoteImposedModal.specName);
+                            setPromoteImposedModal(null);
+                        }}
+                        title="Transformer en Compétence Secondaire"
+                        message={
+                            <span>
+                                Souhaitez-vous transformer <strong>"{promoteImposedModal.specName}"</strong> en compétence secondaire ?
+                                <br /><br />
+                                <span className="text-[11px] opacity-80">
+                                    Une nouvelle compétence sera créée avec une valeur de 0. La spécialisation imposée restera visible (elle est définie par les règles).
+                                </span>
+                            </span>
+                        }
+                        confirmLabel="Transformer"
+                        cancelLabel="Annuler"
+                        type="warning"
                         scheme="paper"
                     />
                 )}

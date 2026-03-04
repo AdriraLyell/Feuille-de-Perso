@@ -1,4 +1,4 @@
-import { CharacterSheetData } from '../../types';
+
 
 // Import migration functions
 import { migrateTerminology } from './migrateTerminology';
@@ -14,9 +14,14 @@ import { migrateCampaignNotes } from './migrateCampaignNotes';
 import { migrateHeaderDates } from './migrateHeaderDates';
 import { migrateFormulas } from './migrateFormulas';
 import { forceRulesReconciliation } from './forceRulesReconciliation';
+import { restoreMysticLinks } from './restoreMysticLinks';
+
+// Type for data being migrated (starts as raw JSON, ends as CharacterSheetData)
+export type MigratableData = Record<string, any>;
 
 // Type for a migration function
-type MigrationFunction = (data: any) => void;
+type MigrationFunction = (data: MigratableData) => void;
+
 
 // Registry of migrations by version
 // Version 1 corresponds to "Legacy to Current" massive migration
@@ -46,8 +51,11 @@ export const MIGRATIONS: Record<number, MigrationFunction[]> = {
     ],
     6: [
         forceRulesReconciliation  // Re-force after reconcileCleanup fix (re-injects skillLibrary with mysticAbilityId)
+    ],
+    7: [
+        restoreMysticLinks
     ]
 };
 
-export const CURRENT_SCHEMA_VERSION = 6;
+export const CURRENT_SCHEMA_VERSION = 7;
 
