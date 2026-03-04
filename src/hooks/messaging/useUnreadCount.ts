@@ -9,7 +9,7 @@ export const useUnreadCount = (settingId: string | undefined, viewerId: string |
         if (!settingId || !viewerId) return;
 
         const fetchCount = async () => {
-            const { count: unread } = await MessageService.countUnread(settingId, viewerId);
+            const unread = await MessageService.countUnread(settingId, viewerId);
             setCount(unread);
         };
 
