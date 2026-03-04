@@ -2,7 +2,7 @@ import React from 'react';
 import { CalendarConfigReal } from '../../../types/rules';
 
 import CalendarEventsList from './CalendarEventsList';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, RotateCcw } from 'lucide-react';
 
 interface Props {
     config: CalendarConfigReal;
@@ -22,6 +22,16 @@ const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
         });
     };
 
+    const rollbackOneDay = () => {
+        const d = new Date(config.currentDate || new Date().toISOString());
+        d.setDate(d.getDate() - 1);
+
+        onUpdate({
+            ...config,
+            currentDate: d.toISOString().split('T')[0]
+        });
+    };
+
     const currentDateObj = config.currentDate ? new Date(config.currentDate) : null;
     const startDateObj = config.startDate ? new Date(config.startDate) : null;
     const diffDays = (currentDateObj && startDateObj)
@@ -31,9 +41,9 @@ const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
     const DAY_FR = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6" >
             {/* Dates */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            < div className="grid grid-cols-1 sm:grid-cols-2 gap-6" >
                 <div>
                     <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">
                         Date de début de campagne
@@ -71,12 +81,20 @@ const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
                         </p>
                     )}
                 </div>
-            </div>
+            </div >
 
             {/* Boutons avance rapide */}
-            <div>
+            < div >
                 <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Avance rapide</span>
-                <div className="flex gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-2">
+                    <button
+                        onClick={rollbackOneDay}
+                        className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-stone-900/40 hover:bg-stone-800 border border-stone-800 hover:border-rose-900/40 text-stone-500 hover:text-rose-400 rounded-sm transition-all flex items-center gap-2"
+                        title="Corriger une erreur (revenir d'un jour)"
+                    >
+                        <RotateCcw size={12} /> Jour -1
+                    </button>
+
                     {(['day', 'week', 'month'] as const).map(unit => (
                         <button
                             key={unit}
@@ -87,17 +105,17 @@ const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
                         </button>
                     ))}
                 </div>
-            </div>
+            </div >
 
             {/* Événements */}
-            <div className="border-t border-stone-700/50 pt-6">
+            < div className="border-t border-stone-700/50 pt-6" >
                 <CalendarEventsList
                     events={config.events}
                     mode="real"
                     onUpdate={events => onUpdate({ ...config, events })}
                 />
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

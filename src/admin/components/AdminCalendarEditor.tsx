@@ -34,7 +34,11 @@ const AdminCalendarEditor: React.FC<Props> = ({ rules, onUpdate }) => {
     const calendar = rules.configurations.calendar;
 
     const updateCalendar = (cal: CalendarConfig) => {
-        onUpdate({ ...rules, configurations: { ...rules.configurations, calendar: cal } });
+        onUpdate({
+            ...rules,
+            configurations: { ...rules.configurations, calendar: cal },
+            lastUpdated: Date.now()
+        });
     };
 
     const selectType = (type: 'real' | 'fictional') => {

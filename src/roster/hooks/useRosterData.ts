@@ -34,7 +34,7 @@ export const useRosterData = (settingId: string) => {
             if (!setting) {
                 setError("La chronique demandée n'existe pas ou n'est plus accessible.");
             }
-        } catch (err) {
+        } catch {
             setError("Impossible de charger les données du registre.");
         } finally {
             setIsLoading(false);
@@ -112,7 +112,50 @@ export const useRosterData = (settingId: string) => {
             configurations: {
                 ...rules.configurations,
                 calendar: newCalendar
+            },
+            lastUpdated: Date.now()
+        };
+
+        setRules(newRules);
+        await CampaignService.saveSetting(settingId, newRules);
+    };
+
+    const handleRollbackTime = async () => {
+        if (!rules || !rules.configurations.calendar) return;
+        const calendar = rules.configurations.calendar;
+        let newCalendar = { ...calendar };
+
+        if (calendar.type === 'fictional') {
+            let { currentDay, currentMonthIndex, currentYear } = calendar;
+
+            currentDay--;
+            if (currentDay < 1) {
+                currentMonthIndex--;
+                if (currentMonthIndex < 0) {
+                    currentMonthIndex = calendar.months.length - 1;
+                    currentYear--;
+                }
+                currentDay = calendar.months[currentMonthIndex]?.days ?? 30;
             }
+
+            newCalendar = { ...calendar, currentDay, currentMonthIndex, currentYear };
+
+        } else if (calendar.type === 'real') {
+            if (!calendar.currentDate) return;
+            const date = new Date(calendar.currentDate);
+            if (isNaN(date.getTime())) return;
+
+            date.setDate(date.getDate() - 1);
+            newCalendar = { ...calendar, currentDate: date.toISOString().split('T')[0] };
+        }
+
+        const newRules = {
+            ...rules,
+            configurations: {
+                ...rules.configurations,
+                calendar: newCalendar
+            },
+            lastUpdated: Date.now()
         };
 
         setRules(newRules);
@@ -249,6 +292,7 @@ export const useRosterData = (settingId: string) => {
         skillMatrix,
         formatCurrentDate,
         handleAdvanceTime,
+        handleRollbackTime,
         loadData
     };
 };

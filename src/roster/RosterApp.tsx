@@ -20,7 +20,8 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
         allAttributes,
         skillMatrix,
         formatCurrentDate,
-        handleAdvanceTime
+        handleAdvanceTime,
+        handleRollbackTime
     } = useRosterData(settingId);
 
     const [showTimeManagement, setShowTimeManagement] = useState(true);
@@ -61,6 +62,7 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                         setShowTimeManagement={setShowTimeManagement}
                         currentDate={formatCurrentDate()}
                         onAdvanceTime={handleAdvanceTime}
+                        onRollbackTime={handleRollbackTime}
                     />
 
                     <RosterAttributesTable

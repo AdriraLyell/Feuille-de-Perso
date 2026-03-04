@@ -1,18 +1,19 @@
-import React from 'react';
-import { Clock, ChevronDown, ChevronRight, CalendarDays } from 'lucide-react';
+import { Clock, ChevronDown, ChevronRight, CalendarDays, RotateCcw } from 'lucide-react';
 
 interface RosterTimeSectionProps {
     showTimeManagement: boolean;
     setShowTimeManagement: (v: boolean) => void;
     currentDate: string;
     onAdvanceTime: (amount: 'day' | 'week' | 'month') => void;
+    onRollbackTime: () => void;
 }
 
 export const RosterTimeSection: React.FC<RosterTimeSectionProps> = ({
     showTimeManagement,
     setShowTimeManagement,
     currentDate,
-    onAdvanceTime
+    onAdvanceTime,
+    onRollbackTime
 }) => (
     <div className="bg-stone-900/40 border border-stone-800 rounded-sm overflow-hidden shadow-glass-dark mb-12">
         <button
@@ -44,6 +45,14 @@ export const RosterTimeSection: React.FC<RosterTimeSectionProps> = ({
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-3">
+                    <button
+                        onClick={onRollbackTime}
+                        className="flex items-center gap-2 px-4 py-2 bg-stone-950/40 hover:bg-rose-950/20 text-stone-400 hover:text-rose-400 rounded-sm font-bold text-sm uppercase tracking-wider border border-stone-800 hover:border-rose-900/30 transition-all shadow-sm group"
+                        title="Corriger une erreur (revenir d'un jour)"
+                    >
+                        <RotateCcw size={16} className="group-hover:-rotate-45 transition-transform" /> Jour -1
+                    </button>
+
                     <button
                         onClick={() => onAdvanceTime('day')}
                         className="flex items-center gap-2 px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-sm font-bold text-sm uppercase tracking-wider border border-stone-700 hover:border-amber-500/50 transition-colors"
