@@ -19,9 +19,8 @@ import { useRules } from '../context/RulesContext';
 import { useEditMode } from '../hooks/sheet/useEditMode';
 import { useVariableSkills } from '../hooks/sheet/useVariableSkills';
 
-import ThematicModal from './ui/ThematicModal';
 import VariantSelectionModal from './ui/VariantSelectionModal';
-import { PencilLine, Check, UserPlus } from 'lucide-react';
+import { syncLayout } from '../utils/layoutUtils';
 
 interface Props {
     isLandscape?: boolean;
@@ -33,8 +32,12 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
     const dataRef = React.useRef(data);
     React.useEffect(() => { dataRef.current = data; }, [data]);
 
-    const { updateData: onChange, addLog: onAddLog, recordXPTransaction, setEditMode: setIsEditMode } = useCharacterActions();
-    const { isEditMode } = useCharacterState();
+    const { updateData: onChange, addLog: onAddLog, recordXPTransaction, setEditMode: setIsEditMode, setEditLayoutMode, clearLayout, autoFitLayout } = useCharacterActions();
+    const { isEditMode, editLayoutMode } = useCharacterState();
+    const layoutJustReset = React.useRef(false);
+    // Use a ref so handleLayoutChange can read editLayoutMode without depending on it
+    const editLayoutModeRef = React.useRef(editLayoutMode);
+    React.useEffect(() => { editLayoutModeRef.current = editLayoutMode; }, [editLayoutMode]);
 
     // Variable Skill State
     const [variantModalState, setVariantModalState] = useState<{
@@ -91,6 +94,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
     const creationActive = data.creationConfig?.active;
     const allowExtendedSkills = data.creationConfig?.extendedSkills || false;
 
+    // Use the isLandscape prop directly (set at router/layout level)
     const { columns, backgrounds, autres } = isLandscape ? landscapeLayout : portraitLayout;
 
     const validateSkillIncrease = useCallback((id: string, newValue: number) => {
@@ -126,6 +130,47 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
     const { handleToggleEditMode } = useEditMode(isEditMode, setIsEditMode);
     const { handleToggleCreationMode } = useCreationMode(data, onChange as any, onAddLog);
 
+    const handleLayoutChange = useCallback((_currentLayout: any, allLayouts: any) => {
+        if (layoutJustReset.current) {
+            layoutJustReset.current = false;
+            return;
+        }
+        // Only persist layout changes when the user is actively editing the layout.
+        // Read via ref to avoid adding editLayoutMode to deps (which would recreate
+        // the callback, trigger RGL remount, fire onLayoutChange → infinite loop).
+        if (!editLayoutModeRef.current) return;
+        onChange((prev: any) => ({
+            ...prev,
+            activeLayout: allLayouts
+        }));
+    }, [onChange]);
+
+    const handleResetLayout = useCallback(() => {
+        const portrait = portraitLayout;
+        const landscape = landscapeLayout;
+        layoutJustReset.current = true;
+        clearLayout(portrait, landscape);
+    }, [clearLayout, portraitLayout, landscapeLayout]);
+
+    const handleAutoFitLayout = useCallback(() => {
+        // Budget calculation based on A4 fixed dimensions from CSS
+        const totalH = isLandscape ? 1205 : 1560;
+
+        // Estimated heights of fixed sections:
+        // Header + Attributes section + Counters padding/header
+        // Header: ~180px
+        // Attributes: ~160px
+        // Counters fixed part: ~36px
+        // Total fixed: ~376px
+        const fixedH = 376;
+        const availablePixels = totalH - fixedH;
+        const availableRows = Math.floor(availablePixels / 24);
+        const colCount = isLandscape ? 5 : 4;
+
+        autoFitLayout(colCount, availableRows);
+        onAddLog("Agencement optimisé automatiquement", "info", "sheet");
+    }, [isLandscape, autoFitLayout, onAddLog]);
+
     return (
         <div className={`flex justify-center transition-all duration-300 ${isEditMode ? 'pr-80' : ''}`}>
             <div className={`sheet-container ${isLandscape ? 'landscape' : ''}`}>
@@ -137,6 +182,10 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
                     isDateLocked={!!rules?.configurations?.calendar}
                     isEditMode={isEditMode}
                     onToggleEditMode={onToggleEditMode || handleToggleEditMode}
+                    isEditLayoutMode={editLayoutMode}
+                    onToggleEditLayoutMode={() => setEditLayoutMode(!editLayoutMode)}
+                    onResetLayout={handleResetLayout}
+                    onAutoFitLayout={handleAutoFitLayout}
                     onToggleCreationMode={handleToggleCreationMode}
                 />
 
@@ -165,8 +214,8 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
                     columns={columns}
                     backgrounds={backgrounds}
                     autres={autres}
-                    isLandscape={isLandscape}
                     isEditMode={isEditMode}
+                    editLayoutMode={editLayoutMode}
                     allowExtendedSkills={allowExtendedSkills}
                     theme={data.theme}
                     rules={rules}
@@ -176,11 +225,12 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
                     onDefineVariant={handleDefineVariant}
                     onDropItem={handleDropItem}
                     onRemoveItem={handleRemoveItem}
+                    onLayoutChange={handleLayoutChange}
                     validateSkillIncrease={validateSkillIncrease}
                     blockedSkills={blockedSkills}
-                    renderExtraColumn={() => null}
+                    layoutConfig={data.activeLayout}
                     renderBottomSection={() => (
-                        <div className="w-full h-[200px] overflow-hidden">
+                        <div className="w-full h-full overflow-hidden">
                             <CountersSection
                                 data={data}
                                 updateCounter={updateCounter}

@@ -78,10 +78,14 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
 
         if (skillCats.length === 0) return fallback;
 
-        // 1. Separate by behavior
-        const skillsSet = skillCats.filter(c => (c.behavior === 'Compétence' && (!isLandscape || c.id !== 'Col_Comp_7')) || c.behavior === 'Secondaire');
-        const autresSet = isLandscape ? skillCats.filter(c => c.id === 'Col_Comp_7') : [];
-        const backgroundsSet = skillCats.filter(c => c.behavior === 'Arrière-plan');
+        // 1. Separate by behavior - Include everything that has a specific place in mapping
+        // Skills, Secondaries, Backgrounds (Arrière-plan) and even the "AUTRES" (Col_Comp_7)
+        // are all part of the column system. Only Compteur and the actual "counters" are separate.
+        const skillsSet = skillCats.filter(c =>
+            c.behavior === 'Compétence' ||
+            c.behavior === 'Secondaire' ||
+            c.behavior === 'Arrière-plan'
+        );
         const countersSet = skillCats.filter(c => c.behavior === 'Compteur');
 
         // 2. Base columns
@@ -147,7 +151,22 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
                 return item;
             });
 
-            const map = mapping[cat.id] || { col: 0, row: 'top' };
+            let map: Mapping | undefined = mapping[cat.id];
+
+            // Distribute unknown categories evenly across columns
+            if (!map) {
+                let minCol = 0;
+                let minCount = Infinity;
+                for (let i = 0; i < columnCount; i++) {
+                    const count = columns[i].topBlocks.length + columns[i].bottomBlocks.length;
+                    if (count < minCount) {
+                        minCount = count;
+                        minCol = i;
+                    }
+                }
+                map = { col: minCol, row: 'top' };
+            }
+
             const block: SkillBlock = {
                 title: cat.label,
                 items: enrichedItems,
@@ -168,62 +187,8 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
         return {
             columns,
             columnCount,
-            backgrounds: backgroundsSet.map(cat => {
-                const items = data.skills[cat.id] || [];
-                const enrichedItems = items.map(item => {
-                    const targetId = item.definitionId || item.id;
-                    // 1. Lookup par ID
-                    let def = skillsMapById.get(targetId) || mysticMapById.get(targetId) || backgroundsMapById.get(targetId);
-
-                    // 2. Fallback par nom pour rétrocompatibilité
-                    if (!def && item.name) {
-                        const nameLower = item.name.trim().toLowerCase();
-                        def = skillsMapByName.get(nameLower) || backgroundsMapByName.get(nameLower);
-                    }
-
-                    if (def) {
-                        return {
-                            ...item,
-                            mysticAbilityId: def.mysticAbilityId || (mysticMapById.has(targetId) ? targetId : undefined),
-                            isVariable: def.isVariable
-                        };
-                    }
-                    return item;
-                });
-                return {
-                    title: cat.label,
-                    items: enrichedItems,
-                    cat: cat.id,
-                    description: cat.description
-                };
-            }),
-            autres: autresSet.map(cat => {
-                const items = data.skills[cat.id] || [];
-                const enrichedItems = items.map(item => {
-                    const targetId = item.definitionId || item.id;
-                    let def = skillsMapById.get(targetId) || mysticMapById.get(targetId);
-
-                    if (!def && item.name) {
-                        const nameLower = item.name.trim().toLowerCase();
-                        def = skillsMapByName.get(nameLower);
-                    }
-
-                    if (def) {
-                        return {
-                            ...item,
-                            mysticAbilityId: def.mysticAbilityId || (mysticMapById.has(targetId) ? targetId : undefined),
-                            isVariable: def.isVariable
-                        };
-                    }
-                    return item;
-                });
-                return {
-                    title: cat.label,
-                    items: enrichedItems,
-                    cat: cat.id,
-                    description: cat.description
-                };
-            }),
+            backgrounds: [], // Now in columns[].bottomBlocks
+            autres: [], // Now in columns[].bottomBlocks
             counters: countersSet.map(cat => ({
                 title: cat.label,
                 id: cat.id,

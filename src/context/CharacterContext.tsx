@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, ReactNode, useMemo, useState, useCallback } from 'react';
 import { CharacterSheetData, XPTransaction } from '../types';
+import { SheetLayout } from '../hooks/useSheetLayout';
 import { useCharacterStateManager } from '../hooks/context/useCharacterStateManager';
 import { useCharacterSyncManager } from '../hooks/context/useCharacterSyncManager';
 import { useCharacterImageMigration } from '../hooks/context/useCharacterImageMigration';
@@ -13,6 +14,7 @@ interface CharacterStateContextType {
     data: CharacterSheetData;
     isSyncing: boolean;
     isEditMode: boolean;
+    editLayoutMode: boolean;
 }
 
 interface CharacterActionsContextType {
@@ -23,6 +25,9 @@ interface CharacterActionsContextType {
     sync: (mode?: 'manual' | 'auto') => Promise<void>;
     recordXPTransaction: (transaction: Omit<XPTransaction, 'id' | 'timestamp'>) => void;
     setEditMode: (active: boolean) => void;
+    setEditLayoutMode: (active: boolean) => void;
+    clearLayout: (portrait: SheetLayout, landscape: SheetLayout) => void;
+    autoFitLayout: (colCount: number, availableHeightRows: number) => void;
 }
 
 const CharacterStateContext = createContext<CharacterStateContextType | undefined>(undefined);
@@ -63,15 +68,16 @@ export const useCharacterActions = () => {
  * Regroupe données et actions.
  */
 export const useCharacter = () => {
-    const { data, isSyncing, isEditMode } = useCharacterState();
+    const { data, isSyncing, isEditMode, editLayoutMode } = useCharacterState();
     const actions = useCharacterActions();
 
     return useMemo(() => ({
         data,
         isSyncing,
         isEditMode,
+        editLayoutMode,
         ...actions
-    }), [data, isSyncing, isEditMode, actions]);
+    }), [data, isSyncing, isEditMode, editLayoutMode, actions]);
 };
 
 // --- Provider ---
@@ -87,7 +93,8 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
     const [data, setData] = useState<CharacterSheetData>(loadInitialCharacterData);
 
     // 2. Use the refactored logic hooks
-    const { resetData, importData, isEditMode, setEditMode } = useCharacterStateManager(data, setData);
+    const { resetData, importData, isEditMode, setEditMode, clearLayout, autoFitLayout } = useCharacterStateManager(data, setData);
+    const [editLayoutMode, setEditLayoutMode] = useState(false);
     const { isSyncing, addLog, recordXPTransaction, sync } = useCharacterSyncManager(data, setData);
 
     // Run image migration effect
@@ -134,7 +141,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
     }, []);
 
     // Providers Wrapper
-    const stateValue = useMemo(() => ({ data, isSyncing, isEditMode }), [data, isSyncing, isEditMode]);
+    const stateValue = useMemo(() => ({ data, isSyncing, isEditMode, editLayoutMode }), [data, isSyncing, isEditMode, editLayoutMode]);
     const actionsValue = useMemo(() => ({
         updateData,
         addLog,
@@ -142,8 +149,11 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         importData,
         sync,
         recordXPTransaction,
-        setEditMode
-    }), [updateData, addLog, resetData, importData, sync, recordXPTransaction, setEditMode]);
+        setEditMode,
+        setEditLayoutMode,
+        clearLayout,
+        autoFitLayout
+    }), [updateData, addLog, resetData, importData, sync, recordXPTransaction, setEditMode, setEditLayoutMode, clearLayout, autoFitLayout]);
 
     return (
         <CharacterStateContext.Provider value={stateValue}>

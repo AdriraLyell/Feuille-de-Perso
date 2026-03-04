@@ -10,6 +10,9 @@ import { reconcileCounters } from './reconcilers/countersReconciler';
 import { reconcileTraits, reconcileCleanup } from './reconcilers/traitsReconciler';
 import { reconcileHeader } from './reconcilers/headerReconciler';
 import { reconcileImposedSpecializations } from './reconcilers/imposedSpecializationsReconciler';
+import { reconcileLayout } from './reconcilers/layoutReconciler';
+import { getInitialCharacterData } from '../data/initialState';
+import { getDynamicColumnsStatic } from './layoutGenerationUtils';
 
 /**
  * Main function to reconcile a character state with a set of rules.
@@ -40,6 +43,11 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
     reconcileImposedSpecializations(newState, rules);
     reconcileCleanup(newState, currentState, rules);
     reconcileHeader(newState, rules);
+
+    // Dynamic layout reconciliation
+    const portraitLayout = getDynamicColumnsStatic(newState, rules, false);
+    const landscapeLayout = getDynamicColumnsStatic(newState, rules, true);
+    reconcileLayout(newState, portraitLayout, landscapeLayout);
 
     return newState;
 };

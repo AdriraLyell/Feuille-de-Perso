@@ -24,7 +24,8 @@ export const SkillBlock = React.memo<{
     onRemove?: (category: string, id: string) => void;
     validateIncrease?: (id: string, newValue: number) => { allowed: boolean; reason?: string };
     blockedSkills?: Record<string, { isBlocked: boolean, sourceName: string }>;
-}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, isEditing = false, onDrop, onRemove, validateIncrease, blockedSkills = {} }) => {
+    isDraggable?: boolean;
+}>(({ title, items, cat, onUpdate, userSpecs = {}, imposedSpecs = {}, theme, onDefineVariant, allowExtendedSkills = false, description, isEditing = false, onDrop, onRemove, validateIncrease, blockedSkills = {}, isDraggable = false }) => {
     const [showDesc, setShowDesc] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
     const [dropIndex, setDropIndex] = useState<number>(-1);
@@ -81,12 +82,12 @@ export const SkillBlock = React.memo<{
 
     return (
         <div
-            className={`flex flex-col transition-all duration-200 ${isEditing ? 'relative' : ''} ${isDragOver ? 'bg-amber-50/30 ring-2 ring-amber-500/30 rounded-sm z-10' : ''} `}
+            className={`flex flex-col h-full transition-all duration-200 ${isEditing ? 'relative' : ''} ${isDragOver ? 'bg-amber-50/30 ring-2 ring-amber-500/30 rounded-sm z-10' : ''} `}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
         >
-            <div className="relative group/header">
+            <div className={`relative group/header ${isDraggable ? 'cursor-move skill-block-header active:scale-[0.98]' : ''}`}>
                 <SectionHeader
                     title={
                         <div className="flex items-center gap-1.5 justify-center">
@@ -95,7 +96,7 @@ export const SkillBlock = React.memo<{
                                 <button
                                     onMouseEnter={() => setShowDesc(true)}
                                     onMouseLeave={() => setShowDesc(false)}
-                                    className="ml-1 text-[#bfae85]/40 hover:text-[#8b2e2e] transition-colors"
+                                    className="ml-1 text-slate-600 hover:text-[#8b2e2e] transition-colors"
                                 >
                                     <Info size={10} />
                                 </button>
@@ -112,7 +113,7 @@ export const SkillBlock = React.memo<{
                 )}
             </div>
 
-            <div className="flex-grow py-1 relative">
+            <div className="flex-grow min-h-0 py-1 relative overflow-y-auto skill-block-scroll">
                 {/* Drop Indicator Logic */}
                 {isEditing && isDragOver && dropIndex !== -1 && (
                     <div
@@ -149,6 +150,7 @@ export const SkillBlock = React.memo<{
                             onRemove={onRemove}
                             validateIncrease={validateIncrease}
                             blockedReason={blockedInfo?.sourceName}
+                            isDraggable={isDraggable}
                         />
                     );
                 })}
@@ -166,6 +168,7 @@ export const SkillBlock = React.memo<{
     if (prevProps.cat !== nextProps.cat) return false;
     if (prevProps.allowExtendedSkills !== nextProps.allowExtendedSkills) return false;
     if (prevProps.isEditing !== nextProps.isEditing) return false;
+    if (prevProps.isDraggable !== nextProps.isDraggable) return false;
     if (prevProps.categoryBehavior !== nextProps.categoryBehavior) return false;
     if (prevProps.description !== nextProps.description) return false;
 

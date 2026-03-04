@@ -51,6 +51,8 @@ export interface CharacterSheetData {
   theme: ThemeConfig; // New Theme Config
   header: HeaderInfo;
   postIts?: PostItData[]; // Les notes visuelles
+  activeLayout?: import('./ui').LayoutConfig; // Configuration de l'agencement personnalisée (chargée)
+  layoutConfigs?: Record<string, import('./ui').LayoutConfig>; // Historique/Surcharges d'agencement (persistantes)
 
   // Dynamic Attributes Structure
   attributes: Record<string, AttributeEntry[]>;

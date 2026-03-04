@@ -12,3 +12,19 @@ export interface DropPayload {
     };
     categoryType?: 'skill' | 'background' | 'counter';
 }
+
+export interface LayoutItem {
+    i: string; // ID du bloc (ex: 'Col_Comp_1', 'counter_volonte')
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    minW?: number;
+    minH?: number;
+}
+
+export interface LayoutConfig {
+    lg?: LayoutItem[]; // Paysage (Desktop)
+    md?: LayoutItem[]; // Tablette
+    sm?: LayoutItem[]; // Portrait (Mobile)
+}

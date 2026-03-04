@@ -27,6 +27,7 @@ interface DotRowProps {
     onRemove?: (category: string, id: string) => void;
     validateIncrease?: (id: string, newValue: number) => { allowed: boolean; reason?: string };
     blockedReason?: string;
+    isDraggable?: boolean;
 }
 
 export const DotRow: React.FC<DotRowProps> = ({
@@ -41,7 +42,8 @@ export const DotRow: React.FC<DotRowProps> = ({
     isEditing = false,
     onRemove,
     validateIncrease,
-    blockedReason
+    blockedReason,
+    isDraggable = false
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const anchorRef = useRef<HTMLSpanElement>(null);
@@ -109,7 +111,7 @@ export const DotRow: React.FC<DotRowProps> = ({
         : 5;
 
     const handleClick = () => {
-        if (isEditing) return;
+        if (isEditing || isDraggable) return; // block interaction in both edit and layout modes
         if (isUndefinedVariable && onDefineVariant) {
             onDefineVariant(category, entry.id, entry.name);
         } else if (hasSpecs) {
@@ -198,7 +200,7 @@ export const DotRow: React.FC<DotRowProps> = ({
             </span>
 
             <PortalTooltip
-                isOpen={isOpen && hasSpecs}
+                isOpen={isOpen && hasSpecs && !isDraggable}
                 anchorRef={anchorRef}
                 title={`${entry.name} : Spécialisations`}
                 maxWidth={400}
@@ -226,7 +228,7 @@ export const DotRow: React.FC<DotRowProps> = ({
                 xpColor={theme?.xpColor}
                 symbol={theme?.dotSymbol}
                 max={effectiveMax}
-                readOnly={isEditing}
+                readOnly={isEditing || isDraggable}
                 blockedReason={blockedReason}
             />
 

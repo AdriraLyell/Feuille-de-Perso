@@ -156,21 +156,6 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                     >
                         <Plus size={18} />
                     </div>
-                    <div
-                        draggable
-                        onDragStart={(e) => {
-                            const payload = {
-                                type: 'spacer',
-                                data: { name: '', id: `spacer-${Date.now()}` },
-                                categoryType: activeTab === 'skills' ? 'skill' : 'background'
-                            };
-                            e.dataTransfer.setData('application/json', JSON.stringify(payload));
-                        }}
-                        title="Glissez un espaceur vide"
-                        className="p-2 rounded-md flex items-center justify-center transition bg-slate-700 text-slate-300 border border-slate-600 cursor-grab active:cursor-grabbing hover:bg-slate-600 hover:text-white"
-                    >
-                        <X size={18} className="rotate-45" />
-                    </div>
                 </div>
                 {customName.trim() && (
                     <p className="text-[10px] text-green-500/70 italic animate-pulse px-1">
@@ -181,6 +166,27 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
 
             {/* List */}
             <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
+                {/* Spacer block at the top */}
+                <div
+                    draggable
+                    onDragStart={(e) => {
+                        const payload = {
+                            type: 'spacer',
+                            data: { name: '', id: `spacer-${Date.now()}` },
+                            categoryType: activeTab === 'skills' ? 'skill' : 'background'
+                        };
+                        e.dataTransfer.setData('application/json', JSON.stringify(payload));
+                    }}
+                    className="group bg-slate-800/30 border-2 border-dashed border-slate-700/50 rounded-md p-2 cursor-grab active:cursor-grabbing hover:border-[#bfae85]/40 hover:bg-slate-800/60 transition flex items-center justify-center gap-2 mb-4"
+                >
+                    <div className="text-slate-500 group-hover:text-[#bfae85]/60 transition-colors">
+                        <GripVertical size={14} />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-white transition-colors">
+                        Glisser pour créer un espace
+                    </span>
+                </div>
+
                 {availableItems.length === 0 ? (
                     <div className="text-center py-10">
                         <Target size={32} className="mx-auto text-slate-700 mb-2 opacity-50" />

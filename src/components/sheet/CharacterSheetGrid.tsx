@@ -4,13 +4,14 @@ import { CharacterSheetData, DropPayload } from '../../types';
 import { RulesData } from '../../types/rules';
 import { ThemeConfig } from '../../types/system';
 import { SkillBlock } from './SkillBlock';
+import { Responsive, useContainerWidth } from 'react-grid-layout';
 
 interface CharacterSheetGridProps {
     columns: SheetColumn[];
     backgrounds: SkillBlockType[];
     autres?: SkillBlockType[];
-    isLandscape: boolean;
     isEditMode: boolean;
+    editLayoutMode: boolean;
     allowExtendedSkills: boolean;
     theme?: ThemeConfig;
     rules: RulesData | null;
@@ -20,20 +21,20 @@ interface CharacterSheetGridProps {
     onDefineVariant: (category: string, id: string, skillName: string, definitionId?: string) => void;
     onDropItem: (category: string, payload: DropPayload, targetIndex?: number) => void;
     onRemoveItem: (category: string, id: string) => void;
-    // For Landscape extra column
-    renderExtraColumn?: () => React.ReactNode;
+    onLayoutChange: (layout: any, allLayouts: any) => void;
     // For Portrait extra sections
     renderBottomSection?: () => React.ReactNode;
     validateSkillIncrease?: (id: string, newValue: number) => { allowed: boolean; reason?: string };
     blockedSkills?: Record<string, { isBlocked: boolean, sourceName: string }>;
+    layoutConfig?: CharacterSheetData['activeLayout'];
 }
 
 const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
     columns,
     backgrounds,
     autres = [],
-    isLandscape,
     isEditMode,
+    editLayoutMode,
     allowExtendedSkills,
     theme,
     rules,
@@ -43,93 +44,212 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
     onDefineVariant,
     onDropItem,
     onRemoveItem,
-    renderExtraColumn,
+    onLayoutChange,
     renderBottomSection,
     validateSkillIncrease,
-    blockedSkills = {}
+    blockedSkills = {},
+    layoutConfig
 }) => {
 
     const renderSkillBlock = (block: SkillBlockType) => (
-        <SkillBlock
-            key={block.cat}
-            title={block.title}
-            items={block.items}
-            cat={block.cat}
-            onUpdate={onUpdateDot}
-            userSpecs={specializations}
-            imposedSpecs={imposedSpecializations}
-            theme={theme}
-            onDefineVariant={onDefineVariant}
-            allowExtendedSkills={allowExtendedSkills}
-            description={block.description}
-            isEditing={isEditMode}
-            categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
-            onDrop={onDropItem}
-            onRemove={onRemoveItem}
-            validateIncrease={validateSkillIncrease}
-            blockedSkills={blockedSkills}
-        />
+        <div key={block.cat} className="h-full border-r border-stone-800">
+            <SkillBlock
+                title={block.title}
+                items={block.items}
+                cat={block.cat}
+                onUpdate={onUpdateDot}
+                userSpecs={specializations}
+                imposedSpecs={imposedSpecializations}
+                theme={theme}
+                onDefineVariant={onDefineVariant}
+                allowExtendedSkills={allowExtendedSkills}
+                description={block.description}
+                isEditing={isEditMode}
+                categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
+                onDrop={onDropItem}
+                onRemove={onRemoveItem}
+                validateIncrease={validateSkillIncrease}
+                blockedSkills={blockedSkills}
+                isDraggable={editLayoutMode}
+            />
+        </div>
     );
 
-    if (isLandscape) {
+    // Collect all blocks (skills, backgrounds, others)
+    const allBlocks: SkillBlockType[] = [];
+    columns.forEach(col => allBlocks.push(...col.blocks));
+    allBlocks.push(...backgrounds);
+    allBlocks.push(...autres);
+
+    const { width, containerRef, mounted } = useContainerWidth();
+
+    // Use column count matching the real container width
+    const breakpoints = { lg: 1200, sm: 0 };
+    const cols = { lg: 5, sm: 4 };
+
+    // Determine column count based on width
+    const colCount = width >= 1200 ? 5 : 4;
+
+    // ALL hooks must be called unconditionally (React rules of hooks).
+    // This useMemo is only used in edit layout mode but must always be called.
+    const staticLayouts = React.useMemo(() => {
+        if (!layoutConfig) return {};
+        return {
+            lg: layoutConfig.lg || undefined,
+            sm: layoutConfig.sm || undefined,
+        };
+    }, [layoutConfig]);
+
+    // ------------------------------------------------------------------
+    // NORMAL MODE: Pure CSS grid using saved layout positions.
+    // RGL is NOT mounted to avoid its internal setState loop.
+    // ------------------------------------------------------------------
+    if (!editLayoutMode) {
+        // Determine which layout set to use based on current breakpoint
+        const layoutItems = colCount === 5 ? layoutConfig?.lg : layoutConfig?.sm;
+
+        // Build a map of cat -> layout position from the saved layout config
+        const positionMap = new Map<string, { x: number; y: number; w: number; h: number }>();
+        if (layoutItems) {
+            for (const item of layoutItems) {
+                positionMap.set(item.i, { x: item.x, y: item.y, w: item.w, h: item.h });
+            }
+        }
+
+        // Calculate grid dimensions
+        const rowHeight = 24; // matches RGL rowHeight
+        let blocksMaxRow = 0;
+        const positioned = allBlocks.map(block => {
+            const pos = positionMap.get(block.cat);
+            if (pos) {
+                const endRow = pos.y + pos.h;
+                if (endRow > blocksMaxRow) blocksMaxRow = endRow;
+                return { block, pos };
+            }
+            return { block, pos: null };
+        });
+
+        // Also position the counters section to find the total height
+        const countersPos = positionMap.get('counters_section');
+        let totalMaxRow = blocksMaxRow;
+        if (countersPos) {
+            const endRow = countersPos.y + countersPos.h;
+            if (endRow > totalMaxRow) totalMaxRow = endRow;
+        }
+
+        // The vertical separators should stop BEFORE the counters section starts
+        // We use the top of the counters section as the limit
+        const vSepEndRow = countersPos ? countersPos.y : blocksMaxRow;
+
         return (
-            <div className="flex-grow grid grid-cols-6 grid-rows-[1fr_auto] border-b-2 border-stone-800">
-                {columns.map((col, idx) => (
-                    <div key={idx} className="border-r border-stone-400 flex flex-col">
-                        {col.blocks.map((block) => (
-                            <div key={block.cat} className="flex-grow border-b border-stone-300 last:border-b-0">
-                                {renderSkillBlock(block)}
-                            </div>
-                        ))}
+            <div
+                ref={containerRef}
+                className="flex-grow relative"
+                style={{
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${colCount}, 1fr)`,
+                    gridTemplateRows: `repeat(${totalMaxRow}, ${rowHeight}px)`,
+                }}
+            >
+                {/* Vertical separators that span the height UNTIL the counters section */}
+                {Array.from({ length: colCount }).map((_, i) => (
+                    <div
+                        key={`v-sep-${i}`}
+                        style={{
+                            gridColumn: i + 1,
+                            gridRow: `1 / span ${vSepEndRow}`,
+                            borderLeft: i === 0 ? '1px solid #1c1917' : undefined,
+                            borderRight: '1px solid #1c1917',
+                            pointerEvents: 'none',
+                            zIndex: 5, // Draw ABOVE everything else to ensure continuous lines
+                        }}
+                    />
+                ))}
+
+                {positioned.map(({ block, pos }) => (
+                    <div
+                        key={block.cat}
+                        style={pos ? {
+                            gridColumn: `${pos.x + 1} / span ${pos.w}`,
+                            gridRow: `${pos.y + 1} / span ${pos.h}`,
+                            overflow: 'hidden',
+                            borderTop: '1px solid #1c1917', // Horizontal line above block names
+                            zIndex: 2,
+                        } : undefined}
+                    >
+                        {/* Remove border-r from renderSkillBlock content here */}
+                        <SkillBlock
+                            title={block.title}
+                            items={block.items}
+                            cat={block.cat}
+                            onUpdate={onUpdateDot}
+                            userSpecs={specializations}
+                            imposedSpecs={imposedSpecializations}
+                            theme={theme}
+                            onDefineVariant={onDefineVariant}
+                            allowExtendedSkills={allowExtendedSkills}
+                            description={block.description}
+                            isEditing={isEditMode}
+                            categoryBehavior={rules?.definitions?.skillCategories?.find(c => c.id === block.cat)?.behavior}
+                            onDrop={onDropItem}
+                            onRemove={onRemoveItem}
+                            validateIncrease={validateSkillIncrease}
+                            blockedSkills={blockedSkills}
+                            isDraggable={editLayoutMode}
+                        />
                     </div>
                 ))}
 
-                {/* 6th Column */}
-                <div className="flex flex-col h-full">
-                    {autres.map((block) => (
-                        <div key={block.cat} className="flex-grow border-b border-stone-300 last:border-b-0">
-                            {renderSkillBlock(block)}
-                        </div>
-                    ))}
-                    {backgrounds.map((block) => (
-                        <div key={block.cat} className="flex-grow border-b border-stone-300 last:border-b-0">
-                            {renderSkillBlock(block)}
-                        </div>
-                    ))}
-                    {renderExtraColumn && renderExtraColumn()}
+                {/* Counter Section */}
+                <div
+                    key="counters_section"
+                    style={countersPos ? {
+                        gridColumn: `${countersPos.x + 1} / span ${countersPos.w}`,
+                        gridRow: `${countersPos.y + 1} / span ${countersPos.h}`,
+                        overflow: 'hidden',
+                        borderTop: '1px solid #1c1917',
+                        zIndex: 2,
+                    } : {
+                        gridColumn: `1 / span ${colCount}`,
+                        overflow: 'hidden',
+                        borderTop: '1px solid #1c1917',
+                        zIndex: 2,
+                    }}
+                >
+                    {renderBottomSection && renderBottomSection()}
                 </div>
-
-                {/* Full Width Bottom Section for Landscape */}
-                {renderBottomSection && (
-                    <div className="col-span-6 border-t-2 border-stone-800">
-                        {renderBottomSection()}
-                    </div>
-                )}
             </div>
         );
     }
 
     return (
-        <>
-            <div className="grid grid-cols-4 border-b-2 border-stone-800 h-auto">
-                {columns.map((col, idx) => (
-                    <div key={idx} className={idx < 3 ? "border-r border-stone-400" : ""}>
-                        {col.topBlocks.map(renderSkillBlock)}
-                    </div>
-                ))}
-            </div>
+        <div
+            ref={containerRef}
+            className="flex-grow relative edit-layout-mode"
+        >
+            {mounted && (
+                <Responsive
+                    className="layout"
+                    width={width}
+                    layouts={staticLayouts as Record<string, any>}
+                    breakpoints={breakpoints}
+                    cols={cols}
+                    rowHeight={24}
+                    onLayoutChange={onLayoutChange}
+                    draggableHandle=".skill-block-header"
+                    margin={[0, 0]}
+                    compactType="vertical"
+                    {...{ isDraggable: true, isResizable: true } as any}
+                >
+                    {allBlocks.map(renderSkillBlock)}
 
-            <div className="grid grid-cols-4 border-b-2 border-stone-800 flex-grow min-h-[200px]">
-                {columns.map((col, idx) => (
-                    <div key={idx} className={idx < 3 ? "border-r border-stone-400" : ""}>
-                        {col.bottomBlocks.map(renderSkillBlock)}
-                        {idx === 3 && backgrounds.map(renderSkillBlock)}
+                    {/* Counter Section as a grid item */}
+                    <div key="counters_section">
+                        {renderBottomSection && renderBottomSection()}
                     </div>
-                ))}
-            </div>
-
-            {renderBottomSection && renderBottomSection()}
-        </>
+                </Responsive>
+            )}
+        </div>
     );
 };
 

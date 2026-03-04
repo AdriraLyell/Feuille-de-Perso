@@ -15,6 +15,7 @@ import { migrateHeaderDates } from './migrateHeaderDates';
 import { migrateFormulas } from './migrateFormulas';
 import { forceRulesReconciliation } from './forceRulesReconciliation';
 import { restoreMysticLinks } from './restoreMysticLinks';
+import { migrateLayoutConfig } from './migrateLayoutConfig';
 
 // Type for data being migrated (starts as raw JSON, ends as CharacterSheetData)
 export type MigratableData = Record<string, any>;
@@ -54,8 +55,11 @@ export const MIGRATIONS: Record<number, MigrationFunction[]> = {
     ],
     7: [
         restoreMysticLinks
+    ],
+    8: [
+        migrateLayoutConfig
     ]
 };
 
-export const CURRENT_SCHEMA_VERSION = 7;
+export const CURRENT_SCHEMA_VERSION = 8;
 
