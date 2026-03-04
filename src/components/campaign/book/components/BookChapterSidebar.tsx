@@ -1,9 +1,11 @@
-import { Calendar, BookPlus, BookDown } from 'lucide-react';
+import { Calendar, BookPlus, BookDown, BookOpen } from 'lucide-react';
 
 interface BookChapterSidebarProps {
     onInsertMoment: () => void;
     onInsertChapterAtCursor: () => void;
     onInsertChapterAtEnd: () => void;
+    onInsertActAtCursor: () => void;
+    onInsertActAtEnd: () => void;
     onToggleCalendar: () => void;
     isCalendarVisible: boolean;
     children?: React.ReactNode;
@@ -14,6 +16,8 @@ export const BookChapterSidebar: React.FC<BookChapterSidebarProps> = ({
     onInsertMoment,
     onInsertChapterAtCursor,
     onInsertChapterAtEnd,
+    onInsertActAtCursor,
+    onInsertActAtEnd,
     onToggleCalendar,
     isCalendarVisible,
     children,
@@ -24,7 +28,17 @@ export const BookChapterSidebar: React.FC<BookChapterSidebarProps> = ({
             className="absolute z-50 flex flex-col items-center gap-3 p-2 bg-stone-900/95 border border-amber-600/30 rounded-xl shadow-2xl backdrop-blur-md animate-in slide-in-from-right-4 duration-500 w-[94px]"
             style={{ right: '-110px', top: '220px' }}
         >
-            <div className="flex gap-1 items-center justify-center">
+            <div className="flex gap-1 items-center justify-center flex-wrap gap-y-2">
+                <button
+                    onClick={onInsertActAtCursor}
+                    className="p-2 rounded-lg bg-stone-800 text-amber-500/80 hover:bg-stone-700 hover:text-amber-400 transition border border-stone-700 hover:border-amber-500 shadow-lg group relative w-full flex justify-center mb-1"
+                >
+                    <BookOpen size={18} />
+                    <div className="absolute right-full mr-3 px-2 py-1 bg-stone-900 border border-stone-700 rounded text-[10px] text-stone-300 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                        Insérer un Acte
+                    </div>
+                </button>
+
                 <button
                     onClick={onInsertChapterAtCursor}
                     className="p-2 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700 hover:text-amber-400 transition border border-stone-700 hover:border-amber-600/50 shadow-lg group relative"

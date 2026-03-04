@@ -192,6 +192,8 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                                 : `${cal?.currentYear}-${cal?.currentMonthIndex !== undefined ? cal.currentMonthIndex + 1 : 1}-${cal?.currentDay || 1}`;
                             (editor.commands as any).insertChapterAtDate(today, undefined, false);
                         }}
+                        onInsertActAtCursor={() => (editor.commands as any).insertAct(true)}
+                        onInsertActAtEnd={() => (editor.commands as any).insertAct(false)}
                         isCalendarVisible={isCalendarVisible}
                         onToggleCalendar={() => setIsCalendarVisible(!isCalendarVisible)}
                         toolbar={(

@@ -203,5 +203,20 @@ export const ColumnarEditorStyles = () => (
             to { visibility: hidden; }
         }
         .ProseMirror-focused .ProseMirror-gapcursor { display: block; }
+
+        /* Font Size Balancing for Cursive Fonts */
+        .ProseMirror span[style*="Dancing Script"] { 
+            font-size: 1.2em; 
+            line-height: normal;
+        }
+        .ProseMirror span[style*="Great Vibes"] { 
+            font-size: 1.5em; 
+            line-height: 0.8;
+            display: inline-block; /* Helps with extreme descenders */
+        }
+        .ProseMirror span[style*="Pinyon Script"] { 
+            font-size: 1.4em; 
+            line-height: 0.9;
+        }
     `}</style>
 );
