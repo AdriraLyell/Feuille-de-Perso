@@ -29,6 +29,8 @@ import AdminHeader from './components/AdminHeader';
 import { CampaignService } from '../services/CampaignService';
 import { migrationTool } from './utils/migrationTool';
 import { MessageService } from '../services/MessageService';
+import MessageWidget from '../components/messaging/MessageWidget';
+import { useMessagingContacts } from '../hooks/messaging/useMessagingContacts';
 
 const AdminApp: React.FC = () => {
     const { session, isAdmin, logout } = useAdminAuth();
