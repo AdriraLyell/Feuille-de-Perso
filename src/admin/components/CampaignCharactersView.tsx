@@ -15,8 +15,6 @@ import { RotateCcw } from 'lucide-react';
 import RecreationModal from './RecreationModal';
 import { RecreationService } from '../services/RecreationService';
 import { CampaignService } from '../../services/CampaignService';
-import MessageWidget from '../../components/messaging/MessageWidget';
-import { useMessagingContacts } from '../../hooks/messaging/useMessagingContacts';
 import { MessageService } from '../../services/MessageService';
 
 interface CampaignCharactersViewProps {
@@ -31,11 +29,8 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
     const [isLoadingCharacter, setIsLoadingCharacter] = useState(false);
     const [characterToRecreate, setCharacterToRecreate] = useState<SyncedCharacter | null>(null);
     const [isRecreating, setIsRecreating] = useState(false);
-    const [isChatOpen, setIsChatOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
 
-    // Contacts pour la messagerie MJ (tous les persos de la campagne)
-    const gmContacts = useMessagingContacts({ settingId, viewerId: 'GM', isGM: true });
 
     useEffect(() => {
         loadCharacters();
@@ -152,20 +147,6 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    {/* Bouton Messagerie MJ */}
-                    <button
-                        onClick={() => setIsChatOpen(true)}
-                        className="relative flex items-center gap-2 px-4 py-2 bg-stone-900 hover:bg-amber-900/30 text-amber-600/80 hover:text-amber-500 rounded-sm font-bold transition-all border border-stone-800 hover:border-amber-900/30 shadow-sm active:scale-95"
-                        title="Ouvrir la messagerie"
-                    >
-                        <MessageSquare size={16} />
-                        <span className="text-xs uppercase tracking-wider">Messagerie</span>
-                        {unreadCount > 0 && (
-                            <span className="absolute -top-1 -right-1 bg-rose-600 text-white text-[9px] font-black rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
-                                {unreadCount > 9 ? '9+' : unreadCount}
-                            </span>
-                        )}
-                    </button>
 
                     <button
                         onClick={loadCharacters}
@@ -291,15 +272,6 @@ const CampaignCharactersView: React.FC<CampaignCharactersViewProps> = ({ setting
                 />
             )}
 
-            {/* Widget Messagerie MJ */}
-            {isChatOpen && (
-                <MessageWidget
-                    settingId={settingId}
-                    viewerId="GM"
-                    viewerName="Meneur de Jeu"
-                    contacts={gmContacts}
-                />
-            )}
         </MotionCard>
     );
 };
