@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Settings, FileText, Save, Printer, History, HelpCircle, ScrollText, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X, AlertTriangle } from 'lucide-react';
+import { Settings, FileText, Save, Printer, History, HelpCircle, ScrollText, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X, AlertTriangle, MessageSquare } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';
 import { useStorageUsage } from '../../hooks/useStorageUsage';
@@ -25,13 +25,17 @@ interface DiegeticNavigationProps {
     appVersion: string;
     onShowCampaignInfo: () => void;
     autoSaveCountdown?: number;
+    isMessagingOpen?: boolean;
+    onToggleMessaging?: () => void;
+    unreadMessagesCount?: number;
 }
 
 const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     currentMode, onModeChange, onOpenImportExport,
     onPrintRequest, onToggleLandscape, isLandscape,
     onShowLogs, showLogs, onShowUserGuide, onShowChangelog, onOpenAppearance, onOpenSync, syncStatus, appVersion,
-    onShowCampaignInfo, autoSaveCountdown
+    onShowCampaignInfo, autoSaveCountdown,
+    isMessagingOpen, onToggleMessaging, unreadMessagesCount
 }) => {
     const { data, isSyncing } = useCharacter();
     const { rules } = useRules();
@@ -74,6 +78,22 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
         { label: 'Historique', icon: <History size={18} />, onClick: onShowLogs, active: showLogs },
         { label: 'Guide', icon: <HelpCircle size={18} />, onClick: onShowUserGuide },
         { label: 'Changelog', icon: <ScrollText size={18} />, onClick: onShowChangelog },
+        {
+            label: 'Messages',
+            icon: (
+                <div className="relative">
+                    <MessageSquare size={18} />
+                    {unreadMessagesCount ? unreadMessagesCount > 0 && (
+                        <div className="absolute -top-1.5 -right-1.5 bg-rose-600 text-white text-[9px] font-black rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 border border-gray-900 shadow-sm">
+                            {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                        </div>
+                    ) : null}
+                </div>
+            ),
+            onClick: () => { onToggleMessaging?.(); setIsMobileMenuOpen(false); },
+            active: isMessagingOpen,
+            highlight: unreadMessagesCount ? unreadMessagesCount > 0 : false
+        }
     ];
 
     return (
@@ -175,6 +195,23 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                                 {stats?.isWarning && !stats?.isCritical && (
                                     <AlertTriangle size={14} className="text-amber-400 ml-0.5" />
                                 )}
+                            </button>
+
+                            <button
+                                onClick={onToggleMessaging}
+                                className={`px-4 py-1.5 rounded-md text-sm font-bold transition flex items-center gap-2 relative ${isMessagingOpen
+                                    ? 'bg-amber-600 text-white shadow-sm'
+                                    : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
+                                title="Messagerie"
+                            >
+                                <div className="relative">
+                                    <MessageSquare size={16} />
+                                    {unreadMessagesCount ? unreadMessagesCount > 0 && (
+                                        <div className="absolute -top-2.5 -right-2 bg-rose-600 text-white text-[9px] font-black rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 border border-gray-900 shadow-sm animate-pulse">
+                                            {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                                        </div>
+                                    ) : null}
+                                </div>
                             </button>
                         </div>
 

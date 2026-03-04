@@ -34,15 +34,25 @@ interface MessageWidgetProps {
     viewerId: string;       // ID du personnage connecté, ou 'GM'
     viewerName: string;     // Nom affiché dans les bulles
     contacts: Contact[];    // Liste des interlocuteurs disponibles
+    isOpen?: boolean;       // État externe (optionnel)
+    onToggle?: (open: boolean) => void; // Callback externe (optionnel)
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const STORAGE_KEY = 'message-widget-pos';
+const WIDGET_STORAGE_KEY = 'message-widget-window-pos';
 
 const loadPos = () => {
     try {
         const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? (JSON.parse(saved) as { x: number; y: number }) : { x: 0, y: 0 };
+    } catch { return { x: 0, y: 0 }; }
+};
+
+const loadWidgetPos = () => {
+    try {
+        const saved = localStorage.getItem(WIDGET_STORAGE_KEY);
         return saved ? (JSON.parse(saved) as { x: number; y: number }) : { x: 0, y: 0 };
     } catch { return { x: 0, y: 0 }; }
 };
@@ -123,12 +133,21 @@ export const MessageWidget: React.FC<MessageWidgetProps> = ({
     viewerId,
     viewerName,
     contacts,
+    isOpen: externalIsOpen,
+    onToggle,
 }) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [internalIsOpen, setInternalIsOpen] = useState(false);
+    const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+    const setIsOpen = (val: boolean) => {
+        if (onToggle) onToggle(val);
+        else setInternalIsOpen(val);
+    };
+
     const [isMinimized, setIsMinimized] = useState(false);
     const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
     const [inputValue, setInputValue] = useState('');
     const [btnPos, setBtnPos] = useState(loadPos);
+    const [widgetPos, setWidgetPos] = useState(loadWidgetPos);
     const [unreadByContact, setUnreadByContact] = useState<Record<string, number>>({});
     const dragLock = useRef(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -214,6 +233,12 @@ export const MessageWidget: React.FC<MessageWidgetProps> = ({
         if (!dragLock.current) setIsOpen(true);
     };
 
+    const handleWidgetDragEnd = (_: unknown, info: PanInfo) => {
+        const newPos = { x: widgetPos.x + info.offset.x, y: widgetPos.y + info.offset.y };
+        setWidgetPos(newPos);
+        localStorage.setItem(WIDGET_STORAGE_KEY, JSON.stringify(newPos));
+    };
+
     // Résoudre le nom d'un sender
     const resolveName = (senderId: string) => {
         if (senderId === viewerId) return viewerName;
@@ -224,8 +249,8 @@ export const MessageWidget: React.FC<MessageWidgetProps> = ({
 
     return (
         <>
-            {/* ── Bouton flottant ── */}
-            {!isOpen && (
+            {/* ── Bouton flottant (affiché seulement si non contrôlé de l'extérieur) ── */}
+            {!isOpen && externalIsOpen === undefined && (
                 <motion.div
                     drag
                     dragMomentum={false}
@@ -261,8 +286,9 @@ export const MessageWidget: React.FC<MessageWidgetProps> = ({
                 <motion.div
                     drag
                     dragMomentum={false}
+                    onDragEnd={handleWidgetDragEnd}
                     initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    animate={{ opacity: 1, scale: 1, x: widgetPos.x, y: widgetPos.y }}
                     className="fixed bottom-6 right-6 z-50 w-[380px] bg-stone-950 border border-stone-700/60 rounded-sm shadow-2xl flex flex-col overflow-hidden no-print"
                     style={{ height: isMinimized ? 'auto' : 480 }}
                 >

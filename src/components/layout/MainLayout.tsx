@@ -46,13 +46,16 @@ import PostItBoard from '../ui/PostItBoard';
 import LayoutModals from './LayoutModals';
 import MessageWidget from '../messaging/MessageWidget';
 import { useMessagingContacts } from '../../hooks/messaging/useMessagingContacts';
+import { useUnreadCount } from '../../hooks/messaging/useUnreadCount';
 
 /** Wrapper minimal pour appeler le hook au niveau composant */
 const MessagingWidgetPlayer: React.FC<{
     settingId: string;
     viewerId: string;
     viewerName: string;
-}> = ({ settingId, viewerId, viewerName }) => {
+    isOpen: boolean;
+    onToggle: (open: boolean) => void;
+}> = ({ settingId, viewerId, viewerName, isOpen, onToggle }) => {
     const contacts = useMessagingContacts({ settingId, viewerId });
     return (
         <MessageWidget
@@ -60,6 +63,8 @@ const MessagingWidgetPlayer: React.FC<{
             viewerId={viewerId}
             viewerName={viewerName}
             contacts={contacts}
+            isOpen={isOpen}
+            onToggle={onToggle}
         />
     );
 };
@@ -157,6 +162,9 @@ const MainLayout: React.FC = () => {
     const [showAppearance, setShowAppearance] = useState(false);
     const [showSync, setShowSync] = useState(false);
     const [showCampaignInfo, setShowCampaignInfo] = useState(false);
+    const [isMessagingOpen, setIsMessagingOpen] = useState(false);
+
+    const unreadMessagesCount = useUnreadCount(rules?.settingId, data.syncInfo?.syncId);
 
     // Guidance Logic
     const shouldHighlightMystic = React.useMemo(() => {
@@ -297,6 +305,9 @@ const MainLayout: React.FC = () => {
                     appVersion={APP_VERSION}
                     onShowCampaignInfo={() => setShowCampaignInfo(true)}
                     autoSaveCountdown={countdown}
+                    isMessagingOpen={isMessagingOpen}
+                    onToggleMessaging={() => setIsMessagingOpen(!isMessagingOpen)}
+                    unreadMessagesCount={unreadMessagesCount}
                 />
 
                 {/* Bandeau interactif : Proposition de Récréation MJ */}
@@ -422,6 +433,8 @@ const MainLayout: React.FC = () => {
                                             settingId={rules.settingId}
                                             viewerId={data.syncInfo.syncId}
                                             viewerName={data.header?.name || data.header?.player || 'Joueur'}
+                                            isOpen={isMessagingOpen}
+                                            onToggle={setIsMessagingOpen}
                                         />
                                     )}
                                 </>
