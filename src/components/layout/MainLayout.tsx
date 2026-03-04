@@ -35,7 +35,7 @@ import CreationHUD from '../CreationHUD';
 const RulesSourceSelector = lazy(() => import('../RulesSourceSelector'));
 const CampaignConflictModal = lazy(() => import('../ui/CampaignConflictModal'));
 const SettingsView = lazy(() => import('../SettingsView'));
-import { Layers, FileType, List, TrendingUp, Book, Package, Clock, X, Trash2, UserPlus, PencilLine, Check } from 'lucide-react';
+import { Layers, FileType, List, TrendingUp, Book, Package, Clock, X, Trash2, UserPlus, PencilLine, Check, Sparkles } from 'lucide-react';
 import { useEditMode } from '../../hooks/sheet/useEditMode';
 import { useCreationMode } from '../../hooks/useCreationMode';
 import { exportCharacterAsJSON } from '../../utils/importExportUtils';
@@ -44,6 +44,25 @@ import { usePrintManager } from '../../hooks/layout/usePrintManager';
 import { useRulesSync } from '../../hooks/layout/useRulesSync';
 import PostItBoard from '../ui/PostItBoard';
 import LayoutModals from './LayoutModals';
+import MessageWidget from '../messaging/MessageWidget';
+import { useMessagingContacts } from '../../hooks/messaging/useMessagingContacts';
+
+/** Wrapper minimal pour appeler le hook au niveau composant */
+const MessagingWidgetPlayer: React.FC<{
+    settingId: string;
+    viewerId: string;
+    viewerName: string;
+}> = ({ settingId, viewerId, viewerName }) => {
+    const contacts = useMessagingContacts({ settingId, viewerId });
+    return (
+        <MessageWidget
+            settingId={settingId}
+            viewerId={viewerId}
+            viewerName={viewerName}
+            contacts={contacts}
+        />
+    );
+};
 
 const MainLayout: React.FC = () => {
     const { data, updateData: setData, addLog, importData, isSyncing, sync, isEditMode, setEditMode: setIsEditMode } = useCharacter();
@@ -104,6 +123,17 @@ const MainLayout: React.FC = () => {
 
     const { hasUpdate, mjMessage } = useCloudSyncCheck(data);
 
+    // Bandeau de récréation MJ
+    const [pendingMjUpdate, setPendingMjUpdate] = React.useState<{ data: Record<string, unknown>; message: string } | null>(null);
+
+    const handleRemoteCharacterUpdate = React.useCallback((newData: Record<string, unknown>) => {
+        const syncInfo = (newData as { syncInfo?: { mjMessage?: string } }).syncInfo;
+        const message = syncInfo?.mjMessage;
+        if (message) {
+            setPendingMjUpdate({ data: newData, message });
+        }
+    }, []);
+
     // Notifications temps réel : admin → joueur
     useRealtimeSync({
         settingId: rules?.settingId,
@@ -111,6 +141,7 @@ const MainLayout: React.FC = () => {
         isOnlineMode,
         reloadRules,
         addLog,
+        onRemoteCharacterUpdate: handleRemoteCharacterUpdate,
     });
 
     // Auto-Save Logic
@@ -197,14 +228,14 @@ const MainLayout: React.FC = () => {
     };
 
     useEffect(() => {
-        if (hasUpdate) {
-            addLog("Mise à jour disponible sur le Cloud (Note du MJ possible). Cliquez sur 'Sync' pour voir.", "success");
-            // Debug log to console if in dev
-            if (import.meta.env.DEV) {
-                logger.log("[Sync] Update detected:", { hasUpdate, mjMessage });
-            }
+        if (hasUpdate && mjMessage && !pendingMjUpdate) {
+            // Si le joueur revient après un "Plus tard" et qu'il n'y a pas de bandeau actif,
+            // on garde juste l'indicateur sur le bouton Sync sans respammer le bandeau.
+        } else if (hasUpdate && !mjMessage) {
+            // Simple mise à jour de données sans action MJ, on loggue discrètement.
+            addLog("Mise à jour disponible sur le Cloud. Ouvrez 'Sync' pour récupérer.", "info", "settings");
         }
-    }, [hasUpdate, mjMessage, addLog]);
+    }, [hasUpdate]);
 
     const handleConfirmBackup = async () => {
         await exportCharacterAsJSON(data, addLog);
@@ -260,13 +291,51 @@ const MainLayout: React.FC = () => {
                     onOpenSync={() => setShowSync(true)}
                     syncStatus={
                         isSyncing ? 'pending' :
-                            hasUpdate ? 'update-available' :
+                            (hasUpdate || pendingMjUpdate) ? 'update-available' :
                                 data.syncInfo ? 'synced' : 'none'
                     }
                     appVersion={APP_VERSION}
                     onShowCampaignInfo={() => setShowCampaignInfo(true)}
                     autoSaveCountdown={countdown}
                 />
+
+                {/* Bandeau interactif : Proposition de Récréation MJ */}
+                {pendingMjUpdate && (
+                    <div className="sticky top-14 z-50 no-print animate-in slide-in-from-top-2 fade-in duration-300">
+                        <div className="mx-auto max-w-4xl px-4 pt-2">
+                            <div className="flex items-center gap-3 bg-[#2a1f0e] border border-amber-700/60 rounded-md px-4 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.5)] backdrop-blur-sm">
+                                <div className="shrink-0 w-8 h-8 rounded-full bg-amber-900/40 border border-amber-700/50 flex items-center justify-center">
+                                    <Sparkles size={16} className="text-amber-400" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mb-0.5">Message du Maître de Jeu</p>
+                                    <p className="text-sm text-amber-100/90 leading-snug truncate">{pendingMjUpdate.message}</p>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <button
+                                        onClick={() => {
+                                            importData(pendingMjUpdate.data as unknown as Parameters<typeof importData>[0]);
+                                            setPendingMjUpdate(null);
+                                            addLog(`✨ Récréation appliquée : ${pendingMjUpdate.message}`, 'success', 'sheet');
+                                        }}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-700 hover:bg-amber-600 text-white text-xs font-bold rounded transition-colors active:scale-95"
+                                    >
+                                        <Check size={13} />
+                                        Appliquer
+                                    </button>
+                                    <button
+                                        onClick={() => setPendingMjUpdate(null)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-stone-700/60 hover:bg-stone-600/60 text-stone-300 text-xs font-bold rounded transition-colors active:scale-95"
+                                        title="Vous pourrez appliquer cette mise à jour plus tard via le menu Sync"
+                                    >
+                                        <X size={13} />
+                                        Plus tard
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="relative z-10 flex flex-col min-h-screen">
 
@@ -346,6 +415,15 @@ const MainLayout: React.FC = () => {
                                     </div>
 
                                     <PostItBoard currentTab={sheetTab} />
+
+                                    {/* MessageWidget : visible uniquement en mode Online (campagne synchronisée) */}
+                                    {isOnlineMode && data.syncInfo?.syncId && rules?.settingId && (
+                                        <MessagingWidgetPlayer
+                                            settingId={rules.settingId}
+                                            viewerId={data.syncInfo.syncId}
+                                            viewerName={data.header?.name || data.header?.player || 'Joueur'}
+                                        />
+                                    )}
                                 </>
                             ) : (
                                 <SettingsView

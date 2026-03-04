@@ -6,6 +6,21 @@ import { RosterTimeSection } from './components/RosterTimeSection';
 import { RosterAttributesTable } from './components/RosterAttributesTable';
 import { RosterSkillMatrix } from './components/RosterSkillMatrix';
 import { RosterTraitsGrid } from './components/RosterTraitsGrid';
+import MessageWidget from '../components/messaging/MessageWidget';
+import { useMessagingContacts } from '../hooks/messaging/useMessagingContacts';
+
+/** Wrapper pour le widget MJ dans le Roster (besoin d'appeler le hook) */
+const RosterMessageWidget: React.FC<{ settingId: string }> = ({ settingId }) => {
+    const contacts = useMessagingContacts({ settingId, viewerId: 'GM', isGM: true });
+    return (
+        <MessageWidget
+            settingId={settingId}
+            viewerId="GM"
+            viewerName="Meneur de Jeu"
+            contacts={contacts}
+        />
+    );
+};
 
 interface RosterAppProps {
     settingId: string;
@@ -80,6 +95,9 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
                     />
                 </main>
             )}
+
+            {/* Widget Messagerie MJ flottant (toujours disponible dans le Roster) */}
+            <RosterMessageWidget settingId={settingId} />
         </div>
     );
 };

@@ -28,6 +28,7 @@ import { useAdminRulesHandler } from './hooks/useAdminRulesHandler';
 import AdminHeader from './components/AdminHeader';
 import { CampaignService } from '../services/CampaignService';
 import { migrationTool } from './utils/migrationTool';
+import { MessageService } from '../services/MessageService';
 
 const AdminApp: React.FC = () => {
     const { session, isAdmin, logout } = useAdminAuth();
@@ -51,12 +52,33 @@ const AdminApp: React.FC = () => {
     const [viewMode, setViewMode] = useState<'dashboard' | 'editor' | 'players'>('dashboard');
     const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'libraries' | 'calendar' | 'players'>('general');
     const [activeLibraryTab, setActiveLibraryTab] = useState<'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters' | 'mystic'>('traits');
+    const [playersTabUnread, setPlayersTabUnread] = useState(0);
 
     const [showImportResult, setShowImportResult] = useState(false);
     const [importReport, setImportReport] = useState<{ success: string[], warnings: string[] } | null>(null);
     const [showChangelog, setShowChangelog] = useState(false);
     const [wizardOpen, setWizardOpen] = useState(false);
     const [candidateRules, setCandidateRules] = useState<RulesData | null>(null);
+
+    // Badge de messages non lus sur l'onglet Joueurs
+    React.useEffect(() => {
+        if (!currentSettingId) return;
+        const poll = () => {
+            MessageService.countUnread(currentSettingId, 'GM')
+                .then((count) => {
+                    // Ne pas afficher le badge si l'onglet Joueurs est déjà actif
+                    if (activeTab !== 'players') {
+                        setPlayersTabUnread(count);
+                    } else {
+                        setPlayersTabUnread(0);
+                    }
+                })
+                .catch(() => { /* silencieux */ });
+        };
+        poll();
+        const interval = setInterval(poll, 15000);
+        return () => clearInterval(interval);
+    }, [currentSettingId, activeTab]);
 
     const [confirmState, setConfirmState] = useState<{
         isOpen: boolean;
@@ -206,7 +228,7 @@ const AdminApp: React.FC = () => {
                         { id: 'skills', label: 'Compétences' },
                         { id: 'libraries', label: <div className="flex items-center justify-center gap-2"><BookOpen size={16} /> Bibliothèques</div> },
                         { id: 'calendar', label: <div className="flex items-center justify-center gap-2"><CalendarDays size={16} /> Calendrier</div> },
-                        { id: 'players', label: <div className="flex items-center justify-center gap-2"><Users size={16} /> Joueurs</div> }
+                        { id: 'players', label: <div className="flex items-center justify-center gap-2"><Users size={16} /> Joueurs{playersTabUnread > 0 && <span className="bg-rose-600 text-white text-[9px] font-black rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">{playersTabUnread > 9 ? '9+' : playersTabUnread}</span>}</div> }
                     ] as const).map(tab => (
                         <button
                             key={tab.id}

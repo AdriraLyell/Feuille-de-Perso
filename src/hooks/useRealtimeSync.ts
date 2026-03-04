@@ -18,6 +18,7 @@ interface UseRealtimeSyncParams {
     isOnlineMode: boolean;
     reloadRules: () => Promise<void>;
     addLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both') => void;
+    onRemoteCharacterUpdate?: (newData: Record<string, unknown>) => void;
 }
 
 export const useRealtimeSync = ({
@@ -26,6 +27,7 @@ export const useRealtimeSync = ({
     isOnlineMode,
     reloadRules,
     addLog,
+    onRemoteCharacterUpdate,
 }: UseRealtimeSyncParams): void => {
     // Debounce refs pour éviter les appels en rafale
     const settingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -64,13 +66,15 @@ export const useRealtimeSync = ({
             return;
         }
 
-        const handleCharacterUpdate = () => {
+        const handleCharacterUpdate = (payload: Record<string, unknown>) => {
             if (characterDebounceRef.current) clearTimeout(characterDebounceRef.current);
-            characterDebounceRef.current = setTimeout(async () => {
-                logger.log('[useRealtimeSync] characters changed — reloading rules...');
+            characterDebounceRef.current = setTimeout(() => {
+                logger.log('[useRealtimeSync] characters changed — notifying layout...');
                 try {
-                    await reloadRules();
-                    addLog('🔔 Le MJ a mis à jour votre fiche. Synchronisez pour récupérer les dernières modifications.', 'success', 'sheet');
+                    const newData = (payload as { new?: { data?: Record<string, unknown> } }).new?.data;
+                    if (newData && onRemoteCharacterUpdate) {
+                        onRemoteCharacterUpdate(newData);
+                    }
                 } catch (e) {
                     logger.error('[useRealtimeSync] Failed to process character update', e);
                 }
