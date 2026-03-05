@@ -11,7 +11,6 @@ import { reconcileTraits, reconcileCleanup } from './reconcilers/traitsReconcile
 import { reconcileHeader } from './reconcilers/headerReconciler';
 import { reconcileImposedSpecializations } from './reconcilers/imposedSpecializationsReconciler';
 import { reconcileLayout } from './reconcilers/layoutReconciler';
-import { getInitialCharacterData } from '../data/initialState';
 import { getDynamicColumnsStatic } from './layoutGenerationUtils';
 
 /**

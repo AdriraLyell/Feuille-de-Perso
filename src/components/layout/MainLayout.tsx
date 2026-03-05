@@ -47,6 +47,7 @@ import LayoutModals from './LayoutModals';
 import MessageWidget from '../messaging/MessageWidget';
 import { useMessagingContacts } from '../../hooks/messaging/useMessagingContacts';
 import { useUnreadCount } from '../../hooks/messaging/useUnreadCount';
+import { useSheetLayout } from '../../hooks/useSheetLayout';
 
 /** Wrapper minimal pour appeler le hook au niveau composant */
 const MessagingWidgetPlayer: React.FC<{
@@ -140,6 +141,8 @@ const MainLayout: React.FC = () => {
     } = useRulesSync(data, rules, setData, updateRules, addLog);
 
     const { hasUpdate, mjMessage } = useCloudSyncCheck(data);
+
+    const { portraitLayout, landscapeLayout } = useSheetLayout(data, rules);
 
     // Bandeau de récréation MJ
     const [pendingMjUpdate, setPendingMjUpdate] = React.useState<{ data: Record<string, unknown>; message: string } | null>(null);
@@ -263,9 +266,9 @@ const MainLayout: React.FC = () => {
     };
 
     const handleResetLayout = React.useCallback(() => {
-        clearLayout({ columns: [] }, { columns: [] });
+        clearLayout(portraitLayout, landscapeLayout);
         addLog("Agencement réinitialisé par défaut", "info", "sheet");
-    }, [clearLayout, addLog]);
+    }, [clearLayout, addLog, portraitLayout, landscapeLayout]);
 
     const handleAutoFitLayout = React.useCallback(() => {
         const totalH = isLandscape ? 1205 : 1560;

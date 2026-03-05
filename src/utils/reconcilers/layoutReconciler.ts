@@ -1,5 +1,4 @@
 import { CharacterSheetData } from '../../types';
-import { RulesData } from '../../types/rules';
 import { syncLayout } from '../layoutUtils';
 import { SheetLayout } from '../../hooks/useSheetLayout';
 

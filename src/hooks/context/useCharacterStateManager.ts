@@ -12,6 +12,7 @@ import { logger } from '../../utils/logger';
 
 import { SheetLayout } from '../../hooks/useSheetLayout';
 import { generateDefaultLayout } from '../../utils/layoutUtils';
+import { LayoutItem } from '../../types/ui';
 
 interface UseCharacterStateManagerResult {
   resetData: () => void;
