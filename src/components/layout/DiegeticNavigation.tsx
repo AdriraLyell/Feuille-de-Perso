@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Settings, FileText, Save, Printer, History, HelpCircle, ScrollText, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X, AlertTriangle, MessageSquare } from 'lucide-react';
+import { Settings, FileText, Save, Printer, History, HelpCircle, ScrollText, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X, AlertTriangle, MessageSquare, Layout, PencilLine } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';
 import { useStorageUsage } from '../../hooks/useStorageUsage';
@@ -28,6 +28,12 @@ interface DiegeticNavigationProps {
     isMessagingOpen?: boolean;
     onToggleMessaging?: () => void;
     unreadMessagesCount?: number;
+    isEditMode?: boolean;
+    onToggleEditMode?: () => void;
+    isEditLayoutMode?: boolean;
+    onToggleEditLayoutMode?: () => void;
+    onResetLayout?: () => void;
+    onAutoFitLayout?: () => void;
 }
 
 const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
@@ -35,12 +41,14 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     onPrintRequest, onToggleLandscape, isLandscape,
     onShowLogs, showLogs, onShowUserGuide, onShowChangelog, onOpenAppearance, onOpenSync, syncStatus, appVersion,
     onShowCampaignInfo, autoSaveCountdown,
-    isMessagingOpen, onToggleMessaging, unreadMessagesCount
+    isMessagingOpen, onToggleMessaging, unreadMessagesCount,
+    isEditMode, onToggleEditMode, isEditLayoutMode, onToggleEditLayoutMode, onResetLayout, onAutoFitLayout
 }) => {
     const { data, isSyncing } = useCharacter();
     const { rules } = useRules();
     const { stats } = useStorageUsage();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isEditMenuOpen, setIsEditMenuOpen] = useState(false);
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
@@ -114,14 +122,79 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                         {isLandscape ? <RectangleHorizontal size={18} /> : <RectangleVertical size={18} />}
                     </button>
 
-                    <button
-                        onClick={onOpenAppearance}
-                        className="px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600 hover:text-white"
-                        title="Changer l'apparence"
-                        aria-label="Changer l'apparence"
-                    >
-                        <Palette size={18} />
-                    </button>
+                    <div className="relative">
+                        <button
+                            onClick={() => setIsEditMenuOpen(!isEditMenuOpen)}
+                            className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition ${isEditMenuOpen || isEditLayoutMode || isEditMode
+                                ? 'bg-amber-600 text-white shadow-sm border border-amber-400'
+                                : 'bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600 hover:text-white'
+                                }`}
+                            title="Menu Édition"
+                        >
+                            <Palette size={18} />
+                            <span className="hidden lg:inline text-xs font-black uppercase tracking-wider">Édition</span>
+                        </button>
+
+                        <AnimatePresence>
+                            {isEditMenuOpen && (
+                                <>
+                                    <div
+                                        className="fixed inset-0 z-[90]"
+                                        onClick={() => setIsEditMenuOpen(false)}
+                                    />
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="absolute left-0 mt-2 w-56 bg-gray-900 border border-gray-700 rounded-lg shadow-2xl overflow-hidden z-[100] backdrop-blur-xl"
+                                    >
+                                        <div className="p-2 border-b border-gray-800 bg-gray-800/50 flex flex-col gap-0.5">
+                                            <p className="px-2 py-1 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Modes de modification</p>
+                                        </div>
+                                        <div className="p-1.5 space-y-1">
+                                            <button
+                                                onClick={() => { onOpenAppearance(); setIsEditMenuOpen(false); }}
+                                                className="w-full flex items-center justify-between px-3 py-2.5 text-xs font-bold hover:bg-gray-800 rounded-md text-gray-300 transition-all hover:translate-x-1"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <Palette size={16} className="text-amber-500" />
+                                                    <span>Apparence</span>
+                                                </div>
+                                            </button>
+
+                                            <button
+                                                onClick={() => { onToggleEditLayoutMode?.(); setIsEditMenuOpen(false); }}
+                                                className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-bold rounded-md transition-all hover:translate-x-1 ${isEditLayoutMode
+                                                    ? 'bg-indigo-600 text-white shadow-lg'
+                                                    : 'text-gray-300 hover:bg-gray-800'
+                                                    }`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <Layout size={16} className={isEditLayoutMode ? 'text-white' : 'text-indigo-400'} />
+                                                    <span>Agencement</span>
+                                                </div>
+                                                {isEditLayoutMode && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+                                            </button>
+
+                                            <button
+                                                onClick={() => { onToggleEditMode?.(); setIsEditMenuOpen(false); }}
+                                                className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-bold rounded-md transition-all hover:translate-x-1 ${isEditMode
+                                                    ? 'bg-red-600 text-white shadow-lg'
+                                                    : 'text-gray-300 hover:bg-gray-800'
+                                                    }`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <PencilLine size={16} className={isEditMode ? 'text-white' : 'text-red-400'} />
+                                                    <span>Compétences</span>
+                                                </div>
+                                                {isEditMode && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                </>
+                            )}
+                        </AnimatePresence>
+                    </div>
 
                     <div className="w-px h-6 bg-gray-600 hidden md:block"></div>
 

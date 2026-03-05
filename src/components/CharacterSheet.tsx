@@ -13,26 +13,25 @@ import CharacterSheetGrid from './sheet/CharacterSheetGrid';
 import { useCharacterData, useCharacterActions, useCharacterState } from '../context/CharacterContext';
 import { useCharacterSheetActions } from '../hooks/useCharacterSheetActions';
 import { useCharacterBonuses } from '../hooks/useCharacterBonuses';
-import { useCreationMode } from '../hooks/useCreationMode';
 import { useSheetLayout } from '../hooks/useSheetLayout';
 import { useRules } from '../context/RulesContext';
-import { useEditMode } from '../hooks/sheet/useEditMode';
 import { useVariableSkills } from '../hooks/sheet/useVariableSkills';
 
 import VariantSelectionModal from './ui/VariantSelectionModal';
-import { syncLayout } from '../utils/layoutUtils';
+import { LayoutConfig } from '../types/ui';
 
 interface Props {
     isLandscape?: boolean;
     onToggleEditMode?: () => void;
+    onToggleCreationMode?: () => void;
 }
 
-const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode }) => {
+const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode, onToggleCreationMode }) => {
     const data = useCharacterData();
     const dataRef = React.useRef(data);
     React.useEffect(() => { dataRef.current = data; }, [data]);
 
-    const { updateData: onChange, addLog: onAddLog, recordXPTransaction, setEditMode: setIsEditMode, setEditLayoutMode, clearLayout, autoFitLayout } = useCharacterActions();
+    const { updateData: onChange, addLog: onAddLog, recordXPTransaction, setEditLayoutMode, clearLayout, autoFitLayout } = useCharacterActions();
     const { isEditMode, editLayoutMode } = useCharacterState();
     const layoutJustReset = React.useRef(false);
     // Use a ref so handleLayoutChange can read editLayoutMode without depending on it
@@ -127,10 +126,8 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
         return { allowed: true };
     }, [rules, creationActive, blockedSkills]);
 
-    const { handleToggleEditMode } = useEditMode(isEditMode, setIsEditMode);
-    const { handleToggleCreationMode } = useCreationMode(data, onChange as any, onAddLog);
 
-    const handleLayoutChange = useCallback((_currentLayout: any, allLayouts: any) => {
+    const handleLayoutChange = useCallback((_currentLayout: unknown, allLayouts: LayoutConfig) => {
         if (layoutJustReset.current) {
             layoutJustReset.current = false;
             return;
@@ -145,31 +142,6 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
         }));
     }, [onChange]);
 
-    const handleResetLayout = useCallback(() => {
-        const portrait = portraitLayout;
-        const landscape = landscapeLayout;
-        layoutJustReset.current = true;
-        clearLayout(portrait, landscape);
-    }, [clearLayout, portraitLayout, landscapeLayout]);
-
-    const handleAutoFitLayout = useCallback(() => {
-        // Budget calculation based on A4 fixed dimensions from CSS
-        const totalH = isLandscape ? 1205 : 1560;
-
-        // Estimated heights of fixed sections:
-        // Header + Attributes section + Counters padding/header
-        // Header: ~180px
-        // Attributes: ~160px
-        // Counters fixed part: ~36px
-        // Total fixed: ~376px
-        const fixedH = 376;
-        const availablePixels = totalH - fixedH;
-        const availableRows = Math.floor(availablePixels / 24);
-        const colCount = isLandscape ? 5 : 4;
-
-        autoFitLayout(colCount, availableRows);
-        onAddLog("Agencement optimisé automatiquement", "info", "sheet");
-    }, [isLandscape, autoFitLayout, onAddLog]);
 
     return (
         <div className={`flex justify-center transition-all duration-300 ${isEditMode ? 'pr-80' : ''}`}>
@@ -181,12 +153,23 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
                     onUpdateHeader={updateHeader}
                     isDateLocked={!!rules?.configurations?.calendar}
                     isEditMode={isEditMode}
-                    onToggleEditMode={onToggleEditMode || handleToggleEditMode}
+                    onToggleEditMode={onToggleEditMode}
                     isEditLayoutMode={editLayoutMode}
                     onToggleEditLayoutMode={() => setEditLayoutMode(!editLayoutMode)}
-                    onResetLayout={handleResetLayout}
-                    onAutoFitLayout={handleAutoFitLayout}
-                    onToggleCreationMode={handleToggleCreationMode}
+                    onResetLayout={() => {
+                        layoutJustReset.current = true;
+                        clearLayout(portraitLayout, landscapeLayout);
+                    }}
+                    onAutoFitLayout={() => {
+                        const totalH = isLandscape ? 1205 : 1560;
+                        const fixedH = 376;
+                        const availablePixels = totalH - fixedH;
+                        const availableRows = Math.floor(availablePixels / 24);
+                        const colCount = isLandscape ? 5 : 4;
+                        autoFitLayout(colCount, availableRows);
+                        onAddLog("Agencement optimisé automatiquement", "info", "sheet");
+                    }}
+                    onToggleCreationMode={onToggleCreationMode}
                 />
 
                 {/* Edition mode logic and sidebar moved to MainLayout */}

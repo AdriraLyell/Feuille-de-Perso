@@ -13,7 +13,11 @@ export const generateDefaultLayout = (sheetLayout: SheetLayout, isLandscape: boo
     const layout: LayoutItem[] = [];
 
     // Helper to compute required grid units for a block
-    const computeH = (itemCount: number) => Math.max(3, Math.ceil((32 + itemCount * 20) / 24) + 1);
+    const computeH = (itemCount: number) => {
+        // Header (28px) + Row (itemCount * 20px). Grid is 24px.
+        // We add +1 row for aesthetic margin and to prevent scrollbars.
+        return Math.max(3, Math.ceil((28 + itemCount * 20) / 24) + 1);
+    };
 
     // Pass 1: compute max height for each "row" (top and bottom)
     // This ensures all blocks in the same visual row start at the same Y position,

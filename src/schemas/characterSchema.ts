@@ -162,6 +162,36 @@ export const CharacterSheetDataSchema = z.object({
     suggestions: z.array(z.any()).optional().default([]),
     _rulesVersion: z.string().optional(),
     _rulesLastUpdated: z.number().optional(),
+    activeLayout: z.object({
+        lg: z.array(z.object({
+            i: z.string(),
+            x: z.number(),
+            y: z.number(),
+            w: z.number(),
+            h: z.number(),
+            minW: z.number().optional(),
+            minH: z.number().optional()
+        })).optional(),
+        md: z.array(z.object({
+            i: z.string(),
+            x: z.number(),
+            y: z.number(),
+            w: z.number(),
+            h: z.number(),
+            minW: z.number().optional(),
+            minH: z.number().optional()
+        })).optional(),
+        sm: z.array(z.object({
+            i: z.string(),
+            x: z.number(),
+            y: z.number(),
+            w: z.number(),
+            h: z.number(),
+            minW: z.number().optional(),
+            minH: z.number().optional()
+        })).optional()
+    }).optional(),
+    layoutConfigs: z.record(z.string(), z.any()).optional(),
     _schemaVersion: z.number().optional()
 });
 

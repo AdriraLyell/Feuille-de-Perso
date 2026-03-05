@@ -153,29 +153,25 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
                                     <span className="uppercase tracking-wider">Reset</span>
                                 </button>
                             )}
-                            <button
-                                onClick={onToggleEditLayoutMode}
-                                className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-[11px] font-black transition-all shadow-md transform hover:scale-105 active:scale-95 mr-2 ${isEditLayoutMode
-                                    ? 'bg-indigo-600 text-white border-2 border-white ring-4 ring-indigo-500/40 animate-pulse shadow-[0_0_20px_rgba(79,70,229,0.6)]'
-                                    : 'bg-stone-50 text-stone-500 border border-stone-200 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300'
-                                    }`}
-                                title={isEditLayoutMode ? "Verrouiller l'agencement" : "Déverrouiller l'agencement"}
-                            >
-                                {isEditLayoutMode ? <Lock size={16} /> : <Layout size={14} />}
-                                <span className="uppercase tracking-wider">{isEditLayoutMode ? 'Verrouiller Layout' : 'Agencement'}</span>
-                            </button>
+                            {isEditLayoutMode && (
+                                <button
+                                    onClick={onToggleEditLayoutMode}
+                                    className="flex items-center gap-1.5 px-4 py-2 rounded-md text-[11px] font-black transition-all shadow-md transform hover:scale-105 active:scale-95 mr-2 bg-indigo-600 text-white border-2 border-white ring-4 ring-indigo-500/40 animate-pulse shadow-[0_0_20px_rgba(79,70,229,0.6)]"
+                                    title="Verrouiller l'agencement"
+                                >
+                                    <Lock size={16} />
+                                    <span className="uppercase tracking-wider">Verrouiller Layout</span>
+                                </button>
+                            )}
                         </div>
                     )}
-                    {onToggleEditMode && (
+                    {isEditMode && onToggleEditMode && (
                         <button
                             onClick={onToggleEditMode}
-                            className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-[11px] font-black transition-all shadow-md transform hover:scale-105 active:scale-95 ${isEditMode
-                                ? 'bg-red-600 text-white border-2 border-white ring-4 ring-red-500/40 animate-pulse shadow-[0_0_20px_rgba(220,38,38,0.6)]'
-                                : 'bg-stone-50 text-stone-500 border border-stone-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300'
-                                }`}
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-md text-[11px] font-black transition-all shadow-md transform hover:scale-105 active:scale-95 bg-red-600 text-white border-2 border-white ring-4 ring-red-500/40 animate-pulse shadow-[0_0_20px_rgba(220,38,38,0.6)]"
                         >
-                            {isEditMode ? <Check size={16} className="animate-bounce" /> : <PencilLine size={14} />}
-                            <span className="uppercase tracking-wider">{isEditMode ? 'Valider Stats' : 'Editer Compétences'}</span>
+                            <Check size={16} className="animate-bounce" />
+                            <span className="uppercase tracking-wider">Valider Stats</span>
                         </button>
                     )}
                 </div>

@@ -165,7 +165,7 @@ export const useCharacterStateManager = (
       if (!currentLayout.length) return prev;
 
       // Group items by column (x)
-      const cols: Record<number, any[]> = {};
+      const cols: Record<number, LayoutItem[]> = {};
       for (const item of currentLayout) {
         if (item.i === 'counters_section') continue;
         const x = item.x;
@@ -194,85 +194,55 @@ export const useCharacterStateManager = (
           if (skillGroup) itemCount = skillGroup.length;
 
           // Header (28px) + Padding/Margins (8px) = 36px. Each row is 20px. Grid row is 24px.
-          // Formula: ceil((36 + itemCount * 20) / 24).
-          // Minimum of 3 rows for aesthetic reasons, or 5 if empty placeholder exists.
+          // +1 safety row to account for header border overhead (prevents last item clipping).
+          // Scrollbars are hidden via CSS so visual overflow is not an issue.
           const needs = (itemCount === 0) ? 116 : (36 + itemCount * 20);
-          return Math.max(3, Math.ceil(needs / 24));
+          return Math.max(3, Math.ceil(needs / 24) + 1);
         });
 
-        const totalIdeal = idealHeights.reduce((a, b) => a + b, 0);
 
-        // Adjust heights to fit budget
-        let finalHeights: number[];
-        if (totalIdeal <= availableHeightRows) {
-          // Extension/Natural fit
-          finalHeights = idealHeights;
-        } else {
-          // Compression (Proportional shrinking)
-          // Budget = availableHeightRows
-          finalHeights = idealHeights.map(h => {
-            const share = Math.floor((h / totalIdeal) * availableHeightRows);
-            return Math.max(3, share);
-          });
+        // Always use ideal heights — never compress below content needs.
+        const finalHeights = idealHeights;
 
-          // Fill rounding gaps
-          let currentSum = finalHeights.reduce((a, b) => a + b, 0);
-          while (currentSum < availableHeightRows) {
-            let maxDiff = -1;
-            let indexToFill = -1;
-            for (let i = 0; i < finalHeights.length; i++) {
-              const diff = idealHeights[i] - finalHeights[i];
-              if (diff > maxDiff) {
-                maxDiff = diff;
-                indexToFill = i;
-              }
-            }
-            if (indexToFill !== -1) {
-              finalHeights[indexToFill]++;
-              currentSum++;
-            } else break;
-          }
-        }
-
-        // Apply new h and y to stacking
+        // Pass 1: Apply ideal h and y (no extension yet)
         let currentY = 0;
         for (let i = 0; i < columnItems.length; i++) {
           const item = columnItems[i];
           const actualItem = newLayout.find(li => li.i === item.i);
           if (actualItem) {
-            let h = finalHeights[i];
-
-            // If it's the last item in the column, extend it to fill available space
-            // This ensures blocks like "Knowledge" or "Other Skills" reach the bottom
-            if (i === columnItems.length - 1) {
-              const remainingBudget = availableHeightRows - currentY;
-              if (remainingBudget > h) {
-                h = remainingBudget;
-              }
-            }
-
-            actualItem.h = h;
+            actualItem.h = finalHeights[i];
             actualItem.y = currentY;
-            currentY += h;
+            currentY += finalHeights[i];
           }
         }
       }
 
-      // Finally, ensure counters_section and other items don't overlap if they were pushed
-      // Actually, since we only touch skill blocks, we should probably stick counters to the bottom of the grid
+      // Pass 2: Find global maxY across all columns (= where counters start)
+      let globalMaxY = availableHeightRows;
+      for (const it of newLayout) {
+        if (it.i !== 'counters_section') {
+          const end = (it.y ?? 0) + (it.h ?? 0);
+          if (end > globalMaxY) globalMaxY = end;
+        }
+      }
+
+      // Pass 3: Extend last block of each column to reach globalMaxY
+      for (let x = 0; x < colCount; x++) {
+        const columnItems = newLayout
+          .filter(it => it.i !== 'counters_section' && it.x === x)
+          .sort((a, b) => (a.y ?? 0) - (b.y ?? 0));
+        if (columnItems.length === 0) continue;
+        const lastItem = columnItems[columnItems.length - 1];
+        const currentEnd = (lastItem.y ?? 0) + (lastItem.h ?? 0);
+        if (currentEnd < globalMaxY) {
+          lastItem.h = globalMaxY - (lastItem.y ?? 0);
+        }
+      }
+
+      // Place counters at globalMaxY
       const countersItem = newLayout.find(li => li.i === 'counters_section');
       if (countersItem) {
-        // Find max Y across all columns
-        let maxY = 0;
-        for (const it of newLayout) {
-          if (it.i !== 'counters_section') {
-            const end = (it.y ?? 0) + (it.h ?? 0);
-            if (end > maxY) maxY = end;
-          }
-        }
-        // Let's place it right after the longest column but at least at availableHeightRows
-        // We set y to availableHeightRows to leave space if something was compressed
-        countersItem.y = Math.max(maxY, availableHeightRows);
+        countersItem.y = globalMaxY;
       }
 
       return {

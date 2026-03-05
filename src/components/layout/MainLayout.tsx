@@ -70,7 +70,20 @@ const MessagingWidgetPlayer: React.FC<{
 };
 
 const MainLayout: React.FC = () => {
-    const { data, updateData: setData, addLog, importData, isSyncing, sync, isEditMode, setEditMode: setIsEditMode } = useCharacter();
+    const {
+        data,
+        updateData: setData,
+        addLog,
+        importData,
+        isSyncing,
+        sync,
+        isEditMode,
+        setEditMode: setIsEditMode,
+        editLayoutMode,
+        setEditLayoutMode,
+        clearLayout,
+        autoFitLayout
+    } = useCharacter();
     const { rules, updateRules, isOnlineMode, reloadRules } = useRules();
 
     // Sheet Modes Hooks
@@ -249,6 +262,21 @@ const MainLayout: React.FC = () => {
         await exportCharacterAsJSON(data, addLog);
     };
 
+    const handleResetLayout = React.useCallback(() => {
+        clearLayout({ columns: [] }, { columns: [] });
+        addLog("Agencement réinitialisé par défaut", "info", "sheet");
+    }, [clearLayout, addLog]);
+
+    const handleAutoFitLayout = React.useCallback(() => {
+        const totalH = isLandscape ? 1205 : 1560;
+        const fixedH = 376;
+        const availablePixels = totalH - fixedH;
+        const availableRows = Math.floor(availablePixels / 24);
+        const colCount = isLandscape ? 5 : 4;
+        autoFitLayout(colCount, availableRows);
+        addLog("Agencement optimisé automatiquement", "info", "sheet");
+    }, [isLandscape, autoFitLayout, addLog]);
+
 
 
     if (!rules || !isSourceSelected) {
@@ -278,7 +306,7 @@ const MainLayout: React.FC = () => {
 
     return (
         <NotificationProvider value={addLog}>
-            <div className={`min-h-screen bg-[#1c1c1c] text-stone-200 font-sans selection:bg-red-900 selection:text-white ${isLandscape ? 'landscape-mode' : ''}`}>
+            <div className={`min-h-screen bg-[#1c1c1c] text-stone-200 font-sans flex flex-col selection:bg-red-900 selection:text-white ${isLandscape ? 'landscape-mode' : ''}`}>
 
                 {/* Background Texture (Parchemin Global) */}
                 <div className="fixed inset-0 pointer-events-none z-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')]"></div>
@@ -308,6 +336,12 @@ const MainLayout: React.FC = () => {
                     isMessagingOpen={isMessagingOpen}
                     onToggleMessaging={() => setIsMessagingOpen(!isMessagingOpen)}
                     unreadMessagesCount={unreadMessagesCount}
+                    isEditMode={isEditMode}
+                    onToggleEditMode={handleToggleEditMode}
+                    isEditLayoutMode={editLayoutMode}
+                    onToggleEditLayoutMode={() => setEditLayoutMode(!editLayoutMode)}
+                    onResetLayout={handleResetLayout}
+                    onAutoFitLayout={handleAutoFitLayout}
                 />
 
                 {/* Bandeau interactif : Proposition de Récréation MJ */}
@@ -417,7 +451,7 @@ const MainLayout: React.FC = () => {
 
 
                                     <div className={`w-full flex px-2 md:px-0 pb-8 ${sheetTab === 'notes' ? 'overflow-visible' : sheetTab === 'prototype' ? 'overflow-hidden' : 'overflow-x-auto'}`}>
-                                        <div className={`${sheetTab === 'p1' ? 'block' : 'hidden'} mx-auto`}><CharacterSheet isLandscape={isLandscape} onToggleEditMode={handleToggleEditMode} /></div>
+                                        <div className={`${sheetTab === 'p1' ? 'block' : 'hidden'} mx-auto`}><CharacterSheet isLandscape={isLandscape} onToggleEditMode={handleToggleEditMode} onToggleCreationMode={handleToggleCreationMode} /></div>
                                         <div className={`${sheetTab === 'specs' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetSpecializations isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'p2' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetPage2 isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'inventaire' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetInventaire isLandscape={isLandscape} /></div>
