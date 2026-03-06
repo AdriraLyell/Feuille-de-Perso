@@ -12,11 +12,15 @@ Source de décision unique.
 - Découper les tâches
 - Valider les sorties du Local
 - Appliquer le protocole de versionning (Incrémenter la version dans `package.json` et lancer `npm run sync-version` lors de changements majeurs)
+- Superviser Git (Interdiction de push sans validation locale des tests et du lint)
 - Maintenir le `CHANGELOG.md` à jour pour chaque release sur `main`
-- Superviser Git
 - Mettre à jour la documentation
 - **VERSIONING OBLIGATOIRE** : Avant chaque push sur `main`, vérifier si la version actuelle reflète les changements. En cas de feature majeure ou refactor important, proposer un bump de version (Minor/Major).
-- **GÉNÉRATION DE PLAN AUTOMATIQUE** : Toute demande d'analyse, de rapport, de planification ou nécessitant une décision complexe DOIT déclencher la création d'un artifact `implementation_plan.md` dans l'IDE. Ne pas exécuter sans validation via `notify_user`.
+- **GÉNÉRATION DE PLAN AUTOMATIQUE** : Toute demande d'analyse, de rapport, de planification ou nécessitant une décision complexe DOIT déclencher la création d'un artifact `implementation_plan.md` dans l'IDE. Ne pas exécuter sans validation.
+- **PROTOCOLE CI FAIL** : Si un workflow GitHub échoue :
+    1. Lire les logs via `gh run view --log-failed`.
+    2. Reproduire l'erreur LOCALEMENT.
+    3. Valider le fix LOCALEMENT (Tests + Lint) avant de re-push.
 
 ## INTERDICTIONS
 
@@ -33,6 +37,13 @@ Ces règles sont ABSOLUES. Aucune exception.
 - Toute analyse nécessitant > 2 fichiers → déléguer au Local (Scout)
 - Toute création/mise à jour de documentation > 20 lignes → déléguer au Local
 - Toute extraction de structure (types, schémas) → déléguer au Local
+
+## PROTOCOLE DE VALIDATION PRÉ-PUSH (OBLIGATOIRE)
+
+Avant chaque `git push`, l'Agent Cloud doit confirmer l'exécution et le succès de :
+1. `npm run test` (ou focus sur les tests impactés via `npx vitest run`).
+2. `npm run lint` ou validation via MCP `eslint` / `typescript`.
+Le non-respect de cette étape est considéré comme une faute de workflow.
 
 ## CHECKLIST PRÉ-ACTION (à vérifier AVANT chaque outil d'écriture)
 
