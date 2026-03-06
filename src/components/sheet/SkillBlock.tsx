@@ -187,7 +187,8 @@ export const SkillBlock = React.memo<{
             p.isVariable !== n.isVariable ||
             p.mysticAbilityId !== n.mysticAbilityId ||
             p.creationValue !== n.creationValue ||
-            p.max !== n.max
+            p.max !== n.max ||
+            p.description !== n.description
         ) {
             return false;
         }

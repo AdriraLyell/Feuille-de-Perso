@@ -46,6 +46,7 @@ export const DotRow: React.FC<DotRowProps> = ({
     isDraggable = false
 }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
     const anchorRef = useRef<HTMLSpanElement>(null);
     const addLog = useNotification();
 
@@ -110,14 +111,7 @@ export const DotRow: React.FC<DotRowProps> = ({
         ? Math.min(entry.value + 1, 10)
         : 5;
 
-    const handleClick = () => {
-        if (isEditing || isDraggable) return; // block interaction in both edit and layout modes
-        if (isUndefinedVariable && onDefineVariant) {
-            onDefineVariant(category, entry.id, entry.name);
-        } else if (hasSpecs) {
-            setIsOpen(!isOpen);
-        }
-    };
+
 
     const getTextColor = (): string | undefined => {
         const skill = entry;
@@ -141,12 +135,26 @@ export const DotRow: React.FC<DotRowProps> = ({
     const textColor = getTextColor();
     const isBlocked = !!blockedReason;
 
+    const handleClick = (e: React.MouseEvent) => {
+        if (isEditing || isDraggable) return;
+        if (isUndefinedVariable) {
+            e.stopPropagation();
+            onDefineVariant?.(category, entry.id, entry.name);
+            return;
+        }
+        if (hasSpecs) {
+            e.stopPropagation();
+            setIsOpen(!isOpen);
+            setIsHovered(false);
+        }
+    };
+
     const handleUpdate = (val: number) => {
         if (validateIncrease && val > entry.value) {
             const check = validateIncrease(entry.id, val);
             if (!check.allowed) {
                 if (check.reason) {
-                    addLog(check.reason, 'danger', 'sheet', `block - ${entry.id} `);
+                    addLog(check.reason, 'danger', 'sheet', `block - ${entry.id}`);
                 }
                 return;
             }
@@ -167,7 +175,8 @@ export const DotRow: React.FC<DotRowProps> = ({
                 };
                 e.dataTransfer.setData('application/json', JSON.stringify(payload));
             } : undefined}
-            onMouseLeave={() => setIsOpen(false)}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
             <span
                 className={`text-xs truncate font-medium transition ${isEditing
@@ -184,7 +193,7 @@ export const DotRow: React.FC<DotRowProps> = ({
                 }}
                 onClick={handleClick}
                 ref={anchorRef}
-                title={entry.description || (entry.variant ? `${entry.name} : ${entry.variant} ` : entry.name)}
+                title={!entry.description ? (entry.variant ? `${entry.name} : ${entry.variant}` : entry.name) : undefined}
             >
                 {entry.variant !== undefined ? (
                     <>
@@ -199,13 +208,30 @@ export const DotRow: React.FC<DotRowProps> = ({
                 {hasSpecs && !isUndefinedVariable && <span className="text-[9px] align-top ml-0.5 text-blue-400">*</span>}
             </span>
 
+            {/* Tooltip pour la description (Hover) */}
+            <PortalTooltip
+                isOpen={isHovered && !!entry.description && !isOpen && !isDraggable}
+                anchorRef={anchorRef}
+                maxWidth={300}
+            >
+                <div className="italic text-[11px] text-stone-200 leading-relaxed whitespace-pre-wrap">
+                    {entry.description}
+                </div>
+            </PortalTooltip>
+
             <PortalTooltip
                 isOpen={isOpen && hasSpecs && !isDraggable}
                 anchorRef={anchorRef}
-                title={`${entry.name} : Spécialisations`}
+                title={`${entry.name}${entry.variant ? ` : ${entry.variant}` : ''}`}
                 maxWidth={400}
             >
+                {entry.description && (
+                    <div className="text-[11px] text-stone-300 italic mb-3 pb-2 border-b border-slate-700/50 leading-relaxed whitespace-pre-wrap">
+                        {entry.description}
+                    </div>
+                )}
                 <div className="flex flex-col gap-1 w-full min-w-[220px] py-1">
+                    <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-2 font-bold px-1">Spécialisations</div>
                     <div className={combinedValidSpecs.length > 5 ? "columns-2 gap-x-8" : "flex flex-col"}>
                         {combinedValidSpecs.map((s, i) => (
                             <div key={i} className="flex items-center text-[11px] mb-1.5 break-inside-avoid px-2 border-l border-slate-700/50 hover:border-amber-500/50 transition-colors ml-1">

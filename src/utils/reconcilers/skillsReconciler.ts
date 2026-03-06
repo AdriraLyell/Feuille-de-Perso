@@ -51,10 +51,12 @@ function processSkillCategories(
             processedNames.add(name);
             processedNamesGlobal.add(name);
 
-            const libSkill = rules.libraries?.skills?.find(s => s && normalizeString(s.name) === normalizeString(name));
+            const libSkill = (rules.libraries?.skills?.find(s => s && normalizeString(s.name) === normalizeString(name)))
+                || (rules.libraries?.mysticAbilities?.find(s => s && normalizeString(s.name) === normalizeString(name)));
             const definitionId = libSkill?.id;
             const isVariable = libSkill?.isVariable === true;
-            const description = libSkill?.description || "";
+            const description = libSkill?.description || undefined;
+            if (libSkill?.description) console.log(`[SKILL DESC] ${name}: "${libSkill.description}"`);
             const max = isBgCat ? 5 : (rules.configurations?.global?.maxSkillScore || 10);
 
             let matchingExisting = existingEntries.filter(e =>
@@ -75,13 +77,17 @@ function processSkillCategories(
                 if (matchingExisting.length > 0) {
                     return matchingExisting.map(existing => {
                         consumedIds.add(existing.id);
+                        const libMatch = (rules.libraries?.skills?.find(s => existing.variant && normalizeString(s.name) === normalizeString(existing.variant)))
+                            || (rules.libraries?.mysticAbilities?.find(s => existing.variant && normalizeString(s.name) === normalizeString(existing.variant)))
+                            || libSkill;
+                        const finalDescription = libMatch ? (libMatch.description || undefined) : undefined;
                         return {
                             ...existing,
                             name,
                             definitionId,
-                            mysticAbilityId: libSkill?.mysticAbilityId || existing.mysticAbilityId,
+                            mysticAbilityId: libMatch?.mysticAbilityId || existing.mysticAbilityId,
                             max,
-                            description: description || existing.description,
+                            description: finalDescription as string | undefined,
                             variant: existing.variant !== undefined ? existing.variant : ""
                         };
                     });
@@ -107,14 +113,18 @@ function processSkillCategories(
 
                 if (existing) {
                     consumedIds.add(existing.id);
+                    const libMatch = (rules.libraries?.skills?.find(s => existing.variant && normalizeString(s.name) === normalizeString(existing.variant)))
+                        || (rules.libraries?.mysticAbilities?.find(s => existing.variant && normalizeString(s.name) === normalizeString(existing.variant)))
+                        || libSkill;
+                    const finalDescription = libMatch ? (libMatch.description || undefined) : undefined;
                     return [{
                         ...existing,
                         id: targetId,
                         max,
                         name,
-                        description: description || existing.description,
+                        description: finalDescription as string | undefined,
                         definitionId,
-                        mysticAbilityId: libSkill?.mysticAbilityId || existing.mysticAbilityId,
+                        mysticAbilityId: libMatch?.mysticAbilityId || existing.mysticAbilityId,
                         variant: (existing.variant === "" || existing.variant === undefined) ? undefined : existing.variant
                     }];
                 } else {
@@ -138,13 +148,18 @@ function processSkillCategories(
             ((e.value || 0) > 0 || e.variant !== undefined || (e.definitionId && rules.libraries?.skills?.find(s => s.id === e.definitionId)?.isVariable))
         ).map(e => {
             const libMatch = e.definitionId
-                ? rules.libraries?.skills?.find(s => s.id === e.definitionId)
-                : rules.libraries?.skills?.find(s => normalizeString(s.name) === normalizeString(e.name));
+                ? ((rules.libraries?.skills?.find(s => s.id === e.definitionId)) || (rules.libraries?.mysticAbilities?.find(s => s.id === e.definitionId)))
+                : (rules.libraries?.skills?.find(s => (e.variant && normalizeString(s.name) === normalizeString(e.variant))))
+                || (rules.libraries?.mysticAbilities?.find(s => (e.variant && normalizeString(s.name) === normalizeString(e.variant))))
+                || (rules.libraries?.skills?.find(s => normalizeString(s.name) === normalizeString(e.name)))
+                || (rules.libraries?.mysticAbilities?.find(s => normalizeString(s.name) === normalizeString(e.name)));
 
             if (libMatch) {
+                const finalDescription = libMatch.description || undefined;
                 return {
                     ...e,
                     definitionId: libMatch.id,
+                    description: finalDescription as string | undefined,
                     mysticAbilityId: libMatch.mysticAbilityId || e.mysticAbilityId
                 };
             }
@@ -164,13 +179,18 @@ function processSkillCategories(
             newSkills[cat] = getSkillCategory(currentState, cat).map(e => {
                 if (!e) return e;
                 const libMatch = e.definitionId
-                    ? rules.libraries?.skills?.find(s => s.id === e.definitionId)
-                    : rules.libraries?.skills?.find(s => s.name && e.name && normalizeString(s.name) === normalizeString(e.name));
+                    ? ((rules.libraries?.skills?.find(s => s.id === e.definitionId)) || (rules.libraries?.mysticAbilities?.find(s => s.id === e.definitionId)))
+                    : (rules.libraries?.skills?.find(s => s.name && e.variant && normalizeString(s.name) === normalizeString(e.variant)))
+                    || (rules.libraries?.mysticAbilities?.find(s => s.name && e.variant && normalizeString(s.name) === normalizeString(e.variant)))
+                    || (rules.libraries?.skills?.find(s => s.name && e.name && normalizeString(s.name) === normalizeString(e.name)))
+                    || (rules.libraries?.mysticAbilities?.find(s => s.name && e.name && normalizeString(s.name) === normalizeString(e.name)));
 
                 if (libMatch) {
+                    const finalDescription = libMatch.description || undefined;
                     return {
                         ...e,
                         definitionId: libMatch.id,
+                        description: finalDescription as string | undefined,
                         mysticAbilityId: libMatch.mysticAbilityId || e.mysticAbilityId
                     };
                 }
@@ -207,7 +227,7 @@ function processBackgrounds(
             const libBg = rules.libraries?.backgrounds?.find(b => normalizeString(b.name) === normalizeString(name));
             const definitionId = libBg?.id;
             const isVariable = libBg?.isVariable === true;
-            const description = libBg?.description || "";
+            const description = libBg?.description || undefined;
 
             const matchingExisting = allExistingSkills.filter(e =>
             (
@@ -223,7 +243,7 @@ function processBackgrounds(
                     definitionId,
                     mysticAbilityId: (libBg?.mysticAbilityId || existing.mysticAbilityId) ?? undefined,
                     max: 5,
-                    description: description || existing.description
+                    description: (libBg ? (libBg.description || undefined) : existing.description) as string | undefined
                 }));
             } else {
                 return [{
@@ -255,6 +275,21 @@ function processBackgrounds(
                 return true;
             }
             return false;
+        }).map(e => {
+            const libMatch = e.definitionId
+                ? rules.libraries?.backgrounds?.find(s => s.id === e.definitionId)
+                : rules.libraries?.backgrounds?.find(s => normalizeString(s.name) === normalizeString(e.name));
+
+            if (libMatch) {
+                const finalDescription = libMatch.description || undefined;
+                return {
+                    ...e,
+                    definitionId: libMatch.id,
+                    description: finalDescription as string | undefined,
+                    mysticAbilityId: (libMatch.mysticAbilityId || e.mysticAbilityId) ?? undefined
+                };
+            }
+            return e;
         });
 
         newSkills[dynamicBgCat] = [...syncedBgs, ...remainingBgs];

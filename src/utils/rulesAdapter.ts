@@ -121,6 +121,7 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
                 return {
                     id: generateId(),
                     name: name,
+                    description: libSkill?.description || undefined,
                     value: 0,
                     creationValue: 0,
                     max: rules.configurations.global.maxSkillScore,
@@ -156,6 +157,7 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
                 return {
                     id: generateId(),
                     name: name,
+                    description: libSkill?.description || undefined,
                     value: 0,
                     creationValue: 0,
                     max: rules.configurations.global.maxSkillScore,
@@ -193,6 +195,7 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
             return {
                 id: generateId(),
                 name: name,
+                description: libBg?.description || undefined,
                 value: 0,
                 creationValue: 0,
                 max: 5,

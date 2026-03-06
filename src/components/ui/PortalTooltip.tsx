@@ -35,6 +35,7 @@ export const PortalTooltip: React.FC<PortalTooltipProps> = ({
 
             let position: 'top' | 'bottom' = 'top';
             let top = rect.top + scrollY;
+            let left = rect.left + window.scrollX + rect.width / 2;
 
             // If too close to the top, flip to bottom
             if (rect.top < tooltipHeightEstimate) {
@@ -44,7 +45,7 @@ export const PortalTooltip: React.FC<PortalTooltipProps> = ({
 
             setCoords({
                 top,
-                left: rect.left + rect.width / 2,
+                left,
                 position
             });
         }
@@ -66,7 +67,7 @@ export const PortalTooltip: React.FC<PortalTooltipProps> = ({
                 maxWidth: `${maxWidth}px`
             }}
         >
-            <div className="bg-slate-800 text-white text-[10px] p-2 rounded shadow-xl animate-in fade-in zoom-in duration-150 relative">
+            <div className="bg-slate-800 text-white text-[10px] p-2 rounded shadow-xl animate-in fade-in zoom-in duration-150 relative whitespace-pre-wrap break-words">
                 {title && (
                     <div className="font-bold text-sm border-b border-slate-600 mb-2 pb-1.5 text-slate-200 tracking-wide">
                         {title}

@@ -27,6 +27,9 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEntry, setEditingEntry] = useState<LibrarySpecializationEntry | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [selectedSkillFilter, setSelectedSkillFilter] = useState<string>('');
+    const [skillFilterSearch, setSkillFilterSearch] = useState('');
+    const [showSkillSuggestions, setShowSkillSuggestions] = useState(false);
     const [skillSearch, setSkillSearch] = useState('');
     const [showPublishConfirm, setShowPublishConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
@@ -86,12 +89,19 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         );
     }, [allSkills, skillSearch, editingEntry?.skillIds]);
 
+    const filteredSkillsForFilter = useMemo(() => {
+        if (!skillFilterSearch.trim()) return [];
+        return allSkills.filter(s => smartIncludes(s.name, skillFilterSearch));
+    }, [allSkills, skillFilterSearch]);
+
     const filteredLibrary = useMemo(() => {
-        return (rules.libraries.specializations || []).filter(s =>
-            smartIncludes(s.name, searchTerm) ||
-            (s.description && smartIncludes(s.description, searchTerm))
-        ).sort((a, b) => a.name.localeCompare(b.name));
-    }, [rules.libraries.specializations, searchTerm]);
+        return (rules.libraries.specializations || []).filter(s => {
+            const matchesSearch = smartIncludes(s.name, searchTerm) ||
+                (s.description && smartIncludes(s.description, searchTerm));
+            const matchesSkill = !selectedSkillFilter || s.skillIds.includes(selectedSkillFilter);
+            return matchesSearch && matchesSkill;
+        }).sort((a, b) => a.name.localeCompare(b.name));
+    }, [rules.libraries.specializations, searchTerm, selectedSkillFilter]);
 
 
     // Handlers
@@ -262,6 +272,68 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                         >
                             <X size={14} />
                         </button>
+                    )}
+                </div>
+
+                <div className="relative w-full sm:w-64 shrink-0">
+                    {selectedSkillFilter ? (
+                        <div className="flex items-center justify-between gap-2 bg-amber-100/80 border border-amber-300/50 px-3 py-1.5 rounded-sm text-xs shadow-inner animate-in fade-in zoom-in duration-200">
+                            <div className="flex flex-col min-w-0">
+                                <span className="text-[9px] text-amber-700/70 font-bold uppercase tracking-tighter">Compétence parent</span>
+                                <span className="text-amber-900 font-bold truncate leading-tight">
+                                    {allSkills.find(s => s.id === selectedSkillFilter)?.name || selectedSkillFilter}
+                                </span>
+                            </div>
+                            <button
+                                onClick={() => setSelectedSkillFilter('')}
+                                className="text-amber-700 hover:text-amber-900 bg-amber-200/50 hover:bg-amber-200 p-1 rounded-full transition-colors shrink-0"
+                                title="Enlever le filtre"
+                            >
+                                <X size={14} />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="relative h-[34px]">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <Search size={14} className="text-[#4a3b32]/50" />
+                            </span>
+                            <input
+                                className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80 h-full"
+                                placeholder="Filtrer par compétence..."
+                                value={skillFilterSearch}
+                                onChange={(e) => {
+                                    setSkillFilterSearch(e.target.value);
+                                    setShowSkillSuggestions(true);
+                                }}
+                                onFocus={() => setShowSkillSuggestions(true)}
+                                onBlur={() => {
+                                    // Delay to allow clicking on suggestion
+                                    setTimeout(() => setShowSkillSuggestions(false), 200);
+                                }}
+                            />
+                            {showSkillSuggestions && filteredSkillsForFilter.length > 0 && (
+                                <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-[#bfae85]/50 rounded-sm shadow-xl max-h-60 overflow-y-auto custom-scrollbar animate-in slide-in-from-top-1 duration-200">
+                                    <div className="p-1.5 bg-stone-50 border-b border-[#bfae85]/20 text-[9px] font-bold text-[#bfae85] uppercase tracking-wider">
+                                        Résultats de recherche
+                                    </div>
+                                    {filteredSkillsForFilter.map(skill => (
+                                        <button
+                                            key={skill.id}
+                                            type="button"
+                                            className="w-full text-left px-4 py-2 text-xs hover:bg-amber-100/50 text-[#1c1917] transition-colors border-b border-[#bfae85]/10 last:border-0 flex items-center justify-between group"
+                                            onClick={() => {
+                                                setSelectedSkillFilter(skill.id);
+                                                setSkillFilterSearch('');
+                                                setShowSkillSuggestions(false);
+                                            }}
+                                        >
+                                            <span className="truncate group-hover:font-bold transition-all">{skill.name}</span>
+                                            <Plus size={10} className="text-amber-600 opacity-0 group-hover:opacity-100" />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
 
