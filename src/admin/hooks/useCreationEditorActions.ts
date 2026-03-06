@@ -10,7 +10,7 @@ export function useCreationEditorActions(rules: RulesData, onUpdate: (newRules: 
             [field]: value
         };
 
-        let updatedTraits = [...(rules.libraries.traits || [])];
+        const updatedTraits = [...(rules.libraries.traits || [])];
         // Sync Bonus MJ trait regardless of what was updated, using 5 as a default
         const bonusValue = updatedConfig.bonusMJ ?? 5;
         const existingIndex = updatedTraits.findIndex(t => t.id === BONUS_MJ_TRAIT_ID || t.id === 'trait-bonus-mj');
