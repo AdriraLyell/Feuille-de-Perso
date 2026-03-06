@@ -13,23 +13,27 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
     const newState: CharacterSheetData = JSON.parse(JSON.stringify(baseState));
 
     // 1. Apply XP Costs
-    newState.xpCosts = {
-        attributeFactor: rules.configurations.xpCosts.attributeFactor,
-        skillFactor: rules.configurations.xpCosts.skillFactor,
-        specializationFactor: rules.configurations.xpCosts.specializationFactor,
-        traitCost: rules.configurations.xpCosts.traitCost ?? 5
-    };
+    if (rules.configurations?.xpCosts) {
+        newState.xpCosts = {
+            attributeFactor: rules.configurations.xpCosts.attributeFactor,
+            skillFactor: rules.configurations.xpCosts.skillFactor,
+            specializationFactor: rules.configurations.xpCosts.specializationFactor,
+            traitCost: rules.configurations.xpCosts.traitCost ?? 5
+        };
+    }
 
     // 2. Apply Creation Config
-    newState.creationConfig = {
-        ...newState.creationConfig,
-        ...rules.configurations.creation,
-        // Ensure nested objects are merged correctly if they exist
-        cardConfig: rules.configurations.cards ? {
-            ...newState.creationConfig.cardConfig,
-            ...rules.configurations.cards
-        } : newState.creationConfig.cardConfig
-    } as CreationConfig;
+    if (rules.configurations?.creation) {
+        newState.creationConfig = {
+            ...newState.creationConfig,
+            ...rules.configurations.creation,
+            // Ensure nested objects are merged correctly if they exist
+            cardConfig: rules.configurations.cards ? {
+                ...newState.creationConfig.cardConfig,
+                ...rules.configurations.cards
+            } : newState.creationConfig.cardConfig
+        } as CreationConfig;
+    }
 
     // 3. Apply Global Configurations (Max Scores)
     // We map these to the state if needed, or they might be used directly from rules by components.
@@ -90,7 +94,7 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
         newState.secondaryAttributes = newSecAttributes;
 
         // Activate based on Configuration Flag
-        newState.secondaryAttributesActive = !!rules.configurations.global.secondaryAttributes;
+        newState.secondaryAttributesActive = !!rules.configurations?.global?.secondaryAttributes;
     }
 
     // 6. Update Skills Definition
@@ -124,7 +128,7 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
                     description: libSkill?.description || undefined,
                     value: 0,
                     creationValue: 0,
-                    max: rules.configurations.global.maxSkillScore,
+                    max: rules.configurations?.global?.maxSkillScore || 10,
                     variant: isVariable ? "" : undefined
                 };
             });
@@ -232,7 +236,7 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
     }
 
     // Force strict structure matching for potential mismatch in rankSlots or other deep objects
-    if (rules.configurations.creation.rankSlots) {
+    if (rules.configurations?.creation?.rankSlots) {
         newState.creationConfig.rankSlots = {
             ...rules.configurations.creation.rankSlots
         };

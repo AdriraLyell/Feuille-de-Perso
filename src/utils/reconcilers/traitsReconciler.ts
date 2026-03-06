@@ -36,7 +36,7 @@ export const reconcileTraits = (newState: CharacterSheetData, currentState: Char
         newState.page2.desavantages = processTraitList(currentState.page2.desavantages || [], 'desavantage');
 
         // --- Bonus MJ Auto-Injection ---
-        const bonusValue = rules.configurations.creation.bonusMJ ?? 0;
+        const bonusValue = rules.configurations?.creation?.bonusMJ ?? 0;
         const desavantages = [...(newState.page2.desavantages || [])];
         const existingIdx = desavantages.findIndex(t => t.definitionId === BONUS_MJ_TRAIT_ID);
 
