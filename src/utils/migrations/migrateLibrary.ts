@@ -19,7 +19,7 @@ export const migrateLibrary = (parsed: MigratableData): void => {
 
     // Pre-fill skillLibrary
     if (!parsed.skillLibrary || !Array.isArray(parsed.skillLibrary) || parsed.skillLibrary.length === 0) {
-        const initialSkillList: LibrarySkillEntry[] = [...INITIAL_DATA.skillLibrary];
+        const initialSkillList: LibrarySkillEntry[] = [...(INITIAL_DATA.skillLibrary || [])];
         const seenNames = new Set<string>(initialSkillList.map(s => s.name.trim().toLowerCase()));
 
         // Harvest skills from sheet data
@@ -52,7 +52,7 @@ export const migrateLibrary = (parsed: MigratableData): void => {
     // Update isVariable flag from INITIAL_DATA
     if (Array.isArray(parsed.skillLibrary)) {
         const defaultVariableStatus = new Map<string, boolean>();
-        INITIAL_DATA.skillLibrary.forEach(s => {
+        (INITIAL_DATA.skillLibrary || []).forEach(s => {
             if (s.isVariable) {
                 defaultVariableStatus.set(s.name.trim().toLowerCase(), true);
             }

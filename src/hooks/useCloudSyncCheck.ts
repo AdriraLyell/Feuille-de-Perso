@@ -36,16 +36,23 @@ export const useCloudSyncCheck = (characterData: CharacterSheetData) => {
                     const cloudLastSynced = new Date(cloudChar.last_synced).getTime();
                     const localLastSynced = syncInfo.lastSynced || 0;
 
+                    // Calculate hash of remote data to see if it's actually different from what we just synced
+                    const cloudHash = CharacterSyncService.generateDataHash(cloudChar.data);
+                    const localHash = CharacterSyncService.generateDataHash(characterData);
+
                     if (import.meta.env.DEV) {
                         logger.log(`[useCloudSyncCheck] id: ${syncInfo.syncId}`, {
                             cloud: new Date(cloudLastSynced).toISOString(),
                             local: new Date(localLastSynced).toISOString(),
-                            hasUpdate: cloudLastSynced > localLastSynced
+                            cloudHash,
+                            localHash,
+                            isHashDifferent: cloudHash !== localHash
                         });
                     }
 
-                    // We consider it an update if the cloud version is newer than local
-                    const hasUpdate = cloudLastSynced > localLastSynced;
+                    // We consider it an update ONLY if the content is different AND cloud is newer
+                    // (The hash check covers the "echo" problem after a manual save)
+                    const hasUpdate = cloudHash !== localHash && cloudLastSynced > (localLastSynced + 5000);
 
                     setStatus({
                         hasUpdate,

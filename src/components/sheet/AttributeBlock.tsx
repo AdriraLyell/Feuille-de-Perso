@@ -13,6 +13,7 @@ const AttributeRow: React.FC<{
     const ref1 = useRef<HTMLInputElement>(null);
     const ref2 = useRef<HTMLInputElement>(null);
     const ref3 = useRef<HTMLInputElement>(null);
+    const [isHovered, setIsHovered] = React.useState(false);
 
     const bonusValue = bonus?.value || 0;
 
@@ -42,8 +43,24 @@ const AttributeRow: React.FC<{
     }
 
     return (
-        <div className="flex items-center px-2 border-b border-dotted border-stone-300 h-[22px] text-xs hover:bg-stone-50 transition-colors">
-            <span className="w-24 truncate font-semibold text-stone-700">{entry.name}</span>
+        <div 
+            className="flex items-center px-2 border-b border-dotted border-stone-300 h-[22px] text-xs hover:bg-stone-50 transition-colors relative"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            <span className="w-24 truncate font-semibold text-stone-700 flex items-center gap-1">
+                {entry.name}
+                {entry.customNotes && <div className="w-1 h-1 rounded-full bg-amber-500/50" />}
+            </span>
+
+            {/* Note personnelle flottante */}
+            {entry.customNotes && isHovered && (
+                <div className="absolute left-0 bottom-full mb-1 z-[100] w-48 p-2 bg-stone-800 text-amber-200 text-[10px] rounded shadow-xl border border-amber-900/30">
+                    <span className="text-[8px] font-black text-amber-500 uppercase block mb-1">Note personnelle</span>
+                    {entry.customNotes}
+                </div>
+            )}
+
             <div className="flex items-center gap-1 flex-grow justify-end">
                 <input
                     ref={ref1}

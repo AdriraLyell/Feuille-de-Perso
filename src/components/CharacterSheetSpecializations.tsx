@@ -22,15 +22,15 @@ const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
 );
 
 const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false }) => {
-    const { data, updateData: onChange, addLog: onAddLog } = useCharacter();
+    const { data, resolvedData, updateData: onChange, addLog: onAddLog } = useCharacter();
     const { rules } = useRules();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [duplicateErrorModal, setDuplicateErrorModal] = useState<string | null>(null);
     const [promoteImposedModal, setPromoteImposedModal] = useState<{ skillId: string; specName: string } | null>(null);
 
     const getSkillName = (skillId: string): string => {
-        for (const cat of Object.keys(data.skills)) {
-            const skill = data.skills[cat].find((s: DotEntry) => s.id === skillId);
+        for (const cat of Object.keys(resolvedData.skills)) {
+            const skill = resolvedData.skills[cat].find((s: DotEntry) => s.id === skillId);
             if (skill) return skill.name;
         }
         return 'Compétence';
@@ -290,7 +290,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
     };
 
     const renderCategory = (title: string, categoryKey: string) => {
-        const categoryData = data.skills[categoryKey];
+        const categoryData = resolvedData.skills[categoryKey];
         if (!categoryData || !Array.isArray(categoryData)) return null;
 
         // Show skill if it has dots OR imposed specializations

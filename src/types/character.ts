@@ -94,8 +94,8 @@ export interface CharacterSheetData {
   specializations: Record<string, string[]>;
   // Key is skill ID, Value is array of imposed specialization objects (Config defined)
   imposedSpecializations: Record<string, ImposedSpecialization[]>;
-  library: LibraryEntry[]; // New field for the Virtue/Flaw library
-  skillLibrary: LibrarySkillEntry[]; // New field for Skill Reserve
+  library?: LibraryEntry[]; // New field for the Virtue/Flaw library
+  skillLibrary?: LibrarySkillEntry[]; // New field for Skill Reserve
   specializationLibrary?: LibrarySpecializationEntry[]; // Catalogue de spécialisations réutilisables
   backgroundLibrary?: LibraryBackgroundEntry[]; // Catalogue d'arrière-plans
   counterLibrary?: LibraryCounterEntry[]; // Catalogue de compteurs
@@ -122,8 +122,10 @@ export interface CharacterSheetData {
     syncId?: string;      // UUID from database
     settingId?: string;   // Campaign ID
     settingName?: string; // Campaign name (cached for display)
-    lastSynced?: number;  // Timestamp of last sync
+    lastSynced?: number;  // Timestamp of last sync (remote)
     lastSyncedHash?: string; // Digital signature of the data at last sync
+    lastLocalEdit?: number; // Timestamp of last local modification
+    isDirty?: boolean;    // True if local changes are not yet synced
     isAutoSyncEnabled?: boolean; // New: Automatic cloud save
     mjMessage?: string;   // Note left by the MJ when signaling an update
     localSettings?: {

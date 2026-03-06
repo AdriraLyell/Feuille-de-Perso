@@ -11,6 +11,7 @@ export interface DotEntry {
   mysticAbilityId?: string; // Link to Mystic Ability ID
   description?: string; // New: Description info-bubble
   isVariable?: boolean; // New: For dynamic styling in UI
+  customNotes?: string; // Notes personnelles du joueur
 }
 
 export interface AttributeEntry {
@@ -23,6 +24,7 @@ export interface AttributeEntry {
   creationVal1?: number;
   creationVal2?: number;
   creationVal3?: number;
+  customNotes?: string; // Notes personnelles du joueur
 }
 
 export interface AttributeCategoryDef {
@@ -61,6 +63,7 @@ export interface CombatEntry {
   attack: string;
   damage: string;
   parry: string;
+  customNotes?: string; // Notes personnelles du joueur
 }
 
 export interface ReputationEntry {
@@ -85,6 +88,7 @@ export interface TraitEntry {
   isPostCreation?: boolean;
   creationValue?: string;
   type?: 'avantage' | 'desavantage';
+  customNotes?: string; // Notes personnelles du joueur
 }
 
 export type FormulaOperator = 'ADD' | 'SET' | 'SUB';

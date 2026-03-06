@@ -64,7 +64,7 @@ export function useDashboardActions() {
                 },
                 libraries: {
                     ...defaultRules.libraries,
-                    skills: INITIAL_DATA.skillLibrary
+                    skills: INITIAL_DATA.skillLibrary || []
                 }
             };
 

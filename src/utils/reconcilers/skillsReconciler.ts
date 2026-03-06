@@ -6,59 +6,47 @@ import { getSkillCategory } from '../stateAccessors';
 
 /**
  * Synchronizes skills and backgrounds with rule definitions.
- * Extracted from rulesReconciler.ts for better maintainability.
+ * Simplified for Phase 2: Metadata (descriptions, names) are resolved at runtime.
+ * This reconciler only handles structural presence and ID mapping.
  */
+
 /**
  * Phase 1: Processing standard skill categories
  */
 function processSkillCategories(
-    newState: CharacterSheetData,
     currentState: CharacterSheetData,
     rules: RulesData
 ): Record<string, DotEntry[]> {
     const ruleSkills = rules.definitions.skills || {};
     const newSkills: Record<string, DotEntry[]> = {};
-    const processedNamesGlobal = new Set<string>();
 
     Object.keys(ruleSkills).forEach(category => {
         const definedNames = ruleSkills[category] || [];
         const existingEntries: DotEntry[] = getSkillCategory(currentState, category);
-
-        const catDef = rules.definitions.skillCategories?.find(c => c.id === category);
-        const behavior = catDef?.behavior;
-        const isCounterCat = behavior === 'Compteur';
-        const isBgCat = behavior === 'Arrière-plan';
 
         const processedNames = new Set<string>();
         const consumedIds = new Set<string>();
 
         // A. Handle defined skills (Rules)
         const syncedSkills = definedNames.flatMap(name => {
+            // Spacer
             if (!name || name.trim() === "") {
-                const spacerCandidate = existingEntries.find(e =>
-                    !consumedIds.has(e.id) &&
-                    (!e.name || e.name.trim() === "")
-                );
-
+                const spacerCandidate = existingEntries.find(e => !consumedIds.has(e.id) && (!e.name || e.name.trim() === ""));
                 if (spacerCandidate) {
                     consumedIds.add(spacerCandidate.id);
                     return [spacerCandidate];
-                } else {
-                    return [{ id: generateId(), name: "", value: 0, creationValue: 0, max: 0, variant: "" } as DotEntry];
                 }
+                return [{ id: generateId(), name: "", value: 0, creationValue: 0, max: 0, variant: "" } as DotEntry];
             }
 
-            processedNames.add(name);
-            processedNamesGlobal.add(name);
+            processedNames.add(name.toLowerCase());
 
+            // Find definition in libraries for ID mapping
             const libSkill = (rules.libraries?.skills?.find(s => s && normalizeString(s.name) === normalizeString(name)))
                 || (rules.libraries?.mysticAbilities?.find(s => s && normalizeString(s.name) === normalizeString(name)));
             const definitionId = libSkill?.id;
-            const isVariable = libSkill?.isVariable === true;
-            const description = libSkill?.description || undefined;
-            if (libSkill?.description) console.log(`[SKILL DESC] ${name}: "${libSkill.description}"`);
-            const max = isBgCat ? 5 : (rules.configurations?.global?.maxSkillScore || 10);
 
+            // Matching logic: definitionId preferred, name fallback
             let matchingExisting = existingEntries.filter(e =>
                 !consumedIds.has(e.id) && (
                     (definitionId && e.definitionId === definitionId) ||
@@ -66,136 +54,42 @@ function processSkillCategories(
                 )
             );
 
-            if (matchingExisting.length === 0 && definitionId && name && name.trim() !== "") {
-                matchingExisting = existingEntries.filter(e =>
-                    !consumedIds.has(e.id) &&
-                    normalizeString(e.name) === normalizeString(name)
-                );
-            }
-
-            if (isVariable) {
-                if (matchingExisting.length > 0) {
-                    return matchingExisting.map(existing => {
-                        consumedIds.add(existing.id);
-                        const libMatch = (rules.libraries?.skills?.find(s => existing.variant && normalizeString(s.name) === normalizeString(existing.variant)))
-                            || (rules.libraries?.mysticAbilities?.find(s => existing.variant && normalizeString(s.name) === normalizeString(existing.variant)))
-                            || libSkill;
-                        const finalDescription = libMatch ? (libMatch.description || undefined) : undefined;
-                        return {
-                            ...existing,
-                            name,
-                            definitionId,
-                            mysticAbilityId: libMatch?.mysticAbilityId || existing.mysticAbilityId,
-                            max,
-                            description: finalDescription as string | undefined,
-                            variant: existing.variant !== undefined ? existing.variant : ""
-                        };
-                    });
-                } else {
-                    return [{
-                        id: generateId(),
-                        name,
-                        description,
-                        value: 0,
-                        creationValue: 0,
-                        max,
-                        variant: "",
-                        definitionId
-                    }];
-                }
-            } else {
-                const existing = matchingExisting[0];
-                let targetId = existing?.id || generateId();
-                if (isCounterCat && rules.definitions.counters) {
-                    const counterKey = Object.keys(rules.definitions.counters).find(k => normalizeString(rules.definitions.counters[k].name) === normalizeString(name));
-                    if (counterKey) targetId = counterKey;
-                }
-
-                if (existing) {
+            if (matchingExisting.length > 0) {
+                return matchingExisting.map(existing => {
                     consumedIds.add(existing.id);
-                    const libMatch = (rules.libraries?.skills?.find(s => existing.variant && normalizeString(s.name) === normalizeString(existing.variant)))
-                        || (rules.libraries?.mysticAbilities?.find(s => existing.variant && normalizeString(s.name) === normalizeString(existing.variant)))
-                        || libSkill;
-                    const finalDescription = libMatch ? (libMatch.description || undefined) : undefined;
-                    return [{
+                    return {
                         ...existing,
-                        id: targetId,
-                        max,
-                        name,
-                        description: finalDescription as string | undefined,
-                        definitionId,
-                        mysticAbilityId: libMatch?.mysticAbilityId || existing.mysticAbilityId,
-                        variant: (existing.variant === "" || existing.variant === undefined) ? undefined : existing.variant
-                    }];
-                } else {
-                    return [{
-                        id: targetId,
-                        name,
-                        description,
-                        value: 0,
-                        creationValue: 0,
-                        max,
-                        variant: undefined,
+                        name, // Keep official name
                         definitionId
-                    }];
-                }
+                    };
+                });
+            } else {
+                // New skill from rules
+                return [{
+                    id: generateId(),
+                    name,
+                    value: 0,
+                    creationValue: 0,
+                    max: 5,
+                    definitionId
+                }];
             }
         });
 
+        // B. Keep remaining skills if they have value (Orphans with data)
         const remainingSkills = existingEntries.filter(e =>
             !consumedIds.has(e.id) &&
-            !processedNames.has(e.name) &&
-            ((e.value || 0) > 0 || e.variant !== undefined || (e.definitionId && rules.libraries?.skills?.find(s => s.id === e.definitionId)?.isVariable))
-        ).map(e => {
-            const libMatch = e.definitionId
-                ? ((rules.libraries?.skills?.find(s => s.id === e.definitionId)) || (rules.libraries?.mysticAbilities?.find(s => s.id === e.definitionId)))
-                : (rules.libraries?.skills?.find(s => (e.variant && normalizeString(s.name) === normalizeString(e.variant))))
-                || (rules.libraries?.mysticAbilities?.find(s => (e.variant && normalizeString(s.name) === normalizeString(e.variant))))
-                || (rules.libraries?.skills?.find(s => normalizeString(s.name) === normalizeString(e.name)))
-                || (rules.libraries?.mysticAbilities?.find(s => normalizeString(s.name) === normalizeString(e.name)));
-
-            if (libMatch) {
-                const finalDescription = libMatch.description || undefined;
-                return {
-                    ...e,
-                    definitionId: libMatch.id,
-                    description: finalDescription as string | undefined,
-                    mysticAbilityId: libMatch.mysticAbilityId || e.mysticAbilityId
-                };
-            }
-            return e;
-        });
+            ((e.value || 0) > 0 || e.variant !== undefined)
+        );
 
         newSkills[category] = [...syncedSkills, ...remainingSkills];
     });
 
-    const standardCats = [
-        'Col_Comp_1', 'Col_Comp_2', 'Col_Comp_3', 'Col_Comp_4',
-        'Col_Comp_5', 'Col_Comp_6', 'Col_Comp_7', 'Col_Comp_8', 'Col_Comp_9',
-        'competences', 'talents', 'connaissances', 'langues', 'arrieres_plans', 'counters'
-    ];
-    standardCats.forEach(cat => {
+    // Handle legacy categories not defined in ruleSkills but present in state
+    const allKnownCats = new Set([...Object.keys(ruleSkills), ...Object.keys(currentState.skills)]);
+    allKnownCats.forEach(cat => {
         if (!newSkills[cat]) {
-            newSkills[cat] = getSkillCategory(currentState, cat).map(e => {
-                if (!e) return e;
-                const libMatch = e.definitionId
-                    ? ((rules.libraries?.skills?.find(s => s.id === e.definitionId)) || (rules.libraries?.mysticAbilities?.find(s => s.id === e.definitionId)))
-                    : (rules.libraries?.skills?.find(s => s.name && e.variant && normalizeString(s.name) === normalizeString(e.variant)))
-                    || (rules.libraries?.mysticAbilities?.find(s => s.name && e.variant && normalizeString(s.name) === normalizeString(e.variant)))
-                    || (rules.libraries?.skills?.find(s => s.name && e.name && normalizeString(s.name) === normalizeString(e.name)))
-                    || (rules.libraries?.mysticAbilities?.find(s => s.name && e.name && normalizeString(s.name) === normalizeString(e.name)));
-
-                if (libMatch) {
-                    const finalDescription = libMatch.description || undefined;
-                    return {
-                        ...e,
-                        definitionId: libMatch.id,
-                        description: finalDescription as string | undefined,
-                        mysticAbilityId: libMatch.mysticAbilityId || e.mysticAbilityId
-                    };
-                }
-                return e;
-            });
+            newSkills[cat] = currentState.skills[cat] || [];
         }
     });
 
@@ -206,7 +100,6 @@ function processSkillCategories(
  * Phase 2: Backgrounds Logic & Deduping
  */
 function processBackgrounds(
-    newState: CharacterSheetData,
     currentState: CharacterSheetData,
     rules: RulesData,
     newSkills: Record<string, DotEntry[]>
@@ -217,109 +110,73 @@ function processBackgrounds(
 
     const ruleBackgrounds = Array.from(new Set([...definedInBackgrounds, ...definedInSkills]));
 
-    if (ruleBackgrounds && Array.isArray(ruleBackgrounds)) {
+    if (ruleBackgrounds && Array.isArray(ruleBackgrounds) && ruleBackgrounds.length > 0) {
+        // Find existing backgrounds in any category
         const allExistingSkills = Object.values(currentState.skills).flat() as DotEntry[];
-        const namesAddedToBgs = new Set<string>();
+        const consumedIds = new Set<string>();
 
         const syncedBgs: DotEntry[] = (ruleBackgrounds as string[]).flatMap(name => {
-            namesAddedToBgs.add(name);
-
             const libBg = rules.libraries?.backgrounds?.find(b => normalizeString(b.name) === normalizeString(name));
             const definitionId = libBg?.id;
-            const isVariable = libBg?.isVariable === true;
-            const description = libBg?.description || undefined;
 
             const matchingExisting = allExistingSkills.filter(e =>
-            (
-                (definitionId && e.definitionId === definitionId) ||
-                (!e.definitionId && normalizeString(e.name) === normalizeString(name))
-            )
+                !consumedIds.has(e.id) && (
+                    (definitionId && e.definitionId === definitionId) ||
+                    (!e.definitionId && normalizeString(e.name) === normalizeString(name))
+                )
             );
 
             if (matchingExisting.length > 0) {
-                return matchingExisting.map(existing => ({
-                    ...existing,
-                    name,
-                    definitionId,
-                    mysticAbilityId: (libBg?.mysticAbilityId || existing.mysticAbilityId) ?? undefined,
-                    max: 5,
-                    description: (libBg ? (libBg.description || undefined) : existing.description) as string | undefined
-                }));
+                return matchingExisting.map(existing => {
+                    consumedIds.add(existing.id);
+                    return {
+                        ...existing,
+                        name,
+                        definitionId
+                    };
+                });
             } else {
                 return [{
                     id: generateId(),
                     name,
-                    description,
                     value: 0,
                     creationValue: 0,
                     max: 5,
-                    variant: isVariable ? "" : undefined,
-                    definitionId,
-                    mysticAbilityId: libBg?.mysticAbilityId ?? undefined
+                    definitionId
                 }];
             }
         });
 
-        const remainingBgs = allExistingSkills.filter((e: DotEntry) => {
-            if (!e || !e.name || namesAddedToBgs.has(e.name)) return false;
-            if (e.definitionId && syncedBgs.some(s => (s as DotEntry).id === e.id)) return false;
-
-            const wasInBackgroundCat = Object.keys(currentState.skills).some(catId => {
+        // Keep remaining backgrounds that have value
+        const remainingBgs = allExistingSkills.filter(e => 
+            !consumedIds.has(e.id) && 
+            ((e.value || 0) > 0 || e.variant !== undefined) &&
+            // Check if it was in a background-like category
+            Object.keys(currentState.skills).some(catId => {
                 const catDef = rules.definitions.skillCategories?.find(c => c.id === catId);
-                const isBgCat = catDef?.behavior === 'Arrière-plan' || catId === 'Col_Comp_8' || catId === 'arrieres_plans';
-                return isBgCat && getSkillCategory(currentState, catId).some((s: DotEntry) => s && s.id === e.id);
-            });
-
-            if (wasInBackgroundCat && ((e.value || 0) > 0 || e.variant !== undefined)) {
-                namesAddedToBgs.add(e.name);
-                return true;
-            }
-            return false;
-        }).map(e => {
-            const libMatch = e.definitionId
-                ? rules.libraries?.backgrounds?.find(s => s.id === e.definitionId)
-                : rules.libraries?.backgrounds?.find(s => normalizeString(s.name) === normalizeString(e.name));
-
-            if (libMatch) {
-                const finalDescription = libMatch.description || undefined;
-                return {
-                    ...e,
-                    definitionId: libMatch.id,
-                    description: finalDescription as string | undefined,
-                    mysticAbilityId: (libMatch.mysticAbilityId || e.mysticAbilityId) ?? undefined
-                };
-            }
-            return e;
-        });
+                return (catDef?.behavior === 'Arrière-plan' || catId === 'arrieres_plans') && 
+                       currentState.skills[catId].some(s => s.id === e.id);
+            })
+        );
 
         newSkills[dynamicBgCat] = [...syncedBgs, ...remainingBgs];
-
-        const allBgIds = new Set([...syncedBgs, ...remainingBgs].map(s => (s as DotEntry).id));
-
+        
+        // Remove these from other categories to avoid duplicates
+        const allBgIds = new Set([...syncedBgs, ...remainingBgs].map(s => s.id));
         Object.keys(newSkills).forEach(catId => {
-            if (catId !== dynamicBgCat && Array.isArray(newSkills[catId])) {
-                newSkills[catId] = newSkills[catId].filter((s: DotEntry) =>
-                    !allBgIds.has(s.id)
-                );
+            if (catId !== dynamicBgCat) {
+                newSkills[catId] = newSkills[catId].filter(s => !allBgIds.has(s.id));
             }
         });
-
-        if (dynamicBgCat !== 'arrieres_plans' && newSkills['arrieres_plans']) {
-            newSkills['arrieres_plans'] = [];
-        }
     }
 }
 
 /**
- * Synchronizes skills and backgrounds with rule definitions.
- * Extracted from rulesReconciler.ts for better maintainability.
+ * Main entry point for skill reconciliation
  */
 export const reconcileSkillsAndBackgrounds = (newState: CharacterSheetData, currentState: CharacterSheetData, rules: RulesData) => {
-    const ruleSkills = rules.definitions.skills;
-    if (!ruleSkills) return;
-
-    const newSkills = processSkillCategories(newState, currentState, rules);
-    processBackgrounds(newState, currentState, rules, newSkills);
+    const newSkills = processSkillCategories(currentState, rules);
+    processBackgrounds(currentState, rules, newSkills);
 
     newState.skills = newSkills;
 };

@@ -101,17 +101,27 @@ export const CharacterSyncService = {
         mode: 'manual' | 'auto' = 'manual'
     ): Promise<SyncResult> {
         try {
-            // Step 0: Inject sync mode and strip redundant SQL fields from JSONB
-            const cleanSyncInfo = { ...data.syncInfo, syncMode: mode };
-            delete cleanSyncInfo.settingId;
-            delete cleanSyncInfo.lastSynced;
+            // Step 0: Clone data to avoid mutating the original state object
+            const dataToSync: CharacterSheetData = JSON.parse(JSON.stringify(data));
 
-            data.syncInfo = cleanSyncInfo;
+            // Step 1: Clean syncInfo from local-only or redundant fields
+            if (dataToSync.syncInfo) {
+                const cleanSyncInfo = { ...dataToSync.syncInfo, syncMode: mode };
+                
+                // Fields managed by SQL columns or local UI state - should NOT be in JSONB
+                delete cleanSyncInfo.settingId;
+                delete cleanSyncInfo.lastSynced;
+                delete cleanSyncInfo.mjMessage;
+                delete cleanSyncInfo.isDirty;
+                delete cleanSyncInfo.lastLocalEdit;
+                
+                dataToSync.syncInfo = cleanSyncInfo;
+            }
 
-            // Step 1: Exclude bookDocument from the main payload — stored in character_books
-            const { bookDocument, ...dataWithoutBook } = data;
+            // Step 2: Exclude bookDocument from the main payload — stored in character_books
+            const { bookDocument, ...dataWithoutBook } = dataToSync;
 
-            // Step 2: Resolve and compress images for portable sync
+            // Step 3: Resolve and compress images for portable sync
             const dataToStore = await ImageSyncResolver.resolveImagesForSync(dataWithoutBook as CharacterSheetData);
 
             const result = await DatabaseService.upsert<{ id: string }>(
@@ -134,7 +144,7 @@ export const CharacterSyncService = {
                 return { success: false, error: "Erreur de synchronisation (DatabaseService)." };
             }
 
-            // Step 3: Sync bookDocument separately if present
+            // Step 4: Sync bookDocument separately if present
             if (bookDocument?.content) {
                 await BookSyncService.saveBook(
                     result.id,
@@ -146,7 +156,7 @@ export const CharacterSyncService = {
             return {
                 success: true,
                 syncId: result.id,
-                hash: this.generateDataHash(data)
+                hash: this.generateDataHash(dataToSync)
             };
         } catch (e) {
             ErrorService.handleError(e, { context: 'CharacterSyncService.syncCharacter' });

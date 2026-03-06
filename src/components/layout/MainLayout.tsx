@@ -35,6 +35,7 @@ import CreationHUD from '../CreationHUD';
 const RulesSourceSelector = lazy(() => import('../RulesSourceSelector'));
 const CampaignConflictModal = lazy(() => import('../ui/CampaignConflictModal'));
 const SettingsView = lazy(() => import('../SettingsView'));
+import { SyncConflictModal } from '../sync/SyncConflictModal';
 import { Layers, FileType, List, TrendingUp, Book, Package, Clock, X, Trash2, UserPlus, PencilLine, Check, Sparkles } from 'lucide-react';
 import { useEditMode } from '../../hooks/sheet/useEditMode';
 import { useCreationMode } from '../../hooks/useCreationMode';
@@ -146,14 +147,46 @@ const MainLayout: React.FC = () => {
 
     // Bandeau de récréation MJ
     const [pendingMjUpdate, setPendingMjUpdate] = React.useState<{ data: Record<string, unknown>; message: string } | null>(null);
+    const [conflictData, setConflictData] = React.useState<CharacterSheetData | null>(null);
 
-    const handleRemoteCharacterUpdate = React.useCallback((newData: Record<string, unknown>) => {
-        const syncInfo = (newData as { syncInfo?: { mjMessage?: string } }).syncInfo;
-        const message = syncInfo?.mjMessage;
-        if (message) {
-            setPendingMjUpdate({ data: newData, message });
+    const handleRemoteCharacterUpdate = React.useCallback((remoteDataRaw: Record<string, unknown>) => {
+        const remoteData = remoteDataRaw as unknown as CharacterSheetData;
+        const remoteSyncInfo = remoteData.syncInfo;
+        const localSyncInfo = data?.syncInfo;
+
+        // 1. Check for MJ Message (Direct recreation proposal)
+        const message = remoteSyncInfo?.mjMessage;
+        // Only show banner if it's a NEW message we don't have locally yet
+        if (message && message !== data?.syncInfo?.mjMessage) {
+            setPendingMjUpdate({ data: remoteData as any, message });
+            return;
         }
-    }, []);
+
+        // 2. Automated Conflict Detection (Timestamps)
+        if (remoteSyncInfo?.lastSynced && localSyncInfo?.lastLocalEdit) {
+            // If local edit happened AFTER the last time we were in sync with server,
+            // and the server version is DIFFERENT from our base, it's a conflict.
+            const hasLocalChanges = localSyncInfo.isDirty || (localSyncInfo.lastLocalEdit > (localSyncInfo.lastSynced || 0));
+            
+            if (hasLocalChanges && remoteSyncInfo.lastSynced !== localSyncInfo.lastSynced) {
+                logger.warn("[Conflict] Remote update received but local changes exist. Blocking auto-overwrite.");
+                setConflictData(remoteData);
+                return;
+            }
+        }
+
+        // 3. No conflict or forced update: Apply remote data
+        // Only apply if it's actually newer or we are "clean"
+        setData(remoteData, true); // true = isSyncAction (don't mark as dirty)
+        addLog("Fiche mise à jour par le serveur.", "info", "sheet", "remote-sync-silent");
+
+    }, [data, setData, addLog]);
+
+    const handleResolveConflict = (finalData: CharacterSheetData) => {
+        setData(finalData, true);
+        setConflictData(null);
+        addLog("Conflit résolu.", "success", "sheet");
+    };
 
     // Notifications temps réel : admin → joueur
     useRealtimeSync({
@@ -330,8 +363,9 @@ const MainLayout: React.FC = () => {
                     onOpenSync={() => setShowSync(true)}
                     syncStatus={
                         isSyncing ? 'pending' :
-                            (hasUpdate || pendingMjUpdate) ? 'update-available' :
-                                data.syncInfo ? 'synced' : 'none'
+                            (hasUpdate || !!pendingMjUpdate) ? 'update-available' :
+                                data.syncInfo?.isDirty ? 'pending' :
+                                    data.syncInfo?.syncId ? 'synced' : 'none'
                     }
                     appVersion={APP_VERSION}
                     onShowCampaignInfo={() => setShowCampaignInfo(true)}
@@ -537,6 +571,14 @@ const MainLayout: React.FC = () => {
                     />
 
                     {data.creationConfig?.active && (<CreationHUD />)}
+
+                    <SyncConflictModal
+                        isOpen={!!conflictData}
+                        localData={data}
+                        remoteData={conflictData as CharacterSheetData}
+                        onResolve={handleResolveConflict}
+                        onCancel={() => setConflictData(null)}
+                    />
                 </div>
             </div>
         </NotificationProvider>

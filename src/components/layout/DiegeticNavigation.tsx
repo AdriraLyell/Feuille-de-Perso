@@ -52,6 +52,29 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
+    const [isOnline, setIsOnline] = React.useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+    React.useEffect(() => {
+        const hO = () => setIsOnline(true);
+        const hF = () => setIsOnline(false);
+        window.addEventListener('online', hO);
+        window.addEventListener('offline', hF);
+        return () => {
+            window.removeEventListener('online', hO);
+            window.removeEventListener('offline', hF);
+        };
+    }, []);
+
+    const getSyncConfig = () => {
+        if (!isOnline) return { color: 'text-red-500 border-red-900/50 bg-red-900/10', tooltip: 'Mode Hors-ligne - Les modifications sont enregistrées localement uniquement' };
+        if (isSyncing) return { color: 'text-blue-400 border-blue-900/50 bg-blue-900/10', tooltip: 'Synchronisation en cours...' };
+        if (syncStatus === 'update-available') return { color: 'text-amber-400 border-amber-500 bg-amber-900/20', tooltip: 'Mise à jour disponible ! Le MJ a modifié votre fiche.' };
+        if (data.syncInfo?.isDirty) return { color: 'text-amber-500/80 border-amber-900/30 bg-amber-900/10', tooltip: 'Modifications locales en attente d\'envoi' };
+        if (data.syncInfo?.syncId) return { color: 'text-emerald-500 border-emerald-900/50 bg-emerald-900/10', tooltip: 'Connecté - Fiche à jour sur le Cloud' };
+        return { color: 'text-gray-400 border-gray-700 bg-gray-800/50', tooltip: 'Synchronisation non configurée' };
+    };
+
+    const syncConfig = getSyncConfig();
+
     const menuItems = [
         { label: 'Thème', icon: <Palette size={18} />, onClick: onOpenAppearance },
         {
@@ -298,12 +321,8 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
 
                         <button
                             onClick={onOpenSync}
-                            className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-sm font-bold border relative ${syncStatus === 'synced'
-                                ? 'bg-green-700/20 text-green-500 border-green-700/50'
-                                : syncStatus === 'update-available'
-                                    ? 'bg-amber-700/30 text-amber-400 border-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.2)] animate-pulse'
-                                    : 'bg-purple-700/20 text-purple-400 border-purple-700/50'
-                                }`}
+                            title={syncConfig.tooltip}
+                            className={`px-3 py-1.5 rounded-lg flex items-center gap-2 transition text-sm font-bold border relative ${syncConfig.color} ${syncStatus === 'update-available' ? 'shadow-[0_0_10px_rgba(245,158,11,0.2)] animate-pulse' : ''}`}
                         >
                             <UploadCloud size={18} className={isSyncing ? "animate-spin-slow" : ""} />
                             <span className="hidden lg:inline">Sync</span>

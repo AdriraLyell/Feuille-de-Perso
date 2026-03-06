@@ -196,14 +196,5 @@
             "Tooltip : refonte du container en 2 colonnes pour une meilleure lisibilité quand il y a beaucoup d'éléments.",
             "Tooltip : agrandissement général de la police des infobulles."
         ]
-    },
-    {
-        "version": "2.97.21",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Tooltip : Correction du lien avec les calculs globaux pour les compteurs perso (récupération forcée des métadonnées de formule).",
-            "Moteur : Normalisation des clés de recherche (suppression d'espaces) pour correspondre aux définitions système."
-        ]
     }
 ]

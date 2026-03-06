@@ -26,7 +26,7 @@ interface Props {
 }
 
 const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
-    const { data, updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacter();
+    const { data, resolvedData, updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacter();
     const { rules } = useRules();
 
     // Wizards States
@@ -183,8 +183,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
 
     const calculateTotal = (list: TraitEntry[]) => list.reduce((acc, item) => acc + (parseInt(item.value) || 0), 0);
 
-    const avantagesTotal = useMemo(() => calculateTotal(data.page2.avantages), [data.page2.avantages]);
-    const desavantagesTotal = useMemo(() => calculateTotal(data.page2.desavantages), [data.page2.desavantages]);
+    const avantagesTotal = useMemo(() => calculateTotal(resolvedData.page2.avantages), [resolvedData.page2.avantages]);
+    const desavantagesTotal = useMemo(() => calculateTotal(resolvedData.page2.desavantages), [resolvedData.page2.desavantages]);
 
     const handleImageLog = React.useCallback((msg: string, type: 'success' | 'danger') => {
         onAddLog(msg, type, 'sheet');
@@ -223,7 +223,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     <div className="grid grid-cols-4 h-[65%] overflow-hidden">
                         <TraitsColumn
                             title="Avantages"
-                            traits={data.page2.avantages}
+                            traits={resolvedData.page2.avantages}
                             type="avantages"
                             total={avantagesTotal}
                             totalColor="text-green-700 bg-green-50 border-green-200"
@@ -237,7 +237,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                         />
                         <TraitsColumn
                             title="Désavantages"
-                            traits={data.page2.desavantages}
+                            traits={resolvedData.page2.desavantages}
                             type="desavantages"
                             total={desavantagesTotal}
                             totalColor="text-red-700 bg-red-50 border-red-200"
@@ -275,7 +275,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                             <div className="grid grid-cols-2 flex-grow overflow-hidden min-h-0">
                                 <TraitsColumn
                                     title="Avantages"
-                                    traits={data.page2.avantages}
+                                    traits={resolvedData.page2.avantages}
                                     type="avantages"
                                     total={avantagesTotal}
                                     totalColor="text-green-700 bg-green-50 border-green-200"
@@ -289,7 +289,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                                 />
                                 <TraitsColumn
                                     title="Désavantages"
-                                    traits={data.page2.desavantages}
+                                    traits={resolvedData.page2.desavantages}
                                     type="desavantages"
                                     total={desavantagesTotal}
                                     totalColor="text-red-700 bg-red-50 border-red-200"
@@ -309,6 +309,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     </div>
                 </div>
             )}
+
 
             {/* Modals */}
             {editingTrait && (

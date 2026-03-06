@@ -294,32 +294,32 @@ describe('Data Migrations - migrateData', () => {
         it('should rename vertu type to avantage', () => {
             const result = migrateData(clone(LEGACY_V1_LIBRARY_TYPES));
 
-            expect(result.library[0].type).toBe('avantage');
+            expect(result.library![0].type).toBe('avantage');
         });
 
         it('should rename defaut type to desavantage', () => {
             const result = migrateData(clone(LEGACY_V1_LIBRARY_TYPES));
 
-            expect(result.library[1].type).toBe('desavantage');
+            expect(result.library![1].type).toBe('desavantage');
         });
 
         it('should ensure tags array exists', () => {
             const result = migrateData(clone(LEGACY_V1_LIBRARY_TYPES));
 
-            expect(Array.isArray(result.library[0].tags)).toBe(true);
+            expect(Array.isArray(result.library![0].tags)).toBe(true);
         });
 
         it('should ensure effects array exists', () => {
             const result = migrateData(clone(LEGACY_V1_LIBRARY_TYPES));
 
-            expect(Array.isArray(result.library[0].effects)).toBe(true);
+            expect(Array.isArray(result.library![0].effects)).toBe(true);
         });
 
         it('should fix skilllibrary typo', () => {
             const result = migrateData(clone(LEGACY_V1_TYPO_SKILLLIBRARY));
 
             expect(result.skillLibrary).toBeDefined();
-            expect(result.skillLibrary.some((s: any) => s.name === 'Acrobatie')).toBe(true);
+            expect(result.skillLibrary!.some((s: any) => s.name === 'Acrobatie')).toBe(true);
             // @ts-expect-error -- testing that typo key is removed
             expect(result.skilllibrary).toBeUndefined();
         });

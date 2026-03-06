@@ -134,6 +134,13 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
                             </div>
                         )}
 
+                        {item.customNotes && (
+                            <div className="text-xs text-amber-200/80 leading-relaxed whitespace-pre-wrap p-2 bg-amber-900/20 rounded border border-amber-900/30">
+                                <span className="text-[9px] uppercase font-bold text-amber-500/80 block mb-0.5">Note personnelle</span>
+                                {item.customNotes}
+                            </div>
+                        )}
+
                         {mysticCapacity && (
                             <div className="mt-3 bg-purple-900/30 border border-purple-500/20 rounded-md p-2">
                                 <div className="text-[10px] uppercase font-bold text-purple-300 mb-1 flex items-center gap-1">

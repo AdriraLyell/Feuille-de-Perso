@@ -10,7 +10,7 @@ import ExperienceSummary from './sheet/ExperienceSummary';
 import CharacterSheetGrid from './sheet/CharacterSheetGrid';
 
 // Hooks
-import { useCharacterData, useCharacterActions, useCharacterState } from '../context/CharacterContext';
+import { useCharacterData, useCharacterActions, useCharacterState, useResolvedData } from '../context/CharacterContext';
 import { useCharacterSheetActions } from '../hooks/useCharacterSheetActions';
 import { useCharacterBonuses } from '../hooks/useCharacterBonuses';
 import { useSheetLayout } from '../hooks/useSheetLayout';
@@ -28,11 +28,13 @@ interface Props {
 
 const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode, onToggleCreationMode }) => {
     const data = useCharacterData();
+    const resolvedData = useResolvedData();
+    
     const dataRef = React.useRef(data);
     React.useEffect(() => { dataRef.current = data; }, [data]);
 
     const { updateData: onChange, addLog: onAddLog, recordXPTransaction, setEditLayoutMode, clearLayout, autoFitLayout } = useCharacterActions();
-    const { isEditMode, editLayoutMode } = useCharacterState();
+    const { isSyncing, isEditMode, editLayoutMode } = useCharacterState();
     const layoutJustReset = React.useRef(false);
     // Use a ref so handleLayoutChange can read editLayoutMode without depending on it
     const editLayoutModeRef = React.useRef(editLayoutMode);
@@ -58,9 +60,9 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
 
     // --- Hooks logic ---
     const { attributeBonuses, blockedSkills, counterCreationBonuses, counterXPBonuses, calculatedMaxes, activeReserves } = useCharacterBonuses(
-        data.page2.avantages,
-        data.page2.desavantages,
-        data.library,
+        resolvedData.page2.avantages,
+        resolvedData.page2.desavantages,
+        resolvedData.library,
         rules?.libraries?.traits || []
     );
 
@@ -85,7 +87,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
         getAttributesGridClass,
         portraitLayout,
         landscapeLayout
-    } = useSheetLayout(data, rules);
+    } = useSheetLayout(resolvedData, rules);
 
     // --- CharacterSheet Logic handlers (now managed by useCharacterSheetActions) ---
 
@@ -125,6 +127,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
 
         return { allowed: true };
     }, [rules, creationActive, blockedSkills]);
+
 
 
     const handleLayoutChange = useCallback((_currentLayout: unknown, allLayouts: LayoutConfig) => {

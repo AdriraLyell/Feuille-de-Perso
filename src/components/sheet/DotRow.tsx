@@ -210,12 +210,25 @@ export const DotRow: React.FC<DotRowProps> = ({
 
             {/* Tooltip pour la description (Hover) */}
             <PortalTooltip
-                isOpen={isHovered && !!entry.description && !isOpen && !isDraggable}
+                isOpen={isHovered && (!!entry.description || !!entry.customNotes) && !isOpen && !isDraggable}
                 anchorRef={anchorRef}
                 maxWidth={300}
             >
-                <div className="italic text-[11px] text-stone-200 leading-relaxed whitespace-pre-wrap">
-                    {entry.description}
+                <div className="flex flex-col gap-2">
+                    {entry.description && (
+                        <div className="italic text-[11px] text-stone-200 leading-relaxed whitespace-pre-wrap">
+                            {entry.description}
+                        </div>
+                    )}
+                    {entry.description && entry.customNotes && (
+                        <div className="border-t border-stone-600/50 pt-1" />
+                    )}
+                    {entry.customNotes && (
+                        <div className="text-[11px] text-amber-200/90 leading-relaxed whitespace-pre-wrap">
+                            <span className="text-[9px] uppercase font-bold text-amber-500/80 block mb-0.5">Note personnelle</span>
+                            {entry.customNotes}
+                        </div>
+                    )}
                 </div>
             </PortalTooltip>
 
@@ -225,11 +238,19 @@ export const DotRow: React.FC<DotRowProps> = ({
                 title={`${entry.name}${entry.variant ? ` : ${entry.variant}` : ''}`}
                 maxWidth={400}
             >
-                {entry.description && (
-                    <div className="text-[11px] text-stone-300 italic mb-3 pb-2 border-b border-slate-700/50 leading-relaxed whitespace-pre-wrap">
-                        {entry.description}
-                    </div>
-                )}
+                <div className="flex flex-col gap-3 mb-3 pb-2 border-b border-slate-700/50">
+                    {entry.description && (
+                        <div className="text-[11px] text-stone-300 italic leading-relaxed whitespace-pre-wrap">
+                            {entry.description}
+                        </div>
+                    )}
+                    {entry.customNotes && (
+                        <div className="text-[11px] text-amber-200/80 leading-relaxed whitespace-pre-wrap p-2 bg-amber-900/20 rounded border border-amber-900/30">
+                            <span className="text-[9px] uppercase font-bold text-amber-500/80 block mb-0.5">Note personnelle</span>
+                            {entry.customNotes}
+                        </div>
+                    )}
+                </div>
                 <div className="flex flex-col gap-1 w-full min-w-[220px] py-1">
                     <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-2 font-bold px-1">Spécialisations</div>
                     <div className={combinedValidSpecs.length > 5 ? "columns-2 gap-x-8" : "flex flex-col"}>

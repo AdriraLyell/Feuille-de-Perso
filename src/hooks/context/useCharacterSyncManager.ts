@@ -13,13 +13,13 @@ interface UseCharacterSyncManagerResult {
 
 export const useCharacterSyncManager = (
   data: CharacterSheetData,
-  setData: React.Dispatch<React.SetStateAction<CharacterSheetData>>
+  updateData: (newData: CharacterSheetData | ((prev: CharacterSheetData) => CharacterSheetData), isSyncAction?: boolean) => void
 ): UseCharacterSyncManagerResult => {
   const [isSyncing, setIsSyncing] = useState(false);
 
   // Add log function
   const addLog = useCallback((message: string, type: 'success' | 'danger' | 'info' = 'info', category: 'sheet' | 'settings' | 'both' = 'sheet', deduplicationId?: string) => {
-    setData(prev => {
+    updateData(prev => {
       const logs = prev.appLogs || [];
       const lastLog = logs[0];
 
@@ -42,12 +42,12 @@ export const useCharacterSyncManager = (
       };
 
       return { ...prev, appLogs: [newLog, ...logs].slice(0, 50) };
-    });
-  }, [setData]);
+    }, true); // Adding a log shouldn't mark the whole data as "dirty" for sync
+  }, [updateData]);
 
   // Record XP transaction function
   const recordXPTransaction = useCallback((transaction: Omit<XPTransaction, 'id' | 'timestamp'>) => {
-    setData(prev => {
+    updateData(prev => {
       const newTransaction: XPTransaction = {
         ...transaction,
         id: Math.random().toString(36).substring(2, 11),
@@ -58,7 +58,7 @@ export const useCharacterSyncManager = (
         xpTransactions: [newTransaction, ...(prev.xpTransactions || [])]
       };
     });
-  }, [setData]);
+  }, [updateData]);
 
   // Sync function
   const sync = useCallback(async (mode: 'manual' | 'auto' = 'manual') => {
@@ -96,7 +96,7 @@ export const useCharacterSyncManager = (
         // Fetch the book from character_books to stay in sync with server
         const remoteBook = await BookSyncService.getBook(result.syncId);
 
-        setData(prev => {
+        updateData(prev => {
           if (prev.syncInfo?.syncId === syncInfo.syncId) {
             return {
               ...prev,
@@ -104,7 +104,8 @@ export const useCharacterSyncManager = (
                 ...prev.syncInfo,
                 lastSynced: Date.now(),
                 lastSyncedHash: newHash,
-                syncMode: mode
+                syncMode: mode,
+                isDirty: false // Reset dirty flag after successful sync
               },
               // Inject remote book if available (keeps local in sync with server)
               ...(remoteBook ? {
@@ -119,7 +120,7 @@ export const useCharacterSyncManager = (
             };
           }
           return prev;
-        });
+        }, true); // Mark as sync action to avoid re-triggering dirty flag
 
         if (mode === 'manual') {
           addLog("Synchronisation réussie", 'success', 'settings', 'sync-success');
@@ -140,7 +141,7 @@ export const useCharacterSyncManager = (
     } finally {
       setIsSyncing(false);
     }
-  }, [data, addLog, setData]);
+  }, [data, addLog, updateData]);
 
   return useMemo(() => ({
     isSyncing,

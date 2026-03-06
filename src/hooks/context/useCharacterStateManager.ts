@@ -25,7 +25,7 @@ interface UseCharacterStateManagerResult {
 
 export const useCharacterStateManager = (
   data: CharacterSheetData,
-  setData: React.Dispatch<React.SetStateAction<CharacterSheetData>>
+  updateData: (newData: CharacterSheetData | ((prev: CharacterSheetData) => CharacterSheetData), isSyncAction?: boolean) => void
 ): UseCharacterStateManagerResult => {
   const { rules } = useRules();
   const [isEditMode, setIsEditMode] = useState(false);
@@ -37,8 +37,8 @@ export const useCharacterStateManager = (
     // Apply rules if available
     const newState = rules ? applyRulesToState(base, rules) : base;
 
-    setData(newState);
-  }, [rules, setData]);
+    updateData(newState);
+  }, [rules, updateData]);
 
   const importData = useCallback((newData: CharacterSheetData) => {
     try {
@@ -61,11 +61,11 @@ export const useCharacterStateManager = (
         }
       }
 
-      setData(finalData);
+      updateData(finalData);
     } catch (e) {
       ErrorService.handleError(e, { context: 'CharacterContext.Import', userMessage: "Le fichier importé est invalide." });
     }
-  }, [rules, setData]);
+  }, [rules, updateData]);
 
   // Save to localStorage effect
   useEffect(() => {
@@ -87,79 +87,42 @@ export const useCharacterStateManager = (
     localStorage.setItem('rpg-sheet-data', JSON.stringify(dataWithSettings));
   }, [data]);
 
-  // Auto-Update Effect (Smart Re-Hydration)
-  // IMPORTANT: We serialize library deps to strings to prevent infinite loops.
-  // Without this, reconciliation deep-clones data (new object refs) → XP effect fires (deps changed)
-  // → XP updates experience → new data object → reconciliation deps see new refs → loop.
-  const specLibJson = JSON.stringify(data.specializationLibrary ?? []);
-  const skillLibJson = JSON.stringify(data.skillLibrary ?? []);
-  const traitLibJson = JSON.stringify(data.library ?? []);
-
+  // Rules Update Effect
   useEffect(() => {
     if (!rules) return;
 
-    // Optimized Reconciliation:
-    // Reconcile if either the version ID or the last updated timestamp has changed.
-    if (data._rulesVersion === rules.version &&
-      data._rulesLastUpdated === rules.lastUpdated &&
-      data.appVersion === APP_VERSION &&
-      specLibJson === localStorage.getItem('last-spec-lib-sync') &&
-      skillLibJson === localStorage.getItem('last-skill-lib-sync') &&
-      traitLibJson === localStorage.getItem('last-trait-lib-sync')
-    ) {
+    // We only need to trigger a light reconciliation if the rules version has changed.
+    // This is mostly to handle removal of items (orphans) or configuration shifts.
+    if (data._rulesVersion === rules.version && data._rulesLastUpdated === rules.lastUpdated) {
       return;
     }
 
-    setData(currentData => {
-      if (currentData._rulesVersion === rules.version &&
-        currentData._rulesLastUpdated === rules.lastUpdated &&
-        JSON.stringify(currentData.specializationLibrary) === localStorage.getItem('last-spec-lib-sync') &&
-        JSON.stringify(currentData.skillLibrary) === localStorage.getItem('last-skill-lib-sync') &&
-        JSON.stringify(currentData.library) === localStorage.getItem('last-trait-lib-sync')
-      ) {
-        return currentData;
-      }
-
+    updateData(currentData => {
       try {
-        const skillsBefore = Object.values(currentData.skills).flat().filter(s => s.name).length;
-        logger.log(`[CharacterContext] Reconciling with rules v${rules.version} (last updated: ${rules.lastUpdated}). Skills before: ${skillsBefore}`);
-
+        logger.log(`[CharacterContext] Light reconciliation with rules v${rules.version}`);
         const newData = reconcileRulesWithState(currentData, rules);
         newData._rulesLastUpdated = rules.lastUpdated;
-
-        // Update sync markers
-        localStorage.setItem('last-spec-lib-sync', JSON.stringify(newData.specializationLibrary || []));
-        localStorage.setItem('last-skill-lib-sync', JSON.stringify(newData.skillLibrary || []));
-        localStorage.setItem('last-trait-lib-sync', JSON.stringify(newData.library || []));
-
-        const skillsAfter = Object.values(newData.skills).flat().filter(s => s.name).length;
-        logger.log(`[CharacterContext] Reconciliation complete. Skills after: ${skillsAfter}`);
-
-        if (skillsAfter < skillsBefore && skillsBefore > 0) {
-          logger.warn(`[CharacterContext] Skills count dropped from ${skillsBefore} to ${skillsAfter}! Check rules for missing definitions.`);
-        }
-
         return newData;
       } catch (e) {
-        ErrorService.handleError(e, { context: 'CharacterContext.Reconciliation', userMessage: "Erreur critique lors de la mise à jour des règles." });
-        return currentData; // Prevent crash, keep old data
+        ErrorService.handleError(e, { context: 'CharacterContext.Reconciliation', userMessage: "Erreur lors de la mise à jour des règles." });
+        return currentData;
       }
-    });
+    }, true);
 
-  }, [rules, data._rulesVersion, specLibJson, skillLibJson, traitLibJson]);
+  }, [rules, data._rulesVersion, updateData]);
 
   const clearLayout = useCallback((portrait: SheetLayout, landscape: SheetLayout) => {
-    setData(prev => ({
+    updateData(prev => ({
       ...prev,
       activeLayout: {
         lg: generateDefaultLayout(landscape, true),
         sm: generateDefaultLayout(portrait, false)
       }
     }));
-  }, [setData]);
+  }, [updateData]);
 
   const autoFitLayout = useCallback((colCount: number, availableHeightRows: number) => {
-    setData(prev => {
+    updateData(prev => {
       const isLandscape = colCount === 5;
       const currentLayout = isLandscape ? [...(prev.activeLayout?.lg || [])] : [...(prev.activeLayout?.sm || [])];
 
@@ -253,7 +216,7 @@ export const useCharacterStateManager = (
           : { ...prev.activeLayout, sm: newLayout }
       };
     });
-  }, [setData]);
+  }, [updateData]);
 
   return {
     isEditMode,

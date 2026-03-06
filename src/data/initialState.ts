@@ -172,7 +172,9 @@ export const getInitialCharacterData = (): CharacterSheetData => {
       fictionCurrentDate: '',
     },
     syncInfo: {
-      isAutoSyncEnabled: false
+      isAutoSyncEnabled: false,
+      lastLocalEdit: Date.now(),
+      isDirty: false
     },
     experience: { gain: '0', spent: '0', rest: '0' },
     // Default Attributes Configuration

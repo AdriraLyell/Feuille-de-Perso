@@ -4,21 +4,24 @@ import { SheetLayout } from '../hooks/useSheetLayout';
 import { useCharacterStateManager } from '../hooks/context/useCharacterStateManager';
 import { useCharacterSyncManager } from '../hooks/context/useCharacterSyncManager';
 import { useCharacterImageMigration } from '../hooks/context/useCharacterImageMigration';
+import { useResolvedCharacter } from '../hooks/context/useResolvedCharacter';
 import { useRules } from './RulesContext';
 import { calculateExperienceResults } from '../utils/mechanics';
 import { loadInitialCharacterData } from '../utils/characterInit';
+import { logger } from '../utils/logger';
 
 // --- Context Definitions ---
 
 interface CharacterStateContextType {
     data: CharacterSheetData;
+    resolvedData: CharacterSheetData; // New: resolved data with rules applied for UI
     isSyncing: boolean;
     isEditMode: boolean;
     editLayoutMode: boolean;
 }
 
 interface CharacterActionsContextType {
-    updateData: (newData: CharacterSheetData | ((prev: CharacterSheetData) => CharacterSheetData)) => void;
+    updateData: (newData: CharacterSheetData | ((prev: CharacterSheetData) => CharacterSheetData), isSyncAction?: boolean) => void;
     addLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', deduplicationId?: string) => void;
     resetData: () => void;
     importData: (newData: CharacterSheetData) => void;
@@ -47,6 +50,13 @@ export const useCharacterState = () => {
     return context;
 };
 
+/**
+ * Hook for UI components to access resolved data (with official names/descriptions).
+ */
+export const useResolvedData = () => {
+    return useCharacterState().resolvedData;
+};
+
 export const useCharacterData = () => {
     return useCharacterState().data;
 };
@@ -68,16 +78,17 @@ export const useCharacterActions = () => {
  * Regroupe données et actions.
  */
 export const useCharacter = () => {
-    const { data, isSyncing, isEditMode, editLayoutMode } = useCharacterState();
+    const { data, resolvedData, isSyncing, isEditMode, editLayoutMode } = useCharacterState();
     const actions = useCharacterActions();
 
     return useMemo(() => ({
         data,
+        resolvedData,
         isSyncing,
         isEditMode,
         editLayoutMode,
         ...actions
-    }), [data, isSyncing, isEditMode, editLayoutMode, actions]);
+    }), [data, resolvedData, isSyncing, isEditMode, editLayoutMode, actions]);
 };
 
 // --- Provider ---
@@ -92,13 +103,39 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
     // 1. Initialize State
     const [data, setData] = useState<CharacterSheetData>(loadInitialCharacterData);
 
-    // 2. Use the refactored logic hooks
-    const { resetData, importData, isEditMode, setEditMode, clearLayout, autoFitLayout } = useCharacterStateManager(data, setData);
+    // 2. Runtime Resolution Hook (The "Brain")
+    const resolvedData = useResolvedCharacter(data, rules);
+
+    /**
+     * Centralized update function that manages dirty flags and local timestamps.
+     * @param isSyncAction If true, the update won't mark the data as dirty (e.g., successful sync from server).
+     */
+    const updateData = useCallback((newData: CharacterSheetData | ((prev: CharacterSheetData) => CharacterSheetData), isSyncAction = false) => {
+        setData(prev => {
+            const next = typeof newData === 'function' ? newData(prev) : newData;
+            
+            // If it's a regular user edit, mark as dirty and update timestamp
+            if (!isSyncAction) {
+                return {
+                    ...next,
+                    syncInfo: {
+                        ...next.syncInfo,
+                        lastLocalEdit: Date.now(),
+                        isDirty: true
+                    }
+                };
+            }
+            return next;
+        });
+    }, []);
+
+    // 3. Use the refactored logic hooks
+    const { resetData, importData, isEditMode, setEditMode, clearLayout, autoFitLayout } = useCharacterStateManager(data, updateData);
     const [editLayoutMode, setEditLayoutMode] = useState(false);
-    const { isSyncing, addLog, recordXPTransaction, sync } = useCharacterSyncManager(data, setData);
+    const { isSyncing, addLog, recordXPTransaction, sync } = useCharacterSyncManager(data, updateData);
 
     // Run image migration effect
-    useCharacterImageMigration(data, setData);
+    useCharacterImageMigration(data, updateData);
 
     // XP Calculation Effect (Remains here as it depends on data and changes data)
     useEffect(() => {
@@ -109,7 +146,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
             data.experience.gain !== newExpState.gain ||
             data.experience.gainTooltip !== newExpState.gainTooltip) {
 
-            setData(prev => ({
+            updateData(prev => ({
                 ...prev,
                 experience: {
                     ...prev.experience,
@@ -118,7 +155,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
                     spent: newExpState.spent,
                     rest: newExpState.rest
                 }
-            }));
+            }), true); // XP calc is an internal update, doesn't necessarily mean "dirty" if just re-calculated
         }
     }, [
         data.skills,
@@ -133,15 +170,54 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
         data.counters,
         data.xpCosts,
         data.creationConfig,
-        rules
+        rules,
+        updateData
     ]);
 
-    const updateData = useCallback((newData: CharacterSheetData | ((prev: CharacterSheetData) => CharacterSheetData)) => {
-        setData(newData);
-    }, []);
+    // --- Phase 3: Automatic Sync Effect (Push-on-Connect & Safety Interval) ---
+    useEffect(() => {
+        if (!data.syncInfo?.syncId || isSyncing) return;
+
+        const isDirty = data.syncInfo?.isDirty;
+        const isAutoSync = data.syncInfo?.isAutoSyncEnabled;
+        const lastSynced = data.syncInfo?.lastSynced || 0;
+        const thirtyMinutes = 30 * 60 * 1000;
+
+        const handleSyncTrigger = (mode: 'auto' | 'manual') => {
+            if (navigator.onLine) {
+                sync(mode);
+            }
+        };
+
+        // 1. Immediate "Push-on-Connect" (only if AutoSync is ON)
+        if (isDirty && isAutoSync) {
+            const timeout = setTimeout(() => handleSyncTrigger('auto'), 2000);
+            window.addEventListener('online', () => handleSyncTrigger('auto'));
+            return () => {
+                clearTimeout(timeout);
+                window.removeEventListener('online', () => handleSyncTrigger('auto'));
+            };
+        }
+
+        // 2. Periodic "Safety Sync" (if AutoSync is OFF but data is dirty)
+        if (isDirty && !isAutoSync) {
+            const checkSafetySync = () => {
+                const now = Date.now();
+                if (now - lastSynced > thirtyMinutes) {
+                    logger.log("[SafetySync] 30 minutes passed since last sync. Triggering background save.");
+                    handleSyncTrigger('auto');
+                }
+            };
+
+            // Check every minute if it's time to do the safety sync
+            const interval = setInterval(checkSafetySync, 60000); 
+            return () => clearInterval(interval);
+        }
+
+    }, [data.syncInfo?.isDirty, data.syncInfo?.isAutoSyncEnabled, data.syncInfo?.lastSynced, data.syncInfo?.syncId, isSyncing, sync]);
 
     // Providers Wrapper
-    const stateValue = useMemo(() => ({ data, isSyncing, isEditMode, editLayoutMode }), [data, isSyncing, isEditMode, editLayoutMode]);
+    const stateValue = useMemo(() => ({ data, resolvedData, isSyncing, isEditMode, editLayoutMode }), [data, resolvedData, isSyncing, isEditMode, editLayoutMode]);
     const actionsValue = useMemo(() => ({
         updateData,
         addLog,

@@ -21,9 +21,6 @@ export const reconcileCounters = (newState: CharacterSheetData, currentState: Ch
         const existingRaw = currentState.counters[key];
         const existing = Array.isArray(existingRaw) ? existingRaw[0] : (existingRaw as DotEntry | undefined);
 
-        const libCounter = rules.libraries?.counters?.find(c => normalizeString(c.name) === normalizeString(def.name) || c.id === key);
-        const description = def.description || libCounter?.description || '';
-
         const defaultValue = def.defaultValue !== undefined ? def.defaultValue : (def.value || 3);
         const max = def.max || 10;
 
@@ -35,7 +32,6 @@ export const reconcileCounters = (newState: CharacterSheetData, currentState: Ch
                 ...existing,
                 name: def.name,
                 max,
-                description: description || existing.description || '',
                 value,
                 creationValue
             };
@@ -43,7 +39,6 @@ export const reconcileCounters = (newState: CharacterSheetData, currentState: Ch
             newCounters[key] = {
                 id: key,
                 name: def.name,
-                description,
                 value,
                 creationValue,
                 max,
