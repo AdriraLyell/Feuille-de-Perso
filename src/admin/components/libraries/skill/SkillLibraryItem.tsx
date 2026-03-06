@@ -62,11 +62,15 @@ export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
                         </div>
                     )}
                     {skill.isVariable && (
-                        <div
+                        <span
                             ref={anchorRef}
-                            className="relative"
+                            className="relative outline-none focus:ring-1 focus:ring-blue-500 rounded-sm"
                             onMouseEnter={() => setShowVariantsTooltip(true)}
                             onMouseLeave={() => setShowVariantsTooltip(false)}
+                            onFocus={() => setShowVariantsTooltip(true)}
+                            onBlur={() => setShowVariantsTooltip(false)}
+                            role="button"
+                            tabIndex={0}
                             title={!hasVariants ? "Compétence à variantes" : undefined}
                         >
                             <Layers
@@ -87,7 +91,7 @@ export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
                                     </div>
                                 </PortalTooltip>
                             )}
-                        </div>
+                        </span>
                     )}
                     {skill.mysticAbilityId && (
                         <div title="Compétence Mystique">
@@ -95,7 +99,7 @@ export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
                         </div>
                     )}
                     {isLocked && (
-                        <div
+                        <span
                             ref={lockIconRef}
                             onMouseEnter={() => {
                                 if (isLocked && !isPlaced && !skill.isCustomized && onLoadUsageDetails) {
@@ -104,7 +108,16 @@ export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
                                 setShowLockTooltip(true);
                             }}
                             onMouseLeave={() => setShowLockTooltip(false)}
-                            className="relative flex items-center shrink-0"
+                            onFocus={() => {
+                                if (isLocked && !isPlaced && !skill.isCustomized && onLoadUsageDetails) {
+                                    onLoadUsageDetails(skill.id);
+                                }
+                                setShowLockTooltip(true);
+                            }}
+                            onBlur={() => setShowLockTooltip(false)}
+                            role="button"
+                            tabIndex={0}
+                            className="relative flex items-center shrink-0 outline-none focus:ring-1 focus:ring-amber-500 rounded-sm"
                             title={isPlaced ? "Utilisée dans cette campagne" : undefined}
                         >
                             <Lock size={11} className="text-amber-500" />
@@ -116,7 +129,7 @@ export const SkillLibraryItem: React.FC<SkillLibraryItemProps> = ({
                                 isCustomized={skill.isCustomized}
                                 usageDetails={usageDetails}
                             />
-                        </div>
+                        </span>
                     )}
 
                     {skill.defaultCategory && (

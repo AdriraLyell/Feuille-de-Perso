@@ -1,3 +1,4 @@
+import { PostgrestError } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 import { ErrorService } from './ErrorService';
 
@@ -12,7 +13,7 @@ export const DatabaseService = {
      * Useful for complex queries constructed outside.
      */
     async execute<T>(
-        queryPromise: PromiseLike<{ data: T | null; error: any }>,
+        queryPromise: PromiseLike<{ data: T | null; error: PostgrestError | null }>,
         context: string,
         userMessage: string
     ): Promise<T | null> {
@@ -57,7 +58,7 @@ export const DatabaseService = {
             ErrorService.handleError(error, { context, userMessage: "Erreur lors de la récupération de la donnée." });
             return null;
         }
-        return data;
+        return data as T;
     },
 
     /**
@@ -66,7 +67,7 @@ export const DatabaseService = {
     async fetchAll<T>(
         table: string,
         query: {
-            eq?: Record<string, any>,
+            eq?: Record<string, unknown>,
             or?: string,
             select?: string,
             order?: { column: string, ascending?: boolean },
@@ -83,7 +84,7 @@ export const DatabaseService = {
         if (query.eq) {
             Object.entries(query.eq).forEach(([key, value]) => {
                 if (value !== undefined && value !== null) {
-                    builder = builder.eq(key, value);
+                    builder = builder.eq(key, value as string | number | boolean);
                 } else if (value === null) {
                     builder = builder.is(key, null);
                 }
@@ -114,16 +115,16 @@ export const DatabaseService = {
      */
     async insert<T>(
         table: string,
-        data: any | any[],
+        data: Record<string, unknown> | Record<string, unknown>[],
         context: string = `DatabaseService.insert(${table})`
     ): Promise<T | T[] | null> {
         const isArray = Array.isArray(data);
 
         let resultPromise;
         if (isArray) {
-            resultPromise = supabase.from(table).insert(data).select();
+            resultPromise = supabase.from(table).insert(data as Record<string, unknown>[]).select();
         } else {
-            resultPromise = supabase.from(table).insert(data).select().single();
+            resultPromise = supabase.from(table).insert(data as Record<string, unknown>).select().single();
         }
 
         const { data: inserted, error } = await resultPromise;
@@ -141,12 +142,12 @@ export const DatabaseService = {
     async update<T>(
         table: string,
         id: string,
-        data: Partial<T>,
+        data: Partial<T> | Record<string, unknown>,
         context: string = `DatabaseService.update(${table})`
     ): Promise<boolean> {
         const { error } = await supabase
             .from(table)
-            .update(data)
+            .update(data as Record<string, unknown>)
             .eq('id', id);
 
         if (error) {
@@ -182,7 +183,7 @@ export const DatabaseService = {
     async deleteBy(
         table: string,
         column: string,
-        value: string,
+        value: string | number | boolean,
         context: string = `DatabaseService.deleteBy(${table})`
     ): Promise<boolean> {
         const { error } = await supabase
@@ -202,13 +203,13 @@ export const DatabaseService = {
      */
     async upsert<T>(
         table: string,
-        data: Partial<T> | any, // Use any for raw data if T is complex, but Partial<T> is preferred
+        data: Record<string, unknown>,
         options: { onConflict?: string, ignoreDuplicates?: boolean } = {},
         context: string = `DatabaseService.upsert(${table})`
     ): Promise<T | null> {
         const { data: result, error } = await supabase
             .from(table)
-            .upsert(data, options)
+            .upsert(data as Record<string, unknown>, options)
             .select()
             .single();
 

@@ -1,4 +1,4 @@
-import { LibraryEntry, TraitEffect } from '../../types';
+import { LibraryEntry } from '../../types';
 
 export interface TraitMigrationInfo {
     id: string;
@@ -31,12 +31,12 @@ export function migrateTraitProperties(trait: LibraryEntry): { trait: LibraryEnt
 
     // Parcourir les effets à l'envers pour pouvoir les supprimer
     for (let i = effects.length - 1; i >= 0; i--) {
-        const effect = effects[i] as TraitEffect;
+        const effect = effects[i];
 
         if (effect.type === 'auto_counter') {
             hasAutoCounter = true;
             if (!autoCounterName) {
-                autoCounterName = effect.target || (effect as any).associatedCounterId;
+                autoCounterName = effect.target || (effect as unknown as Record<string, string>).associatedCounterId;
             }
             effects.splice(i, 1);
             hasChanges = true;
@@ -57,7 +57,7 @@ export function migrateTraitProperties(trait: LibraryEntry): { trait: LibraryEnt
             hasAutoCounter,
             autoCounterName,
             isXPUpgradeable,
-            effects: effects as any
+            effects
         },
         changes
     };
@@ -88,3 +88,4 @@ export function migrateTraitLibrary(traits: LibraryEntry[]): LibraryMigrationRes
         }
     };
 }
+

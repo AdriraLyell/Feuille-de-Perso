@@ -130,7 +130,7 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
                         <ClipboardList size={15} className={auditMode ? 'text-violet-600' : 'text-slate-400'} />
                         <select
                             value={auditMode ?? ''}
-                            onChange={(e) => setAuditMode((e.target.value || null) as typeof auditMode)}
+                            onChange={(e) => setAuditMode((e.target.value || null) as import('../../../hooks/admin/useAdminTraitLibrary').AuditMode)}
                             className={`text-xs border rounded py-1.5 px-2 outline-none cursor-pointer ${auditMode
                                 ? 'border-violet-400 bg-violet-50 text-violet-700 font-semibold'
                                 : 'border-slate-300 bg-white text-slate-600'

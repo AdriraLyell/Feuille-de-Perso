@@ -95,6 +95,13 @@ export const useCharacterSyncManager = (
 
         // Fetch the book from character_books to stay in sync with server
         const remoteBook = await BookSyncService.getBook(result.syncId);
+        
+        let injectedBookContent = remoteBook?.content;
+        if (injectedBookContent) {
+            // Server book has compressed images, we must decompress them for local display
+            const { ImageSyncResolver } = await import('../../services/ImageSyncResolver');
+            injectedBookContent = await ImageSyncResolver.injectImagesAfterSync(injectedBookContent) as typeof injectedBookContent;
+        }
 
         updateData(prev => {
           if (prev.syncInfo?.syncId === syncInfo.syncId) {
@@ -111,7 +118,7 @@ export const useCharacterSyncManager = (
               ...(remoteBook ? {
                 bookDocument: {
                   id: remoteBook.id,
-                  content: remoteBook.content,
+                  content: injectedBookContent!,
                   formatVersion: remoteBook.format_version,
                   createdAt: remoteBook.created_at,
                   updatedAt: remoteBook.updated_at

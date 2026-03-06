@@ -19,9 +19,15 @@ export const LegacyEffectFields: React.FC<LegacyEffectFieldsProps> = ({
         return (
             <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2">
-                    <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest">Compétence</label>
+                    <label 
+                        htmlFor={`free-skill-select-${effect.id}`}
+                        className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest"
+                    >
+                        Compétence
+                    </label>
                     <div className="relative">
                         <select
+                            id={`free-skill-select-${effect.id}`}
                             className="w-full text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1.5 appearance-none focus:border-blue-500 outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm"
                             value={effect.target || ''}
                             onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
@@ -35,8 +41,14 @@ export const LegacyEffectFields: React.FC<LegacyEffectFieldsProps> = ({
                     </div>
                 </div>
                 <div>
-                    <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest text-center">Rang Offert</label>
+                    <label 
+                        htmlFor={`free-skill-value-${effect.id}`}
+                        className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest text-center"
+                    >
+                        Rang Offert
+                    </label>
                     <input
+                        id={`free-skill-value-${effect.id}`}
                         type="number"
                         className="w-full text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1.5 text-center focus:border-blue-500 outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm font-mono"
                         value={effect.value}
@@ -51,9 +63,15 @@ export const LegacyEffectFields: React.FC<LegacyEffectFieldsProps> = ({
         return (
             <div className="flex flex-col gap-2">
                 <div className="flex flex-col">
-                    <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest">Compétence à bloquer</label>
+                    <label 
+                        htmlFor={`block-skill-select-${effect.id}`}
+                        className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest"
+                    >
+                        Compétence à bloquer
+                    </label>
                     <div className="relative">
                         <select
+                            id={`block-skill-select-${effect.id}`}
                             className="w-full text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1.5 appearance-none focus:border-red-500 outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm"
                             value={effect.target || ''}
                             onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
@@ -93,9 +111,15 @@ export const LegacyEffectFields: React.FC<LegacyEffectFieldsProps> = ({
     return (
         <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">
-                <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest">Attribut</label>
+                <label 
+                    htmlFor={`attr-bonus-select-${effect.id}`}
+                    className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest"
+                >
+                    Attribut
+                </label>
                 <div className="relative">
                     <select
+                        id={`attr-bonus-select-${effect.id}`}
                         className="w-full text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1.5 appearance-none focus:border-[#8b2e2e] outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm"
                         value={effect.target || ''}
                         onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
@@ -109,8 +133,14 @@ export const LegacyEffectFields: React.FC<LegacyEffectFieldsProps> = ({
                 </div>
             </div>
             <div>
-                <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest text-center">Bonus (+)</label>
+                <label 
+                    htmlFor={`attr-bonus-value-${effect.id}`}
+                    className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-widest text-center"
+                >
+                    Bonus (+)
+                </label>
                 <input
+                    id={`attr-bonus-value-${effect.id}`}
                     type="number"
                     className="w-full text-xs border border-[#bfae85]/30 rounded-sm px-2 py-1.5 text-center focus:border-[#8b2e2e] outline-none bg-white/80 text-[#1c1917] font-bold shadow-sm font-mono"
                     value={effect.value}

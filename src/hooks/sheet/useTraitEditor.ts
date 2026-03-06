@@ -127,7 +127,7 @@ export const useTraitEditor = (
                         const global = _rules.libraries.formulas.find(f => f.id === e.formulaId);
                         if (global) {
                             if (global.target) res.target = global.target;
-                            if (global.effectType) res.effectType = global.effectType as any;
+                            if (global.effectType) res.effectType = global.effectType as import('../../types').EffectType;
                         }
                     }
                     return res;

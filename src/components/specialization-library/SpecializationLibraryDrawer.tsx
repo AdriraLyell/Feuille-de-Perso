@@ -68,38 +68,43 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
             </div>
 
             {/* List */}
-            <div className="flex-grow overflow-y-auto p-2 custom-scrollbar space-y-2">
+            <ul 
+                className="flex-grow overflow-y-auto p-2 custom-scrollbar space-y-2"
+            >
                 {filteredLibrary.length === 0 ? (
-                    <div className="text-center text-gray-400 py-10 italic text-xs">
+                    <li className="text-center text-gray-400 py-10 italic text-xs">
                         {library.length === 0 ? "La bibliothèque est vide." : "Aucun résultat."}
-                    </div>
+                    </li>
                 ) : (
                     filteredLibrary.map(entry => (
-                        <div
-                            key={entry.id}
-                            draggable
-                            onDragStart={(e) => handleDragStart(e, entry)}
-                            onClick={() => onSelect && onSelect(entry.name, entry.defaultMinLevel)}
-                            className="bg-white border border-gray-200 rounded-lg p-3 hover:border-amber-400 hover:shadow-sm cursor-grab active:cursor-grabbing transition group relative"
-                        >
-                            <div className="flex justify-between items-start mb-1">
-                                <div className="flex items-center gap-2">
-                                    <GripVertical size={14} className="text-gray-300 group-hover:text-amber-500" />
-                                    <span className="font-bold text-sm text-gray-800">{entry.name}</span>
+                        <li key={entry.id}>
+                            <button
+                                type="button"
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, entry)}
+                                onClick={() => onSelect && onSelect(entry.name, entry.defaultMinLevel)}
+                                className="w-full text-left bg-white border border-gray-200 rounded-lg p-3 hover:border-amber-400 hover:shadow-sm cursor-grab active:cursor-grabbing transition group relative outline-none focus:ring-2 focus:ring-amber-500/50"
+                                aria-label={`Ajouter la spécialisation ${entry.name}`}
+                            >
+                                <div className="flex justify-between items-start mb-1 pointer-events-none">
+                                    <div className="flex items-center gap-2">
+                                        <GripVertical size={14} className="text-gray-300 group-hover:text-amber-500" />
+                                        <span className="font-bold text-sm text-gray-800">{entry.name}</span>
+                                    </div>
+                                    <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">
+                                        Lvl {entry.defaultMinLevel}
+                                    </span>
                                 </div>
-                                <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">
-                                    Lvl {entry.defaultMinLevel}
-                                </span>
-                            </div>
-                            {entry.description && (
-                                <p className="text-[10px] text-gray-500 line-clamp-1 group-hover:line-clamp-none transition">
-                                    {entry.description}
-                                </p>
-                            )}
-                        </div>
+                                {entry.description && (
+                                    <p className="text-[10px] text-gray-500 line-clamp-1 group-hover:line-clamp-none transition pointer-events-none">
+                                        {entry.description}
+                                    </p>
+                                )}
+                            </button>
+                        </li>
                     ))
                 )}
-            </div>
+            </ul>
 
             {/* Footer / Instructions */}
             <div className="p-3 bg-gray-50 border-t border-gray-200 text-[10px] text-gray-500 flex gap-2">

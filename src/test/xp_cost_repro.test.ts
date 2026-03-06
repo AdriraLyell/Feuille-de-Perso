@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { describe, it, expect } from 'vitest';
 import { CharacterSheetData, RulesData } from '../types';
@@ -62,3 +63,4 @@ describe('XP Cost & Blocking Reproduction', () => {
         expect(parseInt(result.spent)).toBe(0);
     });
 });
+

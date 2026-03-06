@@ -78,12 +78,14 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                     <div className="space-y-4">
                         {/* Extended Skills Toggle */}
                         <div className="flex items-center justify-between bg-[#bfae85]/10 p-2 rounded-sm border border-[#bfae85]/20 mb-4">
-                            <label className="text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest">Rangs Étendus (6+)</label>
+                            <span className="text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest">Rangs Étendus (6+)</span>
                             <div className="flex items-center gap-2">
                                 <span className="text-[9px] font-bold text-[#5c4d41]/60 tracking-widest">{config.extendedSkills ? 'ACTIF' : 'INACTIF'}</span>
                                 <button
                                     onClick={() => updateCreationConfig('extendedSkills', !config.extendedSkills)}
                                     className={`w-8 h-4 rounded-full p-0.5 transition-colors ${config.extendedSkills ? 'bg-[#8b2e2e]' : 'bg-stone-300'}`}
+                                    aria-pressed={config.extendedSkills}
+                                    title={config.extendedSkills ? 'Désactiver les rangs étendus' : 'Activer les rangs étendus'}
                                 >
                                     <div className={`bg-white w-3 h-3 rounded-full shadow-sm transform transition-transform ${config.extendedSkills ? 'translate-x-4' : ''}`} />
                                 </button>
@@ -91,7 +93,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest mb-1.5">Méthode de Création</label>
+                            <span className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest mb-1.5">Méthode de Création</span>
                             <div className="flex bg-stone-200/50 p-1 rounded-sm border border-stone-300/30">
                                 <button
                                     onClick={() => updateCreationConfig('mode', 'rangs')}
@@ -112,7 +114,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                             <div className="space-y-4">
                                 {/* Sub-mode selector */}
                                 <div>
-                                    <label className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-tighter">Type de Répartition</label>
+                                    <span className="block text-[9px] font-bold text-[#bfae85] mb-1 uppercase tracking-tighter">Type de Répartition</span>
                                     <div className="flex bg-stone-200/50 p-1 rounded-sm border border-stone-300/30">
                                         <button
                                             onClick={() => updateCreationConfig('pointsDistributionMode', 'global')}
@@ -131,8 +133,9 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
 
                                 {(!config.pointsDistributionMode || config.pointsDistributionMode === 'global') ? (
                                     <div className="animate-in fade-in slide-in-from-top-2">
-                                        <label className="block text-sm font-bold text-gray-700 mb-1">XP de Départ (Global)</label>
+                                        <label htmlFor="starting-xp-global" className="block text-sm font-bold text-gray-700 mb-1">XP de Départ (Global)</label>
                                         <input
+                                            id="starting-xp-global"
                                             type="number"
                                             value={config.startingXP || 0}
                                             onChange={(e) => updateCreationConfig('startingXP', parseInt(e.target.value) || 0)}
@@ -142,8 +145,9 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                 ) : (
                                     <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
                                         <div>
-                                            <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">XP Attributs</label>
+                                            <label htmlFor="xp-bucket-attributes" className="block text-xs font-bold text-gray-500 mb-1 uppercase">XP Attributs</label>
                                             <input
+                                                id="xp-bucket-attributes"
                                                 type="number"
                                                 value={config.pointsBuckets?.attributes || 0}
                                                 onChange={(e) => updatePointsBuckets('attributes', parseInt(e.target.value) || 0)}
@@ -151,8 +155,9 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">XP Compétences</label>
+                                            <label htmlFor="xp-bucket-skills" className="block text-xs font-bold text-gray-500 mb-1 uppercase">XP Compétences</label>
                                             <input
+                                                id="xp-bucket-skills"
                                                 type="number"
                                                 value={config.pointsBuckets?.skills || 0}
                                                 onChange={(e) => updatePointsBuckets('skills', parseInt(e.target.value) || 0)}
@@ -160,8 +165,9 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">XP Arrière-plans</label>
+                                            <label htmlFor="xp-bucket-backgrounds" className="block text-xs font-bold text-gray-500 mb-1 uppercase">XP Arrière-plans</label>
                                             <input
+                                                id="xp-bucket-backgrounds"
                                                 type="number"
                                                 value={config.pointsBuckets?.backgrounds || 0}
                                                 onChange={(e) => updatePointsBuckets('backgrounds', parseInt(e.target.value) || 0)}
@@ -176,8 +182,9 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                         {config.mode === 'rangs' && (
                             <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Pts Attributs</label>
+                                    <label htmlFor="pts-attributes-rangs" className="block text-sm font-bold text-gray-700 mb-1">Pts Attributs</label>
                                     <input
+                                        id="pts-attributes-rangs"
                                         type="number"
                                         value={config.attributePoints || 0}
                                         onChange={(e) => updateCreationConfig('attributePoints', parseInt(e.target.value) || 0)}
@@ -185,8 +192,9 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-1">Pts Arr. Plans</label>
+                                    <label htmlFor="pts-backgrounds-rangs" className="block text-sm font-bold text-gray-700 mb-1">Pts Arr. Plans</label>
                                     <input
+                                        id="pts-backgrounds-rangs"
                                         type="number"
                                         value={config.backgroundPoints || 0}
                                         onChange={(e) => updateCreationConfig('backgroundPoints', parseInt(e.target.value) || 0)}
@@ -198,8 +206,9 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
 
                         <div className="grid grid-cols-2 gap-4 bg-[#bfae85]/10 p-3 rounded-sm border border-[#bfae85]/30">
                             <div>
-                                <label className="block text-[10px] font-bold text-[#5c4d41]/60 mb-1 uppercase tracking-widest">Attr. Min</label>
+                                <label htmlFor="attr-min-value" className="block text-[10px] font-bold text-[#5c4d41]/60 mb-1 uppercase tracking-widest">Attr. Min</label>
                                 <input
+                                    id="attr-min-value"
                                     type="number"
                                     value={config.attributeMin ?? -2}
                                     onChange={(e) => updateCreationConfig('attributeMin', parseInt(e.target.value))}
@@ -207,8 +216,9 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                 />
                             </div>
                             <div>
-                                <label className="block text-[10px] font-bold text-[#5c4d41]/60 mb-1 uppercase tracking-widest">Attr. Max</label>
+                                <label htmlFor="attr-max-value" className="block text-[10px] font-bold text-[#5c4d41]/60 mb-1 uppercase tracking-widest">Attr. Max</label>
                                 <input
+                                    id="attr-max-value"
                                     type="number"
                                     value={config.attributeMax ?? 3}
                                     onChange={(e) => updateCreationConfig('attributeMax', parseInt(e.target.value))}
@@ -235,8 +245,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                         <div className="flex items-center gap-2">
                                             <input
                                                 type="number"
-                                                // @ts-expect-error -- legacy code
-                                                value={config.rankSlots[rank] || 0}
+                                                value={(config.rankSlots as Record<number, number>)[rank] || 0}
                                                 onChange={(e) => updateRankSlot(rank, parseInt(e.target.value) || 0)}
                                                 className="w-20 border border-gray-300 rounded px-2 py-1 text-center font-mono focus:border-blue-500 outline-none"
                                             />
@@ -303,9 +312,15 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
 
                 <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 transition-opacity ${config.cardConfig?.active ? 'opacity-100' : 'opacity-40 pointer-events-none grayscale'}`}>
                     <div>
-                        <label className="block text-[10px] font-bold text-[#bfae85] mb-1 uppercase tracking-tighter">Compétences retenues</label>
+                        <label 
+                            htmlFor="card-skills-count"
+                            className="block text-[10px] font-bold text-[#bfae85] mb-1 uppercase tracking-tighter"
+                        >
+                            Compétences retenues
+                        </label>
                         <div className="flex items-center gap-2">
                             <input
+                                id="card-skills-count"
                                 type="number"
                                 value={config.cardConfig?.bestSkillsCount ?? 6}
                                 onChange={(e) => updateCardConfig('bestSkillsCount', parseInt(e.target.value))}
@@ -317,8 +332,14 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                         </div>
                     </div>
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Incrément par Palier</label>
+                        <label 
+                            htmlFor="card-increment"
+                            className="block text-xs font-bold text-gray-500 mb-1 uppercase"
+                        >
+                            Incrément par Palier
+                        </label>
                         <input
+                            id="card-increment"
                             type="number"
                             step="0.1"
                             value={config.cardConfig?.increment ?? 0.5}
@@ -327,8 +348,14 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Seuil de Base (Valet)</label>
+                        <label 
+                            htmlFor="card-base-start"
+                            className="block text-xs font-bold text-gray-500 mb-1 uppercase"
+                        >
+                            Seuil de Base (Valet)
+                        </label>
                         <input
+                            id="card-base-start"
                             type="number"
                             step="0.1"
                             value={config.cardConfig?.baseStart ?? 2}

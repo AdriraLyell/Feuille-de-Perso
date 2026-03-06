@@ -27,7 +27,7 @@ interface GroupedTransaction {
     total: number;
 }
 
-export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGain, totalSpent, totalRest }) => {
+export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGain, totalSpent }) => {
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
     const getCategorizedData = useMemo(() => {

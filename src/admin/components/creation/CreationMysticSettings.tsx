@@ -5,7 +5,7 @@ import { Sparkles, Lock, Unlock } from 'lucide-react';
 interface CreationMysticSettingsProps {
     config: RulesCreationConfig['mysticAbilities'];
     skillCategories?: { id: string; label: string; behavior?: string }[];
-    onUpdate: (field: keyof NonNullable<RulesCreationConfig['mysticAbilities']>, value: any) => void;
+    onUpdate: (field: keyof NonNullable<RulesCreationConfig['mysticAbilities']>, value: string | boolean | Record<string, number>) => void;
     onSync?: () => boolean;
 }
 
@@ -89,10 +89,14 @@ const CreationMysticSettings: React.FC<CreationMysticSettingsProps> = ({ config,
                         <div className="grid grid-cols-5 gap-4">
                             {[1, 2, 3, 4, 5].map((level) => (
                                 <div key={level} className="space-y-1">
-                                    <label className="block text-[10px] text-stone-400 text-center">
+                                    <label 
+                                        htmlFor={`mystic-level-${level}`}
+                                        className="block text-[10px] text-stone-400 text-center"
+                                    >
                                         Niveau {level}
                                     </label>
                                     <input
+                                        id={`mystic-level-${level}`}
                                         type="number"
                                         value={skillsPerLevel[level.toString()] ?? (level === 5 ? -1 : level)}
                                         onChange={(e) => handleLevelChange(level.toString(), e.target.value)}

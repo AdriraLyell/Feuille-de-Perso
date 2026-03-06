@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect, useDeferredValue } from 'react';
+import { useMemo, useRef, useDeferredValue } from 'react';
 import { TraitEntry, LibraryEntry, BonusInfo } from '../types';
 import { normalizeString } from '../utils/stringUtils';
 import { logger } from '../utils/logger';

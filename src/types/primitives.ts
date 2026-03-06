@@ -91,6 +91,12 @@ export interface TraitEntry {
   customNotes?: string; // Notes personnelles du joueur
 }
 
+export interface ArmorEntry {
+  type: string;
+  protection: string;
+  weight: string;
+}
+
 export type FormulaOperator = 'ADD' | 'SET' | 'SUB';
 
 export type EffectType = 'free_skill_rank' | 'master_skill' | 'block_skill_increase' | 'formula' | 'auto_counter' | 'xp_upgradeable';

@@ -67,6 +67,8 @@ const BookImageToolbar: React.FC<BookImageToolbarProps> = ({
                 transform: `translateX(-50%) ${toolbarStyle.placement === 'above' ? 'translateY(-100%)' : ''}`,
             }}
             onMouseDown={(e) => e.stopPropagation()}
+            role="toolbar"
+            aria-label="Barre d'outils d'image"
         >
             {/* === NIVEAU 1 : Contrôles essentiels === */}
             <div className="bg-white/95 p-1 rounded-lg shadow-md flex items-center gap-0.5 border border-stone-200 backdrop-blur-sm whitespace-nowrap">

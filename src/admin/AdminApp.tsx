@@ -207,7 +207,7 @@ const AdminApp: React.FC = () => {
                 onLogout={logout}
                 onShowChangelog={() => setShowChangelog(true)}
                 onCheckSchema={() => currentSettingId && CampaignService.checkSchema?.(currentSettingId)}
-                legacyEffectsCount={(rules.libraries?.traits || []).reduce((acc, t) => acc + (t.effects?.filter(e => {
+                legacyEffectsCount={(rules.libraries?.traits || []).reduce((acc, t) => acc + (t.effects?.filter((e: import('../types').TraitEffect) => {
                     const isFormula = e.type === 'formula';
                     const isLegacyCandidate = ['free_skill_rank', 'master_skill', 'attribute_bonus', 'xp_bonus'].includes(e.type as string);
                     return isLegacyCandidate || (isFormula && !e.formulaId);

@@ -4,13 +4,14 @@ import React, { useState, useRef, useEffect } from 'react';
  * Specialized input to avoid cursor jumping when performing transformations like toUpperCase()
  */
 interface CodeInputProps {
+    id?: string;
     value: string;
     onChange: (val: string) => void;
     placeholder?: string;
     className?: string;
 }
 
-export const CodeInput: React.FC<CodeInputProps> = ({ value, onChange, placeholder, className }) => {
+export const CodeInput: React.FC<CodeInputProps> = ({ id, value, onChange, placeholder, className }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [localValue, setLocalValue] = useState(value);
 
@@ -39,6 +40,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({ value, onChange, placehold
 
     return (
         <input
+            id={id}
             ref={inputRef}
             type="text"
             value={localValue}

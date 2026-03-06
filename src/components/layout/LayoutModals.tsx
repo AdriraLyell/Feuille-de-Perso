@@ -22,17 +22,14 @@ import ConfirmationModal from '../ui/ConfirmationModal';
 interface LayoutModalsProps {
     data: CharacterSheetData;
     rules: RulesData | null;
-    setData: any;
-    addLog: any;
-    isSyncing: boolean;
-    hasUpdate: boolean;
+    setData: (newData: CharacterSheetData | ((prev: CharacterSheetData) => CharacterSheetData), isSyncAction?: boolean) => void;
+    addLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', deduplicationId?: string) => void;
     mode: 'sheet' | 'settings';
     showImportExport: boolean;
     setShowImportExport: (show: boolean) => void;
     showPrintModal: boolean;
     setShowPrintModal: (show: boolean) => void;
-    pagesToPrint: any;
-    handlePrintConfirm: (s: any) => void;
+    handlePrintConfirm: (s: Record<string, boolean>) => void;
     showChangelog: boolean;
     setShowChangelog: (show: boolean) => void;
     showUserGuide: boolean;
@@ -45,9 +42,10 @@ interface LayoutModalsProps {
     setShowCampaignInfo: (show: boolean) => void;
     showConflict: boolean;
     setShowConflict: (show: boolean) => void;
-    pendingRules: any;
+    pendingRules: { rules: RulesData, id: string, name: string } | null;
     handleConfirmReset: () => void;
     handleConfirmBackup: () => void;
+    pagesToPrint: Record<string, boolean>;
     showDiscardConfirm: boolean;
     setShowDiscardConfirm: (show: boolean) => void;
     confirmDiscard: () => void;
@@ -59,13 +57,13 @@ interface LayoutModalsProps {
     executeCreationActivation: () => void;
     isEditMode: boolean;
     setIsEditMode: (val: boolean) => void;
-    handleImportSuccess: (data: any) => void;
+    handleImportSuccess: (data: CharacterSheetData) => void;
 }
 
 const LayoutModals: React.FC<LayoutModalsProps> = ({
-    data, rules, setData, addLog, isSyncing, hasUpdate, mode,
+    data, rules, setData, addLog, mode,
     showImportExport, setShowImportExport,
-    showPrintModal, setShowPrintModal, pagesToPrint, handlePrintConfirm,
+    showPrintModal, setShowPrintModal, handlePrintConfirm,
     showChangelog, setShowChangelog,
     showUserGuide, setShowUserGuide,
     showAppearance, setShowAppearance,
@@ -93,7 +91,7 @@ const LayoutModals: React.FC<LayoutModalsProps> = ({
             <PrintSelectionModal
                 isOpen={showPrintModal}
                 onClose={() => setShowPrintModal(false)}
-                onConfirm={(s: Record<string, boolean>) => handlePrintConfirm(s as any)}
+                onConfirm={(s: Record<string, boolean>) => handlePrintConfirm(s)}
             />
 
             <ChangelogModal isOpen={showChangelog} onClose={() => setShowChangelog(false)} />

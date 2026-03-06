@@ -53,8 +53,14 @@ const SpecializationEditModal: React.FC<SpecializationEditModalProps> = ({
 
                 <div className="p-6 bg-[#fdfbf7] flex flex-col gap-4 overflow-y-auto max-h-[70vh]">
                     <div>
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Nom</label>
+                        <label 
+                            htmlFor="spec-name"
+                            className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest"
+                        >
+                            Nom
+                        </label>
                         <input
+                            id="spec-name"
                             className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-black font-serif text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm"
                             value={editingEntry.name}
                             onChange={(e) => setEditingEntry({ ...editingEntry, name: e.target.value })}
@@ -62,12 +68,18 @@ const SpecializationEditModal: React.FC<SpecializationEditModalProps> = ({
                     </div>
 
                     <div>
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Compétences associées</label>
+                        <label 
+                            htmlFor="spec-skill-filter"
+                            className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest"
+                        >
+                            Compétences associées
+                        </label>
                         <div className="relative mb-2">
                             <span className="absolute inset-y-0 left-0 flex items-center pl-2">
                                 <Search size={12} className="text-[#5c4d41]/60 pointer-events-none" />
                             </span>
                             <input
+                                id="spec-skill-filter"
                                 className="w-full pl-7 pr-2 py-1 text-[11px] border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none bg-white/50"
                                 placeholder="Filtrer les compétences..."
                                 value={skillSearch}
@@ -110,9 +122,15 @@ const SpecializationEditModal: React.FC<SpecializationEditModalProps> = ({
                     </div>
 
                     <div>
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Seuil minimum par défaut (MJ)</label>
+                        <label 
+                            htmlFor="spec-min-level"
+                            className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest"
+                        >
+                            Seuil minimum par défaut (MJ)
+                        </label>
                         <div className="flex gap-4 items-center">
                             <input
+                                id="spec-min-level"
                                 type="number"
                                 min="0"
                                 max="5"
@@ -139,8 +157,14 @@ const SpecializationEditModal: React.FC<SpecializationEditModalProps> = ({
                     </div>
 
                     <div>
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Description</label>
+                        <label 
+                            htmlFor="spec-description"
+                            className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest"
+                        >
+                            Description
+                        </label>
                         <textarea
+                            id="spec-description"
                             className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm bg-white/50 min-h-[80px] focus:border-amber-500 outline-none resize-none shadow-sm italic text-[#4a3b32]"
                             value={editingEntry.description || ''}
                             onChange={(e) => setEditingEntry({ ...editingEntry, description: e.target.value })}

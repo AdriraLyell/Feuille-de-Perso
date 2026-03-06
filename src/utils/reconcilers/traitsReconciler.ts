@@ -42,7 +42,7 @@ export const reconcileTraits = (newState: CharacterSheetData, currentState: Char
  * Phase 2: We no longer store libraries in CharacterSheetData.
  * This function now only ensures that the character state is sane.
  */
-export const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterSheetData, rules: RulesData) => {
+export const reconcileCleanup = (newState: CharacterSheetData, currentState: CharacterSheetData, _rules: RulesData) => {
     // We can clear the libraries from the character state as they are now optional 
     // and resolved from RulesContext at runtime.
     newState.library = [];

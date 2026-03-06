@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { describe, it, expect } from 'vitest';
 import { CharacterSheetData, DotEntry } from '../types';
@@ -125,3 +126,4 @@ describe('Bug Reproduction: Counter Sync Logic', () => {
         expect(newState.counters['sante'].value).toBe(7);
     });
 });
+

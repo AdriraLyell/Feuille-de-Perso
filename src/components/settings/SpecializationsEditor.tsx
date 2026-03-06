@@ -176,10 +176,13 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
                   e.currentTarget.classList.remove('border-amber-300');
                   handleDrop(e, skill.id);
                 }}
+                role="region"
+                aria-label={`Spécialisations pour ${skill.name}`}
               >
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-bold text-sm text-gray-700">{skill.name}</span>
                   <button
+                    type="button"
                     onClick={() => addSpecialization(skill.id)}
                     className="text-[10px] bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 px-2 py-1 rounded flex items-center gap-1 transition-colors font-bold shadow-sm opacity-0 group-hover/skill:opacity-100"
                   >

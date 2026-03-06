@@ -22,7 +22,7 @@ export const CampaignSelector: React.FC<CampaignSelectorProps> = ({ settings, on
                         Chargement des campagnes...
                     </div>
                 ) : (
-                    settings.map((s: any) => (
+                    settings.map((s: GameSettingSummary) => (
                         <button
                             key={s.id}
                             onClick={() => onSelect(s.id)}

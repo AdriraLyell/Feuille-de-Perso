@@ -142,17 +142,21 @@ const MysticSkillWizard: React.FC<MysticSkillWizardProps> = ({
                             const isDisabled = !isSelected && remainingSlots === 0;
 
                             return (
-                                <div
+                                <button
                                     key={skill.id}
+                                    type="button"
                                     onClick={() => !isDisabled && handleToggle(skill.id)}
                                     className={`
-                                        relative group flex items-center gap-3 p-3 rounded border transition cursor-pointer
+                                        w-full relative group flex items-center gap-3 p-3 rounded border transition text-left outline-none focus:ring-2 focus:ring-purple-500/50
                                         ${isSelected
                                             ? 'bg-purple-600/20 border-purple-500 shadow-[0_0_15px_-3px_rgba(147,51,234,0.3)]'
                                             : isDisabled
                                                 ? 'bg-stone-900/20 border-stone-800 opacity-50 cursor-not-allowed'
                                                 : 'bg-stone-800/40 border-stone-700 hover:border-purple-500/50 hover:bg-stone-800/80'}
                                     `}
+                                    disabled={isDisabled}
+                                    role="checkbox"
+                                    aria-checked={isSelected}
                                 >
                                     <div className={`
                                         w-5 h-5 rounded border flex items-center justify-center transition-colors shrink-0
@@ -177,7 +181,7 @@ const MysticSkillWizard: React.FC<MysticSkillWizardProps> = ({
                                             {skill.defaultCategory}
                                         </div>
                                     )}
-                                </div>
+                                </button>
                             );
                         })
                     )}

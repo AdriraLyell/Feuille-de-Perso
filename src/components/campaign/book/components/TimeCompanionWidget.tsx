@@ -236,10 +236,11 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                             const weatherColor = weatherType ? WEATHER_ICONS_SMALL[weatherType]?.color : 'text-amber-500/50';
 
                             return (
-                                <div
+                                <button
                                     key={i}
+                                    type="button"
                                     onClick={() => onDateClick?.(dateStr)}
-                                    className={`group relative text-center text-[13px] py-2.5 rounded transition-all font-medium
+                                    className={`group relative text-center text-[13px] py-2.5 rounded transition-all font-medium outline-none
                                         ${isToday ? 'bg-amber-500 text-stone-950 font-black shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'text-stone-300 hover:bg-stone-800 hover:text-white'}
                                         ${onDateClick ? 'cursor-pointer hover:ring-2 hover:ring-amber-500' : 'cursor-default'}`}
                                 >
@@ -262,24 +263,30 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
 
                                     {onNewChapter && (
                                         <div className="absolute inset-[-1px] opacity-0 group-hover:opacity-100 bg-stone-950 flex items-center justify-center gap-1.5 transition-all duration-200 rounded-md z-10 border-2 border-amber-500 shadow-2xl">
-                                            <button
+                                            <div
                                                 onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr, true); }}
-                                                className="w-7 h-7 flex items-center justify-center hover:bg-amber-500 hover:text-stone-950 rounded-full transition-all text-amber-500 group/btn"
+                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onNewChapter?.(dateStr, true); } }}
+                                                role="button"
+                                                tabIndex={0}
+                                                className="w-7 h-7 flex items-center justify-center hover:bg-amber-500 hover:text-stone-950 rounded-full transition-all text-amber-500 group/btn outline-none"
                                                 title="Insérer au curseur"
                                             >
                                                 <PlusCircle size={15} strokeWidth={2.5} />
-                                            </button>
+                                            </div>
                                             <div className="w-[1px] h-5 bg-amber-500/30" />
-                                            <button
+                                            <div
                                                 onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr, false); }}
-                                                className="w-7 h-7 flex items-center justify-center hover:bg-amber-500 hover:text-stone-950 rounded-full transition-all text-amber-500 group/btn"
+                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onNewChapter?.(dateStr, false); } }}
+                                                role="button"
+                                                tabIndex={0}
+                                                className="w-7 h-7 flex items-center justify-center hover:bg-amber-500 hover:text-stone-950 rounded-full transition-all text-amber-500 group/btn outline-none"
                                                 title="Ajouter à la fin du livre"
                                             >
                                                 <ArrowDownToLine size={15} strokeWidth={2.5} />
-                                            </button>
+                                            </div>
                                         </div>
                                     )}
-                                </div>
+                                </button>
                             );
                         })}
                     </div>
@@ -292,10 +299,11 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                         const weatherColor = weather ? WEATHER_ICONS_SMALL[weather]?.color : 'text-amber-500/40';
 
                         return (
-                            <div
+                            <button
                                 key={date}
+                                type="button"
                                 onClick={() => onDateClick?.(date)}
-                                className="p-2 bg-stone-800/50 border border-stone-700/50 rounded-lg hover:border-amber-500/30 transition-all cursor-pointer group"
+                                className="w-full p-2 bg-stone-800/50 border border-stone-700/50 rounded-lg hover:border-amber-500/30 transition-all cursor-pointer group outline-none focus:ring-1 focus:ring-amber-500/50"
                             >
                                 <div className="flex items-center justify-between gap-2">
                                     <span className="text-[9px] font-bold text-amber-500/80 font-serif">
@@ -307,7 +315,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                                         <PenLine size={10} className="text-amber-500/40 group-hover:text-amber-500 transition-colors" />
                                     )}
                                 </div>
-                            </div>
+                            </button>
                         );
                     })}
                     {notatedDates.size === 0 && (

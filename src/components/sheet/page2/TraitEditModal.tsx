@@ -199,8 +199,9 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
 
                 {/* Nom — lecture seule, défini par la règle */}
                 <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Nom du trait</label>
+                    <label htmlFor="trait-name" className="block text-sm font-bold text-slate-700 mb-1">Nom du trait</label>
                     <input
+                        id="trait-name"
                         type="text"
                         value={editedTrait.name || ''}
                         readOnly
@@ -210,10 +211,11 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
 
                 {/* Coût — lecture seule, fixé par la bibliothèque */}
                 <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">
+                    <label htmlFor="trait-cost" className="block text-sm font-bold text-slate-700 mb-1">
                         Coût / Valeur <span className="text-[10px] font-normal text-slate-400">(défini par les règles)</span>
                     </label>
                     <input
+                        id="trait-cost"
                         type="text"
                         value={editedTrait.value || ''}
                         readOnly
@@ -224,8 +226,9 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
                 {/* Variante — uniquement si le trait est à variante */}
                 {isVariantTrait && (
                     <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-1">Variante / Spécialité</label>
+                        <label htmlFor="trait-variant" className="block text-sm font-bold text-slate-700 mb-1">Variante / Spécialité</label>
                         <input
+                            id="trait-variant"
                             type="text"
                             value={editedTrait.variant || ''}
                             onChange={(e) => handleChange('variant', e.target.value)}
@@ -237,8 +240,9 @@ const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait,
 
                 {/* Description — modifiable par le joueur (notes perso) */}
                 <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Description / Notes personnelles</label>
+                    <label htmlFor="trait-notes" className="block text-sm font-bold text-slate-700 mb-1">Description / Notes personnelles</label>
                     <textarea
+                        id="trait-notes"
                         value={editedTrait.description || ''}
                         onChange={(e) => handleChange('description', e.target.value)}
                         className="w-full border-2 border-stone-200 rounded-lg p-2 focus:border-stone-400 focus:outline-none bg-white min-h-[100px] resize-y"

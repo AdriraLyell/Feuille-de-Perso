@@ -3,11 +3,13 @@ import { GraduationCap, Save, AlertOctagon, X, Sparkles } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import { RulesData } from '../../../types/rules';
 
+import { LibrarySkillEntry } from '../../../types';
+
 interface SkillCustomizationModalProps {
     isOpen: boolean;
     onClose: () => void;
-    editingSkill: any;
-    setEditingSkill: (skill: any) => void;
+    editingSkill: LibrarySkillEntry | null;
+    setEditingSkill: (skill: LibrarySkillEntry) => void;
     variantDraft: string;
     setVariantDraft: (draft: string) => void;
     handleSave: () => void;

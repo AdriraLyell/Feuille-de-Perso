@@ -22,7 +22,6 @@ const CampaignInfoModal: React.FC<CampaignInfoModalProps> = ({
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
             <div
                 className="bg-[#fdfcf7] w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-amber-900/20 flex flex-col animate-in zoom-in-95 duration-300"
-                onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="p-6 bg-amber-900 text-amber-50 flex justify-between items-center bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')]">

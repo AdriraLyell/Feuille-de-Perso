@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import { createContext, useContext } from 'react';
 
 // Signature exacte de la fonction addLog dans App.tsx
 type AddLogFn = (

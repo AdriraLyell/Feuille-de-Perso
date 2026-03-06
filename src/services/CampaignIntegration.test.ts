@@ -29,17 +29,17 @@ vi.mock('./LibraryService', () => ({
 // We will use a "fake" IndexedDB implementation for OfflineStorageService logic
 // since idb-keyval uses browser APIs not available in Node easily without setup.
 // We'll mock the module 'idb-keyval' itself.
-const mockStore = new Map<string, any>();
+const mockStore = new Map<string, unknown>();
 
 vi.mock('idb-keyval', () => ({
-    get: vi.fn((key) => Promise.resolve(mockStore.get(key as string))),
-    set: vi.fn((key, val) => {
-        mockStore.set(key as string, val);
+    get: vi.fn((key: string) => Promise.resolve(mockStore.get(key))),
+    set: vi.fn((key: string, val: unknown) => {
+        mockStore.set(key, val);
         return Promise.resolve();
     }),
     entries: vi.fn(() => Promise.resolve(Array.from(mockStore.entries()))),
-    del: vi.fn((key) => {
-        mockStore.delete(key as string);
+    del: vi.fn((key: string) => {
+        mockStore.delete(key);
         return Promise.resolve();
     })
 }));
@@ -74,8 +74,8 @@ describe('Integration: CampaignService & OfflineStorage', () => {
         };
 
         // 1. Mock Database Response
-        (DatabaseService.fetchOne as any).mockResolvedValue(mockDbSetting);
-        (LibraryService.loadLibraries as any).mockResolvedValue(mockLibraries);
+        (DatabaseService.fetchOne as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue(mockDbSetting);
+        (LibraryService.loadLibraries as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue(mockLibraries);
 
         // 2. Load Setting via CampaignService
         const setting = await CampaignService.loadSetting(campaignId);
@@ -152,8 +152,8 @@ describe('Integration: CampaignService & OfflineStorage', () => {
             definitions: { ...defaultRules.definitions },
             is_public: true
         };
-        (DatabaseService.fetchOne as any).mockResolvedValue(newDbSetting);
-        (LibraryService.loadLibraries as any).mockResolvedValue({ traits: [], skills: [], specializations: [], backgrounds: [], counters: [] });
+        (DatabaseService.fetchOne as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue(newDbSetting);
+        (LibraryService.loadLibraries as unknown as { mockResolvedValue: (v: unknown) => void }).mockResolvedValue({ traits: [], skills: [], specializations: [], backgrounds: [], counters: [] });
 
         // 3. Load & Save
         const newRules = await CampaignService.loadSetting(campaignId);

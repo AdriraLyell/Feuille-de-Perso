@@ -8,7 +8,7 @@ export interface DropPayload {
         isVariable?: boolean;
         categoryType?: 'skill' | 'background' | 'counter';
         // Allow other fields for legacy/flexibility during transition
-        [key: string]: any;
+        [key: string]: unknown;
     };
     categoryType?: 'skill' | 'background' | 'counter';
 }

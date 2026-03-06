@@ -40,6 +40,7 @@ export interface CampaignNoteEntry {
     // Deprecated singular fields (kept for migration types if needed, but handled in code)
     imageId?: string;
     imageConfig?: ImageConfig;
+    base64Cover?: string; // For Export/Import transit (Cover image)
     // New Array Field
     images?: NoteImage[];
     isBookmarked?: boolean;

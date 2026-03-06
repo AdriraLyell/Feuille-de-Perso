@@ -71,18 +71,22 @@ const AdminSuggestions: React.FC<Props> = ({ data, onUpdate, onAddLog }) => {
         }
     };
 
-    const handleConfirmIntegration = (finalEntry: any, originalSuggestionId: string, listType: 'traits' | 'skills' | 'backgrounds') => {
+    const handleConfirmIntegration = (
+        finalEntry: LibraryEntry | LibrarySkillEntry, 
+        originalSuggestionId: string, 
+        listType: 'traits' | 'skills' | 'backgrounds'
+    ) => {
         if (!rules) return;
         const newRules = JSON.parse(JSON.stringify(rules)) as import('../../types/rules').RulesData;
 
         // Push the finalized element to the official rules library
         if (!newRules.libraries[listType]) {
-            newRules.libraries[listType] = [];
+            (newRules.libraries as Record<string, (LibraryEntry | LibrarySkillEntry)[]>)[listType] = [];
         }
-        newRules.libraries[listType].push(finalEntry);
+        (newRules.libraries[listType] as (LibraryEntry | LibrarySkillEntry)[]).push(finalEntry);
 
         // Sort
-        newRules.libraries[listType].sort((a: any, b: any) => a.name.localeCompare(b.name));
+        (newRules.libraries[listType] as { name: string }[]).sort((a, b) => a.name.localeCompare(b.name));
 
         updateRules(newRules);
         handleReject(originalSuggestionId);

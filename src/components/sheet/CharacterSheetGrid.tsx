@@ -4,7 +4,7 @@ import { CharacterSheetData, DropPayload } from '../../types';
 import { RulesData } from '../../types/rules';
 import { ThemeConfig } from '../../types/system';
 import { SkillBlock } from './SkillBlock';
-import { Responsive, useContainerWidth } from 'react-grid-layout';
+import { Responsive, useContainerWidth, Layout } from 'react-grid-layout';
 
 interface CharacterSheetGridProps {
     columns: SheetColumn[];
@@ -21,7 +21,7 @@ interface CharacterSheetGridProps {
     onDefineVariant: (category: string, id: string, skillName: string, definitionId?: string) => void;
     onDropItem: (category: string, payload: DropPayload, targetIndex?: number) => void;
     onRemoveItem: (category: string, id: string) => void;
-    onLayoutChange: (layout: any, allLayouts: any) => void;
+    onLayoutChange: (layout: Layout[], allLayouts: Record<string, Layout[]>) => void;
     // For Portrait extra sections
     renderBottomSection?: () => React.ReactNode;
     validateSkillIncrease?: (id: string, newValue: number) => { allowed: boolean; reason?: string };
@@ -97,7 +97,7 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
         return {
             lg: layoutConfig.lg || undefined,
             sm: layoutConfig.sm || undefined,
-        };
+        } as Record<string, Layout[] | undefined>;
     }, [layoutConfig]);
 
     // ------------------------------------------------------------------
@@ -229,17 +229,20 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
         >
             {mounted && (
                 <Responsive
-                    className="layout"
-                    width={width}
-                    layouts={staticLayouts as Record<string, any>}
-                    breakpoints={breakpoints}
-                    cols={cols}
-                    rowHeight={24}
-                    onLayoutChange={onLayoutChange}
-                    draggableHandle=".skill-block-header"
-                    margin={[0, 0]}
-                    compactType="vertical"
-                    {...{ isDraggable: true, isResizable: true } as any}
+                    {...({
+                        className: "layout",
+                        width: width,
+                        layouts: staticLayouts,
+                        breakpoints: breakpoints,
+                        cols: cols,
+                        rowHeight: 24,
+                        onLayoutChange: onLayoutChange,
+                        draggableHandle: ".skill-block-header",
+                        margin: [0, 0],
+                        compactType: "vertical",
+                        isDraggable: true,
+                        isResizable: true
+                    } as unknown as import('react-grid-layout').ResponsiveProps)}
                 >
                     {allBlocks.map(renderSkillBlock)}
 

@@ -28,8 +28,9 @@ export const SpecListItem: React.FC<SpecListItemProps> = ({
     onLoadUsageDetails
 }) => {
     const [showLockTooltip, React_useStateLock] = React.useState(false);
-    const lockIconRef = React.useRef<HTMLDivElement>(null);
+    const lockIconRef = React.useRef<HTMLSpanElement>(null);
     const setShowLockTooltip = (val: boolean) => React_useStateLock(val);
+
     return (
         <div className={`bg-white border rounded p-2 transition-shadow group ${entry.isActive === false ? 'opacity-60 grayscale border-slate-200' : 'hover:shadow-md border-slate-300'}`}>
             <div className="flex items-center gap-2 mb-1.5">
@@ -49,7 +50,7 @@ export const SpecListItem: React.FC<SpecListItemProps> = ({
                     {entry.isGlobal && <div title="Item Global"><Globe size={14} className="text-indigo-500" /></div>}
                     {entry.isImposed && <div title="Spécialisation Imposée (Auto)"><Zap size={14} className="text-amber-500 fill-amber-200/50" /></div>}
                     {isLocked && (
-                        <div
+                        <span
                             ref={lockIconRef}
                             onMouseEnter={() => {
                                 if (isLocked && !isPlaced && onLoadUsageDetails) {
@@ -58,7 +59,16 @@ export const SpecListItem: React.FC<SpecListItemProps> = ({
                                 setShowLockTooltip(true);
                             }}
                             onMouseLeave={() => setShowLockTooltip(false)}
-                            className="relative flex items-center shrink-0"
+                            onFocus={() => {
+                                if (isLocked && !isPlaced && onLoadUsageDetails) {
+                                    onLoadUsageDetails(entry.id);
+                                }
+                                setShowLockTooltip(true);
+                            }}
+                            onBlur={() => setShowLockTooltip(false)}
+                            role="button"
+                            tabIndex={0}
+                            className="relative flex items-center shrink-0 outline-none focus:ring-1 focus:ring-amber-600 rounded-sm"
                             title={isPlaced ? "Utilisée dans cette campagne" : undefined}
                         >
                             <Lock size={14} className="text-amber-600" />
@@ -69,7 +79,7 @@ export const SpecListItem: React.FC<SpecListItemProps> = ({
                                 isPlaced={isPlaced}
                                 usageDetails={usageDetails}
                             />
-                        </div>
+                        </span>
                     )}
                 </div>
 
@@ -82,7 +92,7 @@ export const SpecListItem: React.FC<SpecListItemProps> = ({
 
                 {/* 4. Actions */}
                 <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                    <button onClick={() => onEdit(entry)} className="text-blue-500 hover:bg-blue-50 p-1 rounded"><Edit2 size={14} /></button>
+                    <button onClick={() => onEdit(entry)} className="text-blue-500 hover:bg-blue-50 p-1 rounded" title="Modifier"><Edit2 size={14} /></button>
                     <button
                         onClick={() => onDelete(entry.id, entry.name)}
                         disabled={isLocked}

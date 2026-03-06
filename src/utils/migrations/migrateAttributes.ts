@@ -41,10 +41,10 @@ export const migrateAttributes = (parsed: MigratableData): void => {
         parsed.attributes = {};
     }
 
-    const rawAttributes = parsed.attributes as Record<string, any>;
+    const rawAttributes = parsed.attributes as Record<string, unknown>;
 
     // 2. Rename legacy IDs to generic IDs (pave_attributs_x) FIRST
-    const renamedAttributes: Record<string, any> = {};
+    const renamedAttributes: Record<string, unknown> = {};
     Object.keys(rawAttributes).forEach(oldId => {
         const val = rawAttributes[oldId];
         if (typeof val !== 'undefined') {
@@ -64,9 +64,16 @@ export const migrateAttributes = (parsed: MigratableData): void => {
     parsed.attributes = renamedAttributes;
 
     // 4. Type conversion (numeric -> string) and structure fix
-    const convertType = (list: any[]) => {
+    const convertType = (list: unknown) => {
         if (!Array.isArray(list)) return list;
-        return list.map(item => {
+        return list.map(itemRaw => {
+            const item = itemRaw as { 
+                id?: string; 
+                name?: string; 
+                val1?: string | number; 
+                val2?: string | number; 
+                val3?: string | number;
+            };
             if (!item) return item;
             if (typeof item.val1 === 'undefined') {
                 return {
@@ -101,8 +108,8 @@ export const migrateAttributes = (parsed: MigratableData): void => {
         parsed.secondaryAttributes = JSON.parse(JSON.stringify(INITIAL_DATA.secondaryAttributes));
     }
 
-    const rawSecondary = parsed.secondaryAttributes as Record<string, any>;
-    const renamedSec: Record<string, any> = {};
+    const rawSecondary = parsed.secondaryAttributes as Record<string, unknown>;
+    const renamedSec: Record<string, unknown> = {};
     Object.keys(rawSecondary).forEach(oldId => {
         renamedSec[migrateAttributeId(oldId)] = rawSecondary[oldId];
     });
@@ -118,10 +125,13 @@ export const migrateAttributes = (parsed: MigratableData): void => {
     }
 
     if (Array.isArray(parsed.attributeSettings)) {
-        parsed.attributeSettings = parsed.attributeSettings.map((s: any) => ({
-            ...s,
-            id: migrateAttributeId(s.id)
-        }));
+        parsed.attributeSettings = parsed.attributeSettings.map(sRaw => {
+            const s = sRaw as { id: string };
+            return {
+                ...s,
+                id: migrateAttributeId(s.id)
+            };
+        });
     }
 
     // Ensure default categories exist

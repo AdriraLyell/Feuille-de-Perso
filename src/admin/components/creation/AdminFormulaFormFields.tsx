@@ -11,7 +11,7 @@ interface AdminFormulaFormFieldsProps {
     rules: RulesData;
     targetSuggestions: { value: string, label: string, type: string }[];
     allVariables: string[];
-    onUpdate: (field: keyof LibraryFormulaEntry, value: any) => void;
+    onUpdate: (field: keyof LibraryFormulaEntry, value: string | boolean | number | null | unknown) => void;
 }
 
 export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
@@ -26,8 +26,14 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
         <div className="flex flex-col gap-4">
             <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-12 lg:col-span-6">
-                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Nom (ex: Calcul du Mana)</label>
+                    <label 
+                        htmlFor="formula-name"
+                        className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1"
+                    >
+                        Nom (ex: Calcul du Mana)
+                    </label>
                     <input
+                        id="formula-name"
                         type="text"
                         value={formula.name}
                         onChange={e => onUpdate('name', e.target.value)}
@@ -35,10 +41,14 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                     />
                 </div>
                 <div className="col-span-12 lg:col-span-6">
-                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1 flex items-center gap-1">
+                    <label 
+                        htmlFor="formula-code"
+                        className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1 flex items-center gap-1"
+                    >
                         Code <span className="text-stone-600 italic">(UPPERCASE)</span>
                     </label>
                     <CodeInput
+                        id="formula-code"
                         value={formula.code || ''}
                         onChange={val => onUpdate('code', val)}
                         placeholder="EX: MA_VARIABLE"
@@ -46,8 +56,14 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                     />
                 </div>
                 <div className="col-span-12">
-                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Description (Optionnel)</label>
+                    <label 
+                        htmlFor="formula-description"
+                        className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1"
+                    >
+                        Description (Optionnel)
+                    </label>
                     <input
+                        id="formula-description"
                         type="text"
                         value={formula.description || ''}
                         onChange={e => onUpdate('description', e.target.value)}
@@ -57,7 +73,7 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
             </div>
 
             <div>
-                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Rôle de la Formule</label>
+                <span className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Rôle de la Formule</span>
                 <div className="flex gap-2 p-1 bg-stone-950 rounded border border-stone-700/50 w-fit">
                     <button
                         onClick={() => onUpdate('type', 'variable')}
@@ -67,7 +83,7 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                     </button>
                     <button
                         onClick={() => onUpdate('type', 'modifier')}
-                        className={`px-3 py-1 text-xs font-bold rounded transition-colors ${formula.type === 'modifier' || (formula as any).type === 'effect' ? 'bg-amber-600 text-stone-900 border-amber-400/50' : 'text-stone-400 hover:text-stone-300'}`}
+                        className={`px-3 py-1 text-xs font-bold rounded transition-colors ${formula.type === 'modifier' ? 'bg-amber-600 text-stone-900 border-amber-400/50' : 'text-stone-400 hover:text-stone-300'}`}
                     >
                         Effet (Modificateur)
                     </button>
@@ -76,7 +92,7 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
 
             {formula.type === 'variable' && (
                 <div className="animate-in fade-in slide-in-from-top-2">
-                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Source de la Variable</label>
+                    <span className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Source de la Variable</span>
                     <div className="flex gap-2 p-1 bg-stone-950 rounded border border-stone-700/50 w-fit">
                         <button
                             onClick={() => onUpdate('aggregateConfig', undefined)}
@@ -95,11 +111,11 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                 </div>
             )}
 
-            {(formula.type === 'modifier' || (formula as any).type === 'effect') && (
+            {formula.type === 'modifier' && (
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
                         <div>
-                            <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Cible de l'Effet</label>
+                            <span className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Cible de l'Effet</span>
                             <TargetSearchDropdown
                                 value={formula.target || ''}
                                 onUpdate={val => onUpdate('target', val)}
@@ -108,8 +124,14 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                         </div>
                         <div className="flex flex-col gap-3">
                             <div>
-                                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Type d'Effet</label>
+                                <label 
+                                    htmlFor="formula-effect-type"
+                                    className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1"
+                                >
+                                    Type d'Effet
+                                </label>
                                 <select
+                                    id="formula-effect-type"
                                     value={formula.effectType || 'modifier'}
                                     onChange={e => onUpdate('effectType', e.target.value)}
                                     className="w-full p-2 bg-stone-950 border border-stone-700 text-stone-300 rounded focus:border-amber-500 outline-none"
@@ -123,10 +145,16 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                             <div className="flex gap-4 items-end">
                                 {!['block_skill_increase', 'master_skill'].includes(formula.effectType || '') && (
                                     <div className="flex-grow">
-                                        <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Opération</label>
+                                        <label 
+                                            htmlFor="formula-operator"
+                                            className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1"
+                                        >
+                                            Opération
+                                        </label>
                                         <select
+                                            id="formula-operator"
                                             value={formula.operator || ''}
-                                            onChange={e => onUpdate('operator', e.target.value as any)}
+                                            onChange={e => onUpdate('operator', e.target.value)}
                                             className={`w-full p-2 bg-stone-950 border text-stone-300 rounded focus:border-amber-500 outline-none ${!formula.operator ? 'border-dashed border-stone-700 text-stone-500' : 'border-stone-700'}`}
                                         >
                                             <option value="">-- Aucune --</option>
@@ -137,7 +165,7 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                                     </div>
                                 )}
                                 <div className="flex flex-col items-center pb-1 min-w-[90px]">
-                                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2 whitespace-nowrap text-center">Forcer Variante</label>
+                                    <span className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2 whitespace-nowrap text-center">Forcer Variante</span>
                                     <button
                                         onClick={() => onUpdate('forceVariant', !formula.forceVariant)}
                                         className={`relative w-12 h-6 rounded-full transition-all duration-300 focus:outline-none ${formula.forceVariant ? 'bg-indigo-600 shadow-glow-indigo' : 'bg-stone-800 border border-stone-700'}`}
@@ -163,9 +191,15 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
 
             {!formula.aggregateConfig && !['block_skill_increase', 'master_skill'].includes(formula.effectType || '') && (
                 <div>
-                    <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1">Équation Mathématique</label>
+                    <label 
+                        htmlFor="formula-math-equation"
+                        className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1"
+                    >
+                        Équation Mathématique
+                    </label>
                     <div className="relative">
                         <input
+                            id="formula-math-equation"
                             type="text"
                             value={formula.formula || ''}
                             onChange={e => {

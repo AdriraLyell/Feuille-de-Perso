@@ -16,13 +16,15 @@ export const migrateDefaults = (parsed: MigratableData): void => {
     }
 
     // Initialize xpLogs
-    if (!Array.isArray(parsed.xpLogs)) {
-        parsed.xpLogs = [];
+    const data = parsed as Record<string, unknown>;
+    if (!Array.isArray(data.xpLogs)) {
+        data.xpLogs = [];
     }
 
     // Migrate xpLogs entries
-    if (parsed.xpLogs.length > 0) {
-        parsed.xpLogs = parsed.xpLogs.map((log: any) => {
+    const xpLogs = data.xpLogs as Record<string, unknown>[];
+    if (xpLogs.length > 0) {
+        data.xpLogs = xpLogs.map((log) => {
             const newLog = { ...log };
             if (typeof newLog.mj === 'undefined') {
                 newLog.mj = '';
@@ -47,7 +49,7 @@ export const migrateDefaults = (parsed: MigratableData): void => {
         parsed.creationConfig = INITIAL_DATA.creationConfig;
     }
 
-    const creationConfig = parsed.creationConfig as Record<string, any>;
+    const creationConfig = parsed.creationConfig as Record<string, unknown>;
     if (typeof creationConfig.attributeMin === 'undefined') {
         creationConfig.attributeMin = INITIAL_DATA.creationConfig.attributeMin;
     }
@@ -71,7 +73,8 @@ export const migrateDefaults = (parsed: MigratableData): void => {
         parsed.campaignNotes = [];
     } else {
         // Migrate campaign notes images
-        parsed.campaignNotes = parsed.campaignNotes.map((note: any) => {
+        const notes = parsed.campaignNotes as Record<string, unknown>[];
+        parsed.campaignNotes = notes.map((note) => {
             if (note.imageId && (!Array.isArray(note.images) || note.images.length === 0)) {
                 note.images = [{
                     id: Math.random().toString(36).substring(2, 11),
@@ -90,9 +93,10 @@ export const migrateDefaults = (parsed: MigratableData): void => {
     if (!parsed.partyNotes) {
         parsed.partyNotes = INITIAL_DATA.partyNotes;
     } else {
-        const partyNotes = parsed.partyNotes as Record<string, any>;
+        const partyNotes = parsed.partyNotes as Record<string, unknown>;
         if (!partyNotes.staticColWidths) {
             partyNotes.staticColWidths = INITIAL_DATA.partyNotes?.staticColWidths;
         }
     }
 };
+

@@ -1,7 +1,7 @@
 // COMPLEX COMPONENT: VERIFY RETURNS CAREFULLY
 import React from 'react';
 import { RulesData } from '../../../types/rules';
-import { LibrarySkillEntry } from '../../../types';
+import { LibrarySkillEntry, LibraryBackgroundEntry, LibraryCounterEntry } from '../../../types';
 import { BookOpen, Archive, GripVertical, ArrowRight, Layers, Tag, Sparkles, Edit2, RotateCcw, PencilLine } from 'lucide-react';
 import { disambiguateCategories } from '../../../utils/categoryUtils';
 import { DragItem } from '../AdminSkillsEditor';
@@ -17,6 +17,8 @@ interface AdminSkillLibrarySidebarProps {
     draggedItem: DragItem | null;
     setDraggedItem: (item: DragItem | null) => void;
 }
+
+type LibraryItem = LibrarySkillEntry | LibraryBackgroundEntry | LibraryCounterEntry;
 
 const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rules, onUpdate, draggedItem, setDraggedItem }) => {
     const {
@@ -136,6 +138,8 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
             className={`w-80 shrink-0 sticky top-32 h-[calc(100vh-9rem)] bg-stone-950/80 border-l border-y border-stone-800 flex flex-col transition-colors rounded-l-md shadow-glass ${draggedItem?.type === 'admin_sheet_skill' ? 'bg-amber-950/20 border-amber-500/30' : ''}`}
             onDragOver={handleDragOver}
             onDrop={handleDropOnLibrary}
+            role="region"
+            aria-label="Réserve de bibliothèques"
         >
             <div className="bg-stone-900 border-b border-stone-800 shadow-sm">
                 <div className="p-3 font-bold text-stone-300 flex items-center gap-2 uppercase tracking-wider text-xs">
@@ -164,15 +168,16 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                         La réserve est vide.
                     </div>
                 ) : (
-                    visibleLibrary.map((item: any) => (
+                    visibleLibrary.map((item: LibraryItem) => (
                         <div
                             key={item.id}
                             className="bg-stone-900 border border-stone-700/60 rounded-sm shadow-sm overflow-hidden hover:border-amber-500/30 transition-colors group/card"
                         >
-                            <div
+                            <button
+                                type="button"
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, 'admin_lib_skill', { name: item.name, data: item })}
-                                className="p-2 cursor-grab active:cursor-grabbing transition-all flex justify-between items-center group/item hover:bg-stone-800"
+                                className="w-full p-2 cursor-grab active:cursor-grabbing transition-all flex justify-between items-center group/item hover:bg-stone-800 text-left outline-none focus:bg-stone-800"
                             >
                                 <div className="flex items-center gap-2 overflow-hidden">
                                     <GripVertical size={14} className="text-stone-600 shrink-0 group-hover:text-stone-400 transition-colors" />
@@ -183,17 +188,17 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-1">
-                                            {item.isCustomized && (
+                                            {(item as LibrarySkillEntry).isCustomized && (
                                                 <div title="Cette compétence possède une surcharge pour cette campagne">
                                                     <PencilLine size={10} className="text-cyan-500 shrink-0" />
                                                 </div>
                                             )}
-                                            {item.isVariable && (
+                                            {(item as LibrarySkillEntry).isVariable && (
                                                 <div className="flex items-center gap-0.5 text-[9px] text-amber-500 bg-amber-950/30 px-1 rounded-sm border border-amber-500/20" title="Compétence à variantes">
                                                     <Layers size={10} />
                                                 </div>
                                             )}
-                                            {item.mysticAbilityId && (
+                                            {(item as LibrarySkillEntry).mysticAbilityId && (
                                                 <div className="flex items-center gap-0.5 text-[9px] text-amber-500 bg-amber-950/30 px-1 rounded-sm border border-amber-500/20" title="Compétence Mystique">
                                                     <Sparkles size={10} />
                                                 </div>
@@ -207,27 +212,33 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                                 <div className="flex items-center gap-1">
                                     {activeTab === 'skills' && (
                                         <>
-                                            {item.isCustomized && (
-                                                <button
+                                            {(item as LibrarySkillEntry).isCustomized && (
+                                                <div
                                                     onClick={(e) => { e.stopPropagation(); handleReset(item.id); }}
+                                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); handleReset(item.id); } }}
+                                                    role="button"
+                                                    tabIndex={0}
                                                     className="p-1 text-stone-500 hover:text-amber-500 hover:bg-stone-700/50 rounded transition-all opacity-0 group-hover/card:opacity-100"
                                                     title="Réinitialiser aux valeurs d'origine"
                                                 >
                                                     <RotateCcw size={12} />
-                                                </button>
+                                                </div>
                                             )}
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); handleOpenEdit(item); }}
+                                            <div
+                                                onClick={(e) => { e.stopPropagation(); handleOpenEdit(item as LibrarySkillEntry); }}
+                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); handleOpenEdit(item as LibrarySkillEntry); } }}
+                                                role="button"
+                                                tabIndex={0}
                                                 className="p-1 text-stone-500 hover:text-amber-500 hover:bg-stone-700/50 rounded transition-all opacity-0 group-hover/card:opacity-100"
                                                 title="Personnaliser pour cette campagne"
                                             >
                                                 <Edit2 size={12} />
-                                            </button>
+                                            </div>
                                         </>
                                     )}
                                     <ArrowRight size={14} className="text-stone-600 opacity-0 group-hover:opacity-100 shrink-0 mx-1 transition-all group-hover:translate-x-1 group-hover:text-amber-500" />
                                 </div>
-                            </div>
+                            </button>
 
                             {/* Local Category Picker */}
                             <div className="px-2 pb-2 bg-stone-950/30 flex items-center justify-between border-t border-stone-800 pt-1">
@@ -238,7 +249,8 @@ const AdminSkillLibrarySidebar: React.FC<AdminSkillLibrarySidebarProps> = ({ rul
                                         onChange={(e) => {
                                             const cat = e.target.value;
                                             const key = activeTab === 'skills' ? 'skills' : activeTab === 'backgrounds' ? 'backgrounds' : 'counters';
-                                            const newList = rules.libraries[key].map((libItem: any) =>
+                                            const list = rules.libraries[key] as LibraryItem[];
+                                            const newList = list.map((libItem: LibraryItem) =>
                                                 libItem.id === item.id ? { ...libItem, defaultCategory: cat } : libItem
                                             );
                                             onUpdate({

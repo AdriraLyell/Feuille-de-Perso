@@ -160,7 +160,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                                             <p className="text-[10px] text-[#5c4d41] italic line-clamp-2 mb-2 leading-tight opacity-80">{entry.description}</p>
                                         )}
                                         <div className="flex flex-wrap gap-1 mt-1">
-                                            {entry.skillIds.map(sid => {
+                                            {entry.skillIds.map((sid: string) => {
                                                 const s = allSkills.find(sk => sk.id === sid);
                                                 return (
                                                     <span key={sid} className="text-[9px] bg-stone-100/50 text-[#5c4d41] px-1.5 py-0.5 rounded-sm border border-[#bfae85]/20">

@@ -232,10 +232,14 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({
                     </p>
 
                     <div>
-                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-amber-900/80 mb-2">
+                        <label 
+                            htmlFor="mj-update-message"
+                            className="block text-[10px] font-black uppercase tracking-[0.2em] text-amber-900/80 mb-2"
+                        >
                             Message du Gardien (Optionnel)
                         </label>
                         <textarea
+                            id="mj-update-message"
                             value={updateMessage}
                             onChange={(e) => setUpdateMessage(e.target.value)}
                             placeholder="Ex: J'ai rectifié tes points de santé..."

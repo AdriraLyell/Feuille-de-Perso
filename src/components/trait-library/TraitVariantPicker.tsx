@@ -18,6 +18,9 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({
 }) => {
     const [customVariant, setCustomVariant] = useState('');
     const [selectedCost, setSelectedCost] = useState<string>(variantPicker.pointsLabel || variantPicker.points_label || variantPicker.cost || '');
+    
+    const costInputRef = React.useRef<HTMLInputElement>(null);
+    const variantInputRef = React.useRef<HTMLInputElement>(null);
 
     // Unified variable cost detection (hyphen, en-dash, em-dash, comma, semicolon, dots)
     const isVariableCost = useMemo(() => {
@@ -28,6 +31,14 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({
     }, [variantPicker]);
 
     const isVariable = variantPicker.isVariable || variantPicker.is_variable;
+
+    React.useEffect(() => {
+        if (isVariableCost) {
+            costInputRef.current?.focus();
+        } else {
+            variantInputRef.current?.focus();
+        }
+    }, [isVariableCost]);
 
     // Suggestions for costs if it's a range (1-3) or list (1, 3, 5)
     const costSuggestions = useMemo(() => {
@@ -119,7 +130,7 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({
                     {/* Cost Selector (if variable) */}
                     {isVariableCost && (
                         <div className="space-y-3 bg-blue-50/50 p-3 rounded border border-blue-100">
-                            <label className="block text-[10px] font-bold text-blue-800 uppercase tracking-wider">Valeur</label>
+                            <label htmlFor="trait-cost-input" className="block text-[10px] font-bold text-blue-800 uppercase tracking-wider">Valeur</label>
 
                             {/* Suggested costs as buttons */}
                             {costSuggestions.length > 0 && (
@@ -138,12 +149,13 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({
 
                             <div className="flex gap-2">
                                 <input
+                                    id="trait-cost-input"
+                                    ref={costInputRef}
                                     type="text"
                                     placeholder="Valeur choisie..."
                                     className="flex-grow border border-stone-200 rounded px-3 py-1.5 text-sm focus:border-blue-500 outline-none font-mono"
                                     value={selectedCost}
                                     onChange={(e) => setSelectedCost(e.target.value)}
-                                    autoFocus={isVariableCost}
                                 />
                             </div>
                         </div>
@@ -152,15 +164,16 @@ const TraitVariantPicker: React.FC<TraitVariantPickerProps> = ({
                     {/* Variant Section */}
                     {(isVariable || allVariantSuggestions.length > 0) ? (
                         <div className="space-y-3">
-                            <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider">Précision / Variant (Ex: Alcool, Chats...)</label>
+                            <label htmlFor="trait-variant-input" className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider">Précision / Variant (Ex: Alcool, Chats...)</label>
                             <div className="flex gap-2">
                                 <input
+                                    id="trait-variant-input"
+                                    ref={variantInputRef}
                                     type="text"
                                     className="flex-grow border border-stone-200 rounded px-3 py-1.5 text-sm focus:border-blue-500 outline-none"
                                     placeholder="Saisir un variant..."
                                     value={customVariant}
                                     onChange={(e) => setCustomVariant(e.target.value)}
-                                    autoFocus={!isVariableCost}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') handleConfirm(customVariant);
                                         if (e.key === 'Escape') onClose();

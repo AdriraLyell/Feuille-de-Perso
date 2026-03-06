@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useCharacterBonuses } from '../hooks/useCharacterBonuses';
@@ -94,3 +95,4 @@ describe('useCharacterBonuses Hook', () => {
         expect(result.current.attributeBonuses['dexterity'].sources).toHaveLength(2);
     });
 });
+

@@ -98,6 +98,7 @@ export const NarrativeSection = Node.create({
     },
 
     addNodeView() {
-        return ReactNodeViewRenderer(NarrativeSectionView as any);
+        return ReactNodeViewRenderer(NarrativeSectionView);
     },
 });
+

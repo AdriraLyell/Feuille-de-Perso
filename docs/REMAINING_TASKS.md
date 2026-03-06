@@ -15,8 +15,10 @@ Statut global : ✅ **Complété**
   - [x] Remplacer les couleurs "magiques" (white/black) par des variables CSS dans `index.css`.
 - [x] **Vérification & Nettoyage Final**
   - [x] Confirmer la suppression de `tiptap-pagination-plus`.
-  - [x] Incrémenter la version (`2.49.14`).
-  - [x] Mettre à jour `src/data/changelog.json`.
+  - [x] Archiver les scripts SQL obsolètes vers `docs/archive/sql/`.
+  - [x] Résoudre les 59 dernières erreurs TypeScript (Typage Strict 100%).
+  - [x] Incrémenter la version (`2.99.0`).
+  - [x] Mettre à jour `CHANGELOG.md`.
   - [x] Build final de vérification (`npm run build`).
 
 ---

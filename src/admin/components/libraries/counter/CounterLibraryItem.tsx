@@ -50,7 +50,7 @@ export const CounterLibraryItem: React.FC<CounterLibraryItemProps> = ({
                 <div className="w-16 flex items-center gap-1 shrink-0">
                     {item.isGlobal && <div title="Item Global"><Globe size={14} className="text-indigo-500" /></div>}
                     {isLocked && (
-                        <div
+                        <span
                             ref={lockIconRef}
                             onMouseEnter={() => {
                                 if (isLocked && !isPlaced && onLoadUsageDetails) {
@@ -59,7 +59,16 @@ export const CounterLibraryItem: React.FC<CounterLibraryItemProps> = ({
                                 setShowLockTooltip(true);
                             }}
                             onMouseLeave={() => setShowLockTooltip(false)}
-                            className="relative flex items-center shrink-0"
+                            onFocus={() => {
+                                if (isLocked && !isPlaced && onLoadUsageDetails) {
+                                    onLoadUsageDetails(item.id);
+                                }
+                                setShowLockTooltip(true);
+                            }}
+                            onBlur={() => setShowLockTooltip(false)}
+                            role="button"
+                            tabIndex={0}
+                            className="relative flex items-center shrink-0 outline-none focus:ring-1 focus:ring-amber-600 rounded-sm"
                             title={isPlaced ? "Utilisé dans cette campagne" : undefined}
                         >
                             <Lock size={14} className="text-amber-600" />
@@ -70,7 +79,7 @@ export const CounterLibraryItem: React.FC<CounterLibraryItemProps> = ({
                                 isPlaced={isPlaced}
                                 usageDetails={usageDetails}
                             />
-                        </div>
+                        </span>
                     )}
                 </div>
 

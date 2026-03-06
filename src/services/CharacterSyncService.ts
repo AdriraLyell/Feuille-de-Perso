@@ -72,7 +72,11 @@ export const CharacterSyncService = {
     generateDataHash(data: CharacterSheetData): string {
         try {
             // Exclude volatile and externalized fields from the hash
-            const { syncInfo: _, appLogs: __, xpLogs: ___, _rulesVersion: ____, bookDocument: _____, ...stableData } = data;
+            const {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                syncInfo, appLogs, xpLogs, _rulesVersion, bookDocument,
+                ...stableData
+            } = data;
 
             // Fast hashing via string manipulation
             const str = JSON.stringify(stableData);
@@ -146,9 +150,10 @@ export const CharacterSyncService = {
 
             // Step 4: Sync bookDocument separately if present
             if (bookDocument?.content) {
+                const compressedBook = await ImageSyncResolver.resolveImagesForSync(bookDocument.content);
                 await BookSyncService.saveBook(
                     result.id,
-                    bookDocument.content,
+                    compressedBook as import('@tiptap/core').JSONContent,
                     bookDocument.formatVersion ?? 2
                 );
             }
@@ -235,7 +240,24 @@ export const CharacterSyncService = {
             'CharacterSyncService.getCharacterById'
         );
 
-        return character ? this._enrichCharacterData(character) : null;
+        if (!character) return null;
+
+        try {
+            const book = await BookSyncService.getBook(id);
+            if (book && character.data) {
+                character.data.bookDocument = {
+                    id: book.id,
+                    content: book.content,
+                    formatVersion: book.format_version,
+                    createdAt: book.created_at,
+                    updatedAt: book.updated_at
+                };
+            }
+        } catch (e) {
+            ErrorService.handleError(e, { context: 'CharacterSyncService.getCharacterById (Book Fetch)' });
+        }
+
+        return this._enrichCharacterData(character);
     },
 
     /**
@@ -326,7 +348,7 @@ export const CharacterSyncService = {
         return await DatabaseService.checkAvailable('characters');
     },
 
-    async processImages(obj: any, action: 'compress' | 'decompress'): Promise<any> {
+    async processImages(obj: unknown, action: 'compress' | 'decompress'): Promise<unknown> {
         return action === 'compress'
             ? ImageSyncResolver.resolveImagesForSync(obj)
             : ImageSyncResolver.injectImagesAfterSync(obj);

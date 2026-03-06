@@ -85,8 +85,9 @@ const VariantSelectionModal: React.FC<Props> = ({
                     {/* Option 1: Suggestions */}
                     {hasSuggestions && (
                         <div className={`border ${selectionMode === 'suggestion' ? 'border-amber-500 bg-amber-50/30' : 'border-stone-200'} rounded-md p-3 transition-colors`}>
-                            <div
-                                className="flex items-center gap-2 cursor-pointer mb-2"
+                            <button
+                                type="button"
+                                className="flex items-center gap-2 mb-2 w-full text-left outline-none"
                                 onClick={() => setSelectionMode('suggestion')}
                             >
                                 {selectionMode === 'suggestion' ? (
@@ -95,7 +96,7 @@ const VariantSelectionModal: React.FC<Props> = ({
                                     <Circle size={18} className="text-stone-400" />
                                 )}
                                 <span className="font-bold text-[#5c4d41]">Choisir parmi les variantes officielles</span>
-                            </div>
+                            </button>
 
                             <div className={`ml-6 grid grid-cols-2 gap-2 ${selectionMode !== 'suggestion' ? 'opacity-50 pointer-events-none' : ''}`}>
                                 {variants.map((v) => (
@@ -116,8 +117,9 @@ const VariantSelectionModal: React.FC<Props> = ({
 
                     {/* Option 2: Custom */}
                     <div className={`border ${selectionMode === 'custom' ? 'border-amber-500 bg-amber-50/30' : 'border-stone-200'} rounded-md p-3 transition-colors`}>
-                        <div
-                            className="flex items-center gap-2 cursor-pointer mb-2"
+                        <button
+                            type="button"
+                            className="flex items-center gap-2 mb-2 w-full text-left outline-none"
                             onClick={() => setSelectionMode('custom')}
                         >
                             {selectionMode === 'custom' ? (
@@ -126,13 +128,17 @@ const VariantSelectionModal: React.FC<Props> = ({
                                 <Circle size={18} className="text-stone-400" />
                             )}
                             <span className="font-bold text-[#5c4d41]">Créer une variante personnalisée</span>
-                        </div>
+                        </button>
 
                         <div className={`ml-6 ${selectionMode !== 'custom' ? 'opacity-50 pointer-events-none' : ''}`}>
-                            <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">
+                            <label 
+                                htmlFor="custom-variant-input"
+                                className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest"
+                            >
                                 Nom de la variante (ex: Poterie, Cuisine...)
                             </label>
                             <input
+                                id="custom-variant-input"
                                 className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm text-lg"
                                 value={customValue}
                                 onChange={(e) => setCustomValue(e.target.value)}

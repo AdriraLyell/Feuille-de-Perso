@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { SyncedCharacter } from '../../services/CharacterSyncService';
 import { CampaignService, GameSettingSummary } from '../../services/CampaignService';
 import { RulesData } from '../../types/rules';
-import { DotEntry } from '../../types';
+import { DotEntry, TraitEntry, CharacterSheetData } from '../../types';
 import { logger } from '../../utils/logger';
 
 export type TabType = 'traits' | 'skills' | 'specializations' | 'backgrounds' | 'counters';
@@ -28,11 +28,11 @@ export function useLibraryImport(
     const [isSaving, setIsSaving] = useState(false);
     const [importDestination, setImportDestination] = useState<'campaign' | 'global'>('campaign');
 
-    const [traitCandidates, setTraitCandidates] = useState<ImportCandidate<any>[]>([]);
-    const [skillCandidates, setSkillCandidates] = useState<ImportCandidate<any>[]>([]);
-    const [specCandidates, setSpecCandidates] = useState<ImportCandidate<any>[]>([]);
-    const [backgroundCandidates, setBackgroundCandidates] = useState<ImportCandidate<any>[]>([]);
-    const [counterCandidates, setCounterCandidates] = useState<ImportCandidate<any>[]>([]);
+    const [traitCandidates, setTraitCandidates] = useState<ImportCandidate<TraitEntry>[]>([]);
+    const [skillCandidates, setSkillCandidates] = useState<ImportCandidate<DotEntry & { defaultCategory: string }>[]>([]);
+    const [specCandidates, setSpecCandidates] = useState<ImportCandidate<unknown>[]>([]); 
+    const [backgroundCandidates, setBackgroundCandidates] = useState<ImportCandidate<DotEntry>[]>([]);
+    const [counterCandidates, setCounterCandidates] = useState<ImportCandidate<DotEntry>[]>([]);
 
     useEffect(() => {
         if (!targetSettingId) {
@@ -51,107 +51,110 @@ export function useLibraryImport(
             if (!currentRules) return;
             setRules(currentRules);
 
-            const charData = typeof character.data === 'string'
+            const charData = (typeof character.data === 'string'
                 ? JSON.parse(character.data)
-                : character.data;
+                : character.data) as CharacterSheetData;
 
-            // Traits
-            const traits = (charData.traits || []).map((t: any) => ({
+            // Traits (Avantages & Désavantages)
+            const allTraits = [...(charData.page2?.avantages || []), ...(charData.page2?.desavantages || [])];
+            const traits = allTraits.map((t: TraitEntry) => ({
                 name: t.name,
                 data: t,
                 isSelected: true,
-                isDuplicate: (currentRules.libraries?.traits || []).some((l: any) =>
+                isDuplicate: (currentRules.libraries?.traits || []).some((l) =>
                     (t.definitionId && l.id === t.definitionId) || l.name?.trim().toLowerCase() === t.name?.trim().toLowerCase()
                 ),
-                isVariable: t.isVariable
+                isVariable: t.isXPUpgradeable
             }));
             setTraitCandidates(traits);
 
-            // Skills
-            const skills: ImportCandidate<any>[] = [];
+            // Skills & Backgrounds
+            const skills: ImportCandidate<DotEntry & { defaultCategory: string }>[] = [];
+            const bgs: ImportCandidate<DotEntry>[] = [];
             const skillsMap = charData.skills || {};
+
             Object.keys(skillsMap).forEach(catId => {
-                const list = skillsMap[catId] || [];
+                const list = (skillsMap as Record<string, DotEntry[]>)[catId] || [];
+                const catDef = currentRules.definitions.skillCategories?.find(c => c.id === catId);
+                const isBg = catDef?.behavior === 'Arrière-plan' || catId === 'Col_Comp_8';
+
                 list.forEach((s: DotEntry) => {
                     if (s.name && s.name !== "Nouvelle Compétence") {
-                        skills.push({
+                        const candidate = {
                             name: s.name,
                             data: { ...s, defaultCategory: catId },
                             isSelected: true,
-                            isDuplicate: (currentRules.libraries?.skills || []).some((l: any) =>
+                            isDuplicate: false,
+                            isVariable: !!s.isVariable
+                        };
+
+                        if (isBg) {
+                            candidate.isDuplicate = (currentRules.libraries?.backgrounds || []).some((l) =>
                                 (s.definitionId && l.id === s.definitionId) || l.name?.trim().toLowerCase() === s.name?.trim().toLowerCase()
-                            ),
-                            isVariable: (s as any).isVariable
-                        });
+                            );
+                            bgs.push(candidate);
+                        } else {
+                            candidate.isDuplicate = (currentRules.libraries?.skills || []).some((l) =>
+                                (s.definitionId && l.id === s.definitionId) || l.name?.trim().toLowerCase() === s.name?.trim().toLowerCase()
+                            );
+                            skills.push(candidate);
+                        }
                     }
                 });
             });
             setSkillCandidates(skills);
+            setBackgroundCandidates(bgs);
 
             // Specs
-            const specs: ImportCandidate<any>[] = [];
-            Object.keys(skillsMap).forEach(catId => {
-                const list = skillsMap[catId] || [];
-                list.forEach((s: DotEntry) => {
-                    if ((s as any).specializations) {
-                        (s as any).specializations.forEach((spec: any) => {
-                            if (spec.name) {
-                                specs.push({
-                                    name: spec.name,
-                                    data: spec,
-                                    isSelected: true,
-                                    isDuplicate: (currentRules.libraries?.specializations || []).some((l: any) =>
-                                        l.name?.trim().toLowerCase() === spec.name?.trim().toLowerCase()
-                                    ),
-                                    isVariable: false
-                                });
-                            }
+            const specs: ImportCandidate<unknown>[] = [];
+            const specMap = charData.specializations || {};
+            Object.keys(specMap).forEach(skillId => {
+                const list = specMap[skillId] || [];
+                list.forEach(specName => {
+                    if (specName && specName.trim() !== "") {
+                        specs.push({
+                            name: specName,
+                            data: { name: specName, skillId },
+                            isSelected: true,
+                            isDuplicate: (currentRules.libraries?.specializations || []).some((l) =>
+                                l.name?.trim().toLowerCase() === specName.trim().toLowerCase()
+                            ),
+                            isVariable: false
                         });
                     }
                 });
             });
             setSpecCandidates(specs);
 
-            // Backgrounds
-            const backgrounds = (charData.backgrounds || []).map((b: any) => ({
-                name: b.name,
-                data: b,
-                isSelected: true,
-                isDuplicate: (currentRules.libraries?.backgrounds || []).some((l: any) =>
-                    (b.definitionId && l.id === b.definitionId) || l.name?.trim().toLowerCase() === b.name?.trim().toLowerCase()
-                ),
-                isVariable: false
-            }));
-            setBackgroundCandidates(backgrounds);
-
             // Counters
-            const countersFlat: ImportCandidate<any>[] = [];
+            const countersFlat: ImportCandidate<DotEntry>[] = [];
             const countersData = charData.counters || {};
 
-            // Handle record structure
             Object.keys(countersData).forEach(key => {
-                const item = countersData[key];
+                const item = (countersData as Record<string, unknown>)[key];
                 if (Array.isArray(item)) {
-                    item.forEach(c => {
-                        if (c.name) {
+                    item.forEach((c: unknown) => {
+                        const counter = c as DotEntry;
+                        if (counter && typeof counter === 'object' && counter.name) {
                             countersFlat.push({
-                                name: c.name,
-                                data: c,
+                                name: counter.name,
+                                data: counter,
                                 isSelected: true,
-                                isDuplicate: (currentRules.libraries?.counters || []).some((l: any) =>
-                                    (c.definitionId && l.id === c.definitionId) || l.name?.trim().toLowerCase() === c.name?.trim().toLowerCase()
+                                isDuplicate: (currentRules.libraries?.counters || []).some((l) =>
+                                    (counter.definitionId && l.id === counter.definitionId) || l.name?.trim().toLowerCase() === counter.name?.trim().toLowerCase()
                                 ),
                                 isVariable: false
                             });
                         }
                     });
-                } else if (item && item.name) {
+                } else if (item && typeof item === 'object' && 'name' in item) {
+                    const counter = item as unknown as DotEntry;
                     countersFlat.push({
-                        name: item.name,
-                        data: item,
+                        name: counter.name,
+                        data: counter,
                         isSelected: true,
-                        isDuplicate: (currentRules.libraries?.counters || []).some((l: any) =>
-                            (item.definitionId && l.id === item.definitionId) || l.name?.trim().toLowerCase() === item.name?.trim().toLowerCase()
+                        isDuplicate: (currentRules.libraries?.counters || []).some((l) =>
+                            (counter.definitionId && l.id === counter.definitionId) || l.name?.trim().toLowerCase() === counter.name?.trim().toLowerCase()
                         ),
                         isVariable: false
                     });
@@ -174,17 +177,17 @@ export function useLibraryImport(
     const handleTabChange = (tab: TabType) => setActiveTab(tab);
 
     const toggleCandidateSelection = (type: TabType, index: number) => {
-        const updater = (prev: ImportCandidate<any>[]) => {
+        const updater = <T>(prev: ImportCandidate<T>[]) => {
             const next = [...prev];
             next[index] = { ...next[index], isSelected: !next[index].isSelected };
             return next;
         };
 
-        if (type === 'traits') setTraitCandidates(updater);
-        if (type === 'skills') setSkillCandidates(updater);
-        if (type === 'specializations') setSpecCandidates(updater);
-        if (type === 'backgrounds') setBackgroundCandidates(updater);
-        if (type === 'counters') setCounterCandidates(updater);
+        if (type === 'traits') setTraitCandidates(prev => updater(prev));
+        if (type === 'skills') setSkillCandidates(prev => updater(prev));
+        if (type === 'specializations') setSpecCandidates(prev => updater(prev));
+        if (type === 'backgrounds') setBackgroundCandidates(prev => updater(prev));
+        if (type === 'counters') setCounterCandidates(prev => updater(prev));
     };
 
     const handleImport = async () => {
@@ -203,7 +206,7 @@ export function useLibraryImport(
                     name: c.name,
                     description: c.data.description || "",
                     type: c.data.type || "avantage",
-                    cost: String(c.data.cost || "0")
+                    cost: String(c.data.value || "0")
                 }));
                 updatedRules.libraries.traits = [...(updatedRules.libraries.traits || []), ...newTraits];
             }
@@ -238,9 +241,9 @@ export function useLibraryImport(
                 const newCounters = selectedCounters.map(c => ({
                     id: crypto.randomUUID(),
                     name: c.name,
-                    description: "",
-                    defaultValue: c.data.defaultValue || 0,
-                    maxValue: c.data.maxValue || 10,
+                    description: c.data.description || "",
+                    defaultValue: c.data.creationValue || 0,
+                    maxValue: c.data.max || 10,
                     xpCost: 0
                 }));
                 updatedRules.libraries.counters = [...(updatedRules.libraries.counters || []), ...newCounters];

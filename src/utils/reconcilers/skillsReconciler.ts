@@ -41,38 +41,72 @@ function processSkillCategories(
 
             processedNames.add(name.toLowerCase());
 
+            const catDef = rules.definitions.skillCategories?.find(c => c.id === category);
+            const isCounterCat = catDef?.behavior === 'Compteur';
+            const isBgCat = catDef?.behavior === 'Arrière-plan';
+
             // Find definition in libraries for ID mapping
             const libSkill = (rules.libraries?.skills?.find(s => s && normalizeString(s.name) === normalizeString(name)))
-                || (rules.libraries?.mysticAbilities?.find(s => s && normalizeString(s.name) === normalizeString(name)));
+                || (rules.libraries?.mysticAbilities?.find(s => s && normalizeString(s.name) === normalizeString(name)))
+                || (isCounterCat ? rules.libraries?.counters?.find(s => s && normalizeString(s.name) === normalizeString(name)) : undefined);
             const definitionId = libSkill?.id;
 
             // Matching logic: definitionId preferred, name fallback
-            let matchingExisting = existingEntries.filter(e =>
+            const matchingExisting = existingEntries.filter(e =>
                 !consumedIds.has(e.id) && (
                     (definitionId && e.definitionId === definitionId) ||
                     (!e.definitionId && normalizeString(e.name) === normalizeString(name))
                 )
             );
 
+            const max = isBgCat ? 5 : (rules.configurations?.global?.maxSkillScore || 10);
+            const libSkillObj = libSkill as Record<string, unknown> | undefined;
+            const libMax = Number(libSkillObj?.maxValue || libSkillObj?.max || max);
+
             if (matchingExisting.length > 0) {
                 return matchingExisting.map(existing => {
                     consumedIds.add(existing.id);
+                    
+                    // Specific logic for counters: ID must match rule key if possible
+                    let targetId = existing.id as string;
+                    if (isCounterCat && rules.definitions.counters) {
+                        const counterKey = Object.keys(rules.definitions.counters).find(k => normalizeString(rules.definitions.counters[k].name) === normalizeString(name));
+                        if (counterKey) targetId = counterKey;
+                    }
+
                     return {
                         ...existing,
+                        id: targetId,
                         name, // Keep official name
-                        definitionId
-                    };
+                        definitionId,
+                        max: libMax // Sync max from library if present
+                    } as DotEntry;
                 });
             } else {
                 // New skill from rules
+                const targetId = generateId();
+                if (isCounterCat && rules.definitions.counters) {
+                    const counterKey = Object.keys(rules.definitions.counters).find(k => normalizeString(rules.definitions.counters[k].name) === normalizeString(name));
+                    if (counterKey) {
+                        return [{
+                            id: counterKey,
+                            name,
+                            value: 0,
+                            creationValue: 0,
+                            max: libMax,
+                            definitionId
+                        }] as DotEntry[];
+                    }
+                }
+
                 return [{
-                    id: generateId(),
+                    id: targetId,
                     name,
                     value: 0,
                     creationValue: 0,
-                    max: 5,
+                    max: libMax,
                     definitionId
-                }];
+                }] as DotEntry[];
             }
         });
 

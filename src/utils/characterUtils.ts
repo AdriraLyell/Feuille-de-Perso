@@ -1,5 +1,5 @@
 
-import { CharacterSheetData } from '../types';
+import { CharacterSheetData, AttributeEntry, DotEntry, CombatEntry, ReputationEntry } from '../types';
 
 // --- RESET LOGIC ---
 /**
@@ -7,10 +7,12 @@ import { CharacterSheetData } from '../types';
  * Utilisé pour redémarrer un personnage de zéro.
  */
 export const resetCharacterValues = (source: CharacterSheetData): CharacterSheetData => {
-    const clean = JSON.parse(JSON.stringify(source));
+    const clean: CharacterSheetData = JSON.parse(JSON.stringify(source));
 
     // Reset Header
-    Object.keys(clean.header).forEach((k: keyof typeof clean.header) => clean.header[k] = "");
+    Object.keys(clean.header).forEach((k) => {
+        (clean.header as unknown as Record<string, string>)[k] = "";
+    });
 
     // Reset XP & Logs
     clean.experience = { gain: '0', spent: '0', rest: '0' };
@@ -21,7 +23,7 @@ export const resetCharacterValues = (source: CharacterSheetData): CharacterSheet
     if (clean.attributes) {
         Object.keys(clean.attributes).forEach((cat: string) => {
             if (Array.isArray(clean.attributes[cat])) {
-                clean.attributes[cat].forEach((attr: any) => {
+                clean.attributes[cat].forEach((attr: AttributeEntry) => {
                     attr.val1 = ""; attr.val2 = ""; attr.val3 = "";
                     attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
                 });
@@ -33,7 +35,7 @@ export const resetCharacterValues = (source: CharacterSheetData): CharacterSheet
     if (clean.secondaryAttributes) {
         Object.keys(clean.secondaryAttributes).forEach((cat: string) => {
             if (Array.isArray(clean.secondaryAttributes[cat])) {
-                clean.secondaryAttributes[cat].forEach((attr: any) => {
+                clean.secondaryAttributes[cat].forEach((attr: AttributeEntry) => {
                     attr.val1 = ""; attr.val2 = ""; attr.val3 = "";
                     attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
                 });
@@ -43,7 +45,7 @@ export const resetCharacterValues = (source: CharacterSheetData): CharacterSheet
 
     // Skills
     Object.keys(clean.skills).forEach((cat: string) => {
-        clean.skills[cat].forEach((skill: any) => {
+        clean.skills[cat].forEach((skill: DotEntry) => {
             skill.value = 0;
             skill.creationValue = 0;
             if (typeof skill.current !== 'undefined') skill.current = 0;
@@ -51,14 +53,14 @@ export const resetCharacterValues = (source: CharacterSheetData): CharacterSheet
     });
 
     // Combat
-    clean.combat.weapons.forEach((w: any) => { w.weapon = ""; w.level = ""; w.init = ""; w.attack = ""; w.damage = ""; w.parry = ""; });
-    clean.combat.armor.forEach((a: any) => { a.type = ""; a.protection = ""; a.weight = ""; });
+    clean.combat.weapons.forEach((w: CombatEntry) => { w.weapon = ""; w.level = ""; w.init = ""; w.attack = ""; w.damage = ""; w.parry = ""; });
+    clean.combat.armor.forEach((a: { type: string; protection: string; weight: string }) => { a.type = ""; a.protection = ""; a.weight = ""; });
     clean.combat.stats = { agility: '', dexterity: '', force: '', size: '' };
 
     // Page 2
     clean.page2.lieux_importants = "";
     clean.page2.contacts = "";
-    clean.page2.reputation.forEach((r: any) => { r.reputation = ''; r.lieu = ''; r.valeur = ''; });
+    clean.page2.reputation.forEach((r: ReputationEntry) => { r.reputation = ''; r.lieu = ''; r.valeur = ''; });
     clean.page2.connaissances = "";
     clean.page2.valeurs_monetaires = "";
     clean.page2.armes_list = "";
@@ -77,13 +79,15 @@ export const resetCharacterValues = (source: CharacterSheetData): CharacterSheet
 
     // Counters
     if (clean.counters?.volonte) {
-        clean.counters.volonte.value = 3; clean.counters.volonte.creationValue = 3; clean.counters.volonte.current = 0;
+        const v = clean.counters.volonte as DotEntry;
+        v.value = 3; v.creationValue = 3; v.current = 0;
     }
     if (clean.counters?.confiance) {
-        clean.counters.confiance.value = 3; clean.counters.confiance.creationValue = 3; clean.counters.confiance.current = 0;
+        const c = clean.counters.confiance as DotEntry;
+        c.value = 3; c.creationValue = 3; c.current = 0;
     }
     if (clean.counters?.custom) {
-        clean.counters.custom.forEach((c: any) => { c.value = 0; c.creationValue = 0; c.current = 0; });
+        clean.counters.custom.forEach((c: DotEntry) => { c.value = 0; c.creationValue = 0; c.current = 0; });
     }
 
     return clean;
@@ -95,7 +99,7 @@ export const resetCharacterValues = (source: CharacterSheetData): CharacterSheet
  * Réinitialise uniquement les statistiques (Attributs, Compétences) et prépare le remboursement d'XP.
  */
 export const recreateCharacterStats = (source: CharacterSheetData): CharacterSheetData => {
-    const clean = JSON.parse(JSON.stringify(source));
+    const clean: CharacterSheetData = JSON.parse(JSON.stringify(source));
 
     // ON GARDE : Header, Combat, Page2 (Social, Traits, Équipement, Image), CampaignNotes
 
@@ -108,7 +112,7 @@ export const recreateCharacterStats = (source: CharacterSheetData): CharacterShe
     if (clean.attributes) {
         Object.keys(clean.attributes).forEach((cat: string) => {
             if (Array.isArray(clean.attributes[cat])) {
-                clean.attributes[cat].forEach((attr: any) => {
+                clean.attributes[cat].forEach((attr: AttributeEntry) => {
                     attr.val1 = ""; attr.val2 = ""; attr.val3 = "";
                     attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
                 });
@@ -120,7 +124,7 @@ export const recreateCharacterStats = (source: CharacterSheetData): CharacterShe
     if (clean.secondaryAttributes) {
         Object.keys(clean.secondaryAttributes).forEach((cat: string) => {
             if (Array.isArray(clean.secondaryAttributes[cat])) {
-                clean.secondaryAttributes[cat].forEach((attr: any) => {
+                clean.secondaryAttributes[cat].forEach((attr: AttributeEntry) => {
                     attr.val1 = ""; attr.val2 = ""; attr.val3 = "";
                     attr.creationVal1 = 0; attr.creationVal2 = 0; attr.creationVal3 = 0;
                 });
@@ -130,7 +134,7 @@ export const recreateCharacterStats = (source: CharacterSheetData): CharacterShe
 
     // Skills (On vide tout, les spécialisations suivront)
     Object.keys(clean.skills).forEach((cat: string) => {
-        clean.skills[cat].forEach((skill: any) => {
+        clean.skills[cat].forEach((skill: DotEntry) => {
             skill.value = 0;
             skill.creationValue = 0;
             if (typeof skill.current !== 'undefined') skill.current = 0;
@@ -142,13 +146,15 @@ export const recreateCharacterStats = (source: CharacterSheetData): CharacterShe
 
     // Counters (Retour aux bases)
     if (clean.counters?.volonte) {
-        clean.counters.volonte.value = 3; clean.counters.volonte.creationValue = 3; clean.counters.volonte.current = 0;
+        const v = clean.counters.volonte as DotEntry;
+        v.value = 3; v.creationValue = 3; v.current = 0;
     }
     if (clean.counters?.confiance) {
-        clean.counters.confiance.value = 3; clean.counters.confiance.creationValue = 3; clean.counters.confiance.current = 0;
+        const c = clean.counters.confiance as DotEntry;
+        c.value = 3; c.creationValue = 3; c.current = 0;
     }
     if (clean.counters?.custom) {
-        clean.counters.custom.forEach((c: any) => { c.value = 0; c.creationValue = 0; c.current = 0; });
+        clean.counters.custom.forEach((c: DotEntry) => { c.value = 0; c.creationValue = 0; c.current = 0; });
     }
 
     return clean;

@@ -44,15 +44,15 @@ export const ImageSyncResolver = {
                     } else {
                         processed[key] = value;
                     }
-                } catch (e) {
-                    logger.error("[ImageSyncResolver] Failed to resolve portrait image:", e);
+                } catch {
+                    logger.error("[ImageSyncResolver] Failed to resolve portrait image:");
                     processed[key] = value;
                 }
             }
             // Case 2: Grimoire Image Node (Tiptap bookImage)
-            else if (key === 'type' && value === 'bookImage' && (obj.attrs as Record<string, any> | undefined)?.imageId) {
+            else if (key === 'type' && value === 'bookImage' && (obj.attrs as Record<string, unknown> | undefined)?.imageId) {
                 try {
-                    const attrs = obj.attrs as Record<string, any>;
+                    const attrs = obj.attrs as Record<string, unknown>;
                     const imageId = attrs.imageId;
 
                     // If imageId is already compressed, skip it
@@ -80,8 +80,8 @@ export const ImageSyncResolver = {
                             return processed;
                         }
                     }
-                } catch (e) {
-                    logger.error("[ImageSyncResolver] Failed to resolve book image:", e);
+                } catch {
+                    logger.error("[ImageSyncResolver] Failed to resolve book image:");
                 }
                 processed[key] = value;
             }
@@ -90,7 +90,7 @@ export const ImageSyncResolver = {
                 try {
                     const result = await ImageCompressionService.compressFull(value);
                     processed[key] = result.compressed;
-                } catch (e) {
+                } catch {
                     processed[key] = value;
                 }
             }
@@ -126,8 +126,8 @@ export const ImageSyncResolver = {
                     const blob = await base64ToBlob(decompressed);
                     const newId = await saveImage(blob);
                     processed[key] = newId;
-                } catch (e) {
-                    logger.error("[ImageSyncResolver] Failed to inject portrait image:", e);
+                } catch {
+                    logger.error("[ImageSyncResolver] Failed to inject portrait image:");
                     processed[key] = '';
                 }
             }
@@ -139,32 +139,34 @@ export const ImageSyncResolver = {
                     const newId = await saveImage(blob);
                     processed.characterImageId = newId;
                     processed.characterImage = '';
-                } catch (e) {
-                    logger.error("[ImageSyncResolver] Failed to inject legacy character image:", e);
+                } catch {
+                    logger.error("[ImageSyncResolver] Failed to inject legacy character image:");
                     processed[key] = '';
                 }
             }
             // Case 2: Grimoire Image Node (compressed string in imageId attr)
-            else if (key === 'type' && value === 'bookImage' && (obj.attrs as Record<string, any> | undefined)?.imageId?.startsWith?.(GZIP_MARKER)) {
+            else if (key === 'type' && value === 'bookImage' && (obj.attrs as Record<string, unknown> | undefined)?.imageId) {
                 try {
-                    const attrs = obj.attrs as Record<string, any>;
+                    const attrs = obj.attrs as Record<string, unknown>;
                     const compressed = attrs.imageId;
-                    const decompressed = ImageCompressionService.decompressFull(compressed);
-                    const blob = await base64ToBlob(decompressed);
-                    const newId = await saveImage(blob);
+                    if (typeof compressed === 'string' && compressed.startsWith(GZIP_MARKER)) {
+                        const decompressed = ImageCompressionService.decompressFull(compressed);
+                        const blob = await base64ToBlob(decompressed);
+                        const newId = await saveImage(blob);
 
-                    processed.type = 'bookImage';
-                    processed.attrs = {
-                        ...attrs,
-                        imageId: newId // Replace compressed data with local ID
-                    };
+                        processed.type = 'bookImage';
+                        processed.attrs = {
+                            ...attrs,
+                            imageId: newId // Replace compressed data with local ID
+                        };
 
-                    for (const k of Object.keys(obj)) {
-                        if (k !== 'type' && k !== 'attrs') processed[k] = obj[k];
+                        for (const k of Object.keys(obj)) {
+                            if (k !== 'type' && k !== 'attrs') processed[k] = obj[k];
+                        }
+                        return processed;
                     }
-                    return processed;
-                } catch (e) {
-                    logger.error("[ImageSyncResolver] Failed to inject book image:", e);
+                } catch {
+                    logger.error("[ImageSyncResolver] Failed to inject book image:");
                 }
                 processed[key] = value;
             }
@@ -176,8 +178,8 @@ export const ImageSyncResolver = {
                     const newId = await saveImage(blob);
                     processed.imageId = newId;
                     // We don't return here because we want to keep processing other fields in the note
-                } catch (e) {
-                    logger.error("[ImageSyncResolver] Failed to inject note cover image:", e);
+                } catch {
+                    logger.error("[ImageSyncResolver] Failed to inject note cover image:");
                 }
                 // Don't include base64Cover in the final object
                 continue;
@@ -189,8 +191,8 @@ export const ImageSyncResolver = {
                     const blob = await base64ToBlob(decompressed);
                     const newId = await saveImage(blob);
                     processed.imageId = newId;
-                } catch (e) {
-                    logger.error("[ImageSyncResolver] Failed to inject note gallery image:", e);
+                } catch {
+                    logger.error("[ImageSyncResolver] Failed to inject note gallery image:");
                 }
                 // Don't include base64Data in the final object
                 continue;
@@ -199,7 +201,7 @@ export const ImageSyncResolver = {
             else if (typeof value === 'string' && value.startsWith(GZIP_MARKER)) {
                 try {
                     processed[key] = ImageCompressionService.decompressFull(value);
-                } catch (e) {
+                } catch {
                     processed[key] = value;
                 }
             }

@@ -38,7 +38,7 @@ export const migrateSkills = (parsed: MigratableData): void => {
         parsed.skills = {};
     }
 
-    const rawSkills = parsed.skills as Record<string, any[]>;
+    const rawSkills = parsed.skills as Record<string, unknown[]>;
 
     // STEP 1: Migrate legacy skill category keys FIRST
     Object.keys(LEGACY_SKILL_MAP).forEach(oldKey => {
@@ -66,8 +66,9 @@ export const migrateSkills = (parsed: MigratableData): void => {
     });
 
     // STEP 4: Ensure all skills have creationValue
-    const ensureCreationValue = (list: any[]) => {
-        return list.map(item => {
+    const ensureCreationValue = (list: unknown[]) => {
+        return list.map(itemRaw => {
+            const item = itemRaw as { creationValue?: number };
             if (item && typeof item.creationValue === 'undefined') {
                 return { ...item, creationValue: 0 };
             }
@@ -93,7 +94,8 @@ export const migrateSkills = (parsed: MigratableData): void => {
 
         Object.keys(rawSkills).forEach(key => {
             if (Array.isArray(rawSkills[key])) {
-                rawSkills[key] = rawSkills[key].map((skill: any) => {
+                rawSkills[key] = rawSkills[key].map(skillRaw => {
+                    const skill = skillRaw as { name?: string; variant?: string };
                     if (!skill || !skill.name) return skill;
                     const normalized = skill.name.trim().toLowerCase();
                     if (variableSkillNames.has(normalized) && typeof skill.variant === 'undefined') {

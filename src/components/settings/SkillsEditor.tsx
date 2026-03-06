@@ -93,10 +93,11 @@ const SkillsEditor: React.FC<SkillsEditorProps> = ({ data, onUpdate, onAddLog, d
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">
+                            <label htmlFor="variant-precision-input" className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">
                                 Spécialité / Variante (ex: Forge, Histoire, Épées...)
                             </label>
                             <input
+                                id="variant-precision-input"
                                 className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm text-lg"
                                 value={variantInput}
                                 onChange={(e) => setVariantInput(e.target.value)}

@@ -81,16 +81,28 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
                         </div>
                     )}
                     <div>
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Nom de la compétence</label>
+                        <label 
+                            htmlFor="skill-name"
+                            className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest"
+                        >
+                            Nom de la compétence
+                        </label>
                         <input
+                            id="skill-name"
                             className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] bg-white/50 focus:border-amber-500 outline-none shadow-sm"
                             value={skill.name}
                             onChange={(e) => onSkillChange({ ...skill, name: e.target.value })}
                         />
                     </div>
                     <div>
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Description (Narrative)</label>
+                        <label 
+                            htmlFor="skill-description"
+                            className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest"
+                        >
+                            Description (Narrative)
+                        </label>
                         <textarea
+                            id="skill-description"
                             className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-3 text-sm text-[#1c1917] bg-white/50 min-h-[120px] focus:border-amber-500 outline-none resize-none shadow-sm italic leading-relaxed"
                             value={skill.description || ''}
                             onChange={(e) => onSkillChange({ ...skill, description: e.target.value })}
@@ -98,7 +110,12 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
                     </div>
                     <div>
                         <div className="flex justify-between items-center mb-1">
-                            <label className="block text-[10px] font-bold text-[#bfae85] uppercase tracking-widest">Catégorie de placement par défaut</label>
+                            <label 
+                                htmlFor="skill-category"
+                                className="block text-[10px] font-bold text-[#bfae85] uppercase tracking-widest"
+                            >
+                                Catégorie de placement par défaut
+                            </label>
                             {!showCategoryHelp && (
                                 <button
                                     onClick={() => setShowCategoryHelp(true)}
@@ -110,6 +127,7 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
                             )}
                         </div>
                         <select
+                            id="skill-category"
                             className={`w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-sm font-bold outline-none shadow-sm ${isOfficial ? 'bg-stone-100 text-stone-500 cursor-not-allowed' : 'text-[#1c1917] bg-white/50 focus:border-amber-500'}`}
                             value={skill.defaultCategory || ''}
                             disabled={isOfficial}
@@ -154,8 +172,14 @@ const LibrarySkillForm: React.FC<LibrarySkillFormProps> = ({
 
                     {skill.isVariable && (
                         <div className="animate-in fade-in slide-in-from-top-2 duration-200 -mt-2 px-1">
-                            <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Variantes suggérées (Réserve)</label>
+                            <label 
+                                htmlFor="suggested-variants-input"
+                                className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest"
+                            >
+                                Variantes suggérées (Réserve)
+                            </label>
                             <input
+                                id="suggested-variants-input"
                                 className="w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 text-xs text-[#1c1917] bg-[#fdfbf7] focus:border-amber-500 outline-none shadow-sm font-bold placeholder:italic placeholder:font-normal"
                                 value={variantDraft}
                                 onChange={(e) => setVariantDraft(e.target.value)}

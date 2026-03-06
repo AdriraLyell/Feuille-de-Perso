@@ -389,7 +389,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                             <SpecListItem
                                 key={entry.id}
                                 entry={entry}
-                                isLocked={globalUsage[entry.id] > 0}
+                                isLocked={(globalUsage[entry.id] || 0) > 0}
                                 allSkills={allSkills}
                                 onEdit={handleOpenEdit}
                                 onDelete={handleDelete}

@@ -63,10 +63,11 @@ export const getSheetVariables = (data: CharacterSheetData & { variables?: Recor
                     }
                 });
             } else if (value && !Array.isArray(value)) {
-                const val = (value as any).value || 0;
+                const counter = value as import('../types').DotEntry;
+                const val = counter.value || 0;
                 vars[key] = val;
-                if ((value as any).name) {
-                    const name = (value as any).name.trim();
+                if (counter.name) {
+                    const name = counter.name.trim();
                     vars[name] = val;
                     const normalized = normalizeString(name);
                     if (normalized !== name.toLowerCase()) vars[normalized] = val;
@@ -185,8 +186,23 @@ const evaluateWithContext = (formula: string, context: Record<string, number>, r
 /**
  * Gets the specific elements involved in an aggregate calculation (e.g. all mystic skills)
  */
-export const getAggregateDetails = (data: any, config: any): { name: string, value: number, category?: string, tag?: string }[] => {
-    let baseList: any[] = [];
+export const getAggregateDetails = (
+    data: CharacterSheetData, 
+    config: { targetType?: string, target?: string, filterTarget?: string, filterValue?: string }
+): { name: string, value: number, category?: string, tag?: string }[] => {
+    let baseList: Array<{ 
+        name?: string; 
+        value?: number | string; 
+        val1?: string; 
+        val2?: string; 
+        val3?: string; 
+        tag?: string; 
+        category?: string;
+        mysticAbilityId?: string;
+        definitionId?: string;
+        level?: number;
+    }> = [];
+    
     const targetType = config.targetType || config.target; // Support both names
 
     switch (targetType) {
@@ -194,8 +210,8 @@ export const getAggregateDetails = (data: any, config: any): { name: string, val
             // Inject category/tag metadata from the map keys and definitions
             if (data.skills) {
                 Object.entries(data.skills).forEach(([catId, skills]) => {
-                    (skills as any[]).forEach(skill => {
-                        let tagFallback = skill.tag || catId;
+                    skills.forEach(skill => {
+                        let tagFallback = (skill as unknown as Record<string, unknown>).tag as string || catId;
 
                         // 1. Direct check on the skill object (historical/migrated data)
                         if (skill.mysticAbilityId) {
@@ -204,7 +220,7 @@ export const getAggregateDetails = (data: any, config: any): { name: string, val
                         // 2. Cross-reference with definitions (local library)
                         else if (data.skillLibrary) {
                             // Match by definitionId OR by normalized name fallback
-                            const def = data.skillLibrary.find((d: any) =>
+                            const def = data.skillLibrary.find(d =>
                                 (skill.definitionId && d.id === skill.definitionId) ||
                                 (skill.name && d.name && normalizeString(skill.name) === normalizeString(d.name))
                             );
@@ -233,7 +249,7 @@ export const getAggregateDetails = (data: any, config: any): { name: string, val
                 ...(data.page2?.avantages || []),
                 ...(data.page2?.desavantages || [])
             ];
-            baseList = traitSources.map((t: any) => {
+            baseList = traitSources.map(t => {
                 // Resolve tag from mysticAbilityId if explicit tag is missing
                 let resolvedTag = t.tag || '';
                 if (!resolvedTag && t.mysticAbilityId) {
@@ -248,7 +264,7 @@ export const getAggregateDetails = (data: any, config: any): { name: string, val
             break;
         }
         case 'mysticAbilities':
-            baseList = (data.mysticAbilities || []).filter((s: any) => typeof s !== 'string');
+            baseList = (data.mysticAbilities || []).filter(s => typeof s !== 'string') as any[];
             break;
         default: return [];
     }
@@ -256,15 +272,16 @@ export const getAggregateDetails = (data: any, config: any): { name: string, val
     // Apply filtering
     let filteredList = baseList;
     if (config.filterTarget && config.filterValue) {
+        const filterVal = config.filterValue;
         if (config.filterTarget === 'tag') {
             filteredList = baseList.filter(item =>
-                smartIncludes(item.tag, config.filterValue) ||
-                smartIncludes(item.category, config.filterValue)
+                smartIncludes(item.tag || '', filterVal) ||
+                smartIncludes(item.category || '', filterVal)
             );
         } else if (config.filterTarget === 'category') {
-            filteredList = baseList.filter(item => smartIncludes(item.category, config.filterValue));
+            filteredList = baseList.filter(item => smartIncludes(item.category || '', filterVal));
         } else if (config.filterTarget === 'name') {
-            filteredList = baseList.filter(item => smartIncludes(item.name, config.filterValue));
+            filteredList = baseList.filter(item => smartIncludes(item.name || '', filterVal));
         }
     }
 
@@ -301,7 +318,10 @@ export const getAggregateDetails = (data: any, config: any): { name: string, val
 /**
  * Helper to calculate aggregate values (Sum of Skills, Max Attribute, etc.)
  */
-export const calculateAggregate = (data: any, config: any): number => {
+export const calculateAggregate = (
+    data: CharacterSheetData, 
+    config: { operation?: string, targetType?: string, target?: string, filterTarget?: string, filterValue?: string }
+): number => {
     const details = getAggregateDetails(data, config);
     if (details.length === 0) return 0;
 
@@ -330,7 +350,7 @@ export const evaluateFormula = (
     formula: string,
     data: CharacterSheetData & { variables?: Record<string, number> },
     options: {
-        entry?: any,
+        entry?: { aggregateConfig?: import('../types').LibraryFormulaEntry['aggregateConfig'] },
         traitLevel?: number,
         scenariosCount?: number
     } = {}

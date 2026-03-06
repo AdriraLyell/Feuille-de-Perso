@@ -45,10 +45,14 @@ const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
             {/* Dates */}
             < div className="grid grid-cols-1 sm:grid-cols-2 gap-6" >
                 <div>
-                    <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">
+                    <label 
+                        htmlFor="campaign-start-date"
+                        className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2"
+                    >
                         Date de début de campagne
                     </label>
                     <input
+                        id="campaign-start-date"
                         type="date"
                         value={config.startDate ?? ''}
                         onChange={e => onUpdate({ ...config, startDate: e.target.value })}
@@ -62,10 +66,14 @@ const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
                 </div>
 
                 <div>
-                    <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">
+                    <label 
+                        htmlFor="campaign-current-date"
+                        className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2"
+                    >
                         Date courante (dans la fiction)
                     </label>
                     <input
+                        id="campaign-current-date"
                         type="date"
                         value={config.currentDate ?? ''}
                         onChange={e => onUpdate({ ...config, currentDate: e.target.value })}

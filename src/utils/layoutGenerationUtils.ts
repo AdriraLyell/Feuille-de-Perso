@@ -1,4 +1,4 @@
-import { CharacterSheetData, DotEntry } from '../types';
+import { CharacterSheetData } from '../types';
 import { RulesData } from '../types/rules';
 import { SheetLayout, SheetColumn, SkillBlock } from '../hooks/useSheetLayout';
 
@@ -60,9 +60,9 @@ export const getDynamicColumnsStatic = (data: CharacterSheetData, rules: RulesDa
     const skillsLibRaw = rules?.libraries?.skills || [];
     const mysticAbilitiesLibRaw = rules?.libraries?.mysticAbilities || [];
 
-    const skillsMapById = new Map<string, any>();
-    const skillsMapByName = new Map<string, any>();
-    const mysticMapById = new Map<string, any>();
+    const skillsMapById = new Map<string, import('../types').LibrarySkillEntry>();
+    const skillsMapByName = new Map<string, import('../types').LibrarySkillEntry>();
+    const mysticMapById = new Map<string, import('../types').LibrarySkillEntry>();
 
     skillsLibRaw.forEach(s => {
         skillsMapById.set(s.id, s);

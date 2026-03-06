@@ -36,7 +36,7 @@ export const useTraitLibrary = (
 
     const allAvailableTags = useMemo(() => {
         const tags = new Set<string>();
-        hybridList.forEach(m => (m.entry.tags || []).forEach(t => tags.add(t)));
+        hybridList.forEach(m => (m.entry.tags || []).forEach((t: string) => tags.add(t)));
         return Array.from(tags).sort();
     }, [hybridList]);
 
@@ -54,10 +54,10 @@ export const useTraitLibrary = (
             const entryTags = entry.tags || [];
             const matchesSearch = smartIncludes(entry.name, searchTerm) ||
                 smartIncludes(entry.description || "", searchTerm) ||
-                entryTags.some(t => smartIncludes(t, searchTerm));
+                entryTags.some((t: string) => smartIncludes(t, searchTerm));
             const matchesType = filterType === 'all' || entry.type === filterType;
-            const matchesTags = selectedTags.length === 0 || selectedTags.every(sel =>
-                entryTags.some(t => t.toLowerCase() === sel.toLowerCase())
+            const matchesTags = selectedTags.length === 0 || selectedTags.every((sel: string) =>
+                entryTags.some((t: string) => t.toLowerCase() === sel.toLowerCase())
             );
             return matchesSearch && matchesType && matchesTags;
         });

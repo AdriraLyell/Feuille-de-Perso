@@ -22,17 +22,6 @@ export interface Message {
     created_at: string;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-/**
- * Retourne tous les messages pertinents pour un viewer donné dans un setting.
- * Un message est pertinent si :
- *   - le viewer est expéditeur ou destinataire
- *   - le destinataire est 'ALL'
- */
-const buildRelevantFilter = (settingId: string) =>
-    `setting_id=eq.${settingId}`;
-
 // ─── API ──────────────────────────────────────────────────────────────────────
 
 /**

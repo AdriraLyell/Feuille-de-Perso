@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { LibraryImporter } from '../../services/library/LibraryImporter';
 import { DatabaseService } from '../../services/DatabaseService';
@@ -75,3 +76,4 @@ describe('LibraryImporter', () => {
         expect(DatabaseService.insert).not.toHaveBeenCalled();
     });
 });
+

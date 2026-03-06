@@ -49,41 +49,6 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
             delete dataToProcess.page2.characterImageId;
         }
 
-        // Resolve Campaign Notes Images
-        if (dataToProcess.campaignNotes) {
-            for (const note of dataToProcess.campaignNotes) {
-                // Main Image
-                if (note.imageId && note.imageId.startsWith('img_')) {
-                    try {
-                        const blob = await getImage(note.imageId);
-                        if (blob) {
-                            (note as { base64Cover?: string }).base64Cover = await blobToBase64(blob);
-                        }
-                    } catch (e) {
-                        ErrorService.handleError(e, { context: 'ExportPanel.exportNoteCover', silent: true });
-                    }
-                    delete note.imageId;
-                }
-
-                // Gallery Images
-                if (note.images && Array.isArray(note.images)) {
-                    for (const img of note.images) {
-                        if (img.imageId) {
-                            try {
-                                const blob = await getImage(img.imageId);
-                                if (blob) {
-                                    (img as { base64Data?: string }).base64Data = await blobToBase64(blob);
-                                }
-                            } catch (e) {
-                                ErrorService.handleError(e, { context: 'ExportPanel.exportNoteImage', silent: true });
-                            }
-                            delete img.imageId;
-                        }
-                    }
-                }
-            }
-        }
-
         // --- PERSIST LOCAL SETTINGS ---
         const expertMode = localStorage.getItem('rpg-sheet-expert-mode') === 'true';
         const activeRulesId = localStorage.getItem('rules-source-id') || undefined;
@@ -128,9 +93,9 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                 break;
             case 'template':
                 exportData = template;
-                delete (exportData as any).library;
-                delete (exportData as any).skillLibrary;
-                delete (exportData as any).specializationLibrary;
+                delete (exportData as Record<string, unknown>).library;
+                delete (exportData as Record<string, unknown>).skillLibrary;
+                delete (exportData as Record<string, unknown>).specializationLibrary;
                 filename = `${timestamp}_Template_Structure`;
                 break;
             case 'library_traits':

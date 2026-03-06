@@ -187,7 +187,15 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                         : (isPanMode ? 'move' : 'grab')
                 }}
                 onMouseDown={isPanMode ? (e) => handleMouseDown(e, 'pan') : undefined}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        if (isPanMode) { /* toggle pan? */ }
+                    }
+                }}
+                role="button"
+                tabIndex={0}
                 data-drag-handle={!isPanMode}
+                aria-label="Image du grimoire"
             >
                 {loading ? (
                     <div className="flex flex-col items-center gap-2 animate-pulse">
@@ -280,7 +288,6 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                         defaultValue={node.attrs.caption}
                         placeholder="Légende de l'image..."
                         className="w-full text-center text-xs font-serif italic border-b border-stone-300 focus:border-stone-500 outline-none bg-transparent px-2 py-1 mt-1"
-                        autoFocus
                         onBlur={(e) => {
                             updateAttributes({ caption: e.target.value });
                             setIsEditingCaption(false);
@@ -295,14 +302,15 @@ const BookImageView: React.FC<BookImageViewProps> = ({ node, updateAttributes, d
                 </div>
             ) : (
                 node.attrs.caption && (
-                    <div
-                        className="text-center text-stone-500 text-xs italic mt-1 font-serif cursor-pointer hover:text-stone-700 transition-colors"
+                    <button
+                        type="button"
+                        className="w-full text-center text-stone-500 text-xs italic mt-1 font-serif cursor-pointer hover:text-stone-700 transition-colors outline-none focus:text-stone-900"
                         style={{ width: isLateral ? '100%' : (node.attrs.width || '100%'), margin: !isFloating ? '0 auto' : undefined }}
                         onClick={() => selected && setIsEditingCaption(true)}
                         title="Cliquer pour modifier"
                     >
                         {node.attrs.caption}
-                    </div>
+                    </button>
                 )
             )}
         </NodeViewWrapper>

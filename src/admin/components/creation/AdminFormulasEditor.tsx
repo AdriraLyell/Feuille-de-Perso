@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
-import { LibraryFormulaEntry } from '../../../types';
+import { CharacterSheetData, LibraryFormulaEntry } from '../../../types';
 import { generateId } from '../../../utils/factories';
 import { Plus, Calculator, User, Loader2 } from 'lucide-react';
 import { CharacterSyncService, SyncedCharacterSummary } from '../../../services/CharacterSyncService';
@@ -9,7 +9,7 @@ import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 import { AdminFormulaEditorItem } from './AdminFormulaEditorItem';
 import { AdminFormulaEditorModal } from './AdminFormulaEditorModal';
 
-const DUMMY_PREVIEW_DATA: any = {
+const DUMMY_PREVIEW_DATA: CharacterSheetData = {
     experience: { total: 25, gain: "25" },
     attributes: {
         Physiologie: [
@@ -33,14 +33,14 @@ const DUMMY_PREVIEW_DATA: any = {
         Col_Comp_5: [{ name: 'Savoir Mystique', value: 2 }, { name: 'Occultisme', value: 4 }]
     },
     traits: [
-        { name: 'Avantage 1', level: 1, category: 'Avantages', tag: 'Social' },
-        { name: 'Désavantage 1', level: 2, category: 'Désavantages', tag: 'Physique' }
+        { id: 't1', name: 'Avantage 1', level: 1, category: 'Avantages', tag: 'Social', value: '1' },
+        { id: 't2', name: 'Désavantage 1', level: 2, category: 'Désavantages', tag: 'Physique', value: '2' }
     ],
     variables: {
         SCENARIOS_COUNT: 5,
         TRAIT_LEVEL: 3
     }
-};
+} as unknown as CharacterSheetData; // Cast locally for dummy data completeness
 
 interface AdminFormulasEditorProps {
     rules: RulesData;
@@ -60,7 +60,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
 
     const [characters, setCharacters] = useState<SyncedCharacterSummary[]>([]);
     const [selectedCharId, setSelectedCharId] = useState<string>('');
-    const [realCharData, setRealCharData] = useState<any | null>(null);
+    const [realCharData, setRealCharData] = useState<CharacterSheetData | null>(null);
     const [isLoadingList, setIsLoadingList] = useState(false);
     const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
@@ -89,7 +89,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
 
         // 3. Collecte des Compteurs
         const counters = (rules.definitions.counters ? Object.values(rules.definitions.counters) : [])
-            .map((c: any) => c.name)
+            .map((c) => c.name)
             .filter(c => c && c.trim() !== '')
             .sort((a, b) => a.localeCompare(b));
         counters.forEach(c => suggestions.push({ value: c, label: c, type: 'Compteur' }));
@@ -143,7 +143,7 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
         try {
             const fullChar = await CharacterSyncService.getCharacterById(id);
             if (fullChar && fullChar.data) {
-                setRealCharData(fullChar.data);
+                setRealCharData(fullChar.data as CharacterSheetData);
                 // Clear any manual preview value to force re-evaluation with real data
                 setPreviewValue(null);
             }
@@ -247,10 +247,14 @@ const AdminFormulasEditor: React.FC<AdminFormulasEditorProps> = ({ rules, onUpda
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="flex flex-col items-end">
-                        <label className="text-[9px] font-bold text-stone-500 uppercase tracking-widest mb-1 flex items-center gap-1">
+                        <label 
+                            htmlFor="preview-source-select"
+                            className="text-[9px] font-bold text-stone-500 uppercase tracking-widest mb-1 flex items-center gap-1"
+                        >
                             {isLoadingDetails ? <Loader2 size={10} className="animate-spin" /> : <User size={10} />} Source de l'Aperçu
                         </label>
                         <select
+                            id="preview-source-select"
                             value={selectedCharId}
                             onChange={(e) => handleCharacterSelect(e.target.value)}
                             disabled={isLoadingList}

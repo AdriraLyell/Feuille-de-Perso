@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { describe, it, expect } from 'vitest';
 import { CharacterSheetData, RulesData } from '../types';
@@ -117,3 +118,4 @@ describe('XP Cost Calculation for Custom Counters', () => {
         expect(Number(result.spent)).toBe(0);
     });
 });
+

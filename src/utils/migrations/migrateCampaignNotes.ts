@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MigratableData } from './registry';
 
 /**
@@ -26,6 +27,20 @@ export const migrateCampaignNotes = (parsed: MigratableData): void => {
             attrs: { date: note.date || new Date().toISOString().split('T')[0] },
             content: [{ type: 'text', text: note.title || 'Nouvelle Session' }]
         });
+
+        // Add main cover image if present
+        if (note.imageId) {
+            tiptapContent.push({
+                type: 'bookImage',
+                attrs: {
+                    imageId: note.imageId,
+                    width: '100%',
+                    height: 'auto',
+                    align: 'center',
+                    caption: ''
+                }
+            });
+        }
 
         // Add content
         if (typeof note.content === 'string' && note.content) {
@@ -78,3 +93,4 @@ export const migrateCampaignNotes = (parsed: MigratableData): void => {
         }
     };
 };
+

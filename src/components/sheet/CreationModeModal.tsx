@@ -86,8 +86,9 @@ const CreationModeModal: React.FC<CreationModeModalProps> = ({ data, onClose, on
                                             {[1, 2, 3, 4, 5].map(r => (
                                                 <div key={r} className="bg-stone-100 border border-stone-300 px-3 py-1 rounded text-center">
                                                     <div className="text-[10px] text-stone-500 font-bold uppercase">R{r}</div>
-                                                    {/* @ts-expect-error -- dynamic key access */}
-                                                    <div className="font-mono font-bold text-lg text-stone-800">{data.creationConfig.rankSlots[r]}</div>
+                                                    <div className="font-mono font-bold text-lg text-stone-800">
+                                                        {(data.creationConfig.rankSlots as Record<number, number>)[r]}
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>

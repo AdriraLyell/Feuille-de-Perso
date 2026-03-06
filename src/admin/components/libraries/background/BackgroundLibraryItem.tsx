@@ -57,11 +57,15 @@ export const BackgroundLibraryItem: React.FC<BackgroundLibraryItemProps> = ({
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
                     {item.isVariable && (
-                        <div
+                        <span
                             ref={anchorRef}
-                            className="relative"
+                            className="relative outline-none focus:ring-1 focus:ring-purple-500 rounded-sm"
                             onMouseEnter={() => setShowVariantsTooltip(true)}
                             onMouseLeave={() => setShowVariantsTooltip(false)}
+                            onFocus={() => setShowVariantsTooltip(true)}
+                            onBlur={() => setShowVariantsTooltip(false)}
+                            role="button"
+                            tabIndex={0}
                             title={!hasVariants ? "Variable" : undefined}
                         >
                             <Layers
@@ -82,10 +86,10 @@ export const BackgroundLibraryItem: React.FC<BackgroundLibraryItemProps> = ({
                                     </div>
                                 </PortalTooltip>
                             )}
-                        </div>
+                        </span>
                     )}
                     {isLocked && (
-                        <div
+                        <span
                             ref={lockIconRef}
                             onMouseEnter={() => {
                                 if (isLocked && !isPlaced && onLoadUsageDetails) {
@@ -94,7 +98,16 @@ export const BackgroundLibraryItem: React.FC<BackgroundLibraryItemProps> = ({
                                 setShowLockTooltip(true);
                             }}
                             onMouseLeave={() => setShowLockTooltip(false)}
-                            className="relative flex items-center shrink-0"
+                            onFocus={() => {
+                                if (isLocked && !isPlaced && onLoadUsageDetails) {
+                                    onLoadUsageDetails(item.id);
+                                }
+                                setShowLockTooltip(true);
+                            }}
+                            onBlur={() => setShowLockTooltip(false)}
+                            role="button"
+                            tabIndex={0}
+                            className="relative flex items-center shrink-0 outline-none focus:ring-1 focus:ring-amber-500 rounded-sm"
                             title={isPlaced ? "Utilisé dans cette campagne" : undefined}
                         >
                             <Lock size={11} className="text-amber-500" />
@@ -105,7 +118,7 @@ export const BackgroundLibraryItem: React.FC<BackgroundLibraryItemProps> = ({
                                 isPlaced={isPlaced}
                                 usageDetails={usageDetails}
                             />
-                        </div>
+                        </span>
                     )}
 
                     {item.defaultCategory && (

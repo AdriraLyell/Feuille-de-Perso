@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest';
 import { reconcileRulesWithState } from '../utils/rulesReconciler';
 import { CharacterSheetData, DotEntry } from '../types';
@@ -45,3 +46,4 @@ describe('Rules Reconciliation Duplication', () => {
         expect(uniqueIds.size).toBe(ids.length);
     });
 });
+

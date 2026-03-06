@@ -18,7 +18,7 @@ import { restoreMysticLinks } from './restoreMysticLinks';
 import { migrateLayoutConfig } from './migrateLayoutConfig';
 
 // Type for data being migrated (starts as raw JSON, ends as CharacterSheetData)
-export type MigratableData = Record<string, any>;
+export type MigratableData = Record<string, unknown>;
 
 // Type for a migration function
 type MigrationFunction = (data: MigratableData) => void;

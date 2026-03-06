@@ -35,7 +35,7 @@ export const PortalTooltip: React.FC<PortalTooltipProps> = ({
 
             let position: 'top' | 'bottom' = 'top';
             let top = rect.top + scrollY;
-            let left = rect.left + window.scrollX + rect.width / 2;
+            const left = rect.left + window.scrollX + rect.width / 2;
 
             // If too close to the top, flip to bottom
             if (rect.top < tooltipHeightEstimate) {

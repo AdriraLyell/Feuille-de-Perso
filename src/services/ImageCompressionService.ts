@@ -248,15 +248,15 @@ export const ImageCompressionService = {
      * Recursively process an object to compress/decompress image strings.
      * Moves this logic from CharacterSyncService to be reusable.
      */
-    async processImages(obj: any, action: 'compress' | 'decompress'): Promise<any> {
+    async processImages(obj: unknown, action: 'compress' | 'decompress'): Promise<unknown> {
         if (!obj || typeof obj !== 'object') return obj;
 
         if (Array.isArray(obj)) {
             return Promise.all(obj.map(item => this.processImages(item, action)));
         }
 
-        const processed: any = {};
-        for (const [key, value] of Object.entries(obj)) {
+        const processed: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
             if (typeof value === 'string') {
                 if (action === 'compress' && value.startsWith('data:image/')) {
                     const result = await this.compressFull(value);
@@ -269,7 +269,7 @@ export const ImageCompressionService = {
                 } else {
                     processed[key] = value;
                 }
-            } else if (typeof value === 'object') {
+            } else if (typeof value === 'object' && value !== null) {
                 processed[key] = await this.processImages(value, action);
             } else {
                 processed[key] = value;

@@ -38,7 +38,7 @@ export const useTraitSelection = (
         // EXCEPTION: master_skill traits use their own specialized wizard
         const isMasterSkill = entry.effects?.some(eff => {
             const formula = formulas.find(f => f.id === eff.formulaId);
-            return (formula?.effectType === 'master_skill' || (formula as any)?.type === 'master_skill');
+            return (formula?.effectType === 'master_skill');
         });
 
         if (!isMasterSkill && (entry.isVariable || (entry as LibraryEntry & { is_variable?: boolean }).is_variable || isVariableCost(entry) || hasForceVariantFormula)) {

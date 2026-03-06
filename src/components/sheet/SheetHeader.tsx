@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UserPlus, PencilLine, Check, Layout, Lock, RotateCcw, Maximize2 } from 'lucide-react';
+import { UserPlus, Check, Lock, RotateCcw, Maximize2 } from 'lucide-react';
 import { HeaderInput } from './Shared';
 
 interface SheetHeaderProps {

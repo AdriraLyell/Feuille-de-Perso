@@ -159,7 +159,7 @@ export const BookImage = Node.create({
                     handleDrop(view, event) {
                         // If ProseMirror is already handling a node drag (internal move), 
                         // ignore the files to prevent duplication.
-                        const isInternalDrag = (view as any).dragging ||
+                        const isInternalDrag = (view as unknown as { dragging: boolean }).dragging ||
                             event.dataTransfer?.types.includes('application/x-prosemirror-nodes') ||
                             event.dataTransfer?.types.includes('text/x-prosemirror-nodes');
 
@@ -212,3 +212,4 @@ export const BookImage = Node.create({
         ];
     },
 });
+

@@ -44,16 +44,16 @@ export const generateDefaultRules = (): RulesData => {
         });
     }
 
-    const counterDefs: Record<string, any> = {};
+    const counterDefs: Record<string, import('../../types/rules').RulesCounterDefinition> = {};
     if (data.counters) {
         Object.keys(data.counters).forEach(key => {
             if (key === 'custom') return;
-            const c = (data.counters as Record<string, any>)[key];
-            if (c && !Array.isArray(c)) {
+            const c = (data.counters as Record<string, unknown>)[key] as import('../../types').DotEntry;
+            if (c && typeof c === 'object') {
                 counterDefs[key] = {
                     id: key,
                     name: c.name,
-                    max: c.max, // Initial State max
+                    max: c.max || 10, // Initial State max
                     xpCost: 5 // Default assumption
                 };
             }
@@ -123,7 +123,7 @@ export const generateDefaultRules = (): RulesData => {
             specializations: data.specializationLibrary || [],
             backgrounds: [],
             counters: [],
-            mysticAbilities: (data as any).mysticAbilities || []
+            mysticAbilities: (data as unknown as { mysticAbilities: import('../../types').LibrarySkillEntry[] }).mysticAbilities || []
         }
     };
 };

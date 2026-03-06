@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest';
 import { migrateData, migrateRulesToV2 } from '../utils/migrations';
 import {
@@ -80,11 +81,11 @@ describe('Data Migrations - migrateData', () => {
     // =========================================================================
     describe('Attribute Migrations', () => {
         it('should ensure all attribute values are strings after migration', () => {
-            const result = migrateData(clone(MINIMAL_VALID_DATA));
+            const result = migrateData(clone(MINIMAL_VALID_DATA) as any);
 
             // All attribute values should be strings (not numbers)
-            Object.values(result.attributes).forEach((catAttrs: any) => {
-                catAttrs.forEach((attr: any) => {
+            Object.values(result.attributes).forEach((catAttrs) => {
+                catAttrs.forEach((attr) => {
                     if (attr.val1 !== '') {
                         expect(typeof attr.val1).toBe('string');
                     }
@@ -93,7 +94,7 @@ describe('Data Migrations - migrateData', () => {
         });
 
         it('should have pave_attributs_x keys after migration', () => {
-            const result = migrateData(clone(MINIMAL_VALID_DATA));
+            const result = migrateData(clone(MINIMAL_VALID_DATA) as any);
 
             expect(result.attributes.pave_attributs_1).toBeDefined();
             expect(result.attributes.pave_attributs_2).toBeDefined();
@@ -101,19 +102,19 @@ describe('Data Migrations - migrateData', () => {
         });
 
         it('should migrate named categories to generic IDs', () => {
-            const result = migrateData(clone(LEGACY_V1_NAMED_ATTRIBUTE_CATEGORIES));
+            const result = migrateData(clone(LEGACY_V1_NAMED_ATTRIBUTE_CATEGORIES) as any);
 
             expect(result.attributes.pave_attributs_1).toBeDefined();
             expect(result.attributes.pave_attributs_2).toBeDefined();
             expect(result.attributes.pave_attributs_3).toBeDefined();
-            expect(result.attributes.physique).toBeUndefined();
+            expect((result.attributes as any).physique).toBeUndefined();
         });
 
         it('should convert numeric val1 to string', () => {
-            const result = migrateData(clone(LEGACY_V1_NUMERIC_ATTRIBUTES));
+            const result = migrateData(clone(LEGACY_V1_NUMERIC_ATTRIBUTES) as any);
 
             // Check that Force from fixture has string val1
-            const forceAttr = result.attributes.pave_attributs_1?.find((a: any) => a.name === 'Force');
+            const forceAttr = result.attributes.pave_attributs_1?.find((a) => a.name === 'Force');
             if (forceAttr) {
                 expect(typeof forceAttr.val1).toBe('string');
             }
@@ -127,21 +128,21 @@ describe('Data Migrations - migrateData', () => {
     // =========================================================================
     describe('Counter Migrations', () => {
         it('should add id to old counter structure', () => {
-            const result = migrateData(clone(LEGACY_V1_COUNTERS));
+            const result = migrateData(clone(LEGACY_V1_COUNTERS) as any);
 
             expect((result.counters.volonte as any).id).toBe('volonte');
             expect((result.counters.confiance as any).id).toBe('confiance');
         });
 
         it('should add current property (for squares)', () => {
-            const result = migrateData(clone(LEGACY_V1_COUNTERS));
+            const result = migrateData(clone(LEGACY_V1_COUNTERS) as any);
 
             expect((result.counters.volonte as any).current).toBe(0);
             expect((result.counters.confiance as any).current).toBe(0);
         });
 
         it('should preserve max values from old structure', () => {
-            const result = migrateData(clone(LEGACY_V1_COUNTERS));
+            const result = migrateData(clone(LEGACY_V1_COUNTERS) as any);
 
             expect((result.counters.volonte as any).value).toBe(5);
             expect((result.counters.confiance as any).value).toBe(3);
@@ -160,10 +161,10 @@ describe('Data Migrations - migrateData', () => {
                 }
             };
 
-            const result = migrateData(dataWithValets);
+            const result = migrateData(dataWithValets as any);
 
-            expect(result.counters.custom.find((c: any) => c.name === 'Valets / Dames / Rois')).toBeUndefined();
-            expect(result.counters.custom.find((c: any) => c.name === 'Autre compteur')).toBeDefined();
+            expect(result.counters.custom.find((c) => c.name === 'Valets / Dames / Rois')).toBeUndefined();
+            expect(result.counters.custom.find((c) => c.name === 'Autre compteur')).toBeDefined();
         });
     });
 
@@ -172,40 +173,40 @@ describe('Data Migrations - migrateData', () => {
     // =========================================================================
     describe('Skill Category Migrations (named -> generic IDs)', () => {
         it('should migrate talents to Col_Comp_1', () => {
-            const result = migrateData(clone(LEGACY_V1_NAMED_SKILL_CATEGORIES));
+            const result = migrateData(clone(LEGACY_V1_NAMED_SKILL_CATEGORIES) as any);
 
             expect(result.skills.Col_Comp_1).toBeDefined();
             // Check that 'Acrobatie' from fixture is in the merged array
-            expect(result.skills.Col_Comp_1.some((s: any) => s.name === 'Acrobatie')).toBe(true);
-            expect(result.skills.talents).toBeUndefined();
+            expect(result.skills.Col_Comp_1.some((s) => s.name === 'Acrobatie')).toBe(true);
+            expect((result.skills as any).talents).toBeUndefined();
         });
 
         it('should migrate competences to Col_Comp_2', () => {
-            const result = migrateData(clone(LEGACY_V1_NAMED_SKILL_CATEGORIES));
+            const result = migrateData(clone(LEGACY_V1_NAMED_SKILL_CATEGORIES) as any);
 
             expect(result.skills.Col_Comp_2).toBeDefined();
             // Check that 'Escalade' from fixture is in the merged array
-            expect(result.skills.Col_Comp_2.some((s: any) => s.name === 'Escalade')).toBe(true);
+            expect(result.skills.Col_Comp_2.some((s) => s.name === 'Escalade')).toBe(true);
         });
 
         it('should migrate connaissances to Col_Comp_4', () => {
-            const result = migrateData(clone(LEGACY_V1_NAMED_SKILL_CATEGORIES));
+            const result = migrateData(clone(LEGACY_V1_NAMED_SKILL_CATEGORIES) as any);
 
             expect(result.skills.Col_Comp_4).toBeDefined();
             // Check that 'Histoire' from fixture is in the merged array
-            expect(result.skills.Col_Comp_4.some((s: any) => s.name === 'Histoire')).toBe(true);
+            expect(result.skills.Col_Comp_4.some((s) => s.name === 'Histoire')).toBe(true);
         });
 
         it('should migrate arrieres_plans to Col_Comp_8', () => {
-            const result = migrateData(clone(LEGACY_V1_NAMED_SKILL_CATEGORIES));
+            const result = migrateData(clone(LEGACY_V1_NAMED_SKILL_CATEGORIES) as any);
 
             expect(result.skills.Col_Comp_8).toBeDefined();
             // Check that 'Noble' from fixture is somewhere in the merged array
-            expect(result.skills.Col_Comp_8.some((s: any) => s.name === 'Noble')).toBe(true);
+            expect(result.skills.Col_Comp_8.some((s) => s.name === 'Noble')).toBe(true);
         });
 
         it('should add creationValue to all skills', () => {
-            const result = migrateData(clone(LEGACY_V1_NAMED_SKILL_CATEGORIES));
+            const result = migrateData(clone(LEGACY_V1_NAMED_SKILL_CATEGORIES) as any);
 
             expect(result.skills.Col_Comp_1[0].creationValue).toBe(0);
         });
@@ -216,7 +217,7 @@ describe('Data Migrations - migrateData', () => {
     // =========================================================================
     describe('Notebook Field Migrations (array -> string)', () => {
         it('should convert array lieux_importants to newline-separated string', () => {
-            const result = migrateData(clone(LEGACY_V1_ARRAY_NOTEBOOK));
+            const result = migrateData(clone(LEGACY_V1_ARRAY_NOTEBOOK) as any);
 
             expect(typeof result.page2.lieux_importants).toBe('string');
             expect(result.page2.lieux_importants).toContain('Taverne du Dragon');
@@ -224,21 +225,21 @@ describe('Data Migrations - migrateData', () => {
         });
 
         it('should filter empty strings from arrays', () => {
-            const result = migrateData(clone(LEGACY_V1_ARRAY_NOTEBOOK));
+            const result = migrateData(clone(LEGACY_V1_ARRAY_NOTEBOOK) as any);
 
             // Should not have empty lines
             expect(result.page2.contacts.split('\n').filter((s: string) => s === '').length).toBe(0);
         });
 
         it('should convert equipement array to string', () => {
-            const result = migrateData(clone(LEGACY_V1_ARRAY_NOTEBOOK));
+            const result = migrateData(clone(LEGACY_V1_ARRAY_NOTEBOOK) as any);
 
             expect(typeof result.page2.equipement).toBe('string');
             expect(result.page2.equipement).toContain('Épée');
         });
 
         it('should convert notes array to string', () => {
-            const result = migrateData(clone(LEGACY_V1_ARRAY_NOTEBOOK));
+            const result = migrateData(clone(LEGACY_V1_ARRAY_NOTEBOOK) as any);
 
             expect(typeof result.page2.notes).toBe('string');
             expect(result.page2.notes).toContain('Note 1');
@@ -250,7 +251,7 @@ describe('Data Migrations - migrateData', () => {
     // =========================================================================
     describe('Specialization Migrations', () => {
         it('should convert string imposed specializations to objects', () => {
-            const result = migrateData(clone(LEGACY_V1_STRING_SPECIALIZATIONS));
+            const result = migrateData(clone(LEGACY_V1_STRING_SPECIALIZATIONS) as any);
 
             expect(result.imposedSpecializations.skill_1[0]).toHaveProperty('name');
             expect(result.imposedSpecializations.skill_1[0]).toHaveProperty('minLevel');
@@ -258,17 +259,17 @@ describe('Data Migrations - migrateData', () => {
         });
 
         it('should set default minLevel to 0', () => {
-            const result = migrateData(clone(LEGACY_V1_STRING_SPECIALIZATIONS));
+            const result = migrateData(clone(LEGACY_V1_STRING_SPECIALIZATIONS) as any);
 
             expect(result.imposedSpecializations.skill_1[0].minLevel).toBe(0);
         });
 
         it('should create specializationLibrary from existing specializations', () => {
-            const result = migrateData(clone(LEGACY_V1_STRING_SPECIALIZATIONS));
+            const result = migrateData(clone(LEGACY_V1_STRING_SPECIALIZATIONS) as any);
 
             expect(result.specializationLibrary).toBeDefined();
             expect(result.specializationLibrary!.length).toBeGreaterThan(0);
-            expect(result.specializationLibrary!.some((s: any) => s.name === 'Épée')).toBe(true);
+            expect(result.specializationLibrary!.some((s) => s.name === 'Épée')).toBe(true);
         });
 
         it('should merge skill IDs for duplicate specialization names', () => {
@@ -280,9 +281,9 @@ describe('Data Migrations - migrateData', () => {
                 }
             };
 
-            const result = migrateData(dataWithDuplicates);
+            const result = migrateData(dataWithDuplicates as any);
 
-            const combatSpec = result.specializationLibrary?.find((s: any) => s.name === 'Combat');
+            const combatSpec = result.specializationLibrary?.find((s) => s.name === 'Combat');
             expect(combatSpec?.skillIds.length).toBe(2);
         });
     });
@@ -292,36 +293,35 @@ describe('Data Migrations - migrateData', () => {
     // =========================================================================
     describe('Library Migrations', () => {
         it('should rename vertu type to avantage', () => {
-            const result = migrateData(clone(LEGACY_V1_LIBRARY_TYPES));
+            const result = migrateData(clone(LEGACY_V1_LIBRARY_TYPES) as any);
 
             expect(result.library![0].type).toBe('avantage');
         });
 
         it('should rename defaut type to desavantage', () => {
-            const result = migrateData(clone(LEGACY_V1_LIBRARY_TYPES));
+            const result = migrateData(clone(LEGACY_V1_LIBRARY_TYPES) as any);
 
             expect(result.library![1].type).toBe('desavantage');
         });
 
         it('should ensure tags array exists', () => {
-            const result = migrateData(clone(LEGACY_V1_LIBRARY_TYPES));
+            const result = migrateData(clone(LEGACY_V1_LIBRARY_TYPES) as any);
 
             expect(Array.isArray(result.library![0].tags)).toBe(true);
         });
 
         it('should ensure effects array exists', () => {
-            const result = migrateData(clone(LEGACY_V1_LIBRARY_TYPES));
+            const result = migrateData(clone(LEGACY_V1_LIBRARY_TYPES) as any);
 
             expect(Array.isArray(result.library![0].effects)).toBe(true);
         });
 
         it('should fix skilllibrary typo', () => {
-            const result = migrateData(clone(LEGACY_V1_TYPO_SKILLLIBRARY));
+            const result = migrateData(clone(LEGACY_V1_TYPO_SKILLLIBRARY) as any);
 
             expect(result.skillLibrary).toBeDefined();
-            expect(result.skillLibrary!.some((s: any) => s.name === 'Acrobatie')).toBe(true);
-            // @ts-expect-error -- testing that typo key is removed
-            expect(result.skilllibrary).toBeUndefined();
+            expect(result.skillLibrary!.some((s) => s.name === 'Acrobatie')).toBe(true);
+            expect((result as any).skilllibrary).toBeUndefined();
         });
     });
 
@@ -330,7 +330,7 @@ describe('Data Migrations - migrateData', () => {
     // =========================================================================
     describe('Campaign Notes Migrations', () => {
         it('should convert single imageId to images array', () => {
-            const result = migrateData(clone(LEGACY_V1_SINGLE_IMAGE_NOTE));
+            const result = migrateData(clone(LEGACY_V1_SINGLE_IMAGE_NOTE) as any);
 
             expect(result.campaignNotes[0].images).toBeDefined();
             expect(Array.isArray(result.campaignNotes[0].images)).toBe(true);
@@ -338,14 +338,14 @@ describe('Data Migrations - migrateData', () => {
         });
 
         it('should preserve image config in new structure', () => {
-            const result = migrateData(clone(LEGACY_V1_SINGLE_IMAGE_NOTE));
+            const result = migrateData(clone(LEGACY_V1_SINGLE_IMAGE_NOTE) as any);
 
             expect(result.campaignNotes![0].images![0].config.width).toBe(200);
             expect(result.campaignNotes![0].images![0].config.align).toBe('right');
         });
 
         it('should remove old imageId property', () => {
-            const result = migrateData(clone(LEGACY_V1_SINGLE_IMAGE_NOTE));
+            const result = migrateData(clone(LEGACY_V1_SINGLE_IMAGE_NOTE) as any);
 
             expect((result.campaignNotes![0] as any).imageId).toBeUndefined();
             expect((result.campaignNotes![0] as any).imageConfig).toBeUndefined();
@@ -357,20 +357,20 @@ describe('Data Migrations - migrateData', () => {
     // =========================================================================
     describe('Default Structure Initialization', () => {
         it('should initialize missing attributeSettings', () => {
-            const result = migrateData(clone(MINIMAL_VALID_DATA));
+            const result = migrateData(clone(MINIMAL_VALID_DATA) as any);
 
             expect(result.attributeSettings).toBeDefined();
         });
 
         it('should initialize missing secondaryAttributes', () => {
-            const result = migrateData(clone(MINIMAL_VALID_DATA));
+            const result = migrateData(clone(MINIMAL_VALID_DATA) as any);
 
             expect(result.secondaryAttributes).toBeDefined();
             expect(result.secondaryAttributesActive).toBe(false);
         });
 
         it('should initialize missing creationConfig', () => {
-            const result = migrateData(clone(MINIMAL_VALID_DATA));
+            const result = migrateData(clone(MINIMAL_VALID_DATA) as any);
 
             expect(result.creationConfig).toBeDefined();
             expect(result.creationConfig.attributeMin).toBeDefined();
@@ -378,32 +378,32 @@ describe('Data Migrations - migrateData', () => {
         });
 
         it('should initialize missing theme', () => {
-            const result = migrateData(clone(MINIMAL_VALID_DATA));
+            const result = migrateData(clone(MINIMAL_VALID_DATA) as any);
 
             expect(result.theme).toBeDefined();
         });
 
         it('should initialize missing xpLogs', () => {
-            const result = migrateData(clone(MINIMAL_VALID_DATA));
+            const result = migrateData(clone(MINIMAL_VALID_DATA) as any);
 
             expect(result.xpLogs).toEqual([]);
         });
 
         it('should initialize missing appLogs', () => {
-            const result = migrateData(clone(MINIMAL_VALID_DATA));
+            const result = migrateData(clone(MINIMAL_VALID_DATA) as any);
 
             expect(result.appLogs).toEqual([]);
         });
 
         it('should initialize missing partyNotes', () => {
-            const result = migrateData(clone(MINIMAL_VALID_DATA));
+            const result = migrateData(clone(MINIMAL_VALID_DATA) as any);
 
             expect(result.partyNotes).toBeDefined();
             expect(result.partyNotes?.staticColWidths).toBeDefined();
         });
 
         it('should ensure all 9 skill categories exist', () => {
-            const result = migrateData(clone(MINIMAL_VALID_DATA));
+            const result = migrateData(clone(MINIMAL_VALID_DATA) as any);
 
             for (let i = 1; i <= 9; i++) {
                 expect(result.skills[`Col_Comp_${i}`]).toBeDefined();
@@ -411,7 +411,7 @@ describe('Data Migrations - migrateData', () => {
         });
 
         it('should ensure reputation has 7 entries', () => {
-            const result = migrateData(clone(MINIMAL_VALID_DATA));
+            const result = migrateData(clone(MINIMAL_VALID_DATA) as any);
 
             expect(result.page2.reputation.length).toBe(7);
         });
@@ -427,7 +427,7 @@ describe('Data Migrations - migrateData', () => {
                 xpLogs: [{ id: '1', date: '2024-01-01', amount: 5, reason: 'Test' }]
             };
 
-            const result = migrateData(dataWithLogs);
+            const result = migrateData(dataWithLogs as any);
 
             expect(result.xpLogs[0].mj).toBe('');
         });
@@ -438,7 +438,7 @@ describe('Data Migrations - migrateData', () => {
                 xpLogs: [{ id: '1', date: '2024-01-01', amount: 5, reason: 'Test' }]
             };
 
-            const result = migrateData(dataWithLogs);
+            const result = migrateData(dataWithLogs as any);
 
             expect(result.xpLogs[0].spendingLocation).toBe('');
         });
@@ -460,19 +460,19 @@ describe('Rules Migrations - migrateRulesToV2', () => {
             }
         };
 
-        const result = migrateRulesToV2(legacyRules);
+        const result = migrateRulesToV2(legacyRules as any);
 
-        expect(result.definitions.skillCategories).toBeDefined();
-        expect(result.definitions.skillCategories.length).toBeGreaterThan(0);
+        expect(result!.definitions.skillCategories).toBeDefined();
+        expect(result!.definitions.skillCategories.length).toBeGreaterThan(0);
     });
 
     it('should set correct behavior for each category', () => {
-        const result = migrateRulesToV2({ definitions: {} });
+        const result = migrateRulesToV2({ definitions: {} } as any);
 
-        const secondary = result.definitions.skillCategories.find((c: any) => c.id === 'Col_Comp_6');
+        const secondary = result!.definitions.skillCategories.find((c) => c.id === 'Col_Comp_6');
         expect(secondary?.behavior).toBe('Secondaire');
 
-        const background = result.definitions.skillCategories.find((c: any) => c.id === 'Col_Comp_8');
+        const background = result!.definitions.skillCategories.find((c) => c.id === 'Col_Comp_8');
         expect(background?.behavior).toBe('Arrière-plan');
     });
 
@@ -485,18 +485,18 @@ describe('Rules Migrations - migrateRulesToV2', () => {
             }
         };
 
-        const result = migrateRulesToV2(legacyRules);
+        const result = migrateRulesToV2(legacyRules as any);
 
-        expect(result.definitions.skills.Col_Comp_1).toEqual(['Acrobatie', 'Combat']);
-        expect(result.definitions.skills.talents).toBeUndefined();
+        expect(result!.definitions.skills.Col_Comp_1).toEqual(['Acrobatie', 'Combat']);
+        expect((result!.definitions.skills as any).talents).toBeUndefined();
     });
 
     it('should ensure xpCosts structure exists', () => {
-        const result = migrateRulesToV2({ definitions: {} });
+        const result = migrateRulesToV2({ definitions: {} } as any);
 
-        expect(result.configurations.xpCosts).toBeDefined();
-        expect(result.configurations.xpCosts.attributeFactor).toBe(6);
-        expect(result.configurations.xpCosts.skillFactor).toBe(1);
+        expect(result!.configurations.xpCosts).toBeDefined();
+        expect(result!.configurations.xpCosts.attributeFactor).toBe(6);
+        expect(result!.configurations.xpCosts.skillFactor).toBe(1);
     });
 
     it('should handle null input gracefully', () => {

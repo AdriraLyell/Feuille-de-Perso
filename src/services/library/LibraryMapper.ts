@@ -34,7 +34,13 @@ export const LibraryMapper = {
         isActive: activeIds.has(t.id) || t.setting_id === sid
     }),
 
-    mapSkill: (s: DBSkill, activeIds: Set<string>, sid: string, variants: string[] = [], rel?: any): LibrarySkillEntry => {
+    mapSkill: (s: DBSkill, activeIds: Set<string>, sid: string, variants: string[] = [], rel?: {
+        name_override?: string;
+        description_override?: string;
+        is_variable_override?: boolean | null;
+        mystic_ability_id_override?: string | null;
+        default_category?: string | null;
+    }): LibrarySkillEntry => {
         const isCustomized = !!(rel?.name_override || rel?.description_override || rel?.is_variable_override !== undefined || rel?.mystic_ability_id_override);
 
         return {
@@ -79,7 +85,6 @@ export const LibraryMapper = {
     }),
 
     mapBackground: (b: DBBackground, activeIds: Set<string>, sid: string, variants: string[] = [], localDefaultCategory?: string): LibraryBackgroundEntry => {
-        const _isCustomized = false; // Backgrounds customization not yet fully enabled in UI similarly to skills
         return {
             id: b.id,
             name: b.name,
@@ -97,12 +102,12 @@ export const LibraryMapper = {
         id: c.id,
         name: c.name,
         description: c.description || '',
-        maxValue: (c as any).max_value ?? c.maxValue ?? 10,
-        defaultValue: (c as any).default_value ?? c.defaultValue ?? 0,
-        xpCost: (c as any).xp_cost ?? c.xpCost ?? 0,
+        maxValue: c.maxValue ?? 10,
+        defaultValue: c.defaultValue ?? 0,
+        xpCost: c.xpCost ?? 0,
         appearance: c.appearance || null,
-        formulaId: c.formula_id,
-        defaultCategory: localDefaultCategory || c.defaultCategory || (c as any).default_category,
+        formulaId: c.formula_id || undefined,
+        defaultCategory: localDefaultCategory || c.defaultCategory,
         isGlobal: c.setting_id == null,
         isActive: activeIds.has(c.id) || c.setting_id === sid
     }),
@@ -117,7 +122,7 @@ export const LibraryMapper = {
             code: f.code,
             formula: f.formula,
             type: type,
-            aggregateConfig: f.aggregate_config,
+            aggregateConfig: f.aggregate_config as any,
             target: f.target,
             effectType: f.effect_type,
             operator: f.operator as 'ADD' | 'SET' | 'SUB' | '',

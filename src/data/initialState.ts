@@ -1,6 +1,6 @@
 import { THEME } from '../constants/theme';
 import { defaultRules } from './defaultRules';
-import { CharacterSheetData, LibrarySkillEntry, DotEntry, ThemeConfig, AttributeEntry } from '../types';
+import { CharacterSheetData, LibrarySkillEntry, DotEntry, ThemeConfig } from '../types';
 import { createDotEntry, createAttributeEntry, createCombatEntry, generateId } from '../utils/factories';
 
 export const DEFAULT_THEME: ThemeConfig = {

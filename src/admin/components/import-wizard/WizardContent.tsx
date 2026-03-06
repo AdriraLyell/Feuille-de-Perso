@@ -9,11 +9,11 @@ interface WizardContentProps {
     activeTab: TabType;
     importDestination: 'campaign' | 'global';
     updateImportDestination: (dest: 'campaign' | 'global') => void;
-    traitCandidates: ImportCandidate<any>[];
-    skillCandidates: ImportCandidate<any>[];
-    specCandidates: ImportCandidate<any>[];
-    backgroundCandidates: ImportCandidate<any>[];
-    counterCandidates: ImportCandidate<any>[];
+    traitCandidates: ImportCandidate<unknown>[];
+    skillCandidates: ImportCandidate<unknown>[];
+    specCandidates: ImportCandidate<unknown>[];
+    backgroundCandidates: ImportCandidate<unknown>[];
+    counterCandidates: ImportCandidate<unknown>[];
     toggleCandidateSelection: (type: TabType, index: number) => void;
 }
 
@@ -59,7 +59,7 @@ export const WizardContent: React.FC<WizardContentProps> = ({
                                     onToggle={() => toggleCandidateSelection('traits', idx)}
                                     importDestination={importDestination}
                                     showType={true}
-                                    typeLabel={c.data.type === 'avantage' ? 'Avantage' : 'Désavantage'}
+                                    typeLabel={(c.data as Record<string, unknown>)?.type === 'avantage' ? 'Avantage' : 'Désavantage'}
                                 />
                             ))
                         )}
@@ -78,7 +78,7 @@ export const WizardContent: React.FC<WizardContentProps> = ({
                                     candidate={c}
                                     onToggle={() => toggleCandidateSelection('skills', idx)}
                                     importDestination={importDestination}
-                                    extraInfo={c.data.defaultCategory ? <div className="text-[10px] text-indigo-500 font-bold uppercase mt-0.5">{c.data.defaultCategory.replace('Col_Comp_', 'Série ')}</div> : null}
+                                    extraInfo={(c.data as Record<string, unknown>)?.defaultCategory ? <div className="text-[10px] text-indigo-500 font-bold uppercase mt-0.5">{String((c.data as Record<string, unknown>).defaultCategory).replace('Col_Comp_', 'Série ')}</div> : null}
                                 />
                             ))
                         )}
@@ -127,20 +127,23 @@ export const WizardContent: React.FC<WizardContentProps> = ({
                         {counterCandidates.length === 0 ? (
                             <div className="text-center py-10 text-slate-400 italic">Aucun compteur détecté.</div>
                         ) : (
-                            counterCandidates.map((c, idx) => (
-                                <CandidateLine
-                                    key={idx}
-                                    candidate={c}
-                                    onToggle={() => toggleCandidateSelection('counters', idx)}
-                                    importDestination={importDestination}
-                                    extraInfo={
-                                        <div className="flex items-center gap-3 text-[10px] text-slate-500">
-                                            <span>Max: {c.data.maxValue}</span>
-                                            <span>Départ: {c.data.defaultValue}</span>
-                                        </div>
-                                    }
-                                />
-                            ))
+                            counterCandidates.map((c, idx) => {
+                                const data = c.data as Record<string, unknown>;
+                                return (
+                                    <CandidateLine
+                                        key={idx}
+                                        candidate={c}
+                                        onToggle={() => toggleCandidateSelection('counters', idx)}
+                                        importDestination={importDestination}
+                                        extraInfo={
+                                            <div className="flex items-center gap-3 text-[10px] text-slate-500">
+                                                <span>Max: {String(data.maxValue || data.max || 10)}</span>
+                                                <span>Départ: {String(data.defaultValue || data.creationValue || 0)}</span>
+                                            </div>
+                                        }
+                                    />
+                                );
+                            })
                         )}
                     </div>
                 )}

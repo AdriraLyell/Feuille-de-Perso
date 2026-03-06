@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { CharacterSheetData } from '../types';
 import { calculateCardValue } from '../utils/mechanics';
 import { canIncreaseMysticSkill, canLearnNewMysticSkill } from '../utils/mysticUtils';
 
@@ -34,7 +35,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
     React.useEffect(() => { dataRef.current = data; }, [data]);
 
     const { updateData: onChange, addLog: onAddLog, recordXPTransaction, setEditLayoutMode, clearLayout, autoFitLayout } = useCharacterActions();
-    const { isSyncing, isEditMode, editLayoutMode } = useCharacterState();
+    const { isEditMode, editLayoutMode } = useCharacterState();
     const layoutJustReset = React.useRef(false);
     // Use a ref so handleLayoutChange can read editLayoutMode without depending on it
     const editLayoutModeRef = React.useRef(editLayoutMode);
@@ -139,7 +140,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
         // Read via ref to avoid adding editLayoutMode to deps (which would recreate
         // the callback, trigger RGL remount, fire onLayoutChange → infinite loop).
         if (!editLayoutModeRef.current) return;
-        onChange((prev: any) => ({
+        onChange((prev: CharacterSheetData) => ({
             ...prev,
             activeLayout: allLayouts
         }));

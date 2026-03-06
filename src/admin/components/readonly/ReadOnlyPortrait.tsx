@@ -31,9 +31,8 @@ export const ReadOnlyPortrait: React.FC<ReadOnlyPortraitProps> = ({ imageId, leg
                                 // Standard blob (object URL) - reuse the original blob, not the text
                                 setImageUrl(URL.createObjectURL(blob));
                             }
-                        } catch (err) {
+                        } catch {
                             // Fallback if text reading fails (unlikely for blob) or other error, try standard object URL
-                            logger.warn("Error checking blob content, falling back to createObjectURL", err);
                             setImageUrl(URL.createObjectURL(blob));
                         }
                     } else if (active) {
@@ -52,7 +51,7 @@ export const ReadOnlyPortrait: React.FC<ReadOnlyPortraitProps> = ({ imageId, leg
                         const { ImageCompressionService } = await import('../../../services/ImageCompressionService');
                         const decompressed = ImageCompressionService.decompressFull(legacyImage);
                         if (active) setImageUrl(decompressed);
-                    } catch (err) {
+                    } catch {
                         if (active) setError(true);
                     }
                 } else {

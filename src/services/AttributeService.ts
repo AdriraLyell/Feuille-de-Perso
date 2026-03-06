@@ -34,7 +34,7 @@ export const AttributeService = {
     /**
      * Save a new attribute preset
      */
-    async saveAttributePreset(name: string, description: string, structure: any, hasSecondary: boolean): Promise<boolean> {
+    async saveAttributePreset(name: string, description: string, structure: unknown, hasSecondary: boolean): Promise<boolean> {
         const { error } = await supabase
             .from(TABLE_ATTRIBUTE_PRESETS)
             .insert([{

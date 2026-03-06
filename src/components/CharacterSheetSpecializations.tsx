@@ -1,6 +1,6 @@
 
 import { useCharacter } from '../context/CharacterContext';
-import { CharacterSheetData, DotEntry, SkillCategoryKey } from '../types';
+import { CharacterSheetData, DotEntry } from '../types';
 import SpecializationOmnibar from './specialization-library/SpecializationOmnibar';
 import SpecializationLibraryDrawer from './specialization-library/SpecializationLibraryDrawer';
 import ConfirmationModal from './ui/ConfirmationModal';
@@ -220,6 +220,8 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                     e.currentTarget.classList.remove('bg-amber-50', 'border-amber-400');
                     handleDrop(e, skill.id);
                 }}
+                role="region"
+                aria-label={`Spécialisations pour ${skill.name}`}
             >
                 <div className="font-black text-[9px] uppercase tracking-tighter flex justify-between items-center text-stone-500 group-hover/skill:text-amber-700 transition-colors px-0.5">
                     <span className="truncate" title={skill.name}>{skill.name}</span>

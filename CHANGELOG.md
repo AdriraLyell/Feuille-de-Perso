@@ -6,6 +6,19 @@
 
 # Changelog
 
+## [2.99.0] - 2026-03-06 [REFACTOR/CLEANUP]
+
+### 🛠️ Core & Qualité
+- **Typage Strict (100%) :** Résolution des 59 dernières erreurs TypeScript résiduelles après le passage au mode strict.
+- **Assainissement du Code :** Élimination complète des types `any` dans les services, hooks et composants critiques (Admin & Fiche).
+- **Archivage SQL :** Centralisation et archivage de tous les scripts de migration obsolètes vers `docs/archive/sql/`.
+- **Nettoyage :** Suppression des fichiers temporaires (`ts_errors.txt`) et organisation des dossiers de scripts.
+
+### 🎭 UI/UX
+- **Stabilité :** Correction des bugs de signature de props et d'imports manquants dans les composants de layout et de bibliothèque.
+
+---
+
 ## [2.98.0] - 2026-03-04 [FEAT/REFACTOR]
 
 ### 📖 Grimoire (Journal de Campagne)

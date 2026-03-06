@@ -6,11 +6,9 @@ import { mergeLibraries } from '../../utils/libraryMerger';
 
 interface SpecializationLibrarySidebarProps {
     data: CharacterSheetData;
-    onUpdate: (newData: CharacterSheetData) => void;
-    onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings') => void;
 }
 
-const SpecializationLibrarySidebar: React.FC<SpecializationLibrarySidebarProps> = ({ data, onUpdate, onAddLog }) => {
+const SpecializationLibrarySidebar: React.FC<SpecializationLibrarySidebarProps> = ({ data }) => {
     const { rules } = useRules();
 
     const hybridLibrary = useMemo(() => {
@@ -42,13 +40,14 @@ const SpecializationLibrarySidebar: React.FC<SpecializationLibrarySidebarProps> 
                         </div>
                     ) : (
                         hybridLibrary.map(item => (
-                            <div
+                            <button
                                 key={item.entry.id}
+                                type="button"
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, item.entry)}
-                                className="bg-white p-2 rounded border border-gray-300 shadow-sm cursor-grab active:cursor-grabbing hover:border-amber-400 hover:shadow-md transition flex justify-between items-center group"
+                                className="bg-white p-2 rounded border border-gray-300 shadow-sm cursor-grab active:cursor-grabbing hover:border-amber-400 hover:shadow-md transition flex justify-between items-center group text-left outline-none focus:ring-2 focus:ring-amber-500/50"
                             >
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 pointer-events-none">
                                     <GripVertical size={14} className="text-gray-300 group-hover:text-amber-500" />
                                     <div className="flex flex-col">
                                         <div className="flex items-center gap-1.5">
@@ -65,8 +64,8 @@ const SpecializationLibrarySidebar: React.FC<SpecializationLibrarySidebarProps> 
                                         <span className="text-[10px] text-amber-600 font-bold uppercase tracking-widest">Lvl {item.entry.defaultMinLevel}</span>
                                     </div>
                                 </div>
-                                <ArrowRight size={14} className="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </div>
+                                <ArrowRight size={14} className="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                            </button>
                         ))
                     )}
                 </div>

@@ -211,10 +211,11 @@ const CloudPanel: React.FC<CloudPanelProps> = ({ data, onLoadSuccess, onClose })
             {/* Search Section */}
             <div className="flex gap-3">
                 <div className="flex-grow">
-                    <label className="block text-sm font-bold text-[#4a3b32] mb-1.5">
+                    <label htmlFor="cloud-player-name" className="block text-sm font-bold text-[#4a3b32] mb-1.5">
                         Nom du Joueur
                     </label>
                     <input
+                        id="cloud-player-name"
                         type="text"
                         value={playerName}
                         onChange={(e) => setPlayerName(e.target.value)}

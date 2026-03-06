@@ -24,12 +24,16 @@ export const FormulaEffectFields: React.FC<FormulaEffectFieldsProps> = ({
     return (
         <div className="flex flex-col gap-3">
             <div className="flex flex-col">
-                <label className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest flex justify-between items-center">
+                <label 
+                    htmlFor={`formula-select-${effect.id}`}
+                    className="block text-[9px] font-bold text-indigo-800 mb-1 uppercase tracking-widest flex justify-between items-center"
+                >
                     <span>Choisir la Formule Globale</span>
                     <span className="text-[8px] font-normal normal-case opacity-70 italic">Dictionnaire MJ</span>
                 </label>
                 <div className="relative">
                     <select
+                        id={`formula-select-${effect.id}`}
                         className="w-full text-xs border border-indigo-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-indigo-500 outline-none bg-white font-bold text-stone-800 shadow-sm"
                         value={effect.formulaId || ''}
                         onChange={(e) => {
@@ -117,11 +121,15 @@ export const FormulaEffectFields: React.FC<FormulaEffectFieldsProps> = ({
                     <div className="grid grid-cols-2 gap-3">
                         {!selectedFormulaEntry?.target && (
                             <div>
-                                <label className="block text-[9px] font-bold text-amber-800 mb-1 uppercase tracking-widest flex items-center gap-1">
+                                <label 
+                                    htmlFor={`target-select-${effect.id}`}
+                                    className="block text-[9px] font-bold text-amber-800 mb-1 uppercase tracking-widest flex items-center gap-1"
+                                >
                                     Cible <span className="text-amber-600/50 font-normal lowercase italic">(à définir)</span>
                                 </label>
                                 <div className="relative">
                                     <select
+                                        id={`target-select-${effect.id}`}
                                         className="w-full text-xs border border-amber-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-amber-500 outline-none bg-amber-50/20 font-bold text-stone-800 shadow-sm"
                                         value={effect.target || ''}
                                         onChange={(e) => onUpdate(effect.id, 'target', e.target.value)}
@@ -144,11 +152,15 @@ export const FormulaEffectFields: React.FC<FormulaEffectFieldsProps> = ({
                             selectedFormulaEntry?.effectType !== 'block_skill_increase' &&
                             selectedFormulaEntry?.effectType !== 'master_skill' && (
                                 <div>
-                                    <label className="block text-[9px] font-bold text-amber-800 mb-1 uppercase tracking-widest flex items-center gap-1">
+                                    <label 
+                                        htmlFor={`operator-select-${effect.id}`}
+                                        className="block text-[9px] font-bold text-amber-800 mb-1 uppercase tracking-widest flex items-center gap-1"
+                                    >
                                         Opération <span className="text-amber-600/50 font-normal lowercase italic">(à définir)</span>
                                     </label>
                                     <div className="relative">
                                         <select
+                                            id={`operator-select-${effect.id}`}
                                             className="w-full text-xs border border-amber-400/30 rounded-sm px-2 py-1.5 appearance-none focus:border-amber-500 outline-none bg-amber-50/20 font-bold text-stone-800 shadow-sm"
                                             value={effect.operator || 'ADD'}
                                             onChange={(e) => onUpdate(effect.id, 'operator', e.target.value as TraitEffect['operator'])}
@@ -177,10 +189,16 @@ export const FormulaEffectFields: React.FC<FormulaEffectFieldsProps> = ({
                         </div>
                     ) : (selectedFormulaEntry?.effectType !== 'block_skill_increase' && selectedFormulaEntry?.effectType !== 'master_skill') ? (
                         <div className="flex flex-col p-2 bg-amber-50/50 rounded border border-amber-200/50 border-dashed">
-                            <label className="block text-[9px] font-bold text-amber-800 mb-1 uppercase tracking-widest">Valeur Fixe pour l'Effet</label>
+                            <label 
+                                htmlFor={`formula-input-${effect.id}`}
+                                className="block text-[9px] font-bold text-amber-800 mb-1 uppercase tracking-widest"
+                            >
+                                Valeur Fixe pour l'Effet
+                            </label>
                             <div className="flex items-center gap-2">
                                 <Calculator size={14} className="text-amber-600/50" />
                                 <input
+                                    id={`formula-input-${effect.id}`}
                                     type="text"
                                     className="flex-grow text-xs border border-amber-400/30 rounded-sm px-2 py-1 focus:border-amber-500 outline-none bg-white font-mono font-bold text-amber-900"
                                     value={effect.formula || ''}

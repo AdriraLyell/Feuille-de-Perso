@@ -5,14 +5,15 @@ import { useRules } from '../context/RulesContext';
 import { WeaponTable, ArmorTable } from './sheet/CombatSection';
 import NotebookInput from './shared/NotebookInput';
 import { Page2SectionHeader } from './sheet/page2/Page2Components';
+import { ArmorEntry, CombatEntry } from '../types';
 
 interface Props {
     isLandscape?: boolean;
 }
 
 const WeaponTableWithFixedLines: React.FC<{
-    weapons: any[];
-    updateCombatWeapon: (id: string, field: any, value: string) => void;
+    weapons: CombatEntry[];
+    updateCombatWeapon: (id: string, field: keyof CombatEntry, value: string) => void;
 }> = ({ weapons, updateCombatWeapon }) => {
     // Force precisely 6 lines
     const displayWeapons = [...(weapons || [])];
@@ -25,8 +26,8 @@ const WeaponTableWithFixedLines: React.FC<{
 };
 
 const ArmorTableWithFixedLines: React.FC<{
-    armor: any[];
-    updateArmor: (index: number, field: any, value: string) => void;
+    armor: ArmorEntry[];
+    updateArmor: (index: number, field: keyof ArmorEntry, value: string) => void;
 }> = ({ armor, updateArmor }) => {
     // Force precisely 4 lines
     const displayArmor = [...(armor || [])];

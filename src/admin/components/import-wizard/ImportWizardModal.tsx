@@ -58,7 +58,7 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
 
     const [showDetails, setShowDetails] = useState(false);
 
-    const SectionCard = ({ id, label, icon: Icon, details }: { id: keyof ImportOptions['sections'], label: string, icon: any, details: string[] }) => {
+    const SectionCard = ({ id, label, icon: Icon, details }: { id: keyof ImportOptions['sections'], label: string, icon: React.ElementType, details: string[] }) => {
         const hasChanges = details.length > 0;
 
         return (
@@ -285,7 +285,8 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
                                                         </div>
                                                         <div className="space-y-2">
                                                             {stats.conflicts.map((conflict, i) => {
-                                                                const isExcluded = options.excludedIds?.includes(conflict.candidate.id);
+                                                                const candidate = conflict.candidate as { id: string };
+                                                                const isExcluded = options.excludedIds?.includes(candidate.id);
 
                                                                 const toggleFieldExclusion = (itemId: string, field: string) => {
                                                                     setOptions(prev => {
@@ -341,7 +342,7 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
                                                                             <input
                                                                                 type="checkbox"
                                                                                 checked={!isExcluded}
-                                                                                onChange={() => toggleExclusion(conflict.candidate.id)}
+                                                                                onChange={() => toggleExclusion(candidate.id)}
                                                                                 className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500"
                                                                             />
                                                                             <div className="font-bold text-sm text-slate-800">{conflict.name}</div>

@@ -1,5 +1,7 @@
 import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry, LibraryFormulaEntry } from './system';
 
+export type { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry, LibraryFormulaEntry };
+
 export interface RulesCreationConfig {
     mode: 'points' | 'rangs';
     startingXP: number;

@@ -5,6 +5,7 @@ import {
   DotEntry,
   HeaderInfo,
   CombatEntry,
+  ArmorEntry,
   ReputationEntry,
   TraitEntry,
   PostItData
@@ -47,6 +48,7 @@ export interface Page2Data {
 }
 
 export interface CharacterSheetData {
+  [key: string]: unknown; // Generic access for migrations and dynamic fields
   creationConfig: CreationConfig;
   theme: ThemeConfig; // New Theme Config
   header: HeaderInfo;
@@ -66,11 +68,7 @@ export interface CharacterSheetData {
   skills: Record<string, DotEntry[]>;
   combat: {
     weapons: CombatEntry[];
-    armor: {
-      type: string;
-      protection: string;
-      weight: string;
-    }[];
+    armor: ArmorEntry[];
     stats: {
       agility: string;
       dexterity: string;
@@ -102,8 +100,8 @@ export interface CharacterSheetData {
   mysticAbilities?: LibrarySkillEntry[]; // Catalogue d'habilités mystiques
   variables?: Record<string, number>; // Variables pour les formules (Valeurs calculées en cache)
   formulaLibrary?: import('./system').LibraryFormulaEntry[]; // Dictionnaire central (Local cache)
-  formulaMacros?: any[]; // Macros de calcul (Legacy)
-  formulaVariables?: any[]; // Définitions de variables calculées (Aggregate)
+  formulaMacros?: unknown[]; // Macros de calcul (Legacy)
+  formulaVariables?: unknown[]; // Définitions de variables calculées (Aggregate)
   xpLogs: XPEntry[];
   xpTransactions: XPTransaction[];
   appLogs: LogEntry[];

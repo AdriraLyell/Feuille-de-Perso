@@ -47,6 +47,8 @@ const AttributeRow: React.FC<{
             className="flex items-center px-2 border-b border-dotted border-stone-300 h-[22px] text-xs hover:bg-stone-50 transition-colors relative"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            role="listitem"
+            aria-label={`Score de ${entry.name}`}
         >
             <span className="w-24 truncate font-semibold text-stone-700 flex items-center gap-1">
                 {entry.name}

@@ -33,11 +33,15 @@ export const FileDropZone: React.FC<FileDropZoneProps> = ({ onFileSelect }) => {
     };
 
     return (
-        <div className="flex-grow flex flex-col justify-center items-center text-center space-y-6 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-8 hover:bg-orange-50 hover:border-orange-300 transition-colors cursor-pointer group" onClick={() => fileInputRef.current?.click()}>
-            <div className="p-5 bg-white rounded-full shadow-sm text-slate-400 group-hover:text-orange-500 transition-colors">
+        <button
+            type="button"
+            className="flex-grow flex flex-col justify-center items-center text-center space-y-6 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-8 hover:bg-orange-50 hover:border-orange-300 transition-colors cursor-pointer group outline-none focus:ring-2 focus:ring-orange-500/50"
+            onClick={() => fileInputRef.current?.click()}
+        >
+            <div className="p-5 bg-white rounded-full shadow-sm text-slate-400 group-hover:text-orange-500 transition-colors pointer-events-none">
                 <Upload size={48} />
             </div>
-            <div>
+            <div className="pointer-events-none">
                 <p className="text-lg text-slate-700 font-bold mb-2">
                     Cliquez pour sélectionner un fichier
                 </p>
@@ -52,11 +56,11 @@ export const FileDropZone: React.FC<FileDropZoneProps> = ({ onFileSelect }) => {
                 className="hidden"
                 onChange={handleFileChange}
             />
-            <button
-                className="bg-white border border-slate-300 text-slate-700 px-6 py-2 rounded-full font-bold hover:bg-white hover:text-orange-600 hover:border-orange-400 transition-colors shadow-sm pointer-events-none"
+            <div
+                className="bg-white border border-slate-300 text-slate-700 px-6 py-2 rounded-full font-bold group-hover:text-orange-600 group-hover:border-orange-400 transition-colors shadow-sm pointer-events-none"
             >
                 Parcourir...
-            </button>
-        </div>
+            </div>
+        </button>
     );
 };

@@ -137,7 +137,7 @@ describe('RulesLoader', () => {
             const result = await loadRules();
 
             // Verify call URL instead of strict count
-            const callUrls = mockFetch.mock.calls.map((c: any) => c[0]);
+            const callUrls = mockFetch.mock.calls.map((c: unknown[]) => c[0] as string);
             const hasApi = callUrls.some((url: string) => url.includes('api.github.com'));
             const hasRaw = callUrls.some((url: string) => url.includes('raw.githubusercontent.com'));
 

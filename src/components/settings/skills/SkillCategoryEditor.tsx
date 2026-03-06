@@ -47,6 +47,8 @@ export const SkillCategoryEditor: React.FC<SkillCategoryEditorProps> = ({
             className={`bg-[#fdfbf7]/80 backdrop-blur-sm p-4 rounded-sm shadow-md flex flex-col ${heightClass} border border-[#bfae85]/30 transition duration-300 ${draggedItem && !isCounters ? 'border-dashed border-amber-400 bg-amber-50/50 scale-[1.01]' : ''}`}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDropOnSheet(e, category, list.length)}
+            role="region"
+            aria-label={`Éditeur de catégorie: ${title}`}
         >
             <h3 className="font-bold text-[10px] mb-4 text-[#5c4d41] border-b border-[#bfae85]/30 pb-2 flex justify-between items-center select-none uppercase tracking-widest">
                 {title}
@@ -66,7 +68,10 @@ export const SkillCategoryEditor: React.FC<SkillCategoryEditorProps> = ({
                     </button>
                 </div>
             </h3>
-            <div className="flex-grow overflow-y-auto space-y-2 pr-1 max-h-[500px] min-h-[50px] custom-scrollbar">
+            <div 
+                className="flex-grow overflow-y-auto space-y-2 pr-1 max-h-[500px] min-h-[50px] custom-scrollbar"
+                role="list"
+            >
                 {list.length === 0 && (
                     <div className="h-16 border-2 border-dashed border-[#bfae85]/30 rounded-sm flex items-center justify-center text-[#5c4d41]/40 text-[10px] pointer-events-none italic">
                         Zone de dépôt
@@ -82,6 +87,7 @@ export const SkillCategoryEditor: React.FC<SkillCategoryEditorProps> = ({
                             onDragStart={(e) => handleDragStart(e, 'sheet_skill', { category, index, item })}
                             onDragOver={handleDragOver}
                             onDrop={(e) => { e.stopPropagation(); handleDropOnSheet(e, category, index); }}
+                            role="listitem"
                         >
                             <div className="cursor-grab text-[#bfae85]/40 hover:text-[#8b2e2e] active:cursor-grabbing p-1 transition-colors">
                                 <GripVertical size={16} />
@@ -89,9 +95,12 @@ export const SkillCategoryEditor: React.FC<SkillCategoryEditorProps> = ({
                             <span className="text-[#5c4d41]/30 text-[9px] w-4 text-center select-none font-mono">{index + 1}</span>
 
                             {item.name === '' ? (
-                                <div className="flex-grow h-8 bg-black/5 border border-dashed border-[#bfae85]/30 rounded-sm flex items-center justify-center text-[10px] text-[#5c4d41]/40 italic cursor-default select-none shadow-inner">
+                                <button
+                                    type="button"
+                                    className="flex-grow h-8 bg-black/5 border border-dashed border-[#bfae85]/30 rounded-sm flex items-center justify-center text-[10px] text-[#5c4d41]/40 italic cursor-grab select-none shadow-inner outline-none focus:bg-stone-200/50"
+                                >
                                     Espaceur
-                                </div>
+                                </button>
                             ) : (
                                 <div className="flex-grow flex items-center gap-1">
                                     <input

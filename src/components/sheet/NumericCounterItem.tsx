@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { CharacterSheetData, DotEntry } from '../../types';
-import { useRules } from '../../context/RulesContext';
 import { normalizeString } from '../../utils/stringUtils';
 import { evaluateFormula, getSheetVariables, getAggregateDetails } from '../../utils/formulaEvaluator';
 import { Minus, Plus, RefreshCw } from 'lucide-react';
@@ -93,7 +92,7 @@ export const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
     updateCounter
 }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const anchorRef = useRef<HTMLDivElement>(null);
+    const anchorRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -130,7 +129,7 @@ export const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
     const computedMax = calculatedMax ?? evaluateFormula(
         formula,
         { ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary },
-        { entry: effectiveEntry }
+        { entry: effectiveEntry as unknown as any }
     );
 
     const currentSpent = counter.current || 0;
@@ -238,18 +237,19 @@ export const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
 
     return (
         <div className="col-span-1 border border-[#bfae85]/40 bg-gradient-to-br from-[#fdfbf7] to-[#f4f2eb] rounded-sm shadow-[inset_0_1px_4px_rgba(0,0,0,0.05)] flex items-center justify-between px-1.5 overflow-visible h-9 group transition relative">
-            <div
-                className="flex flex-col items-start justify-center flex-grow cursor-help h-full w-full overflow-hidden"
+            <button
+                type="button"
+                className="flex flex-col items-start justify-center flex-grow cursor-help h-full w-full overflow-hidden outline-none focus:bg-stone-200/50"
                 ref={anchorRef}
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <span className="font-bold text-[8.5px] uppercase tracking-tighter text-[#8b2e2e]/90 leading-tight truncate w-full">
+                <span className="font-bold text-[8.5px] uppercase tracking-tighter text-[#8b2e2e]/90 leading-tight truncate w-full text-left">
                     {counter.name}
                 </span>
                 <span className="font-black text-xs text-[#5c4d41] leading-none">
                     {currentRemaining} <span className="text-[10px] text-stone-400 font-normal">/ {computedMax}</span>
                 </span>
-            </div>
+            </button>
 
             <PortalTooltip isOpen={isOpen} anchorRef={anchorRef} title={`${counter.name} (Calcul)`} maxWidth={540}>
                 {renderDetails()}

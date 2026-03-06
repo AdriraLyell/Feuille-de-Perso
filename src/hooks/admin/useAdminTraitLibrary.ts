@@ -216,7 +216,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
 
     // Filter & Sort Logic
     const duplicateIds = useMemo(() => {
-        const normalized = library.map(e => ({ id: e.id, key: normalizeString(e.name).replace(/\s+/g, '') }));
+        const normalized = library.map((e: LibraryEntry) => ({ id: e.id, key: normalizeString(e.name).replace(/\s+/g, '') }));
         const seen = new Map<string, string>();
         const dupes = new Set<string>();
         normalized.forEach(({ id, key }) => {
@@ -239,14 +239,14 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
             const entryTags = entry.tags || [];
             const matchesSearch = smartIncludes(entry.name, searchTerm) ||
                 smartIncludes(entry.description || "", searchTerm) ||
-                entryTags.some(t => smartIncludes(t, searchTerm));
+                entryTags.some((t: string) => smartIncludes(t, searchTerm));
 
             const matchesType = typeFilter === null || (typeFilter ? entry.type === 'avantage' : entry.type === 'desavantage');
             const matchesActive = activeFilter === null || (entry.isActive !== false) === activeFilter;
             const matchesSource = sourceFilter === null || (entry.isGlobal === true) === sourceFilter;
 
-            const matchesTags = selectedTags.length === 0 || selectedTags.every(sel =>
-                entryTags.some(t => t.toLowerCase() === sel.toLowerCase())
+            const matchesTags = selectedTags.length === 0 || selectedTags.every((sel: string) =>
+                entryTags.some((t: string) => t.toLowerCase() === sel.toLowerCase())
             );
 
             // Property icon filters
@@ -260,7 +260,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
             if (auditMode === 'incomplete') {
                 matchesAudit = !entry.description?.trim() || !entry.tags || entry.tags.length === 0;
             } else if (auditMode === 'complex') {
-                matchesAudit = (entry.effects || []).some(e => e.type === 'formula');
+                matchesAudit = (entry.effects || []).some((e: import('../../types').TraitEffect) => e.type === 'formula');
             } else if (auditMode === 'popular') {
                 matchesAudit = (globalUsage[entry.id] || 0) > 0;
             } else if (auditMode === 'unused') {
@@ -289,7 +289,7 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
 
     const allAvailableTags = useMemo(() => {
         const tags = new Set<string>();
-        library.forEach(l => (l.tags || []).forEach(t => tags.add(t)));
+        library.forEach(l => (l.tags || []).forEach((t: string) => tags.add(t)));
         return Array.from(tags).sort();
     }, [library]);
 

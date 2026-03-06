@@ -19,7 +19,7 @@ import {
     Minimize2,
 } from 'lucide-react';
 import { useMessages } from '../../hooks/messaging/useMessages';
-import { Message, MessageService } from '../../services/MessageService';
+import { Message } from '../../services/MessageService';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

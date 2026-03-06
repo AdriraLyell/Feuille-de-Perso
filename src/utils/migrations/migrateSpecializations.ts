@@ -12,14 +12,14 @@ export const migrateSpecializations = (parsed: MigratableData): void => {
         parsed.specializations = {};
     }
 
-    const imposedSpecializations = parsed.imposedSpecializations as Record<string, any> | undefined;
+    const imposedSpecializations = parsed.imposedSpecializations as Record<string, unknown[]> | undefined;
 
     // Convert string array to object array in imposedSpecializations
     if (imposedSpecializations) {
         Object.keys(imposedSpecializations).forEach(skillId => {
             const list = imposedSpecializations[skillId];
             if (Array.isArray(list) && list.length > 0 && typeof list[0] === 'string') {
-                imposedSpecializations[skillId] = list.map((s: string) => ({
+                imposedSpecializations[skillId] = (list as string[]).map((s: string) => ({
                     name: s,
                     minLevel: 0
                 }));
@@ -29,7 +29,7 @@ export const migrateSpecializations = (parsed: MigratableData): void => {
 
     // Build specializationLibrary from existing data
     if (!parsed.specializationLibrary || !Array.isArray(parsed.specializationLibrary) || parsed.specializationLibrary.length === 0) {
-        const initialSpecList: any[] = [];
+        const initialSpecList: import('../../types').LibrarySpecializationEntry[] = [];
         const seenSpecNames = new Set<string>();
 
         // 1. Harvest from specializations Record
@@ -69,7 +69,8 @@ export const migrateSpecializations = (parsed: MigratableData): void => {
                 const specs = imposedSpecializations[skillId];
                 if (Array.isArray(specs)) {
                     specs.forEach(s => {
-                        const name = (typeof s === 'string' ? s : s?.name) as string | undefined;
+                        const specObj = s as Record<string, unknown> | string;
+                        const name = (typeof specObj === 'string' ? specObj : specObj?.name) as string | undefined;
                         if (name && name.trim() !== '') {
                             const trimmedName = name.trim();
                             const normalized = trimmedName.toLowerCase();
@@ -79,7 +80,7 @@ export const migrateSpecializations = (parsed: MigratableData): void => {
                                     id: Math.random().toString(36).substring(2, 11),
                                     name: trimmedName,
                                     skillIds: [skillId],
-                                    defaultMinLevel: typeof s === 'object' ? (s.minLevel || 0) : 0,
+                                    defaultMinLevel: typeof specObj === 'object' ? (Number(specObj.minLevel) || 0) : 0,
                                     description: ""
                                 });
                             } else {
@@ -98,3 +99,4 @@ export const migrateSpecializations = (parsed: MigratableData): void => {
         parsed.specializationLibrary = initialSpecList;
     }
 };
+

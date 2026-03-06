@@ -64,7 +64,7 @@ const SyncModal: React.FC<SyncModalProps> = ({
         setIsRestoring(true);
         try {
             const restoredData = await CharacterSyncService.processImages(entry.data, 'decompress');
-            onRestore(restoredData);
+            onRestore(restoredData as CharacterSheetData);
             onClose();
         } catch (e) {
             logger.error("Restoration failed", e);

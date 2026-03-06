@@ -1,10 +1,10 @@
-import { CharacterSheetData, DotEntry, TraitEntry } from '../types';
+import { CharacterSheetData, DotEntry } from '../types';
 
 export interface DataDiff {
   path: string;
   label: string;
-  local: any;
-  remote: any;
+  local: unknown;
+  remote: unknown;
 }
 
 /**
@@ -33,8 +33,12 @@ export const getCharacterDiff = (local: CharacterSheetData, remote: CharacterShe
 
   // 2. Attributes
   Object.keys(local.attributes).forEach(cat => {
-    local.attributes[cat].forEach((attr, idx) => {
-      const remoteAttr = remote.attributes[cat]?.[idx];
+    const localCat = local.attributes[cat];
+    const remoteCat = remote.attributes[cat];
+    if (!localCat || !remoteCat) return;
+
+    localCat.forEach((attr, idx) => {
+      const remoteAttr = remoteCat[idx];
       if (!remoteAttr) return;
       
       ['val1', 'val2', 'val3'].forEach(v => {

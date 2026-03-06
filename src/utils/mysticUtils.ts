@@ -63,7 +63,7 @@ export const getMysticCapacity = (sheet: CharacterSheetData, mysticAbilityId: st
             let isLinked = false;
 
             // 1. Direct link on skill instance (if copied)
-            if ('mysticAbilityId' in skill && (skill as any).mysticAbilityId === mysticAbilityId) {
+            if ('mysticAbilityId' in skill && skill.mysticAbilityId === mysticAbilityId) {
                 isLinked = true;
             }
             // 2. Link via Library definition
@@ -101,13 +101,13 @@ export const canIncreaseMysticSkill = (
     if (skillId) {
         const allSkills = Object.values(sheet.skills).flat();
         const instance = allSkills.find(s => s.id === skillId);
-        mysticAbilityId = (instance as any)?.mysticAbilityId;
+        mysticAbilityId = instance?.mysticAbilityId;
     }
 
     // Fallback to library if not found on instance
     if (!mysticAbilityId) {
-        const libSkill = (sheet as any).skillLibrary?.find((s: any) => s.name === skillName);
-        mysticAbilityId = libSkill?.mysticAbilityId;
+        const libSkill = sheet.skillLibrary?.find(s => s.name === skillName);
+        mysticAbilityId = libSkill?.mysticAbilityId || undefined;
     }
 
     if (!mysticAbilityId) return { allowed: true }; // Not a mystic skill
@@ -138,12 +138,12 @@ export const canLearnNewMysticSkill = (
     if (skillId) {
         const allSkills = Object.values(sheet.skills).flat();
         const instance = allSkills.find(s => s.id === skillId);
-        mysticAbilityId = (instance as any)?.mysticAbilityId;
+        mysticAbilityId = instance?.mysticAbilityId;
     }
 
     if (!mysticAbilityId) {
-        const libSkill = (sheet as any).skillLibrary?.find((s: any) => s.name === skillName);
-        mysticAbilityId = libSkill?.mysticAbilityId;
+        const libSkill = sheet.skillLibrary?.find(s => s.name === skillName);
+        mysticAbilityId = libSkill?.mysticAbilityId || undefined;
     }
 
     if (!mysticAbilityId) return { allowed: true };

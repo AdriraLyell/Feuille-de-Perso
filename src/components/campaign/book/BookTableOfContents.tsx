@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { ChevronDown, ChevronRight, BookOpen } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 export interface TOCEntry {
     type: 'act' | 'chapter' | 'section';
@@ -43,7 +43,7 @@ export const BookTableOfContents: React.FC<BookTableOfContentsProps> = ({ entrie
 
     const [activeGroupIndex, setActiveGroupIndex] = useState<number>(-1);
 
-    const handleToggleAct = (e: React.MouseEvent, index: number) => {
+    const handleToggleAct = (e: React.MouseEvent | React.KeyboardEvent, index: number) => {
         e.stopPropagation();
         setActiveGroupIndex(index === activeGroupIndex ? -1 : index);
     };
@@ -77,6 +77,10 @@ export const BookTableOfContents: React.FC<BookTableOfContentsProps> = ({ entrie
                                         <div
                                             className="flex items-center gap-2 flex-grow cursor-pointer transition-colors"
                                             onClick={(e) => handleToggleAct(e, groupIndex)}
+                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleToggleAct(e, groupIndex); }}
+                                            role="button"
+                                            tabIndex={0}
+                                            aria-expanded={isExpanded}
                                         >
                                             <div className="p-1 hover:bg-amber-100 rounded transition-colors text-amber-700">
                                                 {isExpanded ? (
@@ -89,12 +93,13 @@ export const BookTableOfContents: React.FC<BookTableOfContentsProps> = ({ entrie
                                                 {group.actEntry!.title}
                                             </span>
                                         </div>
-                                        <span
-                                            className="font-serif text-amber-800/60 min-w-[2rem] text-right font-bold text-sm cursor-pointer hover:text-amber-700"
+                                        <button
+                                            type="button"
+                                            className="font-serif text-amber-800/60 min-w-[2rem] text-right font-bold text-sm cursor-pointer hover:text-amber-700 outline-none"
                                             onClick={() => onNavigate(group.actEntry!.page)}
                                         >
                                             {group.actEntry!.page}
-                                        </span>
+                                        </button>
                                     </div>
                                 )}
 
@@ -106,8 +111,9 @@ export const BookTableOfContents: React.FC<BookTableOfContentsProps> = ({ entrie
                                         return (
                                             <button
                                                 key={itemIndex}
+                                                type="button"
                                                 onClick={() => onNavigate(entry.page)}
-                                                className={`group flex items-baseline gap-2 text-left hover:text-amber-700 transition-colors w-full ${isSection ? 'pl-8 opacity-70' : hasAct ? 'pl-6' : 'pl-2'}`}
+                                                className={`group flex items-baseline gap-2 text-left hover:text-amber-700 transition-colors w-full outline-none ${isSection ? 'pl-8 opacity-70' : hasAct ? 'pl-6' : 'pl-2'}`}
                                             >
                                                 <span className={`font-serif group-hover:text-amber-700 whitespace-nowrap truncate max-w-[80%] pt-1 ${isSection ? 'text-sm text-stone-600 italic' : 'font-semibold text-stone-800'}`}>
                                                     {isSection && '•'} {entry.title}

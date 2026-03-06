@@ -14,7 +14,7 @@ export const migrateLibrary = (parsed: MigratableData): void => {
     // Fix key casing typo
     if (parsed.skilllibrary && !parsed.skillLibrary) {
         parsed.skillLibrary = parsed.skilllibrary;
-        delete (parsed as any).skilllibrary;
+        delete parsed.skilllibrary;
     }
 
     // Pre-fill skillLibrary
@@ -23,12 +23,13 @@ export const migrateLibrary = (parsed: MigratableData): void => {
         const seenNames = new Set<string>(initialSkillList.map(s => s.name.trim().toLowerCase()));
 
         // Harvest skills from sheet data
-        const skillsData = parsed.skills as Record<string, any[]> | undefined;
+        const skillsData = parsed.skills as Record<string, unknown[]> | undefined;
         if (skillsData) {
             Object.keys(skillsData).forEach(cat => {
                 if (cat === 'arrieres_plans') return;
                 const skills = skillsData[cat] || [];
-                skills.forEach((skill: any) => {
+                skills.forEach((skillRaw: unknown) => {
+                    const skill = skillRaw as { name?: string };
                     if (skill && skill.name && skill.name.trim() !== '') {
                         const normalized = skill.name.trim().toLowerCase();
                         if (!seenNames.has(normalized)) {
@@ -58,7 +59,8 @@ export const migrateLibrary = (parsed: MigratableData): void => {
             }
         });
 
-        parsed.skillLibrary.forEach((s: any) => {
+        const skillLib = parsed.skillLibrary as Array<{ name?: string; isVariable?: boolean }>;
+        skillLib.forEach((s) => {
             const normalized = s.name?.trim().toLowerCase();
             if (normalized && defaultVariableStatus.has(normalized) && typeof s.isVariable === 'undefined') {
                 s.isVariable = true;
@@ -73,17 +75,20 @@ export const migrateLibrary = (parsed: MigratableData): void => {
 
     // Migrate library type names
     if (Array.isArray(parsed.library)) {
-        parsed.library = parsed.library.map((l: any) => ({
-            ...l,
-            type: l.type === 'vertu' ? 'avantage' : (l.type === 'defaut' ? 'desavantage' : l.type),
-            tags: Array.isArray(l.tags) ? l.tags : [],
-            effects: Array.isArray(l.effects) ? l.effects : []
-        }));
+        parsed.library = parsed.library.map((lRaw: unknown) => {
+            const l = lRaw as { type?: string; tags?: unknown; effects?: unknown };
+            return {
+                ...l,
+                type: l.type === 'vertu' ? 'avantage' : (l.type === 'defaut' ? 'desavantage' : l.type),
+                tags: Array.isArray(l.tags) ? l.tags : [],
+                effects: Array.isArray(l.effects) ? l.effects : []
+            };
+        });
     }
 
     // Initialize mysticAbilities library
     if (!parsed.mysticAbilities) {
-        const initialMystic: LibrarySkillEntry[] = (INITIAL_DATA as any).mysticAbilities || [];
+        const initialMystic: LibrarySkillEntry[] = INITIAL_DATA.mysticAbilities || [];
         parsed.mysticAbilities = initialMystic.map(m => ({ ...m }));
     }
 };

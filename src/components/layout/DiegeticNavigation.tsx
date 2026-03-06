@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Settings, FileText, Save, Printer, History, HelpCircle, ScrollText, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X, AlertTriangle, MessageSquare, Layout, PencilLine } from 'lucide-react';
+import { Settings, FileText, Save, Printer, History, HelpCircle, ScrollText, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X, AlertTriangle, MessageSquare, Layout, PencilLine, RotateCcw, Maximize2 } from 'lucide-react';
 import { useCharacter } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';
 import { useStorageUsage } from '../../hooks/useStorageUsage';
@@ -42,7 +42,8 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     onShowLogs, showLogs, onShowUserGuide, onShowChangelog, onOpenAppearance, onOpenSync, syncStatus, appVersion,
     onShowCampaignInfo, autoSaveCountdown,
     isMessagingOpen, onToggleMessaging, unreadMessagesCount,
-    isEditMode, onToggleEditMode, isEditLayoutMode, onToggleEditLayoutMode, onResetLayout, onAutoFitLayout
+    isEditMode, onToggleEditMode, isEditLayoutMode, onToggleEditLayoutMode,
+    onResetLayout, onAutoFitLayout
 }) => {
     const { data, isSyncing } = useCharacter();
     const { rules } = useRules();
@@ -161,9 +162,11 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                         <AnimatePresence>
                             {isEditMenuOpen && (
                                 <>
-                                    <div
-                                        className="fixed inset-0 z-[90]"
+                                    <button
+                                        type="button"
+                                        className="fixed inset-0 z-[90] bg-transparent cursor-default w-full h-full border-none p-0"
                                         onClick={() => setIsEditMenuOpen(false)}
+                                        aria-label="Fermer le menu"
                                     />
                                     <motion.div
                                         initial={{ opacity: 0, y: 10 }}
@@ -213,6 +216,30 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
                                                 {isEditMode && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
                                             </button>
                                         </div>
+
+                                        {isEditLayoutMode && (
+                                            <>
+                                                <div className="p-2 border-t border-gray-800 bg-gray-800/50 flex flex-col gap-0.5 mt-1">
+                                                    <p className="px-2 py-1 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Outils Agencement</p>
+                                                </div>
+                                                <div className="p-1.5 space-y-1">
+                                                    <button
+                                                        onClick={() => { onAutoFitLayout?.(); setIsEditMenuOpen(false); }}
+                                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-indigo-400 hover:bg-gray-800 rounded-md transition-all hover:translate-x-1"
+                                                    >
+                                                        <Maximize2 size={16} />
+                                                        <span>Ajustement Auto</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => { onResetLayout?.(); setIsEditMenuOpen(false); }}
+                                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-gray-400 hover:bg-gray-800 rounded-md transition-all hover:translate-x-1"
+                                                    >
+                                                        <RotateCcw size={16} />
+                                                        <span>Réinitialiser</span>
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
                                     </motion.div>
                                 </>
                             )}

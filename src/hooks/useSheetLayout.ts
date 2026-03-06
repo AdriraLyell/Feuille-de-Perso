@@ -104,11 +104,11 @@ export const useSheetLayout = (data: CharacterSheetData, rules: RulesData | null
         const mysticAbilitiesLibRaw = rules?.libraries?.mysticAbilities || [];
         const backgroundsLibRaw = rules?.libraries?.backgrounds || [];
 
-        const skillsMapById = new Map<string, any>();
-        const skillsMapByName = new Map<string, any>();
-        const mysticMapById = new Map<string, any>();
-        const backgroundsMapById = new Map<string, any>();
-        const backgroundsMapByName = new Map<string, any>();
+        const skillsMapById = new Map<string, import('../types').LibrarySkillEntry>();
+        const skillsMapByName = new Map<string, import('../types').LibrarySkillEntry>();
+        const mysticMapById = new Map<string, import('../types').LibrarySkillEntry>();
+        const backgroundsMapById = new Map<string, import('../types').LibraryBackgroundEntry>();
+        const backgroundsMapByName = new Map<string, import('../types').LibraryBackgroundEntry>();
 
         skillsLibRaw.forEach(s => {
             skillsMapById.set(s.id, s);

@@ -56,8 +56,7 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
 
     return (
         <div
-            onClick={onClick}
-            className={`flex gap-1 items-center h-[22px] pr-1 transition rounded-sm cursor-pointer group select-none ${isEmpty
+            className={`w-full flex gap-1 items-center h-[22px] pr-1 transition rounded-sm group select-none text-left outline-none ${isEmpty
                 ? 'hover:bg-slate-50 border-b border-dotted border-stone-200'
                 : (isPostCreationAdvantage || isImproved)
                     ? 'bg-emerald-50 hover:bg-emerald-100 border-b border-emerald-200 shadow-sm'
@@ -67,51 +66,70 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
                             ? 'bg-amber-50 hover:bg-amber-100 border-b border-amber-200 shadow-sm'
                             : 'hover:bg-blue-50 bg-white/50 border-b border-stone-300 shadow-sm'
                 }`}
+            role="listitem"
         >
-            <div className={`w-8 shrink-0 text-center font-bold text-xs h-full flex items-center justify-center border-r border-stone-300 ${isEmpty ? 'text-stone-300' : 'text-stone-800 font-handwriting bg-white'
-                } ${isResolved ? 'line-through opacity-50' : ''}`} style={{ fontSize: '0.9rem' }}>
-                {item.value || (isEmpty ? '-' : '')}
-            </div>
-
-            <div className={`flex-grow h-full flex items-center px-1 font-handwriting min-w-0 ${isEmpty ? 'text-stone-300 italic text-[10px]' : 'text-ink'
-                } ${isResolved ? 'line-through opacity-50' : ''}`} style={{ fontSize: isEmpty ? '0.7rem' : '0.9rem' }}
-                ref={anchorRef}
-                onMouseEnter={() => setShowTooltip(true)}
-                onMouseLeave={() => setShowTooltip(false)}
+            <button
+                type="button"
+                onClick={onClick}
+                className="flex-grow flex items-center h-full min-w-0 outline-none focus:ring-1 focus:ring-blue-400 rounded-sm"
             >
-                <span className="truncate w-full block">
-                    <span className="inline-flex items-center gap-1 mr-1.5 leading-none">
-                        {isPostCreationAdvantage && <span title="Acquis avec XP"><Sparkles size={13} className="text-emerald-600 fill-emerald-600/20" strokeWidth={2.5} /></span>}
-                        {isPostCreationDisadvantage && <span title="Nouveau Désavantage (Gain XP)"><Sparkles size={13} className="text-red-500 fill-red-500/20" strokeWidth={2.5} /></span>}
-                        {isImproved && <span title="Amélioré avec XP"><ArrowUp size={13} className="text-blue-600" strokeWidth={3} /></span>}
-                        {isReduced && <span title="Racheté avec XP"><ArrowDown size={13} className="text-orange-600" strokeWidth={3} /></span>}
-                    </span>
-                    {item.name || "Vide"}
-                    {item.variant && <span className="font-bold ml-1 text-slate-600">: {item.variant}</span>}
+                <span 
+                    className={`w-8 shrink-0 text-center font-bold text-xs h-full flex items-center justify-center border-r border-stone-300 ${isEmpty ? 'text-stone-300' : 'text-stone-800 font-handwriting bg-white'
+                    } ${isResolved ? 'line-through opacity-50' : ''}`} 
+                    style={{ fontSize: '0.9rem' }}
+                    role="presentation"
+                >
+                    {item.value || (isEmpty ? '-' : '')}
                 </span>
-            </div>
+
+                <span 
+                    className={`flex-grow h-full flex items-center px-1 font-handwriting min-w-0 ${isEmpty ? 'text-stone-300 italic text-[10px]' : 'text-ink'
+                    } ${isResolved ? 'line-through opacity-50' : ''}`} 
+                    style={{ fontSize: isEmpty ? '0.7rem' : '0.9rem' }}
+                    ref={anchorRef}
+                    onMouseEnter={() => setShowTooltip(true)}
+                    onMouseLeave={() => setShowTooltip(false)}
+                    role="presentation"
+                >
+                    <span className="truncate w-full block">
+                        <span className="inline-flex items-center gap-1 mr-1.5 leading-none">
+                            {isPostCreationAdvantage && <span title="Acquis avec XP"><Sparkles size={13} className="text-emerald-600 fill-emerald-600/20" strokeWidth={2.5} /></span>}
+                            {isPostCreationDisadvantage && <span title="Nouveau Désavantage (Gain XP)"><Sparkles size={13} className="text-red-500 fill-red-500/20" strokeWidth={2.5} /></span>}
+                            {isImproved && <span title="Amélioré avec XP"><ArrowUp size={13} className="text-blue-600" strokeWidth={3} /></span>}
+                            {isReduced && <span title="Racheté avec XP"><ArrowDown size={13} className="text-orange-600" strokeWidth={3} /></span>}
+                        </span>
+                        {item.name || "Vide"}
+                        {item.variant && <span className="font-bold ml-1 text-slate-600">: {item.variant}</span>}
+                    </span>
+                </span>
+            </button>
 
             {!isEmpty && item.mysticAbilityId && onManageMystic && (
-                <div
+                <button
+                    type="button"
                     onClick={(e) => {
                         e.stopPropagation();
                         onManageMystic(e);
                     }}
-                    className="opacity-100 sm:opacity-0 group-hover:opacity-100 text-purple-400 hover:text-purple-600 transition shrink-0 p-0.5 hover:bg-purple-50 rounded"
+                    className="opacity-100 sm:opacity-0 group-hover:opacity-100 text-purple-400 hover:text-purple-600 transition shrink-0 p-0.5 hover:bg-purple-50 rounded outline-none focus:opacity-100"
                     title="Gérer les compétences mystiques"
                 >
                     <Wand2 size={18} />
-                </div>
+                </button>
             )}
 
             {!isEmpty && (
-                <div
-                    onClick={onRemove}
-                    className="opacity-0 group-hover:opacity-100 text-stone-400 hover:text-red-500 transition shrink-0 p-0.5 hover:bg-red-50 rounded"
+                <button
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onRemove(e);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 text-stone-400 hover:text-red-500 transition shrink-0 p-0.5 hover:bg-red-50 rounded outline-none focus:opacity-100"
                     title="Supprimer"
                 >
                     <Trash2 size={18} />
-                </div>
+                </button>
             )}
             <div className="opacity-0 group-hover:opacity-100 text-stone-400 transition-opacity shrink-0 p-0.5 mt-0.5">
                 <Edit size={16} />

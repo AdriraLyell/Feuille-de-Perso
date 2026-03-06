@@ -73,20 +73,31 @@ const TriStateChip: React.FC<TriStateChipProps> = ({
             : inactiveStyle;
 
     return (
-        <button
-            onClick={handleClick}
+        <div
             className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[11px] font-bold transition select-none ${currentStyle}`}
             title={`${label}: ${value === null ? 'Tout' : value === true ? 'Inclure' : 'Exclure'}`}
         >
-            {Icon && value !== false && <Icon size={12} className={value === true ? 'text-white' : ''} />}
-            {value === false && <X size={10} className="text-red-500" />}
-            {label}
+            <button
+                type="button"
+                onClick={handleClick}
+                className="flex items-center gap-1.5 outline-none"
+            >
+                {Icon && value !== false && <Icon size={12} className={value === true ? 'text-white' : ''} />}
+                {value === false && <X size={10} className="text-red-500" />}
+                {label}
+            </button>
+            
             {value !== null && (
-                <span className="ml-1 opacity-60 hover:opacity-100" onClick={(e) => { e.stopPropagation(); onChange(null); }}>
+                <button 
+                    type="button"
+                    className="ml-1 opacity-60 hover:opacity-100 outline-none" 
+                    onClick={(e) => { e.stopPropagation(); onChange(null); }}
+                    title="Réinitialiser le filtre"
+                >
                     <X size={10} />
-                </span>
+                </button>
             )}
-        </button>
+        </div>
     );
 };
 

@@ -38,7 +38,10 @@ export class ErrorService {
                 : JSON.stringify(error);
 
         // 1. Console Log enrichi
-        const isForbidden = technicalMessage.includes('403') || (error as any)?.status === 403 || (error as any)?.code === '42501';
+        const errorObj = (error !== null && typeof error === 'object') ? error as Record<string, unknown> : {};
+        const isForbidden = technicalMessage.includes('403') || 
+            errorObj.status === 403 || 
+            errorObj.code === '42501';
 
         const timestamp = new Date().toLocaleTimeString();
         // eslint-disable-next-line no-console

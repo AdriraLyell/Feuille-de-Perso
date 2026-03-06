@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RulesData } from '../../../types/rules';
-import { LibraryFormulaEntry } from '../../../types';
+import { CharacterSheetData, LibraryFormulaEntry } from '../../../types';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import { AdminFormulaFormFields } from './AdminFormulaFormFields';
 import { evaluateFormula } from '../../../utils/formulaEvaluator';
@@ -15,8 +15,8 @@ interface AdminFormulaEditorModalProps {
     rules: RulesData;
     targetSuggestions: { value: string, label: string, type: string }[];
     allVariables: string[];
-    currentPreviewData: any;
-    realCharData?: any;
+    currentPreviewData: CharacterSheetData;
+    realCharData?: CharacterSheetData | null;
     isNew?: boolean;
 }
 
@@ -42,8 +42,8 @@ export const AdminFormulaEditorModal: React.FC<AdminFormulaEditorModalProps> = (
 
     if (!isOpen || !draft) return null;
 
-    const handleUpdate = (field: keyof LibraryFormulaEntry, value: any) => {
-        const updated = { ...draft, [field]: value };
+    const handleUpdate = (field: keyof LibraryFormulaEntry, value: string | boolean | number | null | unknown) => {
+        const updated = { ...draft, [field]: value } as LibraryFormulaEntry;
 
         // Auto-generation du code à partir du nom
         if (field === 'name') {
@@ -58,7 +58,7 @@ export const AdminFormulaEditorModal: React.FC<AdminFormulaEditorModalProps> = (
 
             const oldExpectedCode = generateCodeFromName(draft.name || '');
             if (!draft.code || draft.code === oldExpectedCode || draft.code.startsWith('VAR_')) {
-                updated.code = generateCodeFromName(value);
+                updated.code = generateCodeFromName(value as string);
             }
         }
 

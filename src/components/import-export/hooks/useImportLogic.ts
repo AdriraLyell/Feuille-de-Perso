@@ -156,6 +156,11 @@ export function useImportLogic({ data, variant, onImportSuccess, onClose }: UseI
             finalData.library = data.library || [];
             finalData.skillLibrary = data.skillLibrary || [];
             finalData.specializationLibrary = data.specializationLibrary || [];
+            
+            // Restore local player's journal
+            finalData.bookDocument = data.bookDocument;
+            finalData.campaignNotes = data.campaignNotes;
+            
             logMsg = "Chargement du Template. Bibliothèques conservées.";
         }
 

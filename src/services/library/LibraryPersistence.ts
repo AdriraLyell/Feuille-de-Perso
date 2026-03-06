@@ -11,7 +11,8 @@ export const LibraryPersistence = {
         if (!initialRules.libraries) return;
 
         for (const typeCfg of LIBRARY_TYPE_CONFIG) {
-            const items = (initialRules.libraries as any)[typeCfg.key] || [];
+            const libraryMap = initialRules.libraries as Record<string, unknown[]>;
+            const items = libraryMap[typeCfg.key] || [];
             if (items.length === 0) continue;
 
             // Fetch existing globals to avoid duplicates
@@ -21,15 +22,16 @@ export const LibraryPersistence = {
             }, `LibraryPersistence.persistInitial.${typeCfg.key}.globals`);
 
             const globalMap = new Map((globals || []).map(g => [g.name.trim().toLowerCase(), g.id]));
-            const toCreate: any[] = [];
-            const toLink: any[] = [];
+            const toCreate: Record<string, unknown>[] = [];
+            const toLink: Record<string, unknown>[] = [];
 
-            items.forEach((item: any) => {
-                const normalized = item.name.trim().toLowerCase();
+            items.forEach((itemRaw) => {
+                const item = itemRaw as Record<string, unknown>;
+                const normalized = String(item.name || '').trim().toLowerCase();
                 const existingId = globalMap.get(normalized);
 
                 if (existingId) {
-                    const link: any = { setting_id: settingId, [typeCfg.idKey]: existingId, is_active: true };
+                    const link: Record<string, unknown> = { setting_id: settingId, [typeCfg.idKey]: existingId, is_active: true };
                     // Default categories for skills/backgrounds/counters/mysticAbilities
                     if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters' || typeCfg.key === 'mysticAbilities') {
                         link.default_category = item.defaultCategory;
@@ -37,7 +39,7 @@ export const LibraryPersistence = {
                     toLink.push(link);
                 } else {
                     // Create as global
-                    const payload: any = {
+                    const payload: Record<string, unknown> = {
                         id: item.id,
                         name: item.name,
                         code: item.code,
@@ -83,7 +85,7 @@ export const LibraryPersistence = {
                     }
 
                     toCreate.push(payload);
-                    const link: any = { setting_id: settingId, [typeCfg.idKey]: item.id, is_active: true };
+                    const link: Record<string, unknown> = { setting_id: settingId, [typeCfg.idKey]: item.id, is_active: true };
                     if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters' || typeCfg.key === 'mysticAbilities') {
                         link.default_category = item.defaultCategory;
                     }
@@ -101,19 +103,21 @@ export const LibraryPersistence = {
      */
     async syncLibraries(settingId: string, rules: RulesData) {
         for (const typeCfg of LIBRARY_TYPE_CONFIG) {
-            const currentItems = (rules.libraries as any)[typeCfg.key] || [];
+            const libraryMap = rules.libraries as Record<string, unknown[]>;
+            const currentItemsRaw = libraryMap[typeCfg.key] || [];
 
             // 0. Track current linked items to detect deletions
             const { data: oldLinks } = await supabase.from(typeCfg.rel).select(typeCfg.idKey).eq('setting_id', settingId);
-            const oldIds = new Set<string>(oldLinks?.map((l: any) => l[typeCfg.idKey]) || []);
+            const oldIds = new Set<string>(oldLinks?.map((l: Record<string, unknown>) => l[typeCfg.idKey] as string) || []);
 
             // 1. UPSERT Global Repository items
-            for (const item of currentItems) {
-                const payload: any = {
-                    id: item.id, // Mandatory for upsert
-                    name: item.name,
-                    code: item.code,
-                    description: item.description,
+            for (const itemRaw of currentItemsRaw) {
+                const item = itemRaw as Record<string, unknown>;
+                const payload: Record<string, unknown> = {
+                    id: item.id as string, // Mandatory for upsert
+                    name: item.name as string,
+                    code: item.code as string,
+                    description: item.description as string,
                     setting_id: null // Ensure it's marked as Global in the repository
                 };
 
@@ -172,9 +176,10 @@ export const LibraryPersistence = {
 
             // 2. Refresh RELATIONSHIPS (Preserve all library items in linked state for this campaign)
             await DatabaseService.deleteBy(typeCfg.rel, 'setting_id', settingId, `LibraryPersistence.sync.${typeCfg.key}.deleteLinks`);
-            if (currentItems.length > 0) {
-                const relPayload = currentItems.map((item: any) => {
-                    const link: any = {
+            if (currentItemsRaw.length > 0) {
+                const relPayload = currentItemsRaw.map((itemRaw) => {
+                    const item = itemRaw as Record<string, unknown>;
+                    const link: Record<string, unknown> = {
                         setting_id: settingId,
                         [typeCfg.idKey]: item.id,
                         is_active: item.isActive !== false
@@ -204,9 +209,10 @@ export const LibraryPersistence = {
                 await DatabaseService.deleteBy(variantsTable, 'setting_id', settingId, `LibraryPersistence.sync.${typeCfg.key}.deleteVariants`);
 
                 // B. Surgical cleanup for GLOBAL variants of the items we are processing
-                const globalItemIds = currentItems
-                    .filter((i: any) => i.isGlobal && !i.isCustomized)
-                    .map((i: any) => i.id);
+                const globalItemIds = currentItemsRaw
+                    .map(i => i as Record<string, unknown>)
+                    .filter((i) => i.isGlobal && !i.isCustomized)
+                    .map((i) => i.id as string);
 
                 if (globalItemIds.length > 0) {
                     await supabase.from(variantsTable)
@@ -215,9 +221,10 @@ export const LibraryPersistence = {
                         .is('setting_id', null);
                 }
 
-                const variantsPayload: any[] = [];
-                currentItems.forEach((item: any) => {
-                    if (item.variants && item.variants.length > 0) {
+                const variantsPayload: Record<string, unknown>[] = [];
+                currentItemsRaw.forEach((itemRaw) => {
+                    const item = itemRaw as Record<string, unknown>;
+                    if (item.variants && Array.isArray(item.variants) && item.variants.length > 0) {
                         const isGlobalItem = item.isGlobal && !item.isCustomized;
                         const targetSid = isGlobalItem ? null : settingId;
 
@@ -237,7 +244,7 @@ export const LibraryPersistence = {
             }
 
             // 4. CLEANUP ORPHANS (Items removed from this campaign that are no longer used anywhere)
-            const currentIds = new Set(currentItems.map((i: any) => i.id));
+            const currentIds = new Set(currentItemsRaw.map((i) => (i as Record<string, unknown>).id as string));
             const removedIds = [...oldIds].filter(id => !currentIds.has(id));
 
             if (removedIds.length > 0) {

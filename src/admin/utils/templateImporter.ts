@@ -1,44 +1,45 @@
-
-import { DotEntry, AttributeEntry, LibrarySkillEntry, LibraryFormulaEntry } from '../../types';
+import { DotEntry, LibrarySkillEntry, LibraryFormulaEntry, LibraryEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry } from '../../types';
 import { RulesData } from '../../types/rules';
+import { generateDefaultRules } from './rulesLoader';
 
 /**
  * Tries to detect if the JSON is a Full Backup or a Direct Sheet Export
  * and returns the CharacterSheetData if found.
  */
-const normalizeInput = (json: any): any => {
-    if (!json || typeof json !== 'object') return null;
+const normalizeInput = (json: unknown): Record<string, unknown> | null => {
+    if (!json || typeof json !== 'object' || json === null) return null;
+    const data = json as Record<string, unknown>;
 
     // 1. Direct CharacterSheetData
-    if (json.header && json.attributes && json.skills) {
-        return json as any;
+    if (data.header && data.attributes && data.skills) {
+        return data;
     }
 
     // 2. Full Backup Wrapper (legacy or specific export)
-    if (json.data && typeof json.data === 'object' && json.data.header && json.data.attributes) {
-        return json.data as any;
+    if (data.data && typeof data.data === 'object' && (data.data as Record<string, unknown>).header && (data.data as Record<string, unknown>).attributes) {
+        return data.data as Record<string, unknown>;
     }
 
-    if (json.creationConfig && json.skills) {
-        return json as any;
+    if (data.creationConfig && data.skills) {
+        return data;
     }
 
     // 4. Specialized Library Export (e.g. skills_campaign.json)
-    if (json.meta && json.data && Array.isArray(json.data) && json.meta.type === 'skills') {
+    if (data.meta && typeof data.meta === 'object' && data.data && Array.isArray(data.data) && (data.meta as Record<string, unknown>).type === 'skills') {
         // Wrap for normalization
         return {
-            header: { character_name: 'Library' } as any,
+            header: { character_name: 'Library' },
             attributes: {},
             skills: {},
-            skillLibrary: json.data
-        } as any;
+            skillLibrary: data.data
+        };
     }
 
     // 5. Direct Library Export (e.g. { libraries: { traits: [] } })
-    if (json.libraries && typeof json.libraries === 'object') {
-        const libs = json.libraries;
+    if (data.libraries && typeof data.libraries === 'object') {
+        const libs = data.libraries as Record<string, unknown>;
         return {
-            header: { character_name: 'Library' } as any,
+            header: { character_name: 'Library' },
             attributes: {},
             skills: {},
             library: libs.traits || [],
@@ -48,11 +49,11 @@ const normalizeInput = (json: any): any => {
             counterLibrary: libs.counters || libs.counterLibrary || [],
             mysticAbilities: libs.mysticAbilities || [],
             formulaLibrary: libs.formulas || []
-        } as any;
+        };
     }
 
     return null;
-}
+};
 
 /**
  * Extracts configuration and definitions from a Character Sheet
@@ -86,12 +87,13 @@ export const extractRulesFromCharacter = (
 
     // 1. Import Creation Config
     if (sheet.creationConfig) {
+        const sheetCreationConfig = sheet.creationConfig as Record<string, unknown>;
         newRules.configurations.creation = {
             ...newRules.configurations.creation,
-            ...sheet.creationConfig,
+            ...sheetCreationConfig,
             // Deep merge rank slots if present
-            rankSlots: sheet.creationConfig.rankSlots || newRules.configurations.creation.rankSlots
-        };
+            rankSlots: (sheetCreationConfig.rankSlots as any) || newRules.configurations.creation.rankSlots
+        } as any;
         success.push("Configuration de Création (Points, Mode)");
     } else {
         warnings.push("Configuration de Création manquante (ignoré).");
@@ -101,7 +103,7 @@ export const extractRulesFromCharacter = (
     if (sheet.xpCosts) {
         newRules.configurations.xpCosts = {
             ...newRules.configurations.xpCosts,
-            ...sheet.xpCosts
+            ...(sheet.xpCosts as any)
         };
         success.push("Configuration des Coûts XP (Multiplicateurs)");
     } else {
@@ -113,20 +115,22 @@ export const extractRulesFromCharacter = (
     // 4. Import Attributes Definitions
     if (sheet.attributes) {
         const newAttrs: Record<string, string[]> = {};
-        Object.keys(sheet.attributes).forEach(cat => {
-            const list = sheet.attributes[cat];
+        const sheetAttributes = sheet.attributes as Record<string, unknown[]>;
+        Object.keys(sheetAttributes).forEach(cat => {
+            const list = sheetAttributes[cat];
             if (Array.isArray(list)) {
-                newAttrs[cat] = list.map((a: AttributeEntry) => a.name);
+                newAttrs[cat] = list.map((a: any) => String(a.name || a));
             }
         });
 
         // Also Secondary Attributes if active
         if (sheet.secondaryAttributesActive && sheet.secondaryAttributes) {
             const newSecAttrs: Record<string, string[]> = {};
-            Object.keys(sheet.secondaryAttributes).forEach(cat => {
-                const list = sheet.secondaryAttributes[cat];
+            const sheetSecondaryAttributes = sheet.secondaryAttributes as Record<string, unknown[]>;
+            Object.keys(sheetSecondaryAttributes).forEach(cat => {
+                const list = sheetSecondaryAttributes[cat];
                 if (Array.isArray(list)) {
-                    newSecAttrs[cat] = list.map((a: AttributeEntry) => a.name);
+                    newSecAttrs[cat] = list.map((a: any) => String(a.name || a));
                 }
             });
             newRules.definitions.secondaryAttributes = newSecAttrs;
@@ -171,15 +175,16 @@ export const extractRulesFromCharacter = (
 
     // 7. Import Counters (Best Effort)
     if (sheet.counters) {
-        const rulesCounters: Record<string, any> = {};
-        Object.keys(sheet.counters).forEach(key => {
+        const rulesCounters: Record<string, import('../../types/rules').RulesCounterDefinition> = {};
+        const countersMap = sheet.counters as Record<string, unknown>;
+        Object.keys(countersMap).forEach(key => {
             if (key === 'custom') return;
-            const c = (sheet.counters as Record<string, any>)[key];
+            const c = countersMap[key] as Record<string, unknown>;
             if (c && !Array.isArray(c)) {
                 rulesCounters[key] = {
                     id: key,
-                    name: c.name || key,
-                    max: c.value || 10, // On sheet, value is the Max dots
+                    name: String(c.name || key),
+                    max: Number(c.value || 10), // On sheet, value is the Max dots
                     xpCost: 5 // Default if unknown
                 };
             }
@@ -192,41 +197,101 @@ export const extractRulesFromCharacter = (
     }
 
     // Import Background Cost config
-    if (sheet.creationConfig && sheet.creationConfig.backgroundCost !== undefined) {
-        newRules.configurations.creation.backgroundCost = sheet.creationConfig.backgroundCost;
+    if (sheet.creationConfig && (sheet.creationConfig as Record<string, unknown>).backgroundCost !== undefined) {
+        newRules.configurations.creation.backgroundCost = (sheet.creationConfig as Record<string, any>).backgroundCost;
     }
 
 
     // 8. Import Libraries (Traits & Skills)
     // We treat the sheet's library/skillLibrary as candidates
     if (sheet.library && Array.isArray(sheet.library)) {
-        newRules.libraries.traits = sheet.library;
+        newRules.libraries.traits = sheet.library as LibraryEntry[];
         success.push(`Bibliothèque de Traits (${sheet.library.length} items)`);
     }
 
     if (sheet.skillLibrary && Array.isArray(sheet.skillLibrary)) {
-        newRules.libraries.skills = sheet.skillLibrary;
+        newRules.libraries.skills = sheet.skillLibrary as LibrarySkillEntry[];
         success.push(`Réserve de Compétences (${sheet.skillLibrary.length} items)`);
     }
 
     if (sheet.specializationLibrary && Array.isArray(sheet.specializationLibrary)) {
-        newRules.libraries.specializations = sheet.specializationLibrary;
+        newRules.libraries.specializations = sheet.specializationLibrary as LibrarySpecializationEntry[];
         success.push(`Bibliothèque de Spécialisations (${sheet.specializationLibrary.length} items)`);
     }
 
     if (sheet.backgroundLibrary && Array.isArray(sheet.backgroundLibrary)) {
-        newRules.libraries.backgrounds = sheet.backgroundLibrary;
+        newRules.libraries.backgrounds = sheet.backgroundLibrary as LibraryBackgroundEntry[];
+        success.push(`Bibliothèque d'Arrière-Plans (${sheet.backgroundLibrary.length} items)`);
+    }
+
+    if (sheet.backgroundLibrary && Array.isArray(sheet.backgroundLibrary)) {
+        newRules.libraries.backgrounds = sheet.backgroundLibrary as LibraryBackgroundEntry[];
         success.push(`Bibliothèque d'Arrière-Plans (${sheet.backgroundLibrary.length} items)`);
     }
 
     if (sheet.counterLibrary && Array.isArray(sheet.counterLibrary)) {
-        newRules.libraries.counters = sheet.counterLibrary;
+        newRules.libraries.counters = sheet.counterLibrary as LibraryCounterEntry[];
         success.push(`Bibliothèque de Compteurs (${sheet.counterLibrary.length} items)`);
     }
 
     if (sheet.mysticAbilities && Array.isArray(sheet.mysticAbilities)) {
         newRules.libraries.mysticAbilities = sheet.mysticAbilities as LibrarySkillEntry[];
         success.push(`Bibliothèque d'Habilités Mystiques (${sheet.mysticAbilities.length} items)`);
+    }
+
+    if (sheet.formulaLibrary && Array.isArray(sheet.formulaLibrary)) {
+        newRules.libraries.formulas = sheet.formulaLibrary as LibraryFormulaEntry[];
+        success.push(`Bibliothèque de Formules (${sheet.formulaLibrary.length} items)`);
+    }
+
+    return { rules: newRules, report: { success, warnings } };
+};
+
+/**
+ * Normalizes a CharacterSheetData object to a RulesData template.
+ */
+export const templateFromSheet = (json: unknown): { rules: RulesData, report: { success: string[], warnings: string[] } } | null => {
+    const sheet = normalizeInput(json);
+    if (!sheet) return null;
+
+    const success: string[] = [];
+    const warnings: string[] = [];
+
+    const newRules = generateDefaultRules();
+
+    // 1. Extract Name & Info
+    const header = (sheet.header || {}) as Record<string, unknown>;
+    newRules.settingName = String(header.character_name || header.name || 'Template Importé');
+
+    // 2. Extract Libraries if present
+    if (sheet.library && Array.isArray(sheet.library)) {
+        newRules.libraries.traits = sheet.library as LibraryEntry[];
+        success.push(`Bibliothèque de Traits (${sheet.library.length} items)`);
+    }
+
+    if (sheet.skillLibrary && Array.isArray(sheet.skillLibrary)) {
+        newRules.libraries.skills = sheet.skillLibrary as LibrarySkillEntry[];
+        success.push(`Bibliothèque de Compétences (${sheet.skillLibrary.length} items)`);
+    }
+
+    if (sheet.specializationLibrary && Array.isArray(sheet.specializationLibrary)) {
+        newRules.libraries.specializations = sheet.specializationLibrary as LibrarySpecializationEntry[];
+        success.push(`Bibliothèque de Spécialisations (${sheet.specializationLibrary.length} items)`);
+    }
+
+    if (sheet.backgroundLibrary && Array.isArray(sheet.backgroundLibrary)) {
+        newRules.libraries.backgrounds = sheet.backgroundLibrary as LibraryBackgroundEntry[];
+        success.push(`Bibliothèque d'Arrière-plans (${sheet.backgroundLibrary.length} items)`);
+    }
+
+    if (sheet.counterLibrary && Array.isArray(sheet.counterLibrary)) {
+        newRules.libraries.counters = sheet.counterLibrary as LibraryCounterEntry[];
+        success.push(`Bibliothèque de Compteurs (${sheet.counterLibrary.length} items)`);
+    }
+
+    if (sheet.mysticAbilities && Array.isArray(sheet.mysticAbilities)) {
+        newRules.libraries.mysticAbilities = sheet.mysticAbilities as LibrarySkillEntry[];
+        success.push(`Bibliothèque Mystique (${sheet.mysticAbilities.length} items)`);
     }
 
     if (sheet.formulaLibrary && Array.isArray(sheet.formulaLibrary)) {

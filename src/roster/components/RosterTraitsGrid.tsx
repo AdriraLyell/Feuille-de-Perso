@@ -66,15 +66,15 @@ export const RosterTraitsGrid: React.FC<RosterTraitsGridProps> = ({
                         {characters.map((char, index) => {
                             const data = char.data as CharacterSheetData;
 
-                            const getSortedTraits = (traits: any[]) => {
+                            const getSortedTraits = (traits: import('../../types').TraitEntry[]) => {
                                 const filtered = (traits || []).filter(t => t.name);
                                 return [...filtered].sort((a, b) => {
                                     let comparison = 0;
                                     if (traitSortBy === 'name') {
                                         comparison = a.name.localeCompare(b.name);
                                     } else if (traitSortBy === 'cost') {
-                                        const costA = parseInt(a.value) || 0;
-                                        const costB = parseInt(b.value) || 0;
+                                        const costA = parseInt(String(a.value)) || 0;
+                                        const costB = parseInt(String(b.value)) || 0;
                                         comparison = costA - costB;
                                     }
                                     return traitSortOrder === 'asc' ? comparison : -comparison;

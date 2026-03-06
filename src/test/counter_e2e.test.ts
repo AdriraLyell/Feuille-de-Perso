@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest';
 import { reconcileRulesWithState } from '../utils/rulesReconciler';
 import { RuleCalculationsService } from '../services/RuleCalculationsService';
@@ -45,3 +46,4 @@ describe('Counter Cost E2E Simulation', () => {
         expect(parseInt(result.spent)).toBe(60);
     });
 });
+

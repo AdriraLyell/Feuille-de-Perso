@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MigratableData } from './registry';
 
 /**
@@ -18,3 +19,4 @@ export const migrateHeaderDates = (parsed: MigratableData): void => {
         header.fictionCurrentDate = '';
     }
 };
+

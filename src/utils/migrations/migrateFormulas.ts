@@ -10,9 +10,17 @@ export const migrateFormulas = (data: MigratableData) => {
     if (!data) return;
 
     if (Array.isArray(data.library)) {
-        data.library.forEach((entry: any) => {
+        data.library.forEach((entryRaw: unknown) => {
+            const entry = entryRaw as { effects?: unknown[] };
             if (entry && Array.isArray(entry.effects)) {
-                entry.effects.forEach((effect: any) => {
+                entry.effects.forEach((effectRaw: unknown) => {
+                    const effect = effectRaw as { 
+                        type: string; 
+                        value?: number | string; 
+                        formula?: string; 
+                        target?: string;
+                        method?: string;
+                    };
                     if (!effect) return;
                     if (effect.type === 'attribute_bonus') {
                         effect.type = 'formula';

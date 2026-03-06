@@ -86,6 +86,8 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ data, onUpdate, onAddLo
             className={`w-80 bg-slate-100 border-l border-gray-300 flex flex-col fixed right-0 top-14 bottom-0 z-30 transition-colors ${draggedItem?.type === 'sheet_skill' ? 'bg-orange-50 border-orange-300' : ''}`}
             onDragOver={handleDragOver}
             onDrop={handleDropOnLibrary}
+            role="region"
+            aria-label="Réserve de compétences"
         >
             <div className="p-4 bg-slate-200 border-b border-gray-300 font-bold text-slate-700 flex items-center gap-2 shadow-sm">
                 <BookOpen size={18} />
@@ -117,17 +119,18 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ data, onUpdate, onAddLo
                         const isPresent = currentSkillNames.has(item.name.trim().toLowerCase());
 
                         return (
-                            <div
+                            <button
                                 key={item.id}
+                                type="button"
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, 'lib_skill', { data: (item as unknown) as Record<string, unknown> })}
-                                className={`p-2 rounded border shadow-sm cursor-grab active:cursor-grabbing transition flex justify-between items-center group ${isPresent
+                                className={`w-full p-2 rounded border shadow-sm cursor-grab active:cursor-grabbing transition flex justify-between items-center group text-left outline-none focus:ring-2 focus:ring-purple-400 ${isPresent
                                     ? 'bg-green-50/30 border-green-200/60 hover:border-green-400'
                                     : 'bg-white border-gray-300 hover:border-purple-400 hover:shadow-md'
                                     }`}
                             >
-                                <div className="flex items-center gap-2 overflow-hidden">
-                                    <GripVertical size={14} className="text-gray-300 shrink-0" />
+                                <div className="flex items-center gap-2 overflow-hidden pointer-events-none">
+                                    <GripVertical size={14} className="text-stone-300 shrink-0" />
                                     <div className="flex flex-col min-w-0">
                                         <div className="flex items-center gap-1.5">
                                             <span className={`font-bold text-sm truncate ${isPresent ? 'text-green-800' : 'text-slate-700'}`}>
@@ -150,8 +153,8 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({ data, onUpdate, onAddLo
                                         </div>
                                     </div>
                                 </div>
-                                <ArrowRight size={14} className="text-gray-300 opacity-0 group-hover:opacity-100 shrink-0 mx-1" />
-                            </div>
+                                <ArrowRight size={14} className="text-stone-300 opacity-0 group-hover:opacity-100 shrink-0 mx-1 pointer-events-none" />
+                            </button>
                         );
                     })
                 )}

@@ -86,13 +86,13 @@ export const useAdminSkillLibrary = (
     }, [list, searchTerm, activeFilter, sourceFilter, typeFilter, usageFilter, mysticFilter, placedSkillNames]);
 
     const availableCategories = useMemo(() => {
-        let rawCategories = [...CATEGORY_HELP];
+        let rawCategories: { code: string; label: string; loc: string }[] = [...CATEGORY_HELP];
         if (rules.definitions.skillCategories && rules.definitions.skillCategories.length > 0) {
             rawCategories = rules.definitions.skillCategories.map(cat => ({
                 code: cat.id,
                 label: cat.label,
                 loc: cat.description || ""
-            })) as any;
+            }));
         }
         return disambiguateCategories(rawCategories);
     }, [rules.definitions.skillCategories]);

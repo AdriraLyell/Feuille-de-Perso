@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest';
 import { reconcileRulesWithState } from '../utils/rulesReconciler';
 import { CharacterSheetData } from '../types';
@@ -165,3 +166,4 @@ describe('Background Migration', () => {
         expect(bgs.find(s => s.name === 'Mentorat')).toBeDefined();
     });
 });
+

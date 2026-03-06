@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest';
 import { calculateExperienceResults, calculateCardValue } from '../utils/mechanics';
 import { INITIAL_DATA } from '../data/initialState';
@@ -144,3 +145,4 @@ describe('Mechanics Utils', () => {
         });
     });
 });
+

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { CharacterSheetData } from '../../types';
-import { getCharacterDiff, DataDiff } from '../../utils/diffUtils';
-import { AlertTriangle, ArrowLeftRight, Check, X, ShieldAlert } from 'lucide-react';
+import { getCharacterDiff } from '../../utils/diffUtils';
+import { ArrowLeftRight, ShieldAlert } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;

@@ -107,8 +107,9 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
                         onClick={(e) => e.stopPropagation()}
                     />
 
-                    <div
-                        className="text-xs text-center flex items-center gap-1.5 hover:bg-stone-800/5 rounded px-2 transition-colors cursor-pointer"
+                    <button
+                        type="button"
+                        className="text-xs text-center flex items-center gap-1.5 hover:bg-stone-800/5 rounded px-2 transition-colors cursor-pointer outline-none focus:ring-1 focus:ring-stone-300"
                         onClick={handleIconClick}
                     >
                         <span className="font-bold">{formatDate(node.attrs.date)}</span>
@@ -117,7 +118,7 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
                                 (le {formatDate(node.attrs.realDate, true)})
                             </span>
                         )}
-                    </div>
+                    </button>
 
                     <div className="flex items-center gap-1 ml-4 border-l border-stone-200 pl-4 opacity-0 group-hover:opacity-100 transition-opacity">
                         {WEATHER_ICONS.map(({ id, icon: Icon, color }) => (

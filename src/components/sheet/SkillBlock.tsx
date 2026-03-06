@@ -86,6 +86,8 @@ export const SkillBlock = React.memo<{
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            role="region"
+            aria-label={`Bloc de compétences: ${title}`}
         >
             <div className={`relative group/header ${isDraggable ? 'cursor-move skill-block-header active:scale-[0.98]' : ''}`}>
                 <SectionHeader

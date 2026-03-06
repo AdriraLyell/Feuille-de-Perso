@@ -16,7 +16,7 @@ import { migrateAttributeId as migrateAttributeIdBase } from './migrateAttribute
 export const migrateData = (parsed: MigratableData): CharacterSheetData => {
 
     // Default to version 0 if _schemaVersion is missing (Legacy data)
-    const currentVersion = parsed._schemaVersion || 0;
+    const currentVersion = (parsed._schemaVersion as number) || 0;
 
     // If up to date, ensure we still clean up and repair
     if (currentVersion >= CURRENT_SCHEMA_VERSION) {
@@ -25,7 +25,7 @@ export const migrateData = (parsed: MigratableData): CharacterSheetData => {
     }
 
     // Deep copy to prevent mutating the original until success
-    const migrated = JSON.parse(JSON.stringify(parsed));
+    const migrated = JSON.parse(JSON.stringify(parsed)) as MigratableData;
     let migrationsApplied = 0;
     const failedSteps: { version: number, index: number, error: string }[] = [];
 
@@ -67,7 +67,7 @@ export const migrateData = (parsed: MigratableData): CharacterSheetData => {
     // NEW: Post-migration cleanup and repair
     repairAndCleanupData(migrated);
 
-    return migrated as CharacterSheetData;
+    return migrated as unknown as CharacterSheetData;
 };
 
 /**
@@ -76,20 +76,21 @@ export const migrateData = (parsed: MigratableData): CharacterSheetData => {
  * - Ensures mandatory structures (counters, etc.)
  * - Repairs legacy effect types that might have bypassed versioned migrations
  */
-const repairAndCleanupData = (obj: any): void => {
+const repairAndCleanupData = (obj: MigratableData): void => {
     if (!obj || typeof obj !== 'object') return;
 
     // 1. Recursive Null Cleanup
-    const cleanupNullsRecursive = (item: any) => {
+    const cleanupNullsRecursive = (item: unknown) => {
         if (!item || typeof item !== 'object') return;
         if (Array.isArray(item)) {
             item.forEach(cleanupNullsRecursive);
             return;
         }
-        Object.keys(item).forEach(key => {
-            const val = item[key];
+        const record = item as Record<string, unknown>;
+        Object.keys(record).forEach(key => {
+            const val = record[key];
             if (val === null) {
-                delete item[key];
+                delete record[key];
             } else if (typeof val === 'object') {
                 cleanupNullsRecursive(val);
             }
@@ -98,16 +99,20 @@ const repairAndCleanupData = (obj: any): void => {
     cleanupNullsRecursive(obj);
 
     // 2. Mandatory Structure Repair
-    if (!obj.counters) obj.counters = { custom: [] };
-    if (!obj.counters.volonte) obj.counters.volonte = { id: 'volonte', name: 'Volonté', value: 3, creationValue: 3, max: 10, current: 0 };
-    if (!obj.counters.confiance) obj.counters.confiance = { id: 'confiance', name: 'Confiance', value: 3, creationValue: 3, max: 10, current: 0 };
-    if (!Array.isArray(obj.counters.custom)) obj.counters.custom = [];
+    const record = obj as Record<string, unknown>;
+    if (!record.counters) record.counters = { custom: [] };
+    
+    const counters = record.counters as Record<string, unknown>;
+    if (!counters.volonte) counters.volonte = { id: 'volonte', name: 'Volonté', value: 3, creationValue: 3, max: 10, current: 0 };
+    if (!counters.confiance) counters.confiance = { id: 'confiance', name: 'Confiance', value: 3, creationValue: 3, max: 10, current: 0 };
+    if (!Array.isArray(counters.custom)) counters.custom = [];
 
     // 3. Effect Types Repair (Idempotent migrateFormulas)
     const VALID_EFFECT_TYPES = ['free_skill_rank', 'master_skill', 'block_skill_increase', 'formula'];
-    const repairEffects = (entry: any) => {
-        if (entry && Array.isArray(entry.effects)) {
-            entry.effects.forEach((effect: any) => {
+    const repairEffects = (entry: unknown) => {
+        const e = entry as { effects?: Array<{ type: string; value?: unknown; method?: string; formula?: string; target?: string }> };
+        if (e && Array.isArray(e.effects)) {
+            e.effects.forEach((effect) => {
                 if (!effect) return;
                 if (!VALID_EFFECT_TYPES.includes(effect.type)) {
                     // Migrate legacy or invalid type to formula
@@ -115,12 +120,12 @@ const repairAndCleanupData = (obj: any): void => {
                         const legacyType = effect.type;
                         effect.type = 'formula';
                         if (legacyType === 'attribute_bonus') {
-                            effect.formula = effect.value?.toString() || '0';
+                            effect.formula = String(effect.value || '0');
                         } else if (legacyType === 'counter_max_bonus') {
-                            effect.formula = `${effect.value || 0} * TRAIT_LEVEL`;
+                            effect.formula = `${String(effect.value || 0)} * TRAIT_LEVEL`;
                         } else if (legacyType === 'xp_bonus') {
                             effect.target = 'XP';
-                            effect.formula = effect.method === 'per_scenario' ? `${effect.value || 0} * SCENARIOS_COUNT` : (effect.value?.toString() || '0');
+                            effect.formula = effect.method === 'per_scenario' ? `${String(effect.value || 0)} * SCENARIOS_COUNT` : String(effect.value || '0');
                             delete effect.method;
                         }
                         delete effect.value;
@@ -135,10 +140,11 @@ const repairAndCleanupData = (obj: any): void => {
         }
     };
 
-    if (Array.isArray(obj.library)) obj.library.forEach(repairEffects);
-    if (obj.page2) {
-        if (Array.isArray(obj.page2.avantages)) obj.page2.avantages.forEach(repairEffects);
-        if (Array.isArray(obj.page2.desavantages)) obj.page2.desavantages.forEach(repairEffects);
+    if (Array.isArray(record.library)) record.library.forEach(repairEffects);
+    if (record.page2) {
+        const p2 = record.page2 as Record<string, unknown>;
+        if (Array.isArray(p2.avantages)) p2.avantages.forEach(repairEffects);
+        if (Array.isArray(p2.desavantages)) p2.desavantages.forEach(repairEffects);
     }
 };
 
@@ -146,8 +152,9 @@ const repairAndCleanupData = (obj: any): void => {
  * Migration function for rules data (v2 format).
  * Converts legacy skill category IDs and ensures proper structure.
  */
-export const migrateRulesToV2 = (rules: any): RulesData => {
-    if (!rules) return rules;
+export const migrateRulesToV2 = (rulesRaw: unknown): RulesData | null => {
+    if (!rulesRaw) return null;
+    const rules = rulesRaw as Record<string, unknown>;
 
     const behaviorMap: Record<string, SkillBehavior> = {
         'Col_Comp_1': 'Comp\u00e9tence',
@@ -163,10 +170,11 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
 
     // 1. Ensure Definitions exist
     if (!rules.definitions) rules.definitions = {};
+    const definitions = rules.definitions as Record<string, unknown>;
 
     // 2. Migrate skillCategories if missing
-    if (!rules.definitions.skillCategories || !Array.isArray(rules.definitions.skillCategories) || rules.definitions.skillCategories.length === 0) {
-        const labels = rules.definitions.labels || {};
+    if (!definitions.skillCategories || !Array.isArray(definitions.skillCategories) || definitions.skillCategories.length === 0) {
+        const labels = (definitions.labels as Record<string, string>) || {};
         const categories: SkillCategoryConfig[] = [];
 
         Object.entries(LEGACY_SKILL_MAP).forEach(([oldKey, newId]) => {
@@ -186,52 +194,52 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
         });
 
         categories.sort((a, b) => a.id.localeCompare(b.id));
-        rules.definitions.skillCategories = categories;
+        definitions.skillCategories = categories;
     }
 
     // 3. Migrate definitions.skills Record keys
-    if (rules.definitions.skills) {
-        const oldSkills = rules.definitions.skills as Record<string, string[]>;
+    if (definitions.skills) {
+        const oldSkills = definitions.skills as Record<string, string[]>;
         const newSkills: Record<string, string[]> = {};
         Object.keys(oldSkills).forEach(oldKey => {
             const newKey = LEGACY_SKILL_MAP[oldKey] || oldKey;
             newSkills[newKey] = oldSkills[oldKey];
         });
-        rules.definitions.skills = newSkills;
+        definitions.skills = newSkills;
     }
 
     // 4. Migrate definitions.attributes Record keys
-    if (rules.definitions.attributes) {
-        const oldAttrs = rules.definitions.attributes as Record<string, string[]>;
+    if (definitions.attributes) {
+        const oldAttrs = definitions.attributes as Record<string, string[]>;
         const newAttrs: Record<string, string[]> = {};
         Object.keys(oldAttrs).forEach(oldKey => {
             const newKey = migrateAttributeIdBase(oldKey);
             newAttrs[newKey] = oldAttrs[oldKey];
         });
-        rules.definitions.attributes = newAttrs;
+        definitions.attributes = newAttrs;
     }
 
     // 5. Migrate definitions.secondaryAttributes Record keys
-    if (rules.definitions.secondaryAttributes) {
-        const oldSecAttrs = rules.definitions.secondaryAttributes as Record<string, string[]>;
+    if (definitions.secondaryAttributes) {
+        const oldSecAttrs = definitions.secondaryAttributes as Record<string, string[]>;
         const newSecAttrs: Record<string, string[]> = {};
         Object.keys(oldSecAttrs).forEach(oldKey => {
             const newKey = migrateAttributeIdBase(oldKey);
-            newSecAttrs[newKey] = oldSecAttrs[oldKey];
+            newSecAttrs[newKey] = oldSecAttrs[oldKey] || [];
         });
-        rules.definitions.secondaryAttributes = newSecAttrs;
+        definitions.secondaryAttributes = newSecAttrs;
     }
 
     // 6. Migrate definitions.labels Record keys
-    if (rules.definitions.labels) {
-        const oldLabels = rules.definitions.labels as Record<string, string>;
+    if (definitions.labels) {
+        const oldLabels = definitions.labels as Record<string, string>;
         const newLabels: Record<string, string> = {};
         Object.keys(oldLabels).forEach(oldKey => {
             let newKey = LEGACY_SKILL_MAP[oldKey] || oldKey;
             newKey = migrateAttributeIdBase(newKey);
             newLabels[newKey] = oldLabels[oldKey];
         });
-        rules.definitions.labels = newLabels;
+        definitions.labels = newLabels;
     }
 
     // 7. Ensure configurations structure
@@ -248,7 +256,7 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
             }
         };
     } else {
-        const configs = rules.configurations as any;
+        const configs = rules.configurations as Record<string, unknown>;
         if (!configs.global) configs.global = { maxAttributeScore: 5, maxSkillScore: 10 };
         if (!configs.creation) configs.creation = INITIAL_DATA.creationConfig;
         if (!configs.xpCosts) {
@@ -258,8 +266,9 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
                 specializationFactor: 0
             };
         }
-        if (!configs.cards && configs.creation.cardConfig) {
-            const legacyConfig = configs.creation.cardConfig as Partial<RulesCardConfig>;
+        const creation = configs.creation as Record<string, unknown> | undefined;
+        if (!configs.cards && creation && creation.cardConfig) {
+            const legacyConfig = creation.cardConfig as Partial<RulesCardConfig>;
             configs.cards = {
                 active: legacyConfig.active ?? true,
                 baseStart: legacyConfig.baseStart ?? 2,
@@ -272,32 +281,35 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
         }
     }
 
-    const libs = rules.libraries as any;
     // 8. Ensure libraries structure
-    if (!libs) {
+    if (!rules.libraries) {
         rules.libraries = {
             traits: [],
             skills: [],
             specializations: [],
             backgrounds: [],
-            counters: []
+            counters: [],
+            mysticAbilities: []
         };
     } else {
+        const libs = rules.libraries as Record<string, unknown>;
         if (!libs.traits) libs.traits = [];
         if (!libs.skills) libs.skills = [];
         if (!libs.specializations) libs.specializations = [];
         if (!libs.backgrounds) libs.backgrounds = [];
         if (!libs.counters) libs.counters = [];
-        if (!libs.mysticAbilities || libs.mysticAbilities.length === 0) {
-            const defaults = (INITIAL_DATA as any).mysticAbilities || [];
-            libs.mysticAbilities = defaults.map((d: any) => ({ ...d }));
+        if (!libs.mysticAbilities || (Array.isArray(libs.mysticAbilities) && libs.mysticAbilities.length === 0)) {
+            const defaults = INITIAL_DATA.mysticAbilities || [];
+            libs.mysticAbilities = defaults.map((d) => ({ ...d }));
         }
     }
 
-    const libraries = rules.libraries as any;
-    // Populate libraries.backgrounds from definitions.backgrounds if empty
-    if (libraries.backgrounds.length === 0 && rules.definitions.backgrounds) {
-        libraries.backgrounds = rules.definitions.backgrounds.map((bg: string) => ({
+    const libs = rules.libraries as Record<string, unknown[]>;
+    const defs = rules.definitions as Record<string, unknown>;
+
+    // Populate backgrounds from definitions
+    if (libs.backgrounds.length === 0 && Array.isArray(defs.backgrounds)) {
+        libs.backgrounds = (defs.backgrounds as string[]).map((bg: string) => ({
             id: bg.toLowerCase().replace(/\s+/g, '_'),
             name: bg,
             description: "",
@@ -305,59 +317,54 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
         }));
     }
 
-    // Populate libraries.counters from definitions.counters if empty
-    if (libraries.counters.length === 0 && rules.definitions.counters) {
-        libraries.counters = Object.values(rules.definitions.counters).map((counter: unknown) => {
-            const c = counter as { id: string; name: string; max: number; xpCost: number };
-            return {
-                id: c.id,
-                name: c.name,
-                description: "",
-                defaultMax: c.max,
-                xpCost: c.xpCost
-            };
-        });
+    // Populate counters from definitions
+    if (libs.counters.length === 0 && defs.counters) {
+        libs.counters = Object.values(defs.counters as Record<string, { id: string, name: string, max: number, xpCost: number }>).map((c) => ({
+            id: c.id,
+            name: c.name,
+            description: "",
+            defaultMax: c.max,
+            xpCost: c.xpCost
+        }));
     }
 
-    // 9. Migrate formulas in traits mapping attribute_bonus to formula
-    if (Array.isArray(libraries.traits)) {
-        if (!libraries.formulas) libraries.formulas = [];
+    // 9. Migrate formulas in traits
+    if (Array.isArray(libs.traits)) {
+        if (!libs.formulas) libs.formulas = [];
 
-        libraries.traits.forEach((trait: any) => {
+        libs.traits.forEach((traitRaw) => {
+            const trait = traitRaw as Record<string, unknown>;
             if (trait && Array.isArray(trait.effects)) {
-                trait.effects.forEach((effect: any) => {
+                trait.effects.forEach((effectRaw) => {
+                    const effect = effectRaw as Record<string, unknown>;
                     if (!effect) return;
                     const isLegacy = ['attribute_bonus', 'counter_max_bonus', 'xp_bonus'].includes(effect.type as string);
                     const isOrphanFormula = effect.type === 'formula' && !effect.formulaId && effect.formula;
 
                     if (isLegacy || isOrphanFormula) {
-                        let formulaString = effect.formula || '';
+                        let formulaString = (effect.formula as string) || '';
                         let target = effect.target;
 
                         if (isLegacy) {
-                            const legacyEffect = effect as any;
-                            if (legacyEffect.type === 'attribute_bonus') {
-                                formulaString = legacyEffect.value?.toString() || '0';
-                            } else if (legacyEffect.type === 'counter_max_bonus') {
-                                formulaString = `${legacyEffect.value || 0} * TRAIT_LEVEL`;
-                            } else if (legacyEffect.type === 'xp_bonus') {
+                            if (effect.type === 'attribute_bonus') {
+                                formulaString = String(effect.value || '0');
+                            } else if (effect.type === 'counter_max_bonus') {
+                                formulaString = `${String(effect.value || 0)} * TRAIT_LEVEL`;
+                            } else if (effect.type === 'xp_bonus') {
                                 target = 'XP';
-                                if (legacyEffect.method === 'per_scenario') {
-                                    formulaString = `${legacyEffect.value || 0} * SCENARIOS_COUNT`;
+                                if (effect.method === 'per_scenario') {
+                                    formulaString = `${String(effect.value || 0)} * SCENARIOS_COUNT`;
                                 } else {
-                                    formulaString = legacyEffect.value?.toString() || '0';
+                                    formulaString = String(effect.value || '0');
                                 }
                             }
                         }
 
                         if (!formulaString) return;
 
-                        // Try to find a global formula with EXACTLY the same formula string
-                        const formulas = libraries.formulas as any[];
-                        let existing = formulas.find((f: any) => f.formula === formulaString);
+                        let existing = (libs.formulas as Record<string, unknown>[]).find((f) => f.formula === formulaString);
 
                         if (!existing) {
-                            // Create one
                             existing = {
                                 id: generateId(),
                                 name: `Mécanique: ${trait.name}`,
@@ -367,24 +374,22 @@ export const migrateRulesToV2 = (rules: any): RulesData => {
                                 isGlobal: true,
                                 description: `Importé depuis le trait ${trait.name}`
                             };
-                            formulas.push(existing);
+                            (libs.formulas as Record<string, unknown>[]).push(existing);
                         }
 
-                        // Mutate the effect
                         effect.type = 'formula';
                         effect.formula = formulaString;
                         effect.formulaId = existing.id;
                         effect.target = target;
-                        // Clear legacy values
-                        delete (effect as any).value;
-                        delete (effect as any).method;
+                        delete effect.value;
+                        delete effect.method;
                     }
                 });
             }
         });
     }
 
-    return rules as RulesData;
+    return rules as unknown as RulesData;
 };
 
 // Re-export for backward compatibility

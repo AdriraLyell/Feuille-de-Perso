@@ -246,6 +246,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
                       </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer ml-4">
+                      <span className="sr-only">Activer la synchronisation automatique</span>
                       <input
                         type="checkbox"
                         className="sr-only peer"
@@ -312,9 +313,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
 
       {activeTab === 'specializations' && (
         <SpecializationLibrarySidebar
-          data={localData}
-          onUpdate={handleLocalUpdate}
-          onAddLog={onAddLog}
+            data={localData}
         />
       )}
 

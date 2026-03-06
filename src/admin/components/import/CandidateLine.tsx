@@ -3,7 +3,7 @@ import { Zap, CheckCircle2 } from 'lucide-react';
 import { ImportCandidate } from '../../hooks/useLibraryImport';
 
 interface CandidateLineProps {
-    candidate: ImportCandidate<any>;
+    candidate: ImportCandidate<unknown>;
     onToggle: () => void;
     importDestination: 'campaign' | 'global';
     typeLabel?: string;
@@ -22,6 +22,8 @@ const CandidateLine: React.FC<CandidateLineProps> = ({
     const isVariableDisabled = importDestination === 'global' && candidate.isVariable;
     const isDisabled = candidate.isDuplicate || isVariableDisabled;
 
+    const data = candidate.data as Record<string, unknown>;
+
     return (
         <div className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${candidate.isDuplicate ? 'bg-slate-50 opacity-60 border-slate-100' : 'bg-white border-slate-200 hover:border-indigo-200'}`}>
             <input
@@ -34,23 +36,23 @@ const CandidateLine: React.FC<CandidateLineProps> = ({
             <div className="flex-grow">
                 <div className="flex items-center gap-2">
                     {showType && typeLabel && (
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${candidate.data.type === 'avantage' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${data.type === 'avantage' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
                             {typeLabel}
                         </span>
                     )}
-                    <span className="font-bold text-slate-800 text-sm">{candidate.data.name}</span>
+                    <span className="font-bold text-slate-800 text-sm">{candidate.name}</span>
                     {candidate.isVariable && (
                         <span className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase flex items-center gap-1">
                             <Zap size={10} /> Variable
                         </span>
                     )}
-                    {candidate.data.cost && (
-                        <span className="text-xs text-slate-400 font-mono">({candidate.data.cost} pts)</span>
+                    {Boolean(data.cost) && (
+                        <span className="text-xs text-slate-400 font-mono">({String(data.cost)} pts)</span>
                     )}
                 </div>
-                {candidate.data.description && (
+                {Boolean(data.description) && (
                     <p className={`text-xs text-slate-500 italic mt-0.5 ${candidate.isVariable ? 'text-amber-600/70' : ''}`}>
-                        {candidate.data.description}
+                        {String(data.description)}
                     </p>
                 )}
                 {extraInfo}

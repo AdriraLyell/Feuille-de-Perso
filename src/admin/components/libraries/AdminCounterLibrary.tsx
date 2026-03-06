@@ -318,10 +318,14 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                             </select>
                         </div>
                         <div className="bg-amber-500/5 p-3 rounded border border-amber-500/20 mb-2">
-                            <label className="block text-xs font-bold text-amber-700 uppercase mb-2 flex items-center gap-2">
+                            <label 
+                                htmlFor="counter-formula"
+                                className="block text-xs font-bold text-amber-700 uppercase mb-2 flex items-center gap-2"
+                            >
                                 <Calculator size={14} /> Valeur Max (Calculée)
                             </label>
                             <select
+                                id="counter-formula"
                                 className="w-full border border-stone-200 rounded px-3 py-2 text-sm focus:border-amber-500 outline-none bg-white font-medium mb-3"
                                 value={editingItem.formulaId || ''}
                                 onChange={(e) => setEditingItem({ ...editingItem, formulaId: e.target.value || undefined })}

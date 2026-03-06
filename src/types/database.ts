@@ -101,8 +101,8 @@ export interface DBGameSetting {
     id: string;
     name: string;
     version: string;
-    configurations: Record<string, any>; // JSONB
-    definitions: Record<string, any>; // JSONB
+    configurations: Record<string, unknown>; // JSONB
+    definitions: Record<string, unknown>; // JSONB
     is_public: boolean;
     created_at?: string;
     updated_at?: string;
@@ -176,7 +176,7 @@ export interface DBFormula {
     type: 'modifier' | 'variable' | 'effect' | 'reserve';
     target?: string;
     effect_type?: string;
-    aggregate_config?: any;
+    aggregate_config?: unknown;
     description?: string;
     operator?: string;
     force_variant?: boolean;

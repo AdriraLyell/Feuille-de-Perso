@@ -24,14 +24,8 @@ export const useSettingsManager = (
     // Helper to compare data excluding volatile/computed fields
     const getComparableData = useCallback((d: CharacterSheetData) => {
         const {
-            appLogs: _appLogs,
-            xpLogs: _xpLogs,
-            experience: _experience,
-            syncInfo: _syncInfo,
-            appVersion: _appVersion,
-            _rulesVersion,
-            _schemaVersion,
-            suggestions: _suggestions,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            appLogs, xpLogs, experience, syncInfo, appVersion, _rulesVersion, _schemaVersion, suggestions,
             ...rest
         } = d;
         return rest;

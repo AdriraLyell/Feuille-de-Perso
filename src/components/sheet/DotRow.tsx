@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { DotEntry } from '../../types';
-import DotRating from '../ui/DotRating';
-import * as LucideIcons from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Trash2 } from 'lucide-react';
 import { useNotification } from '../../context/NotificationContext';
 import { PortalTooltip } from '../ui/PortalTooltip';
+import { DotEntry } from '../../types';
+import DotRating from '../ui/DotRating';
 
 interface DotRowProps {
     entry: DotEntry;
@@ -47,7 +47,7 @@ export const DotRow: React.FC<DotRowProps> = ({
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
-    const anchorRef = useRef<HTMLSpanElement>(null);
+    const anchorRef = useRef<HTMLButtonElement>(null);
     const addLog = useNotification();
 
     useEffect(() => {
@@ -80,6 +80,8 @@ export const DotRow: React.FC<DotRowProps> = ({
                     };
                     e.dataTransfer.setData('application/json', JSON.stringify(payload));
                 } : undefined}
+                role="listitem"
+                aria-label="Espaceur"
             >
                 {isEditing && (
                     <button
@@ -87,7 +89,7 @@ export const DotRow: React.FC<DotRowProps> = ({
                         className="absolute -right-4 top-0 bottom-0 my-auto flex items-center justify-center w-6 h-6 text-red-500 opacity-0 group-hover:opacity-100 bg-white shadow-md rounded-full hover:bg-red-50 hover:text-red-700 transition-all z-10"
                         title="Supprimer la ligne"
                     >
-                        <LucideIcons.Trash2 size={14} />
+                        <Trash2 size={14} />
                     </button>
                 )}
             </div>
@@ -177,10 +179,13 @@ export const DotRow: React.FC<DotRowProps> = ({
             } : undefined}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            role="listitem"
+            aria-label={`Rang de ${entry.name}`}
         >
-            <span
-                className={`text-xs truncate font-medium transition ${isEditing
-                    ? ''
+            <button
+                type="button"
+                className={`text-xs truncate font-medium transition text-left outline-none focus:bg-amber-50/50 ${isEditing
+                    ? 'cursor-default'
                     : isUndefinedVariable
                         ? 'font-bold cursor-pointer hover:underline'
                         : hasSpecs
@@ -206,7 +211,7 @@ export const DotRow: React.FC<DotRowProps> = ({
                     entry.name
                 )}
                 {hasSpecs && !isUndefinedVariable && <span className="text-[9px] align-top ml-0.5 text-blue-400">*</span>}
-            </span>
+            </button>
 
             {/* Tooltip pour la description (Hover) */}
             <PortalTooltip
@@ -285,7 +290,7 @@ export const DotRow: React.FC<DotRowProps> = ({
                     className="absolute -right-4 top-0 bottom-0 my-auto flex items-center justify-center w-6 h-6 text-red-500 opacity-0 group-hover:opacity-100 bg-white shadow-md rounded-full hover:bg-red-50 hover:text-red-700 transition-all z-10"
                     title="Supprimer la compétence"
                 >
-                    <LucideIcons.Trash2 size={14} />
+                    <Trash2 size={14} />
                 </button>
             )}
         </div >

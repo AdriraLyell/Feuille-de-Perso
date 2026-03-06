@@ -24,7 +24,7 @@ export const validateFormulaEntry = (
     if (!isMathValid) {
         status = 'error';
         message = "Syntaxe mathématique invalide";
-    } else if (counter.type === 'modifier' || (counter as any).type === 'effect') {
+    } else if (counter.type === 'modifier') {
         const hasTarget = !!(counter.target && counter.target.trim() !== '');
         const hasOperator = !!(counter.operator && (counter.operator as string) !== '');
         const hasEquation = !!(counter.formula && counter.formula.trim() !== '');

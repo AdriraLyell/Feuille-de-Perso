@@ -11,10 +11,10 @@ export const migrateTerminology = (parsed: MigratableData): void => {
 
     if ('vertus' in page2 && !('avantages' in page2)) {
         page2.avantages = page2.vertus;
-        delete (page2 as any).vertus;
+        delete page2.vertus;
     }
     if ('defauts' in page2 && !('desavantages' in page2)) {
         page2.desavantages = page2.defauts;
-        delete (page2 as any).defauts;
+        delete page2.defauts;
     }
 };

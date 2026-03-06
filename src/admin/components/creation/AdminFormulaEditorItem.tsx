@@ -1,6 +1,6 @@
 import React from 'react';
 import { RulesData } from '../../../types/rules';
-import { LibraryFormulaEntry } from '../../../types';
+import { CharacterSheetData, LibraryFormulaEntry } from '../../../types';
 import { evaluateFormula } from '../../../utils/formulaEvaluator';
 import { Trash2, Calculator, Check, Sigma, AlertCircle, Sparkles } from 'lucide-react';
 import { validateFormulaEntry } from '../../../utils/formulaValidation';
@@ -9,9 +9,9 @@ interface AdminFormulaEditorItemProps {
     counter: LibraryFormulaEntry;
     rules: RulesData;
     previewValue: number | null;
-    currentPreviewData: any;
+    currentPreviewData: CharacterSheetData;
     allVariables: string[];
-    realCharData?: any;
+    realCharData?: CharacterSheetData | null;
     onEdit: () => void;
     onRemove: (id: string) => void;
 }

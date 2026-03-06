@@ -166,8 +166,14 @@ const TraitForm: React.FC<TraitFormProps> = ({
                 {/* Name & Cost (Smart Input) */}
                 <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-1">
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest">Nom du Trait</label>
+                        <label 
+                            htmlFor="trait-name"
+                            className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest"
+                        >
+                            Nom du Trait
+                        </label>
                         <input
+                            id="trait-name"
                             className={`w-full border border-[#bfae85]/50 rounded-sm px-3 py-2 font-serif font-black text-[#1c1917] outline-none shadow-sm placeholder-stone-300 ${!isEditable ? 'bg-stone-100 cursor-not-allowed text-stone-600' : 'bg-white/50 focus:border-amber-500'}`}
                             value={editForm.name}
                             disabled={!isEditable}
@@ -176,7 +182,10 @@ const TraitForm: React.FC<TraitFormProps> = ({
                         />
                     </div>
                     <div className="col-span-1 relative">
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest flex items-center justify-between">
+                        <label 
+                            htmlFor="trait-cost"
+                            className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1.5 tracking-widest flex items-center justify-between"
+                        >
                             <span>Coût / Valeur</span>
                             <div className="group relative">
                                 <Info size={12} className="text-[#bfae85] cursor-help" />
@@ -187,6 +196,7 @@ const TraitForm: React.FC<TraitFormProps> = ({
                         </label>
                         <div className="relative">
                             <input
+                                id="trait-cost"
                                 className={`w-full border border-[#bfae85]/50 rounded-sm pl-8 pr-3 py-2 font-mono outline-none shadow-sm font-bold ${(editForm.isLocked || !isEditable) ? 'bg-stone-100 text-stone-500 cursor-not-allowed' : 'text-[#1c1917] bg-white/50 focus:border-amber-500'}`}
                                 value={editForm.pointsLabel}
                                 disabled={editForm.isLocked || !isEditable}
@@ -220,8 +230,14 @@ const TraitForm: React.FC<TraitFormProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                     {/* Description */}
                     <div className="flex flex-col">
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest flex items-center gap-1"><AlignLeft size={12} /> Description</label>
+                        <label 
+                            htmlFor="trait-description"
+                            className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest flex items-center gap-1"
+                        >
+                            <AlignLeft size={12} /> Description
+                        </label>
                         <textarea
+                            id="trait-description"
                             className={`w-full border border-[#bfae85]/40 rounded-sm px-2.5 py-2 text-xs text-[#1c1917] min-h-[85px] h-full outline-none resize-none italic leading-relaxed shadow-sm ${!isEditable
                                     ? 'bg-stone-100 cursor-not-allowed placeholder-stone-400'
                                     : 'bg-white/50 focus:border-amber-500 placeholder-stone-300'
@@ -235,11 +251,17 @@ const TraitForm: React.FC<TraitFormProps> = ({
 
                     {/* Tags */}
                     <div className="flex flex-col">
-                        <label className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest">Catégories (Tags)</label>
+                        <label 
+                            htmlFor="trait-tags-input"
+                            className="block text-[10px] font-bold text-[#bfae85] uppercase mb-1 tracking-widest"
+                        >
+                            Catégories (Tags)
+                        </label>
                         <div className={`border border-[#bfae85]/40 rounded-sm p-1.5 flex-grow flex flex-col gap-2 ${!isEditable ? 'bg-stone-100/60' : 'bg-white/40'}`}>
                             {isEditable && (
                                 <div className="flex gap-1">
                                     <input
+                                        id="trait-tags-input"
                                         className="flex-grow border border-[#bfae85]/30 rounded-sm px-2 py-1 text-[11px] text-[#1c1917] bg-white focus:border-amber-500 outline-none shadow-inner"
                                         value={tagInput}
                                         onChange={(e) => setTagInput(e.target.value)}

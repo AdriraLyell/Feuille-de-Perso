@@ -303,7 +303,7 @@ const AdminSkillLibrary: React.FC<AdminSkillLibraryProps> = ({ rules, onUpdate, 
                                             onChange={(e) => setEditingSkill({ ...editingSkill, mysticAbilityId: e.target.value })}
                                         >
                                             <option value="">-- Choisir une habilité --</option>
-                                            {rules.libraries.mysticAbilities?.map(ma => (
+                                            {(rules.libraries.mysticAbilities || []).map(ma => (
                                                 <option key={ma.id} value={ma.id}>{ma.name}</option>
                                             ))}
                                         </select>

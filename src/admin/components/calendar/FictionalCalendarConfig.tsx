@@ -241,8 +241,9 @@ const FictionalCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
                             {config.seasons.map((season: CalendarSeason) => (
                                 <div key={season.id} className="bg-mystic-deep/60 border border-stone-700/50 rounded-sm p-3 space-y-3">
                                     <div className="flex items-center gap-2">
-                                        <div
-                                            className="w-4 h-4 rounded-full border-2 border-stone-600 flex-shrink-0 cursor-pointer"
+                                        <button
+                                            type="button"
+                                            className="w-4 h-4 rounded-full border-2 border-stone-600 flex-shrink-0 cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500"
                                             style={{ backgroundColor: season.color }}
                                             onClick={() => {
                                                 const idx = SEASON_COLORS.indexOf(season.color ?? SEASON_COLORS[0]);

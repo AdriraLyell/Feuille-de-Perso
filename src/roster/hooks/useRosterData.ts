@@ -166,7 +166,7 @@ export const useRosterData = (settingId: string) => {
         const attrs: { name: string, category: string }[] = [];
         if (characters.length > 0) {
             Object.entries(characters[0].data.attributes || {}).forEach(([catName, attrList]) => {
-                (attrList as any[]).forEach(attr => {
+                attrList.forEach(attr => {
                     if (!attrs.find(a => a.name === attr.name)) {
                         attrs.push({ name: attr.name, category: catName });
                     }
@@ -181,7 +181,7 @@ export const useRosterData = (settingId: string) => {
         if (characters.length > 0 && rules) {
             const officialSkillMap = new Map<string, string>();
 
-            const addToMap = (lib: any[] | undefined) => {
+            const addToMap = (lib: import('../../types').LibrarySkillEntry[] | undefined) => {
                 lib?.forEach(s => {
                     const lowerName = s.name.trim().toLowerCase();
                     if (s.mysticAbilityId) {
@@ -220,7 +220,7 @@ export const useRosterData = (settingId: string) => {
                         let masterCatId = officialSkillMap.get(lowerName) || officialSkillMap.get(rootName);
 
                         if (!masterCatId) {
-                            const mId = (s as any).mysticAbilityId;
+                            const mId = s.mysticAbilityId;
                             if (mId) {
                                 masterCatId = `MYSTIC_${mId}`;
                             } else {

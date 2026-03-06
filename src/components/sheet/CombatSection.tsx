@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { CharacterSheetData, CombatEntry } from '../../types';
+import { CharacterSheetData, CombatEntry, ArmorEntry } from '../../types';
 import { SectionHeader } from './Shared';
 
 interface CombatSectionProps {
      data: CharacterSheetData;
      updateCombatWeapon: (id: string, field: keyof CombatEntry, value: string) => void;
-     updateArmor: (index: number, field: keyof CharacterSheetData['combat']['armor'][0], value: string) => void;
+     updateArmor: (index: number, field: keyof ArmorEntry, value: string) => void;
 }
 
 export const WeaponTable: React.FC<{
@@ -51,8 +51,8 @@ export const WeaponTable: React.FC<{
 );
 
 export const ArmorTable: React.FC<{
-     armor: CharacterSheetData['combat']['armor'];
-     updateArmor: (index: number, field: keyof CharacterSheetData['combat']['armor'][0], value: string) => void;
+     armor: ArmorEntry[];
+     updateArmor: (index: number, field: keyof ArmorEntry, value: string) => void;
 }> = ({ armor, updateArmor }) => (
      <div className="flex flex-col">
           <SectionHeader title="Défense & Armures" />

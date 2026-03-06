@@ -214,7 +214,7 @@ function getActiveTraitEffects(data: CharacterSheetData, rules?: RulesData): Act
         // 2. Recherche Global
         const globalEntry = globalTraitMap.get(normalizedName);
         if (globalEntry && globalEntry.effects && globalEntry.effects.length > 0) {
-            globalEntry.effects.forEach(e => activeEffects.push(enrichEffect(e, globalEntry.name)));
+            globalEntry.effects.forEach((e: unknown) => activeEffects.push(enrichEffect(e as TraitEffect, globalEntry.name)));
         }
     };
 

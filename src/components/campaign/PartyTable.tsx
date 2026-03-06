@@ -200,11 +200,21 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
                             <tr>
                                 <th className="border-b-2 border-stone-400 bg-[#fbf4e9] text-left p-2 font-serif text-stone-700 relative" style={{ width: staticWidths.character }}>
                                     <div className="truncate font-bold w-full" title="Personnage">Personnage</div>
-                                    <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, 'character', staticWidths.character)} />
+                                    <button 
+                                        type="button"
+                                        className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20 outline-none" 
+                                        onMouseDown={(e) => startResizing(e, 'character', staticWidths.character)} 
+                                        aria-label="Redimensionner colonne Personnage"
+                                    />
                                 </th>
                                 <th className="border-b-2 border-stone-400 bg-[#fbf4e9] text-left p-2 font-serif text-stone-700 border-l border-stone-300 relative" style={{ width: staticWidths.player }}>
                                     <div className="truncate font-bold w-full" title="Joueur">Joueur</div>
-                                    <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, 'player', staticWidths.player)} />
+                                    <button 
+                                        type="button"
+                                        className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20 outline-none" 
+                                        onMouseDown={(e) => startResizing(e, 'player', staticWidths.player)} 
+                                        aria-label="Redimensionner colonne Joueur"
+                                    />
                                 </th>
                                 {columns.map(col => (
                                     <th key={col.id} className="border-b-2 border-stone-400 bg-[#fbf4e9] text-left p-2 font-serif text-stone-700 border-l border-stone-300 group relative" style={{ width: col.width || 150 }}>
@@ -218,7 +228,12 @@ const PartyTable: React.FC<PartyTableProps> = ({ data, onChange, onAddLog }) => 
                                         <button onClick={() => setPendingDeleteColumn({ id: col.id, label: col.label })} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10" title="Supprimer colonne">
                                             <X size={14} />
                                         </button>
-                                        <div className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20" onMouseDown={(e) => startResizing(e, col.id, col.width || 150)} />
+                                        <button 
+                                            type="button"
+                                            className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-stone-300 z-20 outline-none" 
+                                            onMouseDown={(e) => startResizing(e, col.id, col.width || 150)} 
+                                            aria-label={`Redimensionner colonne ${col.label}`}
+                                        />
                                     </th>
                                 ))}
                                 <th className="border-b-2 border-stone-400 bg-[#fbf4e9] p-2 w-12 text-center align-middle">

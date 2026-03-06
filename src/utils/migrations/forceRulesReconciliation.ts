@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MigratableData } from './registry';
 
 export const forceRulesReconciliation = (parsed: MigratableData): void => {
@@ -10,3 +11,4 @@ export const forceRulesReconciliation = (parsed: MigratableData): void => {
         delete (parsed as any)._rulesVersion;
     }
 };
+

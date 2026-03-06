@@ -58,9 +58,11 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
             const data = await loadRules(targetId);
             if (data) {
                 const migrated = migrateRulesToV2(data);
-                setRules(migrated);
-                const online = !!migrated.settingId || migrated.source === 'database';
-                setIsOnlineMode(online);
+                if (migrated) {
+                    setRules(migrated);
+                    const online = !!migrated.settingId || migrated.source === 'database';
+                    setIsOnlineMode(online);
+                }
 
                 // 3. Update cache
                 await OfflineStorageService.saveRules(data);
@@ -83,21 +85,23 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
     // Wrapper for updateRules that auto-detects online mode
     const handleUpdateRules = (newRules: RulesData) => {
         const migrated = migrateRulesToV2(newRules);
-        setRules(migrated);
-        // Auto-detect online mode from rules data
-        const online = !!migrated.settingId || migrated.source === 'database';
-        setIsOnlineMode(online);
+        if (migrated) {
+            setRules(migrated);
+            // Auto-detect online mode from rules data
+            const online = !!migrated.settingId || migrated.source === 'database';
+            setIsOnlineMode(online);
 
-        // PERSISTENCE FIX: Save to cache so it survives refresh
-        OfflineStorageService.saveRules(newRules);
+            // PERSISTENCE FIX: Save to cache so it survives refresh
+            OfflineStorageService.saveRules(newRules);
 
-        // ROBUSTNESS: Persist the active setting ID
-        if (newRules.settingId) {
-            localStorage.setItem('rpg-active-setting-id', newRules.settingId);
+            // ROBUSTNESS: Persist the active setting ID
+            if (newRules.settingId) {
+                localStorage.setItem('rpg-active-setting-id', newRules.settingId);
+            }
+
+            setIsLoading(false); // Ensure loading is stopped
+            logger.log('[RulesContext] Rules updated, online mode:', online);
         }
-
-        setIsLoading(false); // Ensure loading is stopped
-        logger.log('[RulesContext] Rules updated, online mode:', online);
     };
 
     return (

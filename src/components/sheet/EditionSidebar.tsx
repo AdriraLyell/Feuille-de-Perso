@@ -102,10 +102,12 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
             {/* Search & Custom */}
             <div className="p-3 space-y-3 bg-slate-800/30">
                 <div className="relative">
+                    <label htmlFor="sidebar-search" className="sr-only">Rechercher</label>
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                         <Search size={14} className="text-slate-500 pointer-events-none" />
                     </span>
                     <input
+                        id="sidebar-search"
                         type="text"
                         placeholder="Rechercher..."
                         className="w-full bg-slate-950/50 border border-slate-700 rounded-md py-2 pl-9 pr-9 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-[#bfae85]/50 transition-colors"
@@ -123,7 +125,9 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                 </div>
 
                 <div className="flex gap-2">
+                    <label htmlFor="custom-item-name" className="sr-only">{activeTab === 'skills' ? "Nouvelle compétence" : "Nouvel historique"}</label>
                     <input
+                        id="custom-item-name"
                         type="text"
                         placeholder={activeTab === 'skills' ? "Nouvelle compétence..." : "Nouvel historique..."}
                         className="flex-1 bg-slate-950/50 border border-slate-700 rounded-md py-2 px-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-green-500/50 transition-colors"
@@ -153,6 +157,9 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                             ? 'bg-green-600/20 text-green-400 border border-green-500/30 cursor-grab active:cursor-grabbing hover:bg-green-600/30'
                             : 'bg-slate-800 text-slate-600 border border-slate-700 cursor-not-allowed'
                             }`}
+                        role="button"
+                        tabIndex={customName.trim() ? 0 : -1}
+                        aria-label="Glisser pour ajouter l'élément personnalisé"
                     >
                         <Plus size={18} />
                     </div>
@@ -178,6 +185,8 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                         e.dataTransfer.setData('application/json', JSON.stringify(payload));
                     }}
                     className="group bg-slate-800/30 border-2 border-dashed border-slate-700/50 rounded-md p-2 cursor-grab active:cursor-grabbing hover:border-[#bfae85]/40 hover:bg-slate-800/60 transition flex items-center justify-center gap-2 mb-4"
+                    role="listitem"
+                    aria-label="Glisser pour créer un espace"
                 >
                     <div className="text-slate-500 group-hover:text-[#bfae85]/60 transition-colors">
                         <GripVertical size={14} />
@@ -199,6 +208,8 @@ const EditionSidebar: React.FC<EditionSidebarProps> = ({ onClose }) => {
                             draggable
                             onDragStart={(e) => handleDragStart(e, item)}
                             className="group bg-slate-800/40 border border-slate-700/50 rounded-md p-3 cursor-grab active:cursor-grabbing hover:border-[#bfae85]/40 hover:bg-slate-800/80 transition flex items-center justify-between"
+                            role="listitem"
+                            aria-label={`Ajouter ${item.name}`}
                         >
                             <div className="flex items-center gap-3 overflow-hidden">
                                 <GripVertical size={14} className="text-slate-600 shrink-0 group-hover:text-[#bfae85]/60 transition-colors" />

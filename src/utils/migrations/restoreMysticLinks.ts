@@ -1,4 +1,4 @@
-import { CharacterSheetData } from '../../types';
+import { MigratableData } from './registry';
 import { normalizeString } from '../stringUtils';
 
 // Helper for fuzzy plural mapping: removes all 's' at end of words
@@ -10,14 +10,15 @@ const ultraNormalize = (name: string): string => {
  * Migration V7: Restaure les liens mysticAbilityId qui ont pu etre perdus.
  * Version amelioree pour gerer les Talents Exceptionnels et les erreurs d'encodage.
  */
-export const restoreMysticLinks = (data: CharacterSheetData | Record<string, any>): void => {
+export const restoreMysticLinks = (data: MigratableData): void => {
     if (!data) return;
 
     // 1. Map des habilites par nom normalise (ultra-fuzzy)
     const abilityByName = new Map<string, string>();
-    if (data.mysticAbilities && Array.isArray(data.mysticAbilities)) {
-        data.mysticAbilities.forEach(ability => {
-            if (ability.id && ability.name) {
+    const mysticAbilities = data.mysticAbilities as any[];
+    if (mysticAbilities && Array.isArray(mysticAbilities)) {
+        mysticAbilities.forEach(ability => {
+            if (typeof ability !== 'string' && ability.id && ability.name) {
                 const norm = normalizeString(ability.name);
                 const ultra = ultraNormalize(ability.name);
                 abilityByName.set(norm, ability.id);
@@ -28,8 +29,9 @@ export const restoreMysticLinks = (data: CharacterSheetData | Record<string, any
 
     // 2. Maps de la bibliotheque (Skill Name -> Mystic Ability ID)
     const skillLibByName = new Map<string, string>();
-    if (data.skillLibrary && Array.isArray(data.skillLibrary)) {
-        data.skillLibrary.forEach(libSkill => {
+    const skillLibrary = data.skillLibrary as any[];
+    if (skillLibrary && Array.isArray(skillLibrary)) {
+        skillLibrary.forEach(libSkill => {
             if (libSkill.mysticAbilityId) {
                 skillLibByName.set(normalizeString(libSkill.name), libSkill.mysticAbilityId);
             }
@@ -37,10 +39,11 @@ export const restoreMysticLinks = (data: CharacterSheetData | Record<string, any
     }
 
     // 3. Reparer les competences
-    if (data.skills) {
-        Object.values(data.skills).forEach(skillList => {
+    const skills = data.skills as Record<string, any[]>;
+    if (skills) {
+        Object.values(skills).forEach(skillList => {
             if (Array.isArray(skillList)) {
-                skillList.forEach((skill: any) => {
+                skillList.forEach((skill) => {
                     if (skill && !skill.mysticAbilityId && skill.name) {
                         const norm = normalizeString(skill.name);
                         if (skillLibByName.has(norm)) {
@@ -87,8 +90,10 @@ export const restoreMysticLinks = (data: CharacterSheetData | Record<string, any
         });
     };
 
-    if (data.page2) {
-        repairTraits(data.page2.avantages);
-        repairTraits(data.page2.desavantages);
+    const page2 = data.page2 as Record<string, any[]>;
+    if (page2) {
+        repairTraits(page2.avantages || []);
+        repairTraits(page2.desavantages || []);
     }
 };
+

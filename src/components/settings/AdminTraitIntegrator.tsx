@@ -210,7 +210,7 @@ const AdminTraitIntegrator: React.FC<AdminTraitIntegratorProps> = ({ initialData
                 addTag={addTag}
                 removeTag={removeTag}
                 addEffect={addEffect}
-                updateEffect={updateEffect as any}
+                updateEffect={updateEffect as (id: string, field: keyof TraitEffect, value: string | number | boolean | undefined) => void}
                 updateEffectFields={updateEffectFields}
                 removeEffect={removeEffect}
             />

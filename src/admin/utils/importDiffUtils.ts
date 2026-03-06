@@ -1,12 +1,11 @@
 
 import { RulesData } from '../../types/rules';
-import { LibraryEntry } from '../../types/system';
 
 export interface FieldDifference {
     field: string;
     label: string;
-    prev: any;
-    next: any;
+    prev: unknown;
+    next: unknown;
 }
 
 export interface LibraryConflict {
@@ -14,8 +13,8 @@ export interface LibraryConflict {
     name: string;
     type: string;
     differences: FieldDifference[]; // Structured differences
-    current: any;
-    candidate: any;
+    current: unknown;
+    candidate: unknown;
 }
 
 export interface DiffReport {
@@ -50,13 +49,16 @@ export interface ImportOptions {
     fieldExclusions?: Record<string, string[]>; // ItemID -> Fields (names) to KEEP from CURRENT
 }
 
-const isDifferent = (a: any, b: any) => JSON.stringify(a) !== JSON.stringify(b);
+const isDifferent = (a: unknown, b: unknown) => JSON.stringify(a) !== JSON.stringify(b);
 
 /**
  * Compares two library items and returns a list of human-readable differences.
  */
-const getDetailedDifferences = (curr: any, cand: any): FieldDifference[] => {
+const getDetailedDifferences = (currRaw: unknown, candRaw: unknown): FieldDifference[] => {
     const diffs: FieldDifference[] = [];
+    const curr = currRaw as Record<string, unknown>;
+    const cand = candRaw as Record<string, unknown>;
+
     if (curr.name !== cand.name) diffs.push({ field: 'name', label: 'Nom', prev: curr.name, next: cand.name });
     if (curr.type !== cand.type) diffs.push({ field: 'type', label: 'Type', prev: curr.type, next: cand.type });
     if (curr.cost !== cand.cost) diffs.push({ field: 'cost', label: 'Coût', prev: curr.cost, next: cand.cost });
@@ -148,7 +150,7 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
                     stats.conflicts.push({
                         id: existing.id, // Store ID for exclusion tracking
                         name: item.name || "Sans nom",
-                        type: (item as any).type || "item",
+                        type: (item as Record<string, unknown>).type as string || "item",
                         differences: getDetailedDifferences(existing, item),
                         current: existing,
                         candidate: item
@@ -258,8 +260,9 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
                                 const mergedItem = { ...item };
                                 // For each excluded field, RESTORE value from current
                                 itemFieldExclusions.forEach(field => {
-                                    if (field in currentItem) {
-                                        (mergedItem as any)[field] = (currentItem as any)[field];
+                                    if (currentItem && field in currentItem) {
+                                        const fieldName = field as keyof T;
+                                        (mergedItem as Record<keyof T, T[keyof T]>)[fieldName] = currentItem[fieldName];
                                     }
                                 });
                                 map.set(targetId, mergedItem);

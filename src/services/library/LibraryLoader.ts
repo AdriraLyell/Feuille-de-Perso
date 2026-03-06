@@ -126,13 +126,13 @@ export const LibraryLoader = {
             const activeSpecIds = new Set<string>(relSpecs.filter((r: RelSettingSpecialization) => r.is_active).map((r: RelSettingSpecialization) => r.specialization_id));
             const activeBgIds = new Set<string>(relBackgrounds.filter((r: RelSettingBackground) => r.is_active).map((r: RelSettingBackground) => r.background_id));
             const activeCounterIds = new Set<string>(relCounters.filter((r: RelSettingCounter) => r.is_active).map((r: RelSettingCounter) => r.counter_id));
-            const activeMysticIds = new Set<string>(relMysticAbilities.filter((r: any) => r.is_active).map((r: any) => r.mystic_ability_id));
+            const activeMysticIds = new Set<string>(relMysticAbilities.filter((r: RelSettingMysticAbility) => r.is_active).map((r: RelSettingMysticAbility) => r.mystic_ability_id));
             const activeFormulaIds = new Set<string>(relFormulas.filter((r: RelSettingFormula) => r.is_active).map((r: RelSettingFormula) => r.formula_id));
 
             const skillRelMap = new Map<string, RelSettingSkill>(relSkills.map((r: RelSettingSkill) => [r.skill_id, r]));
-            const bgDefaultMap = new Map<string, string>(relBackgrounds.map((r: RelSettingBackground) => [r.background_id, r.default_category]));
-            const counterDefaultMap = new Map<string, string>(relCounters.map((r: RelSettingCounter) => [r.counter_id, r.default_category]));
-            const mysticDefaultMap = new Map<string, string>(relMysticAbilities.map((r: any) => [r.mystic_ability_id, r.default_category]));
+            const bgDefaultMap = new Map<string, string>(relBackgrounds.map((r: RelSettingBackground) => [r.background_id, r.default_category || '']));
+            const counterDefaultMap = new Map<string, string>(relCounters.map((r: RelSettingCounter) => [r.counter_id, r.default_category || '']));
+            const mysticDefaultMap = new Map<string, string>(relMysticAbilities.map((r: RelSettingMysticAbility) => [r.mystic_ability_id, r.default_category || '']));
 
             return {
                 traits: traits.map((t: DBTrait) => LibraryMapper.mapTrait(t, activeTraitIds, settingId, traitVarMap.get(t.id))).sort((a, b) => a.name.localeCompare(b.name)),
@@ -140,7 +140,7 @@ export const LibraryLoader = {
                 specializations: specs.map((s: DBSpecialization) => LibraryMapper.mapSpec(s, activeSpecIds, settingId)).sort((a, b) => a.name.localeCompare(b.name)),
                 backgrounds: backgrounds.map((b: DBBackground) => LibraryMapper.mapBackground(b, activeBgIds, settingId, bgVarMap.get(b.id), bgDefaultMap.get(b.id))).sort((a, b) => a.name.localeCompare(b.name)),
                 counters: counters.map((c: DBCounter) => LibraryMapper.mapCounter(c, activeCounterIds, settingId, counterDefaultMap.get(c.id))).sort((a, b) => a.name.localeCompare(b.name)),
-                mysticAbilities: mysticAbilities.map((m: any) => LibraryMapper.mapMysticAbility(m, activeMysticIds, settingId, mysticDefaultMap.get(m.id))).sort((a: any, b: any) => a.name.localeCompare(b.name)),
+                mysticAbilities: mysticAbilities.map((m: DBMysticAbility) => LibraryMapper.mapMysticAbility(m, activeMysticIds, settingId, mysticDefaultMap.get(m.id))).sort((a, b) => a.name.localeCompare(b.name)),
                 formulas: (formulas || []).map((f: DBFormula) => LibraryMapper.mapFormula(f, activeFormulaIds, settingId)).sort((a, b) => a.name.localeCompare(b.name))
             };
         } catch (error) {
@@ -186,10 +186,13 @@ export const LibraryLoader = {
 
             const usageMap: Record<string, number> = {};
             results.forEach(res => {
-                res.data.forEach((row: any) => {
-                    const id = row[res.idKey];
-                    usageMap[id] = (usageMap[id] || 0) + 1;
-                });
+                const rows = res.data as unknown as Record<string, unknown>[] | null;
+                if (rows) {
+                    rows.forEach((row: Record<string, unknown>) => {
+                        const id = row[res.idKey] as string;
+                        usageMap[id] = (usageMap[id] || 0) + 1;
+                    });
+                }
             });
 
             return usageMap;
@@ -238,13 +241,13 @@ export const LibraryLoader = {
 
             if (settingsError) throw settingsError;
 
-            const settings = (settingsData || []).map((row: any) => ({
-                id: row.setting_id,
-                name: row.game_settings.name
+            const settings = (settingsData || []).map((row: Record<string, unknown>) => ({
+                id: row.setting_id as string,
+                name: (row.game_settings as { name: string }).name
             }));
 
             // 3. Fetch character usage (focus on traits for now as it's the most common/tracable)
-            let characters: any[] = [];
+            let characters: ItemUsageDetail['characters'] = [];
             if (itemType === 'trait') {
                 const { data: charData, error: charError } = await supabase
                     .from('characters')
@@ -256,10 +259,10 @@ export const LibraryLoader = {
                 // Given the constraints, we will at least return the campaigns which is the primary lock source.
 
                 if (!charError && charData) {
-                    characters = charData.map(c => ({
-                        name: c.character_name,
-                        player: c.player_name,
-                        settingName: (c.game_settings as any)?.name
+                    characters = charData.map((c: Record<string, unknown>) => ({
+                        name: c.character_name as string,
+                        player: c.player_name as string,
+                        settingName: (c.game_settings as { name: string })?.name
                     }));
                 }
             }

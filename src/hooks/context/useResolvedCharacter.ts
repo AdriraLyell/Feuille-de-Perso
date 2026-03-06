@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { CharacterSheetData, DotEntry, TraitEntry, AttributeEntry } from '../../types';
+import { CharacterSheetData, TraitEntry } from '../../types';
 import { RulesData } from '../../types/rules';
 
 /**
@@ -80,20 +80,21 @@ export const useResolvedCharacter = (data: CharacterSheetData, rules: RulesData 
     Object.keys(resolved.counters).forEach(key => {
       const counter = resolved.counters[key];
       if (Array.isArray(counter)) {
-        (resolved.counters as any)[key] = counter.map(c => {
+        (resolved.counters as Record<string, unknown>)[key] = counter.map(c => {
            const ruleDef = rules.libraries.counters?.find(rc => rc.id === c.id || rc.name.toLowerCase() === c.name.toLowerCase());
            if (ruleDef) return { ...c, name: ruleDef.name, description: ruleDef.description ?? undefined, max: ruleDef.maxValue || c.max };
            return c;
         });
       } else if (typeof counter === 'object' && counter !== null) {
          // System counters (volonte, confiance)
-         const sysDef = Object.values(rules.definitions.counters).find(rc => rc.id === counter.id || rc.name.toLowerCase() === counter.name.toLowerCase());
+         const counterObj = counter as unknown as Record<string, unknown>;
+         const sysDef = Object.values(rules.definitions.counters).find(rc => rc.id === counterObj.id || rc.name.toLowerCase() === String(counterObj.name).toLowerCase());
          if (sysDef) {
-           (resolved.counters as any)[key] = {
-             ...counter,
+           (resolved.counters as Record<string, unknown>)[key] = {
+             ...counterObj,
              name: sysDef.name,
              description: sysDef.description ?? undefined,
-             max: sysDef.max || counter.max
+             max: sysDef.max || (counterObj.max as number)
            };
          }
       }

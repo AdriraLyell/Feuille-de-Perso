@@ -94,8 +94,9 @@ const CloudConflictResolver: React.FC<CloudConflictResolverProps> = ({
                                 {/* Comparison Grid */}
                                 <div className="grid grid-cols-2 gap-px bg-stone-800">
                                     {/* Option: Current */}
-                                    <div
-                                        className={`p-5 cursor-pointer transition duration-300 relative group ${choice === 'keep_current'
+                                    <button
+                                        type="button"
+                                        className={`p-5 cursor-pointer transition duration-300 relative group text-left outline-none focus:ring-2 focus:ring-blue-500/50 z-10 ${choice === 'keep_current'
                                             ? 'bg-blue-900/10'
                                             : 'bg-stone-900/40 opacity-60 grayscale hover:opacity-100 hover:grayscale-0'
                                             }`}
@@ -142,11 +143,12 @@ const CloudConflictResolver: React.FC<CloudConflictResolverProps> = ({
                                         {choice === 'keep_current' && (
                                             <div className="absolute inset-0 border-2 border-blue-500/30 rounded-none pointer-events-none" />
                                         )}
-                                    </div>
+                                    </button>
 
                                     {/* Option: Incoming */}
-                                    <div
-                                        className={`p-5 cursor-pointer transition duration-300 relative group ${choice === 'replace'
+                                    <button
+                                        type="button"
+                                        className={`p-5 cursor-pointer transition duration-300 relative group text-left outline-none focus:ring-2 focus:ring-amber-500/50 z-10 ${choice === 'replace'
                                             ? 'bg-amber-900/10'
                                             : 'bg-stone-900/40 opacity-60 grayscale hover:opacity-100 hover:grayscale-0'
                                             }`}
@@ -193,7 +195,7 @@ const CloudConflictResolver: React.FC<CloudConflictResolverProps> = ({
                                         {choice === 'replace' && (
                                             <div className="absolute inset-0 border-2 border-amber-500/30 rounded-none pointer-events-none" />
                                         )}
-                                    </div>
+                                    </button>
                                 </div>
                             </motion.div>
                         );

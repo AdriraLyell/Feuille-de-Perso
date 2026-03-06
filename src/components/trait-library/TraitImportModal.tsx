@@ -114,7 +114,14 @@ const TraitImportModal: React.FC<TraitImportModalProps> = ({ data, onClose, onIm
                             </div>
 
                             {sheetTraits.map(item => (
-                                <div key={item.id} onClick={() => toggleSelection(item.id)} className={`flex items-center gap-3 p-3 rounded border cursor-pointer transition-colors ${selectedIds.includes(item.id) ? 'bg-blue-50 border-blue-300 ring-1 ring-blue-300' : 'bg-white border-gray-200 hover:border-blue-300'}`}>
+                                <button
+                                    key={item.id}
+                                    type="button"
+                                    onClick={() => toggleSelection(item.id)}
+                                    className={`w-full text-left flex items-center gap-3 p-3 rounded border transition-colors outline-none focus:ring-2 focus:ring-blue-500/50 ${selectedIds.includes(item.id) ? 'bg-blue-50 border-blue-300 ring-1 ring-blue-300' : 'bg-white border-gray-200 hover:border-blue-300'}`}
+                                    role="checkbox"
+                                    aria-checked={selectedIds.includes(item.id)}
+                                >
                                     <input type="checkbox" checked={selectedIds.includes(item.id)} onChange={() => { }} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 pointer-events-none" />
 
                                     <div className="flex-grow min-w-0">
@@ -134,7 +141,7 @@ const TraitImportModal: React.FC<TraitImportModalProps> = ({ data, onClose, onIm
                                         {item.status === 'update' && <span className="flex items-center gap-1 text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-full"><RefreshCw size={12} /> Mise à jour</span>}
                                         {item.status === 'same' && <span className="text-xs text-gray-400 px-2">Identique</span>}
                                     </div>
-                                </div>
+                                </button>
                             ))}
                         </div>
                     )}

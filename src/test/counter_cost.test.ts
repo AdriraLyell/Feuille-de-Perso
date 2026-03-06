@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest';
 import { RuleCalculationsService } from '../services/RuleCalculationsService';
 import { CharacterSheetData } from '../types';
@@ -50,3 +51,4 @@ describe('Counter Cost Verification', () => {
         expect(parseInt(result.spent)).toBe(30);
     });
 });
+

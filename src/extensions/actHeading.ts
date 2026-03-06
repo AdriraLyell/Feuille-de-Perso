@@ -114,6 +114,7 @@ export const ActHeading = Node.create({
     },
 
     addNodeView() {
-        return ReactNodeViewRenderer(ActHeaderView as any);
+        return ReactNodeViewRenderer(ActHeaderView);
     },
 });
+

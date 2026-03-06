@@ -102,10 +102,16 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20">
-                        <label className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest">Points à la Création</label>
+                        <label 
+                            htmlFor="creation-color-picker"
+                            className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest"
+                        >
+                            Points à la Création
+                        </label>
                         <p className="text-[10px] text-[#5c4d41]/70 mb-2 italic">Couleur des points de base et en mode création.</p>
                         <div className="flex items-center gap-3">
                             <input
+                                id="creation-color-picker"
                                 type="color"
                                 value={theme.creationColor}
                                 onChange={(e) => updateTheme('creationColor', e.target.value)}
@@ -118,10 +124,16 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                     </div>
 
                     <div className="space-y-3 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20">
-                        <label className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest">Points via XP</label>
+                        <label 
+                            htmlFor="xp-color-picker"
+                            className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest"
+                        >
+                            Points via XP
+                        </label>
                         <p className="text-[10px] text-[#5c4d41]/70 mb-2 italic">Couleur des points achetés avec de l'expérience.</p>
                         <div className="flex items-center gap-3">
                             <input
+                                id="xp-color-picker"
                                 type="color"
                                 value={theme.xpColor}
                                 onChange={(e) => updateTheme('xpColor', e.target.value)}
@@ -145,7 +157,10 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                         <div className="space-y-3 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <label className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest flex items-center gap-1.5">
+                                    <label 
+                                        htmlFor="variable-skill-color-picker"
+                                        className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest flex items-center gap-1.5"
+                                    >
                                         <Layers size={12} /> Compétences Variables
                                     </label>
                                     <p className="text-[10px] text-[#5c4d41]/70 mb-2 italic">Ex: Artisanat, Savoir, Langue...</p>
@@ -162,6 +177,7 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                             </div>
                             <div className="flex items-center gap-3">
                                 <input
+                                    id="variable-skill-color-picker"
                                     type="color"
                                     value={theme.skillColors?.variable || '#d97706'}
                                     onChange={(e) => updateSkillColor('variable', e.target.value)}
@@ -177,7 +193,10 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                         <div className="space-y-3 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <label className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest flex items-center gap-1.5">
+                                    <label 
+                                        htmlFor="mystic-skill-color-picker"
+                                        className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest flex items-center gap-1.5"
+                                    >
                                         <Sparkles size={12} /> Mystique (Défaut)
                                     </label>
                                     <p className="text-[10px] text-[#5c4d41]/70 mb-2 italic">Couleur de base des habilités mystiques.</p>
@@ -194,6 +213,7 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                             </div>
                             <div className="flex items-center gap-3">
                                 <input
+                                    id="mystic-skill-color-picker"
                                     type="color"
                                     value={theme.skillColors?.mysticDefault || '#8b5cf6'}
                                     onChange={(e) => updateSkillColor('mysticDefault', e.target.value)}
@@ -209,7 +229,7 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                     {/* 3. Mystic Overrides */}
                     {rules?.libraries?.mysticAbilities && rules.libraries.mysticAbilities.length > 0 && (
                         <div className="mt-4 space-y-3 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20">
-                            <label className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest">Surcharges par Habilité</label>
+                            <h6 className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest">Surcharges par Habilité</h6>
                             <p className="text-[10px] text-[#5c4d41]/70 italic mb-3">Définissez une couleur spécifique pour chaque voie mystique.</p>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -223,15 +243,20 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                                     return (
                                         <div key={ability.id} className="flex items-center gap-2 bg-white/40 p-2 rounded border border-[#bfae85]/20">
                                             <input
+                                                id={`color-override-${ability.id}`}
                                                 type="color"
                                                 value={currentColor}
                                                 onChange={(e) => updateMysticOverride(ability.id, e.target.value)}
                                                 className="w-6 h-6 border-none rounded-sm cursor-pointer bg-white shadow-sm ring-1 ring-[#bfae85]/30 shrink-0"
                                             />
                                             <div className="flex-grow min-w-0">
-                                                <span className="block text-[10px] font-bold truncate" style={{ color: currentColor }}>
+                                                <label 
+                                                    htmlFor={`color-override-${ability.id}`}
+                                                    className="block text-[10px] font-bold truncate cursor-pointer" 
+                                                    style={{ color: currentColor }}
+                                                >
                                                     {ability.name}
-                                                </span>
+                                                </label>
                                             </div>
                                             {hasOverride && (
                                                 <button
@@ -254,7 +279,7 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                 <div className="mt-8 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20 space-y-4">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div>
-                            <label className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest">Forme des points</label>
+                            <h6 className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest">Forme des points</h6>
                             <p className="text-[10px] text-[#5c4d41]/70 italic leading-tight">Le symbole héraldique utilisé pour marquer vos scores.</p>
                         </div>
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-[#fdfbf7] rounded-sm border border-[#bfae85]/30 shadow-inner">

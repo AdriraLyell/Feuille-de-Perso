@@ -96,7 +96,7 @@ export const useVariableSkills = (
                 const libSkill = rules?.libraries?.skills?.find(s => s.id === definitionId);
                 const normalizedVariant = normalizeString(variantName);
 
-                const isKnown = libSkill?.variants?.some(v => normalizeString(v) === normalizedVariant);
+                const isKnown = libSkill?.variants?.some((v: string) => normalizeString(v) === normalizedVariant);
 
                 if (libSkill && !isKnown) {
                     const alreadySuggested = prev.suggestions?.some(s =>

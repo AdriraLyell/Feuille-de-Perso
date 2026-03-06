@@ -51,11 +51,14 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
             className={`flex flex-col h-full bg-stone-900/40 backdrop-blur-sm p-4 rounded-sm shadow-sm border transition-all duration-300 ${isDraggingSidebarItem ? 'border-dashed border-amber-500 bg-amber-900/20 scale-[1.01]' : 'border-stone-700/50'}`}
             onDragOver={handleDragOver}
             onDrop={(e) => { e.preventDefault(); onDrop(e, skills.length); }}
+            role="region"
+            aria-label={`Configuration catégorie: ${label}`}
         >
             {/* Header Area */}
             <div className="border-b border-stone-700/50 pb-3 mb-4 space-y-3">
                 <div className="flex justify-between items-center gap-2">
                     <input
+                        aria-label="Nom de la catégorie"
                         value={label}
                         onChange={(e) => onUpdateLabel(id, e.target.value)}
                         className="bg-stone-950 border border-stone-700 px-2 py-1 outline-none flex-grow text-stone-200 font-bold text-sm rounded-sm shadow-inner focus:border-amber-500 transition-colors font-serif tracking-wide"
@@ -90,6 +93,7 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
 
                 <div className="flex items-center gap-2 text-[10px]">
                     <select
+                        aria-label="Comportement de la catégorie"
                         value={categoryConfig.behavior}
                         onChange={(e) => onUpdateBehavior(id, e.target.value as SkillBehavior)}
                         className="bg-stone-950 border border-stone-700 rounded-sm px-1 py-0.5 text-stone-400 font-medium outline-none focus:border-amber-500 transition-colors"
@@ -142,6 +146,7 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
                             <div className="flex items-center gap-1.5 shrink-0">
                                 <span className="text-[9px] text-stone-600 font-bold">×</span>
                                 <input
+                                    aria-label="Facteur de coût"
                                     type="number"
                                     step="0.1"
                                     value={costConfig.factor}
@@ -155,7 +160,10 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
             </div>
 
             {/* List */}
-            <div className="flex-grow overflow-y-auto space-y-2 pr-1 custom-scrollbar max-h-[500px] min-h-[50px]">
+            <div 
+                className="flex-grow overflow-y-auto space-y-2 pr-1 custom-scrollbar max-h-[500px] min-h-[50px]"
+                role="list"
+            >
                 {skills.length === 0 && (
                     <div className="h-16 border-2 border-dashed border-stone-800 rounded-sm flex items-center justify-center text-stone-600 text-[10px] pointer-events-none italic">
                         Zone de dépôt
@@ -164,7 +172,6 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
 
                 {skills.map((skillName, index) => {
                     const isDragging = draggedItemInfo?.index === index && draggedItemInfo?.category === id;
-                    // const isSpacer = skillName === "";
 
                     return (
                         <div
@@ -174,6 +181,7 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
                             onDragOver={handleDragOver}
                             onDrop={(e) => { e.stopPropagation(); onDrop(e, index); }}
                             className={`flex items-center gap-2 group transition-all duration-200 p-1 rounded-sm border border-transparent ${isDragging ? 'opacity-50 bg-stone-800' : 'hover:bg-stone-800/50 hover:border-stone-700/50'}`}
+                            role="listitem"
                         >
                             <div className="cursor-grab text-stone-700 hover:text-stone-400 active:cursor-grabbing p-1 transition-colors">
                                 <GripVertical size={16} />
@@ -181,11 +189,15 @@ const SkillCategoryCard: React.FC<SkillCategoryCardProps> = ({
                             <span className="text-stone-700 text-[9px] w-4 text-center select-none font-mono font-bold">{index + 1}</span>
 
                             {skillName === "" ? (
-                                <div className="flex-grow h-7 bg-stone-950/30 border border-dashed border-stone-800 rounded-sm flex items-center justify-center text-[10px] text-stone-600 italic cursor-grab select-none">
+                                <button
+                                    type="button"
+                                    className="flex-grow h-7 bg-stone-950/30 border border-dashed border-stone-800 rounded-sm flex items-center justify-center text-[10px] text-stone-600 italic cursor-grab select-none outline-none focus:bg-stone-950/50 focus:border-amber-500/50"
+                                >
                                     Espaceur
-                                </div>
+                                </button>
                             ) : (
                                 <input
+                                    aria-label={`Compétence ${index + 1}`}
                                     value={skillName}
                                     onChange={(e) => onUpdateSkill(id, index, e.target.value)}
                                     onBlur={() => onSkillBlur(id, skillName)}

@@ -84,7 +84,7 @@ const SyncViewTab: React.FC<SyncViewTabProps> = ({
             {/* Campaign Selector */}
             <div>
                 <div className="flex justify-between items-center mb-1.5">
-                    <label className="block text-sm font-bold text-[#4a3b32]">
+                    <label htmlFor="sync-campaign-select" className="block text-sm font-bold text-[#4a3b32]">
                         Campagne
                     </label>
                     {isOnlineMode && (
@@ -103,6 +103,7 @@ const SyncViewTab: React.FC<SyncViewTabProps> = ({
                     </div>
                 ) : (
                     <select
+                        id="sync-campaign-select"
                         value={selectedCampaign}
                         onChange={(e) => setSelectedCampaign(e.target.value)}
                         disabled={isOnlineMode}
@@ -159,6 +160,7 @@ const SyncViewTab: React.FC<SyncViewTabProps> = ({
                     </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
+                    <span className="sr-only">Activer la synchronisation automatique</span>
                     <input
                         type="checkbox"
                         className="sr-only peer"

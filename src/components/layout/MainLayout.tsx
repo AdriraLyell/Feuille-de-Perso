@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 
 import { useCharacter } from '../../context/CharacterContext';
@@ -10,11 +9,6 @@ import { useRules } from '../../context/RulesContext';
 
 import { CampaignService } from '../../services/CampaignService';
 import { ErrorService } from '../../services/ErrorService';
-
-interface VersionManifest {
-    version: string;
-    downloadUrl?: string;
-}
 
 import { logger } from '../../utils/logger';
 import { useCloudSyncCheck } from '../../hooks/useCloudSyncCheck';
@@ -36,7 +30,7 @@ const RulesSourceSelector = lazy(() => import('../RulesSourceSelector'));
 const CampaignConflictModal = lazy(() => import('../ui/CampaignConflictModal'));
 const SettingsView = lazy(() => import('../SettingsView'));
 import { SyncConflictModal } from '../sync/SyncConflictModal';
-import { Layers, FileType, List, TrendingUp, Book, Package, Clock, X, Trash2, UserPlus, PencilLine, Check, Sparkles } from 'lucide-react';
+import { Layers, FileType, List, TrendingUp, Book, Package, Clock, X, Trash2, Check, Sparkles } from 'lucide-react';
 import { useEditMode } from '../../hooks/sheet/useEditMode';
 import { useCreationMode } from '../../hooks/useCreationMode';
 import { exportCharacterAsJSON } from '../../utils/importExportUtils';
@@ -90,8 +84,6 @@ const MainLayout: React.FC = () => {
 
     // Sheet Modes Hooks
     const {
-        isEditMode: _, // We use context instead
-        setIsEditMode: __,
         showEditWarning,
         setShowEditWarning,
         handleToggleEditMode,
@@ -103,7 +95,7 @@ const MainLayout: React.FC = () => {
         handleToggleCreationMode,
         executeCreationActivation,
         setShowCreationWarning
-    } = useCreationMode(data, setData as any, addLog);
+    } = useCreationMode(data, (newData: CharacterSheetData) => setData(newData), addLog);
 
     // Custom Hooks
     const [isLandscape, setIsLandscape] = useState(() => {
@@ -118,12 +110,10 @@ const MainLayout: React.FC = () => {
         localStorage.setItem('rpg-landscape-mode', String(isLandscape));
     }, [isLandscape]);
     const {
-        mode, setMode,
+        mode,
         sheetTab, setSheetTab,
         showDiscardConfirm, setShowDiscardConfirm,
-
         confirmDiscard,
-        isSettingsDirty, setIsSettingsDirty,
         handleSwitchMode
     } = useNavigationState();
 
@@ -146,7 +136,7 @@ const MainLayout: React.FC = () => {
     const { portraitLayout, landscapeLayout } = useSheetLayout(data, rules);
 
     // Bandeau de récréation MJ
-    const [pendingMjUpdate, setPendingMjUpdate] = React.useState<{ data: Record<string, unknown>; message: string } | null>(null);
+    const [pendingMjUpdate, setPendingMjUpdate] = React.useState<{ data: CharacterSheetData; message: string } | null>(null);
     const [conflictData, setConflictData] = React.useState<CharacterSheetData | null>(null);
 
     const handleRemoteCharacterUpdate = React.useCallback((remoteDataRaw: Record<string, unknown>) => {
@@ -158,7 +148,7 @@ const MainLayout: React.FC = () => {
         const message = remoteSyncInfo?.mjMessage;
         // Only show banner if it's a NEW message we don't have locally yet
         if (message && message !== data?.syncInfo?.mjMessage) {
-            setPendingMjUpdate({ data: remoteData as any, message });
+            setPendingMjUpdate({ data: remoteData, message });
             return;
         }
 
@@ -166,7 +156,7 @@ const MainLayout: React.FC = () => {
         if (remoteSyncInfo?.lastSynced && localSyncInfo?.lastLocalEdit) {
             // If local edit happened AFTER the last time we were in sync with server,
             // and the server version is DIFFERENT from our base, it's a conflict.
-            const hasLocalChanges = localSyncInfo.isDirty || (localSyncInfo.lastLocalEdit > (localSyncInfo.lastSynced || 0));
+            const hasLocalChanges = !!localSyncInfo.isDirty || (localSyncInfo.lastLocalEdit > (localSyncInfo.lastSynced || 0));
             
             if (hasLocalChanges && remoteSyncInfo.lastSynced !== localSyncInfo.lastSynced) {
                 logger.warn("[Conflict] Remote update received but local changes exist. Blocking auto-overwrite.");
@@ -199,7 +189,7 @@ const MainLayout: React.FC = () => {
     });
 
     // Auto-Save Logic
-    const { countdown, setLastSavedState } = useAutoSave(data, false, (mode) => sync(mode));
+    const { countdown } = useAutoSave(data, false, (mode) => sync(mode));
 
     // Other UI States
 
@@ -235,7 +225,7 @@ const MainLayout: React.FC = () => {
                 sessionStorage.setItem(`welcome-shown-${rules.settingId}`, 'true');
             }
         }
-    }, []);
+    }, [rules, addLog]);
 
     // Logging helpers
     const clearCurrentLogs = () => {
@@ -256,7 +246,7 @@ const MainLayout: React.FC = () => {
         setIsSourceSelected(true);
         sessionStorage.setItem('rpg-source-selected', 'true');
         importData(newData);
-        const migrated = migrateData(newData);
+        const migrated = migrateData(newData as unknown as import('../../utils/migrations/registry').MigratableData);
 
         const syncInfo = migrated.syncInfo; // Extract syncInfo for clarity
 
@@ -281,7 +271,7 @@ const MainLayout: React.FC = () => {
             }
         }
 
-        setMode('sheet');
+        handleSwitchMode('sheet');
     };
 
     useEffect(() => {
@@ -292,11 +282,7 @@ const MainLayout: React.FC = () => {
             // Simple mise à jour de données sans action MJ, on loggue discrètement.
             addLog("Mise à jour disponible sur le Cloud. Ouvrez 'Sync' pour récupérer.", "info", "settings");
         }
-    }, [hasUpdate]);
-
-    const handleConfirmBackup = async () => {
-        await exportCharacterAsJSON(data, addLog);
-    };
+    }, [hasUpdate, mjMessage, pendingMjUpdate, addLog]);
 
     const handleResetLayout = React.useCallback(() => {
         clearLayout(portraitLayout, landscapeLayout);
@@ -306,14 +292,16 @@ const MainLayout: React.FC = () => {
     const handleAutoFitLayout = React.useCallback(() => {
         const totalH = isLandscape ? 1205 : 1560;
         const fixedH = 376;
+        const colCount = isLandscape ? 5 : 4;
         const availablePixels = totalH - fixedH;
         const availableRows = Math.floor(availablePixels / 24);
-        const colCount = isLandscape ? 5 : 4;
         autoFitLayout(colCount, availableRows);
         addLog("Agencement optimisé automatiquement", "info", "sheet");
     }, [isLandscape, autoFitLayout, addLog]);
 
-
+    const handleConfirmBackup = async () => {
+        await exportCharacterAsJSON(data, addLog);
+    };
 
     if (!rules || !isSourceSelected) {
         return (
@@ -396,7 +384,7 @@ const MainLayout: React.FC = () => {
                                 <div className="flex items-center gap-2 shrink-0">
                                     <button
                                         onClick={() => {
-                                            importData(pendingMjUpdate.data as unknown as Parameters<typeof importData>[0]);
+                                            importData(pendingMjUpdate.data);
                                             setPendingMjUpdate(null);
                                             addLog(`✨ Récréation appliquée : ${pendingMjUpdate.message}`, 'success', 'sheet');
                                         }}
@@ -512,7 +500,6 @@ const MainLayout: React.FC = () => {
                             ) : (
                                 <SettingsView
                                     onClose={() => handleSwitchMode('sheet')}
-                                    onDirtyChange={setIsSettingsDirty}
                                 />
                             )}
                         </Suspense>
@@ -532,15 +519,13 @@ const MainLayout: React.FC = () => {
                         rules={rules}
                         setData={setData}
                         addLog={addLog}
-                        isSyncing={isSyncing}
-                        hasUpdate={hasUpdate}
                         mode={mode}
                         showImportExport={showImportExport}
                         setShowImportExport={setShowImportExport}
                         showPrintModal={showPrintModal}
                         setShowPrintModal={setShowPrintModal}
                         pagesToPrint={pagesToPrint}
-                        handlePrintConfirm={handlePrintConfirm}
+                        handlePrintConfirm={(selection: Record<string, boolean>) => handlePrintConfirm(selection as any)}
                         showChangelog={showChangelog}
                         setShowChangelog={setShowChangelog}
                         showUserGuide={showUserGuide}
@@ -586,3 +571,4 @@ const MainLayout: React.FC = () => {
 };
 
 export default MainLayout;
+

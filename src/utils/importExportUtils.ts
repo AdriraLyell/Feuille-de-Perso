@@ -9,7 +9,10 @@ import { ErrorService } from '../services/ErrorService';
  * Utility to export a character as JSON.
  * Extracted from ExportPanel for reuse in safety modals.
  */
-export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (msg: string, type: 'info' | 'success' | 'danger', scope?: any) => void) => {
+export const exportCharacterAsJSON = async (
+    data: CharacterSheetData, 
+    addLog?: (msg: string, type: 'info' | 'success' | 'danger', scope?: 'sheet' | 'settings' | 'both') => void
+) => {
     const dataToProcess: CharacterSheetData = JSON.parse(JSON.stringify(data));
 
     // 1. Resolve Images from DB
@@ -24,43 +27,6 @@ export const exportCharacterAsJSON = async (data: CharacterSheetData, addLog?: (
             ErrorService.handleError(e, { context: 'ExportCharacter', userMessage: "Impossible d'exporter l'image du personnage (BDD)." });
         }
         delete dataToProcess.page2.characterImageId;
-    }
-
-    // Resolve Campaign Notes Images
-    if (dataToProcess.campaignNotes) {
-        for (const note of dataToProcess.campaignNotes) {
-            // Main Image
-            if (note.imageId && note.imageId.startsWith('img_')) {
-                try {
-                    const blob = await getImage(note.imageId);
-                    if (blob) {
-                        const typedNote = note as any;
-                        typedNote.base64Cover = await blobToBase64(blob);
-                    }
-                } catch (e) {
-                    ErrorService.handleError(e, { context: 'ExportCharacter', userMessage: `Impossible d'exporter l'image de couverture de la note ${note.id}` });
-                }
-                delete (note as any).imageId;
-            }
-
-            // Gallery Images
-            if (note.images && Array.isArray(note.images)) {
-                for (const img of note.images) {
-                    if (img.imageId) {
-                        try {
-                            const blob = await getImage(img.imageId);
-                            if (blob) {
-                                img.base64Data = await blobToBase64(blob);
-                            }
-                        } catch (e) {
-                            ErrorService.handleError(e, { context: 'ExportCharacter', userMessage: `Impossible d'exporter l'image de la note ${img.id}` });
-                        }
-                        // Type assertion needed because imageId is required in runtime type but removed for export
-                        delete (img as any).imageId;
-                    }
-                }
-            }
-        }
     }
 
     // --- PERSIST LOCAL SETTINGS ---
@@ -196,6 +162,10 @@ export const createTemplateFromData = (source: CharacterSheetData): CharacterShe
 
     // Reset Specializations Library
     clean.specializationLibrary = [];
+
+    // Clear Journal
+    clean.bookDocument = undefined;
+    clean.campaignNotes = [];
 
     // Disable creation mode
     clean.creationConfig.active = false;

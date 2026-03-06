@@ -1,7 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 import type { CommandProps, RawCommands } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
-import { TextSelection } from 'prosemirror-state';
 import ChapterHeaderView from '../components/campaign/book/ChapterHeaderView';
 
 declare module '@tiptap/core' {
@@ -159,3 +158,4 @@ export const ChapterHeading = Node.create({
         return ReactNodeViewRenderer(ChapterHeaderView as any);
     },
 });
+

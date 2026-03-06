@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { saveImage, base64ToBlob } from '../../services/imageDB';
 import { logger } from '../../utils/logger';
 
@@ -48,3 +49,4 @@ export const migrateBookImages = async (content: any): Promise<any> => {
 
     return await processNode(content);
 };
+

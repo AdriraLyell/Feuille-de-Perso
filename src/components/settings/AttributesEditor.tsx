@@ -124,9 +124,10 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
 
                 {/* Attribute Cost */}
                 <div className="flex flex-col gap-2">
-                    <label className="block text-[10px] font-bold text-[#5c4d41]/80 uppercase tracking-widest">Coût XP</label>
+                    <label htmlFor="attr-xp-cost" className="block text-[10px] font-bold text-[#5c4d41]/80 uppercase tracking-widest">Coût XP</label>
                     <div className="flex items-center gap-2">
                         <input
+                            id="attr-xp-cost"
                             type="number"
                             value={data.creationConfig.attributeCost ?? 6}
                             onChange={(e) => updateAttributeCost(parseInt(e.target.value) || 0)}

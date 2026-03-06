@@ -23,7 +23,7 @@ export const useAttributePresets = ({
     requestConfirm
 }: UseAttributePresetsProps) => {
     const [showPresetConfirm, setShowPresetConfirm] = useState(false);
-    const [pendingPreset, setPendingPreset] = useState<any>(null);
+    const [pendingPreset, setPendingPreset] = useState<AttributePreset | null>(null);
     const [dbPresets, setDbPresets] = useState<AttributePreset[]>([]);
     const [isLoadingPresets, setIsLoadingPresets] = useState(true);
 
@@ -38,9 +38,9 @@ export const useAttributePresets = ({
         loadDBPresets();
     }, [loadDBPresets]);
 
-    const requestPresetLoad = useCallback((preset: any) => {
-        if (preset.structure && !preset.structure[0].secondaryAttrs && preset.structure[0].attrs) {
-            preset.structure = preset.structure.map((cat: any) => ({
+    const requestPresetLoad = useCallback((preset: AttributePreset) => {
+        if (preset.structure && Array.isArray(preset.structure) && preset.structure.length > 0 && !preset.structure[0].secondaryAttrs && preset.structure[0].attrs) {
+            preset.structure = preset.structure.map((cat) => ({
                 ...cat,
                 secondaryAttrs: []
             }));
@@ -88,7 +88,7 @@ export const useAttributePresets = ({
         const newAttributes: Record<string, string[]> = {};
         const newLabels: Record<string, string> = { ...labelsMap };
         const newSecondary: Record<string, string[]> = { ...secondaryMap };
-        const hasSecondaryInPreset = pendingPreset.has_secondary || pendingPreset.hasSecondary || false;
+        const hasSecondaryInPreset = pendingPreset.hasSecondary || false;
 
         pendingPreset.structure.forEach((cat: any) => {
             newAttributes[cat.id] = [...cat.attrs];

@@ -31,7 +31,7 @@ export const reconcileImposedSpecializations = (newState: CharacterSheetData, ru
 
         // Also include any IDs that might be names directly (legacy/manual)
         const targetIdsAndNamesNormal = [
-            ...ls.skillIds.map(id => normalizeString(id)),
+            ...ls.skillIds.map((id: string) => normalizeString(id)),
             ...targetSkillNamesNormal
         ];
 

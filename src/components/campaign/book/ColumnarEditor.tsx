@@ -42,6 +42,12 @@ interface ColumnarEditorProps {
     readOnly?: boolean;
 }
 
+interface EditorCommands {
+    insertNarrativeSection: (options: { type: string; timeSlot: string }) => void;
+    insertChapterAtDate: (date: string, something?: unknown, atSelection?: boolean) => void;
+    insertAct: (atSelection: boolean) => void;
+}
+
 export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     initialContent,
     onUpdate,
@@ -73,6 +79,8 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
     useEffect(() => {
         setEditor(editor);
     }, [editor, setEditor]);
+
+    const commands = editor?.commands as unknown as EditorCommands;
 
     const {
         isCalendarVisible,
@@ -158,7 +166,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         input.click();
     }, [editor]);
 
-    if (!editor) return null;
+    if (!editor || !commands) return null;
 
     return (
         <div className="w-full flex flex-col items-center justify-start relative overflow-visible gap-4">
@@ -173,27 +181,32 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
             )}
 
             {/* Spread Wrapper: Fixed width for exact button anchoring */}
-            <div className="relative" style={{ width: `${PAGE_WIDTH * 2 + 40}px` }}>
+            <div 
+                className="relative" 
+                style={{ width: `${PAGE_WIDTH * 2 + 40}px` }}
+                role="application"
+                aria-label="Éditeur de livre en colonnes"
+            >
 
                 {!readOnly && (
                     <BookChapterSidebar
-                        onInsertMoment={() => (editor.commands as unknown as { insertNarrativeSection: (opts: { type: string, timeSlot: string }) => boolean }).insertNarrativeSection({ type: 'moment', timeSlot: 'matin' })}
+                        onInsertMoment={() => commands.insertNarrativeSection({ type: 'moment', timeSlot: 'matin' })}
                         onInsertChapterAtCursor={() => {
                             const cal = rules?.configurations?.calendar;
                             const today = cal?.type === 'real'
                                 ? (cal.currentDate || new Date().toISOString()).split('T')[0]
                                 : `${cal?.currentYear}-${cal?.currentMonthIndex !== undefined ? cal.currentMonthIndex + 1 : 1}-${cal?.currentDay || 1}`;
-                            (editor.commands as any).insertChapterAtDate(today, undefined, true);
+                            commands.insertChapterAtDate(today, undefined, true);
                         }}
                         onInsertChapterAtEnd={() => {
                             const cal = rules?.configurations?.calendar;
                             const today = cal?.type === 'real'
                                 ? (cal.currentDate || new Date().toISOString()).split('T')[0]
                                 : `${cal?.currentYear}-${cal?.currentMonthIndex !== undefined ? cal.currentMonthIndex + 1 : 1}-${cal?.currentDay || 1}`;
-                            (editor.commands as any).insertChapterAtDate(today, undefined, false);
+                            commands.insertChapterAtDate(today, undefined, false);
                         }}
-                        onInsertActAtCursor={() => (editor.commands as any).insertAct(true)}
-                        onInsertActAtEnd={() => (editor.commands as any).insertAct(false)}
+                        onInsertActAtCursor={() => commands.insertAct(true)}
+                        onInsertActAtEnd={() => commands.insertAct(false)}
                         isCalendarVisible={isCalendarVisible}
                         onToggleCalendar={() => setIsCalendarVisible(!isCalendarVisible)}
                         toolbar={(
@@ -217,7 +230,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                                 notatedDates={notifiedDates}
                                 voyageRanges={voyageRanges}
                                 onDateClick={handleCalendarDateClick}
-                                onNewChapter={pickingTarget ? undefined : (date, atSelection) => (editor.commands as unknown as { insertChapterAtDate: (d: string, title: undefined, atSel: boolean) => boolean }).insertChapterAtDate(date, undefined, atSelection)}
+                                onNewChapter={pickingTarget ? undefined : (date, atSelection) => commands.insertChapterAtDate(date, undefined, atSelection)}
                             />
                         )}
                     </BookChapterSidebar>
@@ -308,6 +321,8 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                             onMouseDown={handleDrawingMouseDown}
                             onMouseMove={handleDrawingMouseMove}
                             onMouseUp={handleDrawingMouseUp}
+                            role="presentation"
+                            aria-label="Zone de dessin"
                         >
                             <div className="sticky left-1/2 -translate-x-1/2 top-4 w-fit bg-amber-600 text-white px-4 py-2 rounded-full shadow-2xl text-sm font-serif font-bold animate-in slide-in-from-top-4 duration-300 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18M3 12h18" /></svg>

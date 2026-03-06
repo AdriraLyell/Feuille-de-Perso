@@ -1,10 +1,8 @@
 import { CharacterSheetData, DotEntry } from '../../types';
 import { RulesData } from '../../types/rules';
-import { normalizeString } from '../stringUtils';
 
 /**
  * Synchronizes custom counters with their library definitions.
- * 
  * @param newState - The current draft state
  * @param currentState - The source state
  * @param rules - The campaign rules

@@ -7,14 +7,14 @@ import { getImage } from '../../services/imageDB';
 import { ErrorService } from '../../services/ErrorService';
 
 interface NoteImageZoneProps {
-    uniqueId: string; // Placement ID
+    _uniqueId: string; // Placement ID
     imageId: string; // Blob ID
     config?: ImageConfig;
     onUpdateConfig: (newConfig: ImageConfig) => void;
     onDelete: () => void;
 }
 
-const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config, onUpdateConfig, onDelete }) => {
+const NoteImageZone: React.FC<NoteImageZoneProps> = ({ _uniqueId, imageId, config, onUpdateConfig, onDelete }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     // Default Config Initialization
@@ -276,21 +276,25 @@ const NoteImageZone: React.FC<NoteImageZoneProps> = ({ uniqueId, imageId, config
                     </div>
 
                     {/* Move Handle (Center) */}
-                    <div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-move bg-white/80 p-2 rounded-full hover:bg-white text-stone-700"
+                    <button
+                        type="button"
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-move bg-white/80 p-2 rounded-full hover:bg-white text-stone-700 outline-none focus:ring-2 focus:ring-indigo-500"
                         onMouseDown={handleMoveStart}
                         title="Déplacer"
+                        aria-label="Déplacer l'image"
                     >
                         <Move size={20} />
-                    </div>
+                    </button>
 
                     {/* Resize Handle (Bottom Right) */}
-                    <div
-                        className="absolute bottom-0 right-0 cursor-nwse-resize p-1 text-white bg-indigo-600/80 rounded-tl-lg hover:bg-indigo-600"
+                    <button
+                        type="button"
+                        className="absolute bottom-0 right-0 cursor-nwse-resize p-1 text-white bg-indigo-600/80 rounded-tl-lg hover:bg-indigo-600 outline-none focus:bg-indigo-700"
                         onMouseDown={handleResizeStart}
+                        aria-label="Redimensionner l'image"
                     >
                         <Scaling size={16} />
-                    </div>
+                    </button>
                 </div>
 
                 {/* Tape visual */}

@@ -4,6 +4,16 @@ import { LibraryEntry, TraitEffect, LibraryFormulaEntry } from '../../types';
 import { generateId } from '../../utils/factories';
 import { migrateTraitLibrary } from '../../utils/migrations/migrateTraitProperties';
 
+interface MigrationStats {
+    traitsProcessed: number;
+    effectsMigrated: number;
+    formulasCreated: number;
+}
+
+interface LegacyEffect extends TraitEffect {
+    formula?: string;
+}
+
 /**
  * Migration tool to move hardcoded trait effects to the new formula system.
  * Targets both Supabase (online) and JSON (offline).
@@ -13,8 +23,8 @@ export const migrationTool = {
      * Migrates a library of traits by converting hardcoded effects (free_skill_rank, xp_bonus, etc.)
      * into formula-based effects, creating the corresponding formula entries.
      */
-    migrateTraitsToFormulas: (rules: RulesData): { updatedRules: RulesData, stats: any } => {
-        const stats = {
+    migrateTraitsToFormulas: (rules: RulesData): { updatedRules: RulesData, stats: MigrationStats } => {
+        const stats: MigrationStats = {
             traitsProcessed: 0,
             effectsMigrated: 0,
             formulasCreated: 0
@@ -23,11 +33,12 @@ export const migrationTool = {
         const traits = rules.libraries?.traits || [];
         const formulas = [...(rules.libraries?.formulas || [])];
 
-        const newTraits = traits.map((trait: any) => {
+        const newTraits = traits.map((trait: LibraryEntry) => {
             if (!trait.effects || trait.effects.length === 0) return trait;
 
             stats.traitsProcessed++;
             const newEffects = trait.effects.map((effect: TraitEffect) => {
+                const legacyEffect = effect as LegacyEffect;
                 // Skip if already a formula with a formulaId (already migrated or native)
                 if (effect.type === 'formula' && effect.formulaId) return effect;
 
@@ -38,26 +49,27 @@ export const migrationTool = {
                 let effectType = '';
                 let target = effect.target || '';
 
-                if ((effect as any).type === 'free_skill_rank') {
+                const legacyType = String(legacyEffect.type);
+                if (legacyType === 'free_skill_rank') {
                     formulaName = `Rang : ${effect.target}`;
-                    formulaString = `${effect.value}`;
+                    formulaString = String(effect.value);
                     effectType = 'free_skill_rank';
-                } else if ((effect as any).type === 'xp_bonus') {
+                } else if (legacyType === 'xp_bonus') {
                     formulaName = `Bonus XP : ${trait.name}`;
-                    formulaString = `${effect.value}`;
+                    formulaString = String(effect.value);
                     target = 'XP';
                     effectType = 'xp_bonus';
-                } else if ((effect as any).type === 'master_skill') {
+                } else if (legacyType === 'master_skill') {
                     formulaName = `Maîtrise : ${effect.target || trait.name}`;
                     formulaString = `5`;
                     effectType = 'master_skill';
-                } else if ((effect as any).type === 'attribute_bonus') {
+                } else if (legacyType === 'attribute_bonus') {
                     formulaName = `Bonus : ${effect.target}`;
-                    formulaString = `${effect.value}`;
+                    formulaString = String(effect.value);
                     effectType = 'attribute_bonus';
-                } else if (effect.type === 'formula' && (effect as any).formula && !effect.formulaId) {
+                } else if (effect.type === 'formula' && legacyEffect.formula && !effect.formulaId) {
                     formulaName = `Mécanique : ${trait.name}`;
-                    formulaString = (effect as any).formula || '';
+                    formulaString = legacyEffect.formula || '';
                     effectType = 'formula';
                     target = effect.target || '';
                 }
@@ -82,7 +94,7 @@ export const migrationTool = {
                             formula: formulaString,
                             type: 'modifier',
                             target: target,
-                            effectType: effectType as any,
+                            effectType: effectType as LibraryFormulaEntry['effectType'],
                             description: `Migré depuis le trait: ${trait.name}`,
                             isActive: true,
                             isGlobal: true,
@@ -125,7 +137,7 @@ export const migrationTool = {
     /**
      * Migrates trait legacy properties (auto_counter, xp_upgradeable) to direct fields.
      */
-    migrateTraitProperties: (rules: RulesData): { updatedRules: RulesData, stats: any } => {
+    migrateTraitProperties: (rules: RulesData): { updatedRules: RulesData, stats: unknown } => {
         if (!rules.libraries?.traits) return { updatedRules: rules, stats: { traitsMigrated: 0, details: [] } };
 
         const result = migrateTraitLibrary(rules.libraries.traits as LibraryEntry[]);

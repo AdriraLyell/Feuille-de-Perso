@@ -7,7 +7,6 @@ import { useRules } from '../../context/RulesContext';
 import { applyRulesToState } from '../../utils/rulesAdapter';
 import { reconcileRulesWithState } from '../../utils/rulesReconciler';
 import { ErrorService } from '../../services/ErrorService';
-import { APP_VERSION } from '../../constants/app';
 import { logger } from '../../utils/logger';
 
 import { SheetLayout } from '../../hooks/useSheetLayout';
