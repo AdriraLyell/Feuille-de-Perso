@@ -1,5 +1,5 @@
 import { CharacterSheetData, TraitEntry } from '../../types';
-import { RulesData } from '../../types/rules';
+import { RulesData, BONUS_MJ_TRAIT_ID } from '../../types/rules';
 import { normalizeString } from '../stringUtils';
 
 /**
@@ -34,6 +34,46 @@ export const reconcileTraits = (newState: CharacterSheetData, currentState: Char
     if (newState.page2) {
         newState.page2.avantages = processTraitList(currentState.page2.avantages || [], 'avantage');
         newState.page2.desavantages = processTraitList(currentState.page2.desavantages || [], 'desavantage');
+
+        // --- Bonus MJ Auto-Injection ---
+        const bonusValue = rules.configurations.creation.bonusMJ ?? 0;
+        const desavantages = [...(newState.page2.desavantages || [])];
+        const existingIdx = desavantages.findIndex(t => t.definitionId === BONUS_MJ_TRAIT_ID);
+
+        if (bonusValue > 0) {
+            const libTrait = rules.libraries?.traits?.find(t => t.id === BONUS_MJ_TRAIT_ID);
+            if (libTrait) {
+                const traitData: TraitEntry = {
+                    definitionId: BONUS_MJ_TRAIT_ID,
+                    name: libTrait.name,
+                    value: String(bonusValue),
+                    creationValue: String(bonusValue),
+                    type: 'desavantage'
+                };
+
+                if (existingIdx === -1) {
+                    // Find first empty slot
+                    const emptyIdx = desavantages.findIndex(t => !t.name.trim());
+                    if (emptyIdx !== -1) {
+                        desavantages[emptyIdx] = traitData;
+                    } else {
+                        desavantages.push(traitData);
+                    }
+                } else {
+                    // Synchronize value
+                    desavantages[existingIdx] = {
+                        ...desavantages[existingIdx],
+                        name: libTrait.name,
+                        value: String(bonusValue),
+                        creationValue: String(bonusValue)
+                    };
+                }
+            }
+        } else if (existingIdx !== -1) {
+            // Remove if budget is 0
+            desavantages.splice(existingIdx, 1);
+        }
+        newState.page2.desavantages = desavantages;
     }
 }
 
@@ -51,7 +91,7 @@ export const reconcileCleanup = (newState: CharacterSheetData, currentState: Cha
     newState.backgroundLibrary = [];
     newState.counterLibrary = [];
     newState.mysticAbilities = [];
-    
+
     // Ensure basic structures exist
     if (!newState.skills) newState.skills = {};
     if (!newState.counters) newState.counters = { custom: [] };

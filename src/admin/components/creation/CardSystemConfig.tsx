@@ -20,9 +20,9 @@ const CardSystemConfig: React.FC<CardSystemConfigProps> = ({ config, onUpdateCar
                     </span>
                     <button
                         onClick={() => onUpdateCardConfig('active', !config?.active)}
-                        className={`w-12 h-6 rounded-full p-1 transition-all relative border ${config?.active ? 'bg-amber-600 border-amber-500 shadow-glow-gold' : 'bg-stone-800 border-stone-600'}`}
+                        className={`w-10 h-6 rounded-full px-1 transition-all relative border flex items-center shrink-0 ${config?.active ? 'bg-amber-600 border-amber-500 shadow-glow-gold justify-end' : 'bg-stone-800 border-stone-600 justify-start'}`}
                     >
-                        <div className={`bg-stone-200 w-4 h-4 rounded-full shadow-sm transform transition-transform ${config?.active ? 'translate-x-6' : ''}`} />
+                        <div className="bg-stone-200 w-3.5 h-3.5 rounded-full shadow-sm" />
                     </button>
                 </div>
             </div>

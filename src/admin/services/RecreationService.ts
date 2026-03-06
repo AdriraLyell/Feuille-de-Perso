@@ -114,7 +114,8 @@ export const RecreationService = {
             attributeMax: creationRule.attributeMax,
             backgroundPoints: creationRule.backgroundPoints ?? 0,
             rankSlots: creationRule.rankSlots,
-            backgroundCost: creationRule.backgroundCost ?? 2
+            backgroundCost: creationRule.backgroundCost ?? 2,
+            bonusMJ: creationRule.bonusMJ ?? 5
         };
 
         return resultData;

@@ -160,7 +160,8 @@ export const getInitialCharacterData = (): CharacterSheetData => {
         increment: defaultRules.configurations.cards.increment,
         baseStart: defaultRules.configurations.cards.baseStart
       },
-      extendedSkills: defaultRules.configurations.creation.extendedSkills || false
+      extendedSkills: defaultRules.configurations.creation.extendedSkills || false,
+      bonusMJ: defaultRules.configurations.creation.bonusMJ || 5
     },
     theme: JSON.parse(JSON.stringify(DEFAULT_THEME)),
     header: {

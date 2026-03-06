@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { TraitEntry } from '../../../types';
-import { Edit, Trash2, Wand2, Sparkles, ArrowUp, ArrowDown } from 'lucide-react';
+import { Edit, Trash2, Wand2, Sparkles, ArrowUp, ArrowDown, Shield } from 'lucide-react';
+import { BONUS_MJ_TRAIT_ID } from '../../../types/rules';
 import { PortalTooltip } from '../../ui/PortalTooltip';
 import { useCharacterData } from '../../../context/CharacterContext';
 import { useRules } from '../../../context/RulesContext';
@@ -23,6 +24,7 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
     const isResolved = item.value === '0' && item.creationValue !== undefined && item.creationValue !== '0';
 
     const isPostCreation = item.isPostCreation && !isResolved;
+    const isBonusMJ = item.definitionId === BONUS_MJ_TRAIT_ID;
 
     // Use internal trait type if defined, otherwise fall back to the component prop
     const internalTraitType = item.type;
@@ -60,31 +62,33 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
                 ? 'hover:bg-slate-50 border-b border-dotted border-stone-200'
                 : (isPostCreationAdvantage || isImproved)
                     ? 'bg-emerald-50 hover:bg-emerald-100 border-b border-emerald-200 shadow-sm'
-                    : (isPostCreationDisadvantage)
-                        ? 'bg-red-50 hover:bg-red-100 border-b border-red-200 shadow-sm'
-                        : (isReduced)
-                            ? 'bg-amber-50 hover:bg-amber-100 border-b border-amber-200 shadow-sm'
-                            : 'hover:bg-blue-50 bg-white/50 border-b border-stone-300 shadow-sm'
+                    : isBonusMJ
+                        ? 'bg-indigo-50/80 hover:bg-indigo-100/90 border-b border-indigo-200 shadow-sm'
+                        : (isPostCreationDisadvantage)
+                            ? 'bg-red-50 hover:bg-red-100 border-b border-red-200 shadow-sm'
+                            : (isReduced)
+                                ? 'bg-amber-50 hover:bg-amber-100 border-b border-amber-200 shadow-sm'
+                                : 'hover:bg-blue-50 bg-white/50 border-b border-stone-300 shadow-sm'
                 }`}
             role="listitem"
         >
             <button
                 type="button"
-                onClick={onClick}
-                className="flex-grow flex items-center h-full min-w-0 outline-none focus:ring-1 focus:ring-blue-400 rounded-sm"
+                onClick={isBonusMJ ? undefined : onClick}
+                className={`flex-grow flex items-center h-full min-w-0 outline-none focus:ring-1 focus:ring-blue-400 rounded-sm ${isBonusMJ ? 'cursor-default' : ''}`}
             >
-                <span 
+                <span
                     className={`w-8 shrink-0 text-center font-bold text-xs h-full flex items-center justify-center border-r border-stone-300 ${isEmpty ? 'text-stone-300' : 'text-stone-800 font-handwriting bg-white'
-                    } ${isResolved ? 'line-through opacity-50' : ''}`} 
+                        } ${isResolved ? 'line-through opacity-50' : ''}`}
                     style={{ fontSize: '0.9rem' }}
                     role="presentation"
                 >
                     {item.value || (isEmpty ? '-' : '')}
                 </span>
 
-                <span 
+                <span
                     className={`flex-grow h-full flex items-center px-1 font-handwriting min-w-0 ${isEmpty ? 'text-stone-300 italic text-[10px]' : 'text-ink'
-                    } ${isResolved ? 'line-through opacity-50' : ''}`} 
+                        } ${isResolved ? 'line-through opacity-50' : ''}`}
                     style={{ fontSize: isEmpty ? '0.7rem' : '0.9rem' }}
                     ref={anchorRef}
                     onMouseEnter={() => setShowTooltip(true)}
@@ -97,6 +101,7 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
                             {isPostCreationDisadvantage && <span title="Nouveau Désavantage (Gain XP)"><Sparkles size={13} className="text-red-500 fill-red-500/20" strokeWidth={2.5} /></span>}
                             {isImproved && <span title="Amélioré avec XP"><ArrowUp size={13} className="text-blue-600" strokeWidth={3} /></span>}
                             {isReduced && <span title="Racheté avec XP"><ArrowDown size={13} className="text-orange-600" strokeWidth={3} /></span>}
+                            {isBonusMJ && <span title="Trait Système"><Shield size={12} className="text-indigo-500 fill-indigo-500/10" strokeWidth={2.5} /></span>}
                         </span>
                         {item.name || "Vide"}
                         {item.variant && <span className="font-bold ml-1 text-slate-600">: {item.variant}</span>}
@@ -118,7 +123,7 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
                 </button>
             )}
 
-            {!isEmpty && (
+            {!isEmpty && !isBonusMJ && (
                 <button
                     type="button"
                     onClick={(e) => {
@@ -131,9 +136,11 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
                     <Trash2 size={18} />
                 </button>
             )}
-            <div className="opacity-0 group-hover:opacity-100 text-stone-400 transition-opacity shrink-0 p-0.5 mt-0.5">
-                <Edit size={16} />
-            </div>
+            {!isEmpty && !isBonusMJ && (
+                <div className="opacity-0 group-hover:opacity-100 text-stone-400 transition-opacity shrink-0 p-0.5 mt-0.5">
+                    <Edit size={16} />
+                </div>
+            )}
 
             {!isEmpty && (item.description || mysticCapacity) && (
                 <PortalTooltip

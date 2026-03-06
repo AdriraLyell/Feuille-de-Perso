@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { RulesData } from '../../../types/rules';
+import { RulesData, BONUS_MJ_TRAIT_ID } from '../../../types/rules';
 import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, UploadCloud, CheckCircle2, Circle, Globe, X, Zap, Activity, TrendingUp, ClipboardList } from 'lucide-react';
 import TraitCard from '../../../components/trait-library/TraitCard';
 import TraitForm from '../../../components/trait-library/TraitForm';
@@ -250,23 +250,24 @@ const AdminTraitLibrary: React.FC<AdminTraitLibraryProps> = ({ rules, onUpdate, 
                                     <input
                                         type="checkbox"
                                         checked={entry.isActive !== false}
+                                        disabled={entry.id === BONUS_MJ_TRAIT_ID}
                                         onChange={() => handleToggleActive(entry.id)}
-                                        className="w-4 h-4 text-blue-600 rounded cursor-pointer"
-                                        title={entry.isActive !== false ? "Désactiver (Retirer de la campagne)" : "Activer (Ajouter à la campagne)"}
+                                        className={`w-4 h-4 text-blue-600 rounded ${entry.id === BONUS_MJ_TRAIT_ID ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                        title={entry.id === BONUS_MJ_TRAIT_ID ? "Trait système géré par les paramètres" : (entry.isActive !== false ? "Désactiver (Retirer de la campagne)" : "Activer (Ajouter à la campagne)")}
                                     />
                                 </div>
 
                                 <div className="flex-grow">
                                     <TraitCard
                                         entry={entry}
-                                        isEditable={true}
+                                        isEditable={entry.id !== BONUS_MJ_TRAIT_ID}
                                         isSelected={false}
                                         isActive={entry.isActive !== false}
                                         onEdit={handleOpenEdit}
                                         onDelete={handleDelete}
                                         showMultiSelect={false}
                                         source={entry.isGlobal ? 'official' : 'local'}
-                                        isLocked={!!globalUsage[entry.id]}
+                                        isLocked={!!globalUsage[entry.id] || entry.id === BONUS_MJ_TRAIT_ID}
                                         usageDetails={usageDetailsCache.get(entry.id)}
                                         onLoadUsageDetails={loadDetails}
                                     />

@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { CharacterSheetData, LibraryEntry, TraitEffect, DotEntry } from '../types';
 import { MergedEntry } from '../utils/libraryMerger';
 import { useRules } from '../context/RulesContext';
+import { BONUS_MJ_TRAIT_ID } from '../types/rules';
 
 export const useTraitActions = (
     data: CharacterSheetData,
@@ -38,6 +39,8 @@ export const useTraitActions = (
 
     const handleOpenEdit = useCallback((merged: MergedEntry<LibraryEntry> | LibraryEntry) => {
         const entry = 'entry' in merged ? merged.entry : merged;
+        if (entry.id === BONUS_MJ_TRAIT_ID) return; // Disallow editing system trait
+
         const _source = 'source' in merged ? merged.source : 'local';
 
         setError(null);
@@ -53,6 +56,8 @@ export const useTraitActions = (
     }, []);
 
     const handleDelete = useCallback((id: string, source: string) => {
+        if (id === BONUS_MJ_TRAIT_ID) return; // Disallow deleting system trait
+
         if (source === 'official') {
             // Un trait purement officiel ne peut pas être supprimé du JSON, 
             // mais un trait 'modified' peut être supprimé pour revenir à l'état officiel.

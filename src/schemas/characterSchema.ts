@@ -68,7 +68,8 @@ export const CreationConfigSchema = z.object({
         baseStart: z.number()
     }),
     extendedSkills: z.boolean().optional(),
-    backgroundCost: z.number().optional()
+    backgroundCost: z.number().optional(),
+    bonusMJ: z.number().optional().default(5)
 });
 
 export const ThemeConfigSchema = z.object({

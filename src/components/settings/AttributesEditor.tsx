@@ -75,9 +75,9 @@ const AttributesEditor: React.FC<AttributesEditorProps> = ({ data, onUpdate, onA
                 </div>
                 <button
                     onClick={toggleSecondaryAttributes}
-                    className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${data.secondaryAttributesActive ? 'bg-[#8b2e2e]' : 'bg-stone-300'}`}
+                    className={`w-11 h-6 rounded-full px-1 transition-colors duration-300 flex items-center shrink-0 ${data.secondaryAttributesActive ? 'bg-[#8b2e2e]' : 'bg-stone-300'}`}
                 >
-                    <div className={`bg-white w-4 h-4 rounded-full shadow transform transition-transform duration-300 ${data.secondaryAttributesActive ? 'translate-x-6' : ''}`} />
+                    <div className={`bg-white w-4 h-4 rounded-full shadow transform transition-transform duration-300 ${data.secondaryAttributesActive ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
             </div>
 

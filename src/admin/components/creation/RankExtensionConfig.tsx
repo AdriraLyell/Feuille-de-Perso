@@ -16,9 +16,9 @@ export const RankExtensionConfig: React.FC<RankExtensionConfigProps> = ({ extend
                 </div>
                 <button
                     onClick={() => onUpdate(!extendedSkills)}
-                    className={`w-10 h-5 rounded-full p-0.5 transition-all relative border ${extendedSkills ? 'bg-indigo-600 border-indigo-400 shadow-glow-indigo' : 'bg-stone-800 border-stone-700'}`}
+                    className={`w-9 h-5 rounded-full px-1 transition-all relative border flex items-center shrink-0 ${extendedSkills ? 'bg-indigo-600 border-indigo-400 shadow-glow-indigo justify-end' : 'bg-stone-800 border-stone-700 justify-start'}`}
                 >
-                    <div className={`bg-white w-3.5 h-3.5 rounded-full shadow-md transform transition-transform ${extendedSkills ? 'translate-x-5' : ''}`} />
+                    <div className="bg-white w-2.5 h-2.5 rounded-full shadow-md" />
                 </button>
             </div>
             <div>

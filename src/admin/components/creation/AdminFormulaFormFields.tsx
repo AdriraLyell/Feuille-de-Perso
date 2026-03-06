@@ -26,7 +26,7 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
         <div className="flex flex-col gap-4">
             <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-12 lg:col-span-6">
-                    <label 
+                    <label
                         htmlFor="formula-name"
                         className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1"
                     >
@@ -41,7 +41,7 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                     />
                 </div>
                 <div className="col-span-12 lg:col-span-6">
-                    <label 
+                    <label
                         htmlFor="formula-code"
                         className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1 flex items-center gap-1"
                     >
@@ -56,7 +56,7 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                     />
                 </div>
                 <div className="col-span-12">
-                    <label 
+                    <label
                         htmlFor="formula-description"
                         className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1"
                     >
@@ -124,7 +124,7 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                         </div>
                         <div className="flex flex-col gap-3">
                             <div>
-                                <label 
+                                <label
                                     htmlFor="formula-effect-type"
                                     className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1"
                                 >
@@ -145,7 +145,7 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                             <div className="flex gap-4 items-end">
                                 {!['block_skill_increase', 'master_skill'].includes(formula.effectType || '') && (
                                     <div className="flex-grow">
-                                        <label 
+                                        <label
                                             htmlFor="formula-operator"
                                             className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1"
                                         >
@@ -168,9 +168,9 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
                                     <span className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2 whitespace-nowrap text-center">Forcer Variante</span>
                                     <button
                                         onClick={() => onUpdate('forceVariant', !formula.forceVariant)}
-                                        className={`relative w-12 h-6 rounded-full transition-all duration-300 focus:outline-none ${formula.forceVariant ? 'bg-indigo-600 shadow-glow-indigo' : 'bg-stone-800 border border-stone-700'}`}
+                                        className={`relative w-11 h-6 rounded-full transition-all duration-300 focus:outline-none flex items-center px-1 shrink-0 ${formula.forceVariant ? 'bg-indigo-600 shadow-glow-indigo justify-end' : 'bg-stone-800 border border-stone-700 justify-start'}`}
                                     >
-                                        <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 flex items-center justify-center ${formula.forceVariant ? 'translate-x-6' : 'translate-x-0'}`}>
+                                        <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center transition-all">
                                             {formula.forceVariant && <Sparkles size={10} className="text-indigo-600" />}
                                         </div>
                                     </button>
@@ -191,7 +191,7 @@ export const AdminFormulaFormFields: React.FC<AdminFormulaFormFieldsProps> = ({
 
             {!formula.aggregateConfig && !['block_skill_increase', 'master_skill'].includes(formula.effectType || '') && (
                 <div>
-                    <label 
+                    <label
                         htmlFor="formula-math-equation"
                         className="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-1"
                     >

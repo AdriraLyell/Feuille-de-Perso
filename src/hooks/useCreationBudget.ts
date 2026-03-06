@@ -144,8 +144,32 @@ export function useCreationBudget(): CreationBudgetResult {
         });
 
         // Traits (Avantages & Désavantages)
-        // Les traits ne coûtent plus d'XP à la création (Mode Rangs ou Points)
-        // xpEquivalence reste inchangé ici concernant les traits
+        // Les traits coûtent (Avantages) ou rapportent (Désavantages) de l'XP à la création
+        const traitCostFactor = rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
+
+        data.page2.avantages?.forEach(trait => {
+            const val = parseInt(trait.value) || 0;
+            if (val > 0) {
+                const cost = val * traitCostFactor;
+                xpEquivalence += cost;
+                if (mode === 'points') {
+                    xpSpentTotal += cost;
+                    xpSpentSkills += cost; // Or a separate category? Keeping it in skills for simplicity of the bar
+                }
+            }
+        });
+
+        data.page2.desavantages?.forEach(trait => {
+            const val = parseInt(trait.value) || 0;
+            if (val > 0) {
+                const benefit = val * traitCostFactor;
+                xpEquivalence -= benefit;
+                if (mode === 'points') {
+                    xpSpentTotal -= benefit;
+                    xpSpentSkills -= benefit;
+                }
+            }
+        });
 
         return {
             xpSpentTotal,

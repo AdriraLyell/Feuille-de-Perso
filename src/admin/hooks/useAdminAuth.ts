@@ -31,7 +31,10 @@ export const useAdminAuth = () => {
     // Check both metadata locations for the 'admin' role
     const isAdmin = userMetadata?.role === 'admin' || appMetadata?.role === 'admin';
 
-    const logout = () => supabase.auth.signOut();
+    const logout = async () => {
+        await supabase.auth.signOut();
+        setSession(null);
+    };
 
     return {
         session,

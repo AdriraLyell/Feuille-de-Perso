@@ -269,6 +269,9 @@ export const useAdminTraitLibrary = ({ rules, onUpdate, globalUsage = {} }: UseA
                 matchesAudit = duplicateIds.has(entry.id);
             }
 
+            // Hide inactive traits by default unless filtering for them
+            if (activeFilter === null && entry.isActive === false) return false;
+
             return matchesSearch && matchesType && matchesActive && matchesSource && matchesTags
                 && matchesEffects && matchesCounter && matchesXP && matchesVariants && matchesAudit;
         });

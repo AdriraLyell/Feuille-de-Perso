@@ -1,18 +1,48 @@
-import { RulesData, RulesCreationConfig, RulesCardConfig, RulesXPCosts } from '../../types/rules';
+import { RulesData, RulesCreationConfig, RulesCardConfig, RulesXPCosts, BONUS_MJ_TRAIT_ID } from '../../types/rules';
 
 export function useCreationEditorActions(rules: RulesData, onUpdate: (newRules: RulesData) => void) {
     const updateCreationConfig = <K extends keyof RulesCreationConfig>(
         field: K,
         value: RulesCreationConfig[K]
     ) => {
+        const updatedConfig = {
+            ...rules.configurations.creation,
+            [field]: value
+        };
+
+        let updatedTraits = [...(rules.libraries.traits || [])];
+        // Sync Bonus MJ trait regardless of what was updated, using 5 as a default
+        const bonusValue = updatedConfig.bonusMJ ?? 5;
+        const existingIndex = updatedTraits.findIndex(t => t.id === BONUS_MJ_TRAIT_ID || t.id === 'trait-bonus-mj');
+
+        const bonusTrait = {
+            id: BONUS_MJ_TRAIT_ID,
+            name: "Bonus MJ",
+            type: 'desavantage' as const,
+            cost: bonusValue.toString(),
+            pointsLabel: bonusValue.toString(),
+            description: "Ce désavantage est offert par le MJ pour permet d'acheter un ou plusieurs avantages",
+            isLocked: true,
+            isActive: bonusValue > 0,
+            isGlobal: false,
+            tags: ["Système"]
+        };
+
+        if (existingIndex >= 0) {
+            updatedTraits[existingIndex] = bonusTrait;
+        } else {
+            updatedTraits.push(bonusTrait);
+        }
+
         onUpdate({
             ...rules,
             configurations: {
                 ...rules.configurations,
-                creation: {
-                    ...rules.configurations.creation,
-                    [field]: value
-                }
+                creation: updatedConfig
+            },
+            libraries: {
+                ...rules.libraries,
+                traits: updatedTraits
             }
         });
     };

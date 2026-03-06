@@ -1,5 +1,5 @@
 import { DatabaseService } from './DatabaseService';
-import { GameSetting, RulesData, GameSettingSummary } from '../types/rules';
+import { GameSetting, RulesData, GameSettingSummary, processRulesDataForBonusMJ } from '../types/rules';
 export type { GameSetting, RulesData, GameSettingSummary };
 import { LibraryService } from './LibraryService';
 import { logger } from '../utils/logger';
@@ -157,7 +157,7 @@ export const CampaignService = {
                 return null; // Don't proceed with invalid data
             }
 
-            const rules = validationResult.data as RulesData;
+            const rules = processRulesDataForBonusMJ(validationResult.data as RulesData);
 
             // Inject setting metadata
             rules.settingId = id;

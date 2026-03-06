@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { CharacterSheetData } from '../types';
 import { useRules } from '../context/RulesContext';
+import { BONUS_MJ_TRAIT_ID } from '../types/rules';
 import { mergeLibraries } from '../utils/libraryMerger';
 import { smartIncludes } from '../utils/stringUtils';
 
@@ -59,6 +60,13 @@ export const useTraitLibrary = (
             const matchesTags = selectedTags.length === 0 || selectedTags.every((sel: string) =>
                 entryTags.some((t: string) => t.toLowerCase() === sel.toLowerCase())
             );
+
+            // Never show traits that are explicitly deactivated (e.g. Bonus MJ at 0 cost)
+            if (entry.isActive === false) return false;
+
+            // Never show the Bonus MJ trait in the selection library (it's auto-injected)
+            if (entry.id === BONUS_MJ_TRAIT_ID) return false;
+
             return matchesSearch && matchesType && matchesTags;
         });
 

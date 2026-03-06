@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BONUS_MJ_TRAIT_ID } from '../types/rules';
 import { CharacterSheetData, LibraryEntry } from '../types';
 import { Search, Plus, BookOpen, Filter, Coins, Layers, ArrowDownAZ, ArrowUpAZ, Download, RefreshCw, X, Globe, Zap, Sparkles } from 'lucide-react';
 import TraitCard from './trait-library/TraitCard';
@@ -220,7 +221,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                         <TraitCard
                             key={merged.entry.id}
                             entry={merged.entry}
-                            isEditable={isEditable}
+                            isEditable={isEditable && merged.entry.id !== BONUS_MJ_TRAIT_ID && merged.entry.id !== 'trait-bonus-mj'}
                             isSelected={selection.some(s => s.entry.id === merged.entry.id)}
                             onSelect={onSelect ? (entry) => onSelect(entry) : undefined}
                             onMultiSelect={(id) => toggleSelection(id, hybridList)}
@@ -228,6 +229,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                             onDelete={(id) => handleDelete(id, merged.source)}
                             showMultiSelect={!!onMultiSelect}
                             source={merged.source}
+                            isLocked={merged.entry.isLocked}
                         />
                     ))}
                 </div>

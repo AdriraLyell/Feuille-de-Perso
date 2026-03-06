@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CharacterSheetData } from '../../types';
+import { CharacterSheetData, LibraryEntry } from '../../types';
 import { Sliders, List, PieChart, CreditCard, Info } from 'lucide-react';
 
 interface CreationConfigEditorProps {
@@ -14,12 +14,37 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
     if (!config) return null;
 
     const updateCreationConfig = (field: string, value: string | number | boolean) => {
+        const newConfig = {
+            ...data.creationConfig,
+            [field]: value
+        };
+
+        let newLibrary = data.library || [];
+        if (field === 'bonusMJ') {
+            const bonusValue = parseInt(value as string) || 0;
+            const existingIdx = newLibrary.findIndex(l => l.id === 'trait-bonus-mj');
+            const bonusTrait: LibraryEntry = {
+                id: 'trait-bonus-mj',
+                name: 'Bonus MJ',
+                type: 'desavantage',
+                cost: bonusValue.toString(),
+                description: 'Ce désavantage est offert par le MJ pour permet d\'acheter un ou plusieurs avantages',
+                isLocked: true,
+                isActive: true
+            };
+
+            if (existingIdx !== -1) {
+                newLibrary = [...newLibrary];
+                newLibrary[existingIdx] = bonusTrait;
+            } else {
+                newLibrary = [...newLibrary, bonusTrait];
+            }
+        }
+
         onUpdate({
             ...data,
-            creationConfig: {
-                ...data.creationConfig,
-                [field]: value
-            }
+            creationConfig: newConfig,
+            library: newLibrary
         });
         onAddLog(`Config Création modifiée : ${field}`, 'info', 'settings');
     };
@@ -89,6 +114,23 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                                 >
                                     <div className={`bg-white w-3 h-3 rounded-full shadow-sm transform transition-transform ${config.extendedSkills ? 'translate-x-4' : ''}`} />
                                 </button>
+                            </div>
+                        </div>
+
+                        {/* Bonus MJ Field */}
+                        <div className="bg-[#8b2e2e]/5 p-3 rounded-sm border border-[#8b2e2e]/20 mb-4">
+                            <label htmlFor="bonus-mj-value" className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest mb-1.5">Bonus MJ (Points offerts)</label>
+                            <div className="flex items-center gap-3">
+                                <input
+                                    id="bonus-mj-value"
+                                    type="number"
+                                    value={config.bonusMJ ?? 5}
+                                    onChange={(e) => updateCreationConfig('bonusMJ', parseInt(e.target.value) || 0)}
+                                    className="w-24 border border-[#bfae85]/40 rounded-sm px-3 py-1.5 focus:border-[#8b2e2e] outline-none bg-white font-bold text-lg text-[#8b2e2e]"
+                                />
+                                <p className="text-[10px] text-[#5c4d41]/60 leading-tight">
+                                    Crée automatiquement un désavantage "Bonus MJ" du même coût dans la bibliothèque du setting.
+                                </p>
                             </div>
                         </div>
 
@@ -312,7 +354,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
 
                 <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 transition-opacity ${config.cardConfig?.active ? 'opacity-100' : 'opacity-40 pointer-events-none grayscale'}`}>
                     <div>
-                        <label 
+                        <label
                             htmlFor="card-skills-count"
                             className="block text-[10px] font-bold text-[#bfae85] mb-1 uppercase tracking-tighter"
                         >
@@ -332,7 +374,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                         </div>
                     </div>
                     <div>
-                        <label 
+                        <label
                             htmlFor="card-increment"
                             className="block text-xs font-bold text-gray-500 mb-1 uppercase"
                         >
@@ -348,7 +390,7 @@ const CreationConfigEditor: React.FC<CreationConfigEditorProps> = ({ data, onUpd
                         />
                     </div>
                     <div>
-                        <label 
+                        <label
                             htmlFor="card-base-start"
                             className="block text-xs font-bold text-gray-500 mb-1 uppercase"
                         >

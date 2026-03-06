@@ -1,5 +1,7 @@
 import { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry, LibraryFormulaEntry } from './system';
 
+export const BONUS_MJ_TRAIT_ID = '00000000-0000-0000-0000-00000000000a';
+
 export type { LibraryEntry, LibrarySkillEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry, LibraryFormulaEntry };
 
 export interface RulesCreationConfig {
@@ -26,6 +28,7 @@ export interface RulesCreationConfig {
         [key: number]: number; // Allow for extended ranks if needed
     };
     extendedSkills?: boolean;
+    bonusMJ?: number;
 
     // Nouvelle Configuration Habilités Mystiques
     mysticAbilities?: {
@@ -182,3 +185,26 @@ export interface GameSetting {
     isPublic: boolean;
     rules: RulesData;
 }
+
+/**
+ * Ensures the 'Bonus MJ' trait uses the correct technical UUID.
+ * This is used during rules loading/reconciliation to support database constraints.
+ */
+export const processRulesDataForBonusMJ = (rules: RulesData): RulesData => {
+    if (!rules.libraries?.traits) return rules;
+
+    const updatedTraits = rules.libraries.traits.map(t => {
+        if (t.id === 'trait-bonus-mj') {
+            return { ...t, id: BONUS_MJ_TRAIT_ID };
+        }
+        return t;
+    });
+
+    return {
+        ...rules,
+        libraries: {
+            ...rules.libraries,
+            traits: updatedTraits
+        }
+    };
+};

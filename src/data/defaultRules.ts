@@ -24,7 +24,8 @@ export const defaultRules: RulesData = {
                 attributes: 120,
                 skills: 240,
                 backgrounds: 20
-            }
+            },
+            bonusMJ: 5
         },
         xpCosts: {
             attributeFactor: 6,

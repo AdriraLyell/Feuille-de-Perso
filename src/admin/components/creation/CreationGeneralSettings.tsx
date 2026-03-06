@@ -163,6 +163,38 @@ const CreationGeneralSettings: React.FC<CreationGeneralSettingsProps> = ({
                         </div>
                     </MotionFade>
                 )}
+
+                {/* Bonus MJ Section - Row layout */}
+                <div className="pt-8 border-t border-stone-800/50">
+                    <div className="bg-amber-950/10 border border-amber-900/30 p-6 rounded-sm group hover:bg-amber-950/20 transition-all">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div className="flex items-start gap-4 flex-grow">
+                                <div className="p-3 bg-amber-600/10 text-amber-500 rounded-sm shrink-0">
+                                    <CircleDot size={20} className="animate-pulse" />
+                                </div>
+                                <div>
+                                    <label htmlFor="bonus-mj" className="block text-xs font-black text-amber-500/80 mb-1 uppercase tracking-widest group-hover:text-amber-500 transition-colors">Bonus MJ (Points Offerts)</label>
+                                    <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest leading-relaxed">
+                                        Crée automatiquement un désavantage "Bonus MJ" dans la bibliothèque ayant ce coût (points positifs).
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4 shrink-0 px-4 md:border-l border-stone-800">
+                                <input
+                                    id="bonus-mj"
+                                    type="number"
+                                    value={config.bonusMJ ?? 5}
+                                    onChange={(e) => {
+                                        const val = parseInt(e.target.value);
+                                        onUpdateConfig('bonusMJ', isNaN(val) ? 0 : val);
+                                    }}
+                                    className="w-24 bg-stone-900 border border-stone-700 rounded-sm px-4 py-2 text-center font-mono focus:border-amber-500 focus:ring-1 focus:ring-amber-500/30 outline-none text-amber-500 font-black text-xl tabular-nums shadow-inner"
+                                />
+                                <span className="text-[8px] font-black text-stone-700 uppercase tracking-tighter">Points</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </MotionCard>
     );

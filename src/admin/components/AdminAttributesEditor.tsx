@@ -70,9 +70,9 @@ const AdminAttributesEditor: React.FC<AdminAttributesEditorProps> = ({ rules, on
                                 <span className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Secondaires</span>
                                 <button
                                     onClick={actions.toggleSecondaryGlobal}
-                                    className={`w-8 h-4 rounded-full p-0.5 transition-colors duration-200 border ${rules.configurations.global.secondaryAttributes ? 'bg-amber-600 border-amber-500' : 'bg-stone-800 border-stone-600'}`}
+                                    className={`w-8 h-4 rounded-full px-0.5 transition-colors duration-200 border flex items-center shrink-0 ${rules.configurations.global.secondaryAttributes ? 'bg-amber-600 border-amber-500 justify-end' : 'bg-stone-800 border-stone-600 justify-start'}`}
                                 >
-                                    <div className={`bg-stone-200 w-2.5 h-2.5 rounded-full shadow transform transition-transform duration-200 ${rules.configurations.global.secondaryAttributes ? 'translate-x-4 bg-stone-900' : ''}`} />
+                                    <div className={`bg-stone-200 w-2.5 h-2.5 rounded-full shadow transition-all ${rules.configurations.global.secondaryAttributes ? 'bg-stone-900' : ''}`} />
                                 </button>
                             </div>
 
