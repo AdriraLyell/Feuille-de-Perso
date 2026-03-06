@@ -226,7 +226,7 @@
 ### ✅ Issue 4.3 — Fichiers volumineux (CORRIGÉE/STABILISÉE)
 - **Récemment optimisés (v2.56.35)** : `AdminSkillLibrary` (508→370L), `AdminBackgroundLibrary` (450→318L), `AdminMysticLibrary` (404→300L), `AdminCounterLibrary` (359→280L).
 - **Précédemment** : `SkillsEditor` (479→156L), `ImportPanel` (440→150L).
-- Aucun fichier critique de logique pure > 400 lignes.
+- Plusieurs fichiers d'interface (Layouts, Biblioth�ques) d�passent � nouveau les 400 lignes suite aux ajouts r�cents. Un nouveau d�coupage (Issue 4.3) sera n�cessaire prochainement (voir fichiers : MainLayout, AdminSpecializationLibrary, etc.).
 
 ### ✅ Issue 5.1 — Variables CSS (CORRIGÉE)
 - Bloc `:root` consolidé dans `src/index.css` avec 14 variables de couleur et 6 de dimension.

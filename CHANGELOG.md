@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.69.3] - 2026-02-22 [FIX]
+
+
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.69.2] - 2026-02-22 [FIX]
 
 

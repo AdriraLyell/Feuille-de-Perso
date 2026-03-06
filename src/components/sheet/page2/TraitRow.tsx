@@ -78,9 +78,9 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
                 className={`flex-grow flex items-center h-full min-w-0 outline-none focus:ring-1 focus:ring-blue-400 rounded-sm ${isBonusMJ ? 'cursor-default' : ''}`}
             >
                 <span
-                    className={`w-8 shrink-0 text-center font-bold text-xs h-full flex items-center justify-center border-r border-stone-300 ${isEmpty ? 'text-stone-300' : 'text-stone-800 font-handwriting bg-white'
+                    className={`shrink-0 text-center font-bold text-xs h-full flex items-center justify-center border-r border-stone-300 ${isEmpty ? 'text-stone-300' : 'text-stone-800 font-handwriting bg-white'
                         } ${isResolved ? 'line-through opacity-50' : ''}`}
-                    style={{ fontSize: '0.9rem' }}
+                    style={{ fontSize: '0.9rem', width: '32px' }}
                     role="presentation"
                 >
                     {item.value || (isEmpty ? '-' : '')}
@@ -95,16 +95,18 @@ const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onMa
                     onMouseLeave={() => setShowTooltip(false)}
                     role="presentation"
                 >
-                    <span className="truncate w-full block">
-                        <span className="inline-flex items-center gap-1 mr-1.5 leading-none">
+                    <span className="w-full text-left truncate flex items-center">
+                        <span className="inline-flex items-center gap-1 leading-none shrink-0 w-5 justify-center mr-1">
                             {isPostCreationAdvantage && <span title="Acquis avec XP"><Sparkles size={13} className="text-emerald-600 fill-emerald-600/20" strokeWidth={2.5} /></span>}
                             {isPostCreationDisadvantage && <span title="Nouveau Désavantage (Gain XP)"><Sparkles size={13} className="text-red-500 fill-red-500/20" strokeWidth={2.5} /></span>}
                             {isImproved && <span title="Amélioré avec XP"><ArrowUp size={13} className="text-blue-600" strokeWidth={3} /></span>}
                             {isReduced && <span title="Racheté avec XP"><ArrowDown size={13} className="text-orange-600" strokeWidth={3} /></span>}
-                            {isBonusMJ && <span title="Trait Système"><Shield size={12} className="text-indigo-500 fill-indigo-500/10" strokeWidth={2.5} /></span>}
+                            {isBonusMJ && <span title="Trait SYSTEME"><Shield size={12} className="text-indigo-500 fill-indigo-500/10" strokeWidth={2.5} /></span>}
                         </span>
-                        {item.name || "Vide"}
-                        {item.variant && <span className="font-bold ml-1 text-slate-600">: {item.variant}</span>}
+                        <span className="truncate">
+                            {item.name || "Vide"}
+                            {item.variant && <span className="font-bold ml-1 text-slate-600">: {item.variant}</span>}
+                        </span>
                     </span>
                 </span>
             </button>

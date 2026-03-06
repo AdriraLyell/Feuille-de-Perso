@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.99.1",
+        "date": "2026-03-06",
+        "type": "feat",
+        "changes": [
+            "UI : Alignement à gauche des noms d'avantages et désavantages pour une meilleure lisibilité.",
+            "UI : Alignement vertical parfait des noms de traits via la réservation d'un espace fixe pour les icônes (XP, Bonus MJ, etc.)."
+        ]
+    },
+    {
         "version": "2.98.1",
         "date": "2026-03-05",
         "type": "fix",
@@ -185,16 +194,6 @@
         "type": "fix",
         "changes": [
             "Tooltip : Élargissement de la largeur maximale autorisée du portail d'infobulle pour éviter que la 2ème colonne ne soit masquée par débordement."
-        ]
-    },
-    {
-        "version": "2.97.22",
-        "date": "2026-02-28",
-        "type": "feat",
-        "changes": [
-            "Tooltip : suppression de l'affichage de l'expression brute pour épurer le visuel.",
-            "Tooltip : refonte du container en 2 colonnes pour une meilleure lisibilité quand il y a beaucoup d'éléments.",
-            "Tooltip : agrandissement général de la police des infobulles."
         ]
     }
 ]

@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.97.22",
+        "date": "2026-02-28",
+        "type": "feat",
+        "changes": [
+            "Tooltip : suppression de l'affichage de l'expression brute pour épurer le visuel.",
+            "Tooltip : refonte du container en 2 colonnes pour une meilleure lisibilité quand il y a beaucoup d'éléments.",
+            "Tooltip : agrandissement général de la police des infobulles."
+        ]
+    },
+    {
         "version": "2.97.21",
         "date": "2026-02-28",
         "type": "fix",
@@ -676,11 +686,5 @@
         "date": "2026-02-22",
         "type": "fix",
         "description": "Ergonomie : Persistance de l'état ouvert/fermé du Chroniqueur (calendrier) dans les notes de campagne. Le calendrier conserve désormais son état même après avoir changé d'onglet ou rechargé la page."
-    },
-    {
-        "version": "2.69.3",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Ergonomie : Ajout d'un curseur 'pointer' (main) sur les cartes de sélection des sources (Chroniques, Hors Ligne, Reprendre) pour indiquer clairement qu'elles sont interactives."
     }
 ]
