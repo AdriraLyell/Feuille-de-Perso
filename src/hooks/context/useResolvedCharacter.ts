@@ -81,20 +81,42 @@ export const useResolvedCharacter = (data: CharacterSheetData, rules: RulesData 
       const counter = resolved.counters[key];
       if (Array.isArray(counter)) {
         (resolved.counters as Record<string, unknown>)[key] = counter.map(c => {
-           const ruleDef = rules.libraries.counters?.find(rc => rc.id === c.id || rc.name.toLowerCase() === c.name.toLowerCase());
+           // Priority 1: ID match, Priority 2: Name match
+           const ruleDef = rules.libraries.counters?.find(rc => rc.id === c.id) || 
+                          rules.libraries.counters?.find(rc => rc.name.toLowerCase() === c.name.toLowerCase());
            if (ruleDef) return { ...c, name: ruleDef.name, description: ruleDef.description ?? undefined, max: ruleDef.maxValue || c.max };
            return c;
         });
       } else if (typeof counter === 'object' && counter !== null) {
          // System counters (volonte, confiance)
          const counterObj = counter as unknown as Record<string, unknown>;
-         const sysDef = Object.values(rules.definitions.counters).find(rc => rc.id === counterObj.id || rc.name.toLowerCase() === String(counterObj.name).toLowerCase());
-         if (sysDef) {
+         const normalizedName = String(counterObj.name).toLowerCase();
+         const VOLONTE_UUID = 'c0000000-0000-0000-0000-000000000001';
+         const CONFIANCE_UUID = 'c0000000-0000-0000-0000-000000000002';
+
+         // Check definitions first (standard rules)
+         const sysDef = Object.values(rules.definitions.counters).find(rc => 
+            rc.id === counterObj.id || 
+            rc.name.toLowerCase() === normalizedName ||
+            (normalizedName === 'volonte' && rc.id === VOLONTE_UUID) ||
+            (normalizedName === 'confiance' && rc.id === CONFIANCE_UUID)
+         );
+         
+         // Check library for overrides (user rules)
+         const libDef = rules.libraries.counters?.find(rc => 
+            rc.id === counterObj.id || 
+            rc.name.toLowerCase() === normalizedName ||
+            (normalizedName === 'volonte' && rc.id === VOLONTE_UUID) ||
+            (normalizedName === 'confiance' && rc.id === CONFIANCE_UUID)
+         );
+
+         if (libDef || sysDef) {
+           const finalDef = libDef || sysDef;
            (resolved.counters as Record<string, unknown>)[key] = {
              ...counterObj,
-             name: sysDef.name,
-             description: sysDef.description ?? undefined,
-             max: sysDef.max || (counterObj.max as number)
+             name: finalDef.name,
+             description: finalDef.description ?? undefined,
+             max: (finalDef as any).maxValue || (finalDef as any).max || (counterObj.max as number)
            };
          }
       }

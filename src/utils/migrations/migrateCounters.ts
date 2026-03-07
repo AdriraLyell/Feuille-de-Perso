@@ -33,14 +33,25 @@ export const migrateCounters = (parsed: MigratableData): void => {
         }
     }
 
-    // Ensure counters have 'current' property
-    const finalVolonte = counters.volonte as { current?: number };
-    if (finalVolonte && typeof finalVolonte.current === 'undefined') {
-        finalVolonte.current = 0;
+    // Ensure counters have 'current' property and correct IDs for system counters
+    const VOLONTE_UUID = 'c0000000-0000-0000-0000-000000000001';
+    const CONFIANCE_UUID = 'c0000000-0000-0000-0000-000000000002';
+
+    const finalVolonte = counters.volonte as { id?: string; name?: string; current?: number };
+    if (finalVolonte) {
+        if (typeof finalVolonte.current === 'undefined') finalVolonte.current = 0;
+        // Map both legacy 'volonte' string and new UUID to the character's internal ID
+        if (finalVolonte.name === 'Volonté' && finalVolonte.id !== 'volonte' && finalVolonte.id !== VOLONTE_UUID) {
+            finalVolonte.id = 'volonte';
+        }
     }
-    const finalConfiance = counters.confiance as { current?: number };
-    if (finalConfiance && typeof finalConfiance.current === 'undefined') {
-        finalConfiance.current = 0;
+
+    const finalConfiance = counters.confiance as { id?: string; name?: string; current?: number };
+    if (finalConfiance) {
+        if (typeof finalConfiance.current === 'undefined') finalConfiance.current = 0;
+        if (finalConfiance.name === 'Confiance' && finalConfiance.id !== 'confiance' && finalConfiance.id !== CONFIANCE_UUID) {
+            finalConfiance.id = 'confiance';
+        }
     }
 
     if (Array.isArray(counters.custom)) {
