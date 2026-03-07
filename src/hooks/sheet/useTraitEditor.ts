@@ -8,7 +8,7 @@ export const useTraitEditor = (
     onChange: (newData: CharacterSheetData) => void,
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', detail?: string) => void,
     recordXPTransaction?: (transaction: Omit<XPTransaction, 'id' | 'timestamp'>) => void,
-    onMasterSkillNeeded?: (traitName: string, pendingAdd: () => void) => void
+    onMasterSkillsNeeded?: (items: { traitName: string, traitType: 'avantages' | 'desavantages' }[]) => void
 ) => {
     const [multiSelectTarget, setMultiSelectTarget] = useState<'avantages' | 'desavantages' | null>(null);
 
@@ -107,9 +107,8 @@ export const useTraitEditor = (
         const newCustomCounters = [...data.counters.custom];
         let hasCounterChanges = false;
 
-        // Index of trait entries that need master_skill wizard
-        let masterSkillTraitIndex: number | null = null;
-        let masterSkillTraitName: string | null = null;
+        // Collect all traits that need a master_skill wizard
+        const pendingMasterWizards: { traitName: string, traitType: 'avantages' | 'desavantages' }[] = [];
 
         instances.forEach(instance => {
             const entry = instance.entry;
@@ -173,15 +172,16 @@ export const useTraitEditor = (
                     onAddLog(`Compteur ajouté : ${finalCounterName}`, 'info', 'sheet');
                 }
 
-                // Detect master_skill effect — wizard will fill in masterSkillTarget later
-                // Detect master_skill effect — wizard will fill in masterSkillTarget later
+                // Detect master_skill effect
                 const hasMasterSkill = entry.effects?.some(e => {
                     const resolved = resolveEffect(e);
                     return resolved.effectType === 'master_skill';
                 });
-                if (hasMasterSkill && masterSkillTraitIndex === null) {
-                    masterSkillTraitIndex = listIndex;
-                    masterSkillTraitName = entry.name;
+                if (hasMasterSkill) {
+                    pendingMasterWizards.push({ 
+                        traitName: entry.name, 
+                        traitType: multiSelectTarget as 'avantages' | 'desavantage'
+                    });
                 }
 
                 currentList[listIndex] = {
@@ -234,15 +234,9 @@ export const useTraitEditor = (
 
             onChange(newData);
 
-            // Trigger master_skill wizard after state is committed
-            if (masterSkillTraitIndex !== null && masterSkillTraitName && onMasterSkillNeeded) {
-                const traitIdx = masterSkillTraitIndex;
-                const traitType = multiSelectTarget;
-                onMasterSkillNeeded(masterSkillTraitName, () => {
-                    // This callback is called with the chosen skill from the wizard
-                    // It will be replaced by applyMasterSkill in CharacterSheetPage2
-                    void traitIdx; void traitType;
-                });
+            // Trigger master_skill wizards
+            if (pendingMasterWizards.length > 0 && onMasterSkillsNeeded) {
+                onMasterSkillsNeeded(pendingMasterWizards);
             }
         }
         setMultiSelectTarget(null);

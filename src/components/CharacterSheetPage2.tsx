@@ -25,19 +25,17 @@ interface Props {
     isLandscape?: boolean;
 }
 
+type WizardQueueItem = 
+  | { type: 'mystic', payload: { mysticAbilityId: string, mysticAbilityName: string } }
+  | { type: 'master', payload: { traitName: string, traitType: 'avantages' | 'desavantages' } };
+
 const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
     const { data, resolvedData, updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacter();
     const { rules } = useRules();
 
-    // Wizards States
-    const [masterSkillWizard, setMasterSkillWizard] = useState<{ isOpen: boolean, traitName: string, traitType: 'avantages' | 'desavantages' } | null>(null);
+    // Wizards Queue State
+    const [wizardQueue, setWizardQueue] = useState<WizardQueueItem[]>([]);
     const multiSelectTargetRef = useRef<'avantages' | 'desavantages' | null>(null);
-
-    const [wizardState, setWizardState] = useState<{ isOpen: boolean, mysticAbilityId: string | null, mysticAbilityName: string }>({
-        isOpen: false,
-        mysticAbilityId: null,
-        mysticAbilityName: ''
-    });
 
     const [editingTrait, setEditingTrait] = useState<{ type: 'avantages' | 'desavantages', index: number, trait: TraitEntry } | null>(null);
 
@@ -47,8 +45,11 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         removeTrait,
         handleMultiAdd,
         applyMasterSkill
-    } = useTraitEditor(data, rules, onChange, onAddLog, recordXPTransaction, (traitName) => {
-        setMasterSkillWizard({ isOpen: true, traitName, traitType: multiSelectTargetRef.current || 'avantages' });
+    } = useTraitEditor(data, rules, onChange, onAddLog, recordXPTransaction, (items) => {
+        setWizardQueue(prev => [
+            ...prev, 
+            ...items.map(it => ({ type: 'master' as const, payload: it }))
+        ]);
     });
 
     useEffect(() => {
@@ -64,40 +65,43 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
 
     // Handlers
     const handleMultiAddWrapper = (instances: { entry: LibraryEntry; variant?: string; cost?: string }[]) => {
-        let mysticId: string | undefined;
-        let mysticName: string | undefined;
+        const newMysticWizards: WizardQueueItem[] = [];
 
         const processedInstances = instances.map(instance => {
-            if (instance.entry.mysticAbilityId) {
-                mysticId = instance.entry.mysticAbilityId;
-                mysticName = instance.entry.name;
-                return instance;
-            }
+            let mId = instance.entry.mysticAbilityId;
+            let mName = instance.entry.name;
 
-            if (rules?.libraries?.mysticAbilities && rules.configurations?.creation?.mysticAbilities?.active) {
+            if (!mId && rules?.libraries?.mysticAbilities && rules.configurations?.creation?.mysticAbilities?.active) {
                 const match = rules.libraries.mysticAbilities.find(
                     ma => ma.name.toLowerCase().trim() === instance.entry.name.toLowerCase().trim()
                 );
                 if (match) {
-                    mysticId = match.id;
-                    mysticName = match.name;
-                    return { ...instance, entry: { ...instance.entry, mysticAbilityId: match.id } };
+                    mId = match.id;
+                    mName = match.name;
                 }
+            }
+
+            if (mId && mName && rules?.configurations?.creation?.mysticAbilities?.active) {
+                newMysticWizards.push({ type: 'mystic', payload: { mysticAbilityId: mId, mysticAbilityName: mName } });
+                return { ...instance, entry: { ...instance.entry, mysticAbilityId: mId } };
             }
             return instance;
         });
 
         handleMultiAdd(processedInstances);
 
-        if (mysticId && mysticName && rules?.configurations?.creation?.mysticAbilities?.active) {
+        if (newMysticWizards.length > 0) {
             setTimeout(() => {
-                setWizardState({ isOpen: true, mysticAbilityId: mysticId!, mysticAbilityName: mysticName! });
+                setWizardQueue(prev => [...prev, ...newMysticWizards]);
             }, 100);
         }
     };
 
     const handleWizardConfirm = (skillIds: string[]) => {
-        if (!wizardState.mysticAbilityId) return;
+        const currentWizard = wizardQueue[0];
+        if (!currentWizard || currentWizard.type !== 'mystic') return;
+
+        const { mysticAbilityId, mysticAbilityName } = currentWizard.payload;
 
         const newSkills = { ...data.skills };
         const newLibrary = [...(data.skillLibrary || [])];
@@ -113,7 +117,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             if (skillDef.defaultCategory) {
                 category = LEGACY_SKILL_MAP[skillDef.defaultCategory] || skillDef.defaultCategory;
             } else {
-                const parentAbility = rules?.libraries?.mysticAbilities?.find(ma => ma.id === (skillDef.mysticAbilityId || wizardState.mysticAbilityId));
+                const parentAbility = rules?.libraries?.mysticAbilities?.find(ma => ma.id === (skillDef.mysticAbilityId || mysticAbilityId));
                 if (parentAbility?.defaultCategory) {
                     category = LEGACY_SKILL_MAP[parentAbility.defaultCategory] || parentAbility.defaultCategory;
                 }
@@ -122,7 +126,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             if (!category) {
                 const nameLower = skillDef.name.toLowerCase();
                 const isMartialArt = nameLower.includes('art martia');
-                if (isMartialArt || wizardState.mysticAbilityName) {
+                if (isMartialArt || mysticAbilityName) {
                     const mysticConfig = rules?.configurations?.creation?.mysticAbilities;
                     category = isMartialArt ? (mysticConfig?.defaultMartialArtsCategory || 'Col_Comp_7') : (mysticConfig?.defaultMysticOtherCategory || 'Col_Comp_5');
                 } else {
@@ -142,7 +146,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                     variant: skillDef.isVariable ? '' : undefined,
                     description: skillDef.description || undefined,
                     definitionId: skillDef.id,
-                    mysticAbilityId: skillDef.mysticAbilityId || wizardState.mysticAbilityId || undefined
+                    mysticAbilityId: skillDef.mysticAbilityId || mysticAbilityId || undefined
                 } as DotEntry);
 
                 if (!newLibrary.find(l => l.id === skillDef.id)) {
@@ -154,9 +158,11 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
 
         if (addedCount > 0) {
             onChange({ ...data, skills: newSkills, skillLibrary: newLibrary });
-            onAddLog(`Ajout de ${addedCount} compétence(s) mystique(s)`, 'info', 'sheet');
+            onAddLog(`Ajout de ${addedCount} compétence(s) mystique(s) (${mysticAbilityName})`, 'info', 'sheet');
         }
-        setWizardState(prev => ({ ...prev, isOpen: false }));
+        
+        // Remove current from queue
+        setWizardQueue(prev => prev.slice(1));
     };
 
     const updateStringField = (field: keyof CharacterSheetData['page2'], value: string) => {
@@ -175,11 +181,15 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
     };
 
     const handleMasterSkillConfirm = useCallback((categoryId: string, skillName: string) => {
-        if (!masterSkillWizard) return;
-        const updated = applyMasterSkill(data, masterSkillWizard.traitType, masterSkillWizard.traitName, categoryId, skillName);
+        const currentWizard = wizardQueue[0];
+        if (!currentWizard || currentWizard.type !== 'master') return;
+
+        const updated = applyMasterSkill(data, currentWizard.payload.traitType, currentWizard.payload.traitName, categoryId, skillName);
         onChange(updated);
-        setMasterSkillWizard(null);
-    }, [masterSkillWizard, applyMasterSkill, data, onChange]);
+        
+        // Remove current from queue
+        setWizardQueue(prev => prev.slice(1));
+    }, [wizardQueue, applyMasterSkill, data, onChange]);
 
     const calculateTotal = (list: TraitEntry[]) => list.reduce((acc, item) => acc + (parseInt(item.value) || 0), 0);
 
@@ -204,6 +214,8 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         },
         onRemove: (type: 'avantages' | 'desavantages', index: number) => removeTrait(type, index)
     };
+
+    const activeWizard = wizardQueue[0];
 
     return (
         <>
@@ -231,7 +243,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                             onTraitClick={(i, trait) => commonTraitsProps.onTraitClick(i, trait, 'avantages')}
                             onRemove={(i) => commonTraitsProps.onRemove('avantages', i)}
                             onManageMystic={(i, trait) => {
-                                if (trait.mysticAbilityId) setWizardState({ isOpen: true, mysticAbilityId: trait.mysticAbilityId, mysticAbilityName: trait.name });
+                                if (trait.mysticAbilityId) setWizardQueue(prev => [...prev, { type: 'mystic', payload: { mysticAbilityId: trait.mysticAbilityId!, mysticAbilityName: trait.name } }]);
                             }}
                             className="col-span-1 border-r border-stone-400"
                         />
@@ -283,7 +295,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                                     onTraitClick={(i, trait) => commonTraitsProps.onTraitClick(i, trait, 'avantages')}
                                     onRemove={(i) => commonTraitsProps.onRemove('avantages', i)}
                                     onManageMystic={(i, trait) => {
-                                        if (trait.mysticAbilityId) setWizardState({ isOpen: true, mysticAbilityId: trait.mysticAbilityId, mysticAbilityName: trait.name });
+                                        if (trait.mysticAbilityId) setWizardQueue(prev => [...prev, { type: 'mystic', payload: { mysticAbilityId: trait.mysticAbilityId!, mysticAbilityName: trait.name } }]);
                                     }}
                                     className="border-r border-stone-400 bg-white"
                                 />
@@ -336,23 +348,23 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
                 </div>
             )}
 
-            {wizardState.isOpen && wizardState.mysticAbilityId && rules && (
+            {activeWizard?.type === 'mystic' && rules && (
                 <MysticSkillWizard
-                    isOpen={wizardState.isOpen}
-                    onClose={() => setWizardState(prev => ({ ...prev, isOpen: false }))}
+                    isOpen={true}
+                    onClose={() => setWizardQueue(prev => prev.slice(1))}
                     onConfirm={handleWizardConfirm}
-                    mysticAbilityId={wizardState.mysticAbilityId}
-                    mysticAbilityName={wizardState.mysticAbilityName}
+                    mysticAbilityId={activeWizard.payload.mysticAbilityId}
+                    mysticAbilityName={activeWizard.payload.mysticAbilityName}
                     sheet={data}
                     rules={rules}
                 />
             )}
 
-            {masterSkillWizard && masterSkillWizard.isOpen && rules && (
+            {activeWizard?.type === 'master' && rules && (
                 <MasterSkillWizard
                     isOpen={true}
-                    traitName={masterSkillWizard.traitName}
-                    onClose={() => setMasterSkillWizard(null)}
+                    traitName={activeWizard.payload.traitName}
+                    onClose={() => setWizardQueue(prev => prev.slice(1))}
                     onConfirm={handleMasterSkillConfirm}
                     sheet={data}
                     rules={rules}

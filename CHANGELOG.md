@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.71.0] - 2026-02-22 [FEAT]
+
+
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.70.0] - 2026-02-22 [FEAT]
 
 
@@ -27,6 +33,13 @@
 
 
 # Changelog
+
+## [2.99.5] - 2026-03-07 [FIX]
+- **UI :** Mise en place d'une file d'attente séquentielle pour les modales de sélection (Habilités Mystiques, Maîtrise) permettant d'ajouter plusieurs traits déclencheurs simultanément.
+- **UI :** Correction de la superposition du bandeau de sélection dans la bibliothèque de traits (passage à un flux flexbox naturel).
+- **Bug :** Résolution du bug de "double retrait" qui faisait sauter des étapes dans la file d'attente lors de la validation d'une habilité mystique.
+
+---
 
 ## [2.99.4] - 2026-03-07 [FIX]
 - **UI/Layout :** Correction de l'alignement horizontal de la grille de secours pour les nouveaux personnages.

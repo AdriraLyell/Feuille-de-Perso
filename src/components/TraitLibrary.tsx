@@ -206,7 +206,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                 )}
             </div>
 
-            <div className={`flex-grow overflow-y-auto p-0 min-h-0 ${showFooter ? 'pb-16' : ''}`}>
+            <div className="flex-grow overflow-y-auto p-0 min-h-0">
                 {hybridList.length === 0 && (
                     <div className="text-center text-[#5c4d41]/60 py-10 italic px-4 text-sm">
                         {isEditable ? "La bibliothèque est vide. Ajoutez des avantages et désavantages ici pour les réutiliser facilement." : "La bibliothèque est vide."}
@@ -237,7 +237,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
 
             {
                 showFooter && (
-                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-[#fdfbf7] border-t border-[#bfae85]/30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex flex-col gap-2 z-20">
+                    <div className="p-3 bg-[#fdfbf7] border-t border-[#bfae85]/30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex flex-col gap-2 z-20 shrink-0">
                         {selection.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto py-1">
                                 {selection.map(s => (

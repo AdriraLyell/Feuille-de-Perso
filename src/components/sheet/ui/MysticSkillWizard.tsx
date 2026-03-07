@@ -58,7 +58,6 @@ const MysticSkillWizard: React.FC<MysticSkillWizardProps> = ({
 
     const handleConfirm = () => {
         onConfirm(Array.from(selectedIds));
-        onClose();
     };
 
     return (

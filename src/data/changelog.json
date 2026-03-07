@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.99.5",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "UI : Mise en place d'une file d'attente séquentielle pour les modales de sélection (Habilités Mystiques, Maîtrise).",
+            "UI : Correction de la superposition du bandeau de sélection dans la bibliothèque de traits.",
+            "Bug : Résolution du saut d'étapes dans la file d'attente lors de la validation d'une habilité mystique."
+        ]
+    },
+    {
         "version": "2.99.4",
         "date": "2026-03-07",
         "type": "fix",
@@ -190,15 +200,6 @@
             "Ajout d'une option 'Spécialisation Imposée' pour les MJ dans le catalogue",
             "Réconciliation automatique : les spécialisations s'ajoutent seules sur les fiches si le seuil est atteint",
             "Indicateur visuel (éclair) pour les spécialisations automatiques dans la liste admin"
-        ]
-    },
-    {
-        "version": "2.97.26",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Joueur : Correction chirurgicale de l'affichage des compétences parentes dans la bibliothèque de spécialisations (résolution via les bibliothèques globales).",
-            "Traits : Amélioration de la résolution des noms de compétences pour les effets de traits."
         ]
     }
 ]
