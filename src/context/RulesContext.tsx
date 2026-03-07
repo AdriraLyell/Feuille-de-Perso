@@ -39,22 +39,37 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
         setIsLoading(true);
         setError(null);
         try {
-            // 1. Try to load from cache first for instant UI
-            const cached = await OfflineStorageService.getActiveRules();
-            if (cached) {
-                logger.log('[RulesContext] Loaded from cache');
-                setRules(migrateRulesToV2(cached));
-                setIsLoading(false);
-            }
-
-            // 2. Fetch fresh rules from source
+            // 0. Determine target setting ID before checking cache
             const urlParams = new URLSearchParams(window.location.search);
             const urlSettingId = urlParams.get('s') || urlParams.get('setting');
-
-            // ROBUSTNESS: Use stored setting ID if no URL param (to survive refresh/navigation)
             const storedSettingId = localStorage.getItem('rpg-active-setting-id');
             const targetId = urlSettingId || storedSettingId || undefined;
 
+            // 1. Try to load from cache first for instant UI
+            const cached = await OfflineStorageService.getActiveRules();
+            if (cached) {
+                // ROBUSTNESS: Only apply generic cache if it matches the requested setting ID (or no setting ID is requested)
+                const cacheMatchesTarget = !targetId || cached.settingId === targetId;
+                
+                if (cacheMatchesTarget) {
+                    logger.log('[RulesContext] Loaded from cache (matched target)');
+                    setRules(migrateRulesToV2(cached));
+                    setIsLoading(false);
+                } else {
+                    logger.warn('[RulesContext] Cache mismatch (expected:', targetId, ', got:', cached.settingId, '). Ignoring cache.');
+                    // Optionally: try to find a specific cache for this settingId
+                    if (targetId) {
+                        const specificCache = await OfflineStorageService.getRulesBySettingId(targetId);
+                        if (specificCache) {
+                            logger.log('[RulesContext] Loaded from specific campaign cache');
+                            setRules(migrateRulesToV2(specificCache));
+                            setIsLoading(false);
+                        }
+                    }
+                }
+            }
+
+            // 2. Fetch fresh rules from source
             const data = await loadRules(targetId);
             if (data) {
                 const migrated = migrateRulesToV2(data);
