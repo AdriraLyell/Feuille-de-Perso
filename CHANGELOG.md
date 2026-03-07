@@ -44,21 +44,25 @@
 
 
 
-# Historique Ancien (Legacy Changelog)
-
-## [2.69.2] - 2026-02-22 [FIX]
-
-
-
 # Changelog
+
+## [2.100.0] - 2026-03-07 [FIX/FEAT]
+- **Qualité :** Élimination complète de tous les avertissements ESLint résiduels sur l'ensemble du projet (Zero Warning Milestone).
+- **UI :** Harmonisation des types de sélection d'impression avec `PrintSelection`.
+- **UI :** Ajout de la section "Inventaire & Argent" dans les options d'impression.
+- **Accessibilité :** Amélioration du widget d'image avec l'utilisation d'éléments natifs (`button`) pour les interactions statiques (Correction `no-static-element-interactions`).
+- **Admin :** Correction et nettoyage des imports de modèles (Attributes, XP Costs) dans l'outil d'importation de règles.
+- **Cleanup :** Suppression de propriétés inutilisées dans les composants de sidebar (`BookChapterSidebar`).
+
+---
 
 ## [2.99.8] - 2026-03-07 [FIX]
 - **CI/CD :** Sécurisation du script de notification Realtime. Ajout d'un timeout de sécurité et d'une gestion explicite des erreurs de connexion pour éviter que le job de déploiement ne reste bloqué indéfiniment.
 
 ---
-
 ## [2.99.7] - 2026-03-07 [FIX]
-- **CI/CD :** Correction du pipeline de déploiement GitHub Pages. Ajout des étapes de 'Checkout', 'Setup Node' et 'npm install' au job de déploiement pour permettre l'exécution du script de notification Realtime.
+- **CI/CD :** Correction du pipeline de déploiement GitHub Pages.
+ Ajout des étapes de 'Checkout', 'Setup Node' et 'npm install' au job de déploiement pour permettre l'exécution du script de notification Realtime.
 
 ---
 
