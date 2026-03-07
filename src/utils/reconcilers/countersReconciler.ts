@@ -14,6 +14,14 @@ export const reconcileCounters = (newState: CharacterSheetData, currentState: Ch
         custom: currentState.counters.custom || []
     };
 
+    // Always preserve core system counters if the rules somehow omitted them (e.g. cloud rules override)
+    if (currentState.counters.volonte && !rules.definitions.counters.volonte) {
+        newCounters.volonte = currentState.counters.volonte as DotEntry;
+    }
+    if (currentState.counters.confiance && !rules.definitions.counters.confiance) {
+        newCounters.confiance = currentState.counters.confiance as DotEntry;
+    }
+
     Object.keys(rules.definitions.counters).forEach(key => {
         const def = rules.definitions.counters[key];
         const existingRaw = currentState.counters[key];
