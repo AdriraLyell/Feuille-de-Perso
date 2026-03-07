@@ -98,10 +98,25 @@ interface CharacterProviderProps {
 }
 
 export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }) => {
-    const { rules } = useRules();
+    const { rules, reloadRules } = useRules();
 
     // 1. Initialize State
     const [data, setData] = useState<CharacterSheetData>(loadInitialCharacterData);
+
+    // --- Phase 1.5: Rules/Character Alignment ---
+    // Ensure that if we loaded a character from a different campaign, we fetch the correct rules
+    useEffect(() => {
+        const charSettingId = data.syncInfo?.settingId;
+        const currentRulesId = rules?.settingId;
+
+        // Alignment logic: if character has a campaign ID but rules don't match or are empty/orphaned
+        const needsReload = charSettingId && charSettingId !== 'orphan' && charSettingId !== currentRulesId;
+
+        if (needsReload) {
+            logger.log(`[CharacterContext] Campaign mismatch (Char: ${charSettingId}, Rules: ${currentRulesId}). Realigning...`);
+            reloadRules(charSettingId);
+        }
+    }, [data.syncInfo?.settingId, rules?.settingId, reloadRules]);
 
     // 2. Runtime Resolution Hook (The "Brain")
     const resolvedData = useResolvedCharacter(data, rules);

@@ -124,7 +124,11 @@ const SyncModal: React.FC<SyncModalProps> = ({
         try {
             const publicSettings = await CampaignService.listPublicSettings();
             setCampaigns(publicSettings);
-            if (publicSettings.length > 0 && !selectedCampaign) {
+            
+            // SECURITY: Only auto-select if we really have NO preferred campaign from character or rules
+            const hasPreferredCampaign = !!selectedCampaign || !!rules?.settingId || !!characterData.syncInfo?.settingId;
+            
+            if (publicSettings.length > 0 && !hasPreferredCampaign) {
                 setSelectedCampaign(publicSettings[0].id);
             }
         } catch (e) {

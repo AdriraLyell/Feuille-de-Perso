@@ -11,7 +11,7 @@ interface RulesContextType {
     isLoading: boolean;
     error: string | null;
     isOnlineMode: boolean;
-    reloadRules: () => Promise<void>;
+    reloadRules: (forceId?: string) => Promise<void>;
     updateRules: (newRules: RulesData) => void;
 }
 
@@ -35,7 +35,7 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
     const [error, setError] = useState<string | null>(null);
     const [isOnlineMode, setIsOnlineMode] = useState<boolean>(false);
 
-    const fetchRules = async () => {
+    const fetchRules = async (forceId?: string) => {
         setIsLoading(true);
         setError(null);
         try {
@@ -43,7 +43,7 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
             const urlParams = new URLSearchParams(window.location.search);
             const urlSettingId = urlParams.get('s') || urlParams.get('setting');
             const storedSettingId = localStorage.getItem('rpg-active-setting-id');
-            const targetId = urlSettingId || storedSettingId || undefined;
+            const targetId = forceId || urlSettingId || storedSettingId || undefined;
 
             // 1. Try to load from cache first for instant UI
             const cached = await OfflineStorageService.getActiveRules();
