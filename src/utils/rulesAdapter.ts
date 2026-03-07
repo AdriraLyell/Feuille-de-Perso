@@ -53,7 +53,7 @@ export const applyRulesToState = (baseState: CharacterSheetData, rules: RulesDat
             newAttributes[category] = names.map(name => ({
                 id: generateId(), // Start with fresh IDs for a new sheet
                 name: name,
-                val1: "",
+                val1: "0",
                 val2: "",
                 val3: "",
                 creationVal1: 0,

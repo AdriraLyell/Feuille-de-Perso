@@ -12,15 +12,39 @@ const CreationHUD: React.FC = () => {
     const { data, updateData: setData, addLog } = useCharacter();
     const [showConfirm, setShowConfirm] = useState(false);
 
+    const isMigrationMode = !!data.attributeMigrationMode;
+
     const onValidate = () => {
-        setData(prev => ({
-            ...prev,
-            creationConfig: {
-                ...prev.creationConfig,
-                active: false
-            }
-        }));
-        addLog("Création de personnage validée. Mode création désactivé.", 'success', 'sheet');
+        if (isMigrationMode) {
+            setData(prev => {
+                const newData = { ...prev };
+                // Update creationVal1 for attributes so future XP spends are correct
+                Object.values(newData.attributes || {}).forEach(cat => {
+                    cat.forEach(attr => {
+                        attr.creationVal1 = parseInt(attr.val1) || 0;
+                    });
+                });
+                if (newData.secondaryAttributesActive) {
+                    Object.values(newData.secondaryAttributes || {}).forEach(cat => {
+                        cat.forEach(attr => {
+                            attr.creationVal1 = parseInt(attr.val1) || 0;
+                        });
+                    });
+                }
+                newData.attributeMigrationMode = false;
+                return newData;
+            });
+            addLog("Migration des attributs validée.", 'success', 'sheet');
+        } else {
+            setData(prev => ({
+                ...prev,
+                creationConfig: {
+                    ...prev.creationConfig,
+                    active: false
+                }
+            }));
+            addLog("Création de personnage validée. Mode création désactivé.", 'success', 'sheet');
+        }
     };
 
     const {
@@ -68,10 +92,10 @@ const CreationHUD: React.FC = () => {
                         </div>
                         <div>
                             <h3 className="font-bold text-xl uppercase tracking-widest font-serif text-amber-500 leading-tight">
-                                Création
+                                {isMigrationMode ? 'Migration' : 'Création'}
                             </h3>
                             <span className="text-sm font-medium text-stone-400">
-                                {mode === 'rangs' ? 'Système par Rangs' : (isGlobalPoints ? 'Système par XP (Global)' : 'Système par XP (Budgets)')}
+                                {isMigrationMode ? 'Attributs uniquement' : (mode === 'rangs' ? 'Système par Rangs' : (isGlobalPoints ? 'Système par XP (Global)' : 'Système par XP (Budgets)'))}
                             </span>
                         </div>
                     </div>
@@ -105,7 +129,7 @@ const CreationHUD: React.FC = () => {
                                 <div className={`relative px-8 py-3 rounded-lg border-2 bg-stone-800 shadow-inner min-w-[200px] text-center overflow-hidden ${xpRemainingGlobal < 0 ? 'border-red-600' : (xpRemainingGlobal === 0 ? 'border-green-600' : 'border-blue-600')}`}>
                                     <div className="text-xs uppercase text-stone-400 font-bold mb-1 tracking-widest relative z-10">XP Restants</div>
                                     <div className={`text-3xl font-mono font-black relative z-10 ${xpRemainingGlobal < 0 ? 'text-red-400' : (xpRemainingGlobal === 0 ? 'text-green-400' : 'text-blue-200')}`}>
-                                        {formatNumber(xpRemainingGlobal)} {mode === 'points' && <span className="text-lg text-stone-500">/ {startingXP}</span>}
+                                        {formatNumber(xpRemainingGlobal)} {mode === 'points' && !isMigrationMode && <span className="text-lg text-stone-500">/ {startingXP}</span>}
                                     </div>
                                     {/* Background Progress Effect */}
                                     <div
@@ -117,8 +141,12 @@ const CreationHUD: React.FC = () => {
                                 // MODE BUCKETS
                                 <div className="flex gap-4 overflow-x-auto pb-1 items-center no-scrollbar">
                                     <BudgetGauge label="Attributs" current={xpSpentAttributes} max={pointsBuckets?.attributes || 0} formatNumber={formatNumber} />
-                                    <BudgetGauge label="Compétences" current={xpSpentSkills} max={pointsBuckets?.skills || 0} formatNumber={formatNumber} />
-                                    <BudgetGauge label="Arrière-plans" current={xpSpentBackgrounds} max={pointsBuckets?.backgrounds || 0} formatNumber={formatNumber} />
+                                    {!isMigrationMode && (
+                                        <>
+                                            <BudgetGauge label="Compétences" current={xpSpentSkills} max={pointsBuckets?.skills || 0} formatNumber={formatNumber} />
+                                            <BudgetGauge label="Arrière-plans" current={xpSpentBackgrounds} max={pointsBuckets?.backgrounds || 0} formatNumber={formatNumber} />
+                                        </>
+                                    )}
                                 </div>
                             )
                         ) : (
@@ -127,31 +155,35 @@ const CreationHUD: React.FC = () => {
                                 <BudgetGauge label="Attributs" current={attributesUsed} max={attributePoints || 15} formatNumber={formatNumber} />
 
                                 {/* Ranks (Compact Vertical) */}
-                                <div className="flex bg-stone-800 rounded-lg border border-stone-700 p-2 gap-2 shadow-lg">
-                                    {[1, 2, 3, 4, 5].map(rank => {
-                                        const used = ranksUsed[rank] || 0;
-                                        const max = (rankSlots as Record<number, number>)[rank] || 0;
-                                        if (max === 0 && used === 0) return null;
+                                {!isMigrationMode && (
+                                    <>
+                                        <div className="flex bg-stone-800 rounded-lg border border-stone-700 p-2 gap-2 shadow-lg">
+                                            {[1, 2, 3, 4, 5].map(rank => {
+                                                const used = ranksUsed[rank] || 0;
+                                                const max = (rankSlots as Record<number, number>)[rank] || 0;
+                                                if (max === 0 && used === 0) return null;
 
-                                        const isOver = used > max;
-                                        const isFull = used === max;
+                                                const isOver = used > max;
+                                                const isFull = used === max;
 
-                                        const statusColor = isOver ? 'text-red-400' : (isFull ? 'text-green-400' : 'text-stone-300');
-                                        const ringColor = isOver ? 'border-red-500' : (isFull ? 'border-green-600' : 'border-stone-600');
+                                                const statusColor = isOver ? 'text-red-400' : (isFull ? 'text-green-400' : 'text-stone-300');
+                                                const ringColor = isOver ? 'border-red-500' : (isFull ? 'border-green-600' : 'border-stone-600');
 
-                                        return (
-                                            <div key={rank} className="flex flex-col items-center min-w-[36px]">
-                                                <div className={`w-8 h-8 rounded-full border-2 ${ringColor} flex items-center justify-center font-mono font-bold text-sm bg-stone-900 ${statusColor}`}>
-                                                    {formatNumber(used)}
-                                                </div>
-                                                <span className="text-[9px] text-stone-500 mt-1 uppercase font-bold">R{rank}</span>
-                                                <span className="text-[9px] text-stone-600 font-mono">/{max}</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                                return (
+                                                    <div key={rank} className="flex flex-col items-center min-w-[36px]">
+                                                        <div className={`w-8 h-8 rounded-full border-2 ${ringColor} flex items-center justify-center font-mono font-bold text-sm bg-stone-900 ${statusColor}`}>
+                                                            {formatNumber(used)}
+                                                        </div>
+                                                        <span className="text-[9px] text-stone-500 mt-1 uppercase font-bold">R{rank}</span>
+                                                        <span className="text-[9px] text-stone-600 font-mono">/{max}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
 
-                                <BudgetGauge label="Arrière-plans" current={backgroundsUsed} max={backgroundPoints || 5} formatNumber={formatNumber} />
+                                        <BudgetGauge label="Arrière-plans" current={backgroundsUsed} max={backgroundPoints || 5} formatNumber={formatNumber} />
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>

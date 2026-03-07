@@ -24,7 +24,7 @@ export const useCharacterSheetActions = (
             const list = getSkillCategory(prev, category);
             if (!list) return prev;
 
-            const isCreationMode = prev.creationConfig && prev.creationConfig.active;
+            const isCreationMode = (prev.creationConfig && prev.creationConfig.active) || prev.attributeMigrationMode;
             const catDef = rules?.definitions?.skillCategories?.find(c => c.id === category);
             const behavior = catDef?.behavior;
             const isBaseSkill = !behavior || behavior === 'Compétence' || behavior === 'Secondaire' || behavior === 'Arrière-plan';
@@ -183,7 +183,7 @@ export const useCharacterSheetActions = (
     const updateAttribute = useCallback((category: string, id: string, field: 'val1' | 'val2' | 'val3', value: string) => {
         onChange(prev => {
             const numValue = parseInt(value) || 0;
-            const isCreationMode = prev.creationConfig && prev.creationConfig.active;
+            const isCreationMode = (prev.creationConfig && prev.creationConfig.active) || prev.attributeMigrationMode;
 
             const updateInList = <T extends { id: string; name?: string; val1?: string; val2?: string; val3?: string; }>(list: T[]) => {
                 const idx = list.findIndex(item => item.id === id);
@@ -258,7 +258,7 @@ export const useCharacterSheetActions = (
 
     const updateCounter = useCallback((id: string, value: number, isCustom = false, field: 'value' | 'current' = 'value') => {
         onChange(prev => {
-            const isCreationMode = prev.creationConfig && prev.creationConfig.active;
+            const isCreationMode = (prev.creationConfig && prev.creationConfig.active) || prev.attributeMigrationMode;
             if (isCustom) {
                 const newCustom = (prev.counters.custom || []).map(c => {
                     if (c.id !== id) return c;

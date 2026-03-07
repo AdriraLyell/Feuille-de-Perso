@@ -34,6 +34,8 @@ import { Layers, FileType, List, TrendingUp, Book, Package, Clock, X, Trash2, Ch
 import { useEditMode } from '../../hooks/sheet/useEditMode';
 import { useCreationMode } from '../../hooks/useCreationMode';
 import { exportCharacterAsJSON } from '../../utils/importExportUtils';
+import { generateId } from '../../utils/factories';
+import { reconcileRulesWithState } from '../../utils/rulesReconciler';
 import { useNavigationState } from '../../hooks/layout/useNavigationState';
 import { usePrintManager } from '../../hooks/layout/usePrintManager';
 import { useRulesSync } from '../../hooks/layout/useRulesSync';
@@ -303,6 +305,84 @@ const MainLayout: React.FC = () => {
         await exportCharacterAsJSON(data, addLog);
     };
 
+    const handleStartAttributeMigration = React.useCallback(() => {
+        const migrationInfo = data.syncInfo?.pendingAttributeMigration;
+        if (!migrationInfo) return;
+
+        let xpToRefund = 0;
+        const attrCost = migrationInfo.oldAttributeFactor || 6;
+        
+        Object.values(data.attributes).forEach(cat => {
+            cat.forEach(attr => {
+                const currentVal = parseInt(attr.val1) || 0;
+                const creationVal = attr.creationVal1 || 0;
+                if (currentVal > creationVal) {
+                    xpToRefund += (currentVal - creationVal) * attrCost;
+                }
+            });
+        });
+
+        if (data.secondaryAttributesActive) {
+            Object.values(data.secondaryAttributes || {}).forEach(cat => {
+                cat.forEach(attr => {
+                    const currentVal = parseInt(attr.val1) || 0;
+                    const creationVal = attr.creationVal1 || 0;
+                    if (currentVal > creationVal) {
+                        xpToRefund += (currentVal - creationVal) * attrCost;
+                    }
+                });
+            });
+        }
+
+        setData((prev: CharacterSheetData) => {
+            let newData = { ...prev };
+            
+            if (xpToRefund > 0) {
+                const refundTx = {
+                    id: generateId(),
+                    timestamp: new Date().toISOString(),
+                    type: 'refund' as const,
+                    amount: xpToRefund,
+                    description: "Remboursement suite à la mise à jour des règles d'attributs",
+                    source: "migration"
+                };
+                newData.xpTransactions = [refundTx, ...(newData.xpTransactions || [])];
+                newData.experience = { ...newData.experience, rest: (parseInt(newData.experience.rest || '0') + xpToRefund).toString() };
+            }
+            
+            // Prepare migration state
+            newData.syncInfo = { ...newData.syncInfo };
+            delete newData.syncInfo.pendingAttributeMigration;
+            newData.attributeMigrationMode = true;
+
+            // Use the official reconciler to apply new structures and costs
+            if (rules) {
+                newData = reconcileRulesWithState(newData, rules);
+            }
+
+            // Force all attribute values to 0 as per requirement
+            Object.values(newData.attributes || {}).forEach(cat => {
+                cat.forEach(attr => {
+                    attr.val1 = "0";
+                    attr.creationVal1 = 0;
+                });
+            });
+
+            if (newData.secondaryAttributesActive && newData.secondaryAttributes) {
+                Object.values(newData.secondaryAttributes).forEach(cat => {
+                    cat.forEach(attr => {
+                        attr.val1 = "0";
+                        attr.creationVal1 = 0;
+                    });
+                });
+            }
+
+            return newData;
+        }, true);
+
+        addLog("Mode de migration des attributs activé. Les attributs ont été réinitialisés et l'XP a été remboursée.", "info", "sheet");
+    }, [data, setData, addLog, rules]);
+
     if (!rules || !isSourceSelected) {
         return (
             <div className="fixed inset-0 bg-[#1c1c1c] text-white flex items-center justify-center z-50 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')]">
@@ -400,6 +480,31 @@ const MainLayout: React.FC = () => {
                                     >
                                         <X size={13} />
                                         Plus tard
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Bandeau de migration d'attributs */}
+                {data.syncInfo?.pendingAttributeMigration && !data.attributeMigrationMode && (
+                    <div className="sticky top-14 z-50 no-print animate-in slide-in-from-top-2 fade-in duration-300">
+                        <div className="mx-auto max-w-4xl px-4 pt-2">
+                            <div className="flex items-center gap-3 bg-blue-900/80 border border-blue-500/60 rounded-md px-4 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.5)] backdrop-blur-sm">
+                                <div className="shrink-0 w-8 h-8 rounded-full bg-blue-800/40 border border-blue-400/50 flex items-center justify-center">
+                                    <Check size={16} className="text-blue-300" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-300 mb-0.5">Mise à jour des règles</p>
+                                    <p className="text-sm text-blue-100/90 leading-snug">Le MJ a modifié la structure des attributs. Une migration est nécessaire.</p>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <button
+                                        onClick={handleStartAttributeMigration}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded transition-colors active:scale-95"
+                                    >
+                                        Démarrer la migration
                                     </button>
                                 </div>
                             </div>
@@ -555,7 +660,7 @@ const MainLayout: React.FC = () => {
                         handleImportSuccess={handleImportSuccess}
                     />
 
-                    {data.creationConfig?.active && (<CreationHUD />)}
+                    {(data.creationConfig?.active || data.attributeMigrationMode) && (<CreationHUD />)}
 
                     <SyncConflictModal
                         isOpen={!!conflictData}

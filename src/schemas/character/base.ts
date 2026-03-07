@@ -56,6 +56,11 @@ export const SyncInfoSchema = z.object({
     localSettings: z.object({
         expertMode: z.boolean().optional(),
         activeRulesId: z.string().optional()
+    }).optional(),
+    pendingAttributeMigration: z.object({
+        newRulesAttributes: z.record(z.string(), z.array(z.string())),
+        newRulesSecondary: z.record(z.string(), z.array(z.string())),
+        oldAttributeFactor: z.number()
     }).optional()
 });
 

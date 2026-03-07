@@ -21,10 +21,13 @@ export const reconcileConfigurations = (newState: CharacterSheetData, rules: Rul
         };
     }
 
+    const isMigrationPending = !!newState.syncInfo?.pendingAttributeMigration;
+
     // 2. XP Costs
     if (rules.configurations?.xpCosts) {
         newState.xpCosts = {
-            attributeFactor: rules.configurations.xpCosts.attributeFactor || 6,
+            ...newState.xpCosts,
+            attributeFactor: isMigrationPending ? (newState.xpCosts?.attributeFactor || 6) : (rules.configurations.xpCosts.attributeFactor || 6),
             skillFactor: rules.configurations.xpCosts.skillFactor || 1,
             specializationFactor: rules.configurations.xpCosts.specializationFactor || 0,
             traitCost: rules.configurations.xpCosts.traitCost || 5
@@ -40,12 +43,23 @@ export const reconcileConfigurations = (newState: CharacterSheetData, rules: Rul
                 ...newState.creationConfig.cardConfig,
                 ...rules.configurations.cards
             } : newState.creationConfig.cardConfig,
-            rankSlots: rules.configurations.creation.rankSlots
+            rankSlots: rules.configurations.creation.rankSlots,
+            // Preserve attribute rules if a migration is pending
+            attributePoints: isMigrationPending ? newState.creationConfig.attributePoints : rules.configurations.creation.attributePoints,
+            attributeMin: isMigrationPending ? newState.creationConfig.attributeMin : rules.configurations.creation.attributeMin,
+            attributeMax: isMigrationPending ? newState.creationConfig.attributeMax : rules.configurations.creation.attributeMax,
+            attributeCost: isMigrationPending ? newState.creationConfig.attributeCost : rules.configurations.creation.attributeCost,
+            pointsBuckets: isMigrationPending ? {
+                ...rules.configurations.creation.pointsBuckets,
+                attributes: newState.creationConfig.pointsBuckets?.attributes || 0
+            } : rules.configurations.creation.pointsBuckets
         };
     }
 
     // 4. Secondary Attributes Toggle
     if (rules.configurations?.global?.secondaryAttributes !== undefined) {
-        newState.secondaryAttributesActive = rules.configurations.global.secondaryAttributes;
+        if (!isMigrationPending) {
+            newState.secondaryAttributesActive = rules.configurations.global.secondaryAttributes;
+        }
     }
 };

@@ -179,7 +179,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
                 {/* Edition mode logic and sidebar moved to MainLayout */}
 
                 {/* Attributes Section */}
-                <div className="grid grid-cols-12 border-b-2 border-stone-800">
+                <div className="grid grid-cols-12 border-b-2 border-stone-800 relative z-10 bg-white">
                     <div className={`col-span-10 grid ${getAttributesGridClass()}`}>
                         {attributeCategories.map(cat => (
                             <AttributeBlock
@@ -190,46 +190,48 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
                                 cat={cat.id}
                                 onUpdate={updateAttribute}
                                 bonuses={attributeBonuses}
-                                isCreationMode={!!creationActive}
+                                isCreationMode={!!creationActive || !!data.attributeMigrationMode}
                             />
                         ))}
                     </div>
                     <ExperienceSummary experience={data.experience} cardValue={cardValue} />
                 </div>
 
-                <CharacterSheetGrid
-                    columns={columns}
-                    backgrounds={backgrounds}
-                    autres={autres}
-                    isEditMode={isEditMode}
-                    editLayoutMode={editLayoutMode}
-                    allowExtendedSkills={allowExtendedSkills}
-                    theme={data.theme}
-                    rules={rules}
-                    specializations={data.specializations}
-                    imposedSpecializations={data.imposedSpecializations}
-                    onUpdateDot={updateDot}
-                    onDefineVariant={handleDefineVariant}
-                    onDropItem={handleDropItem}
-                    onRemoveItem={handleRemoveItem}
-                    onLayoutChange={handleLayoutChange}
-                    validateSkillIncrease={validateSkillIncrease}
-                    blockedSkills={blockedSkills}
-                    layoutConfig={data.activeLayout}
-                    renderBottomSection={() => (
-                        <div className="w-full h-full overflow-hidden">
-                            <CountersSection
-                                data={data}
-                                updateCounter={updateCounter}
-                                isLandscape={isLandscape}
-                                creationBonuses={counterCreationBonuses}
-                                xpBonuses={counterXPBonuses}
-                                calculatedMaxes={calculatedMaxes}
-                                activeReserves={activeReserves}
-                            />
-                        </div>
-                    )}
-                />
+                <div className={`relative transition-opacity duration-300 ${data.attributeMigrationMode ? 'opacity-50 pointer-events-none grayscale' : ''}`}>
+                    <CharacterSheetGrid
+                        columns={columns}
+                        backgrounds={backgrounds}
+                        autres={autres}
+                        isEditMode={isEditMode}
+                        editLayoutMode={editLayoutMode}
+                        allowExtendedSkills={allowExtendedSkills}
+                        theme={data.theme}
+                        rules={rules}
+                        specializations={data.specializations}
+                        imposedSpecializations={data.imposedSpecializations}
+                        onUpdateDot={updateDot}
+                        onDefineVariant={handleDefineVariant}
+                        onDropItem={handleDropItem}
+                        onRemoveItem={handleRemoveItem}
+                        onLayoutChange={handleLayoutChange}
+                        validateSkillIncrease={validateSkillIncrease}
+                        blockedSkills={blockedSkills}
+                        layoutConfig={data.activeLayout}
+                        renderBottomSection={() => (
+                            <div className="w-full h-full overflow-hidden">
+                                <CountersSection
+                                    data={data}
+                                    updateCounter={updateCounter}
+                                    isLandscape={isLandscape}
+                                    creationBonuses={counterCreationBonuses}
+                                    xpBonuses={counterXPBonuses}
+                                    calculatedMaxes={calculatedMaxes}
+                                    activeReserves={activeReserves}
+                                />
+                            </div>
+                        )}
+                    />
+                </div>
 
                 {/* Warnings moved to MainLayout */}
 

@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.99.2",
+        "date": "2026-03-07",
+        "type": "feat",
+        "changes": [
+            "System : Nouveau moteur de rÃ©conciliation intelligente pour la migration des attributs lors d'un changement de rÃ¨gles.",
+            "Messaging : Inversion de l'ordre de rÃ©cupÃ©ration des messages (plus rÃ©cents en premier) pour une meilleure expÃ©rience utilisateur.",
+            "Logic : Support du mode 'migration' dans le calcul du budget de crÃ©ation et les actions de la fiche.",
+            "Schema : Mise Ã  jour des schÃ©mas Zod pour supporter les mÃ©tadonnÃ©es de synchronisation et de migration."
+        ]
+    },
+    {
         "version": "2.99.1",
         "date": "2026-03-06",
         "type": "feat",

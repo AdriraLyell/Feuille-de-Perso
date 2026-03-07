@@ -131,12 +131,18 @@ export interface CharacterSheetData {
       activeRulesId?: string;
     };
     syncMode?: 'manual' | 'auto'; // Distinction pour le trigger historique
+    pendingAttributeMigration?: {
+      newRulesAttributes: Record<string, string[]>;
+      newRulesSecondary: Record<string, string[]>;
+      oldAttributeFactor: number;
+    };
   };
   appVersion?: string; // Version de l'application lors de la sauvegarde
   _rulesVersion?: string; // Version des règles appliquées (pour optimisation de la réconciliation)
   _rulesLastUpdated?: number; // Timestamp des règles appliquées
   _schemaVersion?: number; // Version du schéma de données (pour migrations séquentielles)
   suggestions?: SuggestionEntry[]; // Nouveau : Suggestions envoyées au MJ
+  attributeMigrationMode?: boolean;
 }
 
 export type SkillCategoryKey = keyof CharacterSheetData['skills'];

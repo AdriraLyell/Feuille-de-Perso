@@ -40,7 +40,7 @@ export const getMessages = async (
         .from('messages')
         .select('*')
         .eq('setting_id', settingId)
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: false }) // Fetch newest first
         .limit(limit);
 
     if (viewerId !== 'GM') {
@@ -55,7 +55,9 @@ export const getMessages = async (
         logger.error('[MessageService] getMessages error', error);
         throw error;
     }
-    return (data ?? []) as Message[];
+    
+    // Reverse the array to maintain chronological order (oldest to newest) in the UI
+    return (data ?? []).reverse() as Message[];
 };
 
 /**

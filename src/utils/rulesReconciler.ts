@@ -4,7 +4,7 @@ import { RulesData } from '../types/rules';
 import { migrateTraitLibrary } from './migrations/migrateTraitProperties';
 
 import { reconcileConfigurations } from './reconcilers/configurationsReconciler';
-import { reconcileAttributes, reconcileSecondaryAttributes } from './reconcilers/attributesReconciler';
+import { reconcileAttributes, reconcileSecondaryAttributes, checkAndTriggerAttributeMigration } from './reconcilers/attributesReconciler';
 import { reconcileSkillsAndBackgrounds } from './reconcilers/skillsReconciler';
 import { reconcileCounters } from './reconcilers/countersReconciler';
 import { reconcileTraits, reconcileCleanup } from './reconcilers/traitsReconciler';
@@ -32,6 +32,9 @@ export const reconcileRulesWithState = (currentState: CharacterSheetData, rules:
     if (rules.version) {
         newState._rulesVersion = rules.version;
     }
+
+    // Determine if we need an attribute migration BEFORE running configurations
+    checkAndTriggerAttributeMigration(newState, rules);
 
     reconcileConfigurations(newState, rules);
     reconcileAttributes(newState, rules);

@@ -193,7 +193,8 @@ export const CharacterSheetDataSchema = z.object({
         })).optional()
     }).optional(),
     layoutConfigs: z.record(z.string(), z.any()).optional(),
-    _schemaVersion: z.number().optional()
+    _schemaVersion: z.number().optional(),
+    attributeMigrationMode: z.boolean().optional()
 });
 
 export type ValidatedCharacterData = z.infer<typeof CharacterSheetDataSchema>;
