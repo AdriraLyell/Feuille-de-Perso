@@ -26,6 +26,12 @@ export const loadInitialCharacterData = (): CharacterSheetData => {
                 if (activeRulesId !== undefined) localStorage.setItem('rules-source-id', activeRulesId);
             }
 
+            // SYNCHRONIZATION FIX: Force the active setting ID to match the loaded character
+            // This prevents RulesContext from fetching an old campaign on F5 refresh.
+            if (validated.syncInfo?.settingId && validated.syncInfo.settingId !== 'orphan') {
+                localStorage.setItem('rpg-active-setting-id', validated.syncInfo.settingId);
+            }
+
             // Force reconciliation if skillLibrary was emptied (fixes mysticAbilityId loss)
             if (!validated.skillLibrary || validated.skillLibrary.length === 0) {
                 validated._rulesVersion = undefined;
