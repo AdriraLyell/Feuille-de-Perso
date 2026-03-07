@@ -223,7 +223,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
                         renderBottomSection={() => (
                             <div className="w-full h-full overflow-hidden">
                                 <CountersSection
-                                    data={resolvedData}
+                                    data={data}
                                     updateCounter={updateCounter}
                                     isLandscape={isLandscape}
                                     creationBonuses={counterCreationBonuses}

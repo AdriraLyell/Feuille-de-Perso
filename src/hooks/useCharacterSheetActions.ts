@@ -282,28 +282,12 @@ export const useCharacterSheetActions = (
                 const current = getCounter(prev, counterKey);
                 if (!current || Array.isArray(current)) return prev;
 
-                const displayName = current.name || id;
-                const normalizedDisplayName = normalizeString(displayName);
-
-                // 1. Try ID match in definitions
-                let sysDef = rules?.definitions?.counters?.[id] || (rules?.definitions?.counters && rules.definitions.counters[counterKey]);
-                // 2. Try Name match in definitions
-                if (!sysDef && rules?.definitions?.counters) {
-                    sysDef = Object.values(rules.definitions.counters).find(c => normalizeString(c.name) === normalizedDisplayName);
-                }
-
-                // 3. Try ID/Name match in libraries
-                const VOLONTE_UUID = 'c0000000-0000-0000-0000-000000000001';
-                const CONFIANCE_UUID = 'c0000000-0000-0000-0000-000000000002';
-                const libDef = rules?.libraries?.counters?.find(c => 
-                    c.id === id || 
-                    normalizeString(c.name) === normalizedDisplayName ||
-                    (normalizedDisplayName === 'volonte' && c.id === VOLONTE_UUID) ||
-                    (normalizedDisplayName === 'confiance' && c.id === CONFIANCE_UUID)
-                );
+                const sysDef = rules?.definitions?.counters?.[id] || (rules?.definitions?.counters && rules.definitions.counters[counterKey]);
+                const displayName = current.name || sysDef?.name || id;
+                const libDef = rules?.libraries?.counters?.find(c => c.id === id || normalizeString(c.name) === normalizeString(displayName));
 
                 const xpCost = libDef?.xpCost != null ? libDef.xpCost : (sysDef?.xpCost ?? 0);
-                const defaultValue = libDef?.defaultValue != null ? libDef.defaultValue : (sysDef?.defaultValue ?? (sysDef as any)?.value ?? 0);
+                const defaultValue = libDef?.defaultValue != null ? libDef.defaultValue : (sysDef?.defaultValue ?? 0);
 
                 if (field === 'value' && (libDef || sysDef)) {
                     if (xpCost <= 0 && value > current.value) return prev;

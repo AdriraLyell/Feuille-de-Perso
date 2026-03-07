@@ -171,9 +171,7 @@ export const LibraryPersistence = {
                 }
 
                 // Use UPSERT instead of update to handle newly created items from the UI
-                // For counters, we explicitly target 'id' to handle system UUIDs vs name conflicts
-                const options = typeCfg.key === 'counters' ? { onConflict: 'id' } : {};
-                await DatabaseService.upsert(typeCfg.table, payload, options, `LibraryPersistence.sync.${typeCfg.key}.upsertGlobal`);
+                await DatabaseService.upsert(typeCfg.table, payload, {}, `LibraryPersistence.sync.${typeCfg.key}.upsertGlobal`);
             }
 
             // 2. Refresh RELATIONSHIPS (Preserve all library items in linked state for this campaign)

@@ -84,10 +84,10 @@ export interface DBCounter {
     setting_id: string | null;
     name: string;
     description?: string;
-    max_value?: number;
-    default_value?: number;
-    xp_cost?: number;
-    default_category?: string;
+    maxValue?: number;
+    defaultValue?: number;
+    xpCost?: number;
+    defaultCategory?: string;
     appearance?: 'squares_only' | null;
     formula_id?: string;
     created_at?: string;

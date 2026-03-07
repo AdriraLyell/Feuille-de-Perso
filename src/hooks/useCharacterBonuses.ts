@@ -15,7 +15,7 @@ export const useCharacterBonuses = (
     library: LibraryEntry[] = [],
     rulesTraits: LibraryEntry[] = []
 ) => {
-    const { data: rawCharacterData, resolvedData: characterData } = useCharacter();
+    const { data: characterData } = useCharacter();
     const deferredData = useDeferredValue(characterData);
     const { rules } = useRules();
 
