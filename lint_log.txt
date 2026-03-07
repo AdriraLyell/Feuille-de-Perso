@@ -1,0 +1,24 @@
+
+D:\Projet JdR\feuille-de-perso\src\components\campaign\book\components\BookChapterSidebar.tsx
+  20:5  warning  'onInsertActAtEnd' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\components\layout\MainLayout.tsx
+  647:117  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\shared\CharacterImageWidget.tsx
+  122:13  warning  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+D:\Projet JdR\feuille-de-perso\src\components\sheet\NumericCounterItem.tsx
+  132:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\components\ui\CampaignConflictModal.tsx
+  18:5  warning  'onClose' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+D:\Projet JdR\feuille-de-perso\src\extensions\bookImage.ts
+  128:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Projet JdR\feuille-de-perso\src\extensions\chapterHeading.ts
+  158:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 7 problems (0 errors, 7 warnings)
+

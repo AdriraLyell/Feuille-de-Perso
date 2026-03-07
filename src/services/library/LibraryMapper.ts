@@ -122,7 +122,7 @@ export const LibraryMapper = {
             code: f.code,
             formula: f.formula,
             type: type,
-            aggregateConfig: f.aggregate_config as any,
+            aggregateConfig: f.aggregate_config as any, // eslint-disable-line @typescript-eslint/no-explicit-any
             target: f.target,
             effectType: f.effect_type,
             operator: f.operator as 'ADD' | 'SET' | 'SUB' | '',

@@ -155,7 +155,7 @@ export const ChapterHeading = Node.create({
     },
 
     addNodeView() {
-        return ReactNodeViewRenderer(ChapterHeaderView as any);
+        return ReactNodeViewRenderer(ChapterHeaderView as any); // eslint-disable-line @typescript-eslint/no-explicit-any
     },
 });
 

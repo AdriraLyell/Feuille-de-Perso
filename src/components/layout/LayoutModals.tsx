@@ -1,7 +1,7 @@
 
 import React, { lazy, Suspense } from 'react';
 import { PencilLine, Check } from 'lucide-react';
-import { CharacterSheetData } from '../../types';
+import { CharacterSheetData, PrintSelection } from '../../types';
 import { RulesData } from '../../types/rules';
 
 // Lazy Loaded Components
@@ -29,7 +29,7 @@ interface LayoutModalsProps {
     setShowImportExport: (show: boolean) => void;
     showPrintModal: boolean;
     setShowPrintModal: (show: boolean) => void;
-    handlePrintConfirm: (s: Record<string, boolean>) => void;
+    handlePrintConfirm: (s: PrintSelection) => void;
     showChangelog: boolean;
     setShowChangelog: (show: boolean) => void;
     showUserGuide: boolean;
@@ -45,7 +45,7 @@ interface LayoutModalsProps {
     pendingRules: { rules: RulesData, id: string, name: string } | null;
     handleConfirmReset: () => void;
     handleConfirmBackup: () => void;
-    pagesToPrint: Record<string, boolean>;
+    pagesToPrint: PrintSelection;
     showDiscardConfirm: boolean;
     setShowDiscardConfirm: (show: boolean) => void;
     confirmDiscard: () => void;
@@ -91,7 +91,7 @@ const LayoutModals: React.FC<LayoutModalsProps> = ({
             <PrintSelectionModal
                 isOpen={showPrintModal}
                 onClose={() => setShowPrintModal(false)}
-                onConfirm={(s: Record<string, boolean>) => handlePrintConfirm(s)}
+                onConfirm={(s: PrintSelection) => handlePrintConfirm(s)}
             />
 
             <ChangelogModal isOpen={showChangelog} onClose={() => setShowChangelog(false)} />

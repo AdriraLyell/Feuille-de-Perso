@@ -181,8 +181,8 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
             )}
 
             {/* Spread Wrapper: Fixed width for exact button anchoring */}
-            <div 
-                className="relative" 
+            <div
+                className="relative"
                 style={{ width: `${PAGE_WIDTH * 2 + 40}px` }}
                 role="application"
                 aria-label="Éditeur de livre en colonnes"
@@ -206,7 +206,6 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                             commands.insertChapterAtDate(today, undefined, false);
                         }}
                         onInsertActAtCursor={() => commands.insertAct(true)}
-                        onInsertActAtEnd={() => commands.insertAct(false)}
                         isCalendarVisible={isCalendarVisible}
                         onToggleCalendar={() => setIsCalendarVisible(!isCalendarVisible)}
                         toolbar={(

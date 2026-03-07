@@ -15,7 +15,7 @@ interface CampaignConflictModalProps {
 
 const CampaignConflictModal: React.FC<CampaignConflictModalProps> = ({
     isOpen,
-    onClose,
+    onClose: _onClose,
     characterName,
     currentCampaignName,
     newCampaignName,
@@ -26,7 +26,7 @@ const CampaignConflictModal: React.FC<CampaignConflictModalProps> = ({
     return (
         <ThematicModal
             isOpen={isOpen}
-            onClose={onStay}
+            onClose={onStay} // Using onStay as the close handler for the modal
             title="Conflit de Campagne"
             icon={<AlertTriangle size={28} className="text-amber-500" />}
             size="md"

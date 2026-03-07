@@ -1,19 +1,21 @@
 
 import React, { useState } from 'react';
-import { Printer, CheckSquare, Square, X, Layers, List, FileType, TrendingUp, Book } from 'lucide-react';
+import { Printer, CheckSquare, Square, X, Layers, List, FileType, TrendingUp, Book, Package } from 'lucide-react';
+import { PrintSelection } from '../types';
 
 interface PrintSelectionModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onConfirm: (selection: Record<string, boolean>) => void;
+    onConfirm: (selection: PrintSelection) => void;
 }
 
 const PrintSelectionModal: React.FC<PrintSelectionModalProps> = ({ isOpen, onClose, onConfirm }) => {
-    const [selection, setSelection] = useState({
+    const [selection, setSelection] = useState<PrintSelection>({
         p1: true,
         specs: false,
         p2: true,
         xp: false,
+        inventaire: true,
         notes: false
     });
 
@@ -78,6 +80,15 @@ const PrintSelectionModal: React.FC<PrintSelectionModalProps> = ({ isOpen, onClo
                             {selection.xp ? <CheckSquare size={20} className="text-blue-600" /> : <Square size={20} />}
                             <TrendingUp size={18} />
                             <span className="font-semibold">Gestion XP</span>
+                        </button>
+
+                        <button
+                            onClick={() => toggle('inventaire')}
+                            className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${selection.inventaire ? 'bg-blue-50 border-blue-300 text-blue-900' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'}`}
+                        >
+                            {selection.inventaire ? <CheckSquare size={20} className="text-blue-600" /> : <Square size={20} />}
+                            <Package size={18} />
+                            <span className="font-semibold">Inventaire & Argent</span>
                         </button>
 
                         <button

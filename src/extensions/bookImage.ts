@@ -125,7 +125,7 @@ export const BookImage = Node.create({
     },
 
     addNodeView() {
-        return ReactNodeViewRenderer(BookImageView as any);
+        return ReactNodeViewRenderer(BookImageView as any); // eslint-disable-line @typescript-eslint/no-explicit-any
     },
 
     addProseMirrorPlugins() {

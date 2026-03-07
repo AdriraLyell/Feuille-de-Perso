@@ -1,0 +1,4 @@
+
+> rpg-sheet-manager@2.99.9 lint
+> eslint src/
+

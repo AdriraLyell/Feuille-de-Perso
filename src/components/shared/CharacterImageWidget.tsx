@@ -117,22 +117,13 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
         setShowDeleteConfirm(false);
     };
 
+    const sharedClasses = "w-full h-full flex flex-col items-center justify-center relative group overflow-hidden outline-none rounded-sm bg-stone-50/30";
+
     return (
         <>
-            <div
-                className="w-full h-full flex flex-col items-center justify-center relative group overflow-hidden outline-none rounded-sm bg-stone-50/30"
-                onClick={() => !imageUrl && !loading && fileInputRef.current?.click()}
-                role={!imageUrl ? "button" : undefined}
-                tabIndex={!imageUrl ? 0 : -1}
-                onKeyDown={(e) => {
-                    if (!imageUrl && !loading && (e.key === 'Enter' || e.key === ' ')) {
-                        e.preventDefault();
-                        fileInputRef.current?.click();
-                    }
-                }}
-            >
-                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
-                {imageUrl ? (
+            {imageUrl ? (
+                <div className={sharedClasses}>
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                     <div className="w-full h-full p-4 flex items-center justify-center">
                         <div className="w-full h-full border-4 border-white shadow-md bg-stone-200 flex items-center justify-center overflow-hidden relative ring-1 ring-stone-300 rounded-sm">
                             <img src={imageUrl} alt="Character" className="w-full h-full object-contain" />
@@ -142,15 +133,29 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
                             </div>
                         </div>
                     </div>
-                ) : (
+                </div>
+            ) : (
+                <button
+                    type="button"
+                    className={sharedClasses}
+                    onClick={() => !loading && fileInputRef.current?.click()}
+                    onKeyDown={(e) => {
+                        if (!loading && (e.key === 'Enter' || e.key === ' ')) {
+                            e.preventDefault();
+                            fileInputRef.current?.click();
+                        }
+                    }}
+                >
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                     <div className="w-full h-full p-4 flex items-center justify-center cursor-pointer">
                         <div className={`w-full h-full border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-400 bg-white/50 hover:bg-white hover:border-blue-400 hover:text-blue-500 transition rounded-lg ${loading ? 'opacity-50 cursor-wait' : ''}`}>
                             {loading ? <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-stone-500 mb-2"></div> : <ImageIcon size={48} className="mb-2 opacity-50" />}
                             <span className="text-xs font-bold uppercase tracking-wider text-center px-4">{loading ? "Traitement..." : "Ajouter une image"}</span>
                         </div>
                     </div>
-                )}
-            </div>
+                </button>
+            )}
+
             <ConfirmationModal
                 isOpen={showDeleteConfirm}
                 onClose={() => setShowDeleteConfirm(false)}

@@ -15,7 +15,7 @@ export const restoreMysticLinks = (data: MigratableData): void => {
 
     // 1. Map des habilites par nom normalise (ultra-fuzzy)
     const abilityByName = new Map<string, string>();
-    const mysticAbilities = data.mysticAbilities as any[];
+    const mysticAbilities = data.mysticAbilities as any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (mysticAbilities && Array.isArray(mysticAbilities)) {
         mysticAbilities.forEach(ability => {
             if (typeof ability !== 'string' && ability.id && ability.name) {
@@ -29,7 +29,7 @@ export const restoreMysticLinks = (data: MigratableData): void => {
 
     // 2. Maps de la bibliotheque (Skill Name -> Mystic Ability ID)
     const skillLibByName = new Map<string, string>();
-    const skillLibrary = data.skillLibrary as any[];
+    const skillLibrary = data.skillLibrary as any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (skillLibrary && Array.isArray(skillLibrary)) {
         skillLibrary.forEach(libSkill => {
             if (libSkill.mysticAbilityId) {
@@ -39,7 +39,7 @@ export const restoreMysticLinks = (data: MigratableData): void => {
     }
 
     // 3. Reparer les competences
-    const skills = data.skills as Record<string, any[]>;
+    const skills = data.skills as Record<string, any[]>; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (skills) {
         Object.values(skills).forEach(skillList => {
             if (Array.isArray(skillList)) {
@@ -56,7 +56,7 @@ export const restoreMysticLinks = (data: MigratableData): void => {
     }
 
     // 4. Reparer les traits (Avantages)
-    const repairTraits = (traitList: any[]) => {
+    const repairTraits = (traitList: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         if (!traitList || !Array.isArray(traitList)) return;
 
         traitList.forEach(trait => {
@@ -90,7 +90,7 @@ export const restoreMysticLinks = (data: MigratableData): void => {
         });
     };
 
-    const page2 = data.page2 as Record<string, any[]>;
+    const page2 = data.page2 as Record<string, any[]>; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (page2) {
         repairTraits(page2.avantages || []);
         repairTraits(page2.desavantages || []);

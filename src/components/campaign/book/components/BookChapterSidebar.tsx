@@ -5,7 +5,6 @@ interface BookChapterSidebarProps {
     onInsertChapterAtCursor: () => void;
     onInsertChapterAtEnd: () => void;
     onInsertActAtCursor: () => void;
-    onInsertActAtEnd: () => void;
     onToggleCalendar: () => void;
     isCalendarVisible: boolean;
     children?: React.ReactNode;
@@ -17,7 +16,6 @@ export const BookChapterSidebar: React.FC<BookChapterSidebarProps> = ({
     onInsertChapterAtCursor,
     onInsertChapterAtEnd,
     onInsertActAtCursor,
-    onInsertActAtEnd,
     onToggleCalendar,
     isCalendarVisible,
     children,

@@ -28,3 +28,12 @@ export interface LayoutConfig {
     md?: LayoutItem[]; // Tablette
     sm?: LayoutItem[]; // Portrait (Mobile)
 }
+
+export interface PrintSelection {
+    p1: boolean;
+    specs: boolean;
+    p2: boolean;
+    xp: boolean;
+    inventaire: boolean;
+    notes: boolean;
+}

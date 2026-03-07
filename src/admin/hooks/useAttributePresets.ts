@@ -90,7 +90,7 @@ export const useAttributePresets = ({
         const newSecondary: Record<string, string[]> = { ...secondaryMap };
         const hasSecondaryInPreset = pendingPreset.hasSecondary || false;
 
-        pendingPreset.structure.forEach((cat: any) => {
+        pendingPreset.structure.forEach((cat: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
             newAttributes[cat.id] = [...cat.attrs];
             newLabels[cat.id] = cat.label;
             if (cat.secondaryAttrs) {

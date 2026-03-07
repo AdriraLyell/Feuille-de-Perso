@@ -2,7 +2,7 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 
 import { useCharacter } from '../../context/CharacterContext';
 import { NotificationProvider } from '../../context/NotificationContext';
-import { CharacterSheetData } from '../../types';
+import { CharacterSheetData, PrintSelection } from '../../types';
 import { APP_VERSION } from '../../constants/app';
 import { migrateData } from '../../utils/migrations';
 import { useRules } from '../../context/RulesContext';
@@ -160,7 +160,7 @@ const MainLayout: React.FC = () => {
             // If local edit happened AFTER the last time we were in sync with server,
             // and the server version is DIFFERENT from our base, it's a conflict.
             const hasLocalChanges = !!localSyncInfo.isDirty || (localSyncInfo.lastLocalEdit > (localSyncInfo.lastSynced || 0));
-            
+
             if (hasLocalChanges && remoteSyncInfo.lastSynced !== localSyncInfo.lastSynced) {
                 logger.warn("[Conflict] Remote update received but local changes exist. Blocking auto-overwrite.");
                 setConflictData(remoteData);
@@ -312,7 +312,7 @@ const MainLayout: React.FC = () => {
 
         let xpToRefund = 0;
         const attrCost = migrationInfo.oldAttributeFactor || 6;
-        
+
         Object.values(data.attributes).forEach(cat => {
             cat.forEach(attr => {
                 const currentVal = parseInt(attr.val1) || 0;
@@ -337,7 +337,7 @@ const MainLayout: React.FC = () => {
 
         setData((prev: CharacterSheetData) => {
             let newData = { ...prev };
-            
+
             if (xpToRefund > 0) {
                 const refundTx = {
                     id: generateId(),
@@ -350,7 +350,7 @@ const MainLayout: React.FC = () => {
                 newData.xpTransactions = [refundTx, ...(newData.xpTransactions || [])];
                 newData.experience = { ...newData.experience, rest: (parseInt(newData.experience.rest || '0') + xpToRefund).toString() };
             }
-            
+
             // Prepare migration state
             newData.syncInfo = { ...newData.syncInfo };
             delete newData.syncInfo.pendingAttributeMigration;
@@ -644,7 +644,7 @@ const MainLayout: React.FC = () => {
                         showPrintModal={showPrintModal}
                         setShowPrintModal={setShowPrintModal}
                         pagesToPrint={pagesToPrint}
-                        handlePrintConfirm={(selection: Record<string, boolean>) => handlePrintConfirm(selection as any)}
+                        handlePrintConfirm={(selection: PrintSelection) => handlePrintConfirm(selection)}
                         showChangelog={showChangelog}
                         setShowChangelog={setShowChangelog}
                         showUserGuide={showUserGuide}

@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react';
+import { PrintSelection } from '../../types';
 
 export const usePrintManager = (isLandscape: boolean) => {
     const [showPrintModal, setShowPrintModal] = useState(false);
-    const [pagesToPrint, setPagesToPrint] = useState({ p1: true, specs: false, p2: true, xp: false, inventaire: false, notes: false });
+    const [pagesToPrint, setPagesToPrint] = useState<PrintSelection>({ p1: true, specs: false, p2: true, xp: false, inventaire: false, notes: false });
 
-    const handlePrintConfirm = useCallback((selection: { p1: boolean, specs: boolean, p2: boolean, xp: boolean, inventaire: boolean, notes: boolean }) => {
+    const handlePrintConfirm = useCallback((selection: PrintSelection) => {
         setPagesToPrint(selection);
         setShowPrintModal(false);
 

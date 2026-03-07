@@ -129,7 +129,7 @@ export const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
     const computedMax = calculatedMax ?? evaluateFormula(
         formula,
         { ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary },
-        { entry: effectiveEntry as unknown as any }
+        { entry: effectiveEntry as unknown as any } // eslint-disable-line @typescript-eslint/no-explicit-any
     );
 
     const currentSpent = counter.current || 0;

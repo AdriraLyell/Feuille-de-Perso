@@ -92,8 +92,8 @@ export const extractRulesFromCharacter = (
             ...newRules.configurations.creation,
             ...sheetCreationConfig,
             // Deep merge rank slots if present
-            rankSlots: (sheetCreationConfig.rankSlots as any) || newRules.configurations.creation.rankSlots
-        } as any;
+            rankSlots: (sheetCreationConfig.rankSlots as Record<number, number>) || newRules.configurations.creation.rankSlots
+        } as unknown as RulesCreationConfig;
         success.push("Configuration de Création (Points, Mode)");
     } else {
         warnings.push("Configuration de Création manquante (ignoré).");
@@ -103,7 +103,8 @@ export const extractRulesFromCharacter = (
     if (sheet.xpCosts) {
         newRules.configurations.xpCosts = {
             ...newRules.configurations.xpCosts,
-            ...(sheet.xpCosts as any)
+            ...newRules.configurations.xpCosts,
+            ...(sheet.xpCosts as import('../types/rules').RulesXPCosts)
         };
         success.push("Configuration des Coûts XP (Multiplicateurs)");
     } else {
@@ -114,38 +115,29 @@ export const extractRulesFromCharacter = (
 
     // 4. Import Attributes Definitions
     if (sheet.attributes) {
-        const newAttrs: Record<string, string[]> = {};
-        const sheetAttributes = sheet.attributes as Record<string, unknown[]>;
-        Object.keys(sheetAttributes).forEach(cat => {
-            const list = sheetAttributes[cat];
-            if (Array.isArray(list)) {
-                newAttrs[cat] = list.map((a: any) => String(a.name || a));
-            }
-        });
+        newRules.definitions.attributes = Object.fromEntries(
+            Object.entries(sheet.attributes).map(([cat, attrs]) => [
+                cat,
+                (attrs as import('../../types').AttributeEntry[]).map((a: import('../../types').AttributeEntry) => a.name)
+            ])
+        );
 
         // Also Secondary Attributes if active
         if (sheet.secondaryAttributesActive && sheet.secondaryAttributes) {
-            const newSecAttrs: Record<string, string[]> = {};
-            const sheetSecondaryAttributes = sheet.secondaryAttributes as Record<string, unknown[]>;
-            Object.keys(sheetSecondaryAttributes).forEach(cat => {
-                const list = sheetSecondaryAttributes[cat];
-                if (Array.isArray(list)) {
-                    newSecAttrs[cat] = list.map((a: any) => String(a.name || a));
-                }
-            });
-            newRules.definitions.secondaryAttributes = newSecAttrs;
-
+            newRules.definitions.secondaryAttributes = Object.fromEntries(
+                Object.entries(sheet.secondaryAttributes).map(([cat, attrs]) => [
+                    cat,
+                    (attrs as import('../../types').AttributeEntry[]).map((a: import('../../types').AttributeEntry) => a.name)
+                ])
+            );
             // Sync with Global Config Flag
             newRules.configurations.global.secondaryAttributes = true;
-
             success.push("Définitions des Attributs (Primaires et Secondaires)");
         } else {
             // Ensure flag is false if not active
             newRules.configurations.global.secondaryAttributes = false;
             success.push("Définitions des Attributs (Primaires)");
         }
-
-        newRules.definitions.attributes = newAttrs;
     }
 
     // 5. Import Skills Definitions
@@ -198,6 +190,7 @@ export const extractRulesFromCharacter = (
 
     // Import Background Cost config
     if (sheet.creationConfig && (sheet.creationConfig as Record<string, unknown>).backgroundCost !== undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         newRules.configurations.creation.backgroundCost = (sheet.creationConfig as Record<string, any>).backgroundCost;
     }
 
