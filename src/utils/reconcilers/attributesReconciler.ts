@@ -11,42 +11,73 @@ export const checkAndTriggerAttributeMigration = (newState: CharacterSheetData, 
     if (!ruleAttributes) return false;
 
     let hasStructuralDifference = false;
-    const currentCategories = Object.keys(newState.attributes || {});
     const ruleCategories = Object.keys(ruleAttributes);
 
-    // 1. Check Primary Categories
-    if (currentCategories.length !== ruleCategories.length || !currentCategories.every(c => ruleCategories.includes(c))) {
-        hasStructuralDifference = true;
-    } else {
-        // 2. Check Primary Attribute Names
-        for (const cat of ruleCategories) {
-            // Important: consistent name filtering (ignore empty strings/spacers for comparison)
-            const currentNames = (newState.attributes[cat] || []).map(a => a.name).filter(n => n && n.trim() !== "").sort();
-            const ruleNames = (ruleAttributes[cat] || []).filter(n => n && n.trim() !== "").sort();
-            if (currentNames.length !== ruleNames.length || !currentNames.every((val, index) => val === ruleNames[index])) {
-                hasStructuralDifference = true;
-                break;
+    // Helper to check if an attribute has any invested points (positive or negative)
+    const hasInvestedPoints = (a: AttributeEntry) => {
+        return (parseInt(a.val1) || 0) !== 0 || (parseInt(a.val2) || 0) !== 0 || (a.creationVal1 || 0) !== 0;
+    };
+
+    // 1. Check Primary Attributes (Missing required OR Extra with points)
+    for (const cat of ruleCategories) {
+        const currentEntries = (newState.attributes[cat] || []).filter(a => a.name && a.name.trim() !== "");
+        const currentNames = currentEntries.map(a => a.name);
+        const ruleNames = (ruleAttributes[cat] || []).filter(n => n && n.trim() !== "");
+
+        // Check if any REQUIRED attribute from the rules is missing
+        if (ruleNames.some(rn => !currentNames.includes(rn))) {
+            hasStructuralDifference = true; break;
+        }
+
+        // Check if any EXTRA attribute (not in rules) has invested points
+        const extraAttributes = currentEntries.filter(a => !ruleNames.includes(a.name));
+        if (extraAttributes.some(hasInvestedPoints)) {
+            hasStructuralDifference = true; break;
+        }
+    }
+
+    // Check for extra primary categories that might have values
+    if (!hasStructuralDifference) {
+        const currentPrimaryCategories = Object.keys(newState.attributes || {});
+        for (const cat of currentPrimaryCategories) {
+            if (!ruleCategories.includes(cat)) {
+                const entries = newState.attributes[cat] || [];
+                if (entries.some(hasInvestedPoints)) {
+                    hasStructuralDifference = true; break;
+                }
             }
         }
     }
 
-    // 3. Check Secondary Attributes (only if primary match and secondary rules exist)
+    // 2. Check Secondary Attributes (only if primary match and secondary rules exist)
     if (!hasStructuralDifference && rules.definitions.secondaryAttributes) {
         const ruleSecAttributes = rules.definitions.secondaryAttributes;
-        // Only consider secondary categories that are valid (exist in primary attributes)
-        // to match applyRulesToState and reconcileSecondaryAttributes logic.
         const validRuleSecCategories = Object.keys(ruleSecAttributes).filter(cat => ruleCategories.includes(cat));
-        const currentSecCategories = Object.keys(newState.secondaryAttributes || {}).filter(cat => (newState.secondaryAttributes[cat] || []).length > 0);
 
-        if (currentSecCategories.length !== validRuleSecCategories.length || !validRuleSecCategories.every(c => currentSecCategories.includes(c))) {
-            hasStructuralDifference = true;
-        } else {
-            for (const cat of validRuleSecCategories) {
-                const currentNames = (newState.secondaryAttributes[cat] || []).map(a => a.name).filter(n => n && n.trim() !== "").sort();
-                const ruleNames = (ruleSecAttributes[cat] || []).filter(n => n && n.trim() !== "").sort();
-                if (currentNames.length !== ruleNames.length || !currentNames.every((val, index) => val === ruleNames[index])) {
-                    hasStructuralDifference = true;
-                    break;
+        for (const cat of validRuleSecCategories) {
+            const currentEntries = (newState.secondaryAttributes[cat] || []).filter(a => a.name && a.name.trim() !== "");
+            const currentNames = currentEntries.map(a => a.name);
+            const ruleNames = (ruleSecAttributes[cat] || []).filter(n => n && n.trim() !== "");
+
+            if (ruleNames.some(rn => !currentNames.includes(rn))) {
+                hasStructuralDifference = true; break;
+            }
+
+            const extraAttributes = currentEntries.filter(a => !ruleNames.includes(a.name));
+            if (extraAttributes.some(hasInvestedPoints)) {
+                hasStructuralDifference = true; break;
+            }
+        }
+
+        // Check for extra secondary categories that might have values
+        if (!hasStructuralDifference) {
+            const currentSecCategories = Object.keys(newState.secondaryAttributes || {});
+            for (const cat of currentSecCategories) {
+                if (!validRuleSecCategories.includes(cat)) {
+                    const entries = newState.secondaryAttributes[cat] || [];
+                    if (entries.some(hasInvestedPoints)) {
+                        hasStructuralDifference = true; break;
+                    }
                 }
             }
         }
@@ -55,14 +86,13 @@ export const checkAndTriggerAttributeMigration = (newState: CharacterSheetData, 
     const currentCost = newState.xpCosts?.attributeFactor || 6;
 
     // Only trigger migration if:
-    // - There is a structural difference (names, categories)
+    // - There is a structural difference (missing required OR extra with points)
     // - Character is NOT in creation mode
     // - Character is NOT already in migration mode
-    // - Character is NOT "empty/new" (has spent some XP or has non-zero attribute values)
-    //   -> If it's a fresh character, we should just apply the rules silently.
+    // - Character is NOT "empty/new"
     
     const hasSpentXP = (parseInt(newState.experience.spent) || 0) > 0;
-    const hasAttributeValues = Object.values(newState.attributes).some(cat => cat.some(a => (parseInt(a.val1) || 0) > 0 || (parseInt(a.val2) || 0) > 0));
+    const hasAttributeValues = Object.values(newState.attributes).some(cat => cat.some(a => (parseInt(a.val1) || 0) !== 0 || (parseInt(a.val2) || 0) !== 0));
     const isFreshCharacter = !hasSpentXP && !hasAttributeValues;
 
     if (hasStructuralDifference && !newState.creationConfig?.active && !newState.attributeMigrationMode && !isFreshCharacter) {
@@ -74,13 +104,13 @@ export const checkAndTriggerAttributeMigration = (newState: CharacterSheetData, 
         };
         return true;
     } else if (hasStructuralDifference && (newState.creationConfig?.active || isFreshCharacter)) {
-        // For fresh characters or during creation, we don't trigger a "pending" migration, 
-        // we allow reconcileAttributes to just do its job.
+        // For fresh characters or during creation, allow reconcileAttributes to just do its job.
         if (newState.syncInfo?.pendingAttributeMigration) {
             delete newState.syncInfo.pendingAttributeMigration;
         }
         return false; 
     } else if (!hasStructuralDifference && newState.syncInfo?.pendingAttributeMigration) {
+        // Migration no longer needed
         delete newState.syncInfo.pendingAttributeMigration;
     }
 
@@ -140,13 +170,17 @@ export const reconcileAttributes = (newState: CharacterSheetData, rules: RulesDa
         newAttributes[category] = syncedAttributes;
     });
 
-    // If NOT in migration mode, keep remaining attributes in their respective categories
+    // If NOT in migration mode, keep remaining attributes ONLY if they have invested points.
+    // This silently auto-cleans empty phantom attributes.
     if (!isMigrationMode) {
         attributePool.forEach(item => {
-            if (!newAttributes[item.originalCategory]) {
-                newAttributes[item.originalCategory] = [];
+            const hasPoints = (parseInt(item.entry.val1) || 0) !== 0 || (parseInt(item.entry.val2) || 0) !== 0 || (item.entry.creationVal1 || 0) !== 0;
+            if (hasPoints) {
+                if (!newAttributes[item.originalCategory]) {
+                    newAttributes[item.originalCategory] = [];
+                }
+                newAttributes[item.originalCategory].push(item.entry);
             }
-            newAttributes[item.originalCategory].push(item.entry);
         });
     }
 
@@ -212,13 +246,17 @@ export const reconcileSecondaryAttributes = (newState: CharacterSheetData, rules
         newSecondary[category] = syncedSecondary;
     });
 
-    // If NOT in migration mode, keep remaining secondary attributes
+    // If NOT in migration mode, keep remaining secondary attributes ONLY if they have invested points.
+    // This silently auto-cleans empty phantom attributes.
     if (!isMigrationMode) {
         secondaryPool.forEach(item => {
-            if (!newSecondary[item.originalCategory]) {
-                newSecondary[item.originalCategory] = [];
+            const hasPoints = (parseInt(item.entry.val1) || 0) !== 0 || (parseInt(item.entry.val2) || 0) !== 0 || (item.entry.creationVal1 || 0) !== 0;
+            if (hasPoints) {
+                if (!newSecondary[item.originalCategory]) {
+                    newSecondary[item.originalCategory] = [];
+                }
+                newSecondary[item.originalCategory].push(item.entry);
             }
-            newSecondary[item.originalCategory].push(item.entry);
         });
     }
 
