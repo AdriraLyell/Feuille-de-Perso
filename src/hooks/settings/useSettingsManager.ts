@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { CharacterSheetData } from '../../types';
 import { getInitialCharacterData } from '../../data/initialState';
-import { applyRulesToState } from '../../utils/rulesAdapter';
+import { reconcileRulesWithState } from '../../utils/rulesReconciler';
 import { RulesData } from '../../types/rules';
 
 export const useSettingsManager = (
@@ -81,7 +81,7 @@ export const useSettingsManager = (
             base.creationConfig.active = true;
         }
 
-        const newState = rules ? applyRulesToState(base, rules) : base;
+        const newState = rules ? reconcileRulesWithState(base, rules) : base;
 
         setLocalData(newState);
         onUpdate(newState);

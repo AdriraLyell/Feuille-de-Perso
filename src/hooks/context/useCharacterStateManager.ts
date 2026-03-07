@@ -4,7 +4,6 @@ import { getInitialCharacterData } from '../../data/initialState';
 import { migrateData } from '../../utils/migrations';
 import { validateCharacterData } from '../../schemas/characterSchema';
 import { useRules } from '../../context/RulesContext';
-import { applyRulesToState } from '../../utils/rulesAdapter';
 import { reconcileRulesWithState } from '../../utils/rulesReconciler';
 import { ErrorService } from '../../services/ErrorService';
 import { logger } from '../../utils/logger';
@@ -33,8 +32,8 @@ export const useCharacterStateManager = (
   const resetData = useCallback(() => {
     // Use factory to get fresh IDs
     const base = getInitialCharacterData();
-    // Apply rules if available
-    const newState = rules ? applyRulesToState(base, rules) : base;
+    // Use full reconciliation to ensure all rule-based logic (Bonus MJ, Layout, etc.) is applied
+    const newState = rules ? reconcileRulesWithState(base, rules) : base;
 
     updateData(newState);
   }, [rules, updateData]);

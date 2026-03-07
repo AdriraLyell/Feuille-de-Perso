@@ -195,8 +195,6 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
 
         const isDirty = data.syncInfo?.isDirty;
         const isAutoSync = data.syncInfo?.isAutoSyncEnabled;
-        const lastSynced = data.syncInfo?.lastSynced || 0;
-        const thirtyMinutes = 30 * 60 * 1000;
 
         const handleSyncTrigger = (mode: 'auto' | 'manual') => {
             if (navigator.onLine) {
@@ -212,21 +210,6 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
                 clearTimeout(timeout);
                 window.removeEventListener('online', () => handleSyncTrigger('auto'));
             };
-        }
-
-        // 2. Periodic "Safety Sync" (if AutoSync is OFF but data is dirty)
-        if (isDirty && !isAutoSync) {
-            const checkSafetySync = () => {
-                const now = Date.now();
-                if (now - lastSynced > thirtyMinutes) {
-                    logger.log("[SafetySync] 30 minutes passed since last sync. Triggering background save.");
-                    handleSyncTrigger('auto');
-                }
-            };
-
-            // Check every minute if it's time to do the safety sync
-            const interval = setInterval(checkSafetySync, 60000); 
-            return () => clearInterval(interval);
         }
 
     }, [data.syncInfo?.isDirty, data.syncInfo?.isAutoSyncEnabled, data.syncInfo?.lastSynced, data.syncInfo?.syncId, isSyncing, sync]);

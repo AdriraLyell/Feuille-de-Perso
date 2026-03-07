@@ -17,7 +17,7 @@ export const defaultRules: RulesData = {
             backgroundPoints: 7,
             attributeMin: -1,
             attributeMax: 3,
-            attributeCost: 1,
+            attributeCost: 6,
             backgroundCost: 2,
             rankSlots: { "1": 10, "2": 8, "3": 6, "4": 2, "5": 0 },
             pointsBuckets: {

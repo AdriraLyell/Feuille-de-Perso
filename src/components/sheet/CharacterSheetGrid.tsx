@@ -110,14 +110,55 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
 
         // Build a map of cat -> layout position from the saved layout config
         const positionMap = new Map<string, { x: number; y: number; w: number; h: number }>();
-        if (layoutItems) {
+        
+        // If we have a saved layout, use it. 
+        // IF NOT (New character / Reset), we generate a simple default flow
+        if (layoutItems && layoutItems.length > 0) {
             for (const item of layoutItems) {
                 positionMap.set(item.i, { x: item.x, y: item.y, w: item.w, h: item.h });
             }
+        } else {
+            // FALLBACK: Generate an exact default layout mimicking generateDefaultLayout logic
+            const computeH = (itemCount: number) => {
+                return Math.max(3, Math.ceil((28 + itemCount * 20) / 24) + 1);
+            };
+
+            let maxTopH = 0;
+            let maxBottomH = 0;
+
+            // Pass 1: compute max height for each visual "row" across all columns
+            columns.forEach((col) => {
+                col.topBlocks.forEach(b => { maxTopH = Math.max(maxTopH, computeH(b.items.length)); });
+                col.bottomBlocks.forEach(b => { maxBottomH = Math.max(maxBottomH, computeH(b.items.length)); });
+            });
+
+            // Pass 2: assign layout positions using uniform row heights for perfect horizontal alignment
+            const isLandscape = colCount === 5;
+            columns.forEach((col, colIdx) => {
+                const hasTop = col.topBlocks.length > 0;
+                const hasBottom = col.bottomBlocks.length > 0;
+
+                col.topBlocks.forEach((block) => {
+                    const height = (isLandscape && hasTop && !hasBottom) ? (maxTopH + maxBottomH) : maxTopH;
+                    positionMap.set(block.cat, { x: colIdx, y: 0, w: 1, h: height });
+                });
+                col.bottomBlocks.forEach((block) => {
+                    positionMap.set(block.cat, { x: colIdx, y: maxTopH, w: 1, h: maxBottomH });
+                });
+            });
+            
+            // Just in case any backgrounds/autres slipped through
+            const finalMaxY = maxTopH + maxBottomH;
+            backgrounds.forEach((block, i) => {
+                positionMap.set(block.cat, { x: i % colCount, y: finalMaxY, w: 1, h: 8 });
+            });
+            autres.forEach((block, i) => {
+                positionMap.set(block.cat, { x: (i + 2) % colCount, y: finalMaxY, w: 1, h: 8 });
+            });
         }
 
         // Calculate grid dimensions
-        const rowHeight = 24; // matches RGL rowHeight
+        const rowHeight = 24; 
         let blocksMaxRow = 0;
         const positioned = allBlocks.map(block => {
             const pos = positionMap.get(block.cat);
@@ -126,19 +167,20 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
                 if (endRow > blocksMaxRow) blocksMaxRow = endRow;
                 return { block, pos };
             }
-            return { block, pos: null };
+            // Should not happen with the fallback logic above
+            return { block, pos: { x: 0, y: 0, w: 1, h: 10 } };
         });
 
-        // Also position the counters section to find the total height
         const countersPos = positionMap.get('counters_section');
-        let totalMaxRow = blocksMaxRow;
+        let totalMaxRow = Math.max(blocksMaxRow, 20); // Minimum height safety
         if (countersPos) {
             const endRow = countersPos.y + countersPos.h;
             if (endRow > totalMaxRow) totalMaxRow = endRow;
+        } else {
+            // If counters not in layout, they take the bottom row
+            totalMaxRow += 8; 
         }
 
-        // The vertical separators should stop BEFORE the counters section starts
-        // We use the top of the counters section as the limit
         const vSepEndRow = countersPos ? countersPos.y : blocksMaxRow;
 
         return (
@@ -151,17 +193,16 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
                     gridTemplateRows: `repeat(${totalMaxRow}, ${rowHeight}px)`,
                 }}
             >
-                {/* Vertical separators that span the height UNTIL the counters section */}
-                {Array.from({ length: colCount }).map((_, i) => (
+                {/* Vertical separators: Render colCount-1 lines to avoid double borders on edges */}
+                {Array.from({ length: colCount - 1 }).map((_, i) => (
                     <div
                         key={`v-sep-${i}`}
                         style={{
                             gridColumn: i + 1,
                             gridRow: `1 / span ${vSepEndRow}`,
-                            borderLeft: i === 0 ? '1px solid #1c1917' : undefined,
                             borderRight: '1px solid #1c1917',
                             pointerEvents: 'none',
-                            zIndex: 5, // Draw ABOVE everything else to ensure continuous lines
+                            zIndex: 10, 
                         }}
                     />
                 ))}
@@ -169,15 +210,15 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
                 {positioned.map(({ block, pos }) => (
                     <div
                         key={block.cat}
-                        style={pos ? {
+                        className="bg-paper-cream" // Ensure background covers separators
+                        style={{
                             gridColumn: `${pos.x + 1} / span ${pos.w}`,
                             gridRow: `${pos.y + 1} / span ${pos.h}`,
                             overflow: 'hidden',
-                            borderTop: '1px solid #1c1917', // Horizontal line above block names
+                            borderTop: '1px solid #1c1917',
                             zIndex: 2,
-                        } : undefined}
+                        }}
                     >
-                        {/* Remove border-r from renderSkillBlock content here */}
                         <SkillBlock
                             title={block.title}
                             items={block.items}
@@ -203,6 +244,7 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
                 {/* Counter Section */}
                 <div
                     key="counters_section"
+                    className="bg-paper-cream"
                     style={countersPos ? {
                         gridColumn: `${countersPos.x + 1} / span ${countersPos.w}`,
                         gridRow: `${countersPos.y + 1} / span ${countersPos.h}`,
@@ -211,6 +253,7 @@ const CharacterSheetGrid: React.FC<CharacterSheetGridProps> = ({
                         zIndex: 2,
                     } : {
                         gridColumn: `1 / span ${colCount}`,
+                        gridRow: `${blocksMaxRow + 1} / span 8`,
                         overflow: 'hidden',
                         borderTop: '1px solid #1c1917',
                         zIndex: 2,

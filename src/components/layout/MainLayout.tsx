@@ -24,6 +24,7 @@ import CharacterSheetSpecializations from '../CharacterSheetSpecializations';
 import CharacterSheetXP from '../CharacterSheetXP';
 import CampaignNotes from '../CampaignNotes';
 import CreationHUD from '../CreationHUD';
+import SafetyAlert from '../ui/SafetyAlert';
 
 // Lazy Loaded Components
 const RulesSourceSelector = lazy(() => import('../RulesSourceSelector'));
@@ -674,6 +675,7 @@ const MainLayout: React.FC = () => {
                     />
 
                     {(data.creationConfig?.active || data.attributeMigrationMode) && (<CreationHUD />)}
+                    <SafetyAlert />
 
                     <SyncConflictModal
                         isOpen={!!conflictData}

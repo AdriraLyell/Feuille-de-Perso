@@ -30,7 +30,10 @@ export function useCreationBudget(): CreationBudgetResult {
     // Defaults
     const minAttr = attributeMin ?? -2;
     const maxAttr = attributeMax ?? 3;
-    const attrCostPerPoint = attributeCost ?? 6;
+    
+    // For XP Equivalence, always prefer the global XP factor over the creation-specific cost
+    // This ensures that even if attributeCost is 1 (for 0/12 budget), the power value reflects real XP (6).
+    const attrCostPerPoint = rules?.configurations?.xpCosts?.attributeFactor ?? (attributeCost ?? 6);
 
     const getCost = (level: number) => (level * (level + 1)) / 2;
 
@@ -150,7 +153,7 @@ export function useCreationBudget(): CreationBudgetResult {
 
         // Traits (Avantages & Désavantages)
         // Only count traits if not in attribute migration mode
-        if (!isMigrationMode) {
+        if (!isMigrationMode && mode === 'points') {
             const traitCostFactor = rules?.configurations?.xpCosts?.traitCost ?? (data.xpCosts?.traitCost ?? 5);
 
             data.page2.avantages?.forEach(trait => {
@@ -158,10 +161,8 @@ export function useCreationBudget(): CreationBudgetResult {
                 if (val > 0) {
                     const cost = val * traitCostFactor;
                     xpEquivalence += cost;
-                    if (mode === 'points') {
-                        xpSpentTotal += cost;
-                        xpSpentSkills += cost;
-                    }
+                    xpSpentTotal += cost;
+                    xpSpentSkills += cost;
                 }
             });
 
@@ -170,10 +171,8 @@ export function useCreationBudget(): CreationBudgetResult {
                 if (val > 0) {
                     const benefit = val * traitCostFactor;
                     xpEquivalence -= benefit;
-                    if (mode === 'points') {
-                        xpSpentTotal -= benefit;
-                        xpSpentSkills -= benefit;
-                    }
+                    xpSpentTotal -= benefit;
+                    xpSpentSkills -= benefit;
                 }
             });
         }
