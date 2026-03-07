@@ -41,6 +41,11 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
+    // STATIC UUIDS for system counters to satisfy DB constraints while keeping IDs stable
+    const VOLONTE_UUID = 'c0000000-0000-0000-0000-000000000001';
+    const CONFIANCE_UUID = 'c0000000-0000-0000-0000-000000000002';
+
+
     const handleOpenNew = () => {
         setError(null);
         setEditingItem({
@@ -72,7 +77,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
         const newDefinitionsCounters = { ...(rules.definitions.counters || {}) };
 
         if (counterToDelete) {
-            const key = counterToDelete.id || counterToDelete.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+            const key = counterToDelete.id === VOLONTE_UUID ? 'volonte' : (counterToDelete.id === CONFIANCE_UUID ? 'confiance' : counterToDelete.id || counterToDelete.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, ''));
             delete newDefinitionsCounters[key];
         }
 
@@ -94,16 +99,24 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
         const duplicate = list.find(c => c.id !== editingItem.id && c.name.trim().toLowerCase() === editingItem.name.trim().toLowerCase());
         if (duplicate) { setError("Un compteur portant ce nom existe déjà."); return; }
 
+        const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        const normName = normalize(editingItem.name);
+
+        let finalId = editingItem.id;
+        if (normName === 'volonte') finalId = VOLONTE_UUID;
+        else if (normName === 'confiance') finalId = CONFIANCE_UUID;
+
         const safeItem = {
             ...editingItem,
+            id: finalId,
             maxValue: Number(editingItem.maxValue) || 10,
             defaultValue: Number(editingItem.defaultValue) || 0,
             xpCost: Number(editingItem.xpCost) || 0,
             appearance: (editingItem.appearance === 'squares_only' ? 'squares_only' : null) as 'squares_only' | null
         };
 
-        const newList = list.some(c => c.id === editingItem.id)
-            ? list.map(c => c.id === editingItem.id ? safeItem : c)
+        const newList = list.some(c => c.id === safeItem.id)
+            ? list.map(c => c.id === safeItem.id ? safeItem : c)
             : [...list, safeItem];
 
         // Sort
@@ -112,8 +125,8 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
         // Update definitions as well so it's ready to be saved correctly to the DB
         const newDefinitionsCounters = { ...(rules.definitions.counters || {}) };
 
-        // key format as in campaignReconciler.ts
-        const key = safeItem.id || safeItem.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+        // key format as in campaignReconciler.ts (using stable UUIDs for system keys)
+        const key = safeItem.id === VOLONTE_UUID ? 'volonte' : (safeItem.id === CONFIANCE_UUID ? 'confiance' : (safeItem.id || safeItem.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '')));
 
         newDefinitionsCounters[key] = {
             id: safeItem.id,
@@ -318,7 +331,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                             </select>
                         </div>
                         <div className="bg-amber-500/5 p-3 rounded border border-amber-500/20 mb-2">
-                            <label 
+                            <label
                                 htmlFor="counter-formula"
                                 className="block text-xs font-bold text-amber-700 uppercase mb-2 flex items-center gap-2"
                             >
