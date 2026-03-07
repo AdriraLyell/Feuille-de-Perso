@@ -45,13 +45,15 @@ export const reconcileConfigurations = (newState: CharacterSheetData, rules: Rul
             } : newState.creationConfig.cardConfig,
             rankSlots: rules.configurations.creation.rankSlots,
             // Preserve attribute rules if a migration is pending
-            attributePoints: isMigrationPending ? newState.creationConfig.attributePoints : rules.configurations.creation.attributePoints,
+            attributePoints: (isMigrationPending ? newState.creationConfig.attributePoints : rules.configurations.creation.attributePoints) ?? 15,
             attributeMin: isMigrationPending ? newState.creationConfig.attributeMin : rules.configurations.creation.attributeMin,
             attributeMax: isMigrationPending ? newState.creationConfig.attributeMax : rules.configurations.creation.attributeMax,
-            attributeCost: isMigrationPending ? newState.creationConfig.attributeCost : rules.configurations.creation.attributeCost,
+            attributeCost: (isMigrationPending ? newState.creationConfig.attributeCost : rules.configurations.creation.attributeCost) ?? 6,
             pointsBuckets: isMigrationPending ? {
                 ...rules.configurations.creation.pointsBuckets,
-                attributes: newState.creationConfig.pointsBuckets?.attributes || 0
+                attributes: newState.creationConfig.pointsBuckets?.attributes || 0,
+                skills: newState.creationConfig.pointsBuckets?.skills || 0,
+                backgrounds: newState.creationConfig.pointsBuckets?.backgrounds || 0
             } : rules.configurations.creation.pointsBuckets
         };
     }
