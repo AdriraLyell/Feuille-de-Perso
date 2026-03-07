@@ -180,7 +180,7 @@ export const useTraitEditor = (
                 if (hasMasterSkill) {
                     pendingMasterWizards.push({ 
                         traitName: entry.name, 
-                        traitType: multiSelectTarget as 'avantages' | 'desavantage'
+                        traitType: multiSelectTarget as 'avantages' | 'desavantages'
                     });
                 }
 
