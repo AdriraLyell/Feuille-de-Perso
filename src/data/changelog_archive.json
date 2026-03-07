@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.97.25",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Admin : Correction du lien brisé entre spécialisations et compétences parentes dans la bibliothèque.",
+            "Library : Le chargeur de bibliothèque récupère désormais automatiquement les compétences référencées par les spécialisations, garantissant l'affichage des noms au lieu des IDs.",
+            "UI : Enrichissement de la résolution des noms de compétences pour inclure les Habiletés Mystiques et Historiques."
+        ]
+    },
+    {
         "version": "2.97.24",
         "date": "2026-02-28",
         "type": "fix",
@@ -685,11 +695,5 @@
         "date": "2026-02-22",
         "type": "feat",
         "description": "Système d'expérience : Il est désormais possible de dépenser de l'XP post-création pour augmenter le niveau d'un avantage (trait) que le personnage possède déjà. L'intégration calcule automatiquement la différence de coût pour un suivi précis de l'expérience dépensée."
-    },
-    {
-        "version": "2.70.0",
-        "date": "2026-02-22",
-        "type": "feat",
-        "description": "Nouveau système de Post-its : Vous pouvez désormais créer des notes visuelles colorées sur chaque onglet de la fiche de personnage. Ces Post-its peuvent être déplacés librement à l'écran, modifiés, redimensionnés et sont sauvegardés avec votre personnage."
     }
 ]

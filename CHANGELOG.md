@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.70.0] - 2026-02-22 [FEAT]
+
+
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.69.5] - 2026-02-22 [FIX]
 
 
@@ -21,6 +27,34 @@
 
 
 # Changelog
+
+## [2.99.4] - 2026-03-07 [FIX]
+- **UI/Layout :** Correction de l'alignement horizontal de la grille de secours pour les nouveaux personnages.
+- **Logic :** Correction du calcul d'équivalence XP pour les attributs et exclusion des traits en mode Rangs pour éviter les valeurs négatives.
+- **System :** Unification du moteur de réinitialisation pour garantir l'injection immédiate des règles (Bonus MJ, Layout).
+- **Security :** Remplacement de la sauvegarde automatique silencieuse par une alerte visuelle "Safety Alert" après 30 min.
+
+---
+
+## [2.99.3] - 2026-03-07 [FIX]
+- **Sync :** Préservation des compteurs système (Volonté/Confiance) lors de la réconciliation.
+- **UI :** Amélioration de l'accessibilité du widget d'image (support clavier et rôles ARIA).
+- **UI :** Optimisation du cycle de vie des URL de blob pour les images.
+
+---
+
+## [2.99.2] - 2026-03-07 [FEAT]
+- **System :** Nouveau moteur de réconciliation intelligente pour la migration des attributs.
+- **Messaging :** Inversion de l'ordre des messages (plus récents en premier).
+- **Logic :** Support du mode 'migration' dans le calcul du budget de création.
+
+---
+
+## [2.99.1] - 2026-03-06 [FEAT]
+- **UI :** Alignement à gauche des noms d'avantages et désavantages.
+- **UI :** Réservation d'un espace fixe pour les icônes de traits pour un alignement vertical parfait.
+
+---
 
 ## [2.99.0] - 2026-03-06 [REFACTOR/CLEANUP]
 

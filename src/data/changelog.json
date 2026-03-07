@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.99.4",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "UI/Layout : Correction de l'alignement horizontal de la grille de secours pour les nouveaux personnages.",
+            "Logic : Correction du calcul d'équivalence XP pour les attributs et exclusion des traits en mode Rangs.",
+            "System : Unification du moteur de réinitialisation pour garantir l'injection immédiate des règles.",
+            "Security : Remplacement de la sauvegarde automatique par une alerte visuelle 'Safety Alert' après 30 min."
+        ]
+    },
+    {
         "version": "2.99.3",
         "date": "2026-03-07",
         "type": "fix",
@@ -188,16 +199,6 @@
         "changes": [
             "Joueur : Correction chirurgicale de l'affichage des compétences parentes dans la bibliothèque de spécialisations (résolution via les bibliothèques globales).",
             "Traits : Amélioration de la résolution des noms de compétences pour les effets de traits."
-        ]
-    },
-    {
-        "version": "2.97.25",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Admin : Correction du lien brisé entre spécialisations et compétences parentes dans la bibliothèque.",
-            "Library : Le chargeur de bibliothèque récupère désormais automatiquement les compétences référencées par les spécialisations, garantissant l'affichage des noms au lieu des IDs.",
-            "UI : Enrichissement de la résolution des noms de compétences pour inclure les Habiletés Mystiques et Historiques."
         ]
     }
 ]
