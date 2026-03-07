@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.99.7",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "CI/CD : Correction du pipeline de déploiement (ajout des étapes manquantes pour la notification Realtime).",
+            "CI/CD : Synchronisation des dépendances dans le job de déploiement."
+        ]
+    },
+    {
         "version": "2.99.6",
         "date": "2026-03-07",
         "type": "feat",

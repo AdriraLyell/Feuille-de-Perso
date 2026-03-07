@@ -34,6 +34,11 @@
 
 # Changelog
 
+## [2.99.7] - 2026-03-07 [FIX]
+- **CI/CD :** Correction du pipeline de déploiement GitHub Pages. Ajout des étapes de 'Checkout', 'Setup Node' et 'npm install' au job de déploiement pour permettre l'exécution du script de notification Realtime.
+
+---
+
 ## [2.99.6] - 2026-03-07 [FEAT]
 - **CI/CD :** Intégration de Supabase Realtime dans le pipeline de déploiement automatique.
 - **System :** Les notifications de mise à jour sont désormais instantanées pour tous les utilisateurs connectés grâce à un canal de diffusion WebSocket (Supabase Broadcast).
