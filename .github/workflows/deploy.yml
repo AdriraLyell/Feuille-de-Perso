@@ -67,6 +67,7 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: Notify deployment via Realtime
+        continue-on-error: true
         run: node scripts/notify-deployment.js
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
