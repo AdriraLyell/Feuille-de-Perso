@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.99.3",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "Sync : Préservation des compteurs système (Volonté/Confiance) lors de la réconciliation pour éviter la perte de données au rafraîchissement.",
+            "UI : Amélioration de l'accessibilité du widget d'image (support clavier et rôles ARIA).",
+            "UI : Optimisation de la gestion du cycle de vie des URL de blob pour les images du personnage."
+        ]
+    },
+    {
         "version": "2.99.2",
         "date": "2026-03-07",
         "type": "feat",
@@ -188,23 +198,6 @@
             "Admin : Correction du lien brisé entre spécialisations et compétences parentes dans la bibliothèque.",
             "Library : Le chargeur de bibliothèque récupère désormais automatiquement les compétences référencées par les spécialisations, garantissant l'affichage des noms au lieu des IDs.",
             "UI : Enrichissement de la résolution des noms de compétences pour inclure les Habiletés Mystiques et Historiques."
-        ]
-    },
-    {
-        "version": "2.97.24",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Campagne : Correction d'une erreur de validation Zod bloquant le chargement des règles après l'ajout de spécialisations.",
-            "Système : Mise à jour des schémas de validation des compteurs et de configuration de création pour supporter les valeurs nullables provenant de JSONB."
-        ]
-    },
-    {
-        "version": "2.97.23",
-        "date": "2026-02-28",
-        "type": "fix",
-        "changes": [
-            "Tooltip : Élargissement de la largeur maximale autorisée du portail d'infobulle pour éviter que la 2ème colonne ne soit masquée par débordement."
         ]
     }
 ]

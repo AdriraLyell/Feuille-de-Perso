@@ -1,5 +1,22 @@
 [
     {
+        "version": "2.97.24",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Campagne : Correction d'une erreur de validation Zod bloquant le chargement des règles après l'ajout de spécialisations.",
+            "Système : Mise à jour des schémas de validation des compteurs et de configuration de création pour supporter les valeurs nullables provenant de JSONB."
+        ]
+    },
+    {
+        "version": "2.97.23",
+        "date": "2026-02-28",
+        "type": "fix",
+        "changes": [
+            "Tooltip : Élargissement de la largeur maximale autorisée du portail d'infobulle pour éviter que la 2ème colonne ne soit masquée par débordement."
+        ]
+    },
+    {
         "version": "2.97.22",
         "date": "2026-02-28",
         "type": "feat",
@@ -674,17 +691,5 @@
         "date": "2026-02-22",
         "type": "feat",
         "description": "Nouveau système de Post-its : Vous pouvez désormais créer des notes visuelles colorées sur chaque onglet de la fiche de personnage. Ces Post-its peuvent être déplacés librement à l'écran, modifiés, redimensionnés et sont sauvegardés avec votre personnage."
-    },
-    {
-        "version": "2.69.5",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "UI : Ajout d'une marge dynamique sur les onglets Personnage et Spécialisations pour éviter que les barres latérales (Édition et Catalogue) ne chevauchent le contenu de la fiche."
-    },
-    {
-        "version": "2.69.4",
-        "date": "2026-02-22",
-        "type": "fix",
-        "description": "Ergonomie : Persistance de l'état ouvert/fermé du Chroniqueur (calendrier) dans les notes de campagne. Le calendrier conserve désormais son état même après avoir changé d'onglet ou rechargé la page."
     }
 ]

@@ -119,10 +119,17 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
 
     return (
         <>
-            <button
-                type="button"
-                className="w-full h-full flex flex-col items-center justify-center relative group cursor-pointer bg-stone-50/30 overflow-hidden outline-none focus:ring-2 focus:ring-indigo-500 rounded-sm"
+            <div
+                className="w-full h-full flex flex-col items-center justify-center relative group overflow-hidden outline-none rounded-sm bg-stone-50/30"
                 onClick={() => !imageUrl && !loading && fileInputRef.current?.click()}
+                role={!imageUrl ? "button" : undefined}
+                tabIndex={!imageUrl ? 0 : -1}
+                onKeyDown={(e) => {
+                    if (!imageUrl && !loading && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault();
+                        fileInputRef.current?.click();
+                    }
+                }}
             >
                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                 {imageUrl ? (
@@ -130,20 +137,20 @@ const CharacterImageWidget: React.FC<CharacterImageWidgetProps> = ({ imageId, le
                         <div className="w-full h-full border-4 border-white shadow-md bg-stone-200 flex items-center justify-center overflow-hidden relative ring-1 ring-stone-300 rounded-sm">
                             <img src={imageUrl} alt="Character" className="w-full h-full object-contain" />
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[1px]">
-                                <button type="button" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }} className="bg-white/90 p-2 rounded-full hover:bg-blue-50 text-blue-600 transition-colors shadow-lg"><Upload size={20} /></button>
-                                <button type="button" onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true); }} className="bg-white/90 p-2 rounded-full hover:bg-red-50 text-red-600 transition-colors shadow-lg"><Trash2 size={20} /></button>
+                                <button type="button" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }} className="bg-white/90 p-2 rounded-full hover:bg-blue-50 text-blue-600 transition-colors shadow-lg" title="Changer l'image"><Upload size={20} /></button>
+                                <button type="button" onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true); }} className="bg-white/90 p-2 rounded-full hover:bg-red-50 text-red-600 transition-colors shadow-lg" title="Supprimer l'image"><Trash2 size={20} /></button>
                             </div>
                         </div>
                     </div>
                 ) : (
-                    <div className="w-full h-full p-4 flex items-center justify-center pointer-events-none">
+                    <div className="w-full h-full p-4 flex items-center justify-center cursor-pointer">
                         <div className={`w-full h-full border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-400 bg-white/50 hover:bg-white hover:border-blue-400 hover:text-blue-500 transition rounded-lg ${loading ? 'opacity-50 cursor-wait' : ''}`}>
                             {loading ? <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-stone-500 mb-2"></div> : <ImageIcon size={48} className="mb-2 opacity-50" />}
                             <span className="text-xs font-bold uppercase tracking-wider text-center px-4">{loading ? "Traitement..." : "Ajouter une image"}</span>
                         </div>
                     </div>
                 )}
-            </button>
+            </div>
             <ConfirmationModal
                 isOpen={showDeleteConfirm}
                 onClose={() => setShowDeleteConfirm(false)}
