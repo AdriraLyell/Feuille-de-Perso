@@ -125,7 +125,8 @@ export function useSkillsEditorActions({ data, onUpdate, onAddLog, draggedItem, 
             name: isSpacer ? '' : defaultName,
             value: 0,
             creationValue: 0,
-            max: 5
+            max: 5,
+            ...(isSpacer ? {} : { playerAdded: true })
         };
 
         onUpdate({
@@ -210,7 +211,8 @@ export function useSkillsEditorActions({ data, onUpdate, onAddLog, draggedItem, 
                 value: 0,
                 creationValue: 0,
                 max: 5,
-                variant: undefined
+                variant: undefined,
+                playerAdded: true
             };
 
             const newSkills = { ...data.skills };
@@ -238,7 +240,8 @@ export function useSkillsEditorActions({ data, onUpdate, onAddLog, draggedItem, 
             value: 0,
             creationValue: 0,
             max: 5,
-            variant: variant
+            variant: variant,
+            playerAdded: true
         };
 
         const newSkills = { ...data.skills };

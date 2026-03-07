@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "mcp__typescript__get_diagnostics"
+      "mcp__typescript__get_diagnostics",
+      "mcp__sequential-thinking__sequentialthinking"
     ]
   }
 }

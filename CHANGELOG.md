@@ -1,5 +1,11 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.71.5] - 2026-02-22 [FEAT]
+
+
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.71.4] - 2026-02-22 [FIX]
 
 
@@ -45,6 +51,11 @@
 
 
 # Changelog
+
+## [2.101.0] - 2026-03-07 [FIX]
+- **Sync :** Correction du bug de disparition du portrait lors de la sauvegarde. Les images sont désormais décompressées automatiquement lors de la réception des mises à jour Realtime.
+
+---
 
 ## [2.100.0] - 2026-03-07 [FIX/FEAT]
 - **Qualité :** Élimination complète de tous les avertissements ESLint résiduels sur l'ensemble du projet (Zero Warning Milestone).

@@ -34,7 +34,7 @@ export const LibraryPersistence = {
                     const link: Record<string, unknown> = { setting_id: settingId, [typeCfg.idKey]: existingId, is_active: true };
                     // Default categories for skills/backgrounds/counters/mysticAbilities
                     if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters' || typeCfg.key === 'mysticAbilities') {
-                        link.default_category = item.defaultCategory;
+                        if (item.defaultCategory) link.default_category = item.defaultCategory;
                     }
                     toLink.push(link);
                 } else {
@@ -69,7 +69,7 @@ export const LibraryPersistence = {
                         payload.max_value = item.maxValue;
                         payload.default_value = item.defaultValue;
                         payload.xp_cost = item.xpCost;
-                        payload.formula_id = item.formulaId || null;
+                        if (item.formulaId) payload.formula_id = item.formulaId;
                     } else if (typeCfg.key === 'specializations') {
                         payload.skill_ids = item.skillIds;
                         payload.default_min_level = item.defaultMinLevel;
@@ -87,7 +87,7 @@ export const LibraryPersistence = {
                     toCreate.push(payload);
                     const link: Record<string, unknown> = { setting_id: settingId, [typeCfg.idKey]: item.id, is_active: true };
                     if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters' || typeCfg.key === 'mysticAbilities') {
-                        link.default_category = item.defaultCategory;
+                        if (item.defaultCategory) link.default_category = item.defaultCategory;
                     }
                     toLink.push(link);
                 }
@@ -155,7 +155,7 @@ export const LibraryPersistence = {
                     payload.max_value = item.maxValue;
                     payload.default_value = item.defaultValue;
                     payload.xp_cost = item.xpCost;
-                    payload.formula_id = item.formulaId || null;
+                    if (item.formulaId) payload.formula_id = item.formulaId;
                 } else if (typeCfg.key === 'specializations') {
                     payload.skill_ids = item.skillIds;
                     payload.default_min_level = item.defaultMinLevel;
@@ -186,7 +186,7 @@ export const LibraryPersistence = {
                     };
                     // Skills, backgrounds, counters and mystic abilities have default categories
                     if (typeCfg.key === 'skills' || typeCfg.key === 'backgrounds' || typeCfg.key === 'counters' || typeCfg.key === 'mysticAbilities') {
-                        link.default_category = item.defaultCategory;
+                        if (item.defaultCategory) link.default_category = item.defaultCategory;
                     }
 
                     // SKILL OVERRIDES

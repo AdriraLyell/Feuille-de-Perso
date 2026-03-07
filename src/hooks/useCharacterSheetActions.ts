@@ -120,7 +120,8 @@ export const useCharacterSheetActions = (
                 max: 5,
                 variant: itemData.isVariable ? "" : undefined,
                 description: itemData.description,
-                definitionId: itemData.id
+                definitionId: itemData.id,
+                playerAdded: true
             };
 
         onChange(prev => {

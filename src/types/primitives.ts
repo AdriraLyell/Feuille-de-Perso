@@ -12,6 +12,7 @@ export interface DotEntry {
   description?: string; // New: Description info-bubble
   isVariable?: boolean; // New: For dynamic styling in UI
   customNotes?: string; // Notes personnelles du joueur
+  playerAdded?: boolean; // Compétence ajoutée par le joueur (protégée de la réconciliation)
 }
 
 export interface AttributeEntry {

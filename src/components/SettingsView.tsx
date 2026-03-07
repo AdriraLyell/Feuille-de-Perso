@@ -83,7 +83,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
     handleLocalUpdate,
     performReset,
 
-  } = useSettingsManager(data, rules, isOnlineMode, expertMode, onUpdate, onAddLog, onDirtyChange);
+  } = useSettingsManager(data, rules, isOnlineMode, expertMode, onUpdate, onAddLog, onDirtyChange, onClose);
 
   // Drag State (Shared between SkillsEditor and LibrarySidebar)
   const [draggedItem, setDraggedItem] = useState<DragItemType | null>(null);

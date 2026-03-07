@@ -15,7 +15,8 @@ interface UseCreationModeReturn {
 export const useCreationMode = (
     data: CharacterSheetData,
     onChange: (newData: CharacterSheetData) => void,
-    onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', deduplicationId?: string) => void
+    onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both', deduplicationId?: string) => void,
+    onActivate?: () => void
 ): UseCreationModeReturn => {
     const [showCreationWarning, setShowCreationWarning] = useState(false);
 
@@ -46,7 +47,10 @@ export const useCreationMode = (
         });
         onAddLog("Mode Création ACTIVÉ - Fiche réinitialisée", 'success', 'sheet');
         setShowCreationWarning(false);
-    }, [data, onChange, onAddLog]);
+        if (onActivate) {
+            onActivate();
+        }
+    }, [data, onChange, onAddLog, onActivate]);
 
     return {
         showCreationWarning,

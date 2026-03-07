@@ -11,7 +11,8 @@ export const useSettingsManager = (
     expertMode: boolean,
     onUpdate: (newData: CharacterSheetData) => void,
     onAddLog: (message: string, type?: 'success' | 'danger' | 'info', category?: 'sheet' | 'settings' | 'both') => void,
-    onDirtyChange?: (isDirty: boolean) => void
+    onDirtyChange?: (isDirty: boolean) => void,
+    onReset?: () => void
 ) => {
     const [localData, setLocalData] = useState<CharacterSheetData>(initialData);
     const [activeTab, setActiveTab] = useState<'general' | 'attributes' | 'skills' | 'specializations' | 'creation' | 'library' | 'cloud' | 'suggestions'>('library');
@@ -91,7 +92,11 @@ export const useSettingsManager = (
             ? `Réinitialisation complète (Règles chargées : v${rules.version})`
             : "Réinitialisation complète des données (Règles par défaut)";
         onAddLog(logMsg, 'danger', 'settings');
-    }, [rules, onUpdate, onAddLog]);
+
+        if (onReset) {
+            onReset();
+        }
+    }, [rules, onUpdate, onAddLog, onReset]);
 
     const toggleAutoSync = useCallback((enabled: boolean) => {
         if (!localData.syncInfo) return;

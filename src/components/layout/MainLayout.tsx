@@ -98,7 +98,7 @@ const MainLayout: React.FC = () => {
         handleToggleCreationMode,
         executeCreationActivation,
         setShowCreationWarning
-    } = useCreationMode(data, (newData: CharacterSheetData) => setData(newData), addLog);
+    } = useCreationMode(data, (newData: CharacterSheetData) => setData(newData), addLog, () => handleSwitchMode('sheet'));
 
     // Custom Hooks
     const [isLandscape, setIsLandscape] = useState(() => {
@@ -142,8 +142,11 @@ const MainLayout: React.FC = () => {
     const [pendingMjUpdate, setPendingMjUpdate] = React.useState<{ data: CharacterSheetData; message: string } | null>(null);
     const [conflictData, setConflictData] = React.useState<CharacterSheetData | null>(null);
 
-    const handleRemoteCharacterUpdate = React.useCallback((remoteDataRaw: Record<string, unknown>) => {
-        const remoteData = remoteDataRaw as unknown as CharacterSheetData;
+    const handleRemoteCharacterUpdate = React.useCallback(async (remoteDataRaw: Record<string, unknown>) => {
+        // 0. Decompress images before applying the remote payload
+        const { ImageSyncResolver } = await import('../../services/ImageSyncResolver');
+        const remoteData = await ImageSyncResolver.injectImagesAfterSync(remoteDataRaw) as CharacterSheetData;
+
         const remoteSyncInfo = remoteData.syncInfo;
         const localSyncInfo = data?.syncInfo;
 
@@ -480,6 +483,7 @@ const MainLayout: React.FC = () => {
                                         onClick={() => {
                                             importData(pendingMjUpdate.data);
                                             setPendingMjUpdate(null);
+                                            handleSwitchMode('sheet');
                                             addLog(`✨ Récréation appliquée : ${pendingMjUpdate.message}`, 'success', 'sheet');
                                         }}
                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-700 hover:bg-amber-600 text-white text-xs font-bold rounded transition-colors active:scale-95"

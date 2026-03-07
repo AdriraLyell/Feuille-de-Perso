@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.101.0",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "Sync : Correction du bug de disparition du portrait lors de la sauvegarde (décompression automatique des images lors des mises à jour Realtime)."
+        ]
+    },
+    {
         "version": "2.99.9",
         "date": "2026-03-07",
         "type": "cleanup",
@@ -185,16 +193,6 @@
         "type": "fix",
         "changes": [
             "UI : libraryMerger détecte les copies locales ayant un équivalent officiel (même ID ou nom) et les marque 'official' — corrige l'absence du badge 🌐."
-        ]
-    },
-    {
-        "version": "2.97.31",
-        "date": "2026-03-01",
-        "type": "fix",
-        "changes": [
-            "Logic : Séparation stricte entre bibliothèque locale et officielle pour les spécialisations.",
-            "UI : Support du mode hybride dans la Sidebar et l'Omnibar de spécialisation (badge Officiel 🌐).",
-            "Logic : Suppression de l'injection corrompue dans le réconciliateur qui transformait l'officiel en local."
         ]
     }
 ]
