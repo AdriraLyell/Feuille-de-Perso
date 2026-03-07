@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.99.8",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "CI/CD : Sécurisation du script de notification Realtime (ajout d'un timeout de sécurité et gestion des erreurs de connexion).",
+            "CI/CD : Amélioration de la fiabilité du processus de terminaison du job de déploiement."
+        ]
+    },
+    {
         "version": "2.99.7",
         "date": "2026-03-07",
         "type": "fix",

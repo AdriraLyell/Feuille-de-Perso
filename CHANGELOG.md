@@ -34,6 +34,11 @@
 
 # Changelog
 
+## [2.99.8] - 2026-03-07 [FIX]
+- **CI/CD :** Sécurisation du script de notification Realtime. Ajout d'un timeout de sécurité et d'une gestion explicite des erreurs de connexion pour éviter que le job de déploiement ne reste bloqué indéfiniment.
+
+---
+
 ## [2.99.7] - 2026-03-07 [FIX]
 - **CI/CD :** Correction du pipeline de déploiement GitHub Pages. Ajout des étapes de 'Checkout', 'Setup Node' et 'npm install' au job de déploiement pour permettre l'exécution du script de notification Realtime.
 

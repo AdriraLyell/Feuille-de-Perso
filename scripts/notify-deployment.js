@@ -27,8 +27,19 @@ async function notifyDeployment() {
 
     const channel = supabase.channel('app-deployments');
 
+    // Safety timeout to prevent the script from hanging forever
+    const timeout = setTimeout(() => {
+        console.error('⌛ Timeout: Broadcast took too long. Exiting...');
+        process.exit(1);
+    }, 15000);
+
+    console.log('📡 Connecting to Supabase Realtime...');
+
     channel.subscribe(async (status) => {
+        console.log(`📡 Subscription status: ${status}`);
+        
         if (status === 'SUBSCRIBED') {
+            console.log('📤 Sending broadcast message...');
             const result = await channel.send({
                 type: 'broadcast',
                 event: 'new-version',
@@ -37,12 +48,16 @@ async function notifyDeployment() {
 
             if (result === 'ok') {
                 console.log('✅ Broadcast sent successfully.');
+                clearTimeout(timeout);
+                // Give a little time for the message to be sent before exiting
+                setTimeout(() => process.exit(0), 2000);
             } else {
                 console.error('❌ Failed to send broadcast:', result);
+                process.exit(1);
             }
-            
-            // Give a little time for the message to be sent before exiting
-            setTimeout(() => process.exit(0), 1000);
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            console.error(`❌ Subscription failed with status: ${status}`);
+            process.exit(1);
         }
     });
 }
