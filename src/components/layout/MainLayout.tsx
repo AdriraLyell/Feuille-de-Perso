@@ -30,7 +30,7 @@ const RulesSourceSelector = lazy(() => import('../RulesSourceSelector'));
 const CampaignConflictModal = lazy(() => import('../ui/CampaignConflictModal'));
 const SettingsView = lazy(() => import('../SettingsView'));
 import { SyncConflictModal } from '../sync/SyncConflictModal';
-import { Layers, FileType, List, TrendingUp, Book, Package, Clock, X, Trash2, Check, Sparkles } from 'lucide-react';
+import { Layers, FileType, List, TrendingUp, Book, Package, Clock, X, Trash2, Check, Sparkles, Loader2 } from 'lucide-react';
 import { useEditMode } from '../../hooks/sheet/useEditMode';
 import { useCreationMode } from '../../hooks/useCreationMode';
 import { exportCharacterAsJSON } from '../../utils/importExportUtils';
@@ -82,7 +82,7 @@ const MainLayout: React.FC = () => {
         clearLayout,
         autoFitLayout
     } = useCharacter();
-    const { rules, updateRules, isOnlineMode, reloadRules } = useRules();
+    const { rules, updateRules, isOnlineMode, reloadRules, isLoading: isRulesLoading } = useRules();
 
     // Sheet Modes Hooks
     const {
@@ -382,6 +382,19 @@ const MainLayout: React.FC = () => {
 
         addLog("Mode de migration des attributs activé. Les attributs ont été réinitialisés et l'XP a été remboursée.", "info", "sheet");
     }, [data, setData, addLog, rules]);
+
+    if (isRulesLoading) {
+        return (
+            <div className="fixed inset-0 bg-[#1c1c1c] text-white flex flex-col items-center justify-center z-50 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')]">
+                <div className="animate-spin text-[#bfae85] mb-4">
+                    <Loader2 size={48} />
+                </div>
+                <div className="text-[#bfae85] font-serif italic text-lg animate-pulse">
+                    Synchronisation de la campagne...
+                </div>
+            </div>
+        );
+    }
 
     if (!rules || !isSourceSelected) {
         return (
