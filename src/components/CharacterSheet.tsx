@@ -198,7 +198,10 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
                 </div>
 
                 <div className={`relative transition-opacity duration-300 ${data.attributeMigrationMode ? 'opacity-50 pointer-events-none grayscale' : ''}`}>
+                    {/* RE-MOUNT TRIGGER: Forcing React to unmount and remount the grid when switching characters 
+                        prevents React-Grid-Layout / CSS Grid from recycling stale internal state, avoiding the layout packing bug. */}
                     <CharacterSheetGrid
+                        key={`grid-${data.syncInfo?.syncId || data.header?.name || 'local'}-${data.activeLayout?.lg?.length || 0}`}
                         columns={columns}
                         backgrounds={backgrounds}
                         autres={autres}
