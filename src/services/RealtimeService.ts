@@ -16,6 +16,29 @@ type UpdateCallback = (payload: Record<string, unknown>) => void;
 
 let settingChannel: RealtimeChannel | null = null;
 let characterChannel: RealtimeChannel | null = null;
+let appChannel: RealtimeChannel | null = null;
+
+/**
+ * S'abonne aux annonces de déploiement via Broadcast.
+ * Permet une notification instantanée de mise à jour de l'application.
+ */
+export const subscribeToAppUpdates = (onUpdate: (version: string) => void): void => {
+    if (appChannel) return; // Éviter les doubles souscriptions
+
+    logger.log('[RealtimeService] Subscribing to app-deployments broadcast');
+
+    appChannel = supabase
+        .channel('app-deployments')
+        .on('broadcast', { event: 'new-version' }, (payload) => {
+            logger.log('[RealtimeService] App version broadcast received', payload);
+            if (payload.payload?.version) {
+                onUpdate(payload.payload.version);
+            }
+        })
+        .subscribe((status) => {
+            logger.log(`[RealtimeService] App deployments channel status: ${status}`);
+        });
+};
 
 /**
  * S'abonne aux changements de la table `game_settings` pour un setting donné.
@@ -95,10 +118,16 @@ export const unsubscribeAll = (): void => {
         characterChannel = null;
         logger.log('[RealtimeService] Unsubscribed from characters');
     }
+    if (appChannel) {
+        supabase.removeChannel(appChannel);
+        appChannel = null;
+        logger.log('[RealtimeService] Unsubscribed from app-deployments');
+    }
 };
 
 export const RealtimeService = {
     subscribeToSetting,
     subscribeToCharacter,
+    subscribeToAppUpdates,
     unsubscribeAll,
 };

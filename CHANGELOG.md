@@ -34,6 +34,13 @@
 
 # Changelog
 
+## [2.99.6] - 2026-03-07 [FEAT]
+- **CI/CD :** Intégration de Supabase Realtime dans le pipeline de déploiement automatique.
+- **System :** Les notifications de mise à jour sont désormais instantanées pour tous les utilisateurs connectés grâce à un canal de diffusion WebSocket (Supabase Broadcast).
+- **Realtime :** Ajout d'un canal global 'app-deployments' pour notifier les clients en temps réel dès qu'une nouvelle version est disponible sur GitHub Pages.
+
+---
+
 ## [2.99.5] - 2026-03-07 [FIX]
 - **UI :** Mise en place d'une file d'attente séquentielle pour les modales de sélection (Habilités Mystiques, Maîtrise) permettant d'ajouter plusieurs traits déclencheurs simultanément.
 - **UI :** Correction de la superposition du bandeau de sélection dans la bibliothèque de traits (passage à un flux flexbox naturel).

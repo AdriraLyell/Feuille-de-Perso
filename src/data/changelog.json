@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.99.6",
+        "date": "2026-03-07",
+        "type": "feat",
+        "changes": [
+            "CI/CD : Intégration de Supabase Realtime dans le pipeline de déploiement.",
+            "System : Les notifications de mise à jour sont désormais instantanées pour tous les utilisateurs connectés.",
+            "Realtime : Ajout d'un canal broadcast 'app-deployments' pour la diffusion globale des versions."
+        ]
+    },
+    {
         "version": "2.99.5",
         "date": "2026-03-07",
         "type": "fix",

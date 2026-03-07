@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { APP_VERSION, REMOTE_MANIFEST_URL } from '../constants/app';
 import { Sparkles, RefreshCw, Download, X } from 'lucide-react';
 import { logger } from '../utils/logger';
+import { RealtimeService } from '../services/RealtimeService';
 
 interface VersionManifest {
     version: string;
@@ -49,7 +50,15 @@ const UpdateNotifier: React.FC = () => {
         // Check immediately on load
         checkVersion();
 
-        // Optional: Check every hour if tab stays open
+        // Subscribe to real-time updates for instant notification
+        RealtimeService.subscribeToAppUpdates((newVersion) => {
+            if (isNewer(newVersion, APP_VERSION)) {
+                // When a broadcast is received, we still fetch the manifest to get the downloadUrl
+                checkVersion();
+            }
+        });
+
+        // Optional: Check every hour as fallback
         const interval = setInterval(checkVersion, 3600000);
         return () => clearInterval(interval);
     }, []);
