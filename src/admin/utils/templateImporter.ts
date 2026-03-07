@@ -1,5 +1,5 @@
 import { DotEntry, LibrarySkillEntry, LibraryFormulaEntry, LibraryEntry, LibrarySpecializationEntry, LibraryBackgroundEntry, LibraryCounterEntry } from '../../types';
-import { RulesData } from '../../types/rules';
+import { RulesData, RulesCreationConfig, RulesXPCosts } from '../../types/rules';
 import { generateDefaultRules } from './rulesLoader';
 
 /**
@@ -103,8 +103,7 @@ export const extractRulesFromCharacter = (
     if (sheet.xpCosts) {
         newRules.configurations.xpCosts = {
             ...newRules.configurations.xpCosts,
-            ...newRules.configurations.xpCosts,
-            ...(sheet.xpCosts as import('../types/rules').RulesXPCosts)
+            ...(sheet.xpCosts as RulesXPCosts)
         };
         success.push("Configuration des Coûts XP (Multiplicateurs)");
     } else {

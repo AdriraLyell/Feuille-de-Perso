@@ -45,6 +45,63 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
     const VOLONTE_UUID = 'c0000000-0000-0000-0000-000000000001';
     const CONFIANCE_UUID = 'c0000000-0000-0000-0000-000000000002';
 
+    const handleCleanDuplicates = () => {
+        const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        const seenNames = new Map<string, string>(); // name -> preferredId
+        const toDelete = new Set<string>();
+        
+        // Phase 1: Identify system counters and map their names to the official UUIDs
+        list.forEach(item => {
+            const normName = normalize(item.name);
+            if (normName === 'volonte') seenNames.set(normName, VOLONTE_UUID);
+            else if (normName === 'confiance') seenNames.set(normName, CONFIANCE_UUID);
+        });
+
+        // Phase 2: Identify duplicates and invalid IDs
+        const cleanedList = list.filter(item => {
+            const normName = normalize(item.name);
+            const preferredId = seenNames.get(normName);
+            
+            // If it's a system counter but has a different ID, it's a duplicate or invalid ID
+            if (preferredId && item.id !== preferredId) {
+                toDelete.add(item.id);
+                return false;
+            }
+            
+            // Catch entries with non-UUID IDs (like 'volonte' string) that might be in the state but fail DB sync
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            if (!uuidRegex.test(item.id) && !item.id.startsWith('c0000000')) {
+                toDelete.add(item.id);
+                return false;
+            }
+
+            return true;
+        });
+
+        // Phase 3: Add official system counters if they were missing or replaced
+        seenNames.forEach((id, name) => {
+            if (!cleanedList.some(c => c.id === id)) {
+                const original = list.find(c => normalize(c.name) === name);
+                cleanedList.push({
+                    id,
+                    name: name === 'volonte' ? 'Volonté' : 'Confiance',
+                    description: original?.description || '',
+                    maxValue: original?.maxValue || 10,
+                    defaultValue: original?.defaultValue || 0,
+                    xpCost: original?.xpCost || 5,
+                    isActive: true
+                });
+            }
+        });
+
+        if (toDelete.size > 0) {
+            onUpdate({
+                ...rules,
+                libraries: { ...rules.libraries, counters: cleanedList }
+            });
+        }
+    };
+
 
     const handleOpenNew = () => {
         setError(null);
@@ -186,7 +243,14 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                     </h2>
                     <p className="text-slate-500 text-sm">Définissez les jauges (Santé, Volonté, Sang...).</p>
                 </div>
-                <div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={handleCleanDuplicates}
+                        className="mr-2 text-slate-500 hover:text-red-600 px-3 py-2 rounded text-sm font-bold transition-colors flex items-center gap-2"
+                        title="Fusionner les doublons et corriger les identifiants"
+                    >
+                        <AlertOctagon size={16} /> Nettoyer
+                    </button>
                     <button
                         onClick={handleOpenNew}
                         className="bg-slate-900 text-white px-4 py-2 rounded font-bold hover:bg-slate-800 transition-colors flex items-center gap-2"
