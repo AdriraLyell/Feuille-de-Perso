@@ -190,25 +190,5 @@
             "UI : Activation du tooltip des spécialisations au clic (toggle) au lieu du survol, pour cohérence avec le reste de la fiche.",
             "UI : Ajout d'un écouteur de clic extérieur pour fermer automatiquement l'infobulle."
         ]
-    },
-    {
-        "version": "2.97.34",
-        "date": "2026-03-01",
-        "type": "feat",
-        "changes": [
-            "UI : Refonte de l'infobulle des spécialisations pour correspondre au style premium des compteurs (ex: Force Vitale).",
-            "UI : Passage au composant PortalTooltip pour éviter les débordements et améliorer le positionnement.",
-            "UI : Support de l'affichage en deux colonnes quand le nombre de spécialisations dépasse 5.",
-            "UI : Amélioration visuelle avec puces dorées et bordures de séparation subtiles."
-        ]
-    },
-    {
-        "version": "2.97.33",
-        "date": "2026-03-01",
-        "type": "fix",
-        "changes": [
-            "UI : Filtre 'hideKnown' par défaut à false — la bibliothèque affiche maintenant le catalogue complet au lieu de cacher les spécialisations acquises.",
-            "UI : Message contextuel quand toutes les spécialisations sont filtrées, avec bouton de réactivation."
-        ]
     }
 ]

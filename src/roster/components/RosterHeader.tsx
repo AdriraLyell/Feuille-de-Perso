@@ -89,7 +89,7 @@ export const RosterHeader: React.FC<RosterHeaderProps> = ({
                                                     <div className={`w-8 h-8 rounded-full border flex items-center justify-center overflow-hidden transition-all duration-300 bg-stone-950 ${isHidden ? 'border-stone-800 grayscale opacity-40' : 'border-amber-900/50 grayscale-0 opacity-100'
                                                         }`}>
                                                         {char.data.portrait ? (
-                                                            <img src={char.data.portrait} alt="" className="w-full h-full object-cover" />
+                                                            <img src={char.data.portrait as string} alt="" className="w-full h-full object-cover" />
                                                         ) : (
                                                             <Users size={14} className={isHidden ? 'text-stone-700' : 'text-amber-700'} />
                                                         )}

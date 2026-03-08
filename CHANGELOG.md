@@ -1,5 +1,15 @@
 # Historique Ancien (Legacy Changelog)
 
+## [2.74.0] - 2026-02-23 [FEAT]
+
+
+
+## [2.73.0] - 2026-02-23 [FEAT]
+
+
+
+# Historique Ancien (Legacy Changelog)
+
 ## [2.72.0] - 2026-02-23 [FEAT]
 
 
