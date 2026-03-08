@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.104.0",
+        "date": "2026-03-08",
+        "type": "feat",
+        "changes": [
+            "Roster : Ajout d'un menu de sélection des personnages via le bouton 'Âmes'. Permet au MJ de choisir quels investigateurs afficher, avec exclusion dynamique des calculs de scores maximums et persistance locale des choix."
+        ]
+    },
+    {
         "version": "2.103.0",
         "date": "2026-03-08",
         "type": "fix",

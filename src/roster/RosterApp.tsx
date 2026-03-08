@@ -35,6 +35,9 @@ interface RosterAppProps {
 export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
     const {
         characters,
+        allCharacters,
+        hiddenCharacterIds,
+        toggleCharacterVisibility,
         rules,
         isLoading,
         error,
@@ -71,6 +74,9 @@ export const RosterApp: React.FC<RosterAppProps> = ({ settingId }) => {
             <RosterHeader
                 settingName={rules.settingName || "Inconnue"}
                 characterCount={characters.length}
+                allCharacters={allCharacters}
+                hiddenCharacterIds={hiddenCharacterIds}
+                onToggleCharacter={toggleCharacterVisibility}
                 isMessagingOpen={isMessagingOpen}
                 onToggleMessaging={() => setIsMessagingOpen(!isMessagingOpen)}
             />

@@ -10,7 +10,11 @@ export interface SkillRow {
 }
 
 export const useRosterData = (settingId: string) => {
-    const [characters, setCharacters] = useState<SyncedCharacter[]>([]);
+    const [allCharacters, setAllCharacters] = useState<SyncedCharacter[]>([]);
+    const [hiddenCharacterIds, setHiddenCharacterIds] = useState<string[]>(() => {
+        const saved = localStorage.getItem(`roster_hidden_chars_${settingId}`);
+        return saved ? JSON.parse(saved) : [];
+    });
     const [rules, setRules] = useState<RulesData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -18,6 +22,10 @@ export const useRosterData = (settingId: string) => {
     useEffect(() => {
         loadData();
     }, [settingId]);
+
+    useEffect(() => {
+        localStorage.setItem(`roster_hidden_chars_${settingId}`, JSON.stringify(hiddenCharacterIds));
+    }, [hiddenCharacterIds, settingId]);
 
     const loadData = async () => {
         setIsLoading(true);
@@ -28,7 +36,7 @@ export const useRosterData = (settingId: string) => {
                 CampaignService.loadSetting(settingId)
             ]);
 
-            setCharacters(chars);
+            setAllCharacters(chars);
             setRules(setting);
 
             if (!setting) {
@@ -39,6 +47,16 @@ export const useRosterData = (settingId: string) => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const characters = useMemo(() => {
+        return allCharacters.filter(c => !hiddenCharacterIds.includes(c.id));
+    }, [allCharacters, hiddenCharacterIds]);
+
+    const toggleCharacterVisibility = (id: string) => {
+        setHiddenCharacterIds(prev =>
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
     };
 
     const formatCurrentDate = () => {
@@ -285,6 +303,9 @@ export const useRosterData = (settingId: string) => {
 
     return {
         characters,
+        allCharacters,
+        hiddenCharacterIds,
+        toggleCharacterVisibility,
         rules,
         isLoading,
         error,
