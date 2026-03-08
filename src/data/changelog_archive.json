@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.97.32",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "UI : libraryMerger détecte les copies locales ayant un équivalent officiel (même ID ou nom) et les marque 'official' — corrige l'absence du badge 🌐."
+        ]
+    },
+    {
         "version": "2.97.31",
         "date": "2026-03-01",
         "type": "fix",
@@ -714,11 +722,5 @@
         "date": "2026-02-23",
         "type": "feat",
         "description": "Fusion et consolidation globale des compétences dans le Registre des Acteurs (Roster). Les compétences sont désormais classées selon le référentiel maître de la chronique, ignorant les classements individuels pour éviter les doublons. Ajout d'une gestion intelligente des variantes et regroupement automatique des capacités liées aux Habiletés Mystiques."
-    },
-    {
-        "version": "2.72.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Création du Registre des Acteurs (Roster View). Ajout d'une nouvelle URL publique '?roster=uuid' permettant d'afficher une présentation tabulaire et détaillée de l'ensemble des personnages joueurs d'une chronique. Accessible via un nouveau bouton raccourci sur les cartes de campagne depuis le Tableau de Bord Admin."
     }
 ]

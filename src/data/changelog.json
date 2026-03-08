@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.102.0",
+        "date": "2026-03-08",
+        "type": "fix",
+        "changes": [
+            "Sync : Correction de la race condition lors de la mise à jour des règles (l'enregistrement des bibliothèques précède désormais la notification de mise à jour pour garantir la disponibilité immédiate des nouveaux traits)."
+        ]
+    },
+    {
         "version": "2.101.0",
         "date": "2026-03-07",
         "type": "fix",
@@ -185,14 +193,6 @@
         "changes": [
             "UI : Filtre 'hideKnown' par défaut à false — la bibliothèque affiche maintenant le catalogue complet au lieu de cacher les spécialisations acquises.",
             "UI : Message contextuel quand toutes les spécialisations sont filtrées, avec bouton de réactivation."
-        ]
-    },
-    {
-        "version": "2.97.32",
-        "date": "2026-03-01",
-        "type": "fix",
-        "changes": [
-            "UI : libraryMerger détecte les copies locales ayant un équivalent officiel (même ID ou nom) et les marque 'official' — corrige l'absence du badge 🌐."
         ]
     }
 ]
