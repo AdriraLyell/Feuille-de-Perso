@@ -121,6 +121,7 @@ export const useCharacterSheetActions = (
                 variant: itemData.isVariable ? "" : undefined,
                 description: itemData.description,
                 definitionId: itemData.id,
+                mysticAbilityId: (itemData as Record<string, unknown>).mysticAbilityId as string | undefined,
                 playerAdded: true
             };
 

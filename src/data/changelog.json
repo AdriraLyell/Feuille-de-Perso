@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.105.0",
+        "date": "2026-03-08",
+        "type": "UI",
+        "changes": [
+            "Popup de Calcul : Restauration de l'affichage des accents pour les variables normalisées (ex: 'Volonté' s'affiche avec son accent même si le calcul utilise 'Volonte')."
+        ]
+    },
+    {
         "version": "2.104.0",
         "date": "2026-03-08",
         "type": "feat",
@@ -180,15 +188,6 @@
         "changes": [
             "Logic : Prise en compte des modifications du seuil MJ (defaultMinLevel) dans la bibliothèque locale pour les spécialisations imposées.",
             "System : Déclenchement automatique de la réconciliation dès qu'une bibliothèque locale (spécialisations, compétences, traits) est modifiée."
-        ]
-    },
-    {
-        "version": "2.97.35",
-        "date": "2026-03-01",
-        "type": "fix",
-        "changes": [
-            "UI : Activation du tooltip des spécialisations au clic (toggle) au lieu du survol, pour cohérence avec le reste de la fiche.",
-            "UI : Ajout d'un écouteur de clic extérieur pour fermer automatiquement l'infobulle."
         ]
     }
 ]

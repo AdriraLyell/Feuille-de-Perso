@@ -110,10 +110,10 @@ function processSkillCategories(
             }
         });
 
-        // B. Keep remaining skills if they have value, a variant, or were player-added
+        // B. Keep remaining skills that are player-added, library-linked, or have value
         const remainingSkills = existingEntries.filter(e =>
             !consumedIds.has(e.id) &&
-            ((e.value || 0) > 0 || e.variant !== undefined || e.playerAdded)
+            ((e.value || 0) > 0 || e.variant !== undefined || e.playerAdded || e.definitionId || e.mysticAbilityId)
         );
 
         newSkills[category] = [...syncedSkills, ...remainingSkills];
@@ -181,10 +181,10 @@ function processBackgrounds(
             }
         });
 
-        // Keep remaining backgrounds that have value or were player-added
+        // Keep remaining backgrounds that are player-added, library-linked, or have value
         const remainingBgs = allExistingSkills.filter(e =>
             !consumedIds.has(e.id) &&
-            ((e.value || 0) > 0 || e.variant !== undefined || e.playerAdded) &&
+            ((e.value || 0) > 0 || e.variant !== undefined || e.playerAdded || e.definitionId || e.mysticAbilityId) &&
             // Check if it was in a background-like category
             Object.keys(currentState.skills).some(catId => {
                 const catDef = rules.definitions.skillCategories?.find(c => c.id === catId);

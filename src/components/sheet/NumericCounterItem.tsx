@@ -172,6 +172,10 @@ export const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
             );
         } else if (formula) {
             const sheetVars = getSheetVariables({ ...data, formulaLibrary: rules?.libraries?.formulas || data.formulaLibrary });
+            const sheetVarsLower = Object.keys(sheetVars).reduce((acc, k) => {
+                acc[k.toLowerCase()] = sheetVars[k];
+                return acc;
+            }, {} as Record<string, number>);
             let parsedVars: string[] = [];
             let baseValue = 0;
             try {
@@ -193,11 +197,24 @@ export const NumericCounterItem: React.FC<NumericCounterItemProps> = ({
                     )}
                     <div className="columns-2 gap-x-6">
                         {parsedVars.map(v => {
-                            const val = sheetVars[v] || 0;
+                            const val = sheetVars[v] ?? sheetVarsLower[v.toLowerCase()] ?? 0;
                             const formulaEntry = rules?.libraries?.formulas?.find((f: LibraryFormulaEntry) =>
                                 f.code === v || f.id === v || normalizeString(f.name) === normalizeString(v)
                             );
-                            const displayName = formulaEntry?.name || translateVariableName(v);
+
+                            // Tenter de retrouver le nom original avec accents pour l'affichage (ex: "Volonté" au lieu de "Volonte")
+                            let displayName = formulaEntry?.name || translateVariableName(v);
+
+                            // Si le displayName est identique au code normalisé (ce qui arrive quand safe-expr-eval l'a "nettoyé"), 
+                            // on cherche une version accentuée dans la liste des variables réelles (sheetVars)
+                            if (displayName === v) {
+                                const originalKey = Object.keys(sheetVars).find(key =>
+                                    normalizeString(key) === normalizeString(v) && key !== key.toLowerCase()
+                                ) || Object.keys(sheetVars).find(key =>
+                                    normalizeString(key) === normalizeString(v)
+                                );
+                                if (originalKey) displayName = originalKey;
+                            }
 
                             const hasAggregateDetails = formulaEntry?.aggregateConfig && val !== 0;
                             const aggDetails = hasAggregateDetails

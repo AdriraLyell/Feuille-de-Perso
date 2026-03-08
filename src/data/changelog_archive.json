@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.35",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "UI : Activation du tooltip des spécialisations au clic (toggle) au lieu du survol, pour cohérence avec le reste de la fiche.",
+            "UI : Ajout d'un écouteur de clic extérieur pour fermer automatiquement l'infobulle."
+        ]
+    },
+    {
         "version": "2.97.34",
         "date": "2026-03-01",
         "type": "feat",
@@ -724,11 +733,5 @@
         "date": "2026-02-23",
         "type": "fix",
         "description": "Ergonomie : Suppression du label textuel 'Réglages' dans la barre de navigation pour un design plus épuré, conservant uniquement l'icône avec une info-bulle d'aide."
-    },
-    {
-        "version": "2.75.0",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Notifications temps réel admin → joueur via Supabase Realtime (WebSocket). Les modifications apportées par le Maître de Jeu (calendrier, règles, données de fiche) sont désormais propagées instantanément à tous les joueurs connectés, sans rechargement de page. Une notification apparaît automatiquement dans l'historique des actions."
     }
 ]
