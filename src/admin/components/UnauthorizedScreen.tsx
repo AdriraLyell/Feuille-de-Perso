@@ -33,7 +33,7 @@ const UnauthorizedScreen: React.FC<UnauthorizedScreenProps> = ({ session }) => {
                         </div>
 
                         <a
-                            href="/"
+                            href="./"
                             className="flex items-center justify-center gap-2 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-slate-200"
                         >
                             <Home size={18} />

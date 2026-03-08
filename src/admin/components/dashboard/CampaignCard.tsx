@@ -79,7 +79,7 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
-                        window.open(`/?roster=${setting.id}`, '_blank');
+                        window.open(`./?roster=${setting.id}`, '_blank');
                     }}
                     className="p-2 bg-stone-800/90 text-emerald-400 hover:text-emerald-300 hover:bg-stone-700 rounded-full transition-colors shadow-lg border border-transparent hover:border-emerald-900/50"
                     title="Afficher le Registre des PJ"
