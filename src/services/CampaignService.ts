@@ -182,7 +182,19 @@ export const CampaignService = {
      */
     async saveSetting(id: string, rules: RulesData, name?: string): Promise<{ success: boolean; message?: string }> {
 
-        // 1. Update Root
+        // 1. Synchronize Libraries FIRST
+        // Les bibliothèques doivent être commitées AVANT l'update de game_settings,
+        // car cet update déclenche un événement Supabase Realtime vers les fiches joueurs.
+        // Si on inversait l'ordre, les joueurs recevraient le ping avant que les traits
+        // soient disponibles (race condition).
+        try {
+            await LibraryService.syncLibraries(id, rules);
+        } catch (libError) {
+            ErrorService.handleError(libError, { context: 'CampaignService.saveSetting', userMessage: "Erreur sauvegarde bibliothèques." });
+            return { success: false, message: `Erreur Bibliothèques: ${(libError as Error).message}` };
+        }
+
+        // 2. Update Root LAST (triggers Supabase Realtime → player sheets reload rules)
         const rootUpdate: Partial<DBGameSetting> = {
             version: rules.version,
             updated_at: new Date().toISOString(),
@@ -201,14 +213,7 @@ export const CampaignService = {
             return { success: false, message: "Erreur MAJ Root" };
         }
 
-        // 2. Synchronize Libraries
-        try {
-            await LibraryService.syncLibraries(id, rules);
-            return { success: true };
-        } catch (libError) {
-            ErrorService.handleError(libError, { context: 'CampaignService.saveSetting', userMessage: "Erreur sauvegarde bibliothèques." });
-            return { success: false, message: `Erreur Bibliothèques: ${(libError as Error).message}` };
-        }
+        return { success: true };
     },
 
     /**
