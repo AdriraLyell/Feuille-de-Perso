@@ -80,6 +80,16 @@
 
 # Changelog
 
+## [2.107.0] - 2026-03-09 [FEAT]
+- **Système :** Intégration des phases lunaires pour les calendriers de type "Réel".
+- **Calcul :** Algorithme astronomique précis basé sur le cycle synodique (29,53 jours).
+- **UI :** Affichage de la phase (émoji + nom) dans l'administration du calendrier.
+- **Roster :** Ajout de la phase lunaire dans la section "Gestion Temporelle" (vues repliée et dépliée).
+- **Widget :** Intégration de l'émoji lunaire dans l'en-tête du widget "Chroniqueur" avec infobulle descriptive.
+- **Design :** Mise en place d'un système de badges stylisés avec effets de lueur et bordures dorées pour une meilleure lisibilité.
+
+---
+
 ## [2.101.0] - 2026-03-07 [FIX]
 - **Sync :** Correction du bug de disparition du portrait lors de la sauvegarde. Les images sont désormais décompressées automatiquement lors de la réception des mises à jour Realtime.
 

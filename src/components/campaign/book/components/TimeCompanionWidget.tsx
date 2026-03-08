@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight, PenLine, List, Grid3X3, PlusCircle, Clock, Sun, CloudRain, Swords, Moon, Snowflake, Cloud, ArrowDownToLine } from 'lucide-react';
 import { CalendarConfig, CalendarEvent } from '../../../../types/rules';
+import { calculateMoonPhase } from '../../../../utils/moonPhase';
 
 interface TimeCompanionWidgetProps {
     config: CalendarConfig;
@@ -206,8 +207,18 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                         <button onClick={prevMonth} className="p-1 hover:text-amber-400 text-stone-600 transition-colors">
                             <ChevronLeft size={14} />
                         </button>
-                        <div className="text-[13px] font-bold text-stone-100 uppercase text-center truncate px-2 tracking-widest">
-                            {monthName}
+                        <div className="flex items-center gap-2 px-2">
+                            <div className="text-[13px] font-bold text-stone-100 uppercase text-center truncate tracking-widest">
+                                {monthName}
+                            </div>
+                            {isReal && (() => {
+                                const moon = calculateMoonPhase((config as import('../../../../types/rules').CalendarConfigReal).currentDate);
+                                return moon ? (
+                                    <span className="text-lg cursor-help drop-shadow-[0_0_8px_rgba(245,158,11,0.4)] hover:scale-110 transition-transform" title={moon.name}>
+                                        {moon.emoji}
+                                    </span>
+                                ) : null;
+                            })()}
                         </div>
                         <button onClick={nextMonth} className="p-1 hover:text-amber-400 text-stone-600 transition-colors">
                             <ChevronRight size={14} />

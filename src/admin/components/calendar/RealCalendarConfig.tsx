@@ -3,6 +3,7 @@ import { CalendarConfigReal } from '../../../types/rules';
 
 import CalendarEventsList from './CalendarEventsList';
 import { CalendarDays, RotateCcw } from 'lucide-react';
+import { calculateMoonPhase } from '../../../utils/moonPhase';
 
 interface Props {
     config: CalendarConfigReal;
@@ -45,7 +46,7 @@ const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
             {/* Dates */}
             < div className="grid grid-cols-1 sm:grid-cols-2 gap-6" >
                 <div>
-                    <label 
+                    <label
                         htmlFor="campaign-start-date"
                         className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2"
                     >
@@ -66,7 +67,7 @@ const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
                 </div>
 
                 <div>
-                    <label 
+                    <label
                         htmlFor="campaign-current-date"
                         className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-2"
                     >
@@ -80,13 +81,28 @@ const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
                         className="w-full bg-stone-800 border border-stone-600 rounded-sm px-3 py-2 text-sm text-stone-200 focus:outline-none focus:border-amber-gold/60 transition-colors"
                     />
                     {currentDateObj && (
-                        <p className="text-stone-500 text-xs mt-1 flex items-center gap-2">
-                            <CalendarDays size={11} />
-                            {DAY_FR[currentDateObj.getDay()]} {currentDateObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                            {diffDays !== null && diffDays >= 0 && (
-                                <span className="text-amber-gold/70">— J+{diffDays}</span>
-                            )}
-                        </p>
+                        <div className="flex flex-col gap-1 mt-1">
+                            <p className="text-stone-500 text-xs flex items-center gap-2">
+                                <CalendarDays size={11} />
+                                {DAY_FR[currentDateObj.getDay()]} {currentDateObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                {diffDays !== null && diffDays >= 0 && (
+                                    <span className="text-amber-gold/70">— J+{diffDays}</span>
+                                )}
+                            </p>
+                            {(() => {
+                                const moon = calculateMoonPhase(currentDateObj);
+                                return moon ? (
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <div className="flex items-center gap-2 px-2.5 py-1 bg-stone-900 border border-amber-900/40 rounded shadow-sm">
+                                            <span className="text-base drop-shadow-[0_0_3px_rgba(255,255,255,0.2)]">{moon.emoji}</span>
+                                            <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest leading-none">
+                                                {moon.name}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ) : null;
+                            })()}
+                        </div>
                     )}
                 </div>
             </div >
