@@ -1,7 +1,8 @@
+```json
 {
   "name": "rpg-sheet-manager",
   "private": true,
-  "version": "2.102.0",
+  "version": "2.103.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

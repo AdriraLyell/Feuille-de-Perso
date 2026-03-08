@@ -1,5 +1,13 @@
 [
     {
+        "version": "2.103.0",
+        "date": "2026-03-08",
+        "type": "fix",
+        "changes": [
+            "Logic : Rendu de l'évaluateur de formules insensible à la casse pour supporter les accents et majuscules dans les variables (ex: 'Athlétisme', 'Volonté')."
+        ]
+    },
+    {
         "version": "2.102.0",
         "date": "2026-03-08",
         "type": "fix",

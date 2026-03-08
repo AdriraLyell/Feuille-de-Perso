@@ -377,9 +377,22 @@ export const evaluateFormula = (
         // Use safe-expr-eval parser
         const expr = parser.parse(normalizeFormula(formula));
 
+        // Build a lowercase map for case-insensitive and accent-insensitive matching
+        const lowerContextKeys = Object.keys(context).reduce((acc, key) => {
+            acc[key.toLowerCase()] = key;
+            return acc;
+        }, {} as Record<string, string>);
+
         // Map undefined variables to 0 to prevent evaluation errors
         getExpressionVariables(formula).forEach((v: string) => {
-            if (context[v] === undefined) context[v] = 0;
+            if (context[v] === undefined) {
+                const lowerV = v.toLowerCase();
+                if (lowerContextKeys[lowerV] !== undefined) {
+                    context[v] = context[lowerContextKeys[lowerV]];
+                } else {
+                    context[v] = 0;
+                }
+            }
         });
 
         // Evaluate with safe context
