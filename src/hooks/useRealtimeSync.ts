@@ -71,8 +71,20 @@ export const useRealtimeSync = ({
             characterDebounceRef.current = setTimeout(() => {
                 logger.log('[useRealtimeSync] characters changed — notifying layout...');
                 try {
-                    const newData = (payload as { new?: { data?: Record<string, unknown> } }).new?.data;
-                    if (newData && onRemoteCharacterUpdate) {
+                    const newRow = (payload as { new?: Record<string, unknown> }).new as (Record<string, any> | undefined);
+                    const rawData = newRow?.data;
+
+                    if (rawData && onRemoteCharacterUpdate) {
+                        // Enrich with SQL columns to avoid state loss in syncInfo
+                        const newData = {
+                            ...rawData,
+                            syncInfo: {
+                                ...(rawData.syncInfo || {}),
+                                syncId: newRow.id,
+                                settingId: newRow.setting_id || 'orphan',
+                                lastSynced: newRow.last_synced ? new Date(newRow.last_synced).getTime() : Date.now()
+                            }
+                        };
                         onRemoteCharacterUpdate(newData);
                     }
                 } catch (e) {

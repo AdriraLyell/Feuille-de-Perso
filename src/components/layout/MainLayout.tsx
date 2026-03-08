@@ -142,6 +142,32 @@ const MainLayout: React.FC = () => {
     const [pendingMjUpdate, setPendingMjUpdate] = React.useState<{ data: CharacterSheetData; message: string } | null>(null);
     const [conflictData, setConflictData] = React.useState<CharacterSheetData | null>(null);
 
+    // Safety Alert Countdown Timer logic (sync with SafetyAlert.tsx)
+    const [safetyTimeRemaining, setSafetyTimeRemaining] = useState<number | undefined>(undefined);
+    useEffect(() => {
+        const lastSynced = data.syncInfo?.lastSynced || 0;
+        const isAutoSync = data.syncInfo?.isAutoSyncEnabled;
+        const syncId = data.syncInfo?.syncId;
+        const isDirty = data.syncInfo?.isDirty;
+
+        if (!syncId || isAutoSync || !isDirty) {
+            setSafetyTimeRemaining(undefined);
+            return;
+        }
+
+        const tick = () => {
+            const now = Date.now();
+            const alertThreshold = 60 * 60 * 1000; // 60 minutes
+            const remaining = alertThreshold - (now - lastSynced);
+            setSafetyTimeRemaining(remaining > 0 ? remaining : 0);
+        };
+
+        const interval = setInterval(tick, 30000); // 30s update is enough for tooltip
+        tick();
+
+        return () => clearInterval(interval);
+    }, [data.syncInfo?.lastSynced, data.syncInfo?.isAutoSyncEnabled, data.syncInfo?.syncId, data.syncInfo?.isDirty]);
+
     const handleRemoteCharacterUpdate = React.useCallback(async (remoteDataRaw: Record<string, unknown>) => {
         // 0. Decompress images before applying the remote payload
         const { ImageSyncResolver } = await import('../../services/ImageSyncResolver');
@@ -455,6 +481,7 @@ const MainLayout: React.FC = () => {
                     appVersion={APP_VERSION}
                     onShowCampaignInfo={() => setShowCampaignInfo(true)}
                     autoSaveCountdown={countdown}
+                    safetyTimeRemaining={safetyTimeRemaining}
                     isMessagingOpen={isMessagingOpen}
                     onToggleMessaging={() => setIsMessagingOpen(!isMessagingOpen)}
                     unreadMessagesCount={unreadMessagesCount}

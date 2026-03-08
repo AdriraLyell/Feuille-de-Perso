@@ -21,8 +21,8 @@ const SafetyAlert: React.FC = () => {
 
         const checkSafety = () => {
             const now = Date.now();
-            const alertThreshold = 30 * 60 * 1000; // 30 minutes
-            
+            const alertThreshold = 60 * 60 * 1000; // 60 minutes
+
             if (now - lastSynced > alertThreshold) {
                 setIsVisible(true);
             } else {
@@ -42,11 +42,11 @@ const SafetyAlert: React.FC = () => {
     return (
         <div className="fixed bottom-20 right-4 z-[100] animate-in slide-in-from-bottom-10 duration-500 no-print">
             <div className="bg-[#8b2e2e] border-2 border-amber-600/50 rounded-lg shadow-2xl p-4 max-w-sm relative overflow-hidden text-white">
-                
+
                 {/* Decorative background glow */}
                 <div className="absolute -right-4 -top-4 w-16 h-16 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
 
-                <button 
+                <button
                     onClick={() => setIsVisible(false)}
                     className="absolute top-2 right-2 text-white/50 hover:text-white transition-colors"
                 >
@@ -63,7 +63,7 @@ const SafetyAlert: React.FC = () => {
                             Attention : Oubli ?
                         </h4>
                         <p className="text-xs text-white/80 mb-3 font-medium leading-relaxed">
-                            Votre feuille n'a pas été sauvegardée depuis plus de 30 minutes. 
+                            Votre feuille n'a pas été sauvegardée depuis plus de 60 minutes.
                             Vos dernières modifications risquent d'être perdues en cas de fermeture.
                         </p>
 

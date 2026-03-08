@@ -34,6 +34,7 @@ interface DiegeticNavigationProps {
     onToggleEditLayoutMode?: () => void;
     onResetLayout?: () => void;
     onAutoFitLayout?: () => void;
+    safetyTimeRemaining?: number;
 }
 
 const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
@@ -43,7 +44,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     onShowCampaignInfo, autoSaveCountdown,
     isMessagingOpen, onToggleMessaging, unreadMessagesCount,
     isEditMode, onToggleEditMode, isEditLayoutMode, onToggleEditLayoutMode,
-    onResetLayout, onAutoFitLayout
+    onResetLayout, onAutoFitLayout, safetyTimeRemaining
 }) => {
     const { data, isSyncing } = useCharacter();
     const { rules } = useRules();
@@ -69,7 +70,14 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
         if (!isOnline) return { color: 'text-red-500 border-red-900/50 bg-red-900/10', tooltip: 'Mode Hors-ligne - Les modifications sont enregistrées localement uniquement' };
         if (isSyncing) return { color: 'text-blue-400 border-blue-900/50 bg-blue-900/10', tooltip: 'Synchronisation en cours...' };
         if (syncStatus === 'update-available') return { color: 'text-amber-400 border-amber-500 bg-amber-900/20', tooltip: 'Mise à jour disponible ! Le MJ a modifié votre fiche.' };
-        if (data.syncInfo?.isDirty) return { color: 'text-amber-500/80 border-amber-900/30 bg-amber-900/10', tooltip: 'Modifications locales en attente d\'envoi' };
+        if (data.syncInfo?.isDirty) {
+            let tooltip = 'Modifications locales en attente d\'envoi';
+            if (safetyTimeRemaining !== undefined && !data.syncInfo?.isAutoSyncEnabled) {
+                const mins = Math.max(0, Math.ceil(safetyTimeRemaining / 60000));
+                tooltip += ` (Alerte dans ${mins} min)`;
+            }
+            return { color: 'text-amber-500/80 border-amber-900/30 bg-amber-900/10', tooltip };
+        }
         if (data.syncInfo?.syncId) return { color: 'text-emerald-500 border-emerald-900/50 bg-emerald-900/10', tooltip: 'Connecté - Fiche à jour sur le Cloud' };
         return { color: 'text-gray-400 border-gray-700 bg-gray-800/50', tooltip: 'Synchronisation non configurée' };
     };

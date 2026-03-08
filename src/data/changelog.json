@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.106.0",
+        "date": "2026-03-08",
+        "type": "fix",
+        "changes": [
+            "Sync : Stabilisation de l'icône de synchronisation (correction du clignotement orange après sauvegarde via la récupération du timestamp serveur dans Realtime).",
+            "Sync : Amélioration du moteur de hashage pour ignorer les différences de format d'images entre local et cloud.",
+            "UX : Passage du seuil de l'alerte de sécurité ('Safety Alert') de 30 à 60 minutes.",
+            "UX : Ajout du temps restant avant l'alerte de sécurité dans l'infobulle de l'icône de synchronisation."
+        ]
+    },
+    {
         "version": "2.105.0",
         "date": "2026-03-08",
         "type": "UI",
@@ -179,15 +190,6 @@
         "changes": [
             "UI : Les spécialisations imposées (⚡) affichent un bouton de promotion au survol dans l'onglet Spécialisations.",
             "Logic : Une spécialisation imposée peut être transformée en compétence secondaire (valeur 0) sans être supprimée — elle reste pilotée par les règles MJ."
-        ]
-    },
-    {
-        "version": "2.97.36",
-        "date": "2026-03-01",
-        "type": "fix",
-        "changes": [
-            "Logic : Prise en compte des modifications du seuil MJ (defaultMinLevel) dans la bibliothèque locale pour les spécialisations imposées.",
-            "System : Déclenchement automatique de la réconciliation dès qu'une bibliothèque locale (spécialisations, compétences, traits) est modifiée."
         ]
     }
 ]

@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.97.36",
+        "date": "2026-03-01",
+        "type": "fix",
+        "changes": [
+            "Logic : Prise en compte des modifications du seuil MJ (defaultMinLevel) dans la bibliothèque locale pour les spécialisations imposées.",
+            "System : Déclenchement automatique de la réconciliation dès qu'une bibliothèque locale (spécialisations, compétences, traits) est modifiée."
+        ]
+    },
+    {
         "version": "2.97.35",
         "date": "2026-03-01",
         "type": "fix",
@@ -727,11 +736,5 @@
         "date": "2026-02-23",
         "type": "fix",
         "description": "Ergonomie : Déplacement du sélecteur de Thème (icône palette) vers la section des contrôles de vue (à côté du switch Portrait/Paysage) et suppression de son label textuel pour plus de cohérence visuelle."
-    },
-    {
-        "version": "2.75.1",
-        "date": "2026-02-23",
-        "type": "fix",
-        "description": "Ergonomie : Suppression du label textuel 'Réglages' dans la barre de navigation pour un design plus épuré, conservant uniquement l'icône avec une info-bulle d'aide."
     }
 ]

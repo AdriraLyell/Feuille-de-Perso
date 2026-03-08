@@ -78,8 +78,19 @@ export const CharacterSyncService = {
                 ...stableData
             } = data;
 
-            // Fast hashing via string manipulation
-            const str = JSON.stringify(stableData);
+            // Character images differ in representation between environments (IndexedDB ID vs Cloud GZIP vs legacy Base64).
+            // We normalize them in the hash to allow consistent identity checking.
+            const str = JSON.stringify(stableData, (key, value) => {
+                if (typeof value === 'string' && (
+                    value.startsWith('GZIP:') ||
+                    value.startsWith('data:image/') ||
+                    (value.startsWith('img_') && value.length > 5)
+                )) {
+                    return "__IMAGE_CONTENT__";
+                }
+                return value;
+            });
+
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
                 const char = str.charCodeAt(i);
@@ -111,14 +122,14 @@ export const CharacterSyncService = {
             // Step 1: Clean syncInfo from local-only or redundant fields
             if (dataToSync.syncInfo) {
                 const cleanSyncInfo = { ...dataToSync.syncInfo, syncMode: mode };
-                
+
                 // Fields managed by SQL columns or local UI state - should NOT be in JSONB
                 delete cleanSyncInfo.settingId;
                 delete cleanSyncInfo.lastSynced;
                 delete cleanSyncInfo.mjMessage;
                 delete cleanSyncInfo.isDirty;
                 delete cleanSyncInfo.lastLocalEdit;
-                
+
                 dataToSync.syncInfo = cleanSyncInfo;
             }
 
