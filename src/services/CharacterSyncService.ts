@@ -135,7 +135,8 @@ export const CharacterSyncService = {
                     player_name: playerName.trim(),
                     character_name: characterName.trim(),
                     data: dataToStore,
-                    last_synced: new Date().toISOString()
+                    last_synced: new Date().toISOString(),
+                    created_by: null // Force anonymous ownership even if admin is syncing
                 },
                 {
                     onConflict: 'setting_id,character_name,player_name',
