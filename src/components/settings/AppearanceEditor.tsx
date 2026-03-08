@@ -18,6 +18,11 @@ interface AppearanceEditorProps {
     rules: RulesData | null;
 }
 
+const COMPLEX_SYMBOLS = [
+    'skull', 'ghost', 'sword', 'axe', 'hammer', 'eye', 'wind', 'crosshair',
+    'key', 'anchor', 'feather', 'paw', 'tree', 'waves', 'plus', 'trophy', 'crown'
+];
+
 const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onAddLog, rules }) => {
     const theme: ThemeConfig = data.theme || DEFAULT_THEME;
 
@@ -102,7 +107,7 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20">
-                        <label 
+                        <label
                             htmlFor="creation-color-picker"
                             className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest"
                         >
@@ -124,7 +129,7 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                     </div>
 
                     <div className="space-y-3 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20">
-                        <label 
+                        <label
                             htmlFor="xp-color-picker"
                             className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest"
                         >
@@ -157,7 +162,7 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                         <div className="space-y-3 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <label 
+                                    <label
                                         htmlFor="variable-skill-color-picker"
                                         className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest flex items-center gap-1.5"
                                     >
@@ -193,7 +198,7 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                         <div className="space-y-3 bg-[#bfae85]/5 p-4 rounded-sm border border-[#bfae85]/20">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <label 
+                                    <label
                                         htmlFor="mystic-skill-color-picker"
                                         className="block text-[10px] font-bold text-[#8b2e2e] uppercase tracking-widest flex items-center gap-1.5"
                                     >
@@ -250,9 +255,9 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                                                 className="w-6 h-6 border-none rounded-sm cursor-pointer bg-white shadow-sm ring-1 ring-[#bfae85]/30 shrink-0"
                                             />
                                             <div className="flex-grow min-w-0">
-                                                <label 
+                                                <label
                                                     htmlFor={`color-override-${ability.id}`}
-                                                    className="block text-[10px] font-bold truncate cursor-pointer" 
+                                                    className="block text-[10px] font-bold truncate cursor-pointer"
                                                     style={{ color: currentColor }}
                                                 >
                                                     {ability.name}
@@ -304,7 +309,11 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
                                     }`}
                                 title={name.charAt(0).toUpperCase() + name.slice(1)}
                             >
-                                <Icon size={18} fill={(theme.dotSymbol || 'circle') === name ? 'white' : 'transparent'} strokeWidth={2} />
+                                <Icon
+                                    size={18}
+                                    fill={((theme.dotSymbol || 'circle') === name && !COMPLEX_SYMBOLS.includes(name)) ? 'white' : 'transparent'}
+                                    strokeWidth={(theme.dotSymbol || 'circle') === name && COMPLEX_SYMBOLS.includes(name) ? 3 : 2}
+                                />
                             </button>
                         ))}
                     </div>
@@ -318,14 +327,15 @@ const AppearanceEditor: React.FC<AppearanceEditorProps> = ({ data, onUpdate, onA
 const SymbolPreview: React.FC<{ symbol: string, color: string, filled: boolean }> = ({ symbol, color, filled }) => {
     const Icon = SYMBOL_MAP[symbol] || Circle;
     const inactiveColor = '#d6d3d1'; // stone-300
+    const isComplex = COMPLEX_SYMBOLS.includes(symbol);
 
     return (
         <div className="w-4 h-4 flex items-center justify-center">
             <Icon
                 size={12}
                 stroke={filled ? color : inactiveColor}
-                fill={filled ? color : 'transparent'}
-                strokeWidth={filled ? 2.5 : 1.5}
+                fill={filled && !isComplex ? color : 'transparent'}
+                strokeWidth={filled ? (isComplex ? 3 : 2.5) : 1.5}
             />
         </div>
     );

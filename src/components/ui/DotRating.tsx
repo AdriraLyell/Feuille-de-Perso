@@ -57,6 +57,12 @@ const SYMBOL_MAP: Record<string, LucideIcon> = {
   waves: Waves
 };
 
+// Symbols that look better as outline even when "filled" because they have internal details
+const COMPLEX_SYMBOLS = [
+  'skull', 'ghost', 'sword', 'axe', 'hammer', 'eye', 'wind', 'crosshair',
+  'key', 'anchor', 'feather', 'paw', 'tree', 'waves', 'plus', 'trophy', 'crown'
+];
+
 const DotRating: React.FC<DotRatingProps> = ({
   value,
   creationValue = 0,
@@ -71,6 +77,7 @@ const DotRating: React.FC<DotRatingProps> = ({
 }) => {
   const IconComponent = SYMBOL_MAP[symbol] || Circle;
   const isBlocked = !!blockedReason;
+  const isComplex = COMPLEX_SYMBOLS.includes(symbol);
 
   return (
     <div className={`flex items-center space-x-1 ${className}`}>
@@ -78,27 +85,17 @@ const DotRating: React.FC<DotRatingProps> = ({
         const filled = index < value;
         const isCreationDot = index < creationValue;
 
-        // Option C: Hide dots above current value if blocked
         if (isBlocked && index >= value) {
-          return <div key={index} className="w-3" />; // Empty spacer to keep width or just nothing? 
-          // Better to keep a small spacer or nothing? User said "faire disparaître".
-          // If I return null, the width of the row will jump. 
-          // But since it's aligned to the right (ml-auto), it might be better to return null to compress it.
+          return <div key={index} className="w-3" />;
         }
 
         const activeColor = isCreationDot ? (creationColor || '#2563eb') : (xpColor || '#292524');
-        const inactiveColor = '#a8a29e'; // stone-400 (was stone-300)
+        const inactiveColor = '#a8a29e'; // stone-400
 
         const handleClick = () => {
           if (readOnly || !onChange) return;
           const newValue = index + 1;
-
-          // Soft block check even if UI hides dots (safety)
-          if (isBlocked && newValue > value) {
-            // The dot would be hidden anyway, but just in case
-            return;
-          }
-
+          if (isBlocked && newValue > value) return;
           onChange(newValue === value ? newValue - 1 : newValue);
         };
 
@@ -116,8 +113,8 @@ const DotRating: React.FC<DotRatingProps> = ({
             <IconComponent
               size={12}
               stroke={filled ? activeColor : inactiveColor}
-              fill={filled ? activeColor : 'transparent'}
-              strokeWidth={filled ? 2.5 : 2.2}
+              fill={filled && !isComplex ? activeColor : 'transparent'}
+              strokeWidth={filled ? (isComplex ? 3 : 2.5) : 1.8}
             />
           </button>
         );
@@ -127,3 +124,4 @@ const DotRating: React.FC<DotRatingProps> = ({
 };
 
 export default DotRating;
+
