@@ -201,7 +201,7 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
                     >
                         {bornZodiacs && (
                             <div
-                                className="absolute right-0 flex gap-1.5 px-1 py-0.5 bg-black/[0.02] backdrop-blur-[1px] border border-white/5 rounded-sm cursor-help hover:scale-110 transition-transform z-10"
+                                className="absolute right-0 flex gap-0.5 px-0.5 py-0.5 bg-black/[0.02] backdrop-blur-[1px] border border-white/5 rounded-sm cursor-help z-10"
                                 title={`${bornZodiacs.zodiac?.name || ''} / ${bornZodiacs.chineseZodiac?.fullName || ''}`}
                             >
                                 {bornZodiacs.zodiac && <span className="text-[20px] leading-none drop-shadow-sm">{bornZodiacs.zodiac.emoji}</span>}
