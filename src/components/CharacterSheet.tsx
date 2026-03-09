@@ -30,7 +30,7 @@ interface Props {
 const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode, onToggleCreationMode }) => {
     const data = useCharacterData();
     const resolvedData = useResolvedData();
-    
+
     const dataRef = React.useRef(data);
     React.useEffect(() => { dataRef.current = data; }, [data]);
 
@@ -185,8 +185,8 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
                             <AttributeBlock
                                 key={cat.id}
                                 title={cat.label}
-                                items={data.attributes[cat.id] || []}
-                                secondaryItems={data.secondaryAttributesActive ? data.secondaryAttributes[cat.id] : undefined}
+                                items={resolvedData.attributes[cat.id] || []}
+                                secondaryItems={resolvedData.secondaryAttributesActive ? resolvedData.secondaryAttributes[cat.id] : undefined}
                                 cat={cat.id}
                                 onUpdate={updateAttribute}
                                 bonuses={attributeBonuses}
@@ -223,7 +223,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
                         renderBottomSection={() => (
                             <div className="w-full h-full overflow-hidden">
                                 <CountersSection
-                                    data={data}
+                                    data={resolvedData}
                                     updateCounter={updateCounter}
                                     isLandscape={isLandscape}
                                     creationBonuses={counterCreationBonuses}

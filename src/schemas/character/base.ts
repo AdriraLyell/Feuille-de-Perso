@@ -148,3 +148,14 @@ export const ImposedSpecializationSchema = z.object({
     name: z.string(),
     minLevel: z.number()
 });
+
+export const PostItDataSchema = z.object({
+    id: z.string(),
+    text: z.string(),
+    color: z.string(),
+    x: z.number(),
+    y: z.number(),
+    width: z.number(),
+    height: z.number(),
+    tabId: z.string()
+});

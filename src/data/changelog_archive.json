@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.40",
+        "date": "2026-03-02",
+        "type": "fix",
+        "changes": [
+            "Logic : Remplacement du tokenizer ASCII par un UnicodeTokenizer pour supporter les accents dans les formules (ex: Dextérité).",
+            "Logic : Ajout d'une normalisation pré-parsing pour assurer la compatibilité avec le moteur safe-expr-eval.",
+            "Database : Renforcement de la migration restoreMysticLinks pour supporter les correspondances indirectes (ex: Art de la Cartomancie -> Cartomancie).",
+            "Refactor : Éradication massive des 'any' dans les réconciliateurs et utilitaires de calcul."
+        ]
+    },
+    {
         "version": "2.97.39",
         "date": "2026-03-01",
         "type": "chore",
@@ -743,11 +754,5 @@
         "date": "2026-02-23",
         "type": "feat",
         "description": "Registre : Ajout d'une section 'Gestion Temporelle' permettant d'afficher la date actuelle de la chronique et d'avancer le temps (+1 Jour, +1 Semaine, +1 Mois) directement depuis l'interface."
-    },
-    {
-        "version": "2.75.5",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Ergonomie : Ajout de menus accordéons pour les sections 'Compétences' et 'Traits' dans le Registre, permettant de réduire l'encombrement visuel lors de la consultation."
     }
 ]

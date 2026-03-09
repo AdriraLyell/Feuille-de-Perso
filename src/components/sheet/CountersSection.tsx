@@ -59,7 +59,11 @@ export const CountersSection = React.memo<CountersSectionProps>(({
 
         const effectiveValue = counter.value + creationBonus + xpBonus;
         const effectiveCreationValue = (counter.creationValue || 0) + creationBonus;
-        const effectiveMax = calculatedMax ?? (counter.max || 10);
+
+        // On récupère le paramètre depuis la librairie/système d'abord, puis les max calculés (ex: formules). 
+        // Si la valeur (base + traits) dépasse ce max, on étend visuellement (pour ne pas tronquer l'UI).
+        const baseMax = calculatedMax ?? libEntry?.maxValue ?? sysDef?.max ?? (counter.max || 10);
+        const effectiveMax = Math.max(baseMax, effectiveValue);
 
         return (
             <div key={counter.id} className="col-span-2 border border-stone-300 bg-white rounded-sm shadow-sm flex items-center p-1 overflow-hidden h-9 justify-between gap-1 pl-1.5 pr-0.5">

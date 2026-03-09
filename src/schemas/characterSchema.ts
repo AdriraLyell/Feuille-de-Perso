@@ -12,7 +12,8 @@ import {
     XPEntrySchema,
     XPTransactionSchema,
     LogEntrySchema,
-    ImposedSpecializationSchema
+    ImposedSpecializationSchema,
+    PostItDataSchema
 } from './character/base';
 
 import {
@@ -141,6 +142,7 @@ export const CharacterSheetDataSchema = z.object({
     specializationLibrary: z.array(LibrarySpecializationEntrySchema).optional().default([]),
     backgroundLibrary: z.array(LibrarySkillEntrySchema).optional().default([]),
     counterLibrary: z.array(LibraryCounterEntrySchema).optional().default([]),
+    postIts: z.array(PostItDataSchema).optional().default([]),
     xpLogs: z.array(XPEntrySchema).optional().default([]),
     xpTransactions: z.array(XPTransactionSchema).optional().default([]),
     appLogs: z.array(LogEntrySchema).optional().default([]),

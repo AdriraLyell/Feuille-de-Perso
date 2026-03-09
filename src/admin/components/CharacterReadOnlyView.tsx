@@ -192,12 +192,12 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({
                     onConfirm={async (merged: RulesData, excludedIds: string[]) => {
                         try {
                             await CampaignService.saveSetting(character.setting_id!, merged);
-                            
+
                             // Nettoyer les suggestions sur la fiche du joueur
                             if (character.id && processedData) {
                                 // On ne garde que les suggestions qui ont été explicitement EXCLUES de la fusion
                                 const remainingSuggestions = (processedData.suggestions || []).filter(s => excludedIds.includes(s.id));
-                                
+
                                 const updatedCharacterData: CharacterSheetData = {
                                     ...processedData,
                                     suggestions: remainingSuggestions
@@ -206,13 +206,13 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({
                                 const syncSuccess = await CharacterSyncService.updateCharacterData(character.id, updatedCharacterData);
                                 if (syncSuccess) {
                                     setProcessedData(updatedCharacterData);
-                                    addLog(remainingSuggestions.length > 0 
-                                        ? `Bibliothèque mise à jour. ${remainingSuggestions.length} suggestion(s) conservée(s).` 
-                                        : "Bibliothèque mise à jour et écritures suspectes archivées !", 
+                                    addLog(remainingSuggestions.length > 0
+                                        ? `Bibliothèque mise à jour. ${remainingSuggestions.length} suggestion(s) conservée(s).`
+                                        : "Bibliothèque mise à jour et écritures suspectes archivées !",
                                         "success"
                                     );
                                 } else {
-                                    addLog("Bibliothèque mise à jour, mais échec du nettoyage des suggestions.", "warning");
+                                    addLog("Bibliothèque mise à jour, mais échec du nettoyage des suggestions.", "danger");
                                 }
                             } else {
                                 addLog("Bibliothèque de campagne mise à jour avec succès !", "success");
@@ -257,7 +257,7 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({
                     </p>
 
                     <div>
-                        <label 
+                        <label
                             htmlFor="mj-update-message"
                             className="block text-[10px] font-black uppercase tracking-[0.2em] text-amber-900/80 mb-2"
                         >
