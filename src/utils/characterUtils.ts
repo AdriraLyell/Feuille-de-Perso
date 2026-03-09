@@ -132,7 +132,7 @@ export const recreateCharacterStats = (source: CharacterSheetData): CharacterShe
         });
     }
 
-    // Skills (On vide tout, les spécialisations suivront)
+    // Skills (On vide tout, les spécialités suivront)
     Object.keys(clean.skills).forEach((cat: string) => {
         clean.skills[cat].forEach((skill: DotEntry) => {
             skill.value = 0;

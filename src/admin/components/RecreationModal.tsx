@@ -103,7 +103,7 @@ const RecreationModal: React.FC<RecreationModalProps> = ({
                                     </li>
                                     <li className="flex gap-2">
                                         <span className="text-rose-700">•</span>
-                                        <div><span className="text-stone-200">Perte de Spécialisations</span> : Ces raffinements doivent être redistribués.</div>
+                                        <div><span className="text-stone-200">Perte de Spécialités</span> : Ces raffinements doivent être redistribués.</div>
                                     </li>
                                     <li className="flex gap-2">
                                         <span className="text-rose-700">•</span>

@@ -140,7 +140,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                 specializations: currentList.filter(s => s.id !== showDeleteConfirm)
             }
         });
-        addLog(`Spécialisation officielle "${deletedEntry?.name}" supprimée.`, 'info', 'settings');
+        addLog(`Spécialité officielle "${deletedEntry?.name}" supprimée.`, 'info', 'settings');
         setShowDeleteConfirm(null);
     };
 
@@ -159,7 +159,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
         );
 
         if (duplicate) {
-            setError("Une spécialisation portant ce nom existe déjà.");
+            setError("Une spécialité portant ce nom existe déjà.");
             return;
         }
 
@@ -179,7 +179,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
             }
         });
 
-        addLog(`Spécialisation officielle "${editingEntry.name}" enregistrée.`, 'success', 'settings');
+        addLog(`Spécialité officielle "${editingEntry.name}" enregistrée.`, 'success', 'settings');
         setIsModalOpen(false);
         setEditingEntry(null);
     };
@@ -235,12 +235,12 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
             const result = await publishFileToGitHub(
                 'public/data/specializations.json',
                 content,
-                `update(specs): Mise à jour bibliothèque spécialisations v${rules.version}`,
+                `update(specs): Mise à jour bibliothèque spécialités v${rules.version}`,
                 { token, owner, repo, branch: 'main' }
             );
 
             if (result.success) {
-                addLog('Bibliothèque de spécialisations publiée avec succès !', 'success', 'settings');
+                addLog('Bibliothèque de spécialités publiée avec succès !', 'success', 'settings');
             } else {
                 addLog("Erreur lors de la publication : " + result.message, 'danger', 'settings');
             }
@@ -261,7 +261,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                     </span>
                     <input
                         className="w-full pl-9 pr-9 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
-                        placeholder="Rechercher une spécialisation..."
+                        placeholder="Rechercher une spécialité..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -378,8 +378,8 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                 {library.length === 0 ? (
                     <div className="text-center text-[#5c4d41]/60 py-10 italic px-4 text-sm flex flex-col items-center">
                         <Award size={48} className="opacity-20 mb-2" />
-                        <p>La bibliothèque de spécialisations officielles est vide.</p>
-                        <p className="text-xs mt-2 text-[#5c4d41]/80 italic">Ajoutez des spécialisations standards proposées à tous les joueurs.</p>
+                        <p>La bibliothèque de spécialités officielles est vide.</p>
+                        <p className="text-xs mt-2 text-[#5c4d41]/80 italic">Ajoutez des spécialités standards proposées à tous les joueurs.</p>
                     </div>
                 ) : filteredLibrary.length === 0 ? (
                     <div className="text-center text-[#5c4d41]/60 py-10 italic">Aucun résultat.</div>
@@ -406,7 +406,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
             <ThematicModal
                 isOpen={isModalOpen && !!editingEntry}
                 onClose={() => setIsModalOpen(false)}
-                title={library.some(e => e.id === editingEntry?.id) ? 'Éditer Spécialisation' : 'Nouvelle Spécialisation'}
+                title={library.some(e => e.id === editingEntry?.id) ? 'Éditer Spécialité' : 'Nouvelle Spécialité'}
                 icon={<Award size={20} />}
                 size="md"
                 footer={
@@ -434,7 +434,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                 isOpen={showPublishConfirm}
                 onClose={() => setShowPublishConfirm(false)}
                 onConfirm={executePublish}
-                title="Publier les spécialisations ?"
+                title="Publier les spécialités ?"
                 message="Vous allez mettre à jour le fichier specializations.json public."
                 confirmLabel="Publier"
                 type="warning"
@@ -444,7 +444,7 @@ const AdminSpecializationLibrary: React.FC<AdminSpecializationLibraryProps> = ({
                 isOpen={!!showDeleteConfirm}
                 onClose={() => setShowDeleteConfirm(null)}
                 onConfirm={confirmDelete}
-                title="Supprimer la spécialisation ?"
+                title="Supprimer la spécialité ?"
                 message="Cette action supprimera définitivement l'entrée de la base admin."
                 confirmLabel="Supprimer"
                 type="danger"

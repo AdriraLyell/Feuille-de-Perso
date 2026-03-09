@@ -61,7 +61,7 @@ const PrintSelectionModal: React.FC<PrintSelectionModalProps> = ({ isOpen, onClo
                         >
                             {selection.specs ? <CheckSquare size={20} className="text-blue-600" /> : <Square size={20} />}
                             <List size={18} />
-                            <span className="font-semibold">Spécialisations</span>
+                            <span className="font-semibold">Spécialités</span>
                         </button>
 
                         <button

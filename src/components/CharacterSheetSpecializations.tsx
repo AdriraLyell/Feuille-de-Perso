@@ -57,7 +57,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         });
 
         const skillName = getSkillName(skillId);
-        onAddLog(`Spécialisation modifiée (${skillName}) : ${value}`, 'info', 'sheet', `spec_${skillId}_${index}`);
+        onAddLog(`Spécialité modifiée (${skillName}) : ${value}`, 'info', 'sheet', `spec_${skillId}_${index}`);
     };
 
     const handlePromote = (skillId: string, index: number, specName: string) => {
@@ -103,7 +103,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                 };
             });
 
-            onAddLog(`Spécialisation "${specName}" promue en compétence secondaire.`, 'success', 'sheet');
+            onAddLog(`Spécialité "${specName}" promue en compétence secondaire.`, 'success', 'sheet');
         } catch (err) {
             logger.error(`[Promotion] Error:`, err);
             ErrorService.handleError(err, { context: 'CharacterSheetSpecializations.handlePromote' });
@@ -141,7 +141,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                 }
             }));
 
-            onAddLog(`Spécialisation imposée "${specName}" convertie en compétence secondaire.`, 'success', 'sheet');
+            onAddLog(`Spécialité imposée "${specName}" convertie en compétence secondaire.`, 'success', 'sheet');
         } catch (err) {
             logger.error(`[PromotionImposée] Error:`, err);
             ErrorService.handleError(err, { context: 'CharacterSheetSpecializations.handlePromoteImposed' });
@@ -221,7 +221,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                     handleDrop(e, skill.id);
                 }}
                 role="region"
-                aria-label={`Spécialisations pour ${skill.name}`}
+                aria-label={`Spécialités pour ${skill.name}`}
             >
                 <div className="font-black text-[9px] uppercase tracking-tighter flex justify-between items-center text-stone-500 group-hover/skill:text-amber-700 transition-colors px-0.5">
                     <span className="truncate" title={skill.name}>{skill.name}</span>
@@ -336,7 +336,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
             <div className={`sheet-container p-6 ${isLandscape ? 'landscape' : ''}`}>
 
                 <h1 className="text-3xl font-black text-center uppercase py-2 tracking-widest border-b-2 border-stone-800 mb-4 text-indigo-950 font-serif relative">
-                    Spécialisations
+                    Spécialités
                     <button
                         onClick={() => setIsDrawerOpen(true)}
                         className="absolute right-0 top-1/2 -translate-y-1/2 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold py-1 px-3 rounded shadow-sm transition-colors flex items-center gap-1 uppercase cursor-pointer"
@@ -349,8 +349,8 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                     {!hasAnySkill && (
                         <div className="text-center text-stone-400 italic mt-20 flex-grow flex items-center justify-center">
                             <div>
-                                <p className="mb-2 text-lg">Aucune compétence (principale) ne possède de point ou de spécialisation imposée.</p>
-                                <p className="text-sm">Ajoutez des points dans l'onglet "Personnage" pour voir apparaître les champs de spécialisation ici.</p>
+                                <p className="mb-2 text-lg">Aucune compétence (principale) ne possède de point ou de spécialité imposée.</p>
+                                <p className="text-sm">Ajoutez des points dans l'onglet "Personnage" pour voir apparaître les champs de spécialité ici.</p>
                             </div>
                         </div>
                     )}
@@ -395,7 +395,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                                 La compétence secondaire <strong>"{duplicateErrorModal}"</strong> existe déjà.
                                 <br /><br />
                                 <span className="text-[11px] opacity-80">
-                                    Veuillez supprimer la compétence existante ou choisir une autre spécialisation à promouvoir.
+                                    Veuillez supprimer la compétence existante ou choisir une autre spécialité à promouvoir.
                                 </span>
                             </span>
                         }
@@ -420,7 +420,7 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                                 Souhaitez-vous transformer <strong>"{promoteImposedModal.specName}"</strong> en compétence secondaire ?
                                 <br /><br />
                                 <span className="text-[11px] opacity-80">
-                                    Une nouvelle compétence sera créée avec une valeur de 0. La spécialisation imposée restera visible (elle est définie par les règles).
+                                    Une nouvelle compétence sera créée avec une valeur de 0. La spécialité imposée restera visible (elle est définie par les règles).
                                 </span>
                             </span>
                         }

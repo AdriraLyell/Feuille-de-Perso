@@ -52,7 +52,7 @@ const LibraryRenameModal: React.FC<LibraryRenameModalProps> = ({ oldName, newNam
                 <div className="bg-amber-50/50 border border-amber-200/50 p-4 rounded-sm flex gap-3 text-left">
                     <AlertCircle className="text-amber-700 shrink-0" size={18} />
                     <p className="text-[10px] text-amber-900 leading-tight">
-                        <strong>Notes :</strong> Vos points acquis, l'expérience dépensée et les spécialisations déjà saisies seront intégralement conservés sous le nouveau nom.
+                        <strong>Notes :</strong> Vos points acquis, l'expérience dépensée et les spécialités déjà saisies seront intégralement conservés sous le nouveau nom.
                     </p>
                 </div>
             </div>

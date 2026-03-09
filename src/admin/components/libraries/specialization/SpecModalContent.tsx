@@ -90,7 +90,7 @@ export const SpecModalContent: React.FC<SpecModalContentProps> = ({
                     value={editingEntry.defaultMinLevel}
                     onChange={(e) => setEditingEntry({ ...editingEntry, defaultMinLevel: parseInt(e.target.value) || 0 })}
                 />
-                <p className="text-[10px] text-[#5c4d41]/60 mt-1 italic">Niveau de compétence requis pour débloquer cette spécialisation.</p>
+                <p className="text-[10px] text-[#5c4d41]/60 mt-1 italic">Niveau de compétence requis pour débloquer cette spécialité.</p>
             </div>
 
             <div className="flex items-start gap-3 bg-amber-50/50 p-3 rounded border border-amber-200/50">
@@ -102,9 +102,9 @@ export const SpecModalContent: React.FC<SpecModalContentProps> = ({
                     onChange={(e) => setEditingEntry({ ...editingEntry, isImposed: e.target.checked })}
                 />
                 <div className="flex flex-col">
-                    <label htmlFor="spec-imposed" className="text-xs font-bold text-amber-900 cursor-pointer">Spécialisation Imposée ?</label>
+                    <label htmlFor="spec-imposed" className="text-xs font-bold text-amber-900 cursor-pointer">Spécialité Imposée ?</label>
                     <p className="text-[10px] text-amber-800/70 italic leading-tight mt-0.5">
-                        Si coché, cette spécialisation s'ajoutera automatiquement sur la fiche de tous les personnages si le seuil est atteint.
+                        Si coché, cette spécialité s'ajoutera automatiquement sur la fiche de tous les personnages si le seuil est atteint.
                     </p>
                 </div>
             </div>

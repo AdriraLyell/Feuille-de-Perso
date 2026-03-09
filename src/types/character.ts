@@ -94,7 +94,7 @@ export interface CharacterSheetData {
   imposedSpecializations: Record<string, ImposedSpecialization[]>;
   library?: LibraryEntry[]; // New field for the Virtue/Flaw library
   skillLibrary?: LibrarySkillEntry[]; // New field for Skill Reserve
-  specializationLibrary?: LibrarySpecializationEntry[]; // Catalogue de spécialisations réutilisables
+  specializationLibrary?: LibrarySpecializationEntry[]; // Catalogue de spécialités réutilisables
   backgroundLibrary?: LibraryBackgroundEntry[]; // Catalogue d'arrière-plans
   counterLibrary?: LibraryCounterEntry[]; // Catalogue de compteurs
   mysticAbilities?: LibrarySkillEntry[]; // Catalogue d'habilités mystiques

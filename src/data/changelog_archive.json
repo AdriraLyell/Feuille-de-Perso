@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.97.39",
+        "date": "2026-03-01",
+        "type": "chore",
+        "changes": [
+            "Maintenance : Mise à jour des dépendances npm (minor & moderate updates).",
+            "Maintenance : Correction des erreurs de lint introduites ou détectées après mise à jour (no-useless-assignment, preserve-caught-error).",
+            "Maintenance : Amélioration du typage du logger et de l'ErrorService pour réduire les usages de 'any'.",
+            "Audit : Identification d'une vulnérabilité haute sur expr-eval (2.0.2 est la dernière version, pas de correctif disponible)."
+        ]
+    },
+    {
         "version": "2.97.38",
         "date": "2026-03-01",
         "type": "feat",
@@ -738,11 +749,5 @@
         "date": "2026-02-23",
         "type": "feat",
         "description": "Ergonomie : Ajout de menus accordéons pour les sections 'Compétences' et 'Traits' dans le Registre, permettant de réduire l'encombrement visuel lors de la consultation."
-    },
-    {
-        "version": "2.75.4",
-        "date": "2026-02-23",
-        "type": "fix",
-        "description": "Registre : Suppression du sélecteur de format portrait/paysage pour revenir à l'affichage standard (Attributs en lignes, Compétences en lignes) tout en conservant l'accordéon et le nouvel alignement des traits."
     }
 ]

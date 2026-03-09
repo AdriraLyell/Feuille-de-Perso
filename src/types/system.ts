@@ -155,7 +155,7 @@ export interface LibrarySkillEntry {
   };
 }
 
-// Nouveau : Entrée pour le catalogue des spécialisations
+// Nouveau : Entrée pour le catalogue des spécialités
 export interface LibrarySpecializationEntry {
   id: string;
   name: string;

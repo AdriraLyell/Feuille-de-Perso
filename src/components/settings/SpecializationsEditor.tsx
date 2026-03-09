@@ -84,7 +84,7 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
     });
 
     const { name } = getSkillContext(skillId);
-    onAddLog(`Ajout : Spécialisation automatique pour "${name}"`, 'success', 'settings');
+    onAddLog(`Ajout : Spécialité automatique pour "${name}"`, 'success', 'settings');
   };
 
   const removeSpecialization = (skillId: string, index: number) => {
@@ -99,7 +99,7 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
       }
     });
     const { name } = getSkillContext(skillId);
-    onAddLog(`Suppression : Spécialisation "${specName || '(vide)'}" pour "${name}"`, 'danger', 'settings');
+    onAddLog(`Suppression : Spécialité "${specName || '(vide)'}" pour "${name}"`, 'danger', 'settings');
   };
 
   const handleDrop = (e: React.DragEvent, skillId: string) => {
@@ -177,7 +177,7 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
                   handleDrop(e, skill.id);
                 }}
                 role="region"
-                aria-label={`Spécialisations pour ${skill.name}`}
+                aria-label={`Spécialités pour ${skill.name}`}
               >
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-bold text-sm text-gray-700">{skill.name}</span>
@@ -192,7 +192,7 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
 
                 {imposedSpecs.length === 0 && (
                   <div className="text-[10px] text-gray-400 italic px-1 pb-1">
-                    Aucune spécialisation automatique.
+                    Aucune spécialité automatique.
                   </div>
                 )}
 
@@ -207,7 +207,7 @@ const SpecializationsEditor: React.FC<SpecializationsEditorProps> = ({ data, onU
                         onSelect={(entry) => updateSpecialization(skill.id, idx, 'minLevel', entry.defaultMinLevel)}
                         skillId={skill.id}
                         className="flex-grow"
-                        placeholder="Spécialisation..."
+                        placeholder="Spécialité..."
                       />
                       <div className="flex items-center bg-white border border-gray-300 rounded px-1 h-[26px] shrink-0">
                         <span className="text-[9px] font-bold text-gray-400 mr-1 uppercase">Seuil</span>

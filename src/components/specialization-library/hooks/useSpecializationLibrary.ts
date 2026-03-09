@@ -79,7 +79,7 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
         return skills.sort((a, b) => a.name.localeCompare(b.name));
     }, [data.skills, rules?.libraries]);
 
-    // Déterminer quelles spécialisations sont déjà utilisées sur la fiche
+    // Déterminer quelles spécialités sont déjà utilisées sur la fiche
     const usedSpecializations = useMemo(() => {
         const names = new Set<string>();
         Object.values(data.specializations || {}).forEach(spes => {
@@ -139,7 +139,7 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
         );
 
         if (duplicate) {
-            setError("Une spécialisation locale portant ce nom existe déjà.");
+            setError("Une spécialité locale portant ce nom existe déjà.");
             return;
         }
 
@@ -154,7 +154,7 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
         }
 
         onUpdate({ ...data, specializationLibrary: newLibrary });
-        addLog(`Spécialisation "${editingEntry.name}" enregistrée.`, 'success', 'settings');
+        addLog(`Spécialité "${editingEntry.name}" enregistrée.`, 'success', 'settings');
         setIsModalOpen(false);
         setEditingEntry(null);
     }, [editingEntry, hybridSpecializations, data, onUpdate, addLog]);
@@ -177,7 +177,7 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
                 }
             };
             updateRules(updatedRules);
-            addLog(`Bibliothèque officielle mise à jour (${newSpecs.length} spécialisations).`, 'success', 'settings');
+            addLog(`Bibliothèque officielle mise à jour (${newSpecs.length} spécialités).`, 'success', 'settings');
             setShowOfficialUpdateConfirm(false);
         } catch (e) {
             addLog("Échec de la mise à jour officielle : " + (e as Error).message, 'danger', 'settings');
@@ -228,16 +228,16 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
         if (addedCount > 0) {
             currentLib.sort((a, b) => a.name.localeCompare(b.name));
             onUpdate({ ...data, specializationLibrary: currentLib });
-            addLog(`${addedCount} spécialisation(s) importée(s) depuis la fiche.`, 'success', 'settings');
+            addLog(`${addedCount} spécialité(s) importée(s) depuis la fiche.`, 'success', 'settings');
         } else {
-            addLog("Toutes les spécialisations de la fiche sont déjà dans la bibliothèque.", 'info', 'settings');
+            addLog("Toutes les spécialités de la fiche sont déjà dans la bibliothèque.", 'info', 'settings');
         }
         setShowImportConfirm(false);
     }, [data, onUpdate, addLog]);
 
     const handleDeleteRequest = useCallback((merged: MergedEntry<LibrarySpecializationEntry>) => {
         if (merged.source === 'official') {
-            addLog("Impossible de supprimer une spécialisation officielle.", 'info', 'settings');
+            addLog("Impossible de supprimer une spécialité officielle.", 'info', 'settings');
             return;
         }
         setEntryToDelete(merged.entry);
@@ -250,7 +250,7 @@ export const useSpecializationLibrary = ({ data, onUpdate }: UseSpecializationLi
             ...data,
             specializationLibrary: localList.filter(e => e.id !== entryToDelete.id)
         });
-        addLog(`Spécialisation "${entryToDelete.name}" supprimée.`, 'info', 'settings');
+        addLog(`Spécialité "${entryToDelete.name}" supprimée.`, 'info', 'settings');
         setEntryToDelete(null);
     }, [entryToDelete, data, onUpdate, addLog]);
 

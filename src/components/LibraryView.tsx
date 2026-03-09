@@ -119,7 +119,7 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                         }`}
                 >
                     <Award size={18} />
-                    Bibliothèque de Spécialisations
+                    Bibliothèque de Spécialités
                 </button>
             </div>
 

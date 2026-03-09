@@ -187,11 +187,11 @@ export function useImportLogic({ data, variant, onImportSuccess, onClose }: UseI
         // SPECIALIZATION ACTIONS
         else if (importAction === 'spec_lib_replace') {
             finalData.specializationLibrary = importedFile.specializationLibrary || [];
-            logMsg = "Remplacement du Catalogue de Spécialisations.";
+            logMsg = "Remplacement du Catalogue de Spécialités.";
         }
         else if (importAction === 'spec_lib_merge') {
             finalData.specializationLibrary = smartMerge(data.specializationLibrary || [], (importedFile.specializationLibrary || []), resolutionMap, 'specialization');
-            logMsg = "Fusion du Catalogue de Spécialisations.";
+            logMsg = "Fusion du Catalogue de Spécialités.";
         }
 
         // COMBINED ACTIONS

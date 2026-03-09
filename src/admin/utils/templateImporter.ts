@@ -208,7 +208,7 @@ export const extractRulesFromCharacter = (
 
     if (sheet.specializationLibrary && Array.isArray(sheet.specializationLibrary)) {
         newRules.libraries.specializations = sheet.specializationLibrary as LibrarySpecializationEntry[];
-        success.push(`Bibliothèque de Spécialisations (${sheet.specializationLibrary.length} items)`);
+        success.push(`Bibliothèque de Spécialités (${sheet.specializationLibrary.length} items)`);
     }
 
     if (sheet.backgroundLibrary && Array.isArray(sheet.backgroundLibrary)) {
@@ -268,7 +268,7 @@ export const templateFromSheet = (json: unknown): { rules: RulesData, report: { 
 
     if (sheet.specializationLibrary && Array.isArray(sheet.specializationLibrary)) {
         newRules.libraries.specializations = sheet.specializationLibrary as LibrarySpecializationEntry[];
-        success.push(`Bibliothèque de Spécialisations (${sheet.specializationLibrary.length} items)`);
+        success.push(`Bibliothèque de Spécialités (${sheet.specializationLibrary.length} items)`);
     }
 
     if (sheet.backgroundLibrary && Array.isArray(sheet.backgroundLibrary)) {

@@ -87,9 +87,9 @@ export const WizardContent: React.FC<WizardContentProps> = ({
 
                 {activeTab === 'specializations' && (
                     <div className="space-y-3">
-                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Spécialisations Détectées</h3>
+                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Spécialités Détectées</h3>
                         {specCandidates.length === 0 ? (
-                            <div className="text-center py-10 text-slate-400 italic">Aucune spécialisation détectée.</div>
+                            <div className="text-center py-10 text-slate-400 italic">Aucune spécialité détectée.</div>
                         ) : (
                             specCandidates.map((c, idx) => (
                                 <CandidateLine

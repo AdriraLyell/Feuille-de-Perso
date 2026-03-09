@@ -160,7 +160,7 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
                                     <h4 className="font-bold text-lg text-slate-800 flex items-center gap-2">
                                         <BookOpen size={20} className="text-amber-600" /> Bibliothèques de Contenu
                                     </h4>
-                                    <p className="text-xs text-slate-500">Traits, Compétences (Réserve), Spécialisations</p>
+                                    <p className="text-xs text-slate-500">Traits, Compétences (Réserve), Spécialités</p>
                                 </div>
                             </div>
                         </div>
@@ -179,7 +179,7 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
                                         <div className="text-[10px] text-amber-600">{diff.details.libraries.skills.conflict} conflits</div>
                                     </div>
                                     <div className="bg-slate-50 p-3 rounded border">
-                                        <div className="text-xs uppercase font-bold text-slate-500">Spécialisations</div>
+                                        <div className="text-xs uppercase font-bold text-slate-500">Spécialités</div>
                                         <div className="font-mono text-lg font-bold text-blue-600">+{diff.details.libraries.specializations.new}</div>
                                         <div className="text-[10px] text-amber-600">{diff.details.libraries.specializations.conflict} conflits</div>
                                     </div>

@@ -129,8 +129,8 @@ const UserGuideModal: React.FC<UserGuideModalProps> = ({ isOpen, onClose }) => {
                                     <p>L'onglet <strong>Gestion XP</strong> permet d'ajouter vos gains. L'application déduit automatiquement le coût de vos attributs et compétences (hors valeurs de départ).</p>
                                 </GuideSection>
 
-                                <GuideSection title="Spécialisations" icon={<Target size={18} className="text-red-600" />}>
-                                    <p>L'onglet <strong>Spécialisations</strong> n'affiche que les compétences où vous possédez au moins 1 point. Vos bonus d'historique s'y ajoutent automatiquement.</p>
+                                <GuideSection title="Spécialités" icon={<Target size={18} className="text-red-600" />}>
+                                    <p>L'onglet <strong>Spécialités</strong> n'affiche que les compétences où vous possédez au moins 1 point. Vos bonus d'historique s'y ajoutent automatiquement.</p>
                                 </GuideSection>
                             </div>
                         </div>

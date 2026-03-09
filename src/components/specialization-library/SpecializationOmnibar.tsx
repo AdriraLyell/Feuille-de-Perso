@@ -28,7 +28,7 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
     onSelect,
     onBlur,
     onPromote,
-    placeholder = "Saisir une spécialisation...",
+    placeholder = "Saisir une spécialité...",
     className = "",
     skillId,
     variant = 'default',
@@ -168,13 +168,13 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
                     isOpen={showPromoteConfirm}
                     onClose={() => setShowPromoteConfirm(false)}
                     onConfirm={() => onPromote && onPromote(value)}
-                    title="Promouvoir la Spécialisation"
+                    title="Promouvoir la Spécialité"
                     message={
                         <span>
                             Souhaitez-vous promouvoir <strong>"{value}"</strong> en compétence secondaire ?
                             <br /><br />
                             <span className="text-[11px] opacity-80">
-                                Cela créera une nouvelle compétence avec une valeur de 0 et libérera l'emplacement de spécialisation actuel.
+                                Cela créera une nouvelle compétence avec une valeur de 0 et libérera l'emplacement de spécialité actuel.
                             </span>
                         </span>
                     }

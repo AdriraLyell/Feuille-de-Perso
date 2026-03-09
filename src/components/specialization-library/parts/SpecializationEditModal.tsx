@@ -44,7 +44,7 @@ const SpecializationEditModal: React.FC<SpecializationEditModalProps> = ({
                 <div className="p-4 border-b border-[#bfae85]/50 flex justify-between items-center text-white bg-amber-700/90">
                     <h3 className="font-bold text-lg flex items-center gap-2 font-serif tracking-wide">
                         <Award size={20} />
-                        {!isEditable ? 'Détails Spécialisation' : isExisting ? 'Éditer Spécialisation' : 'Nouvelle Spécialisation (Copie)'}
+                        {!isEditable ? 'Détails Spécialité' : isExisting ? 'Éditer Spécialité' : 'Nouvelle Spécialité (Copie)'}
                     </h3>
                     <button onClick={onClose} className="hover:bg-white/20 p-1 rounded transition-colors">
                         <X size={24} />
@@ -149,7 +149,7 @@ const SpecializationEditModal: React.FC<SpecializationEditModalProps> = ({
                                     />
                                 </div>
                                 <span className="text-xs font-bold text-[#4a3b32] group-hover:text-amber-700 transition-colors flex items-center gap-1">
-                                    Spécialisation Imposée ?
+                                    Spécialité Imposée ?
                                 </span>
                             </label>
                         </div>

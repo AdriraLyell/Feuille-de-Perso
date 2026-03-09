@@ -257,7 +257,7 @@ export const DotRow: React.FC<DotRowProps> = ({
                     )}
                 </div>
                 <div className="flex flex-col gap-1 w-full min-w-[220px] py-1">
-                    <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-2 font-bold px-1">Spécialisations</div>
+                    <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-2 font-bold px-1">Spécialités</div>
                     <div className={combinedValidSpecs.length > 5 ? "columns-2 gap-x-8" : "flex flex-col"}>
                         {combinedValidSpecs.map((s, i) => (
                             <div key={i} className="flex items-center text-[11px] mb-1.5 break-inside-avoid px-2 border-l border-slate-700/50 hover:border-amber-500/50 transition-colors ml-1">

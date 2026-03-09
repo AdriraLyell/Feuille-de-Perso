@@ -107,7 +107,7 @@ export function calculateSkillXP(
                 const cost = getXPCost(skill.value, effectiveCreationValue, specFactor, true);
                 if (cost > 0) {
                     skillSpent += cost;
-                    breakdown.push({ name: skill.name || skill.id, amount: -cost, category: 'Spécialisations' });
+                    breakdown.push({ name: skill.name || skill.id, amount: -cost, category: 'Spécialités' });
                 }
             });
         }

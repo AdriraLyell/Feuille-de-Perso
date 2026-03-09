@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.108.1",
+        "date": "2026-03-09",
+        "type": "feat",
+        "changes": [
+            "UI : Renommage global du terme 'Spécialisations' en 'Spécialités' dans toute l'interface utilisateur (Fiche, Admin, Logs, Imports/Exports).",
+            "System : Préservation de la structure de données technique (specializations) pour garantir la compatibilité ascendante."
+        ]
+    },
+    {
         "version": "2.108.0",
         "date": "2026-03-09",
         "type": "feat",
@@ -179,17 +188,6 @@
             "Logic : Ajout d'une normalisation pré-parsing pour assurer la compatibilité avec le moteur safe-expr-eval.",
             "Database : Renforcement de la migration restoreMysticLinks pour supporter les correspondances indirectes (ex: Art de la Cartomancie -> Cartomancie).",
             "Refactor : Éradication massive des 'any' dans les réconciliateurs et utilitaires de calcul."
-        ]
-    },
-    {
-        "version": "2.97.39",
-        "date": "2026-03-01",
-        "type": "chore",
-        "changes": [
-            "Maintenance : Mise à jour des dépendances npm (minor & moderate updates).",
-            "Maintenance : Correction des erreurs de lint introduites ou détectées après mise à jour (no-useless-assignment, preserve-caught-error).",
-            "Maintenance : Amélioration du typage du logger et de l'ErrorService pour réduire les usages de 'any'.",
-            "Audit : Identification d'une vulnérabilité haute sur expr-eval (2.0.2 est la dernière version, pas de correctif disponible)."
         ]
     }
 ]

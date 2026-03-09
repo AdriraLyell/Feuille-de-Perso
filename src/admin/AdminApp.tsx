@@ -274,7 +274,7 @@ const AdminApp: React.FC = () => {
                                 { id: 'backgrounds', label: 'Arrière-Plans' },
                                 { id: 'counters', label: 'Compteurs' },
                                 { id: 'mystic', label: 'Habilités Myst.' },
-                                { id: 'specializations', label: 'Spécialisations' }
+                                { id: 'specializations', label: 'Spécialités' }
                             ] as const).map((lt) => (
                                 <button
                                     key={lt.id}

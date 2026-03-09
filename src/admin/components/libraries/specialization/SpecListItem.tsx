@@ -48,7 +48,7 @@ export const SpecListItem: React.FC<SpecListItemProps> = ({
                 {/* 2. Status Icons */}
                 <div className="w-16 flex items-center gap-1 shrink-0">
                     {entry.isGlobal && <div title="Item Global"><Globe size={14} className="text-indigo-500" /></div>}
-                    {entry.isImposed && <div title="Spécialisation Imposée (Auto)"><Zap size={14} className="text-amber-500 fill-amber-200/50" /></div>}
+                    {entry.isImposed && <div title="Spécialité Imposée (Auto)"><Zap size={14} className="text-amber-500 fill-amber-200/50" /></div>}
                     {isLocked && (
                         <span
                             ref={lockIconRef}

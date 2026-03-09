@@ -88,7 +88,7 @@ export const XPReceiptView: React.FC<XPReceiptViewProps> = ({ breakdown, totalGa
             } else if (lowerCat.includes('mêlée') || lowerCat.includes('combat') || lowerCat.includes('tir') || lowerCat.includes('arme')) {
                 icon = <Swords size={16} />;
                 colorClass = 'text-red-700';
-            } else if (lowerCat.includes('arrière-plan') || lowerCat.includes('spécialisation')) {
+            } else if (lowerCat.includes('arrière-plan') || lowerCat.includes('spécialité')) {
                 icon = <Bookmark size={16} />;
                 colorClass = 'text-stone-600';
             }

@@ -84,7 +84,7 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
                                 onDragStart={(e) => handleDragStart(e, entry)}
                                 onClick={() => onSelect && onSelect(entry.name, entry.defaultMinLevel)}
                                 className="w-full text-left bg-white border border-gray-200 rounded-lg p-3 hover:border-amber-400 hover:shadow-sm cursor-grab active:cursor-grabbing transition group relative outline-none focus:ring-2 focus:ring-amber-500/50"
-                                aria-label={`Ajouter la spécialisation ${entry.name}`}
+                                aria-label={`Ajouter la spécialité ${entry.name}`}
                             >
                                 <div className="flex justify-between items-start mb-1 pointer-events-none">
                                     <div className="flex items-center gap-2">
@@ -109,7 +109,7 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
             {/* Footer / Instructions */}
             <div className="p-3 bg-gray-50 border-t border-gray-200 text-[10px] text-gray-500 flex gap-2">
                 <Info size={14} className="shrink-0 text-amber-500" />
-                <p>Faites glisser une spécialisation sur la fiche ou cliquez pour l'ajouter (si liste active).</p>
+                <p>Faites glisser une spécialité sur la fiche ou cliquez pour l'ajouter (si liste active).</p>
             </div>
         </div>
     );

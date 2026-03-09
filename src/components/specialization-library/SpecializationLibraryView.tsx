@@ -50,7 +50,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                         </span>
                         <input
                             className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#bfae85]/50 rounded-sm focus:border-amber-500 outline-none text-[#1c1917] placeholder-[#4a3b32]/40 bg-white/80"
-                            placeholder="Rechercher une spécialisation..."
+                            placeholder="Rechercher une spécialité..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -66,7 +66,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                     <button
                         onClick={() => setHideKnown(!hideKnown)}
                         className={`px-2 py-1.5 rounded-sm border transition-colors flex items-center justify-center ${hideKnown ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-white text-[#5c4d41] border-[#bfae85]/50 hover:bg-stone-50'}`}
-                        title={hideKnown ? "Afficher les spécialisations acquises" : "Masquer les spécialisations acquises"}
+                        title={hideKnown ? "Afficher les spécialités acquises" : "Masquer les spécialités acquises"}
                     >
                         {hideKnown ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -101,9 +101,9 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                 {filteredLibrary.length === 0 ? (
                     <div className="text-center text-[#5c4d41]/60 py-10 italic px-4 text-sm flex flex-col items-center">
                         <Award size={48} className="opacity-20 mb-2" />
-                        <p>{searchTerm ? "Aucun résultat." : hasItems ? "Toutes les spécialisations sont déjà sur votre fiche." : "La bibliothèque de spécialisations est vide."}</p>
+                        <p>{searchTerm ? "Aucun résultat." : hasItems ? "Toutes les spécialités sont déjà sur votre fiche." : "La bibliothèque de spécialités est vide."}</p>
                         {!searchTerm && hasItems && hideKnown && (
-                            <button onClick={() => setHideKnown(false)} className="mt-2 text-xs text-amber-700 underline hover:text-amber-900 transition-colors">Afficher les spécialisations acquises</button>
+                            <button onClick={() => setHideKnown(false)} className="mt-2 text-xs text-amber-700 underline hover:text-amber-900 transition-colors">Afficher les spécialités acquises</button>
                         )}
                         {!searchTerm && !hasItems && <p className="text-xs mt-2 text-[#5c4d41]/80 italic">Peuplez-la manuellement ou importez l'existant.</p>}
                     </div>
@@ -129,7 +129,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                                                     {entry.name}
                                                 </span>
                                                 {isOfficial && (
-                                                    <div title="Spécialisation Officielle" className="w-fit mt-0.5">
+                                                    <div title="Spécialité Officielle" className="w-fit mt-0.5">
                                                         <Globe size={11} className="text-indigo-500" />
                                                     </div>
                                                 )}
@@ -141,7 +141,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                                                 </span>
                                             )}
                                             {entry.isImposed && (
-                                                <span className="text-[9px] bg-blue-100/50 text-blue-800/80 px-1.5 py-0.5 rounded-sm flex items-center gap-1 font-bold border border-blue-200/50 uppercase tracking-tight" title="Spécialisation Imposée">
+                                                <span className="text-[9px] bg-blue-100/50 text-blue-800/80 px-1.5 py-0.5 rounded-sm flex items-center gap-1 font-bold border border-blue-200/50 uppercase tracking-tight" title="Spécialité Imposée">
                                                     <Zap size={10} className="fill-blue-500" /> Imposée
                                                 </span>
                                             )}
@@ -201,8 +201,8 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                 isOpen={showImportConfirm}
                 onClose={() => setShowImportConfirm(false)}
                 onConfirm={executeImportFromSheet}
-                title="Importer les spécialisations ?"
-                message="Scanne toutes les spécialisations (Joueur & MJ) présentes sur la fiche pour les ajouter à la bibliothèque. Les doublons seront ignorés."
+                title="Importer les spécialités ?"
+                message="Scanne toutes les spécialités (Joueur & MJ) présentes sur la fiche pour les ajouter à la bibliothèque. Les doublons seront ignorés."
                 confirmLabel="Confirmer l'import"
                 type="info"
             />
@@ -222,7 +222,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                 onClose={() => setShowOfficialUpdateConfirm(false)}
                 onConfirm={executeOfficialUpdate}
                 title="Mise à jour officielle"
-                message="Voulez-vous vérifier et télécharger les dernières spécialisations officielles ?"
+                message="Voulez-vous vérifier et télécharger les dernières spécialités officielles ?"
                 confirmLabel="Mettre à jour"
                 type="info"
             />

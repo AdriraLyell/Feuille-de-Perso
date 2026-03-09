@@ -108,7 +108,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, variant, onExportSucces
                 break;
             case 'library_specs':
                 exportData = { specializationLibrary: data.specializationLibrary, appVersion: APP_VERSION } as Record<string, unknown>;
-                filename = `${timestamp}_Biblio_Specialisations`;
+                filename = `${timestamp}_Biblio_Specialites`;
                 break;
         }
 
