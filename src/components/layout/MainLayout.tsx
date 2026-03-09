@@ -453,7 +453,7 @@ const MainLayout: React.FC = () => {
 
     return (
         <NotificationProvider value={addLog}>
-            <div className={`min-h-screen bg-[#1c1c1c] text-stone-200 font-sans flex flex-col selection:bg-red-900 selection:text-white ${isLandscape ? 'landscape-mode' : ''}`}>
+            <div className={`min-w-fit min-h-screen pt-14 bg-[#1c1c1c] text-stone-200 font-sans flex flex-col selection:bg-red-900 selection:text-white ${isLandscape ? 'landscape-mode' : ''}`}>
 
                 {/* Background Texture (Parchemin Global) */}
                 <div className="fixed inset-0 pointer-events-none z-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')]"></div>
@@ -589,7 +589,7 @@ const MainLayout: React.FC = () => {
                     </aside>
 
                     {/* Main Content */}
-                    <main className={`mt-4 flex flex-col items-center gap-4 w-full main-content-area ${data.creationConfig?.active ? 'pb-40' : ''}`}>
+                    <main className={`mt-4 flex flex-col items-center gap-4 w-full main-content-area transition-all duration-300 ${data.creationConfig?.active ? 'pb-40' : ''} ${(isEditMode || showLogs) ? 'pr-80' : ''}`}>
                         <Suspense fallback={<div className="p-8 text-center text-stone-400">Chargement...</div>}>
                             {mode === 'sheet' ? (
                                 <>
@@ -625,13 +625,13 @@ const MainLayout: React.FC = () => {
 
 
 
-                                    <div className={`w-full flex px-2 md:px-0 pb-8 ${sheetTab === 'notes' ? 'overflow-visible' : sheetTab === 'prototype' ? 'overflow-hidden' : 'overflow-x-auto'}`}>
-                                        <div className={`${sheetTab === 'p1' ? 'block' : 'hidden'} mx-auto`}><CharacterSheet isLandscape={isLandscape} onToggleEditMode={handleToggleEditMode} onToggleCreationMode={handleToggleCreationMode} /></div>
-                                        <div className={`${sheetTab === 'specs' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetSpecializations isLandscape={isLandscape} /></div>
-                                        <div className={`${sheetTab === 'p2' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetPage2 isLandscape={isLandscape} /></div>
-                                        <div className={`${sheetTab === 'inventaire' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetInventaire isLandscape={isLandscape} /></div>
-                                        <div className={`${sheetTab === 'xp' ? 'block' : 'hidden'} mx-auto`}><CharacterSheetXP isLandscape={isLandscape} /></div>
-                                        <div className={`${sheetTab === 'notes' ? 'block' : 'hidden'} mx-auto`}><CampaignNotes /></div>
+                                    <div className="w-full block px-2 md:px-0 pb-8">
+                                        <div className={`${sheetTab === 'p1' ? 'block' : 'hidden'} w-max mx-auto max-w-full`}><CharacterSheet isLandscape={isLandscape} onToggleEditMode={handleToggleEditMode} onToggleCreationMode={handleToggleCreationMode} /></div>
+                                        <div className={`${sheetTab === 'specs' ? 'block' : 'hidden'} w-max mx-auto max-w-full`}><CharacterSheetSpecializations isLandscape={isLandscape} /></div>
+                                        <div className={`${sheetTab === 'p2' ? 'block' : 'hidden'} w-max mx-auto max-w-full`}><CharacterSheetPage2 isLandscape={isLandscape} /></div>
+                                        <div className={`${sheetTab === 'inventaire' ? 'block' : 'hidden'} w-max mx-auto max-w-full`}><CharacterSheetInventaire isLandscape={isLandscape} /></div>
+                                        <div className={`${sheetTab === 'xp' ? 'block' : 'hidden'} w-max mx-auto max-w-full`}><CharacterSheetXP isLandscape={isLandscape} /></div>
+                                        <div className={`${sheetTab === 'notes' ? 'block' : 'hidden'} w-full mx-auto max-w-7xl`}><CampaignNotes /></div>
                                     </div>
 
                                     <PostItBoard currentTab={sheetTab} />

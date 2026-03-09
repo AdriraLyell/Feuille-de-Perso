@@ -137,7 +137,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     ];
 
     return (
-        <nav className="bg-gray-800 text-white px-4 shadow-md no-print sticky top-0 z-50 h-14 flex items-center border-b border-gray-700 relative">
+        <nav className="bg-gray-800 text-white px-4 shadow-md no-print fixed top-0 left-0 right-0 w-full z-50 h-14 flex items-center border-b border-gray-700">
             <div className="max-w-[1920px] mx-auto flex justify-between items-center w-full">
 
                 {/* Left: Toggles + Sheet Button */}

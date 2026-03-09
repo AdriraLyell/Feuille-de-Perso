@@ -92,9 +92,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
   const showAdvancedTabs = !isOnlineMode || expertMode;
 
   return (
-    <div className={`w-full px-6 pb-20 mx-auto relative flex transition-all duration-300 ${!showAdvancedTabs ? 'max-w-[1100px]' : 'max-w-[1600px]'}`}>
+    <div className={`w-full px-6 pb-20 mx-auto relative flex transition-all duration-300 ${!showAdvancedTabs ? 'max-w-[1100px]' : 'max-w-[1600px]'} ${['attributes', 'skills', 'specializations', 'suggestions'].includes(activeTab) ? 'pr-80' : ''}`}>
       {/* --- LEFT COLUMN: Main Content --- */}
-      <div className={`flex-grow transition-all duration-300 ${(activeTab === 'skills' || activeTab === 'specializations') ? 'mr-80' : ''}`}>
+      <div className="flex-grow transition-all duration-300">
 
 
         {/* Expert Mode Warning Banner */}

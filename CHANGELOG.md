@@ -94,6 +94,15 @@
 
 # Changelog
 
+## [2.108.2] - 2026-03-09 [FIX]
+- **UI :** Correction des problèmes d'affichage lors d'un zoom important (supérieur à 200%).
+- **Layout :** Bascule vers un défilement horizontal natif (fenêtre) pour garantir l'accessibilité des ascenseurs.
+- **Navigation :** Fixation de la barre de menu en haut de l'écran pour une visibilité permanente.
+- **Sidebar :** Prévention du chevauchement de la fiche par les barres latérales (Édition, Logs, Bibliothèque) via un espacement dynamique.
+- **Design :** Correction du bug de centrage qui rognait la partie gauche de la fiche lors du dépassement du viewport.
+
+---
+
 ## [2.107.0] - 2026-03-09 [FEAT]
 - **Système :** Intégration des phases lunaires pour les calendriers de type "Réel".
 - **Calcul :** Algorithme astronomique précis basé sur le cycle synodique (29,53 jours).
