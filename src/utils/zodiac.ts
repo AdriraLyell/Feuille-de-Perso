@@ -1,5 +1,6 @@
 const LUNAR_MONTH = 29.530588853;
 const KNOWN_NEW_MOON = new Date(Date.UTC(2000, 0, 6, 18, 14, 0)).getTime() / 86400000;
+import { parseFlexibleDate, flexibleDateToDate } from './dateUtils';
 
 function getMoonAgeDays(date: Date): number {
     const daysSince = (date.getTime() / 86400000) - KNOWN_NEW_MOON;
@@ -12,13 +13,13 @@ export function getLunarNewYearDate(year: number): Date {
     // Le Nouvel An Chinois correspond à la nouvelle lune la plus proche du 4 Février (Lichun)
     let closestToFeb4 = new Date(Date.UTC(year, 0, 21)); // Fallback
     let minDiff = 100;
-    
+
     // On scanne la période possible du Nouvel An (20 Janvier au 22 Février)
     for (let d = 20; d <= 53; d++) {
         // On évalue à midi UTC pour éviter les effets de bord liés au fuseau
         const date = new Date(Date.UTC(year, 0, d, 12, 0, 0));
         const age = getMoonAgeDays(date);
-        
+
         // Si on est un jour de nouvelle lune (l'âge est proche de 0 ou 29.5)
         if (age < 1.0 || age > 28.5) {
             const feb4 = new Date(Date.UTC(year, 1, 4, 12, 0, 0));
@@ -30,7 +31,7 @@ export function getLunarNewYearDate(year: number): Date {
             }
         }
     }
-    
+
     return closestToFeb4;
 }
 
@@ -41,9 +42,15 @@ export interface ZodiacInfo {
 
 export function getWesternZodiac(dateStr: string | Date): ZodiacInfo | null {
     if (!dateStr) return null;
-    
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return null;
+
+    let d: Date | null;
+    if (dateStr instanceof Date) {
+        d = dateStr;
+    } else {
+        d = flexibleDateToDate(parseFlexibleDate(dateStr));
+    }
+
+    if (!d || isNaN(d.getTime())) return null;
 
     const day = d.getDate();
     const month = d.getMonth() + 1; // 1-12
@@ -80,7 +87,7 @@ const CHINESE_ANIMALS = [
 const CHINESE_ELEMENTS = [
     { name: 'Métal', color: 'text-stone-300' }, // 0, 1
     { name: 'Eau', color: 'text-blue-400' },    // 2, 3
-    { name: 'Bois', color: 'text-emerald-500'}, // 4, 5
+    { name: 'Bois', color: 'text-emerald-500' }, // 4, 5
     { name: 'Feu', color: 'text-orange-500' },  // 6, 7
     { name: 'Terre', color: 'text-amber-700' }  // 8, 9
 ];
@@ -95,17 +102,22 @@ export interface ChineseZodiacInfo {
 
 export function getChineseZodiac(dateStr: string | Date): ChineseZodiacInfo | null {
     if (!dateStr) return null;
-    
-    // Convert logic to UTC to ensure consistency ignoring timezones
-    const localDate = new Date(dateStr);
-    if (isNaN(localDate.getTime())) return null;
-    
+
+    let localDate: Date | null;
+    if (dateStr instanceof Date) {
+        localDate = dateStr;
+    } else {
+        localDate = flexibleDateToDate(parseFlexibleDate(dateStr));
+    }
+
+    if (!localDate || isNaN(localDate.getTime())) return null;
+
     // Create UTC date representation
     const d = new Date(Date.UTC(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), 12, 0, 0));
-    
+
     const year = d.getUTCFullYear();
     const lny = getLunarNewYearDate(year);
-    
+
     // Déterminer l'année chinoise
     let chineseYear = year;
     if (d.getTime() < lny.getTime()) {
@@ -116,14 +128,14 @@ export function getChineseZodiac(dateStr: string | Date): ChineseZodiacInfo | nu
     // 1924 - 4 = 1920. 1920 % 12 = 0 (Rat)
     let animalIdx = (chineseYear - 4) % 12;
     if (animalIdx < 0) animalIdx += 12;
-    
+
     const animal = CHINESE_ANIMALS[animalIdx];
-    
+
     // L'élément dépend du dernier chiffre de l'année chinoise
     // 0,1 -> Metal (0) | 2,3 -> Water (1) | 4,5 -> Wood (2) | 6,7 -> Fire (3) | 8,9 -> Earth (4)
     const elementIdx = Math.floor((Math.abs(chineseYear) % 10) / 2);
     const element = CHINESE_ELEMENTS[elementIdx];
-    
+
     return {
         animal: animal.name,
         element: element.name,

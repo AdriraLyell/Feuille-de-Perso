@@ -3,6 +3,7 @@ import React from 'react';
 import { UserPlus, Check, Lock, RotateCcw, Maximize2 } from 'lucide-react';
 import { HeaderInput } from './Shared';
 import { getWesternZodiac, getChineseZodiac } from '../../utils/zodiac';
+import { parseFlexibleDate } from '../../utils/dateUtils';
 
 interface SheetHeaderProps {
     headerData: {
@@ -46,33 +47,7 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
     isEditLayoutMode = false,
     isDateLocked = false
 }) => {
-    // Helper pour parser les dates de manière flexible (FR, ISO, ou Fictif)
-    const parseFlexibleDate = (dateStr: string) => {
-        if (!dateStr) return null;
-        const trimmed = dateStr.trim();
 
-        // 1. Format français : DD/MM/YYYY
-        const frMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4,})$/);
-        if (frMatch) {
-            return { day: parseInt(frMatch[1]), month: parseInt(frMatch[2]), year: parseInt(frMatch[3]), type: 'standard' };
-        }
-
-        // 2. Format ISO : YYYY-MM-DD
-        const isoMatch = trimmed.match(/^(\d{4,})-(\d{1,2})-(\d{1,2})$/);
-        if (isoMatch) {
-            return { year: parseInt(isoMatch[1]), month: parseInt(isoMatch[2]), day: parseInt(isoMatch[3]), type: 'standard' };
-        }
-
-        // 3. Format Fictif : "Jour Mois Année" (on prend le dernier nombre comme année)
-        const yearMatch = trimmed.match(/(-?\d+)$/);
-        if (yearMatch) {
-            const year = parseInt(yearMatch[1]);
-            const dayMatch = trimmed.match(/^(\d+)/);
-            return { year, month: 1, day: dayMatch ? parseInt(dayMatch[1]) : 1, type: 'fictional' };
-        }
-
-        return null;
-    };
 
     // Calcul automatique de l'âge
     const calculatedAge = React.useMemo(() => {

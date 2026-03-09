@@ -1,6 +1,7 @@
 /**
  * Utilitaires pour le calcul des phases de la lune (Calendrier Réel)
  */
+import { parseFlexibleDate, flexibleDateToDate } from './dateUtils';
 
 export const MOON_PHASES = [
     { name: "Nouvelle Lune", emoji: "🌑" },
@@ -21,8 +22,13 @@ export function calculateMoonPhase(dateInput: string | Date | null | undefined) 
     if (!dateInput) return null;
 
     try {
-        const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-        if (isNaN(date.getTime())) return null;
+        let date: Date | null;
+        if (dateInput instanceof Date) {
+            date = dateInput;
+        } else {
+            date = flexibleDateToDate(parseFlexibleDate(dateInput));
+        }
+        if (!date || isNaN(date.getTime())) return null;
 
         // Nouvelle lune connue (6 Janvier 2000 à 18:14 UTC)
         const refNewMoonDate = new Date(Date.UTC(2000, 0, 6, 18, 14, 0)).getTime();
