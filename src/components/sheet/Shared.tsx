@@ -14,8 +14,9 @@ export const HeaderInput: React.FC<{
   className?: string;
   readOnly?: boolean;
   title?: string;
-}> = ({ label, value, onChange, className = '', readOnly, title }) => (
-  <div className={`flex items-baseline px-2 py-0.5 h-full ${className}`} title={title}>
+  children?: React.ReactNode;
+}> = ({ label, value, onChange, className = '', readOnly, title, children }) => (
+  <div className={`flex items-baseline px-2 py-0.5 h-full relative ${className}`} title={title}>
     <span className="text-[10px] font-bold mr-1 whitespace-nowrap uppercase text-stone-500 tracking-wider shrink-0 leading-none">{label} :</span>
     <input
       className={`sheet-input text-sm w-full min-w-0 ${readOnly ? 'cursor-default focus:ring-0' : ''}`}
@@ -23,5 +24,6 @@ export const HeaderInput: React.FC<{
       onChange={(e) => !readOnly && onChange(e.target.value)}
       readOnly={readOnly}
     />
+    {children}
   </div>
 );

@@ -2,6 +2,7 @@
 import React from 'react';
 import { UserPlus, Check, Lock, RotateCcw, Maximize2 } from 'lucide-react';
 import { HeaderInput } from './Shared';
+import { getWesternZodiac, getChineseZodiac } from '../../utils/zodiac';
 
 interface SheetHeaderProps {
     headerData: {
@@ -101,6 +102,14 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
             onUpdateHeader('age', calculatedAge);
         }
     }, [calculatedAge, headerData.age, onUpdateHeader]);
+
+    const bornZodiacs = React.useMemo(() => {
+        if (!headerData.born) return null;
+        const zodiac = getWesternZodiac(headerData.born);
+        const chineseZodiac = getChineseZodiac(headerData.born);
+        if (!zodiac && !chineseZodiac) return null;
+        return { zodiac, chineseZodiac };
+    }, [headerData.born]);
 
     const lockTitle = "Champ verrouillé (géré par le calendrier de la campagne)";
 
@@ -210,7 +219,22 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
                         />
                     </div>
                     <HeaderInput label="Sexe" value={headerData.sex} onChange={(v) => onUpdateHeader('sex', v)} className="w-[8%] border-r border-stone-300" />
-                    <HeaderInput label="Né(e) le" value={headerData.born} onChange={(v) => onUpdateHeader('born', v)} className="flex-grow border-r border-stone-300" />
+                    <HeaderInput
+                        label="Né(e) le"
+                        value={headerData.born}
+                        onChange={(v) => onUpdateHeader('born', v)}
+                        className="flex-grow border-r border-stone-300"
+                    >
+                        {bornZodiacs && (
+                            <div
+                                className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1.5 px-2 py-0.5 bg-stone-900 border border-amber-900/40 rounded shadow-sm cursor-help hover:scale-105 transition-transform"
+                                title={`${bornZodiacs.zodiac?.name || ''} / ${bornZodiacs.chineseZodiac?.fullName || ''}`}
+                            >
+                                {bornZodiacs.zodiac && <span className="text-sm drop-shadow-[0_0_2px_rgba(255,255,255,0.2)]">{bornZodiacs.zodiac.emoji}</span>}
+                                {bornZodiacs.chineseZodiac && <span className="text-sm drop-shadow-[0_0_2px_rgba(255,255,255,0.2)]">{bornZodiacs.chineseZodiac.emoji}</span>}
+                            </div>
+                        )}
+                    </HeaderInput>
                     <HeaderInput
                         label="Date Fiction"
                         value={headerData.fictionCurrentDate || ''}
