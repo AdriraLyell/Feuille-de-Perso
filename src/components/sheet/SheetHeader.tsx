@@ -181,9 +181,8 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
                     />
                 </div>
 
-                {/* Row 2: Physical / Dates / Details */}
                 <div className="flex h-10 bg-white">
-                    <div className={`flex items-baseline px-2 py-0.5 h-full w-[8%] border-r border-stone-300 ${calculatedAge !== null ? 'bg-amber-50/30' : ''}`}>
+                    <div className={`flex items-center px-2 py-0.5 h-full w-[8%] border-r border-stone-300 ${calculatedAge !== null ? 'bg-amber-50/30' : ''}`}>
                         <span className="text-[10px] font-bold mr-1 whitespace-nowrap uppercase text-stone-500 tracking-wider shrink-0 leading-none">Age :</span>
                         <input
                             className={`sheet-input text-sm w-full min-w-0 ${calculatedAge !== null ? 'font-bold text-amber-800' : ''}`}
@@ -202,11 +201,11 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
                     >
                         {bornZodiacs && (
                             <div
-                                className="absolute right-1 top-1/2 -translate-y-1/2 flex gap-2 px-1.5 py-0.5 bg-black/[0.05] backdrop-blur-[1px] border border-white/5 rounded-sm shadow-sm cursor-help hover:scale-110 transition-transform z-10"
+                                className="absolute right-0 flex gap-1.5 px-1 py-0.5 bg-black/[0.02] backdrop-blur-[1px] border border-white/5 rounded-sm cursor-help hover:scale-110 transition-transform z-10"
                                 title={`${bornZodiacs.zodiac?.name || ''} / ${bornZodiacs.chineseZodiac?.fullName || ''}`}
                             >
-                                {bornZodiacs.zodiac && <span className="text-[18px] leading-none drop-shadow-sm">{bornZodiacs.zodiac.emoji}</span>}
-                                {bornZodiacs.chineseZodiac && <span className="text-[18px] leading-none drop-shadow-sm">{bornZodiacs.chineseZodiac.emoji}</span>}
+                                {bornZodiacs.zodiac && <span className="text-[20px] leading-none drop-shadow-sm">{bornZodiacs.zodiac.emoji}</span>}
+                                {bornZodiacs.chineseZodiac && <span className="text-[20px] leading-none drop-shadow-sm">{bornZodiacs.chineseZodiac.emoji}</span>}
                             </div>
                         )}
                     </HeaderInput>

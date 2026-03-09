@@ -16,14 +16,16 @@ export const HeaderInput: React.FC<{
   title?: string;
   children?: React.ReactNode;
 }> = ({ label, value, onChange, className = '', readOnly, title, children }) => (
-  <div className={`flex items-baseline px-2 py-0.5 h-full relative ${className}`} title={title}>
+  <div className={`flex items-center px-2 py-0.5 h-full relative ${className}`} title={title}>
     <span className="text-[10px] font-bold mr-1 whitespace-nowrap uppercase text-stone-500 tracking-wider shrink-0 leading-none">{label} :</span>
-    <input
-      className={`sheet-input text-sm w-full min-w-0 ${readOnly ? 'cursor-default focus:ring-0' : ''}`}
-      value={value}
-      onChange={(e) => !readOnly && onChange(e.target.value)}
-      readOnly={readOnly}
-    />
-    {children}
+    <div className="flex-grow flex items-center relative h-full">
+      <input
+        className={`sheet-input text-sm w-full min-w-0 ${readOnly ? 'cursor-default focus:ring-0' : ''}`}
+        value={value}
+        onChange={(e) => !readOnly && onChange(e.target.value)}
+        readOnly={readOnly}
+      />
+      {children}
+    </div>
   </div>
 );
