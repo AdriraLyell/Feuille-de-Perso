@@ -55,17 +55,23 @@ const normalizeInput = (json: unknown): Record<string, unknown> | null => {
     return null;
 };
 
+interface ExtractOptions {
+    skipDefinitions?: boolean; // If true, only extract libraries and config, not structural layout
+}
+
 /**
  * Extracts configuration and definitions from a Character Sheet
  * to update the Admin Rules.
  */
 export const extractRulesFromCharacter = (
     inputJson: unknown,
-    currentRules: RulesData
+    currentRules: RulesData,
+    options: ExtractOptions = {}
 ): { rules: RulesData; report: { success: string[]; warnings: string[] } } => {
     const sheet = normalizeInput(inputJson);
     const warnings: string[] = [];
     const success: string[] = [];
+    const skipDefinitions = options.skipDefinitions || false;
 
     if (!sheet) {
         throw new Error("Format de fichier non reconnu. Veuillez importer un JSON de Personnage ou de Template (Système).");
@@ -113,22 +119,30 @@ export const extractRulesFromCharacter = (
 
 
     // 4. Import Attributes Definitions
-    if (sheet.attributes) {
-        newRules.definitions.attributes = Object.fromEntries(
+    if (sheet.attributes && !skipDefinitions) {
+        const newAttributes = Object.fromEntries(
             Object.entries(sheet.attributes).map(([cat, attrs]) => [
                 cat,
                 (attrs as import('../../types').AttributeEntry[]).map((a: import('../../types').AttributeEntry) => a.name)
             ])
         );
+        newRules.definitions.attributes = {
+            ...newRules.definitions.attributes,
+            ...newAttributes
+        };
 
         // Also Secondary Attributes if active
         if (sheet.secondaryAttributesActive && sheet.secondaryAttributes) {
-            newRules.definitions.secondaryAttributes = Object.fromEntries(
+            const newSecondary = Object.fromEntries(
                 Object.entries(sheet.secondaryAttributes).map(([cat, attrs]) => [
                     cat,
                     (attrs as import('../../types').AttributeEntry[]).map((a: import('../../types').AttributeEntry) => a.name)
                 ])
             );
+            newRules.definitions.secondaryAttributes = {
+                ...newRules.definitions.secondaryAttributes,
+                ...newSecondary
+            };
             // Sync with Global Config Flag
             newRules.configurations.global.secondaryAttributes = true;
             success.push("Définitions des Attributs (Primaires et Secondaires)");
@@ -140,22 +154,27 @@ export const extractRulesFromCharacter = (
     }
 
     // 5. Import Skills Definitions
-    if (sheet.skills) {
-        const newSkills: Record<string, string[]> = {};
+    if (sheet.skills && !skipDefinitions) {
+        const extractedSkills: Record<string, string[]> = {};
         Object.keys(sheet.skills).forEach(cat => {
             const list = (sheet.skills as Record<string, DotEntry[]>)[cat];
             if (Array.isArray(list)) {
-                newSkills[cat] = list
+                extractedSkills[cat] = list
                     .map((s: DotEntry) => s.name ? s.name : "") // Keep name or empty string for spacer
                     .filter((name: string) => name !== undefined && name !== null); // Only filter real nulls
             }
         });
-        newRules.definitions.skills = newSkills;
-        success.push(`Définitions des Compétences (${Object.keys(newSkills).length} catégories)`);
+        
+        // MERGE instead of replace the whole record
+        newRules.definitions.skills = {
+            ...newRules.definitions.skills,
+            ...extractedSkills
+        };
+        success.push(`Définitions des Compétences (${Object.keys(extractedSkills).length} catégories mises à jour)`);
     }
 
     // 6. Import Backgrounds (Arrières-Plans)
-    if (sheet.skills && (sheet.skills as Record<string, DotEntry[]>).arrieres_plans) {
+    if (sheet.skills && (sheet.skills as Record<string, DotEntry[]>).arrieres_plans && !skipDefinitions) {
         const bgList = (sheet.skills as Record<string, DotEntry[]>).arrieres_plans
             .filter((s: DotEntry) => s.name && s.name.trim() !== "")
             .map((s: DotEntry) => s.name);
@@ -165,7 +184,7 @@ export const extractRulesFromCharacter = (
     }
 
     // 7. Import Counters (Best Effort)
-    if (sheet.counters) {
+    if (sheet.counters && !skipDefinitions) {
         const rulesCounters: Record<string, import('../../types/rules').RulesCounterDefinition> = {};
         const countersMap = sheet.counters as Record<string, unknown>;
         Object.keys(countersMap).forEach(key => {
@@ -181,9 +200,11 @@ export const extractRulesFromCharacter = (
             }
         });
 
-        // If we are updating rules, we might want to keep existing config if keys match?
-        // But here we are overwriting.
-        newRules.definitions.counters = rulesCounters;
+        // MERGE instead of replace
+        newRules.definitions.counters = {
+            ...newRules.definitions.counters,
+            ...rulesCounters
+        };
         success.push(`Définitions Compteurs (${Object.keys(rulesCounters).length} items detected)`);
     }
 

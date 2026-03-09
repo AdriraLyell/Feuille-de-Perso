@@ -14,18 +14,18 @@ interface ImportWizardModalProps {
 
 const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, onConfirm, currentRules, candidateRules }) => {
     // 1. Hooks (must be at the top)
-    const [options, setOptions] = useState<ImportOptions>({
+    const [options, setOptions] = useState<ImportOptions>(({
         sections: {
             general: true,
-            attributes: true,
-            skills: true,
-            backgrounds: true,
-            counters: true,
+            attributes: false,
+            skills: false,
+            backgrounds: false,
+            counters: false,
             libraries: true
         },
         libraryStrategy: 'ignore', // Safer default
         excludedIds: []
-    });
+    }));
 
     const [showDetails, setShowDetails] = useState(false);
     const [expandedDiffId, setExpandedDiffId] = useState<string | null>(null);
@@ -145,19 +145,19 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
                         />
                         <SectionCard
                             id="attributes"
-                            label="Attributs"
+                            label="Structure des Attributs (Colonnes)"
                             icon={Layers}
                             details={diff.details.attributes}
                         />
                         <SectionCard
                             id="skills"
-                            label="Compétences"
+                            label="Structure des Compétences (Colonnes)"
                             icon={BookOpen}
                             details={diff.details.skills}
                         />
                         <SectionCard
                             id="counters"
-                            label="Compteurs & Jauges"
+                            label="Structure des Compteurs (Système)"
                             icon={Settings}
                             details={diff.details.counters}
                         />

@@ -79,7 +79,7 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({
             }
 
             const { extractRulesFromCharacter } = await import('../utils/templateImporter');
-            const { rules: extracted } = extractRulesFromCharacter(processedData, rules);
+            const { rules: extracted } = extractRulesFromCharacter(processedData, rules, { skipDefinitions: true });
 
             setCandidateRules(extracted);
             setCurrentRules(rules);

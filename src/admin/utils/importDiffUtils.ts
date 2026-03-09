@@ -261,8 +261,18 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
     }
 
     if (options.sections.attributes) {
-        if (candidate.definitions.attributes) result.definitions.attributes = candidate.definitions.attributes;
-        if (candidate.definitions.secondaryAttributes) result.definitions.secondaryAttributes = candidate.definitions.secondaryAttributes;
+        if (candidate.definitions.attributes) {
+            result.definitions.attributes = {
+                ...result.definitions.attributes,
+                ...candidate.definitions.attributes
+            };
+        }
+        if (candidate.definitions.secondaryAttributes) {
+            result.definitions.secondaryAttributes = {
+                ...result.definitions.secondaryAttributes,
+                ...candidate.definitions.secondaryAttributes
+            };
+        }
         if (candidate.configurations.global) {
             result.configurations.global.secondaryAttributes = candidate.configurations.global.secondaryAttributes;
             result.configurations.global.maxAttributeScore = candidate.configurations.global.maxAttributeScore;
@@ -270,8 +280,18 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
     }
 
     if (options.sections.skills) {
-        if (candidate.definitions.skills) result.definitions.skills = candidate.definitions.skills;
-        if (candidate.definitions.labels) result.definitions.labels = candidate.definitions.labels;
+        if (candidate.definitions.skills) {
+            result.definitions.skills = {
+                ...result.definitions.skills,
+                ...candidate.definitions.skills
+            };
+        }
+        if (candidate.definitions.labels) {
+            result.definitions.labels = {
+                ...result.definitions.labels,
+                ...candidate.definitions.labels
+            };
+        }
     }
 
     if (options.sections.backgrounds) {
