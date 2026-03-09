@@ -21,8 +21,9 @@ const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
     </div>
 );
 
-const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false }) => {
-    const { data, resolvedData, updateData: onChange, addLog: onAddLog } = useCharacter();
+const CharacterSheetSpecializations: React.FC = () => {
+    const { data, resolvedData } = useCharacterState();
+    const { updateData: onChange, addLog: onAddLog } = useCharacterActions();
     const { rules } = useRules();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [duplicateErrorModal, setDuplicateErrorModal] = useState<string | null>(null);

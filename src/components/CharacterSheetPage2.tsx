@@ -25,12 +25,13 @@ interface Props {
     isLandscape?: boolean;
 }
 
-type WizardQueueItem = 
-  | { type: 'mystic', payload: { mysticAbilityId: string, mysticAbilityName: string } }
-  | { type: 'master', payload: { traitName: string, traitType: 'avantages' | 'desavantages' } };
+type WizardQueueItem =
+    | { type: 'mystic', payload: { mysticAbilityId: string, mysticAbilityName: string } }
+    | { type: 'master', payload: { traitName: string, traitType: 'avantages' | 'desavantages' } };
 
 const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
-    const { data, resolvedData, updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacter();
+    const { data, resolvedData } = useCharacterState();
+    const { updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacterActions();
     const { rules } = useRules();
 
     // Wizards Queue State
@@ -47,7 +48,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
         applyMasterSkill
     } = useTraitEditor(data, rules, onChange, onAddLog, recordXPTransaction, (items) => {
         setWizardQueue(prev => [
-            ...prev, 
+            ...prev,
             ...items.map(it => ({ type: 'master' as const, payload: it }))
         ]);
     });
@@ -160,7 +161,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
             onChange({ ...data, skills: newSkills, skillLibrary: newLibrary });
             onAddLog(`Ajout de ${addedCount} compétence(s) mystique(s) (${mysticAbilityName})`, 'info', 'sheet');
         }
-        
+
         // Remove current from queue
         setWizardQueue(prev => prev.slice(1));
     };
@@ -186,7 +187,7 @@ const CharacterSheetPage2: React.FC<Props> = ({ isLandscape = false }) => {
 
         const updated = applyMasterSkill(data, currentWizard.payload.traitType, currentWizard.payload.traitName, categoryId, skillName);
         onChange(updated);
-        
+
         // Remove current from queue
         setWizardQueue(prev => prev.slice(1));
     }, [wizardQueue, applyMasterSkill, data, onChange]);

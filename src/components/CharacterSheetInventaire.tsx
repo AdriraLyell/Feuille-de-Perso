@@ -40,7 +40,8 @@ const ArmorTableWithFixedLines: React.FC<{
 };
 
 const CharacterSheetInventaire: React.FC<Props> = ({ isLandscape = false }) => {
-    const { data, updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacter();
+    const { data } = useCharacterState();
+    const { updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacterActions();
     const { rules } = useRules();
 
     const {

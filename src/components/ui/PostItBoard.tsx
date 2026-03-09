@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, PanInfo } from 'framer-motion';
-import { useCharacter } from '../../context/CharacterContext';
+import { useCharacterState, useCharacterActions } from '../../context/CharacterContext';
 import { PostItData, CharacterSheetData } from '../../types';
 import { StickyNote, X, Plus } from 'lucide-react';
 // import { v4 as uuidv4 } from 'uuid'; replaced by crypto.randomUUID()

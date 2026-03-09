@@ -1,15 +1,16 @@
 
 import React, { useState } from 'react';
 
-import { useCharacter } from '../context/CharacterContext';
 import { Calculator, AlertTriangle, Sliders, Feather, AlertOctagon } from 'lucide-react';
 import { useCreationBudget } from '../hooks/useCreationBudget';
 import { BudgetGauge } from './creation/BudgetGauge';
 import { CreationValidationModal } from './creation/CreationValidationModal';
+import { useCharacterState, useCharacterActions } from '../context/CharacterContext';
 import { CreationGuidance } from './creation/CreationGuidance';
 
 const CreationHUD: React.FC = () => {
-    const { data, updateData: setData, addLog } = useCharacter();
+    const { data } = useCharacterState();
+    const { updateData: setData, addLog } = useCharacterActions();
     const [showConfirm, setShowConfirm] = useState(false);
 
     const isMigrationMode = !!data.attributeMigrationMode;

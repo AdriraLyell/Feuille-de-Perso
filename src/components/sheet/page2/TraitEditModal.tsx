@@ -17,7 +17,8 @@ interface TraitEditModalProps {
 
 const TraitEditModal: React.FC<TraitEditModalProps> = ({ isOpen, onClose, trait, onSave, type }) => {
     const [editedTrait, setEditedTrait] = useState<TraitEntry | null>(null);
-    const { data, addLog: onAddLog } = useCharacter();
+    const { data } = useCharacterState();
+    const { addLog: onAddLog } = useCharacterActions();
     const { rules } = useRules();
 
     useEffect(() => {

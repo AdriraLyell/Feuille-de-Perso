@@ -1,5 +1,6 @@
+```
 import { useMemo } from 'react';
-import { useCharacter } from '../context/CharacterContext';
+import { useCharacterState } from '../context/CharacterContext';
 import { useRules } from '../context/RulesContext';
 import { DotEntry } from '../types';
 
@@ -116,10 +117,10 @@ export function useCreationBudget(): CreationBudgetResult {
                 const val = parseInt(attr.val1) || 0;
 
                 if (val < minAttr) {
-                    attributeErrors.push(`${attr.name} : ${val} (Min ${minAttr})`);
+                    attributeErrors.push(`${ attr.name } : ${ val } (Min ${ minAttr })`);
                 }
                 if (val > maxAttr) {
-                    attributeErrors.push(`${attr.name} : ${val} (Max ${maxAttr})`);
+                    attributeErrors.push(`${ attr.name } : ${ val } (Max ${ maxAttr })`);
                 }
 
                 if (val !== 0) {
@@ -207,71 +208,71 @@ export function useCreationBudget(): CreationBudgetResult {
         if (mode === 'points') {
             if (isGlobalPoints) {
                 if (!isMigrationMode) {
-                    if (xpRemainingGlobal > 0) messages.push(`Il vous reste ${formatNumber(xpRemainingGlobal)} XP à dépenser.`);
-                    if (xpRemainingGlobal < 0) overspent.push(`Dépassement de ${formatNumber(Math.abs(xpRemainingGlobal))} XP.`);
+                    if (xpRemainingGlobal > 0) messages.push(`Il vous reste ${ formatNumber(xpRemainingGlobal) } XP à dépenser.`);
+                    if (xpRemainingGlobal < 0) overspent.push(`Dépassement de ${ formatNumber(Math.abs(xpRemainingGlobal)) } XP.`);
                 }
             } else {
                 const budgetAttrs = pointsBuckets?.attributes || 0;
 
-                if (xpSpentAttributes > budgetAttrs) overspent.push(`Attributs : Dépassement de ${xpSpentAttributes - budgetAttrs} XP.`);
-                if (xpSpentAttributes < budgetAttrs) messages.push(`Attributs : Reste ${budgetAttrs - xpSpentAttributes} XP.`);
+                if (xpSpentAttributes > budgetAttrs) overspent.push(`Attributs: Dépassement de ${ xpSpentAttributes - budgetAttrs } XP.`);
+                if (xpSpentAttributes < budgetAttrs) messages.push(`Attributs: Reste ${ budgetAttrs - xpSpentAttributes } XP.`);
 
                 if (!isMigrationMode) {
                     const budgetSkills = pointsBuckets?.skills || 0;
                     const budgetBg = pointsBuckets?.backgrounds || 0;
 
-                    if (xpSpentSkills > budgetSkills) overspent.push(`Compétences : Dépassement de ${xpSpentSkills - budgetSkills} XP.`);
-                    if (xpSpentSkills < budgetSkills) messages.push(`Compétences : Reste ${budgetSkills - xpSpentSkills} XP.`);
+                    if (xpSpentSkills > budgetSkills) overspent.push(`Compétences: Dépassement de ${ xpSpentSkills - budgetSkills } XP.`);
+                    if (xpSpentSkills < budgetSkills) messages.push(`Compétences: Reste ${ budgetSkills - xpSpentSkills } XP.`);
 
-                    if (xpSpentBackgrounds > budgetBg) overspent.push(`Arrière-plans : Dépassement de ${xpSpentBackgrounds - budgetBg} XP.`);
-                    if (xpSpentBackgrounds < budgetBg) messages.push(`Arrière-plans : Reste ${budgetBg - xpSpentBackgrounds} XP.`);
+                    if (xpSpentBackgrounds > budgetBg) overspent.push(`Arrière - plans : Dépassement de ${ xpSpentBackgrounds - budgetBg } XP.`);
+                    if (xpSpentBackgrounds < budgetBg) messages.push(`Arrière - plans : Reste ${ budgetBg - xpSpentBackgrounds } XP.`);
                 }
             }
         } else {
             // Attributes (Rangs Mode)
             const attrMax = attributePoints || 15;
-            if (attributesUsed < attrMax) messages.push(`Il reste ${attrMax - attributesUsed} points d'Attributs.`);
-            if (attributesUsed > attrMax) overspent.push(`Attributs : ${attributesUsed - attrMax} point(s) en trop.`);
+            if (attributesUsed < attrMax) messages.push(`Il reste ${ attrMax - attributesUsed } points d'Attributs.`);
+if (attributesUsed > attrMax) overspent.push(`Attributs : ${attributesUsed - attrMax} point(s) en trop.`);
 
-            if (!isMigrationMode) {
-                // Backgrounds (Rangs Mode)
-                const bgMax = backgroundPoints || 5;
-                if (backgroundsUsed < bgMax) messages.push(`Il reste ${bgMax - backgroundsUsed} points d'Arrière-plans.`);
-                if (backgroundsUsed > bgMax) overspent.push(`Arrière-plans : ${backgroundsUsed - bgMax} point(s) en trop.`);
+if (!isMigrationMode) {
+    // Backgrounds (Rangs Mode)
+    const bgMax = backgroundPoints || 5;
+    if (backgroundsUsed < bgMax) messages.push(`Il reste ${bgMax - backgroundsUsed} points d'Arrière-plans.`);
+    if (backgroundsUsed > bgMax) overspent.push(`Arrière-plans : ${backgroundsUsed - bgMax} point(s) en trop.`);
 
-                // Ranks - use proper Record access with number keys
-                [1, 2, 3, 4, 5].forEach(rank => {
-                    const max = (rankSlots as Record<number, number>)[rank] || 0;
-                    if (max === 0) return;
-                    const used = ranksUsed[rank] || 0;
+    // Ranks - use proper Record access with number keys
+    [1, 2, 3, 4, 5].forEach(rank => {
+        const max = (rankSlots as Record<number, number>)[rank] || 0;
+        if (max === 0) return;
+        const used = ranksUsed[rank] || 0;
 
-                    if (used < max) messages.push(`Rang ${rank} : Manque ${formatNumber(max - used)} rangs.`);
-                    if (used > max) overspent.push(`Rang ${rank} : ${formatNumber(used - max)} rangs en trop.`);
-                });
-            }
+        if (used < max) messages.push(`Rang ${rank} : Manque ${formatNumber(max - used)} rangs.`);
+        if (used > max) overspent.push(`Rang ${rank} : ${formatNumber(used - max)} rangs en trop.`);
+    });
+}
         }
 
-        return { messages, overspent };
+return { messages, overspent };
     }, [mode, isGlobalPoints, xpRemainingGlobal, xpSpentAttributes, xpSpentSkills, xpSpentBackgrounds, pointsBuckets, attributesUsed, backgroundsUsed, ranksUsed, rankSlots, attributePoints, backgroundPoints, attributeErrors, formatNumber, data.attributeMigrationMode]);
 
-    const { messages, overspent } = getValidationWarnings;
-    const hasErrors = overspent.length > 0;
+const { messages, overspent } = getValidationWarnings;
+const hasErrors = overspent.length > 0;
 
-    return {
-        xpSpentTotal,
-        xpSpentAttributes,
-        xpSpentSkills,
-        xpSpentBackgrounds,
-        xpEquivalence,
-        ranksUsed,
-        attributesUsed,
-        backgroundsUsed,
-        attributeErrors,
-        messages,
-        overspent,
-        hasErrors,
-        formatNumber,
-        isGlobalPoints,
-        xpRemainingGlobal
-    };
+return {
+    xpSpentTotal,
+    xpSpentAttributes,
+    xpSpentSkills,
+    xpSpentBackgrounds,
+    xpEquivalence,
+    ranksUsed,
+    attributesUsed,
+    backgroundsUsed,
+    attributeErrors,
+    messages,
+    overspent,
+    hasErrors,
+    formatNumber,
+    isGlobalPoints,
+    xpRemainingGlobal
+};
 }

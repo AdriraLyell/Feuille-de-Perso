@@ -70,19 +70,12 @@ const MessagingWidgetPlayer: React.FC<{
 
 const MainLayout: React.FC = () => {
     const {
-        data,
-        updateData: setData,
-        addLog,
-        importData,
-        isSyncing,
-        sync,
-        isEditMode,
-        setEditMode: setIsEditMode,
-        editLayoutMode,
-        setEditLayoutMode,
-        clearLayout,
-        autoFitLayout
-    } = useCharacter();
+        data, resolvedData, isSyncing, isEditMode, editLayoutMode
+    } = useCharacterState();
+    const {
+        updateData, addLog, recordXPTransaction, sync, resetData, importData,
+        setEditMode, setEditLayoutMode, clearLayout, autoFitLayout
+    } = useCharacterActions();
     const { rules, updateRules, isOnlineMode, reloadRules, isLoading: isRulesLoading } = useRules();
 
     // Sheet Modes Hooks

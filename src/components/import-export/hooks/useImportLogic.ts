@@ -26,8 +26,11 @@ interface UseImportLogicProps {
     onClose: () => void;
 }
 
-export function useImportLogic({ data, variant, onImportSuccess, onClose }: UseImportLogicProps) {
-    const { importData } = useCharacter();
+export const useImportLogic = (
+    onClose: () => void,
+    onImportSuccess?: (data: CharacterSheetData) => void
+) => {
+    const { importData } = useCharacterActions();
     const addLog = useNotification();
 
     const [pendingFile, setPendingFile] = useState<Partial<CharacterSheetData> | null>(null);
@@ -156,11 +159,11 @@ export function useImportLogic({ data, variant, onImportSuccess, onClose }: UseI
             finalData.library = data.library || [];
             finalData.skillLibrary = data.skillLibrary || [];
             finalData.specializationLibrary = data.specializationLibrary || [];
-            
+
             // Restore local player's journal
             finalData.bookDocument = data.bookDocument;
             finalData.campaignNotes = data.campaignNotes;
-            
+
             logMsg = "Chargement du Template. Bibliothèques conservées.";
         }
 

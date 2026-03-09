@@ -1,12 +1,13 @@
+```
 import React, { useState } from 'react';
 import { Book, Users, PenTool } from 'lucide-react';
-import { useCharacter } from '../context/CharacterContext';
 import PartyTable from './campaign/PartyTable';
 import { ColumnarEditor } from './campaign/book/ColumnarEditor';
-import { BookSyncService } from '../services/BookSyncService';
+import { useCharacterState, useCharacterActions } from '../context/CharacterContext';
 
 const CampaignNotes: React.FC = () => {
-    const { data, updateData: onChange, addLog } = useCharacter();
+    const { data } = useCharacterState();
+    const { updateData: onChange, addLog } = useCharacterActions();
     const [activeTab, setActiveTab] = useState<'journal' | 'party'>('journal');
 
     const handleUpdate = React.useCallback((content: Record<string, unknown>) => {
@@ -44,9 +45,9 @@ const CampaignNotes: React.FC = () => {
     return (
         <div className="w-full bg-[#121212] relative">
             <style>{`
-                .hide-scrollbar::-webkit-scrollbar { display: none; }
-                .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-            `}</style>
+    .hide - scrollbar:: -webkit - scrollbar { display: none; }
+                .hide - scrollbar { -ms - overflow - style: none; scrollbar - width: none; }
+`}</style>
 
             {/* Background Texture (Deep Wood) - Exactly 100px margin around the book (1484 + 200 = 1684) */}
             <div className="absolute inset-y-0 left-0 min-w-[1684px] w-full opacity-15 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')]"></div>
@@ -63,10 +64,10 @@ const CampaignNotes: React.FC = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as 'journal' | 'party')}
-                                className={`group flex items-center gap-3 transition-all ${activeTab === tab.id ? 'text-stone-100' : 'text-stone-500 hover:text-stone-300'}`}
+                                className={`group flex items - center gap - 3 transition - all ${ activeTab === tab.id ? 'text-stone-100' : 'text-stone-500 hover:text-stone-300' } `}
                             >
                                 <tab.icon size={20} className={activeTab === tab.id ? 'text-amber-500' : ''} />
-                                <span className={`text-sm font-bold uppercase tracking-widest font-serif leading-none hidden sm:inline`}>{tab.label}</span>
+                                <span className={`text - sm font - bold uppercase tracking - widest font - serif leading - none hidden sm: inline`}>{tab.label}</span>
                                 {activeTab === tab.id && <div className="h-1 w-full bg-amber-500 absolute -bottom-6 left-0" />}
                             </button>
                         ))}

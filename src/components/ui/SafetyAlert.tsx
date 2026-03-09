@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { useCharacter } from '../../context/CharacterContext';
+import { useCharacterState, useCharacterActions } from '../../context/CharacterContext';
 import { AlertTriangle, X, RefreshCw } from 'lucide-react';
 
 const SafetyAlert: React.FC = () => {
-    const { data, sync, isSyncing } = useCharacter();
+    const { data, isSyncing } = useCharacterState();
+    const { sync } = useCharacterActions();
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {

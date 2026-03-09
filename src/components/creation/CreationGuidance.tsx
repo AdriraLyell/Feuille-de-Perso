@@ -1,10 +1,11 @@
+```
 import React, { useState } from 'react';
 import { Sparkles, X } from 'lucide-react';
-import { useCharacter } from '../../context/CharacterContext';
+import { useCharacterState } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';
 
 export const CreationGuidance: React.FC = () => {
-    const { data } = useCharacter();
+    const { data } = useCharacterState();
     const { rules } = useRules();
     const [isVisible, setIsVisible] = useState(true);
 

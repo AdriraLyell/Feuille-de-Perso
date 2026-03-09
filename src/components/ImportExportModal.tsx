@@ -16,8 +16,8 @@ interface ImportExportModalProps {
     variant: 'player' | 'gm';
 }
 
-const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, onExportSuccess, onImportSuccess, variant }) => {
-    const { data } = useCharacter();
+export const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, onImportSuccess }) => {
+    const { data } = useCharacterState();
     const [activeTab, setActiveTab] = useState<'export' | 'import'>('export');
 
     if (!isOpen) return null;

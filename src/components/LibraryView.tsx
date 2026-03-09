@@ -23,7 +23,8 @@ interface LibraryViewProps {
 
 const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: propUpdate, isEditable = true }) => {
     // Fallback to context if not provided (for backward compatibility if used elsewhere)
-    const { data: contextData, updateData: contextUpdate } = useCharacter();
+    const { data: contextData } = useCharacterState();
+    const { updateData: contextUpdate } = useCharacterActions();
 
     const data = propData || contextData;
     const onUpdate = propUpdate || contextUpdate;

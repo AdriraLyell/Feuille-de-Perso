@@ -57,10 +57,6 @@ export const useResolvedData = () => {
     return useCharacterState().resolvedData;
 };
 
-export const useCharacterData = () => {
-    return useCharacterState().data;
-};
-
 /**
  * Hook pour accéder aux actions de modification.
  * Ne provoque PAS de re-rendu quand les données changent (fonctions stables).
@@ -71,24 +67,6 @@ export const useCharacterActions = () => {
         throw new Error('useCharacterActions must be used within a CharacterProvider');
     }
     return context;
-};
-
-/**
- * Hook Legacy (compatibilité).
- * Regroupe données et actions.
- */
-export const useCharacter = () => {
-    const { data, resolvedData, isSyncing, isEditMode, editLayoutMode } = useCharacterState();
-    const actions = useCharacterActions();
-
-    return useMemo(() => ({
-        data,
-        resolvedData,
-        isSyncing,
-        isEditMode,
-        editLayoutMode,
-        ...actions
-    }), [data, resolvedData, isSyncing, isEditMode, editLayoutMode, actions]);
 };
 
 // --- Provider ---
@@ -128,7 +106,7 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
     const updateData = useCallback((newData: CharacterSheetData | ((prev: CharacterSheetData) => CharacterSheetData), isSyncAction = false) => {
         setData(prev => {
             const next = typeof newData === 'function' ? newData(prev) : newData;
-            
+
             // If it's a regular user edit, mark as dirty and update timestamp
             if (!isSyncAction) {
                 return {

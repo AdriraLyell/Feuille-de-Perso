@@ -43,10 +43,10 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     onShowLogs, showLogs, onShowUserGuide, onShowChangelog, onOpenAppearance, onOpenSync, syncStatus, appVersion,
     onShowCampaignInfo, autoSaveCountdown,
     isMessagingOpen, onToggleMessaging, unreadMessagesCount,
-    isEditMode, onToggleEditMode, isEditLayoutMode, onToggleEditLayoutMode,
-    onResetLayout, onAutoFitLayout, safetyTimeRemaining
+    isEditMode: propsIsEditMode, onToggleEditMode, isEditLayoutMode, onToggleEditLayoutMode,
+    onResetLayout, onAutoFitLayout
 }) => {
-    const { data, isSyncing } = useCharacter();
+    const { data, isSyncing } = useCharacterState();
     const { rules } = useRules();
     const { stats } = useStorageUsage();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

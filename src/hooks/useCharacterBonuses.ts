@@ -1,9 +1,10 @@
+```
 import { useMemo, useRef, useDeferredValue } from 'react';
 import { TraitEntry, LibraryEntry, BonusInfo } from '../types';
 import { normalizeString } from '../utils/stringUtils';
 import { logger } from '../utils/logger';
 import { evaluateFormula } from '../utils/formulaEvaluator';
-import { useCharacter } from '../context/CharacterContext';
+import { useCharacterState } from '../context/CharacterContext';
 import { useRules } from '../context/RulesContext';
 
 /**
@@ -113,7 +114,7 @@ export const useCharacterBonuses = (
                                 } else if (operator === 'SET') {
                                     attributeBonuses[targetName].value = result;
                                 }
-                                attributeBonuses[targetName].sources.push(`${trait.name} (${operator === 'SUB' ? '-' : operator === 'SET' ? '=' : '+'}${result})`);
+                                attributeBonuses[targetName].sources.push(`${ trait.name } (${ operator === 'SUB' ? '-' : operator === 'SET' ? '=' : '+' }${ result })`);
                             } else if ((effectiveType as string) === 'master_skill' || (effectiveType as string) === 'block_skill_increase') {
                                 // These are handled by their own logic blocks usually
                             } else {
@@ -130,7 +131,7 @@ export const useCharacterBonuses = (
                             }
 
                         } catch (e) {
-                            logger.error(`Error evaluating formula for trait ${trait.name}:`, e);
+                            logger.error(`Error evaluating formula for trait ${ trait.name }: `, e);
                         }
                     }
                 });
@@ -152,7 +153,7 @@ export const useCharacterBonuses = (
                             });
                             calculatedMaxes[skill.name] = maxVal;
                         } catch (e) {
-                            logger.error(`Error calculating dynamic max for counter ${skill.name}:`, e);
+                            logger.error(`Error calculating dynamic max for counter ${ skill.name }: `, e);
                         }
                     }
                 }
@@ -175,7 +176,7 @@ export const useCharacterBonuses = (
                                 });
                                 calculatedMaxes[counter.name] = maxVal;
                             } catch (e) {
-                                logger.error(`Error calculating dynamic max for counter ${counter.name}:`, e);
+                                logger.error(`Error calculating dynamic max for counter ${ counter.name }: `, e);
                             }
                         }
                     } else if (libEntry?.formula) {
@@ -186,7 +187,7 @@ export const useCharacterBonuses = (
                             });
                             calculatedMaxes[counter.name] = maxVal;
                         } catch (e) {
-                            logger.error(`Error calculating dynamic max for counter ${counter.name}:`, e);
+                            logger.error(`Error calculating dynamic max for counter ${ counter.name }: `, e);
                         }
                     }
                 };

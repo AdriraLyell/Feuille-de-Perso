@@ -5,13 +5,15 @@ import { XPEntry } from '../types';
 import { Plus, Trash2, Calendar, FileText, TrendingUp, User, MessageSquare } from 'lucide-react';
 import { XPReceiptView } from './sheet/XPReceiptView';
 import { calculateExperienceResults } from '../utils/mechanics';
+import { useCharacterState, useCharacterActions } from '../context/CharacterContext';
 
 interface Props {
   isLandscape?: boolean;
 }
 
 const CharacterSheetXP: React.FC<Props> = ({ isLandscape = false }) => {
-  const { data, updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacter();
+  const { data } = useCharacterState();
+  const { updateData: onChange, addLog: onAddLog, recordXPTransaction } = useCharacterActions();
   const { rules } = useRules();
   const [activeTab, setActiveTab] = useState<'sessions' | 'history'>('sessions');
 

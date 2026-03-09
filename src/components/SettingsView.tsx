@@ -66,7 +66,8 @@ export interface DragItemType {
 }
 
 const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) => {
-  const { data, updateData: onUpdate, addLog: onAddLog } = useCharacter();
+  const { data } = useCharacterState();
+  const { updateData: onUpdate, addLog: onAddLog } = useCharacterActions();
   const { rules, isOnlineMode } = useRules();
   const { expertMode, enableExpertMode, disableExpertMode } = useExpertMode();
 
@@ -313,7 +314,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onClose, onDirtyChange }) =
 
       {activeTab === 'specializations' && (
         <SpecializationLibrarySidebar
-            data={localData}
+          data={localData}
         />
       )}
 
