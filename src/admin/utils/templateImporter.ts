@@ -236,6 +236,74 @@ export const extractRulesFromCharacter = (
         success.push(`Bibliothèque de Formules (${sheet.formulaLibrary.length} items)`);
     }
 
+    // 9. Extract Suggestions into Candidate Libraries
+    if (sheet.suggestions && Array.isArray(sheet.suggestions)) {
+        const suggestions = sheet.suggestions as import('../../types').SuggestionEntry[];
+        
+        const extractedSkills: import('../../types').LibrarySkillEntry[] = [];
+        const extractedBackgrounds: import('../../types').LibrarySkillEntry[] = [];
+        const extractedSpecs: import('../../types').LibrarySpecializationEntry[] = [];
+        const extractedTraits: import('../../types').LibraryEntry[] = [];
+
+        suggestions.forEach(s => {
+            if (s.type === 'skill') {
+                extractedSkills.push({
+                    id: s.id,
+                    name: s.name,
+                    defaultCategory: s.category,
+                    description: s.description || null,
+                    isActive: true
+                });
+            } else if (s.type === 'background') {
+                extractedBackgrounds.push({
+                    id: s.id,
+                    name: s.name,
+                    defaultCategory: s.category,
+                    description: s.description || null,
+                    isActive: true
+                });
+            } else if (s.type === 'specialization') {
+                extractedSpecs.push({
+                    id: s.id,
+                    name: s.name,
+                    skillIds: s.parentId ? [s.parentId] : [],
+                    defaultMinLevel: 0,
+                    description: s.description,
+                    isActive: true
+                });
+            } else if (s.type === 'trait') {
+                extractedTraits.push({
+                    id: s.id,
+                    name: s.name,
+                    type: (s.category?.toLowerCase().includes('désavantage') || s.category?.toLowerCase().includes('défaut')) ? 'desavantage' : 'avantage',
+                    description: s.description || null,
+                    tags: s.tags || null,
+                    effects: s.effects || null,
+                    pointsLabel: s.pointsLabel,
+                    cost: s.cost ? String(s.cost) : undefined,
+                    isActive: true
+                });
+            }
+        });
+
+        if (extractedSkills.length > 0) {
+            newRules.libraries.skills = [...(newRules.libraries.skills || []), ...extractedSkills];
+            success.push(`Extraction de ${extractedSkills.length} Compétence(s) suggérée(s)`);
+        }
+        if (extractedBackgrounds.length > 0) {
+            newRules.libraries.backgrounds = [...(newRules.libraries.backgrounds || []), ...extractedBackgrounds];
+            success.push(`Extraction de ${extractedBackgrounds.length} Historique(s) suggéré(s)`);
+        }
+        if (extractedSpecs.length > 0) {
+            newRules.libraries.specializations = [...(newRules.libraries.specializations || []), ...extractedSpecs];
+            success.push(`Extraction de ${extractedSpecs.length} Spécialité(s) suggérée(s)`);
+        }
+        if (extractedTraits.length > 0) {
+            newRules.libraries.traits = [...(newRules.libraries.traits || []), ...extractedTraits];
+            success.push(`Extraction de ${extractedTraits.length} Trait(s) suggéré(s)`);
+        }
+    }
+
     return { rules: newRules, report: { success, warnings } };
 };
 

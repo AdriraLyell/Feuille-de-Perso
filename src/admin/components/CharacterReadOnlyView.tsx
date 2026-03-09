@@ -189,10 +189,35 @@ const CharacterReadOnlyView: React.FC<CharacterReadOnlyViewProps> = ({
                     onClose={() => setIsWizardOpen(false)}
                     currentRules={currentRules}
                     candidateRules={candidateRules}
-                    onConfirm={async (merged: RulesData) => {
+                    onConfirm={async (merged: RulesData, excludedIds: string[]) => {
                         try {
                             await CampaignService.saveSetting(character.setting_id!, merged);
-                            addLog("Bibliothèque de campagne mise à jour avec succès !", "success");
+                            
+                            // Nettoyer les suggestions sur la fiche du joueur
+                            if (character.id && processedData) {
+                                // On ne garde que les suggestions qui ont été explicitement EXCLUES de la fusion
+                                const remainingSuggestions = (processedData.suggestions || []).filter(s => excludedIds.includes(s.id));
+                                
+                                const updatedCharacterData: CharacterSheetData = {
+                                    ...processedData,
+                                    suggestions: remainingSuggestions
+                                };
+
+                                const syncSuccess = await CharacterSyncService.updateCharacterData(character.id, updatedCharacterData);
+                                if (syncSuccess) {
+                                    setProcessedData(updatedCharacterData);
+                                    addLog(remainingSuggestions.length > 0 
+                                        ? `Bibliothèque mise à jour. ${remainingSuggestions.length} suggestion(s) conservée(s).` 
+                                        : "Bibliothèque mise à jour et écritures suspectes archivées !", 
+                                        "success"
+                                    );
+                                } else {
+                                    addLog("Bibliothèque mise à jour, mais échec du nettoyage des suggestions.", "warning");
+                                }
+                            } else {
+                                addLog("Bibliothèque de campagne mise à jour avec succès !", "success");
+                            }
+
                             setIsWizardOpen(false);
                             onRefreshRules?.();
                         } catch (err) {

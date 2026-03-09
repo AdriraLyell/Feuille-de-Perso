@@ -52,6 +52,29 @@ const AdminSuggestions: React.FC<Props> = ({ data, onUpdate, onAddLog }) => {
             return;
         }
 
+        // --- 1.5 Spécialisation : Ajout Automatique ---
+        if (suggestion.type === 'specialization' && suggestion.parentId) {
+            if (!newRules.libraries.specializations) newRules.libraries.specializations = [];
+            const isKnown = newRules.libraries.specializations.some((s) => s.name.toLowerCase() === suggestion.name.toLowerCase());
+            if (!isKnown) {
+                newRules.libraries.specializations.push({
+                    id: `spec_${Date.now()}`,
+                    name: suggestion.name,
+                    skillIds: [suggestion.parentId],
+                    defaultMinLevel: 0,
+                    isActive: true,
+                    isGlobal: true
+                });
+                newRules.libraries.specializations.sort((a, b) => a.name.localeCompare(b.name));
+                onAddLog(`Spécialisation "${suggestion.name}" ajoutée à la bibliothèque.`, 'success', 'settings');
+            } else {
+                onAddLog("Cette spécialisation existe déjà dans la bibliothèque.", 'info', 'settings');
+            }
+            updateRules(newRules);
+            handleReject(suggestion.id);
+            return;
+        }
+
         // --- 2. Nouvel Élément Complet : Ouvrir le Modal d'Ajustement ---
         if (suggestion.type === 'trait') {
             const localEntry = (data.library || []).find(l => l.name === suggestion.name);
@@ -72,8 +95,8 @@ const AdminSuggestions: React.FC<Props> = ({ data, onUpdate, onAddLog }) => {
     };
 
     const handleConfirmIntegration = (
-        finalEntry: LibraryEntry | LibrarySkillEntry, 
-        originalSuggestionId: string, 
+        finalEntry: LibraryEntry | LibrarySkillEntry,
+        originalSuggestionId: string,
         listType: 'traits' | 'skills' | 'backgrounds'
     ) => {
         if (!rules) return;
@@ -89,7 +112,42 @@ const AdminSuggestions: React.FC<Props> = ({ data, onUpdate, onAddLog }) => {
         (newRules.libraries[listType] as { name: string }[]).sort((a, b) => a.name.localeCompare(b.name));
 
         updateRules(newRules);
-        handleReject(originalSuggestionId);
+
+        // Mettre à jour l'ID dans la fiche du joueur pour garder le lien
+        const originalSuggestion = suggestions.find(s => s.id === originalSuggestionId);
+        if (originalSuggestion && (listType === 'skills' || listType === 'backgrounds')) {
+            const newSheetData = { ...data };
+            let modified = false;
+            Object.keys(newSheetData.skills).forEach(cat => {
+                newSheetData.skills[cat] = newSheetData.skills[cat].map(s => {
+                    if (s.name?.trim().toLowerCase() === originalSuggestion.name.trim().toLowerCase() && s.id !== finalEntry.id) {
+                        modified = true;
+                        return { ...s, id: finalEntry.id, definitionId: finalEntry.id };
+                    }
+                    return s;
+                });
+            });
+
+            if (modified) {
+                const newSuggestions = newSheetData.suggestions?.filter(s => s.id !== originalSuggestionId) || [];
+                onUpdate({ ...newSheetData, suggestions: newSuggestions });
+            } else {
+                handleReject(originalSuggestionId);
+            }
+        } else if (originalSuggestion && listType === 'traits') {
+            const newSheetData = { ...data };
+            const newLibrary = newSheetData.library?.map(t => {
+                if (t.name.trim().toLowerCase() === originalSuggestion.name.trim().toLowerCase() && t.id !== finalEntry.id) {
+                    return { ...t, id: finalEntry.id };
+                }
+                return t;
+            }) || [];
+            const newSuggestions = newSheetData.suggestions?.filter(s => s.id !== originalSuggestionId) || [];
+            onUpdate({ ...newSheetData, library: newLibrary, suggestions: newSuggestions });
+        } else {
+            handleReject(originalSuggestionId);
+        }
+
         onAddLog(`L'élément "${finalEntry.name}" a été officialisé !`, 'success', 'settings');
 
         // Close modal
@@ -122,14 +180,14 @@ const AdminSuggestions: React.FC<Props> = ({ data, onUpdate, onAddLog }) => {
                 {suggestions.map(s => (
                     <div key={s.id} className="bg-white border border-stone-200 p-4 rounded-sm shadow-sm flex items-center justify-between hover:border-amber-300 transition-colors">
                         <div className="flex items-center gap-4 flex-grow">
-                            <div className={`p-2.5 rounded-full ${s.type === 'variant' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                                {s.type === 'variant' ? <BookmarkPlus size={20} /> : <Lightbulb size={20} />}
+                            <div className={`p-2.5 rounded-full ${s.type === 'variant' ? 'bg-indigo-100 text-indigo-700' : s.type === 'specialization' ? 'bg-fuchsia-100 text-fuchsia-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                                {s.type === 'variant' || s.type === 'specialization' ? <BookmarkPlus size={20} /> : <Lightbulb size={20} />}
                             </div>
                             <div>
                                 <div className="font-bold text-[#2c241b] text-base">{s.name}</div>
                                 <div className="text-xs text-stone-500 flex items-center gap-2 mt-0.5">
                                     <span className="font-bold uppercase tracking-widest text-[#8b2e2e]">
-                                        {s.type === 'variant' ? 'Nouvelle Variante' : 'Nouvel Élément'}
+                                        {s.type === 'variant' ? 'Nouvelle Variante' : s.type === 'specialization' ? 'Nouvelle Spécialité' : 'Nouvel Élément'}
                                     </span>
                                     {s.category && <span className="px-1.5 py-0.5 bg-stone-100/80 rounded text-[10px] font-mono">{s.category}</span>}
                                     <span className="flex items-center gap-1 ml-1 opacity-70">

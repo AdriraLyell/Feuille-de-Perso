@@ -147,14 +147,19 @@ export const useCharacterSheetActions = (
             updatedSkills[category] = currentList;
             const newState = { ...prev, skills: updatedSkills };
 
-            if (type === 'custom_lib_item' || type === 'lib_skill') {
+            if (type === 'custom_lib_item') {
                 const suggestionType = categoryType || (category.toLowerCase().includes('background') || category.toLowerCase().includes('arrière-plan') ? 'background' : 'skill');
                 const suggestion: SuggestionEntry = {
                     id: generateId(),
                     type: suggestionType as 'skill' | 'background',
                     name: itemData.name,
                     category: category,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
+                    description: itemData.description || undefined,
+                    tags: Array.isArray(itemData.tags) ? itemData.tags : undefined,
+                    effects: Array.isArray(itemData.effects) ? itemData.effects : undefined,
+                    pointsLabel: typeof itemData.pointsLabel === 'string' ? itemData.pointsLabel : undefined,
+                    cost: itemData.cost ? Number(itemData.cost) : undefined
                 };
                 newState.suggestions = [...(prev.suggestions || []), suggestion];
                 onAddLog(`Suggestion créée pour le MJ : ${itemData.name}`, 'info', 'sheet');

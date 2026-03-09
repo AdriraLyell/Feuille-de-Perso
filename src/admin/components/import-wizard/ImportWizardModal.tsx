@@ -2,22 +2,18 @@
 import React, { useState, useMemo } from 'react';
 import { RulesData } from '../../../types/rules';
 import { calculateDiff, mergeRules, ImportOptions } from '../../utils/importDiffUtils';
-import { Check, X, AlertTriangle, Settings, BookOpen, Database, Layers, CheckCircle2, ChevronRight, ChevronDown, PlusCircle } from 'lucide-react';
+import { Check, X, AlertTriangle, Settings, BookOpen, Database, Layers, CheckCircle2, ChevronRight, ChevronDown, ChevronUp, PlusCircle, RefreshCw } from 'lucide-react';
 
 interface ImportWizardModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onConfirm: (mergedRules: RulesData) => void;
+    onConfirm: (mergedRules: RulesData, excludedIds: string[]) => void;
     currentRules: RulesData;
     candidateRules: RulesData;
 }
 
 const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, onConfirm, currentRules, candidateRules }) => {
-    if (!isOpen) return null;
-
-
-
-    // Default Options
+    // 1. Hooks (must be at the top)
     const [options, setOptions] = useState<ImportOptions>({
         sections: {
             general: true,
@@ -31,8 +27,15 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
         excludedIds: []
     });
 
+    const [showDetails, setShowDetails] = useState(false);
+    const [expandedDiffId, setExpandedDiffId] = useState<string | null>(null);
+    const [isConfirming, setIsConfirming] = useState(false);
+
     const diff = useMemo(() => calculateDiff(currentRules, candidateRules), [currentRules, candidateRules]);
 
+    if (!isOpen) return null;
+
+    // 2. Actions
     const handleToggleSection = (key: keyof ImportOptions['sections']) => {
         setOptions(prev => ({
             ...prev,
@@ -40,9 +43,18 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
         }));
     };
 
-    const handleConfirm = () => {
-        const merged = mergeRules(currentRules, candidateRules, options);
-        onConfirm(merged);
+    const handleConfirm = async () => {
+        if (isConfirming) return;
+        setIsConfirming(true);
+        try {
+            const merged = mergeRules(currentRules, candidateRules, options);
+            await onConfirm(merged, options.excludedIds || []);
+        } catch (err) {
+            console.error("[ImportWizard] Fusion Error:", err);
+            alert("Une erreur est survenue lors de la fusion.");
+        } finally {
+            setIsConfirming(false);
+        }
     };
 
     const toggleExclusion = (id: string) => {
@@ -56,7 +68,12 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
         });
     };
 
-    const [showDetails, setShowDetails] = useState(false);
+    const truncateStr = (val: unknown, len = 20) => {
+        if (val === null || val === undefined) return "";
+        const s = typeof val === 'string' ? val : JSON.stringify(val);
+        if (!s) return "";
+        return s.length > len ? s.substring(0, len) + '...' : s;
+    };
 
     const SectionCard = ({ id, label, icon: Icon, details }: { id: keyof ImportOptions['sections'], label: string, icon: React.ElementType, details: string[] }) => {
         const hasChanges = details.length > 0;
@@ -354,20 +371,55 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
                                                                             <div className="pl-7 space-y-1.5 mt-2 pt-2 border-t border-slate-50">
                                                                                 {conflict.differences.map((d, di) => {
                                                                                     const isFieldExcluded = itemFieldExclusions.includes(d.field);
+                                                                                    const diffId = `${conflict.id}-${d.field}`;
+                                                                                    const isExpanded = expandedDiffId === diffId;
+                                                                                    
                                                                                     return (
-                                                                                        <label key={di} className={`flex items-start gap-2 text-xs group cursor-pointer ${isFieldExcluded ? 'opacity-50' : ''}`}>
+                                                                                        <div key={di} className={`flex items-start gap-2 text-xs group ${isFieldExcluded ? 'opacity-50' : ''}`}>
                                                                                             <input
                                                                                                 type="checkbox"
                                                                                                 checked={!isFieldExcluded}
                                                                                                 onChange={() => toggleFieldExclusion(conflict.id, d.field)}
-                                                                                                className="mt-0.5 w-3 h-3 rounded text-blue-500 focus:ring-blue-400"
+                                                                                                className="mt-0.5 w-3 h-3 rounded text-blue-500 focus:ring-blue-400 cursor-pointer"
                                                                                             />
                                                                                             <div className="flex-grow">
-                                                                                                <span className="font-semibold text-slate-700">{d.label} : </span>
-                                                                                                <span className="text-slate-400 line-through mr-1">{typeof d.prev === 'string' ? d.prev : JSON.stringify(d.prev)}</span>
-                                                                                                <span className="text-blue-600 font-medium">→ {typeof d.next === 'string' ? d.next : JSON.stringify(d.next)}</span>
+                                                                                                <div 
+                                                                                                    className="font-semibold text-slate-700 cursor-pointer inline-flex items-center gap-1 hover:text-blue-600 transition-colors"
+                                                                                                    onClick={() => setExpandedDiffId(isExpanded ? null : diffId)}
+                                                                                                >
+                                                                                                    {d.label} {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />} :
+                                                                                                </div>
+                                                                                                {!isExpanded ? (
+                                                                                                    <div className="inline ml-1" onClick={() => setExpandedDiffId(isExpanded ? null : diffId)}>
+                                                                                                        <span className="text-slate-400 line-through mr-1 cursor-pointer italic">{truncateStr(d.prev, 40)}</span>
+                                                                                                        <span className="text-blue-600 font-medium cursor-pointer">→ {truncateStr(d.next, 40)}</span>
+                                                                                                    </div>
+                                                                                                ) : (
+                                                                                                    <div className="mt-2 pl-3 border-l-2 border-blue-400 bg-slate-50/50 p-2 rounded-r">
+                                                                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                                                                            {/* Valeur Actuelle */}
+                                                                                                            <div className="bg-white p-2.5 rounded border border-slate-200 shadow-sm flex flex-col h-full">
+                                                                                                                <div className="text-[10px] uppercase font-bold text-slate-400 mb-2 border-b border-slate-100 pb-1 flex items-center justify-between">
+                                                                                                                    <span className="flex items-center gap-1"><X size={12} /> Valeur Actuelle</span>
+                                                                                                                </div>
+                                                                                                                <div className="text-slate-500 line-through text-xs whitespace-pre-wrap break-words font-mono flex-grow">
+                                                                                                                    {d.prev ? (typeof d.prev === 'string' ? d.prev : JSON.stringify(d.prev, null, 2)) : <span className="italic opacity-40 text-[10px]">(Vide)</span>}
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            {/* Nouvelle Valeur */}
+                                                                                                            <div className="bg-blue-50 p-2.5 rounded border border-blue-200 shadow-sm flex flex-col h-full ring-1 ring-blue-50">
+                                                                                                                <div className="text-[10px] uppercase font-bold text-blue-600 mb-2 border-b border-blue-100 pb-1 flex items-center justify-between">
+                                                                                                                    <span className="flex items-center gap-1"><Check size={12} /> Importé (Nouveau)</span>
+                                                                                                                </div>
+                                                                                                                <div className="text-blue-800 font-semibold text-xs whitespace-pre-wrap break-words font-mono flex-grow">
+                                                                                                                    {d.next ? (typeof d.next === 'string' ? d.next : JSON.stringify(d.next, null, 2)) : <span className="italic text-blue-300 text-[10px]">(Vide)</span>}
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                )}
                                                                                             </div>
-                                                                                        </label>
+                                                                                        </div>
                                                                                     );
                                                                                 })}
                                                                             </div>
@@ -402,9 +454,18 @@ const ImportWizardModal: React.FC<ImportWizardModalProps> = ({ isOpen, onClose, 
                     </button>
                     <button
                         onClick={handleConfirm}
-                        className="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                        disabled={isConfirming}
+                        className={`px-6 py-2 ${isConfirming ? 'bg-blue-400 cursor-wait' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold rounded-lg shadow-lg transition-colors flex items-center gap-2`}
                     >
-                        <Check size={20} /> Confirmer la Fusion
+                        {isConfirming ? (
+                            <>
+                                <RefreshCw size={20} className="animate-spin" /> Fusion en cours...
+                            </>
+                        ) : (
+                            <>
+                                <Check size={20} /> Confirmer la Fusion
+                            </>
+                        )}
                     </button>
                 </div>
             </div>

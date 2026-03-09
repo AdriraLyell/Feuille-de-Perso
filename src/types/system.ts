@@ -249,9 +249,14 @@ export interface AttributePreset {
 
 export interface SuggestionEntry {
   id: string; // UUID
-  type: 'skill' | 'background' | 'variant' | 'trait';
+  type: 'skill' | 'background' | 'variant' | 'trait' | 'specialization';
   name: string;
   category: string;
-  parentId?: string; // For variants: ID of the parent skill/trait
+  parentId?: string; // For variants/specializations: ID of the parent skill/trait
   timestamp: number;
+  description?: string;
+  tags?: string[];
+  effects?: import('./primitives').TraitEffect[];
+  pointsLabel?: string;
+  cost?: number;
 }

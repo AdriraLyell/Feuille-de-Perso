@@ -94,6 +94,15 @@
 
 # Changelog
 
+## [2.108.3] - 2026-03-09 [FIX/FEAT]
+- **Système :** Fiabilisation du suivi des "Écritures suspectes". Les descriptions, tags et effets sont désormais correctement capturés et transmis au MJ.
+- **Admin :** Refonte de l'Assistant d'Importation. Ajout d'un système d'accordéon pour comparer les descriptions en deux colonnes.
+- **Admin :** Nettoyage automatique des suggestions sur la fiche du joueur après une fusion réussie (archivage sélectif).
+- **Import :** Correction des faux positifs liés aux sauts de ligne Windows (\r\n) et aux valeurs vides (undefined vs "").
+- **UI :** Ajout d'états de chargement et sécurisation des boutons de fusion pour éviter les erreurs silencieuses.
+
+---
+
 ## [2.108.2] - 2026-03-09 [FIX]
 - **UI :** Correction des problèmes d'affichage lors d'un zoom important (supérieur à 200%).
 - **Layout :** Bascule vers un défilement horizontal natif (fenêtre) pour garantir l'accessibilité des ascenseurs.

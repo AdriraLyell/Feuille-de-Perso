@@ -1,6 +1,6 @@
 
 import { useCharacter } from '../context/CharacterContext';
-import { CharacterSheetData, DotEntry } from '../types';
+import { CharacterSheetData, DotEntry, SuggestionEntry } from '../types';
 import SpecializationOmnibar from './specialization-library/SpecializationOmnibar';
 import SpecializationLibraryDrawer from './specialization-library/SpecializationLibraryDrawer';
 import ConfirmationModal from './ui/ConfirmationModal';
@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useRules } from '../context/RulesContext';
 import { logger } from '../utils/logger';
 import { ErrorService } from '../services/ErrorService';
-import { createDotEntry } from '../utils/factories';
+import { createDotEntry, generateId } from '../utils/factories';
 
 interface Props {
     isLandscape?: boolean;
@@ -48,12 +48,37 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
         }
         newSpecs[index] = value;
 
+        const valTrimmed = value.trim();
+        let newSuggestions = data.suggestions || [];
+        if (valTrimmed) {
+            const isKnown = rules?.libraries?.specializations?.some(s => s.name.trim().toLowerCase() === valTrimmed.toLowerCase());
+            if (!isKnown) {
+                const alreadySuggested = newSuggestions.some(s => s.type === 'specialization' && s.name.trim().toLowerCase() === valTrimmed.toLowerCase());
+                if (!alreadySuggested) {
+                    newSuggestions = [
+                        ...newSuggestions,
+                        {
+                            id: generateId(),
+                            type: 'specialization',
+                            name: valTrimmed,
+                            category: skillId,
+                            parentId: skillId,
+                            timestamp: Date.now(),
+                            description: rules?.libraries?.specializations?.find(s => s.name.trim().toLowerCase() === valTrimmed.toLowerCase())?.description
+                        }
+                    ];
+                    onAddLog(`Suggestion de spécialité créée : ${valTrimmed}`, 'info', 'sheet');
+                }
+            }
+        }
+
         onChange({
             ...data,
             specializations: {
                 ...data.specializations,
                 [skillId]: newSpecs
-            }
+            },
+            suggestions: newSuggestions
         });
 
         const skillName = getSkillName(skillId);
@@ -90,6 +115,24 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
 
                 const currentCatSkills = prev.skills[secondaryCat] || [];
 
+                let newSuggestions = prev.suggestions || [];
+                const isKnownInLib = rules?.libraries?.skills?.some(s => s.name.trim().toLowerCase() === specName.trim().toLowerCase());
+                if (!isKnownInLib) {
+                    const alreadySuggested = newSuggestions.some(s => s.type === 'skill' && s.name.trim().toLowerCase() === specName.trim().toLowerCase());
+                    if (!alreadySuggested) {
+                        newSuggestions = [
+                            ...newSuggestions,
+                            {
+                                id: generateId(),
+                                type: 'skill',
+                                name: specName.trim(),
+                                category: secondaryCat,
+                                timestamp: Date.now()
+                            }
+                        ];
+                    }
+                }
+
                 return {
                     ...prev,
                     skills: {
@@ -99,7 +142,8 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
                     specializations: {
                         ...prev.specializations,
                         [skillId]: newSpecs
-                    }
+                    },
+                    suggestions: newSuggestions
                 };
             });
 
@@ -133,13 +177,34 @@ const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false })
             const newSkill = createDotEntry(specName, 0);
 
             // 4. Ajouter la compétence sans toucher aux specs imposées (le MJ reste maître)
-            onChange((prev: CharacterSheetData) => ({
-                ...prev,
-                skills: {
-                    ...prev.skills,
-                    [secondaryCat]: [...(prev.skills[secondaryCat] || []), newSkill]
+            onChange((prev: CharacterSheetData) => {
+                let newSuggestions = prev.suggestions || [];
+                const isKnownInLib = rules?.libraries?.skills?.some(s => s.name.trim().toLowerCase() === specName.trim().toLowerCase());
+                if (!isKnownInLib) {
+                    const alreadySuggested = newSuggestions.some(s => s.type === 'skill' && s.name.trim().toLowerCase() === specName.trim().toLowerCase());
+                    if (!alreadySuggested) {
+                        newSuggestions = [
+                            ...newSuggestions,
+                            {
+                                id: generateId(),
+                                type: 'skill',
+                                name: specName.trim(),
+                                category: secondaryCat,
+                                timestamp: Date.now()
+                            }
+                        ];
+                    }
                 }
-            }));
+
+                return {
+                    ...prev,
+                    skills: {
+                        ...prev.skills,
+                        [secondaryCat]: [...(prev.skills[secondaryCat] || []), newSkill]
+                    },
+                    suggestions: newSuggestions
+                };
+            });
 
             onAddLog(`Spécialité imposée "${specName}" convertie en compétence secondaire.`, 'success', 'sheet');
         } catch (err) {

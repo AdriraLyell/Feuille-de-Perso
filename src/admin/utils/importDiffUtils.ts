@@ -51,6 +51,11 @@ export interface ImportOptions {
 
 const isDifferent = (a: unknown, b: unknown) => JSON.stringify(a) !== JSON.stringify(b);
 
+const normalizeString = (val: unknown): string => {
+    if (val === null || val === undefined) return "";
+    return String(val).trim().replace(/\r\n/g, '\n');
+};
+
 /**
  * Compares two library items and returns a list of human-readable differences.
  */
@@ -59,20 +64,20 @@ const getDetailedDifferences = (currRaw: unknown, candRaw: unknown): FieldDiffer
     const curr = currRaw as Record<string, unknown>;
     const cand = candRaw as Record<string, unknown>;
 
-    if (curr.name !== cand.name) diffs.push({ field: 'name', label: 'Nom', prev: curr.name, next: cand.name });
-    if (curr.type !== cand.type) diffs.push({ field: 'type', label: 'Type', prev: curr.type, next: cand.type });
-    if (curr.cost !== cand.cost) diffs.push({ field: 'cost', label: 'Coût', prev: curr.cost, next: cand.cost });
-    if (curr.pointsLabel !== cand.pointsLabel) diffs.push({ field: 'pointsLabel', label: 'Label', prev: curr.pointsLabel, next: cand.pointsLabel });
-    if (curr.description !== cand.description) diffs.push({ field: 'description', label: 'Description', prev: '...', next: '...' });
+    if (normalizeString(curr.name) !== normalizeString(cand.name)) diffs.push({ field: 'name', label: 'Nom', prev: curr.name, next: cand.name });
+    if (normalizeString(curr.type) !== normalizeString(cand.type)) diffs.push({ field: 'type', label: 'Type', prev: curr.type, next: cand.type });
+    if (Number(curr.cost || 0) !== Number(cand.cost || 0)) diffs.push({ field: 'cost', label: 'Coût', prev: curr.cost, next: cand.cost });
+    if (normalizeString(curr.pointsLabel) !== normalizeString(cand.pointsLabel)) diffs.push({ field: 'pointsLabel', label: 'Label', prev: curr.pointsLabel, next: cand.pointsLabel });
+    if (normalizeString(curr.description) !== normalizeString(cand.description)) diffs.push({ field: 'description', label: 'Description', prev: curr.description, next: cand.description });
 
     // Compare tags
-    if (isDifferent(curr.tags, cand.tags)) {
+    if (isDifferent(curr.tags || [], cand.tags || [])) {
         diffs.push({ field: 'tags', label: 'Tags', prev: curr.tags, next: cand.tags });
     }
 
     // Compare effects
-    if (isDifferent(curr.effects, cand.effects)) {
-        diffs.push({ field: 'effects', label: 'Effets', prev: '...', next: '...' });
+    if (isDifferent(curr.effects || [], cand.effects || [])) {
+        diffs.push({ field: 'effects', label: 'Effets', prev: curr.effects, next: cand.effects });
     }
 
     return diffs;
@@ -99,12 +104,34 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
 
     // 1. General Config
     if (isDifferent(current.configurations.creation, candidate.configurations.creation)) {
-        report.details.general.push("Configuration de création modifiée");
+        const curr = current.configurations.creation as unknown as Record<string, unknown>;
+        const cand = candidate.configurations.creation as unknown as Record<string, unknown>;
+        const changes = Object.keys(cand).filter(k => isDifferent(curr[k], cand[k]));
+        if (changes.length > 0) {
+            const details = changes.map(k => {
+                const prevVal = curr[k] !== undefined ? JSON.stringify(curr[k]) : 'non défini';
+                const nextVal = cand[k] !== undefined ? JSON.stringify(cand[k]) : 'non défini';
+                // Trim long JSON for rankSlots or similar
+                const displayNext = nextVal.length > 30 ? '{...}' : nextVal;
+                const displayPrev = prevVal.length > 30 ? '{...}' : prevVal;
+                return `"${k}" (${displayPrev} → ${displayNext})`;
+            }).join(', ');
+            report.details.general.push(`Création modifiée : ${details}`);
+        } else {
+            report.details.general.push("Configuration de création modifiée");
+        }
     }
     if (isDifferent(current.configurations.xpCosts, candidate.configurations.xpCosts)) {
-        report.details.general.push("Coûts XP modifiés");
+        const curr = (current.configurations.xpCosts || {}) as unknown as Record<string, unknown>;
+        const cand = (candidate.configurations.xpCosts || {}) as unknown as Record<string, unknown>;
+        const changes = Object.keys(cand).filter(k => isDifferent(curr[k], cand[k]));
+        if (changes.length > 0) {
+            const details = changes.map(k => `"${k}" (${curr[k]} → ${cand[k]})`).join(', ');
+            report.details.general.push(`Coûts XP modifiés : ${details}`);
+        } else {
+            report.details.general.push("Coûts XP modifiés");
+        }
     }
-
 
     // 2. Attributes
     const attrKeys = new Set([...Object.keys(current.definitions.attributes), ...Object.keys(candidate.definitions.attributes)]);
@@ -118,7 +145,27 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
     const skillKeys = new Set([...Object.keys(current.definitions.skills), ...Object.keys(candidate.definitions.skills)]);
     skillKeys.forEach(k => {
         if (isDifferent(current.definitions.skills[k], candidate.definitions.skills[k])) {
-            report.details.skills.push(`Catégorie "${k}" modifiée`);
+            const catDef = current.definitions.skillCategories?.find(c => c.id === k);
+            const label = catDef ? catDef.label : k;
+            
+            const currList = current.definitions.skills[k] || [];
+            const candList = candidate.definitions.skills[k] || [];
+            
+            const added = candList.filter(s => !currList.includes(s) && s.trim() !== "");
+            const removed = currList.filter(s => !candList.includes(s) && s.trim() !== "");
+            
+            let details = `Catégorie "${label}" modifiée`;
+            if (added.length > 0 && removed.length > 0) {
+                details += ` : Ajouts [${added.join(', ')}], Retraits [${removed.join(', ')}]`;
+            } else if (added.length > 0) {
+                details += ` : Ajouts [${added.join(', ')}]`;
+            } else if (removed.length > 0) {
+                details += ` : Retraits [${removed.join(', ')}]`;
+            } else {
+                details += ` : Ordre ou format modifié`;
+            }
+            
+            report.details.skills.push(details);
         }
     });
 
@@ -146,15 +193,20 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
                 stats.newItems.push({ id: item.id, name: item.name || "Sans nom" });
             } else {
                 if (isDifferent(existing, item)) {
-                    stats.conflict++;
-                    stats.conflicts.push({
-                        id: existing.id, // Store ID for exclusion tracking
-                        name: item.name || "Sans nom",
-                        type: (item as Record<string, unknown>).type as string || "item",
-                        differences: getDetailedDifferences(existing, item),
-                        current: existing,
-                        candidate: item
-                    });
+                    const diffs = getDetailedDifferences(existing, item);
+                    if (diffs.length > 0) {
+                        stats.conflict++;
+                        stats.conflicts.push({
+                            id: existing.id, // Store ID for exclusion tracking
+                            name: item.name || "Sans nom",
+                            type: (item as Record<string, unknown>).type as string || "item",
+                            differences: diffs,
+                            current: existing,
+                            candidate: item
+                        });
+                    } else {
+                        stats.identical++;
+                    }
                 } else {
                     stats.identical++;
                 }
@@ -184,10 +236,16 @@ export const calculateDiff = (current: RulesData, candidate: RulesData): DiffRep
         report.details.general.length > 0 ||
         report.details.attributes.length > 0 ||
         report.details.skills.length > 0 ||
+        report.details.backgrounds.length > 0 ||
+        report.details.counters.length > 0 ||
         report.details.libraries.traits.new > 0 ||
         report.details.libraries.traits.conflict > 0 ||
         report.details.libraries.skills.new > 0 ||
-        report.details.libraries.skills.conflict > 0;
+        report.details.libraries.skills.conflict > 0 ||
+        report.details.libraries.backgrounds.new > 0 ||
+        report.details.libraries.backgrounds.conflict > 0 ||
+        report.details.libraries.specializations.new > 0 ||
+        report.details.libraries.specializations.conflict > 0;
 
     return report;
 };
@@ -197,31 +255,31 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
     const result: RulesData = JSON.parse(JSON.stringify(current));
 
     if (options.sections.general) {
-        result.configurations.creation = candidate.configurations.creation;
-        result.configurations.xpCosts = candidate.configurations.xpCosts;
-
-        // Also card config if present? Assuming included in general
-        result.configurations.cards = candidate.configurations.cards;
+        if (candidate.configurations.creation) result.configurations.creation = candidate.configurations.creation;
+        if (candidate.configurations.xpCosts) result.configurations.xpCosts = candidate.configurations.xpCosts;
+        if (candidate.configurations.cards) result.configurations.cards = candidate.configurations.cards;
     }
 
     if (options.sections.attributes) {
-        result.definitions.attributes = candidate.definitions.attributes;
-        result.definitions.secondaryAttributes = candidate.definitions.secondaryAttributes;
-        result.configurations.global.secondaryAttributes = candidate.configurations.global.secondaryAttributes;
-        result.configurations.global.maxAttributeScore = candidate.configurations.global.maxAttributeScore;
+        if (candidate.definitions.attributes) result.definitions.attributes = candidate.definitions.attributes;
+        if (candidate.definitions.secondaryAttributes) result.definitions.secondaryAttributes = candidate.definitions.secondaryAttributes;
+        if (candidate.configurations.global) {
+            result.configurations.global.secondaryAttributes = candidate.configurations.global.secondaryAttributes;
+            result.configurations.global.maxAttributeScore = candidate.configurations.global.maxAttributeScore;
+        }
     }
 
     if (options.sections.skills) {
-        result.definitions.skills = candidate.definitions.skills;
-        result.definitions.labels = candidate.definitions.labels; // Labels usually go with skills definitions
+        if (candidate.definitions.skills) result.definitions.skills = candidate.definitions.skills;
+        if (candidate.definitions.labels) result.definitions.labels = candidate.definitions.labels;
     }
 
     if (options.sections.backgrounds) {
-        result.definitions.backgrounds = candidate.definitions.backgrounds;
+        if (candidate.definitions.backgrounds) result.definitions.backgrounds = candidate.definitions.backgrounds;
     }
 
     if (options.sections.counters) {
-        result.definitions.counters = candidate.definitions.counters;
+        if (candidate.definitions.counters) result.definitions.counters = candidate.definitions.counters;
     }
 
     // Library Merge Logic
@@ -275,7 +333,8 @@ export const mergeRules = (current: RulesData, candidate: RulesData, options: Im
                         }
                     } else if (options.libraryStrategy === 'copy') {
                         // Create copy with new ID even if name matches
-                        const copy = { ...item, id: crypto.randomUUID() };
+                        const safeUUID = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `copy_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                        const copy = { ...item, id: safeUUID };
                         map.set(copy.id, copy);
                     }
                     // if 'ignore', do nothing
