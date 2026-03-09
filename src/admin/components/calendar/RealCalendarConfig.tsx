@@ -4,6 +4,7 @@ import { CalendarConfigReal } from '../../../types/rules';
 import CalendarEventsList from './CalendarEventsList';
 import { CalendarDays, RotateCcw } from 'lucide-react';
 import { calculateMoonPhase } from '../../../utils/moonPhase';
+import { getWesternZodiac, getChineseZodiac } from '../../../utils/zodiac';
 
 interface Props {
     config: CalendarConfigReal;
@@ -91,16 +92,39 @@ const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
                             </p>
                             {(() => {
                                 const moon = calculateMoonPhase(currentDateObj);
-                                return moon ? (
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <div className="flex items-center gap-2 px-2.5 py-1 bg-stone-900 border border-amber-900/40 rounded shadow-sm">
-                                            <span className="text-base drop-shadow-[0_0_3px_rgba(255,255,255,0.2)]">{moon.emoji}</span>
-                                            <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest leading-none">
-                                                {moon.name}
-                                            </span>
-                                        </div>
+                                const zodiac = getWesternZodiac(currentDateObj);
+                                const chineseZodiac = getChineseZodiac(currentDateObj);
+
+                                if (!moon && !zodiac && !chineseZodiac) return null;
+
+                                return (
+                                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                                        {moon && (
+                                            <div className="flex items-center gap-2 px-2.5 py-1 bg-stone-900 border border-amber-900/40 rounded shadow-sm" title="Phase Lunaire">
+                                                <span className="text-base drop-shadow-[0_0_3px_rgba(255,255,255,0.2)]">{moon.emoji}</span>
+                                                <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest leading-none">
+                                                    {moon.name}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {zodiac && (
+                                            <div className="flex items-center gap-2 px-2.5 py-1 bg-stone-900 border border-amber-900/40 rounded shadow-sm" title="Signe du Zodiaque">
+                                                <span className="text-base drop-shadow-[0_0_3px_rgba(255,255,255,0.2)]">{zodiac.emoji}</span>
+                                                <span className="text-[10px] font-bold text-stone-300 uppercase tracking-widest leading-none">
+                                                    {zodiac.name}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {chineseZodiac && (
+                                            <div className="flex items-center gap-2 px-2.5 py-1 bg-stone-900 border border-amber-900/40 rounded shadow-sm" title="Zodiaque Chinois">
+                                                <span className="text-base drop-shadow-[0_0_3px_rgba(255,255,255,0.2)]">{chineseZodiac.emoji}</span>
+                                                <span className="text-[10px] font-bold text-stone-300 uppercase tracking-widest leading-none">
+                                                    {chineseZodiac.animal} <span className={chineseZodiac.elementColor}>({chineseZodiac.element})</span>
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
-                                ) : null;
+                                );
                             })()}
                         </div>
                     )}

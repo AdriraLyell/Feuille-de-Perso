@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Clock, ChevronDown, ChevronRight, CalendarDays, RotateCcw } from 'lucide-react';
 import { calculateMoonPhase } from '../../utils/moonPhase';
+import { getWesternZodiac, getChineseZodiac } from '../../utils/zodiac';
 
 interface RosterTimeSectionProps {
     showTimeManagement: boolean;
@@ -34,12 +35,18 @@ export const RosterTimeSection: React.FC<RosterTimeSectionProps> = ({
                             <span className="text-[13px] font-serif font-bold text-amber-400 capitalize px-3 py-1 mt-0.5 rounded-sm border border-stone-800 bg-stone-900/50 shadow-glass-dark">
                                 {currentDate}
                             </span>
-                            {moon && (
-                                <div className="flex items-center gap-2 text-stone-300 text-[11px] font-bold bg-stone-900 border border-amber-900/40 px-2.5 py-1 rounded shadow-sm">
-                                    <span className="text-sm drop-shadow-[0_0_3px_rgba(255,255,255,0.2)]">{moon.emoji}</span>
-                                    <span className="hidden sm:inline uppercase tracking-wider text-[10px] text-amber-500/90">{moon.name}</span>
-                                </div>
-                            )}
+                            {(() => {
+                                const zodiac = getWesternZodiac(currentDate);
+                                const chineseZodiac = getChineseZodiac(currentDate);
+                                if (!moon && !zodiac && !chineseZodiac) return null;
+                                return (
+                                    <div className="flex flex-wrap items-center gap-1.5 text-stone-300 text-[11px] font-bold bg-stone-900 border border-amber-900/40 px-2.5 py-1 rounded shadow-sm">
+                                        {moon && <span className="text-base cursor-help drop-shadow-[0_0_3px_rgba(255,255,255,0.2)]" title={moon.name}>{moon.emoji}</span>}
+                                        {zodiac && <span className="text-base cursor-help drop-shadow-[0_0_3px_rgba(255,255,255,0.2)]" title={zodiac.name}>{zodiac.emoji}</span>}
+                                        {chineseZodiac && <span className="text-base cursor-help drop-shadow-[0_0_3px_rgba(255,255,255,0.2)]" title={chineseZodiac.fullName}>{chineseZodiac.emoji}</span>}
+                                    </div>
+                                );
+                            })()}
                         </div>
                     )}
                 </div>
@@ -56,12 +63,35 @@ export const RosterTimeSection: React.FC<RosterTimeSectionProps> = ({
                             <div className="text-xl font-serif font-black text-amber-400 capitalize bg-stone-950 border border-stone-800 px-6 py-2 rounded-sm shadow-glass-dark mt-0">
                                 {currentDate}
                             </div>
-                            {moon && (
-                                <div className="mt-3 flex items-center gap-3 px-4 py-1.5 bg-stone-950 border border-stone-800 rounded shadow-glass-dark">
-                                    <span className="text-2xl drop-shadow-[0_0_5px_rgba(245,158,11,0.3)]">{moon.emoji}</span>
-                                    <span className="text-sm font-serif font-bold text-amber-500 uppercase tracking-[0.15em]">{moon.name}</span>
-                                </div>
-                            )}
+                            {(() => {
+                                const zodiac = getWesternZodiac(currentDate);
+                                const chineseZodiac = getChineseZodiac(currentDate);
+                                if (!moon && !zodiac && !chineseZodiac) return null;
+                                return (
+                                    <div className="mt-3 flex flex-wrap justify-center gap-3">
+                                        {moon && (
+                                            <div className="flex items-center gap-3 px-4 py-1.5 bg-stone-950 border border-stone-800 rounded shadow-glass-dark" title="Phase Lunaire">
+                                                <span className="text-2xl drop-shadow-[0_0_5px_rgba(245,158,11,0.3)]">{moon.emoji}</span>
+                                                <span className="text-sm font-serif font-bold text-amber-500 uppercase tracking-[0.15em]">{moon.name}</span>
+                                            </div>
+                                        )}
+                                        {zodiac && (
+                                            <div className="flex items-center gap-3 px-4 py-1.5 bg-stone-950 border border-stone-800 rounded shadow-glass-dark" title="Signe du Zodiaque">
+                                                <span className="text-2xl drop-shadow-[0_0_5px_rgba(245,158,11,0.3)]">{zodiac.emoji}</span>
+                                                <span className="text-sm font-serif font-bold text-stone-300 uppercase tracking-[0.15em]">{zodiac.name}</span>
+                                            </div>
+                                        )}
+                                        {chineseZodiac && (
+                                            <div className="flex items-center gap-3 px-4 py-1.5 bg-stone-950 border border-stone-800 rounded shadow-glass-dark" title="Zodiaque Chinois">
+                                                <span className="text-2xl drop-shadow-[0_0_5px_rgba(245,158,11,0.3)]">{chineseZodiac.emoji}</span>
+                                                <span className="text-sm font-serif font-bold text-stone-300 uppercase tracking-[0.15em]">
+                                                    {chineseZodiac.animal} <span className={chineseZodiac.elementColor}>({chineseZodiac.element})</span>
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()}
                         </div>
                     </div>
 
