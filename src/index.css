@@ -23,6 +23,8 @@
   /* Indigo 900 */
 
   /* Fonts */
+  --color-ink: #1e3a8a;
+  --font-handwriting: "Patrick Hand", cursive;
   --font-serif: "Cinzel", "Playfair Display", serif;
   --font-sans: "Inter", "Lato", sans-serif;
   --font-hand: "Patrick Hand", cursive;
@@ -92,11 +94,15 @@
 }
 
 .scrollbar-hide {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
 }
+
 .scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+  display: none;
+  /* Chrome, Safari */
 }
 
 :root {
@@ -155,16 +161,21 @@ body {
   /* Darker background outside sheet for contrast */
 }
 
-/* Handwriting Inputs */
-.sheet-input {
+.sheet-input,
+.font-handwriting {
   background: transparent;
-  width: 100%;
-  height: 100%;
   outline: none;
   color: var(--color-ink);
   /* Ink Color (Bleu nuit) */
   font-family: 'Patrick Hand', cursive;
-  font-size: 1.1em;
+  font-size: 1.3em;
+  /* Slightly increased from default */
+}
+
+/* Ensure font-handwriting doesn't conflict with sheet-input */
+.sheet-input {
+  width: 100%;
+  height: 100%;
 }
 
 .sheet-input:focus {
@@ -404,17 +415,69 @@ body {
   border-radius: 1px;
 }
 
-.react-grid-layout { transition: height 0.2s ease; }
-.react-grid-item.react-grid-placeholder { background: rgba(191, 174, 133, 0.1) !important; border: 2px dashed rgba(191, 174, 133, 0.4) !important; border-radius: 4px !important; opacity: 0.5 !important; z-index: 1 !important; }
-.react-grid-item { transition: all 0.2s ease; transition-property: left, top, width, height; }
-.react-grid-item.resizing { z-index: 1000; will-change: width, height; }
-.react-grid-item.react-draggable-dragging { z-index: 1000; will-change: left, top; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
-.react-resizable-handle { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-.edit-layout-mode .react-resizable-handle { opacity: 1; pointer-events: all; }
-.react-resizable-handle::after { border-right: 3px solid var(--color-gold) !important; border-bottom: 3px solid var(--color-gold) !important; }
-.skill-block-scroll { scrollbar-width: thin; scrollbar-color: rgba(191, 174, 133, 0.4) transparent; }
+.react-grid-layout {
+  transition: height 0.2s ease;
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: rgba(191, 174, 133, 0.1) !important;
+  border: 2px dashed rgba(191, 174, 133, 0.4) !important;
+  border-radius: 4px !important;
+  opacity: 0.5 !important;
+  z-index: 1 !important;
+}
+
+.react-grid-item {
+  transition: all 0.2s ease;
+  transition-property: left, top, width, height;
+}
+
+.react-grid-item.resizing {
+  z-index: 1000;
+  will-change: width, height;
+}
+
+.react-grid-item.react-draggable-dragging {
+  z-index: 1000;
+  will-change: left, top;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.react-resizable-handle {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.edit-layout-mode .react-resizable-handle {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.react-resizable-handle::after {
+  border-right: 3px solid var(--color-gold) !important;
+  border-bottom: 3px solid var(--color-gold) !important;
+}
+
+.skill-block-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(191, 174, 133, 0.4) transparent;
+}
+
 /* Block drag cursor on headers in locked mode */
-:not(.edit-layout-mode) .skill-block-header { cursor: default !important; }
-.skill-block-scroll::-webkit-scrollbar { width: 4px; }
-.skill-block-scroll::-webkit-scrollbar-track { background: transparent; }
-.skill-block-scroll::-webkit-scrollbar-thumb { background-color: rgba(191, 174, 133, 0.4); border-radius: 20px; }
+:not(.edit-layout-mode) .skill-block-header {
+  cursor: default !important;
+}
+
+.skill-block-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.skill-block-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.skill-block-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(191, 174, 133, 0.4);
+  border-radius: 20px;
+}

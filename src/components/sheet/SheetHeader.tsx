@@ -165,32 +165,39 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
             <div className="flex flex-col border-b-2 border-stone-800 text-xs">
                 {/* Row 1: Identity & Campaign Start */}
                 <div className="flex border-b border-stone-400 h-10 bg-white">
-                    <HeaderInput label="Nom" value={headerData.name} onChange={(v) => onUpdateHeader('name', v)} className="flex-grow-[1.5] border-r border-stone-300" />
-                    <HeaderInput label="Joueur" value={headerData.player} onChange={(v) => onUpdateHeader('player', v)} className="flex-grow border-r border-stone-300" />
-                    <HeaderInput label="Chronique" value={headerData.chronicle} onChange={(v) => onUpdateHeader('chronicle', v)} className="flex-grow border-r border-stone-300" />
-                    <HeaderInput label="Nature" value={headerData.nature} onChange={(v) => onUpdateHeader('nature', v)} className="flex-grow border-r border-stone-300" />
-                    <HeaderInput label="Conduite" value={headerData.conduct} onChange={(v) => onUpdateHeader('conduct', v)} className="flex-grow border-r border-stone-300" />
-                    <HeaderInput label="Statut" value={headerData.status} onChange={(v) => onUpdateHeader('status', v)} className="flex-grow border-r border-stone-300" />
+                    <HeaderInput label="Nom" value={headerData.name} onChange={(v) => onUpdateHeader('name', v)} className="flex-grow-[1.7] border-r border-stone-300" />
+                    <HeaderInput label="Joueur" value={headerData.player} onChange={(v) => onUpdateHeader('player', v)} className="flex-grow-[1.1] border-r border-stone-300" />
+                    <HeaderInput label="Nature" value={headerData.nature} onChange={(v) => onUpdateHeader('nature', v)} className="w-[12%] border-r border-stone-300" />
+                    <HeaderInput label="Conduite" value={headerData.conduct} onChange={(v) => onUpdateHeader('conduct', v)} className="w-[12%] border-r border-stone-300" />
+                    <HeaderInput
+                        label="Statut"
+                        value={headerData.status}
+                        onChange={(v) => onUpdateHeader('status', v)}
+                        className="flex-grow"
+                    />
                     <HeaderInput
                         label="Début"
                         value={headerData.campaignStartDate || ''}
                         onChange={(v) => onUpdateHeader('campaignStartDate', v)}
-                        className={`flex-grow ${isDateLocked ? 'bg-stone-50' : ''}`}
+                        className={`w-[180px] shrink-0 border-l border-stone-300 ${isDateLocked ? 'bg-stone-50' : ''}`}
+                        labelClassName="w-22 text-right mr-2"
                         readOnly={isDateLocked}
                         title={isDateLocked ? lockTitle : ""}
                     />
                 </div>
 
                 <div className="flex h-10 bg-white">
-                    <div className={`flex items-center px-2 py-0.5 h-full w-[8%] border-r border-stone-300 ${calculatedAge !== null ? 'bg-amber-50/30' : ''}`}>
-                        <span className="text-[10px] font-bold mr-1 whitespace-nowrap uppercase text-stone-500 tracking-wider shrink-0 leading-none">Age :</span>
-                        <input
-                            className={`sheet-input text-sm w-full min-w-0 ${calculatedAge !== null ? 'font-bold text-amber-800' : ''}`}
-                            value={headerData.age}
-                            onChange={(e) => calculatedAge === null && onUpdateHeader('age', e.target.value)}
-                            readOnly={calculatedAge !== null}
-                            title={calculatedAge !== null ? "Calculé automatiquement via Né(e) le et Date Fiction" : ""}
-                        />
+                    <div className={`flex flex-col justify-center px-2 h-full w-[8%] border-r border-stone-300 ${calculatedAge !== null ? 'bg-amber-50/30' : ''}`}>
+                        <div className="flex items-baseline w-full">
+                            <span className="text-[10px] font-bold mr-1 whitespace-nowrap uppercase text-stone-500 tracking-wider shrink-0">Age :</span>
+                            <input
+                                className={`sheet-input text-sm w-full min-w-0 ${calculatedAge !== null ? 'font-bold text-amber-800' : ''}`}
+                                value={headerData.age}
+                                onChange={(e) => calculatedAge === null && onUpdateHeader('age', e.target.value)}
+                                readOnly={calculatedAge !== null}
+                                title={calculatedAge !== null ? "Calculé automatiquement via Né(e) le et Date Fiction" : ""}
+                            />
+                        </div>
                     </div>
                     <HeaderInput label="Sexe" value={headerData.sex} onChange={(v) => onUpdateHeader('sex', v)} className="w-[8%] border-r border-stone-300" />
                     <HeaderInput
@@ -209,17 +216,18 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
                             </div>
                         )}
                     </HeaderInput>
+                    <HeaderInput label="Taille" value={headerData.height} onChange={(v) => onUpdateHeader('height', v)} className="w-[10%] border-r border-stone-300" />
+                    <HeaderInput label="Cheveux" value={headerData.hair} onChange={(v) => onUpdateHeader('hair', v)} className="flex-grow border-r border-stone-300" />
+                    <HeaderInput label="Yeux" value={headerData.eyes} onChange={(v) => onUpdateHeader('eyes', v)} className="flex-grow" />
                     <HeaderInput
                         label="Date Fiction"
                         value={headerData.fictionCurrentDate || ''}
                         onChange={(v) => onUpdateHeader('fictionCurrentDate', v)}
-                        className={`flex-grow border-r border-stone-300 ${isDateLocked ? 'bg-stone-50' : ''}`}
+                        className={`w-[180px] shrink-0 border-l border-stone-300 ${isDateLocked ? 'bg-stone-50' : ''}`}
+                        labelClassName="w-22 text-right mr-2"
                         readOnly={isDateLocked}
                         title={isDateLocked ? lockTitle : ""}
                     />
-                    <HeaderInput label="Taille" value={headerData.height} onChange={(v) => onUpdateHeader('height', v)} className="w-[10%] border-r border-stone-300" />
-                    <HeaderInput label="Cheveux" value={headerData.hair} onChange={(v) => onUpdateHeader('hair', v)} className="flex-grow border-r border-stone-300" />
-                    <HeaderInput label="Yeux" value={headerData.eyes} onChange={(v) => onUpdateHeader('eyes', v)} className="flex-grow" />
                 </div>
             </div>
         </>

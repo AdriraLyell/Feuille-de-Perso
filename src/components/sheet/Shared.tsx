@@ -12,20 +12,23 @@ export const HeaderInput: React.FC<{
   value: string;
   onChange: (val: string) => void;
   className?: string;
+  labelClassName?: string;
   readOnly?: boolean;
   title?: string;
   children?: React.ReactNode;
-}> = ({ label, value, onChange, className = '', readOnly, title, children }) => (
-  <div className={`flex items-center px-2 py-0.5 h-full relative ${className}`} title={title}>
-    <span className="text-[10px] font-bold mr-1 whitespace-nowrap uppercase text-stone-500 tracking-wider shrink-0 leading-none">{label} :</span>
-    <div className="flex-grow flex items-center relative h-full">
-      <input
-        className={`sheet-input text-sm w-full min-w-0 ${readOnly ? 'cursor-default focus:ring-0' : ''}`}
-        value={value}
-        onChange={(e) => !readOnly && onChange(e.target.value)}
-        readOnly={readOnly}
-      />
-      {children}
+}> = ({ label, value, onChange, className = '', labelClassName = '', readOnly, title, children }) => (
+  <div className={`flex flex-col justify-center px-2 h-full relative ${className}`} title={title}>
+    <div className="flex items-baseline w-full">
+      <span className={`text-[10px] font-bold mr-1 whitespace-nowrap uppercase text-stone-500 tracking-wider shrink-0 ${labelClassName}`}>{label} :</span>
+      <div className="flex-grow flex items-baseline relative">
+        <input
+          className={`sheet-input text-sm w-full min-w-0 ${readOnly ? 'cursor-default focus:ring-0' : ''}`}
+          value={value}
+          onChange={(e) => !readOnly && onChange(e.target.value)}
+          readOnly={readOnly}
+        />
+        {children}
+      </div>
     </div>
   </div>
 );

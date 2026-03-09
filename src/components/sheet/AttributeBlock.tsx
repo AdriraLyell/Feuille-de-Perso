@@ -43,7 +43,7 @@ const AttributeRow: React.FC<{
     }
 
     return (
-        <div 
+        <div
             className="flex items-center px-2 border-b border-dotted border-stone-300 h-[22px] text-xs hover:bg-stone-50 transition-colors relative"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -54,6 +54,7 @@ const AttributeRow: React.FC<{
                 {entry.name}
                 {entry.customNotes && <div className="w-1 h-1 rounded-full bg-amber-500/50" />}
             </span>
+
 
             {/* Note personnelle flottante */}
             {entry.customNotes && isHovered && (
@@ -68,7 +69,7 @@ const AttributeRow: React.FC<{
                     ref={ref1}
                     id={`attr-${category}-${entry.id}-val1`}
                     name={`attr-${category}-${entry.id}-val1`}
-                    className={`w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50 no-spinner ${!isCreationMode ? 'opacity-70 cursor-not-allowed border-stone-200' : ''}`}
+                    className={`w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm no-spinner ${!isCreationMode ? 'opacity-70 cursor-not-allowed' : ''}`}
                     value={entry.val1}
                     onChange={(e) => isCreationMode && onUpdate(category, entry.id, 'val1', e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, ref2)}
@@ -78,12 +79,13 @@ const AttributeRow: React.FC<{
                     inputMode="numeric"
                     disabled={!isCreationMode}
                 />
+
                 <span className="text-stone-400 font-handwriting">+</span>
                 <input
                     ref={ref2}
                     id={`attr-${category}-${entry.id}-val2`}
                     name={`attr-${category}-${entry.id}-val2`}
-                    className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50 no-spinner"
+                    className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm no-spinner"
                     value={entry.val2}
                     onChange={(e) => onUpdate(category, entry.id, 'val2', e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, ref3)}
@@ -92,12 +94,13 @@ const AttributeRow: React.FC<{
                     type="text"
                     inputMode="numeric"
                 />
+
                 <span className="text-stone-400 font-handwriting">+</span>
                 <input
                     ref={ref3}
                     id={`attr-${category}-${entry.id}-val3`}
                     name={`attr-${category}-${entry.id}-val3`}
-                    className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm hover:bg-white/50 no-spinner"
+                    className="w-6 h-5 text-center border-b border-stone-300 focus:border-blue-500 outline-none bg-transparent font-handwriting text-ink text-sm no-spinner"
                     value={entry.val3}
                     onChange={(e) => onUpdate(category, entry.id, 'val3', e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e)}
@@ -107,9 +110,9 @@ const AttributeRow: React.FC<{
                     inputMode="numeric"
                 />
 
-                <span className="text-stone-400 font-handwriting">=</span>
+                <span className="text-stone-400 font-handwriting ml-1">=</span>
                 <div
-                    className={`w-7 h-5 flex items-center justify-center font-bold rounded border shadow-sm ml-1 font-handwriting text-sm cursor-help transition-colors ${bonusValue > 0 ? 'bg-green-100 text-green-900 border-green-300' :
+                    className={`min-w-[28px] h-5 flex items-center justify-center font-bold rounded border shadow-sm ml-1 font-handwriting text-sm cursor-help transition-colors ${bonusValue > 0 ? 'bg-green-100 text-green-900 border-green-300' :
                         bonusValue < 0 ? 'bg-red-100 text-red-900 border-red-300' :
                             'bg-blue-50 text-blue-900 border-blue-100'
                         }`}
@@ -118,6 +121,8 @@ const AttributeRow: React.FC<{
                     {total}
                 </div>
             </div>
+
+
         </div>
     );
 };

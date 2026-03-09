@@ -1,5 +1,25 @@
 [
     {
+        "version": "2.97.38",
+        "date": "2026-03-01",
+        "type": "feat",
+        "changes": [
+            "Admin Traits : Ajout de 4 pills iconiques (Effets/Zap, Compteur/Activity, XP/TrendingUp, Variantes/Layers) pour filtrer par propriétés de trait en un clic.",
+            "Admin Traits : Ajout d'un sélecteur Audit avec 5 modes intelligents (À compléter, Mécaniques formules, Favoris, Jamais utilisés, Doublons potentiels).",
+            "Admin Traits : Bouton RESET unifié réinitialisant l'ensemble des filtres (chips, pills, audit).",
+            "Admin Traits : Réorganisation de la barre de filtres en 2 lignes (recherche+audit+tri / chips+pills) pour plus de clarté."
+        ]
+    },
+    {
+        "version": "2.97.37",
+        "date": "2026-03-01",
+        "type": "feat",
+        "changes": [
+            "UI : Les spécialisations imposées (⚡) affichent un bouton de promotion au survol dans l'onglet Spécialisations.",
+            "Logic : Une spécialisation imposée peut être transformée en compétence secondaire (valeur 0) sans être supprimée — elle reste pilotée par les règles MJ."
+        ]
+    },
+    {
         "version": "2.97.36",
         "date": "2026-03-01",
         "type": "fix",
@@ -724,17 +744,5 @@
         "date": "2026-02-23",
         "type": "fix",
         "description": "Registre : Suppression du sélecteur de format portrait/paysage pour revenir à l'affichage standard (Attributs en lignes, Compétences en lignes) tout en conservant l'accordéon et le nouvel alignement des traits."
-    },
-    {
-        "version": "2.75.3",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Amélioration du Roster : Ajout d'un accordéon pour masquer les attributs, d'un commutateur de format (Paysage/Portrait) pour basculer l'orientation des matrices, et alignement structuré des avantages et désavantages dans les cartes de personnages."
-    },
-    {
-        "version": "2.75.2",
-        "date": "2026-02-23",
-        "type": "fix",
-        "description": "Ergonomie : Déplacement du sélecteur de Thème (icône palette) vers la section des contrôles de vue (à côté du switch Portrait/Paysage) et suppression de son label textuel pour plus de cohérence visuelle."
     }
 ]
