@@ -1,9 +1,9 @@
-```
 import React, { useState } from 'react';
 import { Book, Users, PenTool } from 'lucide-react';
 import PartyTable from './campaign/PartyTable';
 import { ColumnarEditor } from './campaign/book/ColumnarEditor';
 import { useCharacterState, useCharacterActions } from '../context/CharacterContext';
+import { BookSyncService } from '../services/BookSyncService';
 
 const CampaignNotes: React.FC = () => {
     const { data } = useCharacterState();
@@ -64,7 +64,7 @@ const CampaignNotes: React.FC = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as 'journal' | 'party')}
-                                className={`group flex items - center gap - 3 transition - all ${ activeTab === tab.id ? 'text-stone-100' : 'text-stone-500 hover:text-stone-300' } `}
+                                className={`group flex items - center gap - 3 transition - all ${activeTab === tab.id ? 'text-stone-100' : 'text-stone-500 hover:text-stone-300'} `}
                             >
                                 <tab.icon size={20} className={activeTab === tab.id ? 'text-amber-500' : ''} />
                                 <span className={`text - sm font - bold uppercase tracking - widest font - serif leading - none hidden sm: inline`}>{tab.label}</span>

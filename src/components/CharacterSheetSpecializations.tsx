@@ -1,5 +1,5 @@
 
-import { useCharacter } from '../context/CharacterContext';
+import { useCharacterState, useCharacterActions } from '../context/CharacterContext';
 import { CharacterSheetData, DotEntry, SuggestionEntry } from '../types';
 import SpecializationOmnibar from './specialization-library/SpecializationOmnibar';
 import SpecializationLibraryDrawer from './specialization-library/SpecializationLibraryDrawer';
@@ -21,7 +21,7 @@ const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
     </div>
 );
 
-const CharacterSheetSpecializations: React.FC = () => {
+const CharacterSheetSpecializations: React.FC<Props> = ({ isLandscape = false }) => {
     const { data, resolvedData } = useCharacterState();
     const { updateData: onChange, addLog: onAddLog } = useCharacterActions();
     const { rules } = useRules();

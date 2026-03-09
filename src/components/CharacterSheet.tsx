@@ -11,7 +11,7 @@ import ExperienceSummary from './sheet/ExperienceSummary';
 import CharacterSheetGrid from './sheet/CharacterSheetGrid';
 
 // Hooks
-import { useCharacterData, useCharacterActions, useCharacterState, useResolvedData } from '../context/CharacterContext';
+import { useCharacterActions, useCharacterState, useResolvedData } from '../context/CharacterContext';
 import { useCharacterSheetActions } from '../hooks/useCharacterSheetActions';
 import { useCharacterBonuses } from '../hooks/useCharacterBonuses';
 import { useSheetLayout } from '../hooks/useSheetLayout';
@@ -28,7 +28,7 @@ interface Props {
 }
 
 const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode, onToggleCreationMode }) => {
-    const data = useCharacterData();
+    const { data } = useCharacterState();
     const resolvedData = useResolvedData();
 
     const dataRef = React.useRef(data);

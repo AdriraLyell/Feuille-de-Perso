@@ -3,7 +3,7 @@ import ThematicModal from '../../ui/ThematicModal';
 import ThematicButton from '../../ui/ThematicButton';
 import { TraitEntry } from '../../../types';
 import { Save, X, Edit, Sparkles, RotateCcw } from 'lucide-react';
-import { useCharacter } from '../../../context/CharacterContext';
+import { useCharacterState, useCharacterActions } from '../../../context/CharacterContext';
 import { useRules } from '../../../context/RulesContext';
 import { normalizeString } from '../../../utils/stringUtils';
 

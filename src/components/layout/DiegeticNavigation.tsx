@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Settings, FileText, Save, Printer, History, HelpCircle, ScrollText, Download, RectangleVertical, RectangleHorizontal, Palette, UploadCloud, Info, Menu, X, AlertTriangle, MessageSquare, Layout, PencilLine, RotateCcw, Maximize2 } from 'lucide-react';
-import { useCharacter } from '../../context/CharacterContext';
+import { useCharacterState } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';
 import { useStorageUsage } from '../../hooks/useStorageUsage';
 
@@ -43,8 +43,8 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     onShowLogs, showLogs, onShowUserGuide, onShowChangelog, onOpenAppearance, onOpenSync, syncStatus, appVersion,
     onShowCampaignInfo, autoSaveCountdown,
     isMessagingOpen, onToggleMessaging, unreadMessagesCount,
-    isEditMode: propsIsEditMode, onToggleEditMode, isEditLayoutMode, onToggleEditLayoutMode,
-    onResetLayout, onAutoFitLayout
+    isEditMode, onToggleEditMode, isEditLayoutMode, onToggleEditLayoutMode,
+    onResetLayout, onAutoFitLayout, safetyTimeRemaining
 }) => {
     const { data, isSyncing } = useCharacterState();
     const { rules } = useRules();

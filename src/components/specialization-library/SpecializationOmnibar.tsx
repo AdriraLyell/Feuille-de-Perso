@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Award, ArrowUpCircle, Zap, Globe } from 'lucide-react';
-import { useCharacterData } from '../../context/CharacterContext';
+import { useCharacterState } from '../../context/CharacterContext';
 import { useRules } from '../../context/RulesContext';
 import ConfirmationModal from '../ui/ConfirmationModal';
 import { LibrarySpecializationEntry } from '../../types';
@@ -35,7 +35,7 @@ const SpecializationOmnibar: React.FC<SpecializationOmnibarProps> = ({
     showPlaceholder = true,
     isDuplicate = false
 }) => {
-    const data = useCharacterData();
+    const { data } = useCharacterState();
     const { rules } = useRules();
     const [isOpen, setIsOpen] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState(-1);

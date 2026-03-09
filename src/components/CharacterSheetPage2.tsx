@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { CharacterSheetData, TraitEntry, LibraryEntry, DotEntry } from '../types';
-import { useCharacter } from '../context/CharacterContext';
+import { useCharacterState, useCharacterActions } from '../context/CharacterContext';
 import { useRules } from '../context/RulesContext';
 
 // Icons

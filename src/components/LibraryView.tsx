@@ -3,7 +3,7 @@ import { CharacterSheetData } from '../types';
 import { BookOpen, GraduationCap, Award } from 'lucide-react';
 import TraitLibrary from './TraitLibrary';
 import SpecializationLibraryView from './specialization-library/SpecializationLibraryView';
-import { useCharacter } from '../context/CharacterContext';
+import { useCharacterState, useCharacterActions } from '../context/CharacterContext';
 import { useNotification } from '../context/NotificationContext';
 import { useRules } from '../context/RulesContext';
 

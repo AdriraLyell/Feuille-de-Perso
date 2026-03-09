@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import ThematicButton from './ui/ThematicButton';
 import ThematicModal from './ui/ThematicModal';
-import { useCharacter } from '../context/CharacterContext';
+import { useCharacterState, useCharacterActions } from '../context/CharacterContext';
 
 
 // Import sub-components

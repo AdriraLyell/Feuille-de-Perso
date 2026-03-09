@@ -21,7 +21,8 @@ const COLORS = [
 ];
 
 export const PostItBoard: React.FC<PostItBoardProps> = ({ currentTab }) => {
-    const { data, updateData } = useCharacter();
+    const { data } = useCharacterState();
+    const { updateData } = useCharacterActions();
     const postIts = data.postIts || [];
     const activePostIts = postIts.filter((p: PostItData) => p.tabId === currentTab);
 

@@ -3,12 +3,12 @@ import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useCharacterBonuses } from '../hooks/useCharacterBonuses';
 import { TraitEntry, LibraryEntry } from '../types';
-import { useCharacter } from '../context/CharacterContext';
+import { useCharacterState } from '../context/CharacterContext';
 import { useRules } from '../context/RulesContext';
 
 // Mocking Contexts
 vi.mock('../context/CharacterContext', () => ({
-    useCharacter: vi.fn(),
+    useCharacterState: vi.fn(),
 }));
 
 vi.mock('../context/RulesContext', () => ({
@@ -35,7 +35,7 @@ const MOCK_RULES = {
 describe('useCharacterBonuses Hook', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        (useCharacter as any).mockReturnValue({ data: MOCK_CHARACTER_DATA });
+        (useCharacterState as any).mockReturnValue({ data: MOCK_CHARACTER_DATA });
         (useRules as any).mockReturnValue({ rules: MOCK_RULES });
     });
 

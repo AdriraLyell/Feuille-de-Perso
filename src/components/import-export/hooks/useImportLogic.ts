@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CharacterSheetData } from '../../../types';
 import { useNotification } from '../../../context/NotificationContext';
-import { useCharacter } from '../../../context/CharacterContext';
+import { useCharacterActions } from '../../../context/CharacterContext';
 import { APP_VERSION } from '../../../constants/app';
 import { createTemplateFromData, detectConflicts, smartMerge, DataConflict } from '../../../utils/importExportUtils';
 
@@ -26,10 +26,12 @@ interface UseImportLogicProps {
     onClose: () => void;
 }
 
-export const useImportLogic = (
-    onClose: () => void,
-    onImportSuccess?: (data: CharacterSheetData) => void
-) => {
+export const useImportLogic = ({
+    data,
+    variant,
+    onClose,
+    onImportSuccess
+}: UseImportLogicProps) => {
     const { importData } = useCharacterActions();
     const addLog = useNotification();
 

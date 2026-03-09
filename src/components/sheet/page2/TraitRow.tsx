@@ -3,7 +3,7 @@ import { TraitEntry } from '../../../types';
 import { Edit, Trash2, Wand2, Sparkles, ArrowUp, ArrowDown, Shield } from 'lucide-react';
 import { BONUS_MJ_TRAIT_ID } from '../../../types/rules';
 import { PortalTooltip } from '../../ui/PortalTooltip';
-import { useCharacterData } from '../../../context/CharacterContext';
+import { useCharacterState } from '../../../context/CharacterContext';
 import { useRules } from '../../../context/RulesContext';
 import { getMysticCapacity } from '../../../utils/mysticUtils';
 
@@ -16,7 +16,7 @@ interface TraitRowProps {
 }
 
 const TraitRow: React.FC<TraitRowProps> = ({ item, type, onClick, onRemove, onManageMystic }) => {
-    const character = useCharacterData();
+    const { data: character } = useCharacterState();
     const { rules } = useRules();
     const anchorRef = useRef<HTMLDivElement>(null);
     const [showTooltip, setShowTooltip] = useState(false);

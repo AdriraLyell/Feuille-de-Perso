@@ -1,6 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 
-import { useCharacter } from '../../context/CharacterContext';
+import { useCharacterState, useCharacterActions } from '../../context/CharacterContext';
 import { NotificationProvider } from '../../context/NotificationContext';
 import { CharacterSheetData, PrintSelection } from '../../types';
 import { APP_VERSION } from '../../constants/app';
@@ -70,12 +70,17 @@ const MessagingWidgetPlayer: React.FC<{
 
 const MainLayout: React.FC = () => {
     const {
-        data, resolvedData, isSyncing, isEditMode, editLayoutMode
+        data, isSyncing, isEditMode, editLayoutMode
     } = useCharacterState();
     const {
-        updateData, addLog, recordXPTransaction, sync, resetData, importData,
+        updateData, addLog, sync, importData,
         setEditMode, setEditLayoutMode, clearLayout, autoFitLayout
     } = useCharacterActions();
+
+    // Alias for compatibility with existing hooks
+    const setData = updateData;
+    const setIsEditMode = setEditMode;
+
     const { rules, updateRules, isOnlineMode, reloadRules, isLoading: isRulesLoading } = useRules();
 
     // Sheet Modes Hooks
@@ -91,7 +96,7 @@ const MainLayout: React.FC = () => {
         handleToggleCreationMode,
         executeCreationActivation,
         setShowCreationWarning
-    } = useCreationMode(data, (newData: CharacterSheetData) => setData(newData), addLog, () => handleSwitchMode('sheet'));
+    } = useCreationMode(data, (newData: CharacterSheetData) => updateData(newData), addLog, () => handleSwitchMode('sheet'));
 
     // Custom Hooks
     const [isLandscape, setIsLandscape] = useState(() => {

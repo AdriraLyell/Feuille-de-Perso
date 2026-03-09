@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { CharacterSheetData } from '../types';
 import { Download, Upload, Save } from 'lucide-react';
-import { useCharacter } from '../context/CharacterContext';
+import { useCharacterState } from '../context/CharacterContext';
 import ThematicModal from './ui/ThematicModal';
 import { APP_VERSION } from '../constants/app';
 import ExportPanel from './import-export/ExportPanel';
@@ -16,7 +16,13 @@ interface ImportExportModalProps {
     variant: 'player' | 'gm';
 }
 
-export const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose, onImportSuccess }) => {
+export const ImportExportModal: React.FC<ImportExportModalProps> = ({
+    isOpen,
+    onClose,
+    onExportSuccess,
+    onImportSuccess,
+    variant
+}) => {
     const { data } = useCharacterState();
     const [activeTab, setActiveTab] = useState<'export' | 'import'>('export');
 

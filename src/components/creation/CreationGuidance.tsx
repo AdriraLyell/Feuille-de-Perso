@@ -1,4 +1,3 @@
-```
 import React, { useState } from 'react';
 import { Sparkles, X } from 'lucide-react';
 import { useCharacterState } from '../../context/CharacterContext';

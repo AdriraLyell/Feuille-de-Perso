@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useCharacter } from '../context/CharacterContext';
 import { useRules } from '../context/RulesContext';
 import { XPEntry } from '../types';
 import { Plus, Trash2, Calendar, FileText, TrendingUp, User, MessageSquare } from 'lucide-react';

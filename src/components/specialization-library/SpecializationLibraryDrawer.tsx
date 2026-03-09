@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { X, Search, Award, Info, GripVertical } from 'lucide-react';
-import { useCharacterData } from '../../context/CharacterContext';
+import { useCharacterState } from '../../context/CharacterContext';
 import { LibrarySpecializationEntry } from '../../types';
 import { smartIncludes } from '../../utils/stringUtils';
 
@@ -16,7 +16,7 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
     onClose,
     onSelect
 }) => {
-    const data = useCharacterData();
+    const { data } = useCharacterState();
     const [searchTerm, setSearchTerm] = useState('');
 
     const library = data.specializationLibrary || [];
@@ -68,7 +68,7 @@ const SpecializationLibraryDrawer: React.FC<SpecializationLibraryDrawerProps> = 
             </div>
 
             {/* List */}
-            <ul 
+            <ul
                 className="flex-grow overflow-y-auto p-2 custom-scrollbar space-y-2"
             >
                 {filteredLibrary.length === 0 ? (

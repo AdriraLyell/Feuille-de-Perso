@@ -1,5 +1,5 @@
 import React from 'react';
-import { useCharacter } from '../context/CharacterContext';
+import { useCharacterState, useCharacterActions } from '../context/CharacterContext';
 import { useCharacterSheetActions } from '../hooks/useCharacterSheetActions';
 import { useRules } from '../context/RulesContext';
 import { WeaponTable, ArmorTable } from './sheet/CombatSection';
