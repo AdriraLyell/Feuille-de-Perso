@@ -599,8 +599,9 @@ const MainLayout: React.FC = () => {
                                         <div className="pointer-events-auto flex gap-4 bg-white/95 backdrop-blur-md p-2 rounded-full shadow-2xl border border-gray-200 flex-wrap justify-center items-center">
                                             {/* Primary Tabs */}
                                             <div className="flex gap-2">
-                                                <button onClick={() => setSheetTab('p1')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'p1' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Layers size={16} /> Personnage</button>
+                                                <button data-postit-target="p1" onClick={() => setSheetTab('p1')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'p1' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Layers size={16} /> Personnage</button>
                                                 <button
+                                                    data-postit-target="p2"
                                                     onClick={() => setSheetTab('p2')}
                                                     className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition
                                                         ${sheetTab === 'p2'
@@ -613,10 +614,10 @@ const MainLayout: React.FC = () => {
                                                     <FileType size={16} />
                                                     Détails
                                                 </button>
-                                                <button onClick={() => setSheetTab('inventaire')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'inventaire' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Package size={16} /> Inventaire</button>
-                                                <button onClick={() => setSheetTab('specs')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'specs' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><List size={16} /> Spécialités</button>
-                                                <button onClick={() => setSheetTab('xp')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'xp' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><TrendingUp size={16} /> Gestion XP</button>
-                                                <button onClick={() => setSheetTab('notes')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'notes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Book size={16} /> Journal</button>
+                                                <button data-postit-target="inventaire" onClick={() => setSheetTab('inventaire')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'inventaire' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Package size={16} /> Inventaire</button>
+                                                <button data-postit-target="specs" onClick={() => setSheetTab('specs')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'specs' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><List size={16} /> Spécialités</button>
+                                                <button data-postit-target="xp" onClick={() => setSheetTab('xp')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'xp' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><TrendingUp size={16} /> Gestion XP</button>
+                                                <button data-postit-target="notes" onClick={() => setSheetTab('notes')} className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition ${sheetTab === 'notes' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`}><Book size={16} /> Journal</button>
                                             </div>
                                         </div>
                                     </nav>

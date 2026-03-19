@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { useCharacterState, useCharacterActions } from '../../context/CharacterContext';
 import { PostItData, CharacterSheetData } from '../../types';
-import { StickyNote, X, Plus } from 'lucide-react';
+import { StickyNote, X, Plus, SendToBack } from 'lucide-react';
 // import { v4 as uuidv4 } from 'uuid'; replaced by crypto.randomUUID()
 
 interface PostItBoardProps {
     currentTab: string;
 }
+
+const TABS = [
+    { id: 'p1', label: 'Personnage' },
+    { id: 'p2', label: 'Détails' },
+    { id: 'inventaire', label: 'Inventaire' },
+    { id: 'specs', label: 'Spécialités' },
+    { id: 'xp', label: 'Gestion XP' },
+    { id: 'notes', label: 'Journal' }
+];
 
 const COLORS = [
     { name: 'Jaune', value: '#FEF08A' },
@@ -125,6 +134,7 @@ export const PostItBoard: React.FC<PostItBoardProps> = ({ currentTab }) => {
                         data={postIt}
                         onUpdate={(updates) => handleUpdate(postIt.id, updates)}
                         onDelete={() => handleDelete(postIt.id)}
+                        currentTab={currentTab}
                     />
                 ))}
             </div>
@@ -136,34 +146,107 @@ interface PostItNoteProps {
     data: PostItData;
     onUpdate: (updates: Partial<PostItData>) => void;
     onDelete: () => void;
+    currentTab: string;
 }
 
-const PostItNote: React.FC<PostItNoteProps> = ({ data, onUpdate, onDelete }) => {
+const PostItNote: React.FC<PostItNoteProps> = ({ data, onUpdate, onDelete, currentTab }) => {
+    const [showMoveMenu, setShowMoveMenu] = useState(false);
+    const [hoveredTabId, setHoveredTabId] = useState<string | null>(null);
+    
     // Stable random seed for rotation based on ID
     const rotation = React.useMemo(() => {
         const hash = data.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
         return (hash % 6) - 3; // -3 to 3 degrees
     }, [data.id]);
 
+    const findTabUnderPoint = (x: number, y: number) => {
+        if (x === undefined || y === undefined) return null;
+        const elementsUnder = document.elementsFromPoint(x, y);
+        for (const el of elementsUnder) {
+            const tabBtn = el.closest('[data-postit-target]');
+            if (tabBtn) {
+                return tabBtn.getAttribute('data-postit-target');
+            }
+        }
+        return null;
+    };
+
+    const handleDrag = (e: any, info: PanInfo) => {
+        const target = findTabUnderPoint(info.point.x, info.point.y);
+        if (target !== hoveredTabId) {
+            // Visual feedback on the tab button itself (direct DOM to avoid full re-render)
+            // Remove previous glow
+            if (hoveredTabId) {
+                const prevBtn = document.querySelector(`[data-postit-target="${hoveredTabId}"]`);
+                if (prevBtn) prevBtn.classList.remove('ring-4', 'ring-blue-400', 'ring-opacity-70', 'scale-110');
+            }
+            
+            // Add new glow
+            if (target && target !== currentTab) {
+                const nextBtn = document.querySelector(`[data-postit-target="${target}"]`);
+                if (nextBtn) nextBtn.classList.add('ring-4', 'ring-blue-400', 'ring-opacity-70', 'scale-110');
+            }
+            
+            setHoveredTabId(target === currentTab ? null : target);
+        }
+    };
+
+    const handleDragEnd = (e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+        // Clear highlights
+        if (hoveredTabId) {
+            const btn = document.querySelector(`[data-postit-target="${hoveredTabId}"]`);
+            if (btn) btn.classList.remove('ring-4', 'ring-blue-400', 'ring-opacity-70', 'scale-110');
+        }
+        
+        const finalTarget = findTabUnderPoint(info.point.x, info.point.y);
+        setHoveredTabId(null);
+
+        if (finalTarget && finalTarget !== currentTab) {
+            onUpdate({ 
+                tabId: finalTarget, 
+                x: 150 + Math.random() * 100, 
+                y: 150 + Math.random() * 100 
+            });
+        } else {
+            // Just update position
+            onUpdate({ x: data.x + info.offset.x, y: data.y + info.offset.y });
+        }
+    };
+
+    const hoveredTabLabel = hoveredTabId ? TABS.find(t => t.id === hoveredTabId)?.label : null;
+
     return (
         <motion.div
             drag
             dragMomentum={false}
-            onDragEnd={(e, info) => {
-                onUpdate({ x: data.x + info.offset.x, y: data.y + info.offset.y });
-            }}
+            onDrag={handleDrag}
+            onDragEnd={handleDragEnd}
             initial={{ x: data.x, y: data.y, opacity: 0, scale: 0.8, rotate: rotation }}
-            animate={{ x: data.x, y: data.y, opacity: 1, scale: 1, rotate: rotation }}
+            animate={{ 
+                x: data.x, 
+                y: data.y, 
+                opacity: hoveredTabId ? 0.6 : 1, 
+                scale: hoveredTabId ? 0.9 : 1,
+                rotate: hoveredTabId ? 0 : rotation 
+            }}
             exit={{ opacity: 0, scale: 0.8 }}
             style={{
                 backgroundColor: data.color,
                 position: 'absolute',
                 width: 'max-content',
-                zIndex: 45
+                zIndex: hoveredTabId ? 100 : (showMoveMenu ? 50 : 45)
             }}
-            className="pointer-events-auto shadow-[2px_2px_10px_rgba(0,0,0,0.15)] border border-black/5 rounded-sm flex flex-col group transition-shadow hover:shadow-xl"
+            className={`pointer-events-auto shadow-[2px_2px_10px_rgba(0,0,0,0.15)] border rounded-sm flex flex-col group transition-shadow hover:shadow-xl ${hoveredTabId ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-50' : 'border-black/5'}`}
         >
-            <div className="h-6 w-full cursor-grab active:cursor-grabbing flex justify-between items-center px-1 bg-black/5">
+            {/* Visual indicator for tab change */}
+            {hoveredTabId && (
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg whitespace-nowrap animate-bounce flex items-center gap-1">
+                    <SendToBack size={10} />
+                    Vers : {hoveredTabLabel}
+                </div>
+            )}
+
+            <div className="h-6 w-full cursor-grab active:cursor-grabbing flex justify-between items-center px-1 bg-black/5 relative">
                 <div className="flex gap-1 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {COLORS.map(c => (
                         <button
@@ -175,14 +258,52 @@ const PostItNote: React.FC<PostItNoteProps> = ({ data, onUpdate, onDelete }) => 
                         />
                     ))}
                 </div>
-                <button
-                    onClick={onDelete}
-                    className="text-black/40 hover:text-red-600 hover:bg-red-100 rounded p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Supprimer"
-                >
-                    <X size={14} />
-                </button>
+                
+                <div className="flex gap-1">
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowMoveMenu(!showMoveMenu)}
+                            className="text-black/40 hover:text-blue-700 hover:bg-blue-100 rounded p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Déplacer vers..."
+                        >
+                            <SendToBack size={14} />
+                        </button>
+                        
+                        {showMoveMenu && (
+                            <div className="absolute right-0 top-full mt-1 bg-white shadow-xl rounded-md border border-gray-200 py-1 min-w-32 z-50">
+                                <div className="text-[10px] font-bold text-gray-400 px-3 py-1 uppercase border-b border-gray-100 mb-1">
+                                    Déplacer vers...
+                                </div>
+                                {TABS.filter(t => t.id !== currentTab).map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => {
+                                            onUpdate({ tabId: tab.id, x: 150 + Math.random() * 100, y: 150 + Math.random() * 100 });
+                                            setShowMoveMenu(false);
+                                        }}
+                                        className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <button
+                        onClick={onDelete}
+                        className="text-black/40 hover:text-red-600 hover:bg-red-100 rounded p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Supprimer"
+                    >
+                        <X size={14} />
+                    </button>
+                </div>
             </div>
+            
+            {showMoveMenu && (
+                <div className="absolute inset-0 z-40" onClick={() => setShowMoveMenu(false)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') setShowMoveMenu(false); }} aria-label="Close menu" />
+            )}
+
             <textarea
                 value={data.text}
                 onChange={(e) => onUpdate({ text: e.target.value })}
