@@ -1,5 +1,26 @@
 [
     {
+        "version": "2.110.0",
+        "date": "2026-03-19",
+        "type": "feat",
+        "changes": [
+            "UI/Post-it : Nouveau système de déplacement des Post-its entre les onglets de la fiche.",
+            "UI/Post-it : Glisser-déposer interactif sur les onglets de navigation avec halo lumineux et agrandissement de l'onglet cible.",
+            "UI/Post-it : Retour visuel dynamique pendant le drag (badge de destination, transparence, redressement).",
+            "UI/Post-it : Menu de transfert rapide ajouté dans l'en-tête de chaque Post-it pour une meilleure accessibilité mobile."
+        ]
+    },
+    {
+        "version": "2.109.0",
+        "date": "2026-03-19",
+        "type": "refactor",
+        "changes": [
+            "System : Migration complète vers une architecture de hooks granulaires pour les bibliothèques d'administration (Admin Library).",
+            "Fix : Correction de l'invisibilité des Post-its legacy (Louise) en ajoutant des valeurs par défaut automatiques pour les champs manquants (tabId, dimensions).",
+            "Logic : Suppression du hook global monolithique au profit de sous-hooks spécialisés (Skills, Traits, etc.)."
+        ]
+    },
+    {
         "version": "2.108.4",
         "date": "2026-03-09",
         "type": "fix",
@@ -165,27 +186,6 @@
             "Messaging : Inversion de l'ordre de récupération des messages (plus récents en premier) pour une meilleure expérience utilisateur.",
             "Logic : Support du mode 'migration' dans le calcul du budget de création et les actions de la fiche.",
             "Schema : Mise à jour des schémas Zod pour supporter les métadonnées de synchronisation et de migration."
-        ]
-    },
-    {
-        "version": "2.99.1",
-        "date": "2026-03-06",
-        "type": "feat",
-        "changes": [
-            "UI : Alignement à gauche des noms d'avantages et désavantages pour une meilleure lisibilité.",
-            "UI : Alignement vertical parfait des noms de traits via la réservation d'un espace fixe pour les icônes (XP, Bonus MJ, etc.)."
-        ]
-    },
-    {
-        "version": "2.98.1",
-        "date": "2026-03-05",
-        "type": "fix",
-        "changes": [
-            "UI : Correction de l''Auto-Fit en mode paysage (exclusion automatique du pavé des compteurs du budget de hauteur).",
-            "UI : Alignement parfait des colonnes courtes (Talents, Connaissances) sur le bas de la page via une extension dynamique.",
-            "System : Fix critique de la persistence du layout (activeLayout désormais préservé au refresh F5 via le schéma Zod).",
-            "UI : Masquage visuel des barres de défilement (scrollbar-hide) tout en conservant la navigation fluide.",
-            "Refactor : Nettoyage des imports inutilisés et renforcement du typage TypeScript dans les gestionnaires de layout."
         ]
     }
 ]
