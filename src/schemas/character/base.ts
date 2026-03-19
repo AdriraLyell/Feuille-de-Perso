@@ -152,10 +152,10 @@ export const ImposedSpecializationSchema = z.object({
 export const PostItDataSchema = z.object({
     id: z.string(),
     text: z.string(),
-    color: z.string(),
+    color: z.string().optional().default('#FEF08A'),
     x: z.number(),
     y: z.number(),
-    width: z.number(),
-    height: z.number(),
-    tabId: z.string()
+    width: z.number().optional().default(250),
+    height: z.number().optional().default(250),
+    tabId: z.string().optional().default('p1')
 });
