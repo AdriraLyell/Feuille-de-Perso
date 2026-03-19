@@ -15,7 +15,7 @@ interface RulesContextType {
     updateRules: (newRules: RulesData) => void;
 }
 
-const RulesContext = createContext<RulesContextType | undefined>(undefined);
+export const RulesContext = createContext<RulesContextType | undefined>(undefined);
 
 export const useRules = () => {
     const context = useContext(RulesContext);

@@ -1,13 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { RulesData } from '../../../types/rules';
-import { LibrarySkillEntry } from '../../../types/system';
 import { Search, Plus, Sparkles, Save, AlertOctagon, CheckCircle2, Circle, Globe, Filter, X } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import TriStateChip from '../../../components/ui/TriStateChip';
 import { useItemUsageDetails } from '../../../hooks/admin/useItemUsageDetails';
-import { smartIncludes } from '../../../utils/stringUtils';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 import { MysticLibraryItem } from './mystic/MysticLibraryItem';
+import { useAdminMysticLibrary } from '../../../hooks/admin/useAdminMysticLibrary';
 
 interface AdminMysticLibraryProps {
     rules: RulesData;
@@ -16,150 +15,41 @@ interface AdminMysticLibraryProps {
 }
 
 const AdminMysticLibrary: React.FC<AdminMysticLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
-    const list = rules.libraries.mysticAbilities || [];
-    const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'mystic');
+    const {
+        list,
+        searchTerm, setSearchTerm,
+        isModalOpen, setIsModalOpen,
+        editingItem, setEditingItem,
+        error,
+        showDeleteConfirm, setShowDeleteConfirm,
+        filteredList,
+        handleOpenNew,
+        handleOpenEdit,
+        handleDelete,
+        confirmDelete,
+        handleSave,
+        handleBulkSelect,
+        toggleActive
+    } = useAdminMysticLibrary(rules, onUpdate, globalUsage);
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<LibrarySkillEntry | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'mystic');
 
     const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
     const [sourceFilter, setSourceFilter] = useState<boolean | null>(null);
 
-    const filteredList = useMemo(() => {
-        return list
-            .filter(b => {
-                const matchesSearch = smartIncludes(b.name, searchTerm) || (b.description && smartIncludes(b.description, searchTerm));
-                if (!matchesSearch) return false;
-
+    const filteredAndStatusList = React.useMemo(() => {
+        return filteredList.filter(b => {
                 if (activeFilter !== null) {
                     const isActive = b.isActive !== false;
                     if (activeFilter !== isActive) return false;
                 }
-
                 if (sourceFilter !== null) {
                     const isGlobal = b.isGlobal === true;
                     if (sourceFilter !== isGlobal) return false;
                 }
-
                 return true;
-            })
-            .sort((a, b) => a.name.localeCompare(b.name));
-    }, [list, searchTerm, activeFilter, sourceFilter]);
-
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
-
-    const handleOpenNew = () => {
-        setError(null);
-        setEditingItem({
-            id: crypto.randomUUID(),
-            name: '',
-            description: '',
-            isActive: true,
-            isGlobal: true
-        });
-        setIsModalOpen(true);
-    };
-
-    const handleOpenEdit = (item: LibrarySkillEntry) => {
-        setError(null);
-        setEditingItem({ ...item });
-        setIsModalOpen(true);
-    };
-
-    const handleDelete = (id: string) => {
-        setShowDeleteConfirm(id);
-    };
-
-    const confirmDelete = () => {
-        if (!showDeleteConfirm) return;
-        onUpdate({
-            ...rules,
-            libraries: { ...rules.libraries, mysticAbilities: list.filter(b => b.id !== showDeleteConfirm) }
-        });
-        setShowDeleteConfirm(null);
-    };
-
-    const handleSave = () => {
-        if (!editingItem) return;
-        const itemName = editingItem.name.trim();
-
-        if (!itemName) { setError("Le nom est requis."); return; }
-
-        const duplicate = list.find(b => b.id !== editingItem.id && b.name.trim().toLowerCase() === itemName.toLowerCase());
-        if (duplicate) { setError("Une habilité portant ce nom existe déjà."); return; }
-
-        const updatedAbility = {
-            ...editingItem,
-            name: itemName,
-            defaultCategory: editingItem.defaultCategory || undefined
-        };
-
-        const newList = list.some(b => b.id === editingItem.id)
-            ? list.map(b => b.id === editingItem.id ? updatedAbility : b)
-            : [...list, updatedAbility];
-
-        newList.sort((a, b) => a.name.localeCompare(b.name));
-
-        // SYNC LOGIC: Auto-Manage associated Trait
-        const currentTraits = rules.libraries.traits || [];
-        // Find if a trait is already linked or matches name
-        const targetTraitIndex = currentTraits.findIndex(t =>
-            t.mysticAbilityId === editingItem.id ||
-            (!t.mysticAbilityId && t.name.toLowerCase() === itemName.toLowerCase())
-        );
-
-        const newTraits = [...currentTraits];
-        const traitBaseData = {
-            name: itemName,
-            type: 'avantage' as const,
-            isVariableCost: true,
-            cost: "1",
-            pointsLabel: "1-5",
-            description: editingItem.description || "Habilité mystique",
-            mysticAbilityId: editingItem.id, // Ensure link
-            isActive: editingItem.isActive,
-            isGlobal: editingItem.isGlobal,
-            tags: ['Mystique']
-        };
-
-        if (targetTraitIndex >= 0) {
-            // Update existing
-            newTraits[targetTraitIndex] = {
-                ...newTraits[targetTraitIndex],
-                ...traitBaseData
-            };
-        } else {
-            // Create new
-            newTraits.push({
-                id: crypto.randomUUID(),
-                ...traitBaseData
             });
-        }
-
-        onUpdate({
-            ...rules,
-            libraries: {
-                ...rules.libraries,
-                mysticAbilities: newList,
-                traits: newTraits
-            }
-        });
-        setIsModalOpen(false);
-        setEditingItem(null);
-    };
-
-    const handleBulkSelect = (active: boolean) => {
-        const visibleIds = new Set(filteredList.map(item => item.id));
-        const newList = list.map(item =>
-            visibleIds.has(item.id) ? { ...item, isActive: active } : item
-        );
-        onUpdate({
-            ...rules,
-            libraries: { ...rules.libraries, mysticAbilities: newList }
-        });
-    };
+    }, [filteredList, activeFilter, sourceFilter]);
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-120px)] flex flex-col">
@@ -240,14 +130,14 @@ const AdminMysticLibrary: React.FC<AdminMysticLibraryProps> = ({ rules, onUpdate
                         className="text-xs font-bold text-amber-600 hover:text-amber-800 flex items-center gap-1.5 transition-colors"
                     >
                         <CheckCircle2 size={14} />
-                        Tout activer {searchTerm ? `(${filteredList.length})` : ''}
+                        Tout activer {searchTerm ? `(${filteredAndStatusList.length})` : ''}
                     </button>
                     <button
                         onClick={() => handleBulkSelect(false)}
                         className="text-xs font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1.5 transition-colors"
                     >
                         <Circle size={14} />
-                        Tout désactiver {searchTerm ? `(${filteredList.length})` : ''}
+                        Tout désactiver {searchTerm ? `(${filteredAndStatusList.length})` : ''}
                     </button>
                 </div>
             )}
@@ -255,11 +145,11 @@ const AdminMysticLibrary: React.FC<AdminMysticLibraryProps> = ({ rules, onUpdate
             <div className="flex-grow overflow-y-auto bg-slate-50 border border-slate-200 rounded p-4 custom-scrollbar">
                 {list.length === 0 ? (
                     <div className="text-center text-slate-400 py-20 italic">Bibliothèque vide.</div>
-                ) : filteredList.length === 0 ? (
+                ) : filteredAndStatusList.length === 0 ? (
                     <div className="text-center text-slate-400 py-10 italic">Aucun résultat.</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                        {filteredList.map(item => {
+                        {filteredAndStatusList.map(item => {
                             const isLocked = !!globalUsage[item.id];
 
                             return (
@@ -267,10 +157,7 @@ const AdminMysticLibrary: React.FC<AdminMysticLibraryProps> = ({ rules, onUpdate
                                     key={item.id}
                                     item={item}
                                     isLocked={isLocked}
-                                    onToggleActive={(id: string, current: boolean) => {
-                                        const newList = list.map(b => b.id === id ? { ...b, isActive: !current } : b);
-                                        onUpdate({ ...rules, libraries: { ...rules.libraries, mysticAbilities: newList } });
-                                    }}
+                                    onToggleActive={(id: string, current: boolean) => toggleActive(id, current)}
                                     handleOpenEdit={handleOpenEdit}
                                     handleDelete={handleDelete}
                                     rules={rules}

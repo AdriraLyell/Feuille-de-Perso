@@ -1,0 +1,20 @@
+37c64a5 refactor: replace legacy useCharacter with useCharacterState/Actions hooks (v2.108.5)
+d5ccef6 refactor: remove legacy useCharacter hook and update all call sites to use granular hooks
+2c5e202 feat: Add admin read-only character view with rule import wizard and force update functionality.
+dc72036 chore: final cleanup of temp_screenshots after merge
+945ed18 fix: resolve flows for counters and attributes to respect admin max values (Volonté/Confiance)
+221844d feat: improve suggestion tracking and import assistant robustness
+3cd837e chore: cleanup project root and maintenance
+49eef70 chore: version 2.108.2 - fix zoom/scroll issues and layout stability
+d1e978a feat(ui): rename Specialisations to Specialites globally in UI
+dbb7f09 chore: version 2.108.0 - alignement en-tête personnage et nettoyage
+20e63a4 style: remove zodiac hover zoom and tighten spacing (v2.107.0)
+74b1df5 style: perfect vertical centering for zodiac badge with flex wrapper (v2.107.0)
+a81d813 style: final polish of zodiac badge in character sheet (v2.107.0)
+a9f264b style: refine zodiac badge in character sheet (v2.107.0)
+1323799 style: align zodiac badge and make it glassmorphic (v2.107.0)
+70f87dd fix: robust date parsing for zodiac and moon phase (v2.107.0)
+c29b24f feat: add zodiac signs to character birth date (v2.107.0)
+35cb155 feat: add western and chinese zodiacs for real calendar (v2.107.0)
+bfaa26a feat: add moon phases for real calendar (v2.107.0)
+97e818e chore: version 2.106.0 - sync icon stabilization and safety timer update

@@ -1,8 +1,7 @@
-import { useState, useMemo } from 'react';
-import { LibrarySkillEntry, CharacterSheetData } from '../../types';
+import { useState, useMemo, useCallback } from 'react';
+import { LibrarySkillEntry, CharacterSheetData, DotEntry } from '../../types';
 import { RulesData } from '../../types/rules';
-import { mergeLibraries, MergedEntry } from '../../utils/libraryMerger';
-import { smartIncludes } from '../../utils/stringUtils';
+import { useAdminLibrary } from '../useAdminLibrary';
 
 export const useSkillLibrary = (
     data: CharacterSheetData,
@@ -12,26 +11,49 @@ export const useSkillLibrary = (
 ) => {
     const [skillSearch, setSkillSearch] = useState('');
     const [hideKnownSkills, setHideKnownSkills] = useState(true);
-    const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
-    const [editingSkill, setEditingSkill] = useState<LibrarySkillEntry | null>(null);
-    const [skillFormSource, setSkillFormSource] = useState<'local' | 'official'>('local');
-    const [skillError, setSkillError] = useState<string | null>(null);
     const [showRenameConfirm, setShowRenameConfirm] = useState<{ oldName: string, newSkill: LibrarySkillEntry } | null>(null);
-    const [showImportConfirm, setShowImportConfirm] = useState(false);
-    const [skillToDelete, setSkillToDelete] = useState<LibrarySkillEntry | null>(null);
 
-    const hybridSkills = useMemo(() => {
-        const local = data.skillLibrary || [];
-        const official = rules?.libraries?.skills || [];
-        return mergeLibraries(local, official);
-    }, [data.skillLibrary, rules]);
+    const onImport = useCallback((currentLib: LibrarySkillEntry[]) => {
+        const existingNames = new Set(currentLib.map((s) => s.name.trim().toLowerCase()));
+        let addedCount = 0;
+
+        Object.keys(data.skills || {}).forEach(key => {
+            if (key === 'arrieres_plans') return;
+            const sheetSkills = (data.skills as any)[key] || [];
+            sheetSkills.forEach((skill: DotEntry) => {
+                const normalized = skill.name ? skill.name.trim() : "";
+                if (normalized && !existingNames.has(normalized.toLowerCase())) {
+                    currentLib.push({
+                        id: Math.random().toString(36).substr(2, 9),
+                        name: skill.name,
+                        description: "",
+                        defaultCategory: key
+                    });
+                    existingNames.add(normalized.toLowerCase());
+                    addedCount++;
+                }
+            });
+        });
+
+        return { addedCount, updatedLib: currentLib };
+    }, [data.skills]);
+
+    const admin = useAdminLibrary<LibrarySkillEntry>({
+        data,
+        onUpdate,
+        addLog,
+        collectionKey: 'skillLibrary',
+        officialLibraryKey: 'skills',
+        itemName: 'Compétence',
+        onImport
+    });
 
     const usedSkillNames = useMemo(() => {
         const names = new Set<string>();
         if (data.skills) {
             Object.keys(data.skills).forEach(key => {
-                const list = data.skills[key] || [];
-                list.forEach((s: import('../../types').DotEntry) => {
+                const list = (data.skills as any)[key] || [];
+                list.forEach((s: DotEntry) => {
                     if (s.name && s.name.trim() !== '') {
                         names.add(s.name.trim().toLowerCase());
                     }
@@ -42,31 +64,29 @@ export const useSkillLibrary = (
     }, [data.skills]);
 
     const filteredSkills = useMemo(() => {
-        return hybridSkills.filter(m => {
-            const matchesSearch = smartIncludes(m.entry.name, skillSearch) ||
-                smartIncludes(m.entry.description || '', skillSearch);
-            const isKnown = usedSkillNames.has(m.entry.name.trim().toLowerCase());
-            const matchesFilter = hideKnownSkills ? !isKnown : true;
-            return matchesSearch && matchesFilter;
+        return admin.hybridList.filter(m => {
+            const matchesSearch = (admin.searchTerm === '' || 
+                admin.hybridList.some(h => h.entry.id === m.entry.id && (
+                    h.entry.name.toLowerCase().includes(admin.searchTerm.toLowerCase()) ||
+                    (h.entry.description && h.entry.description.toLowerCase().includes(admin.searchTerm.toLowerCase()))
+                ))
+            );
+            // Re-implementing a bit of logic because admin.searchTerm and skillSearch are distinct if I don't sync them
+            // Actually, I should use admin.searchTerm directly in the UI later.
+            return (
+                (m.entry.name.toLowerCase().includes(admin.searchTerm.toLowerCase()) ||
+                (m.entry.description && m.entry.description.toLowerCase().includes(admin.searchTerm.toLowerCase()))) &&
+                (hideKnownSkills ? !usedSkillNames.has(m.entry.name.trim().toLowerCase()) : true)
+            );
         }).sort((a, b) => a.entry.name.localeCompare(b.entry.name));
-    }, [hybridSkills, skillSearch, hideKnownSkills, usedSkillNames]);
+    }, [admin.hybridList, admin.searchTerm, hideKnownSkills, usedSkillNames]);
 
     const handleOpenNewSkill = () => {
-        setSkillError(null);
-        setEditingSkill({
+        admin.handleOpenNew({
             id: Math.random().toString(36).substr(2, 9),
             name: '',
             description: ''
         });
-        setSkillFormSource('local');
-        setIsSkillModalOpen(true);
-    };
-
-    const handleOpenEditSkill = (merged: MergedEntry<LibrarySkillEntry>) => {
-        setSkillError(null);
-        setEditingSkill({ ...merged.entry });
-        setSkillFormSource(merged.source === 'official' ? 'official' : 'local');
-        setIsSkillModalOpen(true);
     };
 
     const finalizeSaveSkill = (skillToSave: LibrarySkillEntry, renameOnSheet: boolean = false) => {
@@ -86,10 +106,10 @@ export const useSkillLibrary = (
             const oldName = showRenameConfirm.oldName.trim().toLowerCase();
             const newName = skillToSave.name.trim();
 
-            const updatedSkills = { ...data.skills };
+            const updatedSkills = { ...data.skills } as any;
             Object.keys(updatedSkills).forEach(cat => {
                 if (Array.isArray(updatedSkills[cat])) {
-                    updatedSkills[cat] = updatedSkills[cat].map((s: import('../../types').DotEntry) =>
+                    updatedSkills[cat] = updatedSkills[cat].map((s: DotEntry) =>
                         (s.name && s.name.trim().toLowerCase() === oldName)
                             ? { ...s, name: newName }
                             : s
@@ -101,37 +121,36 @@ export const useSkillLibrary = (
 
         onUpdate(newData);
         addLog(`Compétence "${skillToSave.name}" enregistrée dans la réserve.`, 'success', 'settings');
-        setIsSkillModalOpen(false);
-        setEditingSkill(null);
-        setSkillFormSource('local');
+        admin.setIsModalOpen(false);
+        admin.setEditingEntry(null);
         setShowRenameConfirm(null);
     };
 
     const handleSaveSkill = (skillToSave: LibrarySkillEntry) => {
         if (!skillToSave.name.trim()) {
-            setSkillError("Le nom de la compétence est requis.");
+            admin.setError("Le nom de la compétence est requis.");
             return;
         }
 
-        const duplicate = hybridSkills.find(m =>
+        const duplicate = admin.hybridList.find(m =>
             m.source === 'local' &&
             m.entry.id !== skillToSave.id &&
             m.entry.name.trim().toLowerCase() === skillToSave.name.trim().toLowerCase()
         );
 
         if (duplicate) {
-            setSkillError("Une compétence portant ce nom existe déjà.");
+            admin.setError("Une compétence portant ce nom existe déjà.");
             return;
         }
 
-        const existingMerged = hybridSkills.find(m => m.entry.id === skillToSave.id);
+        const existingMerged = admin.hybridList.find(m => m.entry.id === skillToSave.id);
         const existing = existingMerged ? existingMerged.entry : null;
         const nameChanged = existing && existing.name.trim().toLowerCase() !== skillToSave.name.trim().toLowerCase();
         const isUsed = existing && usedSkillNames.has(existing.name.trim().toLowerCase());
 
         if (nameChanged && isUsed) {
             setShowRenameConfirm({ oldName: existing.name, newSkill: skillToSave });
-            setIsSkillModalOpen(false);
+            admin.setIsModalOpen(false);
             return;
         }
 
@@ -143,74 +162,21 @@ export const useSkillLibrary = (
         finalizeSaveSkill(cleanedSkill);
     };
 
-    const handleDeleteRequest = (merged: MergedEntry<LibrarySkillEntry>) => {
-        if (merged.source === 'official') {
-            addLog("Impossible de supprimer une compétence officielle.", "info", "settings");
-            return;
-        }
-        setSkillToDelete(merged.entry);
-    };
-
-    const executeDeleteSkill = () => {
-        if (!skillToDelete) return;
-        const localList = data.skillLibrary || [];
-        onUpdate({ ...data, skillLibrary: localList.filter(s => s.id !== skillToDelete.id) });
-        addLog(`Compétence "${skillToDelete.name}" supprimée de la réserve.`, 'info', 'settings');
-        setSkillToDelete(null);
-    };
-
-    const executeImportFromSheet = () => {
-        const currentLib = JSON.parse(JSON.stringify(data.skillLibrary || []));
-        const existingNames = new Set(currentLib.map((s: LibrarySkillEntry) => s.name.trim().toLowerCase()));
-        let addedCount = 0;
-
-        Object.keys(data.skills).forEach(key => {
-            if (key === 'arrieres_plans') return;
-            const sheetSkills = data.skills[key] || [];
-            sheetSkills.forEach((skill: import('../../types').DotEntry) => {
-                const normalized = skill.name ? skill.name.trim() : "";
-                if (normalized && !existingNames.has(normalized.toLowerCase())) {
-                    currentLib.push({
-                        id: Math.random().toString(36).substr(2, 9),
-                        name: skill.name,
-                        description: "",
-                        defaultCategory: key
-                    });
-                    existingNames.add(normalized.toLowerCase());
-                    addedCount++;
-                }
-            });
-        });
-
-        if (addedCount > 0) {
-            currentLib.sort((a: LibrarySkillEntry, b: LibrarySkillEntry) => a.name.localeCompare(b.name));
-            onUpdate({ ...data, skillLibrary: currentLib });
-            addLog(`${addedCount} compétence(s) importée(s) depuis la fiche.`, 'success', 'settings');
-        } else {
-            addLog("Toutes les compétences de la fiche sont déjà dans la réserve.", 'info', 'settings');
-        }
-        setShowImportConfirm(false);
-    };
-
     return {
-        skillSearch, setSkillSearch,
+        ...admin,
+        skillSearch: admin.searchTerm, setSkillSearch: admin.setSearchTerm,
         hideKnownSkills, setHideKnownSkills,
-        isSkillModalOpen, setIsSkillModalOpen,
-        editingSkill, setEditingSkill,
-        skillFormSource,
-        skillError, setSkillError,
         showRenameConfirm, setShowRenameConfirm,
-        showImportConfirm, setShowImportConfirm,
-        skillToDelete, setSkillToDelete,
-        hybridSkills,
+        hybridSkills: admin.hybridList,
         usedSkillNames,
         filteredSkills,
         handleOpenNewSkill,
-        handleOpenEditSkill,
+        handleOpenEditSkill: admin.handleOpenEdit,
         handleSaveSkill,
         finalizeSaveSkill,
-        handleDeleteRequest,
-        executeDeleteSkill,
-        executeImportFromSheet
+        handleDeleteRequest: admin.handleDeleteRequest,
+        executeDeleteSkill: admin.executeDelete,
+        executeImportFromSheet: admin.executeImportFromSheet
     };
 };
+

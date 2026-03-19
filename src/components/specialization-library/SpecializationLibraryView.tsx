@@ -109,7 +109,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {filteredLibrary.map(merged => {
+                        {filteredLibrary.map((merged: any) => {
                             const entry = merged.entry;
                             const isUsed = usedSpecializations.has(entry.name.trim().toLowerCase());
                             const isOfficial = merged.source === 'official';
@@ -161,7 +161,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                                         )}
                                         <div className="flex flex-wrap gap-1 mt-1">
                                             {entry.skillIds.map((sid: string) => {
-                                                const s = allSkills.find(sk => sk.id === sid);
+                                                const s = allSkills.find((sk: any) => sk.id === sid);
                                                 return (
                                                     <span key={sid} className="text-[9px] bg-stone-100/50 text-[#5c4d41] px-1.5 py-0.5 rounded-sm border border-[#bfae85]/20">
                                                         {s ? s.name : sid}
@@ -187,7 +187,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
                     onClose={() => setIsModalOpen(false)}
                     editingEntry={editingEntry}
                     setEditingEntry={setEditingEntry}
-                    handleSave={handleSave}
+                    handleSave={() => handleSave(editingEntry!)}
                     allSkills={allSkills}
                     skillSearch={skillSearch}
                     setSkillSearch={setSkillSearch}
@@ -220,7 +220,7 @@ const SpecializationLibraryView: React.FC<SpecializationLibraryViewProps> = ({ d
             <ConfirmationModal
                 isOpen={showOfficialUpdateConfirm}
                 onClose={() => setShowOfficialUpdateConfirm(false)}
-                onConfirm={executeOfficialUpdate}
+                onConfirm={() => executeOfficialUpdate('./data/specializations.json')}
                 title="Mise à jour officielle"
                 message="Voulez-vous vérifier et télécharger les dernières spécialités officielles ?"
                 confirmLabel="Mettre à jour"

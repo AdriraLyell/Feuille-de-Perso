@@ -12,7 +12,10 @@ import CharacterSheetGrid from './sheet/CharacterSheetGrid';
 
 // Hooks
 import { useCharacterActions, useCharacterState, useResolvedData } from '../context/CharacterContext';
-import { useCharacterSheetActions } from '../hooks/useCharacterSheetActions';
+import { useHeaderActions } from '../hooks/character-actions/useHeaderActions';
+import { useSkillActions } from '../hooks/character-actions/useSkillActions';
+import { useAttributeActions } from '../hooks/character-actions/useAttributeActions';
+import { useCounterActions } from '../hooks/character-actions/useCounterActions';
 import { useCharacterBonuses } from '../hooks/useCharacterBonuses';
 import { useSheetLayout } from '../hooks/useSheetLayout';
 import { useRules } from '../context/RulesContext';
@@ -69,14 +72,10 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
 
     // Logic removed because it's now in MainLayout
 
-    const {
-        updateHeader,
-        updateDot,
-        handleDropItem,
-        handleRemoveItem,
-        updateAttribute,
-        updateCounter
-    } = useCharacterSheetActions(data, onChange, onAddLog, recordXPTransaction, rules);
+    const { updateHeader } = useHeaderActions(onChange, onAddLog);
+    const { updateDot, handleDropItem, handleRemoveItem } = useSkillActions(onChange, onAddLog, recordXPTransaction, rules);
+    const { updateAttribute } = useAttributeActions(data, onChange, onAddLog, recordXPTransaction);
+    const { updateCounter } = useCounterActions(onChange, onAddLog, recordXPTransaction, rules);
 
     const {
         handleDefineVariant,
@@ -90,7 +89,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
         landscapeLayout
     } = useSheetLayout(resolvedData, rules);
 
-    // --- CharacterSheet Logic handlers (now managed by useCharacterSheetActions) ---
+    // --- UI Logic handlers ---
 
     const cardValue = calculateCardValue(data, rules);
     const creationActive = data.creationConfig?.active;

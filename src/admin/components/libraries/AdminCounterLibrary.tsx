@@ -1,12 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { RulesData } from '../../../types/rules';
-import { LibraryCounterEntry } from '../../../types/system';
 import { Search, Plus, Save, AlertOctagon, Gauge, CheckCircle2, Circle, X, Calculator } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import { useItemUsageDetails } from '../../../hooks/admin/useItemUsageDetails';
-import { smartIncludes } from '../../../utils/stringUtils';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 import { CounterLibraryItem } from './counter/CounterLibraryItem';
+import { useAdminCounterLibrary } from '../../../hooks/admin/useAdminCounterLibrary';
 
 interface AdminCounterLibraryProps {
     rules: RulesData;
@@ -15,167 +14,25 @@ interface AdminCounterLibraryProps {
 }
 
 const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
-    const list = rules.libraries.counters;
+    const {
+        list,
+        searchTerm, setSearchTerm,
+        isModalOpen, setIsModalOpen,
+        editingItem, setEditingItem,
+        error,
+        showDeleteConfirm, setShowDeleteConfirm,
+        placedNames,
+        filteredList,
+        handleOpenNew,
+        handleOpenEdit,
+        handleDelete,
+        confirmDelete,
+        handleSave,
+        handleBulkSelect,
+        toggleActive
+    } = useAdminCounterLibrary(rules, onUpdate, globalUsage);
+
     const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'counter');
-
-    const [searchTerm, setSearchTerm] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<LibraryCounterEntry | null>(null);
-    const [error, setError] = useState<string | null>(null);
-
-    const filteredList = useMemo(() => {
-        return list
-            .filter(c => smartIncludes(c.name, searchTerm) || (c.description && smartIncludes(c.description, searchTerm)))
-            .sort((a, b) => a.name.localeCompare(b.name));
-    }, [list, searchTerm]);
-
-    const placedNames = useMemo(() => {
-        const names = new Set<string>();
-        const counterCat = rules.definitions.skillCategories?.find(c => c.behavior === 'Compteur')?.id || 'Col_Comp_9';
-        const placed = rules.definitions.skills?.[counterCat] || [];
-        placed.forEach(name => {
-            if (name.trim()) names.add(name.trim().toLowerCase());
-        });
-        return names;
-    }, [rules.definitions]);
-
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
-
-    // STATIC UUIDS for system counters to satisfy DB constraints while keeping IDs stable
-    const VOLONTE_UUID = 'c0000000-0000-0000-0000-000000000001';
-    const CONFIANCE_UUID = 'c0000000-0000-0000-0000-000000000002';
-
-
-    const handleOpenNew = () => {
-        setError(null);
-        setEditingItem({
-            id: crypto.randomUUID(),
-            name: '',
-            description: '',
-            maxValue: 10,
-            defaultValue: 0,
-            xpCost: 0,
-            isGlobal: false
-        });
-        setIsModalOpen(true);
-    };
-
-    const handleOpenEdit = (item: LibraryCounterEntry) => {
-        setError(null);
-        setEditingItem({ ...item });
-        setIsModalOpen(true);
-    };
-
-    const handleDelete = (id: string) => {
-        setShowDeleteConfirm(id);
-    };
-
-    const confirmDelete = () => {
-        if (!showDeleteConfirm) return;
-
-        const counterToDelete = list.find(c => c.id === showDeleteConfirm);
-        const newDefinitionsCounters = { ...(rules.definitions.counters || {}) };
-
-        if (counterToDelete) {
-            const key = counterToDelete.id === VOLONTE_UUID ? 'volonte' : (counterToDelete.id === CONFIANCE_UUID ? 'confiance' : counterToDelete.id || counterToDelete.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, ''));
-            delete newDefinitionsCounters[key];
-        }
-
-        onUpdate({
-            ...rules,
-            definitions: {
-                ...rules.definitions,
-                counters: newDefinitionsCounters
-            },
-            libraries: { ...rules.libraries, counters: list.filter(c => c.id !== showDeleteConfirm) }
-        });
-        setShowDeleteConfirm(null);
-    };
-
-    const handleSave = () => {
-        if (!editingItem) return;
-        if (!editingItem.name.trim()) { setError("Le nom est requis."); return; }
-
-        const duplicate = list.find(c => c.id !== editingItem.id && c.name.trim().toLowerCase() === editingItem.name.trim().toLowerCase());
-        if (duplicate) { setError("Un compteur portant ce nom existe déjà."); return; }
-
-        const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-        const normName = normalize(editingItem.name);
-
-        let finalId = editingItem.id;
-        if (normName === 'volonte') finalId = VOLONTE_UUID;
-        else if (normName === 'confiance') finalId = CONFIANCE_UUID;
-
-        const safeItem = {
-            ...editingItem,
-            id: finalId,
-            maxValue: Number(editingItem.maxValue) || 10,
-            defaultValue: Number(editingItem.defaultValue) || 0,
-            xpCost: Number(editingItem.xpCost) || 0,
-            appearance: (editingItem.appearance === 'squares_only' ? 'squares_only' : null) as 'squares_only' | null
-        };
-
-        const newList = list.some(c => c.id === safeItem.id)
-            ? list.map(c => c.id === safeItem.id ? safeItem : c)
-            : [...list, safeItem];
-
-        // Sort
-        newList.sort((a, b) => a.name.localeCompare(b.name));
-
-        // Update definitions as well so it's ready to be saved correctly to the DB
-        const newDefinitionsCounters = { ...(rules.definitions.counters || {}) };
-
-        // key format as in campaignReconciler.ts (using stable UUIDs for system keys)
-        const key = safeItem.id === VOLONTE_UUID ? 'volonte' : (safeItem.id === CONFIANCE_UUID ? 'confiance' : (safeItem.id || safeItem.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '')));
-
-        newDefinitionsCounters[key] = {
-            id: safeItem.id,
-            name: safeItem.name,
-            description: safeItem.description || newDefinitionsCounters[key]?.description || '',
-            max: safeItem.formulaId ? 0 : (safeItem.maxValue ?? 10), // Will be calculated if formulaId is present
-            value: safeItem.defaultValue ?? newDefinitionsCounters[key]?.value,
-            defaultValue: safeItem.defaultValue ?? newDefinitionsCounters[key]?.defaultValue,
-            xpCost: safeItem.xpCost ?? newDefinitionsCounters[key]?.xpCost ?? 0,
-            appearance: safeItem.appearance === 'squares_only' ? 'squares_only' : undefined,
-            formulaId: safeItem.formulaId
-        };
-
-        onUpdate({
-            ...rules,
-            definitions: {
-                ...rules.definitions,
-                counters: newDefinitionsCounters
-            },
-            libraries: { ...rules.libraries, counters: newList }
-        });
-        setIsModalOpen(false);
-        setEditingItem(null);
-    };
-
-    const handleBulkSelect = (active: boolean) => {
-        const visibleIds = new Set(filteredList.map(item => item.id));
-        const newList = list.map(item => {
-            if (!visibleIds.has(item.id)) return item;
-
-            if (!active) {
-                const isPlaced = placedNames.has(item.name.trim().toLowerCase());
-                const isGloballyUsed = !!globalUsage[item.id];
-                const isUsedByTrait = false; // Obsolète : Les compteurs de traits sont instanciés à la volée sur la fiche.
-
-                if (isPlaced || isGloballyUsed || isUsedByTrait) return item; // Cannot deactivate
-            }
-
-            return { ...item, isActive: active };
-        });
-
-        // No need to update definitions.counters here since it's just isActive flag, 
-        // the list remains the same, but wait! Are deactivated counters removed from the definitions map? No, definitions map just stores metadata, active list comes from libraries in the end.
-
-        onUpdate({
-            ...rules,
-            libraries: { ...rules.libraries, counters: newList }
-        });
-    };
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-120px)] flex flex-col">
@@ -246,10 +103,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                         {filteredList.map(item => {
                             const isPlaced = placedNames.has(item.name.trim().toLowerCase());
                             const isGloballyUsed = !!globalUsage[item.id];
-
-                            // Check if any active trait uses this counter
-                            const isUsedByTrait = false; // Obsolète : Les compteurs de traits sont instanciés à la volée sur la fiche et n'utilisent plus la bibliothèque Admin.
-
+                            const isUsedByTrait = false;
                             const isLocked = isPlaced || isGloballyUsed || isUsedByTrait;
 
                             return (
@@ -258,12 +112,7 @@ const AdminCounterLibrary: React.FC<AdminCounterLibraryProps> = ({ rules, onUpda
                                     item={item}
                                     isPlaced={isPlaced}
                                     isLocked={isLocked}
-                                    onToggleActive={(id: string, current: boolean) => {
-                                        // Prevents disabling globally locking trait or local locking trait effect from here, maybe show a toast instead
-                                        if (current && isLocked) return;
-                                        const newList = list.map(c => c.id === id ? { ...c, isActive: !current } : c);
-                                        onUpdate({ ...rules, libraries: { ...rules.libraries, counters: newList } });
-                                    }}
+                                    onToggleActive={(id: string, current: boolean) => toggleActive(id, current)}
                                     handleOpenEdit={handleOpenEdit}
                                     handleDelete={handleDelete}
                                     rules={rules}

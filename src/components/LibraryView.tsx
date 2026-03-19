@@ -41,15 +41,16 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
     const {
         skillSearch, setSkillSearch,
         hideKnownSkills, setHideKnownSkills,
-        isSkillModalOpen, setIsSkillModalOpen,
-        editingSkill, setEditingSkill,
-        skillError,
+        isModalOpen: isSkillModalOpen, setIsModalOpen: setIsSkillModalOpen,
+        editingEntry: editForm, // Renamed from editingSkill
+        setEditingEntry: setEditForm, // Renamed from setEditingSkill
+        error: skillError,
         showRenameConfirm, setShowRenameConfirm,
         showImportConfirm, setShowImportConfirm,
-        skillToDelete, setSkillToDelete,
-        hybridSkills,
+        entryToDelete: skillToDelete, setEntryToDelete: setSkillToDelete,
+        hybridList: hybridSkills,
         usedSkillNames,
-        filteredSkills,
+        filteredLibrary: filteredSkills,
         handleOpenNewSkill,
         handleOpenEditSkill,
         handleSaveSkill,
@@ -57,7 +58,6 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
         handleDeleteRequest,
         executeDeleteSkill,
         executeImportFromSheet,
-        skillFormSource
     } = useSkillLibrary(data, rules, onUpdate, addLog);
 
     // OFFICIAL: Use local state for visibility for now (could be moved to hook too if shared)
@@ -175,15 +175,15 @@ const LibraryView: React.FC<LibraryViewProps> = ({ data: propData, onUpdate: pro
                 />
             )}
 
-            {isSkillModalOpen && editingSkill && (
+            {isSkillModalOpen && editForm && (
                 <LibrarySkillForm
                     isOpen={isSkillModalOpen}
-                    isOfficial={skillFormSource === 'official'}
+                    isOfficial={hybridSkills.find(m => m.entry.id === editForm.id)?.source === 'official'}
                     onClose={() => setIsSkillModalOpen(false)}
-                    title={!isEditable ? 'Détails Compétence' : data.skillLibrary?.some(s => s.id === editingSkill.id) ? 'Éditer Compétence' : 'Nouvelle Compétence (Copie)'}
-                    skill={editingSkill}
-                    onSkillChange={setEditingSkill}
-                    onSave={() => handleSaveSkill(editingSkill)} // Passing editingSkill here
+                    title={!isEditable ? 'Détails Compétence' : data.skillLibrary?.some(s => s.id === editForm.id) ? 'Éditer Compétence' : 'Nouvelle Compétence (Copie)'}
+                    skill={editForm}
+                    onSkillChange={setEditForm}
+                    onSave={() => handleSaveSkill(editForm)} // Passing editForm here
                     error={skillError}
                     categories={availableCategories.length > 0 ? availableCategories : undefined}
                     isEditable={isEditable}

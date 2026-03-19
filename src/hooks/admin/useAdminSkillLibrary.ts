@@ -1,39 +1,44 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { RulesData } from '../../types/rules';
 import { LibrarySkillEntry } from '../../types';
 import { smartIncludes } from '../../utils/stringUtils';
 import { disambiguateCategories } from '../../utils/categoryUtils';
 import { CATEGORY_HELP } from '../../constants/app';
 import { publishFileToGitHub } from '../../services/githubService';
+import { useAdminLibrary } from '../useAdminLibrary';
+import { useNotification } from '../../context/NotificationContext';
 
-/**
- * Hook to manage the state and logic for AdminSkillLibrary.
- * Extracts CRUD, filtering, and publishing logic from the component.
- */
 export const useAdminSkillLibrary = (
     rules: RulesData,
     onUpdate: (newRules: RulesData) => void,
     _globalUsage: Record<string, number> = {},
     mode: 'global' | 'override' = 'global'
 ) => {
-    const list = rules.libraries?.skills || [];
+    const addLog = useNotification();
+    
+    const admin = useAdminLibrary<LibrarySkillEntry, RulesData>({
+        data: rules,
+        onUpdate,
+        addLog,
+        collectionKey: 'libraries.skills',
+        officialLibraryKey: 'skills',
+        itemName: 'Compétence',
+        disableMerge: true
+    });
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingSkill, setEditingSkill] = useState<LibrarySkillEntry | null>(null);
+    const list = admin.hybridList.map(m => m.entry);
+
     const [variantDraft, setVariantDraft] = useState('');
-    const [error, setError] = useState<string | null>(null);
     const [showCategoryHelp, setShowCategoryHelp] = useState(false);
 
-    // Advanced Filters
+    // Filters
     const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
     const [sourceFilter, setSourceFilter] = useState<boolean | null>(null);
-    const [typeFilter, setTypeFilter] = useState<boolean | null>(null);
+    const [typeFilter, setTypeFilter] = useState<boolean | null>(null); // isVariable
     const [usageFilter, setUsageFilter] = useState<boolean | null>(null);
     const [mysticFilter, setMysticFilter] = useState<boolean | null>(null);
 
     const [showPublishConfirm, setShowPublishConfirm] = useState(false);
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
     const [publishResult, setPublishResult] = useState<{ success: boolean; message: string } | null>(null);
     const [showConfigAlert, setShowConfigAlert] = useState(false);
 
@@ -50,40 +55,19 @@ export const useAdminSkillLibrary = (
     }, [rules.definitions.skills]);
 
     const filteredList = useMemo(() => {
-        return list
-            .filter(s => {
-                const matchesSearch = smartIncludes(s.name, searchTerm) || (s.description && smartIncludes(s.description, searchTerm));
-                if (!matchesSearch) return false;
+        return list.filter(s => {
+            const matchesSearch = smartIncludes(s.name, admin.searchTerm) || (s.description && smartIncludes(s.description, admin.searchTerm));
+            if (!matchesSearch) return false;
 
-                if (activeFilter !== null) {
-                    const isActive = s.isActive !== false;
-                    if (activeFilter !== isActive) return false;
-                }
+            if (activeFilter !== null && (s.isActive !== false) !== activeFilter) return false;
+            if (sourceFilter !== null && (s.isGlobal === true) !== sourceFilter) return false;
+            if (typeFilter !== null && (s.isVariable === true) !== typeFilter) return false;
+            if (usageFilter !== null && placedSkillNames.has(s.name.trim().toLowerCase()) !== usageFilter) return false;
+            if (mysticFilter !== null && (!!s.mysticAbilityId) !== mysticFilter) return false;
 
-                if (sourceFilter !== null) {
-                    const isGlobal = s.isGlobal === true;
-                    if (sourceFilter !== isGlobal) return false;
-                }
-
-                if (typeFilter !== null) {
-                    const isVariable = s.isVariable === true;
-                    if (typeFilter !== isVariable) return false;
-                }
-
-                if (usageFilter !== null) {
-                    const isPlaced = placedSkillNames.has(s.name.trim().toLowerCase());
-                    if (usageFilter !== isPlaced) return false;
-                }
-
-                if (mysticFilter !== null) {
-                    const isMystic = !!s.mysticAbilityId;
-                    if (mysticFilter !== isMystic) return false;
-                }
-
-                return true;
-            })
-            .sort((a, b) => a.name.localeCompare(b.name));
-    }, [list, searchTerm, activeFilter, sourceFilter, typeFilter, usageFilter, mysticFilter, placedSkillNames]);
+            return true;
+        }).sort((a, b) => a.name.localeCompare(b.name));
+    }, [list, admin.searchTerm, activeFilter, sourceFilter, typeFilter, usageFilter, mysticFilter, placedSkillNames]);
 
     const availableCategories = useMemo(() => {
         let rawCategories: { code: string; label: string; loc: string }[] = [...CATEGORY_HELP];
@@ -101,20 +85,17 @@ export const useAdminSkillLibrary = (
         return availableCategories.find(c => c.code === code)?.label || code;
     };
 
-    const handleOpenNew = () => {
-        setError(null);
-        setEditingSkill({
+    const handleOpenNew = useCallback(() => {
+        admin.handleOpenNew({
             id: crypto.randomUUID(),
             name: '',
             description: '',
             isVariable: false
         });
         setVariantDraft('');
-        setIsModalOpen(true);
-    };
+    }, [admin]);
 
-    const handleOpenEdit = (skill: LibrarySkillEntry) => {
-        // Ensure we have a master definition if we are in a campaign and about to customize
+    const handleOpenEdit = useCallback((skill: LibrarySkillEntry) => {
         const skillWithMaster = { ...skill };
         if (!!rules.settingId && !skillWithMaster.isCustomized && !skillWithMaster.masterDefinition) {
             skillWithMaster.masterDefinition = {
@@ -125,37 +106,26 @@ export const useAdminSkillLibrary = (
                 defaultCategory: skill.defaultCategory || undefined
             };
         }
-
-        setEditingSkill({
-            ...skillWithMaster,
-            mysticAbilityId: skillWithMaster.mysticAbilityId || ""
-        });
+        admin.handleOpenEdit({ entry: { ...skillWithMaster, mysticAbilityId: skillWithMaster.mysticAbilityId || "" }, source: 'local' });
         setVariantDraft(skillWithMaster.variants?.join(', ') || '');
-        setError(null);
-        setIsModalOpen(true);
-    };
+    }, [admin, rules.settingId]);
 
-    const handleDelete = (id: string) => {
-        setShowDeleteConfirm(id);
-    };
+    const handleSave = useCallback(() => {
+        if (!admin.editingEntry) return;
+        const cleanedVariants = variantDraft.split(',').map(v => v.trim()).filter(v => v !== '');
+        const skillToSave: LibrarySkillEntry = {
+            ...admin.editingEntry,
+            variants: cleanedVariants,
+            isCustomized: (mode === 'override' && !!rules.settingId) ? true : admin.editingEntry.isCustomized
+        };
+        admin.handleSave(skillToSave);
+    }, [admin, variantDraft, mode, rules.settingId]);
 
-    const confirmDelete = () => {
-        if (!showDeleteConfirm) return;
-        onUpdate({
-            ...rules,
-            libraries: { ...rules.libraries, skills: list.filter(s => s.id !== showDeleteConfirm) }
-        });
-        setShowDeleteConfirm(null);
-    };
-
-    const handleReset = (skillId: string) => {
-        const skillIndex = list.findIndex(s => s.id === skillId);
-        if (skillIndex === -1) return;
-
-        const skill = list[skillIndex];
+    const handleReset = useCallback((skillId: string) => {
+        const skill = list.find(s => s.id === skillId);
+        if (!skill) return;
 
         let resetSkill: LibrarySkillEntry;
-
         if (skill.masterDefinition) {
             resetSkill = {
                 ...skill,
@@ -167,128 +137,64 @@ export const useAdminSkillLibrary = (
                 isCustomized: false,
             };
         } else {
-            // Fallback for legacy data without masterDefinition
-            // We just remove the flag. The values will revert on next engine reload,
-            // or stay as-is for now but without the 'Custom' status.
-            resetSkill = {
-                ...skill,
-                isCustomized: false
-            };
+            resetSkill = { ...skill, isCustomized: false };
         }
+        admin.handleSave(resetSkill);
+    }, [admin, list]);
 
-        const newList = [...list];
-        newList[skillIndex] = resetSkill;
+    const toggleSkillActive = useCallback((skill: LibrarySkillEntry) => {
+        admin.handleSave({ ...skill, isActive: !skill.isActive });
+    }, [admin]);
 
-        onUpdate({
-            ...rules,
-            libraries: { ...rules.libraries, skills: newList }
-        });
-    };
-
-    const handleSave = () => {
-        if (!editingSkill) return;
-        if (!editingSkill.name.trim()) { setError("Le nom est requis."); return; }
-
-        const duplicate = list.find(s => s.id !== editingSkill.id && s.name.trim().toLowerCase() === editingSkill.name.trim().toLowerCase());
-        if (duplicate) { setError("Une compétence portant ce nom existe déjà."); return; }
-
-        const cleanedVariants = variantDraft
-            .split(',')
-            .map(v => v.trim())
-            .filter(v => v !== '');
-
-        // LOGIC CHANGE: Only force customization if in override mode (sidebar)
-        const skillToSave: LibrarySkillEntry = {
-            ...editingSkill,
-            variants: cleanedVariants,
-            isCustomized: (mode === 'override' && !!rules.settingId) ? true : editingSkill.isCustomized
-        };
-
-        const newList = list.some(s => s.id === skillToSave.id)
-            ? list.map(s => s.id === skillToSave.id ? skillToSave : s)
-            : [...list, skillToSave];
-
-        newList.sort((a, b) => a.name.localeCompare(b.name));
-
-        onUpdate({
-            ...rules,
-            libraries: { ...rules.libraries, skills: newList }
-        });
-        setIsModalOpen(false);
-        setEditingSkill(null);
-    };
-
-    const toggleSkillActive = (skill: LibrarySkillEntry) => {
-        const newList = list.map(s => s.id === skill.id ? { ...s, isActive: !s.isActive } : s);
-        onUpdate({ ...rules, libraries: { ...rules.libraries, skills: newList } });
-    };
-
-    const handleBulkSelect = (active: boolean) => {
+    const handleBulkSelect = useCallback((active: boolean) => {
         const visibleIds = new Set(filteredList.map(s => s.id));
-        const newList = list.map(skill =>
-            visibleIds.has(skill.id) ? { ...skill, isActive: active } : skill
-        );
-        onUpdate({
-            ...rules,
-            libraries: { ...rules.libraries, skills: newList }
-        });
-    };
+        const newList = list.map(skill => visibleIds.has(skill.id) ? { ...skill, isActive: active } : skill);
+        onUpdate({ ...rules, libraries: { ...rules.libraries, skills: newList } });
+    }, [filteredList, list, onUpdate, rules]);
 
-    const handlePublishClick = () => {
+    const handlePublishClick = useCallback(() => {
         const token = localStorage.getItem('GITHUB_TOKEN');
         const owner = localStorage.getItem('GITHUB_OWNER');
         const repo = localStorage.getItem('GITHUB_REPO');
-
         if (!token || !owner || !repo) {
             setShowConfigAlert(true);
             return;
         }
-
         setShowPublishConfirm(true);
-    };
+    }, []);
 
-    const executePublish = async () => {
+    const executePublish = useCallback(async () => {
         const token = localStorage.getItem('GITHUB_TOKEN') || '';
         const owner = localStorage.getItem('GITHUB_OWNER') || '';
         const repo = localStorage.getItem('GITHUB_REPO') || '';
-
         try {
             const content = JSON.stringify({
-                meta: {
-                    version: rules.version,
-                    date: new Date().toISOString(),
-                    type: 'skills'
-                },
+                meta: { version: rules.version, date: new Date().toISOString(), type: 'skills' },
                 data: list
             }, null, 2);
-
             const settingSlug = rules.settingName ? rules.settingName.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '_') : '';
             const fileName = (rules.settingId && settingSlug) ? `public/data/skills_${settingSlug}.json` : 'public/data/skills.json';
-
             const result = await publishFileToGitHub(
                 fileName,
                 content,
                 `update(skills): Mise à jour bibliothèque compétences ${rules.settingName || ''} v${rules.version}`,
                 { token, owner, repo, branch: 'main' }
             );
-
-            if (result.success) {
-                setPublishResult({ success: true, message: "Bibliothèque de compétences publiée avec succès !" });
-            } else {
-                setPublishResult({ success: false, message: "Erreur lors de la publication : " + result.message });
-            }
+            if (result.success) setPublishResult({ success: true, message: "Bibliothèque de compétences publiée avec succès !" });
+            else setPublishResult({ success: false, message: "Erreur lors de la publication : " + result.message });
         } catch (e) {
             setPublishResult({ success: false, message: "Erreur inattendue : " + (e as Error).message });
         }
-    };
+        setShowPublishConfirm(false);
+    }, [list, rules]);
 
     return {
         list,
-        searchTerm, setSearchTerm,
-        isModalOpen, setIsModalOpen,
-        editingSkill, setEditingSkill,
+        searchTerm: admin.searchTerm, setSearchTerm: admin.setSearchTerm,
+        isModalOpen: admin.isModalOpen, setIsModalOpen: admin.setIsModalOpen,
+        editingSkill: admin.editingEntry, setEditingSkill: admin.setEditingEntry,
         variantDraft, setVariantDraft,
-        error, setError,
+        error: admin.error,
         showCategoryHelp, setShowCategoryHelp,
         activeFilter, setActiveFilter,
         sourceFilter, setSourceFilter,
@@ -296,7 +202,7 @@ export const useAdminSkillLibrary = (
         usageFilter, setUsageFilter,
         mysticFilter, setMysticFilter,
         showPublishConfirm, setShowPublishConfirm,
-        showDeleteConfirm, setShowDeleteConfirm,
+        showDeleteConfirm: admin.entryToDelete?.id || null, setShowDeleteConfirm: (id: string | null) => admin.setEntryToDelete(id ? list.find(l => l.id === id) || null : null),
         publishResult, setPublishResult,
         showConfigAlert, setShowConfigAlert,
         placedSkillNames,
@@ -305,9 +211,9 @@ export const useAdminSkillLibrary = (
         getCategoryLabel,
         handleOpenNew,
         handleOpenEdit,
-        handleDelete,
+        handleDelete: (id: string) => admin.setEntryToDelete(list.find(l => l.id === id) || null),
         toggleSkillActive,
-        confirmDelete,
+        confirmDelete: admin.executeDelete,
         handleSave,
         handleReset,
         handleBulkSelect,

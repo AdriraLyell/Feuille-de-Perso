@@ -17,10 +17,10 @@
     "verify": "powershell -File ./scripts/verify-agent.ps1"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.94.1",
+    "@supabase/supabase-js": "^2.99.1",
     "@tailwindcss/vite": "^4.2.1",
     "@tippyjs/react": "^4.2.6",
-    "@tiptap/extension-color": "^3.19.0",
+    "@tiptap/extension-color": "^3.20.1",
     "@tiptap/extension-font-family": "^3.20.0",
     "@tiptap/extension-highlight": "^3.19.0",
     "@tiptap/extension-image": "^3.19.0",
@@ -58,7 +58,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.4",
-    "@vitest/ui": "^4.0.18",
+    "@vitest/ui": "^4.1.0",
     "autoprefixer": "^10.4.18",
     "dotenv": "^17.2.3",
     "eslint": "^10.0.2",
@@ -71,7 +71,7 @@
     "typescript-eslint": "^8.54.0",
     "vite": "^7.3.1",
     "vite-plugin-singlefile": "^2.0.1",
-    "vitest": "^4.0.18"
+    "vitest": "^4.1.0"
   },
   "overrides": {
     "eslint-plugin-jsx-a11y": {

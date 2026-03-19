@@ -3,27 +3,31 @@ import { CharacterSheetData, LibraryEntry, TraitEffect, DotEntry } from '../type
 import { MergedEntry } from '../utils/libraryMerger';
 import { useRules } from '../context/RulesContext';
 import { BONUS_MJ_TRAIT_ID } from '../types/rules';
+import { useAdminLibrary } from './useAdminLibrary';
+import { useNotification } from '../context/NotificationContext';
 
 export const useTraitActions = (
     data: CharacterSheetData,
     onUpdate: (newData: CharacterSheetData) => void,
     defaultType: 'avantage' | 'desavantage'
 ) => {
-    const { rules, updateRules } = useRules();
+    const addLog = useNotification();
+    const { rules } = useRules();
     const allFormulas = useMemo(() => rules?.libraries?.formulas || [], [rules]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editForm, setEditForm] = useState<LibraryEntry | null>(null);
-    const [formSource, setFormSource] = useState<'local' | 'official' | 'modified'>('local');
     const [tagInput, setTagInput] = useState('');
-    const [error, setError] = useState<string | null>(null);
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
-    const [showOfficialUpdateConfirm, setShowOfficialUpdateConfirm] = useState(false);
-    const [updateResult, setUpdateResult] = useState<{ success: boolean; message: string } | null>(null);
+
+    const admin = useAdminLibrary<LibraryEntry>({
+        data,
+        onUpdate,
+        addLog,
+        collectionKey: 'library',
+        officialLibraryKey: 'traits',
+        itemName: 'Trait'
+    });
 
     const handleOpenNew = useCallback(() => {
-        setError(null);
         setTagInput('');
-        setEditForm({
+        admin.handleOpenNew({
             id: Math.random().toString(36).substr(2, 9),
             name: '',
             type: defaultType,
@@ -33,9 +37,7 @@ export const useTraitActions = (
             tags: [],
             effects: []
         });
-        setFormSource('local');
-        setIsModalOpen(true);
-    }, [defaultType]);
+    }, [defaultType, admin]);
 
     const handleOpenEdit = useCallback((merged: MergedEntry<LibraryEntry> | LibraryEntry) => {
         const entry = 'entry' in merged ? merged.entry : merged;
@@ -43,128 +45,47 @@ export const useTraitActions = (
 
         const _source = 'source' in merged ? merged.source : 'local';
 
-        setError(null);
         setTagInput('');
-        setEditForm({
+        admin.setEditingEntry({
             ...entry,
             id: entry.id,
-            tags: [...(entry.tags || [])],
-            effects: (entry.effects || []).map(e => ({ ...e }))
+            tags: [...(entry.tags || [])] as string[],
+            effects: (entry.effects || []).map(e => ({ ...e })) as TraitEffect[]
         });
-        setFormSource(_source as 'local' | 'official' | 'modified');
-        setIsModalOpen(true);
-    }, []);
+        admin.setIsModalOpen(true);
+        // Note: formSource logic might need to be preserved if UI depends on it
+    }, [admin]);
 
     const handleDelete = useCallback((id: string, source: string) => {
         if (id === BONUS_MJ_TRAIT_ID) return; // Disallow deleting system trait
-
-        if (source === 'official') {
-            // Un trait purement officiel ne peut pas être supprimé du JSON, 
-            // mais un trait 'modified' peut être supprimé pour revenir à l'état officiel.
-            return;
-        }
-        setShowDeleteConfirm(id);
-    }, []);
-
-    const confirmDelete = useCallback(() => {
-        if (!showDeleteConfirm) return;
-        const local = (data && Array.isArray(data.library)) ? data.library : [];
-        onUpdate({ ...data, library: local.filter(l => l.id !== showDeleteConfirm) });
-        setShowDeleteConfirm(null);
-    }, [data, onUpdate, showDeleteConfirm]);
-
-    const handleSave = useCallback(() => {
-        if (!editForm) return;
-        if (!editForm.name.trim()) { setError("Le nom du trait ne peut pas être vide."); return; }
-
-        const local = (data && Array.isArray(data.library)) ? data.library : [];
-        const duplicate = local.find(l => l.id !== editForm.id && l.name.trim().toLowerCase() === editForm.name.trim().toLowerCase());
-
-        if (duplicate) { setError("Un trait personnel portant ce nom existe déjà."); return; }
-
-        const formToSave = {
-            ...editForm,
-            variants: editForm.variants ? editForm.variants.map(v => v.trim()).filter(v => v !== '') : []
-        };
-
-        const existsLocally = local.some(l => l.id === formToSave.id);
-        const newLibrary = existsLocally
-            ? local.map(l => l.id === formToSave.id ? formToSave : l)
-            : [formToSave, ...local];
-
-        onUpdate({ ...data, library: newLibrary });
-        setIsModalOpen(false);
-        setEditForm(null);
-        setFormSource('local');
-    }, [data, editForm, onUpdate]);
-
-    const executeOfficialUpdate = async () => {
-        try {
-            const res = await fetch('./data/traits.json?t=' + Date.now());
-            if (!res.ok) throw new Error("Fichier introuvable");
-
-            const json = await res.json();
-            const newTraits = json.data as LibraryEntry[];
-
-            if (json.meta && json.meta.type !== 'traits') throw new Error("Format invalide");
-
-            const updatedRules = {
-                ...rules!,
-                libraries: {
-                    ...rules!.libraries,
-                    traits: newTraits
-                },
-                lastUpdated: Date.now() // Force CharacterContext reconciliation
-            };
-            updateRules(updatedRules);
-            setUpdateResult({ success: true, message: `Bibliothèque officielle mise à jour (${newTraits.length} traits).` });
-        } catch (e) {
-            setUpdateResult({ success: false, message: "Échec de la mise à jour officielle : " + (e as Error).message });
-        } finally {
-            setShowOfficialUpdateConfirm(false);
-        }
-    };
-
-    const handleImportTraits = useCallback((importedEntries: LibraryEntry[]) => {
-        const local = (data && Array.isArray(data.library)) ? data.library : [];
-        const newLibrary = [...local];
-
-        importedEntries.forEach(entry => {
-            const index = newLibrary.findIndex(l => l.id === entry.id);
-            if (index >= 0) {
-                newLibrary[index] = entry;
-            } else {
-                newLibrary.unshift(entry);
-            }
-        });
-
-        onUpdate({ ...data, library: newLibrary });
-    }, [data, onUpdate]);
+        if (source === 'official') return;
+        admin.setEntryToDelete(admin.hybridList.find(m => m.entry.id === id)?.entry || null);
+    }, [admin]);
 
     const addTag = useCallback(() => {
-        if (!editForm || !tagInput.trim()) return;
+        if (!admin.editingEntry || !tagInput.trim()) return;
         const newTag = tagInput.trim();
-        if (!(editForm.tags || []).includes(newTag)) {
-            setEditForm({ ...editForm, tags: [...(editForm.tags || []), newTag] });
+        if (!(admin.editingEntry.tags || []).includes(newTag)) {
+            admin.setEditingEntry({ ...admin.editingEntry, tags: [...(admin.editingEntry.tags || []), newTag] });
         }
         setTagInput('');
-    }, [editForm, tagInput]);
+    }, [admin, tagInput]);
 
     const removeTag = useCallback((tagToRemove: string) => {
-        if (!editForm) return;
-        setEditForm({ ...editForm, tags: (editForm.tags || []).filter(t => t !== tagToRemove) });
-    }, [editForm]);
+        if (!admin.editingEntry) return;
+        admin.setEditingEntry({ ...admin.editingEntry, tags: (admin.editingEntry.tags || []).filter(t => t !== tagToRemove) });
+    }, [admin]);
 
     const addEffect = useCallback(() => {
-        if (!editForm) return;
+        if (!admin.editingEntry) return;
         const newEffect: TraitEffect = { id: Math.random().toString(36).substr(2, 9), type: 'formula', value: 0 };
-        setEditForm({ ...editForm, effects: [...(editForm.effects || []), newEffect] });
-    }, [editForm]);
+        admin.setEditingEntry({ ...admin.editingEntry, effects: [...(admin.editingEntry.effects || []), newEffect] });
+    }, [admin]);
 
     const updateEffect = useCallback((id: string, field: keyof TraitEffect, value: string | number | boolean | undefined) => {
-        if (!editForm) return;
+        if (!admin.editingEntry) return;
 
-        const newEffects = (editForm.effects || []).map(e => e.id === id ? { ...e, [field]: value } : e);
+        const newEffects = (admin.editingEntry.effects || []).map(e => e.id === id ? { ...e, [field]: value } : e);
 
         // Détecter si une des formules force la variante
         const hasForceVariantFormula = newEffects.some(ef => {
@@ -175,17 +96,17 @@ export const useTraitActions = (
 
         // Si une formule force la variante, on s'assure que le trait est marqué comme variable
         const updatedForm: LibraryEntry = {
-            ...editForm,
+            ...admin.editingEntry,
             effects: newEffects,
-            isVariable: hasForceVariantFormula ? true : editForm.isVariable
+            isVariable: hasForceVariantFormula ? true : admin.editingEntry.isVariable
         };
 
-        setEditForm(updatedForm);
-    }, [editForm, allFormulas]);
+        admin.setEditingEntry(updatedForm);
+    }, [admin, allFormulas]);
 
     const removeEffect = useCallback((id: string) => {
-        if (!editForm) return;
-        const newEffects = (editForm.effects || []).filter(e => e.id !== id);
+        if (!admin.editingEntry) return;
+        const newEffects = (admin.editingEntry.effects || []).filter(e => e.id !== id);
 
         // Recalculer si une des formules restantes force toujours la variante
         const hasForceVariantFormula = newEffects.some(ef => {
@@ -194,12 +115,12 @@ export const useTraitActions = (
             return formula?.forceVariant;
         });
 
-        setEditForm({
-            ...editForm,
+        admin.setEditingEntry({
+            ...admin.editingEntry,
             effects: newEffects,
-            isVariable: hasForceVariantFormula ? true : editForm.isVariable
+            isVariable: hasForceVariantFormula ? true : admin.editingEntry.isVariable
         });
-    }, [editForm, allFormulas]);
+    }, [admin, allFormulas]);
 
     const allSkills = useMemo(() => {
         const skills: { id: string, name: string }[] = [];
@@ -265,7 +186,7 @@ export const useTraitActions = (
         // System counters
         Object.keys(data.counters).forEach(key => {
             if (key !== 'custom') {
-                const rawEntry = data.counters[key];
+                const rawEntry = (data.counters as any)[key];
                 if (!Array.isArray(rawEntry)) {
                     const c = rawEntry as DotEntry;
                     if (c && c.name && c.name.trim() !== '') {
@@ -296,30 +217,44 @@ export const useTraitActions = (
         return counters.sort((a, b) => a.name.localeCompare(b.name));
     }, [data.counters, data.counterLibrary]);
 
-
-
     return {
-        isModalOpen,
-        setIsModalOpen,
-        editForm,
-        setEditForm,
-        formSource,
+        ...admin,
+        editForm: admin.editingEntry,
+        setEditForm: admin.setEditingEntry,
         tagInput,
         setTagInput,
-        error,
-        showDeleteConfirm,
-        setShowDeleteConfirm,
-        showOfficialUpdateConfirm,
-        setShowOfficialUpdateConfirm,
-        updateResult,
-        setUpdateResult,
+        showDeleteConfirm: admin.entryToDelete ? admin.entryToDelete.id : null,
+        setShowDeleteConfirm: (id: string | null) => admin.setEntryToDelete(id ? admin.hybridList.find(m => m.entry.id === id)?.entry || null : null),
+        showOfficialUpdateConfirm: admin.showOfficialUpdateConfirm,
+        setShowOfficialUpdateConfirm: admin.setShowOfficialUpdateConfirm,
+        updateResult: null, // This was used for official update result, can be re-integrated if needed
         handleOpenNew,
         handleOpenEdit,
         handleDelete,
-        confirmDelete,
-        handleSave,
-        executeOfficialUpdate,
-        handleImportTraits,
+        confirmDelete: admin.executeDelete,
+        handleSave: () => admin.handleSave(admin.editingEntry!),
+        executeOfficialUpdate: () => admin.executeOfficialUpdate('./data/traits.json'),
+        handleImportTraits: (entries: LibraryEntry[]) => {
+            const currentLib = JSON.parse(JSON.stringify((data.library as LibraryEntry[]) || []));
+            let addedCount = 0;
+            const updatedLib = [...currentLib];
+            
+            entries.forEach(entry => {
+                const index = updatedLib.findIndex(l => l.id === entry.id || (l.name.toLowerCase() === entry.name.toLowerCase() && l.type === entry.type));
+                if (index >= 0) {
+                    updatedLib[index] = { ...updatedLib[index], ...entry };
+                } else {
+                    updatedLib.push(entry);
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0 || entries.length > 0) {
+                updatedLib.sort((a, b) => a.name.localeCompare(b.name));
+                onUpdate({ ...data, library: updatedLib });
+                addLog(`${addedCount} trait(s) importé(s)/mis à jour.`, 'success', 'settings');
+            }
+        },
         addTag,
         removeTag,
         addEffect,
@@ -331,3 +266,4 @@ export const useTraitActions = (
         allFormulas
     };
 };
+

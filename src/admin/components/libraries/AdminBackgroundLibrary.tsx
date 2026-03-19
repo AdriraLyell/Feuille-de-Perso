@@ -1,13 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { RulesData } from '../../../types/rules';
-import { LibraryBackgroundEntry } from '../../../types/system';
 import { Search, Plus, Users, Save, AlertOctagon, Layers, CheckCircle2, Circle, Globe, Filter, X } from 'lucide-react';
 import ThematicModal from '../../../components/ui/ThematicModal';
 import TriStateChip from '../../../components/ui/TriStateChip';
 import { useItemUsageDetails } from '../../../hooks/admin/useItemUsageDetails';
-import { smartIncludes } from '../../../utils/stringUtils';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 import { BackgroundLibraryItem } from './background/BackgroundLibraryItem';
+import { useAdminBackgroundLibrary } from '../../../hooks/admin/useAdminBackgroundLibrary';
 
 interface AdminBackgroundLibraryProps {
     rules: RulesData;
@@ -16,119 +15,48 @@ interface AdminBackgroundLibraryProps {
 }
 
 const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, onUpdate, globalUsage = {} }) => {
-    const list = rules.libraries.backgrounds;
+    const {
+        list,
+        searchTerm, setSearchTerm,
+        isModalOpen, setIsModalOpen,
+        editingItem, setEditingItem,
+        error,
+        showDeleteConfirm, setShowDeleteConfirm,
+        placedNames,
+        filteredList,
+        handleOpenNew,
+        handleOpenEdit,
+        handleDelete,
+        confirmDelete,
+        handleSave,
+        handleBulkSelect,
+        toggleActive
+    } = useAdminBackgroundLibrary(rules, onUpdate, globalUsage);
+
     const { usageDetailsCache, loadDetails } = useItemUsageDetails('global', 'background');
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<LibraryBackgroundEntry | null>(null);
-    const [error, setError] = useState<string | null>(null);
-
-    // Advanced Filters
+    // Advanced Filters (State kept here as they are specific to the UI of this library)
     const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
     const [sourceFilter, setSourceFilter] = useState<boolean | null>(null);
     const [typeFilter, setTypeFilter] = useState<boolean | null>(null);
 
-    const filteredList = useMemo(() => {
-        return list
-            .filter(b => {
-                const matchesSearch = smartIncludes(b.name, searchTerm) || (b.description && smartIncludes(b.description, searchTerm));
-                if (!matchesSearch) return false;
-
+    const filteredAndStatusList = React.useMemo(() => {
+        return filteredList.filter(b => {
                 if (activeFilter !== null) {
                     const isActive = b.isActive !== false;
                     if (activeFilter !== isActive) return false;
                 }
-
                 if (sourceFilter !== null) {
                     const isGlobal = b.isGlobal === true;
                     if (sourceFilter !== isGlobal) return false;
                 }
-
                 if (typeFilter !== null) {
                     const isVariable = b.isVariable === true;
                     if (typeFilter !== isVariable) return false;
                 }
-
                 return true;
-            })
-            .sort((a, b) => a.name.localeCompare(b.name));
-    }, [list, searchTerm, activeFilter, sourceFilter, typeFilter]);
-
-    const placedNames = useMemo(() => {
-        const names = new Set<string>();
-        const bgCat = rules.definitions.skillCategories?.find(c => c.behavior === 'Arrière-plan')?.id || 'Col_Comp_8';
-        const placed = rules.definitions.skills?.[bgCat] || [];
-        placed.forEach(name => {
-            if (name.trim()) names.add(name.trim().toLowerCase());
-        });
-        return names;
-    }, [rules.definitions]);
-
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
-
-    const handleOpenNew = () => {
-        setError(null);
-        setEditingItem({
-            id: crypto.randomUUID(),
-            name: '',
-            description: '',
-            isVariable: false
-        });
-        setIsModalOpen(true);
-    };
-
-    const handleOpenEdit = (item: LibraryBackgroundEntry) => {
-        setError(null);
-        setEditingItem({ ...item });
-        setIsModalOpen(true);
-    };
-
-    const handleDelete = (id: string) => {
-        setShowDeleteConfirm(id);
-    };
-
-    const confirmDelete = () => {
-        if (!showDeleteConfirm) return;
-        onUpdate({
-            ...rules,
-            libraries: { ...rules.libraries, backgrounds: list.filter(b => b.id !== showDeleteConfirm) }
-        });
-        setShowDeleteConfirm(null);
-    };
-
-    const handleSave = () => {
-        if (!editingItem) return;
-        if (!editingItem.name.trim()) { setError("Le nom est requis."); return; }
-
-        const duplicate = list.find(b => b.id !== editingItem.id && b.name.trim().toLowerCase() === editingItem.name.trim().toLowerCase());
-        if (duplicate) { setError("Un historique portant ce nom existe déjà."); return; }
-
-        const newList = list.some(b => b.id === editingItem.id)
-            ? list.map(b => b.id === editingItem.id ? editingItem : b)
-            : [...list, editingItem];
-
-        // Sort
-        newList.sort((a, b) => a.name.localeCompare(b.name));
-
-        onUpdate({
-            ...rules,
-            libraries: { ...rules.libraries, backgrounds: newList }
-        });
-        setIsModalOpen(false);
-        setEditingItem(null);
-    };
-
-    const handleBulkSelect = (active: boolean) => {
-        const visibleIds = new Set(filteredList.map(item => item.id));
-        const newList = list.map(item =>
-            visibleIds.has(item.id) ? { ...item, isActive: active } : item
-        );
-        onUpdate({
-            ...rules,
-            libraries: { ...rules.libraries, backgrounds: newList }
-        });
-    };
+            });
+    }, [filteredList, activeFilter, sourceFilter, typeFilter]);
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200 h-[calc(100vh-120px)] flex flex-col">
@@ -217,14 +145,14 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                         className="text-xs font-bold text-purple-600 hover:text-purple-800 flex items-center gap-1.5 transition-colors"
                     >
                         <CheckCircle2 size={14} />
-                        Tout activer {searchTerm ? `(${filteredList.length})` : ''}
+                        Tout activer {searchTerm ? `(${filteredAndStatusList.length})` : ''}
                     </button>
                     <button
                         onClick={() => handleBulkSelect(false)}
                         className="text-xs font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1.5 transition-colors"
                     >
                         <Circle size={14} />
-                        Tout désactiver {searchTerm ? `(${filteredList.length})` : ''}
+                        Tout désactiver {searchTerm ? `(${filteredAndStatusList.length})` : ''}
                     </button>
                 </div>
             )}
@@ -232,11 +160,11 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
             <div className="flex-grow overflow-y-auto bg-slate-50 border border-slate-200 rounded p-4 custom-scrollbar">
                 {list.length === 0 ? (
                     <div className="text-center text-slate-400 py-20 italic">Bibliothèque vide.</div>
-                ) : filteredList.length === 0 ? (
+                ) : filteredAndStatusList.length === 0 ? (
                     <div className="text-center text-slate-400 py-10 italic">Aucun résultat.</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                        {filteredList.map(item => {
+                        {filteredAndStatusList.map(item => {
                             const isPlaced = placedNames.has(item.name.trim().toLowerCase());
                             const isGloballyUsed = !!globalUsage[item.id];
                             const isLocked = isPlaced || isGloballyUsed;
@@ -247,10 +175,7 @@ const AdminBackgroundLibrary: React.FC<AdminBackgroundLibraryProps> = ({ rules, 
                                     item={item}
                                     isPlaced={isPlaced}
                                     isLocked={isLocked}
-                                    onToggleActive={(id: string, current: boolean) => {
-                                        const newList = list.map(b => b.id === id ? { ...b, isActive: !current } : b);
-                                        onUpdate({ ...rules, libraries: { ...rules.libraries, backgrounds: newList } });
-                                    }}
+                                    onToggleActive={(id: string, current: boolean) => toggleActive(id, current)}
                                     handleOpenEdit={handleOpenEdit}
                                     handleDelete={handleDelete}
                                     rules={rules}

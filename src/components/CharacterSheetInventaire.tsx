@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCharacterState, useCharacterActions } from '../context/CharacterContext';
-import { useCharacterSheetActions } from '../hooks/useCharacterSheetActions';
+import { useCombatActions } from '../hooks/character-actions/useCombatActions';
 import { useRules } from '../context/RulesContext';
 import { WeaponTable, ArmorTable } from './sheet/CombatSection';
 import NotebookInput from './shared/NotebookInput';
@@ -47,7 +47,7 @@ const CharacterSheetInventaire: React.FC<Props> = ({ isLandscape = false }) => {
     const {
         updateCombatWeapon,
         updateArmor
-    } = useCharacterSheetActions(data, onChange, onAddLog, recordXPTransaction, rules);
+    } = useCombatActions(onChange, onAddLog);
 
     const updateStringField = (field: string, value: string) => {
         onChange({ ...data, page2: { ...data.page2, [field]: value } });

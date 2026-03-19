@@ -43,7 +43,6 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
         setIsModalOpen,
         editForm,
         setEditForm,
-        formSource,
         tagInput,
         setTagInput,
         error,
@@ -51,8 +50,6 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
         setShowDeleteConfirm,
         showOfficialUpdateConfirm,
         setShowOfficialUpdateConfirm,
-        updateResult,
-        setUpdateResult,
         handleOpenNew,
         handleOpenEdit,
         handleDelete,
@@ -297,7 +294,7 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                 isModalOpen && editForm && (
                     <TraitForm
                         editForm={editForm}
-                        isOfficial={formSource === 'official'}
+                        isOfficial={hybridList.find(m => m.entry.id === editForm.id)?.source === 'official'}
                         library={[]}
                         allSkills={allSkills}
                         allAttributes={allAttributes}
@@ -339,16 +336,6 @@ const TraitLibrary: React.FC<TraitLibraryProps> = ({
                 type="danger"
             />
 
-            <ConfirmationModal
-                isOpen={!!updateResult}
-                onClose={() => setUpdateResult(null)}
-                onConfirm={() => setUpdateResult(null)}
-                title={updateResult?.success ? "Succès" : "Erreur"}
-                message={updateResult?.message || ""}
-                confirmLabel="OK"
-                type={updateResult?.success ? "success" : "danger"}
-                cancelLabel=""
-            />
         </div >
     );
 };
