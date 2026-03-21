@@ -69,7 +69,7 @@ describe('Mechanics Utils', () => {
             const data: CharacterSheetData = JSON.parse(JSON.stringify(INITIAL_DATA));
             data.creationConfig.cardConfig.active = true;
             // Average will be low
-            expect(calculateCardValue(data)).toBe("Aucune");
+            expect(calculateCardValue(data)?.label).toBe("Aucune");
         });
 
         it('should return "Un Valet" for average 2.5 (if base=2, inc=0.5)', () => {
@@ -90,7 +90,7 @@ describe('Mechanics Utils', () => {
             data.skills.Col_Comp_1[0].value = 3;
             data.skills.Col_Comp_1[1].value = 3;
 
-            expect(calculateCardValue(data)).toBe("Deux Valets");
+            expect(calculateCardValue(data)?.label).toBe("Deux Valets");
         });
     });
 

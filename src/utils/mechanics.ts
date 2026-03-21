@@ -1,5 +1,5 @@
 
-import { CharacterSheetData, ExperienceData, RulesData } from '../types';
+import { CharacterSheetData, ExperienceData, RulesData, CardCalculationResult } from '../types';
 import { RuleCalculationsService } from '../services/RuleCalculationsService';
 
 // --- XP CALCULATION LOGIC ---
@@ -8,6 +8,6 @@ export const calculateExperienceResults = (data: CharacterSheetData, rules?: Rul
 };
 
 // --- CARD CALCULATION LOGIC ---
-export const calculateCardValue = (data: CharacterSheetData, rules?: RulesData | null): string | null => {
+export const calculateCardValue = (data: CharacterSheetData, rules?: RulesData | null): CardCalculationResult | null => {
     return RuleCalculationsService.calculateCardValue(data, rules || null);
 };

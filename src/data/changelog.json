@@ -4,6 +4,7 @@
         "date": "2026-03-21",
         "type": "feat/ui",
         "changes": [
+            "UI/Cartes : Ajout d'un tooltip détaillé pour le calcul de la main de départ (cartes) avec affichage des compétences utilisées et de la moyenne.",
             "Security : Suppression de l'alerte de sauvegarde automatique des 60 minutes ('Safety Alert') pour fluidifier l'expérience utilisateur.",
             "UI/Roster : Refonte visuelle des Traits (Avantages/Désavantages) pour une meilleure lisibilité (design hybride avec bordures d'accent et badges colorés)."
         ]

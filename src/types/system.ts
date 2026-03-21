@@ -1,6 +1,12 @@
 
 import { TraitEffect } from './primitives';
 
+export interface CardCalculationResult {
+  label: string;
+  skills: { name: string; value: number }[];
+  average: number;
+}
+
 export interface CreationConfig {
   active: boolean;
   mode: 'points' | 'rangs';
