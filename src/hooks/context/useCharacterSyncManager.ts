@@ -93,8 +93,22 @@ export const useCharacterSyncManager = (
       if (result.success && result.syncId) {
         const newHash = result.hash;
 
-        // Fetch the book from character_books to stay in sync with server
-        const remoteBook = await BookSyncService.getBook(result.syncId);
+        let remoteBook = null;
+
+        // If local book was modified, push it instead of pulling
+        if (syncInfo?.isBookDirty && data.bookDocument) {
+           const savedBook = await BookSyncService.saveBook(
+               result.syncId, 
+               data.bookDocument.content, 
+               data.bookDocument.formatVersion
+           );
+           if (savedBook) {
+               remoteBook = savedBook; // Keep metadata like updated_at
+           }
+        } else {
+           // Otherwise, fetch the book from character_books to stay in sync with server
+           remoteBook = await BookSyncService.getBook(result.syncId);
+        }
         
         let injectedBookContent = remoteBook?.content;
         if (injectedBookContent) {
@@ -112,13 +126,14 @@ export const useCharacterSyncManager = (
                 lastSynced: Date.now(),
                 lastSyncedHash: newHash,
                 syncMode: mode,
-                isDirty: false // Reset dirty flag after successful sync
+                isDirty: false, // Reset dirty flag after successful sync
+                isBookDirty: false // Reset book dirty flag after successful sync
               },
               // Inject remote book if available (keeps local in sync with server)
               ...(remoteBook ? {
                 bookDocument: {
                   id: remoteBook.id,
-                  content: injectedBookContent!,
+                  content: injectedBookContent || {},
                   formatVersion: remoteBook.format_version,
                   createdAt: remoteBook.created_at,
                   updatedAt: remoteBook.updated_at

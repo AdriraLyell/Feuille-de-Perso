@@ -124,6 +124,7 @@ export interface CharacterSheetData {
     lastSyncedHash?: string; // Digital signature of the data at last sync
     lastLocalEdit?: number; // Timestamp of last local modification
     isDirty?: boolean;    // True if local changes are not yet synced
+    isBookDirty?: boolean; // True if book changes are not yet synced
     isAutoSyncEnabled?: boolean; // New: Automatic cloud save
     mjMessage?: string;   // Note left by the MJ when signaling an update
     localSettings?: {

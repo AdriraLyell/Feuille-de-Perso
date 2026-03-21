@@ -21,15 +21,6 @@ const CampaignNotes: React.FC = () => {
                 updatedAt: now
             };
 
-            // Fire-and-forget save to character_books if already synced
-            if (prev.syncInfo?.syncId) {
-                BookSyncService.saveBook(
-                    prev.syncInfo.syncId,
-                    content as import('@tiptap/core').JSONContent,
-                    2
-                ).catch(() => { /* errors handled inside BookSyncService */ });
-            }
-
             return {
                 ...prev,
                 bookDocument: {
@@ -37,9 +28,13 @@ const CampaignNotes: React.FC = () => {
                     content,
                     formatVersion: 2,
                     updatedAt: new Date().toISOString()
+                },
+                syncInfo: {
+                    ...prev.syncInfo,
+                    isBookDirty: true
                 }
             };
-        });
+        }, true); // The 'true' flag means this is a 'silent' local update that won't immediately trigger character auto-sync
     }, [onChange]);
 
     return (
