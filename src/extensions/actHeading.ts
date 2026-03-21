@@ -22,6 +22,14 @@ export const ActHeading = Node.create({
 
     defining: true,
 
+    addAttributes() {
+        return {
+            breakBefore: {
+                default: true,
+            },
+        };
+    },
+
     parseHTML() {
         return [
             {
@@ -89,6 +97,7 @@ export const ActHeading = Node.create({
                                 .insertContentAt(pos, [
                                     {
                                         type: this.name,
+                                        attrs: { breakBefore: false },
                                         content: [{ type: 'text', text: 'Nouvel Acte' }],
                                     },
                                     { type: 'paragraph' }

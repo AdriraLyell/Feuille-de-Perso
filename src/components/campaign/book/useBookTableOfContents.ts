@@ -50,11 +50,16 @@ export function useBookTableOfContents(
             const left = htmlSection.offsetLeft;
             const pageIndex = Math.floor(left / stride) + 1; // Content starting at index 1 is Page 2 if TOC is Page 1
 
+            const breakBeforeAttr = htmlSection.getAttribute('data-break-before');
+            const breakBefore = breakBeforeAttr === 'true';
+
             newEntries.push({
                 type: entryType,
                 title,
                 date: dateText,
-                page: pageIndex
+                page: pageIndex,
+                breakBefore,
+                domElement: htmlSection,
             });
         });
 

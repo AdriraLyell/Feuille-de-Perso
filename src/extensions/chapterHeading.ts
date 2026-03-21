@@ -36,6 +36,9 @@ export const ChapterHeading = Node.create({
             realDate: {
                 default: '',
             },
+            breakBefore: {
+                default: true,
+            },
         };
     },
 
@@ -122,7 +125,7 @@ export const ChapterHeading = Node.create({
                                 .insertContentAt(pos, [
                                     {
                                         type: this.name,
-                                        attrs: { date, realDate: finalRealDate },
+                                        attrs: { date, realDate: finalRealDate, breakBefore: false },
                                         content: [{ type: 'text', text: 'Nouveau Chapitre' }],
                                     },
                                     { type: 'paragraph' }

@@ -322,7 +322,7 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                             paddingTop: '60px'
                         }}
                     >
-                        <BookTableOfContents entries={entries} onNavigate={navigateToPage} />
+                        <BookTableOfContents entries={entries} onNavigate={navigateToPage} editor={editor} />
                     </div>
 
                     {/* Drawing Overlay */}

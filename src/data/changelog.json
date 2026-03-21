@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.115.0",
+        "date": "2026-03-21",
+        "type": "feature/journal",
+        "changes": [
+            "Journal : Option 'Haut de page' par chapitre et acte — toggle au survol pour forcer ou non le début en haut de colonne.",
+            "Journal : Checkbox discret dans le sommaire pour basculer le haut de page de chaque chapitre/acte.",
+            "Journal : Les anciens chapitres/actes conservent le comportement haut de page par défaut.",
+            "Journal : Les chapitres/actes insérés au curseur restent à la position du curseur (pas de saut automatique)."
+        ]
+    },
+    {
         "version": "2.114.0",
         "date": "2026-03-21",
         "type": "fix/journal",

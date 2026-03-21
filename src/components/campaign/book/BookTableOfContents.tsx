@@ -1,16 +1,20 @@
-import React, { useState, useMemo } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
+import { ChevronDown, ChevronRight, ArrowUpToLine } from 'lucide-react';
+import { Editor } from '@tiptap/core';
 
 export interface TOCEntry {
     type: 'act' | 'chapter' | 'section';
     title: string;
     date: string;
     page: number;
+    breakBefore?: boolean;
+    domElement?: HTMLElement;
 }
 
 interface BookTableOfContentsProps {
     entries: TOCEntry[];
     onNavigate: (page: number) => void;
+    editor: Editor | null;
 }
 
 interface ActGroup {
@@ -18,7 +22,25 @@ interface ActGroup {
     items: TOCEntry[];
 }
 
-export const BookTableOfContents: React.FC<BookTableOfContentsProps> = ({ entries, onNavigate }) => {
+export const BookTableOfContents: React.FC<BookTableOfContentsProps> = ({ entries, onNavigate, editor }) => {
+    const toggleBreakBefore = useCallback((entry: TOCEntry) => {
+        if (!editor || !entry.domElement) return;
+        try {
+            const pos = editor.view.posAtDOM(entry.domElement, 0);
+            const resolvedPos = editor.state.doc.resolve(pos);
+            // Find the node-view-wrapper's corresponding ProseMirror node
+            const nodePos = resolvedPos.before(resolvedPos.depth);
+            const node = editor.state.doc.nodeAt(nodePos);
+            if (!node) return;
+            const tr = editor.state.tr.setNodeMarkup(nodePos, undefined, {
+                ...node.attrs,
+                breakBefore: !node.attrs.breakBefore,
+            });
+            editor.view.dispatch(tr);
+        } catch {
+            // Silently fail if DOM position is stale
+        }
+    }, [editor]);
     const actGroups = useMemo(() => {
         const groups: ActGroup[] = [];
         let currentGroup: ActGroup = { items: [] };
@@ -95,6 +117,14 @@ export const BookTableOfContents: React.FC<BookTableOfContentsProps> = ({ entrie
                                         </div>
                                         <button
                                             type="button"
+                                            onClick={(e) => { e.stopPropagation(); toggleBreakBefore(group.actEntry!); }}
+                                            className={`p-1 rounded transition-all hover:bg-amber-50 opacity-40 hover:opacity-100 ${group.actEntry!.breakBefore ? 'text-indigo-500 opacity-70' : 'text-stone-400'}`}
+                                            title={group.actEntry!.breakBefore ? 'Haut de page' : 'Position libre'}
+                                        >
+                                            <ArrowUpToLine size={11} />
+                                        </button>
+                                        <button
+                                            type="button"
                                             className="font-serif text-amber-800/60 min-w-[2rem] text-right font-bold text-sm cursor-pointer hover:text-amber-700 outline-none"
                                             onClick={() => onNavigate(group.actEntry!.page)}
                                         >
@@ -108,21 +138,36 @@ export const BookTableOfContents: React.FC<BookTableOfContentsProps> = ({ entrie
                                 >
                                     {group.items.map((entry, itemIndex) => {
                                         const isSection = entry.type === 'section';
+                                        const isChapter = entry.type === 'chapter';
                                         return (
-                                            <button
+                                            <div
                                                 key={itemIndex}
-                                                type="button"
-                                                onClick={() => onNavigate(entry.page)}
-                                                className={`group flex items-baseline gap-2 text-left hover:text-amber-700 transition-colors w-full outline-none ${isSection ? 'pl-8 opacity-70' : hasAct ? 'pl-6' : 'pl-2'}`}
+                                                className={`flex items-baseline gap-1 w-full ${isSection ? 'pl-8 opacity-70' : hasAct ? 'pl-6' : 'pl-2'}`}
                                             >
-                                                <span className={`font-serif group-hover:text-amber-700 whitespace-nowrap truncate max-w-[80%] pt-1 ${isSection ? 'text-sm text-stone-600 italic' : 'font-semibold text-stone-800'}`}>
-                                                    {isSection && '•'} {entry.title}
-                                                </span>
-                                                <div className="flex-grow border-b border-dotted border-stone-300 mx-1 mb-[5px]" />
-                                                <span className="font-serif text-stone-500 min-w-[2rem] text-right text-sm">
-                                                    {entry.page}
-                                                </span>
-                                            </button>
+                                                {isChapter && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => { e.stopPropagation(); toggleBreakBefore(entry); }}
+                                                        className={`p-0.5 rounded transition-all hover:bg-indigo-50 self-center opacity-40 hover:opacity-100 ${entry.breakBefore ? 'text-indigo-500 opacity-70' : 'text-stone-400'}`}
+                                                        title={entry.breakBefore ? 'Haut de page' : 'Position libre'}
+                                                    >
+                                                        <ArrowUpToLine size={10} />
+                                                    </button>
+                                                )}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onNavigate(entry.page)}
+                                                    className="group flex items-baseline gap-2 text-left hover:text-amber-700 transition-colors flex-grow outline-none"
+                                                >
+                                                    <span className={`font-serif group-hover:text-amber-700 whitespace-nowrap truncate max-w-[80%] pt-1 ${isSection ? 'text-sm text-stone-600 italic' : 'font-semibold text-stone-800'}`}>
+                                                        {isSection && '•'} {entry.title}
+                                                    </span>
+                                                    <div className="flex-grow border-b border-dotted border-stone-300 mx-1 mb-[5px]" />
+                                                    <span className="font-serif text-stone-500 min-w-[2rem] text-right text-sm">
+                                                        {entry.page}
+                                                    </span>
+                                                </button>
+                                            </div>
                                         );
                                     })}
                                 </div>

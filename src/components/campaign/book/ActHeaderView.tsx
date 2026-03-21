@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react';
 import { Editor, NodeViewProps } from '@tiptap/core';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, ArrowUpToLine } from 'lucide-react';
 
 interface ActHeaderViewProps extends Omit<NodeViewProps, 'node' | 'editor'> {
-    node: NodeViewProps['node'];
+    node: NodeViewProps['node'] & { attrs: { breakBefore: boolean } };
     editor: Editor;
+    updateAttributes: (attrs: Partial<{ breakBefore: boolean }>) => void;
 }
 
-const ActHeaderView: React.FC<ActHeaderViewProps> = ({ node, editor, getPos }) => {
+const ActHeaderView: React.FC<ActHeaderViewProps> = ({ node, editor, getPos, updateAttributes }) => {
 
     useEffect(() => {
         const isDefault = node.content?.size > 0 &&
@@ -41,7 +42,21 @@ const ActHeaderView: React.FC<ActHeaderViewProps> = ({ node, editor, getPos }) =
     }, [editor, getPos, node]);
 
     return (
-        <NodeViewWrapper className="act-header-wrapper mt-16 mb-10 pb-6 relative group w-full text-center flex flex-col items-center">
+        <NodeViewWrapper
+            className="act-header-wrapper mt-16 mb-10 pb-6 relative group w-full text-center flex flex-col items-center"
+            style={node.attrs.breakBefore ? { breakBefore: 'column' } : undefined}
+            data-break-before={node.attrs.breakBefore ? 'true' : 'false'}
+        >
+            {/* Break-before toggle */}
+            <button
+                type="button"
+                onClick={() => updateAttributes({ breakBefore: !node.attrs.breakBefore })}
+                className={`absolute top-2 right-2 p-1.5 rounded-lg transition-all opacity-0 group-hover:opacity-100 hover:bg-amber-50 ${node.attrs.breakBefore ? 'bg-amber-100 ring-1 ring-amber-300' : ''}`}
+                title={node.attrs.breakBefore ? 'Ne plus forcer le haut de page' : 'Forcer le haut de page'}
+            >
+                <ArrowUpToLine size={14} className={node.attrs.breakBefore ? 'text-amber-700' : 'text-stone-400'} />
+            </button>
+
             {/* Act Visual Decoration */}
             <div className="flex items-center justify-center gap-4 mb-4 text-amber-800/60">
                 <div className="h-px w-24 bg-gradient-to-r from-transparent to-amber-800/40" />
