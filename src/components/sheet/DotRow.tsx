@@ -271,28 +271,31 @@ export const DotRow: React.FC<DotRowProps> = ({
                 </div>
             </PortalTooltip>
 
-            <DotRating
-                value={entry.value}
-                creationValue={entry.creationValue}
-                onChange={handleUpdate}
-                className={`scale-90 origin-right ml-auto ${isEditing ? 'pointer-events-none' : ''}`}
-                creationColor={theme?.creationColor}
-                xpColor={theme?.xpColor}
-                symbol={theme?.dotSymbol}
-                max={effectiveMax}
-                readOnly={isEditing || isDraggable}
-                blockedReason={blockedReason}
-            />
+            <div className={`flex items-center ml-auto ${isEditing ? 'relative' : ''}`}>
+                <DotRating
+                    value={entry.value}
+                    creationValue={entry.creationValue}
+                    onChange={handleUpdate}
+                    className={`scale-90 origin-right transition-opacity duration-200 ${isEditing ? (isHovered && (entry.value === 0 || !entry.name) ? 'opacity-0 pointer-events-none' : 'pointer-events-none') : ''}`}
+                    creationColor={theme?.creationColor}
+                    xpColor={theme?.xpColor}
+                    symbol={theme?.dotSymbol}
+                    max={effectiveMax}
+                    readOnly={isEditing || isDraggable}
+                    blockedReason={blockedReason}
+                />
 
-            {isEditing && (entry.value === 0 || !entry.name) && (
-                <button
-                    onClick={(e) => { e.stopPropagation(); onRemove?.(category, entry.id); }}
-                    className="absolute -right-4 top-0 bottom-0 my-auto flex items-center justify-center w-6 h-6 text-red-500 opacity-0 group-hover:opacity-100 bg-white shadow-md rounded-full hover:bg-red-50 hover:text-red-700 transition-all z-10"
-                    title="Supprimer la compétence"
-                >
-                    <Trash2 size={14} />
-                </button>
-            )}
+                {isEditing && (entry.value === 0 || !entry.name) && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onRemove?.(category, entry.id); }}
+                        className={`absolute inset-0 flex items-center justify-end px-1 text-red-600 font-bold text-[10px] uppercase tracking-tighter transition-all duration-200 ${isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2 pointer-events-none'}`}
+                        title="Supprimer la compétence"
+                    >
+                        <span className="mr-1">Supprimer</span>
+                        <Trash2 size={12} />
+                    </button>
+                )}
+            </div>
         </div >
     );
 };

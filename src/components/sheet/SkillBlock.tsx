@@ -115,7 +115,7 @@ export const SkillBlock = React.memo<{
                 )}
             </div>
 
-            <div className="flex-grow min-h-0 pt-1 pb-2 relative overflow-y-auto scrollbar-hide skill-block-scroll">
+            <div className="flex-grow min-h-0 pt-1 pb-2 relative overflow-y-auto overflow-x-hidden scrollbar-hide skill-block-scroll">
                 {/* Drop Indicator Logic */}
                 {isEditing && isDragOver && dropIndex !== -1 && (
                     <div
