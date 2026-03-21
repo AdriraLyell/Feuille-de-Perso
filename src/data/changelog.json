@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.113.0",
+        "date": "2026-03-21",
+        "type": "perf/journal",
+        "changes": [
+            "Sync : Optimisation drastique de la bande passante du Grimoire. Les modifications du journal ne sont plus envoyées à chaque frappe mais couplées à la synchronisation globale du personnage.",
+            "Sync : Introduction du flag 'isBookDirty' pour le suivi local des modifications du journal.",
+            "Sync : Amélioration de la logique de réconciliation pour privilégier l'envoi du journal local s'il a été modifié."
+        ]
+    },
+    {
         "version": "2.112.0",
         "date": "2026-03-21",
         "type": "feat/ui",
@@ -175,16 +185,6 @@
             "Logic : Correction du calcul d'équivalence XP pour les attributs et exclusion des traits en mode Rangs.",
             "System : Unification du moteur de réinitialisation pour garantir l'injection immédiate des règles.",
             "Security : Remplacement de la sauvegarde automatique par une alerte visuelle 'Safety Alert' après 30 min."
-        ]
-    },
-    {
-        "version": "2.99.3",
-        "date": "2026-03-07",
-        "type": "fix",
-        "changes": [
-            "Sync : Préservation des compteurs système (Volonté/Confiance) lors de la réconciliation pour éviter la perte de données au rafraîchissement.",
-            "UI : Amélioration de l'accessibilité du widget d'image (support clavier et rôles ARIA).",
-            "UI : Optimisation de la gestion du cycle de vie des URL de blob pour les images du personnage."
         ]
     }
 ]

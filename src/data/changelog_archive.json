@@ -1,5 +1,15 @@
 [
     {
+        "version": "2.99.3",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "Sync : Préservation des compteurs système (Volonté/Confiance) lors de la réconciliation pour éviter la perte de données au rafraîchissement.",
+            "UI : Amélioration de l'accessibilité du widget d'image (support clavier et rôles ARIA).",
+            "UI : Optimisation de la gestion du cycle de vie des URL de blob pour les images du personnage."
+        ]
+    },
+    {
         "version": "2.99.2",
         "date": "2026-03-07",
         "type": "feat",
@@ -762,11 +772,5 @@
         "date": "2026-02-23",
         "type": "feat",
         "description": "Ergonomie (Registre) : Ajout d'un bouton de suppression (croix) dans le champ de recherche des compétences pour vider rapidement la saisie."
-    },
-    {
-        "version": "2.75.9",
-        "date": "2026-02-23",
-        "type": "fix",
-        "description": "Ergonomie (Registre) : Agrandissement de la taille du texte des valeurs dans le tableau des attributs pour améliorer la lisibilité."
     }
 ]
