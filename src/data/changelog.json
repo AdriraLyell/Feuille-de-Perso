@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.112.0",
+        "date": "2026-03-21",
+        "type": "feat/ui",
+        "changes": [
+            "Security : Suppression de l'alerte de sauvegarde automatique des 60 minutes ('Safety Alert') pour fluidifier l'expérience utilisateur.",
+            "UI/Roster : Refonte visuelle des Traits (Avantages/Désavantages) pour une meilleure lisibilité (design hybride avec bordures d'accent et badges colorés)."
+        ]
+    },
+    {
         "version": "2.110.0",
         "date": "2026-03-19",
         "type": "feat",
@@ -175,17 +184,6 @@
             "Sync : Préservation des compteurs système (Volonté/Confiance) lors de la réconciliation pour éviter la perte de données au rafraîchissement.",
             "UI : Amélioration de l'accessibilité du widget d'image (support clavier et rôles ARIA).",
             "UI : Optimisation de la gestion du cycle de vie des URL de blob pour les images du personnage."
-        ]
-    },
-    {
-        "version": "2.99.2",
-        "date": "2026-03-07",
-        "type": "feat",
-        "changes": [
-            "System : Nouveau moteur de réconciliation intelligente pour la migration des attributs lors d'un changement de règles.",
-            "Messaging : Inversion de l'ordre de récupération des messages (plus récents en premier) pour une meilleure expérience utilisateur.",
-            "Logic : Support du mode 'migration' dans le calcul du budget de création et les actions de la fiche.",
-            "Schema : Mise à jour des schémas Zod pour supporter les métadonnées de synchronisation et de migration."
         ]
     }
 ]

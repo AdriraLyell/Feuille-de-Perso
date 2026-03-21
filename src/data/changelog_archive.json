@@ -1,5 +1,16 @@
 [
     {
+        "version": "2.99.2",
+        "date": "2026-03-07",
+        "type": "feat",
+        "changes": [
+            "System : Nouveau moteur de réconciliation intelligente pour la migration des attributs lors d'un changement de règles.",
+            "Messaging : Inversion de l'ordre de récupération des messages (plus récents en premier) pour une meilleure expérience utilisateur.",
+            "Logic : Support du mode 'migration' dans le calcul du budget de création et les actions de la fiche.",
+            "Schema : Mise à jour des schémas Zod pour supporter les métadonnées de synchronisation et de migration."
+        ]
+    },
+    {
         "version": "2.99.1",
         "date": "2026-03-06",
         "type": "feat",
@@ -757,11 +768,5 @@
         "date": "2026-02-23",
         "type": "fix",
         "description": "Ergonomie (Registre) : Agrandissement de la taille du texte des valeurs dans le tableau des attributs pour améliorer la lisibilité."
-    },
-    {
-        "version": "2.75.8",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Ergonomie (Registre) : Affichage discret de la date courante de la chronique dans l'en-tête de la section 'Gestion Temporelle' lorsque celle-ci est repliée."
     }
 ]
