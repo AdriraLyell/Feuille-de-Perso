@@ -34,7 +34,6 @@ interface DiegeticNavigationProps {
     onToggleEditLayoutMode?: () => void;
     onResetLayout?: () => void;
     onAutoFitLayout?: () => void;
-    safetyTimeRemaining?: number;
 }
 
 const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
@@ -44,7 +43,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
     onShowCampaignInfo, autoSaveCountdown,
     isMessagingOpen, onToggleMessaging, unreadMessagesCount,
     isEditMode, onToggleEditMode, isEditLayoutMode, onToggleEditLayoutMode,
-    onResetLayout, onAutoFitLayout, safetyTimeRemaining
+    onResetLayout, onAutoFitLayout
 }) => {
     const { data, isSyncing } = useCharacterState();
     const { rules } = useRules();
@@ -71,11 +70,7 @@ const DiegeticNavigation: React.FC<DiegeticNavigationProps> = ({
         if (isSyncing) return { color: 'text-blue-400 border-blue-900/50 bg-blue-900/10', tooltip: 'Synchronisation en cours...' };
         if (syncStatus === 'update-available') return { color: 'text-amber-400 border-amber-500 bg-amber-900/20', tooltip: 'Mise à jour disponible ! Le MJ a modifié votre fiche.' };
         if (data.syncInfo?.isDirty) {
-            let tooltip = 'Modifications locales en attente d\'envoi';
-            if (safetyTimeRemaining !== undefined && !data.syncInfo?.isAutoSyncEnabled) {
-                const mins = Math.max(0, Math.ceil(safetyTimeRemaining / 60000));
-                tooltip += ` (Alerte dans ${mins} min)`;
-            }
+            const tooltip = 'Modifications locales en attente d\'envoi';
             return { color: 'text-amber-500/80 border-amber-900/30 bg-amber-900/10', tooltip };
         }
         if (data.syncInfo?.syncId) return { color: 'text-emerald-500 border-emerald-900/50 bg-emerald-900/10', tooltip: 'Connecté - Fiche à jour sur le Cloud' };
