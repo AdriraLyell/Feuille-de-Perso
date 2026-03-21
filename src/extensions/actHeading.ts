@@ -125,7 +125,7 @@ export const ActHeading = Node.create({
     },
 
     addNodeView() {
-        return ReactNodeViewRenderer(ActHeaderView);
+        return ReactNodeViewRenderer(ActHeaderView as any); // eslint-disable-line @typescript-eslint/no-explicit-any
     },
 });
 
