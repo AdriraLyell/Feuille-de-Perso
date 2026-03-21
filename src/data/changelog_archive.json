@@ -1,5 +1,14 @@
 [
     {
+        "version": "2.99.7",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "CI/CD : Correction du pipeline de déploiement (ajout des étapes manquantes pour la notification Realtime).",
+            "CI/CD : Synchronisation des dépendances dans le job de déploiement."
+        ]
+    },
+    {
         "version": "2.99.6",
         "date": "2026-03-07",
         "type": "feat",
@@ -779,11 +788,5 @@
         "date": "2026-02-23",
         "type": "feat",
         "description": "Registre (Roster) : Ajout d'options de tri global pour les avantages et désavantages dans la section Profils. Permet de trier les traits par nom ou par coût pour tous les personnages simultanément."
-    },
-    {
-        "version": "2.75.13",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Bibliothèque de Traits : Amélioration des options de tri. Ajout de boutons explicites pour le tri par ordre alphabétique et par coût, avec retour visuel amélioré et icônes directionnelles."
     }
 ]

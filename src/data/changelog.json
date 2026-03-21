@@ -1,5 +1,17 @@
 [
     {
+        "version": "2.116.0",
+        "date": "2026-03-21",
+        "type": "fix/feat",
+        "changes": [
+            "Système : Protection de l'état d'activation du mode création et du système de cartes lors de la réconciliation des règles.",
+            "Reset : Garantie du lancement immédiat du HUD de création après une réinitialisation complète.",
+            "Admin : Ajout de labels explicites sur les boutons de navigation (Journal, Gestion de Groupe).",
+            "Journal : Option 'Haut de page' par chapitre/acte avec recalcul du sommaire.",
+            "Journal : Correction du positionnement des titres de chapitres via suppression du break-before parasite."
+        ]
+    },
+    {
         "version": "2.115.0",
         "date": "2026-03-21",
         "type": "feature/journal",
@@ -177,15 +189,6 @@
         "changes": [
             "CI/CD : Sécurisation du script de notification Realtime (ajout d'un timeout de sécurité et gestion des erreurs de connexion).",
             "CI/CD : Amélioration de la fiabilité du processus de terminaison du job de déploiement."
-        ]
-    },
-    {
-        "version": "2.99.7",
-        "date": "2026-03-07",
-        "type": "fix",
-        "changes": [
-            "CI/CD : Correction du pipeline de déploiement (ajout des étapes manquantes pour la notification Realtime).",
-            "CI/CD : Synchronisation des dépendances dans le job de déploiement."
         ]
     }
 ]

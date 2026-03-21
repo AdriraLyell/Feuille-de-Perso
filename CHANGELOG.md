@@ -1,27 +1,19 @@
-# Historique Ancien (Legacy Changelog)
-
-## [2.75.12] - 2026-02-23 [FEAT]
-
-
-
-## [2.75.11] - 2026-02-23 [FEAT]
-
-
-
-## [2.75.10] - 2026-02-23 [FEAT]
-
-
-
 ## [2.116.0] - 2026-03-21 [FIX/FEAT]
 
-### Système & Core
-- **fix(core) :** Protection de l'état d'activation du mode création et du système de cartes lors de la réconciliation des règles. Empêche la désactivation accidentelle après un reset ou une migration.
-- **fix(reset) :** Garantie du lancement immédiat du HUD de création lors d'une réinitialisation complète depuis les paramètres.
+- **Système :** Protection de l'état d'activation du mode création et du système de cartes lors de la réconciliation des règles.
+- **Reset :** Garantie du lancement immédiat du HUD de création après une réinitialisation complète.
+- **Admin :** Ajout de labels explicites sur les boutons de navigation (Journal, Gestion de Groupe).
+- **Journal :** Option 'Haut de page' par chapitre/acte avec recalcul du sommaire.
+- **Journal :** Correction du positionnement des titres de chapitres via suppression du break-before parasite.
 
-### Admin & Journal
-- **feat(admin) :** Ajout de labels explicites sur les boutons de navigation sidebar (Journal, Gestion de Groupe).
-- **feat(journal) :** Support du saut de page individuel par chapitre ou acte (Option "Haut de page") avec recalcul automatique du sommaire.
-- **fix(journal) :** Désactivation du `break-before: column` sur les titres de chapitres pour éviter les sauts de page forcés indésirables.
+---
+
+## [2.115.0] - 2026-03-21 [FEAT]
+
+- **Journal :** Option 'Haut de page' par chapitre et acte (toggle au survol).
+- **Journal :** Checkbox discret dans le sommaire pour chaque chapitre/acte.
+- **Journal :** Les anciens chapitres/actes conservent le comportement haut de page par défaut.
+- **Journal :** Les chapitres/actes insérés au curseur respectent la position du curseur.
 
 ---
 
@@ -35,8 +27,6 @@
 - fix(journal): ajout de `onMouseDown preventDefault` sur les boutons sidebar pour préserver le focus éditeur
 - fix(journal): correction des dépendances du useEffect dans ChapterHeaderView (alignement avec ActHeaderView)
 - fix(journal): double RAF dans useBookTableOfContents pour fiabiliser le calcul de page après reflow CSS
-
----
 
 # Historique Ancien (Legacy Changelog)
 
