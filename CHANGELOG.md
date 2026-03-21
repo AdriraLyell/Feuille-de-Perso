@@ -1,3 +1,14 @@
+## [2.114.0] - 2026-03-21 [FIX]
+
+### Journal de campagne - Insertion au curseur
+- fix(journal): correction du positionnement aléatoire des chapitres et actes insérés au curseur
+- fix(journal): retrait du `break-before: column` CSS sur les chapitres qui les forçait en haut de colonne
+- fix(journal): passage de la position du curseur en paramètre explicite depuis le composant React
+- fix(journal): remplacement du pattern `splitBlock/insertContent` par `insertContentAt` (pattern prouvé de narrativeSection)
+- fix(journal): ajout de `onMouseDown preventDefault` sur les boutons sidebar pour préserver le focus éditeur
+- fix(journal): correction des dépendances du useEffect dans ChapterHeaderView (alignement avec ActHeaderView)
+- fix(journal): double RAF dans useBookTableOfContents pour fiabiliser le calcul de page après reflow CSS
+
 # Historique Ancien (Legacy Changelog)
 
 ## [2.75.9] - 2026-02-23 [FIX]

@@ -44,8 +44,8 @@ interface ColumnarEditorProps {
 
 interface EditorCommands {
     insertNarrativeSection: (options: { type: string; timeSlot: string }) => void;
-    insertChapterAtDate: (date: string, something?: unknown, atSelection?: boolean) => void;
-    insertAct: (atSelection: boolean) => void;
+    insertChapterAtDate: (date: string, something?: unknown, atSelection?: boolean, cursorPos?: number) => void;
+    insertAct: (atSelection: boolean, cursorPos?: number) => void;
 }
 
 export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
@@ -196,7 +196,8 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                             const today = cal?.type === 'real'
                                 ? (cal.currentDate || new Date().toISOString()).split('T')[0]
                                 : `${cal?.currentYear}-${cal?.currentMonthIndex !== undefined ? cal.currentMonthIndex + 1 : 1}-${cal?.currentDay || 1}`;
-                            commands.insertChapterAtDate(today, undefined, true);
+                            const pos = editor?.state.selection.$to.pos;
+                            commands.insertChapterAtDate(today, undefined, true, pos);
                         }}
                         onInsertChapterAtEnd={() => {
                             const cal = rules?.configurations?.calendar;
@@ -204,8 +205,20 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
                                 ? (cal.currentDate || new Date().toISOString()).split('T')[0]
                                 : `${cal?.currentYear}-${cal?.currentMonthIndex !== undefined ? cal.currentMonthIndex + 1 : 1}-${cal?.currentDay || 1}`;
                             commands.insertChapterAtDate(today, undefined, false);
+
+                            setTimeout(() => {
+                                if (containerRef.current) {
+                                    containerRef.current.scrollTo({
+                                        left: containerRef.current.scrollWidth,
+                                        behavior: 'smooth'
+                                    });
+                                }
+                            }, 100);
                         }}
-                        onInsertActAtCursor={() => commands.insertAct(true)}
+                        onInsertActAtCursor={() => {
+                            const pos = editor?.state.selection.$to.pos;
+                            commands.insertAct(true, pos);
+                        }}
                         isCalendarVisible={isCalendarVisible}
                         onToggleCalendar={() => setIsCalendarVisible(!isCalendarVisible)}
                         toolbar={(

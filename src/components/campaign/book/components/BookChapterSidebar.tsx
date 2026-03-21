@@ -28,6 +28,7 @@ export const BookChapterSidebar: React.FC<BookChapterSidebarProps> = ({
         >
             <div className="flex gap-1 items-center justify-center flex-wrap gap-y-2">
                 <button
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={onInsertActAtCursor}
                     className="p-2 rounded-lg bg-stone-800 text-amber-500/80 hover:bg-stone-700 hover:text-amber-400 transition border border-stone-700 hover:border-amber-500 shadow-lg group relative w-full flex justify-center mb-1"
                 >
@@ -38,6 +39,7 @@ export const BookChapterSidebar: React.FC<BookChapterSidebarProps> = ({
                 </button>
 
                 <button
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={onInsertChapterAtCursor}
                     className="p-2 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700 hover:text-amber-400 transition border border-stone-700 hover:border-amber-600/50 shadow-lg group relative"
                 >
@@ -74,6 +76,7 @@ export const BookChapterSidebar: React.FC<BookChapterSidebarProps> = ({
             {isCalendarVisible && children}
 
             <button
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={onInsertMoment}
                 className="p-2.5 rounded-lg bg-stone-800 text-stone-300 hover:bg-stone-700 hover:text-amber-400 transition border border-stone-700 hover:border-amber-600/50 shadow-lg group relative"
             >

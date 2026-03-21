@@ -71,7 +71,8 @@ export function useBookTableOfContents(
             if (rafId !== null) cancelAnimationFrame(rafId);
             rafId = requestAnimationFrame(() => {
                 rafId = null;
-                updateTOC();
+                // Double RAF : lire offsetLeft après le re-render React et le reflow CSS columns
+                requestAnimationFrame(updateTOC);
             });
         };
 

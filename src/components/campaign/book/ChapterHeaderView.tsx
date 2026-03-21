@@ -44,7 +44,7 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
 
             return () => clearTimeout(timer);
         }
-    }, []); // Run only once on mount
+    }, [editor, getPos, node]);
 
     const formatDate = (dateStr: string, isReal: boolean = false) => {
         if (!dateStr) return isReal ? '' : 'Date du récit...';

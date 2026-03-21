@@ -8,7 +8,7 @@ declare module '@tiptap/core' {
         actHeading: {
             setAct: () => ReturnType;
             appendAct: () => ReturnType;
-            insertAct: (atSelection?: boolean) => ReturnType;
+            insertAct: (atSelection?: boolean, cursorPos?: number) => ReturnType;
         };
     }
 }
@@ -81,17 +81,19 @@ export const ActHeading = Node.create({
                     },
 
             insertAct:
-                (atSelection?: boolean) =>
+                (atSelection?: boolean, cursorPos?: number) =>
                     ({ chain, state }: CommandProps) => {
                         if (atSelection) {
+                            const pos = cursorPos ?? state.selection.$to.pos;
                             return chain()
+                                .insertContentAt(pos, [
+                                    {
+                                        type: this.name,
+                                        content: [{ type: 'text', text: 'Nouvel Acte' }],
+                                    },
+                                    { type: 'paragraph' }
+                                ])
                                 .focus()
-                                .splitBlock()
-                                .insertContent({
-                                    type: this.name,
-                                    content: [{ type: 'text', text: 'Nouvel Acte' }],
-                                })
-                                .insertContent({ type: 'paragraph' })
                                 .run();
                         }
 
