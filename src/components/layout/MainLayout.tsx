@@ -603,7 +603,7 @@ const MainLayout: React.FC = () => {
                                         <div className={`${sheetTab === 'p2' ? 'block' : 'hidden'} w-max mx-auto max-w-full`}><CharacterSheetPage2 isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'inventaire' ? 'block' : 'hidden'} w-max mx-auto max-w-full`}><CharacterSheetInventaire isLandscape={isLandscape} /></div>
                                         <div className={`${sheetTab === 'xp' ? 'block' : 'hidden'} w-max mx-auto max-w-full`}><CharacterSheetXP isLandscape={isLandscape} /></div>
-                                        <div className={`${sheetTab === 'notes' ? 'block' : 'hidden'} w-full mx-auto max-w-7xl`}><CampaignNotes /></div>
+                                        <div className={`${sheetTab === 'notes' ? 'block' : 'hidden'} w-full`}><CampaignNotes /></div>
                                     </div>
 
                                     <PostItBoard currentTab={sheetTab} />
