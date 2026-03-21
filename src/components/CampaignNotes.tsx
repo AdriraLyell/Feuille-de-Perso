@@ -40,8 +40,8 @@ const CampaignNotes: React.FC = () => {
     return (
         <div className="w-full bg-[#121212] relative">
             <style>{`
-    .hide - scrollbar:: -webkit - scrollbar { display: none; }
-                .hide - scrollbar { -ms - overflow - style: none; scrollbar - width: none; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 `}</style>
 
             {/* Background Texture (Deep Wood) - Exactly 100px margin around the book (1484 + 200 = 1684) */}
@@ -53,16 +53,16 @@ const CampaignNotes: React.FC = () => {
                 <div className="w-full max-w-7xl px-8 py-6 flex items-center justify-between border-b border-white/5 bg-black/20 backdrop-blur-sm">
                     <div className="flex items-center gap-8">
                         {[
-                            { id: 'journal', icon: Book, label: 'Journal de Campagne' },
-                            { id: 'party', icon: Users, label: 'Membres du Groupe' }
+                            { id: 'journal', icon: Book, label: 'Journal' },
+                            { id: 'party', icon: Users, label: 'Gestion de Groupe' }
                         ].map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as 'journal' | 'party')}
-                                className={`group flex items - center gap - 3 transition - all ${activeTab === tab.id ? 'text-stone-100' : 'text-stone-500 hover:text-stone-300'} `}
+                                className={`group flex items-center gap-3 transition-all relative ${activeTab === tab.id ? 'text-stone-100' : 'text-stone-500 hover:text-stone-300'}`}
                             >
                                 <tab.icon size={20} className={activeTab === tab.id ? 'text-amber-500' : ''} />
-                                <span className={`text - sm font - bold uppercase tracking - widest font - serif leading - none hidden sm: inline`}>{tab.label}</span>
+                                <span className="text-sm font-bold uppercase tracking-widest font-serif leading-none">{tab.label}</span>
                                 {activeTab === tab.id && <div className="h-1 w-full bg-amber-500 absolute -bottom-6 left-0" />}
                             </button>
                         ))}

@@ -122,6 +122,13 @@
 
 # Changelog
 
+## [2.113.1] - 2026-03-21 [UI/FIX]
+- **Fiche :** Refonte de la suppression des compétences en mode édition (Substitution au survol).
+- **Layout :** Correction de l'ascenseur horizontal parasite en mode édition.
+- **UI :** Harmonisation des labels et nettoyage du layout dans les notes de campagne.
+
+---
+
 ## [2.108.3] - 2026-03-09 [FIX/FEAT]
 - **Système :** Fiabilisation du suivi des "Écritures suspectes". Les descriptions, tags et effets sont désormais correctement capturés et transmis au MJ.
 - **Admin :** Refonte de l'Assistant d'Importation. Ajout d'un système d'accordéon pour comparer les descriptions en deux colonnes.
