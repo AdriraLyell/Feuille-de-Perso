@@ -25,7 +25,13 @@ export const ColumnarEditorStyles = () => (
             margin-right: 0 !important;
             max-width: none !important;
         }    
-        .ProseMirror p {
+        .ProseMirror p, 
+        .ProseMirror h1, 
+        .ProseMirror h2, 
+        .ProseMirror h3,
+        .ProseMirror li,
+        .ProseMirror blockquote {
+            scroll-margin-top: 200px; /* Espace de sécurité pour la pillule */
             break-inside: auto !important;
             page-break-inside: auto !important;
             widows: 1 !important;

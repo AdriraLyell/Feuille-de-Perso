@@ -72,6 +72,51 @@ export const ColumnarEditor: React.FC<ColumnarEditorProps> = ({
         editable: !readOnly,
         immediatelyRender: false,
         onUpdate: handleUpdate,
+        onSelectionUpdate: ({ editor }: { editor: any }) => {
+            // On attend que le DOM soit à jour pour mesurer la position réelle du curseur
+            requestAnimationFrame(() => {
+                const { view, state } = editor;
+                try {
+                    const coords = view.coordsAtPos(state.selection.head);
+                    const container = containerRef.current;
+                    
+                    // 1. GESTION VERTICALE (Contre la pillule)
+                    const pillule = document.querySelector('nav[aria-label="Navigation des onglets de personnage"]');
+                    const pilluleBottom = pillule ? pillule.getBoundingClientRect().bottom : 100;
+                    const safetyMargin = 30;
+
+                    if (coords.top < pilluleBottom + safetyMargin) {
+                        window.scrollBy(0, coords.top - (pilluleBottom + safetyMargin));
+                    } else if (coords.bottom > window.innerHeight - safetyMargin) {
+                        window.scrollBy(0, coords.bottom - (window.innerHeight - safetyMargin));
+                    }
+
+                    // 2. GESTION HORIZONTALE (Saut de double-page)
+                    if (container) {
+                        const containerRect = container.getBoundingClientRect();
+                        const stride = (PAGE_WIDTH + 40) * 2;
+                        const currentScroll = container.scrollLeft;
+                        
+                        const relativeX = coords.left - containerRect.left + currentScroll;
+                        const targetSpreadIndex = Math.floor(relativeX / stride);
+                        const currentSpreadIndex = Math.round(currentScroll / stride);
+
+                        if (targetSpreadIndex !== currentSpreadIndex) {
+                            container.scrollTo({
+                                left: targetSpreadIndex * stride,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                } catch {
+                    // Erreur silencieuse si les coordonnées ne sont pas encore prêtes
+                }
+            });
+        },
+        editorProps: {
+            // On désactive le scroll natif de l'éditeur car nous le gérons manuellement au-dessus
+            handleScrollToSelection: () => true
+        }
     }), [readOnly, handleUpdate]);
 
     const editor = useEditor(editorOptions);
