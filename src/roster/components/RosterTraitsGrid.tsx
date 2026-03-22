@@ -1,8 +1,103 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronRight, ArrowDownAZ, ArrowUpAZ, Coins } from 'lucide-react';
 import { SyncedCharacter } from '../../services/CharacterSyncService';
-import { CharacterSheetData } from '../../types';
+import { CharacterSheetData, TraitEntry } from '../../types';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
+import { PortalTooltip } from '../../components/ui/PortalTooltip';
+
+interface RosterTraitItemProps {
+    trait: TraitEntry;
+    isAdv: boolean;
+}
+
+const RosterTraitItem: React.FC<RosterTraitItemProps> = ({ trait, isAdv }) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+    const anchorRef = useRef<HTMLDivElement>(null);
+    const hasContent = !!(trait.description?.trim() || trait.customNotes?.trim());
+
+    useEffect(() => {
+        if (!showTooltip || !hasContent) return;
+        
+        const handleClickOutside = (e: MouseEvent) => {
+            if (anchorRef.current && !anchorRef.current.contains(e.target as Node)) {
+                setShowTooltip(false);
+            }
+        };
+        
+        // Petit délai pour éviter que le clic d'ouverture ne ferme immédiatement le tooltip
+        const timer = setTimeout(() => {
+            window.addEventListener('click', handleClickOutside);
+        }, 0);
+        
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('click', handleClickOutside);
+        };
+    }, [showTooltip, hasContent]);
+
+    return (
+        <div 
+            ref={anchorRef}
+            role={hasContent ? "button" : "presentation"}
+            tabIndex={hasContent ? 0 : -1}
+            onClick={hasContent ? () => setShowTooltip(!showTooltip) : undefined}
+            onKeyDown={hasContent ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setShowTooltip(!showTooltip);
+                }
+            } : undefined}
+            className={`text-[11px] outline-none focus-visible:ring-1 focus-visible:ring-amber-500 leading-tight px-2.5 py-1.5 rounded-sm border flex justify-between items-start gap-2 w-full transition-colors bg-stone-900/40 text-stone-300 border-stone-800 border-l-2 ${
+                isAdv 
+                ? 'border-l-emerald-500' 
+                : 'border-l-rose-500'
+            } ${hasContent ? 'cursor-help hover:bg-stone-800/50' : 'cursor-default'} ${showTooltip ? 'bg-stone-800/80 border-stone-700' : ''}`}
+        >
+            <span className="font-bold break-words whitespace-normal text-left flex-1">
+                {trait.name}
+                {trait.variant && (
+                    <span className="opacity-50 font-normal italic ml-1">
+                        : {trait.variant}
+                    </span>
+                )}
+            </span>
+            {trait.value && (
+                <span className={`font-mono text-[10px] shrink-0 mt-0.5 px-1.5 py-0.5 rounded-sm border ${
+                    isAdv
+                    ? 'bg-emerald-950/40 text-emerald-400 border-emerald-900/50'
+                    : 'bg-rose-950/60 text-rose-400 border-rose-900/50'
+                }`}>
+                    {trait.value}
+                </span>
+            )}
+
+            {showTooltip && (trait.description || trait.customNotes) && (
+                <PortalTooltip
+                    anchorRef={anchorRef}
+                    isOpen={showTooltip}
+                    maxWidth={300}
+                >
+                    <div className="space-y-2">
+                        <div className="font-bold text-sm text-stone-200 border-b border-stone-600 pb-1 mb-1">
+                            {trait.name} {trait.variant && <span className="text-stone-400 font-normal">: {trait.variant}</span>}
+                        </div>
+                        {trait.description && (
+                            <div className="text-xs text-stone-300 whitespace-pre-wrap leading-relaxed italic">
+                                "{trait.description}"
+                            </div>
+                        )}
+                        {trait.customNotes && (
+                            <div className="text-xs text-amber-200/80 leading-relaxed whitespace-pre-wrap p-2 bg-amber-900/20 rounded border border-amber-900/30">
+                                <span className="text-[9px] uppercase font-bold text-amber-500/80 block mb-0.5">Note personnelle</span>
+                                {trait.customNotes}
+                            </div>
+                        )}
+                    </div>
+                </PortalTooltip>
+            )}
+        </div>
+    );
+};
 
 interface RosterTraitsGridProps {
     characters: SyncedCharacter[];
@@ -134,32 +229,11 @@ export const RosterTraitsGrid: React.FC<RosterTraitsGridProps> = ({
                                                 {currentTraits.length > 0 ? (
                                                     <div className="space-y-1.5">
                                                         {currentTraits.map((trait, i) => (
-                                                            <div 
+                                                            <RosterTraitItem 
                                                                 key={i} 
-                                                                className={`text-[11px] leading-tight px-2.5 py-1.5 rounded-sm border flex justify-between items-start gap-2 w-full transition-colors bg-stone-900/40 text-stone-300 border-stone-800 border-l-2 ${
-                                                                    isAdv 
-                                                                    ? 'border-l-emerald-500 hover:bg-stone-800/50' 
-                                                                    : 'border-l-rose-500 hover:bg-stone-800/50'
-                                                                }`}
-                                                            >
-                                                                <span className="font-bold break-words whitespace-normal text-left flex-1" title={trait.variant ? `${trait.name} : ${trait.variant}` : trait.name}>
-                                                                    {trait.name}
-                                                                    {trait.variant && (
-                                                                        <span className="opacity-50 font-normal italic ml-1">
-                                                                            : {trait.variant}
-                                                                        </span>
-                                                                    )}
-                                                                </span>
-                                                                {trait.value && (
-                                                                    <span className={`font-mono text-[10px] shrink-0 mt-0.5 px-1.5 py-0.5 rounded-sm border ${
-                                                                        isAdv
-                                                                        ? 'bg-emerald-950/40 text-emerald-400 border-emerald-900/50'
-                                                                        : 'bg-rose-950/60 text-rose-400 border-rose-900/50'
-                                                                    }`}>
-                                                                        {trait.value}
-                                                                    </span>
-                                                                )}
-                                                            </div>
+                                                                trait={trait} 
+                                                                isAdv={isAdv} 
+                                                            />
                                                         ))}
                                                     </div>
                                                 ) : (

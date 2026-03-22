@@ -1,3 +1,11 @@
+## [2.119.0] - 2026-03-22 [FEAT/UI]
+
+- **Roster :** Implémentation des tooltips au clic sur les traits pour consulter leurs descriptions sans quitter la vue d'ensemble.
+- **Roster :** Ajout d'un curseur d'aide (`?`) sur les traits possédant une description ou une note personnelle.
+- **Roster :** Optimisation de l'affichage : les traits sans contenu ne déclenchent plus d'interaction et conservent le curseur standard.
+
+---
+
 ## [2.118.0] - 2026-03-22 [FIX/FEAT]
 
 - **Journal :** Migration de la persistance locale vers IndexedDB pour garantir la conservation du texte lors d'un arrêt brutal ou redémarrage du PC.
