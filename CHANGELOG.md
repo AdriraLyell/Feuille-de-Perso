@@ -1,3 +1,19 @@
+## [2.118.0] - 2026-03-22 [FIX/FEAT]
+
+- **Journal :** Migration de la persistance locale vers IndexedDB pour garantir la conservation du texte lors d'un arrêt brutal ou redémarrage du PC.
+- **Journal :** Le contenu est désormais sauvegardé en temps réel et restauré automatiquement si le stockage principal (localStorage) est incomplet.
+- **Système :** Optimisation du poids du stockage local en déportant les données volumineuses du journal vers une base de données dédiée plus robuste.
+
+---
+
+## [2.117.0] - 2026-03-22 [FEAT]
+
+- **Roster :** Mise en place d'un tri alphabétique permanent sur les noms de personnages.
+- **Roster :** Alignement cohérent de l'ordre dans les tableaux d'attributs, matrices de compétences et grilles de traits.
+- **Roster :** Le menu de gestion de la visibilité des personnages suit également l'ordre alphabétique pour une navigation plus fluide.
+
+---
+
 ## [2.116.0] - 2026-03-21 [FIX/FEAT]
 
 - **Système :** Protection de l'état d'activation du mode création et du système de cartes lors de la réconciliation des règles.

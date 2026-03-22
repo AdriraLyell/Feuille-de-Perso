@@ -4,6 +4,7 @@ import { SheetLayout } from '../hooks/useSheetLayout';
 import { useCharacterStateManager } from '../hooks/context/useCharacterStateManager';
 import { useCharacterSyncManager } from '../hooks/context/useCharacterSyncManager';
 import { useCharacterImageMigration } from '../hooks/context/useCharacterImageMigration';
+import { useBookContentFallback } from '../hooks/context/useBookContentFallback';
 import { useResolvedCharacter } from '../hooks/context/useResolvedCharacter';
 import { useRules } from './RulesContext';
 import { calculateExperienceResults } from '../utils/mechanics';
@@ -129,6 +130,8 @@ export const CharacterProvider: React.FC<CharacterProviderProps> = ({ children }
 
     // Run image migration effect
     useCharacterImageMigration(data, updateData);
+    // Run IDB fallback: restores journal if bookDocument is missing after a restart
+    useBookContentFallback(data, updateData);
 
     // XP Calculation Effect (Remains here as it depends on data and changes data)
     useEffect(() => {
