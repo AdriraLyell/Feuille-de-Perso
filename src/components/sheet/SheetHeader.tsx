@@ -86,6 +86,19 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
         return { zodiac, chineseZodiac };
     }, [headerData.born]);
 
+    // Aide à la saisie des dates : JJMMYYYY -> JJ/MM/AAAA
+    const formatAsDateType = (val: string) => {
+        // 1. Extraire uniquement les chiffres
+        const digits = val.replace(/\D/g, '').slice(0, 10); // Limiter à 10 chiffres (au cas où année longue)
+
+        // 2. Reconstruire avec les slashs
+        if (digits.length <= 2) return digits;
+        if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+        
+        // On autorise des années de 4 à 6 chiffres si besoin, mais on place le slash après le mois
+        return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+    };
+
     const lockTitle = "Champ verrouillé (géré par le calendrier de la campagne)";
 
     return (
@@ -203,7 +216,7 @@ const SheetHeader: React.FC<SheetHeaderProps> = ({
                     <HeaderInput
                         label="Né(e) le"
                         value={headerData.born}
-                        onChange={(v) => onUpdateHeader('born', v)}
+                        onChange={(v) => onUpdateHeader('born', formatAsDateType(v))}
                         className="flex-grow border-r border-stone-300"
                     >
                         {bornZodiacs && (

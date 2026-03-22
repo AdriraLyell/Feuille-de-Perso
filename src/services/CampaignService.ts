@@ -1,5 +1,7 @@
 import { DatabaseService } from './DatabaseService';
+import { supabase } from './supabase';
 import { GameSetting, RulesData, GameSettingSummary, processRulesDataForBonusMJ } from '../types/rules';
+
 export type { GameSetting, RulesData, GameSettingSummary };
 import { LibraryService } from './LibraryService';
 import { logger } from '../utils/logger';
@@ -214,6 +216,57 @@ export const CampaignService = {
         }
 
         return { success: true };
+    },
+
+    /**
+     * Surgical Update: Only update the calendar configuration.
+     * This is much lighter than saveSetting because it skips library synchronization.
+     * Triggers Supabase Realtime for the campaign.
+     */
+    async patchCalendar(id: string, calendar: RulesData['configurations']['calendar']): Promise<{ success: boolean; message?: string }> {
+        if (!id || !calendar) return { success: false, message: "Données manquantes" };
+
+        try {
+            // 1. Vérifier l'auth (Log only for debug)
+            const { data: { session } } = await supabase.auth.getSession();
+            logger.info("[CampaignService] Session status:", session ? "Authenticated" : "Anonymous");
+
+            // 2. Charger les configurations actuelles
+            const current = await CampaignService.loadSetting(id);
+            if (!current) {
+                logger.error("[CampaignService] Impossible de charger les règles pour id:", id);
+                return { success: false, message: "Campagne introuvable." };
+            }
+
+            // 3. Fusionner les configurations
+            const updatedConfigurations = {
+                ...current.configurations,
+                calendar
+            };
+
+            logger.info("[CampaignService] Patching calendar for:", id, "New Date:", calendar.currentDate || calendar.currentDay);
+
+            // 4. Update via DatabaseService
+            const success = await DatabaseService.update(
+                TABLE_GAME_SETTINGS,
+                id,
+                { 
+                    configurations: updatedConfigurations,
+                    updated_at: new Date().toISOString()
+                },
+                'CampaignService.patchCalendar'
+            );
+
+            if (!success) {
+                logger.error("[CampaignService] Mise à jour en base échouée (possiblement RLS).");
+                return { success: false, message: "Erreur persistante lors de la sauvegarde (Vérifiez vos droits MJ)." };
+            }
+
+            return { success: true };
+        } catch (e) {
+            logger.error("[CampaignService] Exception in patchCalendar:", e);
+            return { success: false, message: "Exception lors du patch calendrier." };
+        }
     },
 
     /**

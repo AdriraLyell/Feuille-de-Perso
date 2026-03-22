@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { CharacterSheetData, TraitEntry } from '../../types';
 import { RulesData } from '../../types/rules';
+import { formatCalendarDate, formatSimpleDate } from '../../utils/dateUtils';
 
 /**
  * Hook to resolve character data by merging personal choices with campaign rules.
@@ -12,6 +13,17 @@ export const useResolvedCharacter = (data: CharacterSheetData, rules: RulesData 
 
     // Deep clone to avoid mutating the original state
     const resolved: CharacterSheetData = JSON.parse(JSON.stringify(data));
+
+    // 0. Resolve Campaign Dates (Single Source of Truth)
+    if (rules.configurations?.calendar) {
+        const cal = rules.configurations.calendar;
+        resolved.header.fictionCurrentDate = formatCalendarDate(cal);
+        
+        // Also sync campaign start date if available in rules
+        if (cal.startDate) {
+           resolved.header.campaignStartDate = formatSimpleDate(cal.startDate);
+        }
+    }
 
     // 1. Resolve Skills
     Object.keys(resolved.skills).forEach(cat => {

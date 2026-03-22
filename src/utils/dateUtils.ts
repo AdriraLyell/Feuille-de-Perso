@@ -5,8 +5,8 @@ export function parseFlexibleDate(dateStr: string) {
     if (!dateStr) return null;
     const trimmed = dateStr.trim();
 
-    // 1. Format français : DD/MM/YYYY
-    const frMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4,})$/);
+    // 1. Format français : DD/MM/YYYY (accepte aussi les espaces ou tirets)
+    const frMatch = trimmed.match(/^(\d{1,2})[/\s-](\d{1,2})[/\s-](\d{4,})$/);
     if (frMatch) {
         return { day: parseInt(frMatch[1]), month: parseInt(frMatch[2]), year: parseInt(frMatch[3]), type: 'standard' as const };
     }
@@ -35,4 +35,30 @@ export function flexibleDateToDate(parsed: ReturnType<typeof parseFlexibleDate>)
     if (!parsed) return null;
     // On utilise Date.UTC pour éviter les décalages de fuseau horaire
     return new Date(Date.UTC(parsed.year, parsed.month - 1, parsed.day, 12, 0, 0));
+}
+
+/**
+ * Formatage centralisé de la date de campagne/calendrier
+ */
+export function formatCalendarDate(calendar: any): string {
+    if (!calendar) return "Non configuré";
+    
+    if (calendar.type === 'fictional') {
+        const m = calendar.months?.[calendar.currentMonthIndex]?.name ?? `Mois ${calendar.currentMonthIndex + 1}`;
+        return `Jour ${calendar.currentDay}, ${m}, An ${calendar.currentYear}`;
+    } else {
+        if (!calendar.currentDate) return "Date indéfinie";
+        return formatSimpleDate(calendar.currentDate);
+    }
+}
+/**
+ * Formatage simple jj/mm/aaaa
+ */
+export function formatSimpleDate(dateStr: string | undefined): string {
+    if (!dateStr) return "";
+    const parsed = parseFlexibleDate(dateStr);
+    if (!parsed || parsed.type !== 'standard') return dateStr;
+    const d = parsed.day.toString().padStart(2, '0');
+    const m = parsed.month.toString().padStart(2, '0');
+    return `${d}/${m}/${parsed.year}`;
 }

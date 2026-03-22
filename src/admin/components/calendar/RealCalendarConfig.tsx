@@ -5,6 +5,7 @@ import CalendarEventsList from './CalendarEventsList';
 import { CalendarDays, RotateCcw } from 'lucide-react';
 import { calculateMoonPhase } from '../../../utils/moonPhase';
 import { getWesternZodiac, getChineseZodiac } from '../../../utils/zodiac';
+import { formatSimpleDate } from '../../../utils/dateUtils';
 
 interface Props {
     config: CalendarConfigReal;
@@ -62,7 +63,7 @@ const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
                     />
                     {startDateObj && (
                         <p className="text-stone-500 text-xs mt-1">
-                            {DAY_FR[startDateObj.getDay()]} {startDateObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                            {DAY_FR[startDateObj.getDay()]} {formatSimpleDate(config.startDate)}
                         </p>
                     )}
                 </div>
@@ -85,7 +86,7 @@ const RealCalendarConfig: React.FC<Props> = ({ config, onUpdate }) => {
                         <div className="flex flex-col gap-1 mt-1">
                             <p className="text-stone-500 text-xs flex items-center gap-2">
                                 <CalendarDays size={11} />
-                                {DAY_FR[currentDateObj.getDay()]} {currentDateObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                {DAY_FR[currentDateObj.getDay()]} {formatSimpleDate(config.currentDate)}
                                 {diffDays !== null && diffDays >= 0 && (
                                     <span className="text-amber-gold/70">— J+{diffDays}</span>
                                 )}

@@ -151,7 +151,7 @@ const CharacterSheet: React.FC<Props> = ({ isLandscape = false, onToggleEditMode
             <div className={`sheet-container ${isLandscape ? 'landscape' : ''}`}>
 
                 <SheetHeader
-                    headerData={data.header}
+                    headerData={resolvedData.header}
                     creationActive={!!creationActive}
                     onUpdateHeader={updateHeader}
                     isDateLocked={!!rules?.configurations?.calendar}

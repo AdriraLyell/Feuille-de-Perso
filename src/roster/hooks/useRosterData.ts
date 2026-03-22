@@ -1,7 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { CharacterSyncService, SyncedCharacter } from '../../services/CharacterSyncService';
 import { CampaignService, RulesData } from '../../services/CampaignService';
+import { formatCalendarDate } from '../../utils/dateUtils';
 import { CharacterSheetData } from '../../types';
+import { supabase } from '../../services/supabase';
+import { TABLE_GAME_SETTINGS } from '../../constants/db';
 
 export interface SkillRow {
     name: string;
@@ -19,15 +22,74 @@ export const useRosterData = (settingId: string) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+
+    // ÉCOUTE REALTIME : Synchronisation bidirectionnelle (Admin <-> Roster)
+    // On écoute les changements sur la table game_settings pour rafraîchir la date
     useEffect(() => {
-        loadData();
+        if (!settingId) return;
+
+        const channel = supabase
+            .channel(`roster-rules-${settingId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: TABLE_GAME_SETTINGS,
+                    filter: `id=eq.${settingId}`
+                },
+                (payload) => {
+                    const updatedConfigs = (payload.new as { configurations: RulesData['configurations'] }).configurations;
+                    const newUpdatedAt = (payload.new as { updated_at: string }).updated_at;
+                    const newTimestamp = new Date(newUpdatedAt).getTime();
+
+                    if (updatedConfigs?.calendar) {
+                        setRules(prev => {
+                            if (!prev) return prev;
+                            // Éviter de reboucler inutilement
+                            if (prev.lastUpdated === newTimestamp) return prev;
+
+                            const nextRules = {
+                                ...prev,
+                                configurations: {
+                                    ...prev.configurations,
+                                    calendar: updatedConfigs.calendar
+                                },
+                                lastUpdated: newTimestamp
+                            };
+
+                            // Mettre à jour les personnages aussi car la date a changé via une source externe (Admin)
+                            const formattedDate = formatCurrentDate(nextRules);
+                            setAllCharacters(prevChars => prevChars.map(char => ({
+                                ...char,
+                                data: {
+                                    ...char.data,
+                                    header: {
+                                        ...char.data.header,
+                                        fictionCurrentDate: formattedDate
+                                    }
+                                }
+                            })));
+
+                            return nextRules;
+                        });
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [settingId]);
 
     useEffect(() => {
         localStorage.setItem(`roster_hidden_chars_${settingId}`, JSON.stringify(hiddenCharacterIds));
     }, [hiddenCharacterIds, settingId]);
 
+    // --- ACTIONS ---
     const loadData = async () => {
+        if (!settingId) return;
         setIsLoading(true);
         setError(null);
         try {
@@ -36,18 +98,23 @@ export const useRosterData = (settingId: string) => {
                 CampaignService.loadSetting(settingId)
             ]);
 
-            setAllCharacters(chars);
+            setAllCharacters(chars || []);
             setRules(setting);
 
             if (!setting) {
                 setError("La chronique demandée n'existe pas ou n'est plus accessible.");
             }
-        } catch {
-            setError("Impossible de charger les données du registre.");
+        } catch (e) {
+             console.error("[useRosterData] Load failed:", e);
+             setError("Impossible de charger les données du registre.");
         } finally {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        loadData();
+    }, [settingId]);
 
     const sortedAllCharacters = useMemo(() => {
         return [...allCharacters].sort((a, b) => a.character_name.localeCompare(b.character_name));
@@ -63,18 +130,9 @@ export const useRosterData = (settingId: string) => {
         );
     };
 
-    const formatCurrentDate = () => {
-        if (!rules?.configurations?.calendar) return "Non configuré";
-        const cal = rules.configurations.calendar;
-        if (cal.type === 'fictional') {
-            const m = cal.months?.[cal.currentMonthIndex]?.name ?? `Mois ${cal.currentMonthIndex + 1}`;
-            return `Jour ${cal.currentDay}, ${m}, An ${cal.currentYear}`;
-        } else {
-            if (!cal.currentDate) return "Date indéfinie";
-            const d = new Date(cal.currentDate);
-            if (isNaN(d.getTime())) return cal.currentDate;
-            return d.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        }
+    /** Format with provided rules (or fall back to hook state) */
+    const formatCurrentDate = (targetRules = rules) => {
+        return formatCalendarDate(targetRules?.configurations?.calendar);
     };
 
     const handleAdvanceTime = async (amount: 'day' | 'week' | 'month') => {
@@ -139,7 +197,31 @@ export const useRosterData = (settingId: string) => {
         };
 
         setRules(newRules);
-        await CampaignService.saveSetting(settingId, newRules);
+
+        // Propager localement aux personnages du roster
+        const formattedDate = formatCurrentDate(newRules);
+        setAllCharacters(prev => prev.map(char => ({
+            ...char,
+            data: {
+                ...char.data,
+                header: {
+                    ...char.data.header,
+                    fictionCurrentDate: formattedDate
+                }
+            }
+        })));
+
+        // 2. Persister en base
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log("[useRosterData] Tentative de sauvegarde par:", session?.user?.email || "Anonyme");
+
+        const result = await CampaignService.patchCalendar(settingId, newCalendar);
+        if (!result.success) {
+            console.error("[useRosterData] Erreur de persistance:", result.message);
+            setError(result.message || "Erreur de sauvegarde");
+        } else {
+            console.log("[useRosterData] Sauvegarde réussie.");
+        }
     };
 
     const handleRollbackTime = async () => {
@@ -181,7 +263,29 @@ export const useRosterData = (settingId: string) => {
         };
 
         setRules(newRules);
-        await CampaignService.saveSetting(settingId, newRules);
+        const formattedDate = formatCurrentDate(newRules);
+        setAllCharacters(prev => prev.map(char => ({
+            ...char,
+            data: {
+                ...char.data,
+                header: {
+                    ...char.data.header,
+                    fictionCurrentDate: formattedDate
+                }
+            }
+        })));
+
+        // 2. Persister en base
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log("[useRosterData] Tentative de rollback par:", session?.user?.email || "Anonyme");
+
+        const result = await CampaignService.patchCalendar(settingId, newCalendar);
+        if (!result.success) {
+            console.error("[useRosterData] Erreur de rollback:", result.message);
+            setError(result.message || "Erreur de rollback");
+        } else {
+            console.log("[useRosterData] Rollback réussi.");
+        }
     };
 
     const allAttributes = useMemo(() => {

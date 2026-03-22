@@ -1,9 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { RulesData } from '../../types/rules';
 import { CampaignService } from '../../services/CampaignService';
 import { LibraryService } from '../../services/LibraryService';
 import { generateRulesJSONContent } from '../utils/rulesGenerator';
 import { usePersistence } from './usePersistence';
+
+import { supabase } from '../../services/supabase';
+import { TABLE_GAME_SETTINGS } from '../../constants/db';
 
 declare global {
     interface Window {
@@ -44,6 +47,48 @@ export const useAdminRulesHandler = () => {
             resetPersistence();
         }
     }, [currentSettingId, resetPersistence]);
+
+    // ÉCOUTE REALTIME : Synchronisation bidirectionnelle (Roster <-> Admin)
+    useEffect(() => {
+        if (!currentSettingId) return;
+
+        const channel = supabase
+            .channel(`admin-rules-${currentSettingId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: TABLE_GAME_SETTINGS,
+                    filter: `id=eq.${currentSettingId}`
+                },
+                (payload) => {
+                    // Ne mettre à jour que si les configurations ont changé
+                    const newConfigs = (payload.new as { configurations: RulesData['configurations'] }).configurations;
+                    const newUpdatedAt = (payload.new as { updated_at: string }).updated_at;
+                    const newTimestamp = new Date(newUpdatedAt).getTime();
+
+                    if (newConfigs) {
+                        setRules(prev => {
+                            if (!prev) return prev;
+                            // Éviter de reboucler si nous sommes l'auteur du changement (updated_at)
+                            if (prev.lastUpdated === newTimestamp) return prev;
+                            
+                            return {
+                                ...prev,
+                                configurations: newConfigs,
+                                lastUpdated: newTimestamp
+                            };
+                        });
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [currentSettingId]);
 
     const handleSaveToCloud = useCallback(async () => {
         if (!currentSettingId || !rules) return;

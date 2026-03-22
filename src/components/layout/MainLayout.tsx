@@ -14,6 +14,7 @@ import { logger } from '../../utils/logger';
 import { useCloudSyncCheck } from '../../hooks/useCloudSyncCheck';
 import { useAutoSave } from '../../hooks/useAutoSave';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
+import { formatCalendarDate } from '../../utils/dateUtils';
 
 // Static Components
 import DiegeticNavigation from './DiegeticNavigation';
@@ -628,7 +629,7 @@ const MainLayout: React.FC = () => {
                     </main>
 
                     <div id="printable-area" className="hidden">
-                        {pagesToPrint.p1 && (<div className="print-sheet-wrapper"><CharacterSheet isLandscape={isLandscape} /></div>)}
+                        {pagesToPrint.p1 && (<div className="print-sheet-wrapper"><CharacterSheet isLandscape={isLandscape} onToggleEditMode={handleToggleEditMode} onToggleCreationMode={handleToggleCreationMode} /></div>)}
                         {pagesToPrint.specs && (<div className="print-sheet-wrapper"><CharacterSheetSpecializations isLandscape={isLandscape} /></div>)}
                         {pagesToPrint.p2 && (<div className="print-sheet-wrapper"><CharacterSheetPage2 isLandscape={isLandscape} /></div>)}
                         {pagesToPrint.inventaire && (<div className="print-sheet-wrapper"><CharacterSheetInventaire isLandscape={isLandscape} /></div>)}
