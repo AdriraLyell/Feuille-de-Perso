@@ -244,7 +244,8 @@ export const CampaignService = {
                 calendar
             };
 
-            logger.info("[CampaignService] Patching calendar for:", id, "New Date:", calendar.currentDate || calendar.currentDay);
+            const dateToLog = calendar.type === 'real' ? calendar.currentDate : `An ${calendar.currentYear}`;
+            logger.info("[CampaignService] Patching calendar for:", id, "New Date:", dateToLog);
 
             // 4. Update via DatabaseService
             const success = await DatabaseService.update(

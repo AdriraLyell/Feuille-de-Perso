@@ -17,10 +17,14 @@ export const useResolvedCharacter = (data: CharacterSheetData, rules: RulesData 
     // 0. Resolve Campaign Dates (Single Source of Truth)
     if (rules.configurations?.calendar) {
         const cal = rules.configurations.calendar;
-        resolved.header.fictionCurrentDate = formatCalendarDate(cal);
+        if (cal.type === 'fictional') {
+            resolved.header.fictionCurrentDate = formatCalendarDate(cal);
+        } else {
+            resolved.header.fictionCurrentDate = formatSimpleDate(cal.currentDate);
+        }
         
         // Also sync campaign start date if available in rules
-        if (cal.startDate) {
+        if (cal.type === 'real' && cal.startDate) {
            resolved.header.campaignStartDate = formatSimpleDate(cal.startDate);
         }
     }

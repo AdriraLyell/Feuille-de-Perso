@@ -1,3 +1,14 @@
+## [2.120.0] - 2026-03-22 [FIX/FEAT]
+
+- **Roster :** Résolution du bug de persistance de la date. Les incréments temporels sont désormais sauvegardés instantanément.
+- **Système :** Implémentation d'une mise à jour "chirurgicale" du calendrier (`patchCalendar`) pour supprimer les lenteurs de synchronisation.
+- **Realtime :** Synchronisation bidirectionnelle de la date entre le Roster, l'Administration et toutes les fiches de personnages ouvertes.
+- **UI :** Uniformisation du format de date au standard français `JJ/MM/AAAA` sur l'ensemble de l'application.
+- **Fiche :** Ajout d'un masque de saisie intelligent sur le champ de date de naissance (auto-formatage JJ/MM/AAAA pendant la frappe).
+- **Technique :** Correction de plantages critiques en console liés à des imports manquants ou des appels de fonctions inexistantes dans les logs.
+
+---
+
 ## [2.119.0] - 2026-03-22 [FEAT/UI]
 
 - **Roster :** Implémentation des tooltips au clic sur les traits pour consulter leurs descriptions sans quitter la vue d'ensemble.
