@@ -1,3 +1,11 @@
+## [2.118.0] - 2026-03-22 [FIX/FEAT]
+
+- **Journal :** Migration de la persistance locale vers IndexedDB pour garantir la conservation du texte lors d'un arrêt brutal ou redémarrage du PC.
+- **Journal :** Le contenu est désormais sauvegardé en temps réel et restauré automatiquement si le stockage principal (localStorage) est incomplet.
+- **Système :** Optimisation du poids du stockage local en déportant les données volumineuses du journal vers une base de données dédiée plus robuste.
+
+---
+
 ## [2.117.0] - 2026-03-22 [FEAT]
 
 - **Roster :** Mise en place d'un tri alphabétique permanent sur les noms de personnages.

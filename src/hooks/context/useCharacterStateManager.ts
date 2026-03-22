@@ -7,6 +7,7 @@ import { useRules } from '../../context/RulesContext';
 import { reconcileRulesWithState } from '../../utils/rulesReconciler';
 import { ErrorService } from '../../services/ErrorService';
 import { logger } from '../../utils/logger';
+import { BookStorageService } from '../../services/BookStorageService';
 
 import { SheetLayout } from '../../hooks/useSheetLayout';
 import { generateDefaultLayout } from '../../utils/layoutUtils';
@@ -34,6 +35,9 @@ export const useCharacterStateManager = (
     const base = getInitialCharacterData();
     // Use full reconciliation to ensure all rule-based logic (Bonus MJ, Layout, etc.) is applied
     const newState = rules ? reconcileRulesWithState(base, rules) : base;
+
+    // Clear journal from IndexedDB on reset
+    BookStorageService.clearBookContent();
 
     updateData(newState);
   }, [rules, updateData]);
@@ -83,6 +87,11 @@ export const useCharacterStateManager = (
     };
 
     localStorage.setItem('rpg-sheet-data', JSON.stringify(dataWithSettings));
+
+    // Backup journal content to IndexedDB for reliable persistence across restarts
+    if (data.bookDocument?.content) {
+      BookStorageService.saveBookContent(data.bookDocument.content);
+    }
   }, [data]);
 
   // Rules Update Effect
