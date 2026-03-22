@@ -39,7 +39,6 @@ export const reconcileConfigurations = (newState: CharacterSheetData, rules: Rul
         // We MUST preserve the runtime 'active' state of the character
         // as it's a character status, not a rule definition.
         const currentActive = newState.creationConfig?.active ?? false;
-        const currentCardActive = newState.creationConfig?.cardConfig?.active ?? false;
 
         newState.creationConfig = {
             ...newState.creationConfig,
@@ -48,7 +47,7 @@ export const reconcileConfigurations = (newState: CharacterSheetData, rules: Rul
             cardConfig: rules.configurations.cards ? {
                 ...newState.creationConfig.cardConfig,
                 ...rules.configurations.cards,
-                active: currentCardActive // Keep character runtime status
+                active: rules.configurations.cards.active // Sync from rules
             } : newState.creationConfig.cardConfig,
             rankSlots: rules.configurations.creation.rankSlots,
             // Preserve attribute rules if a migration is pending
