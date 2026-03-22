@@ -34,7 +34,7 @@ export const ColumnarEditorStyles = () => (
             line-height: 1.6;
         }
 
-        h1, h2, h3, .chapter-header-wrapper {
+        h1, h2, h3 {
             break-before: column;
             break-after: avoid;
             break-inside: avoid;

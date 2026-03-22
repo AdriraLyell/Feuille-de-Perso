@@ -294,6 +294,7 @@ export const TimeCompanionWidget: React.FC<TimeCompanionWidgetProps> = ({
                                     {onNewChapter && (
                                         <div className="absolute inset-[-1px] opacity-0 group-hover:opacity-100 bg-stone-950 flex items-center justify-center gap-1.5 transition-all duration-200 rounded-md z-10 border-2 border-amber-500 shadow-2xl">
                                             <div
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={(e) => { e.stopPropagation(); onNewChapter?.(dateStr, true); }}
                                                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onNewChapter?.(dateStr, true); } }}
                                                 role="button"

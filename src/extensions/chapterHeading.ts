@@ -8,7 +8,7 @@ declare module '@tiptap/core' {
         chapterHeading: {
             setChapter: () => ReturnType;
             appendChapter: () => ReturnType;
-            insertChapterAtDate: (date: string, realDate?: string, atSelection?: boolean) => ReturnType;
+            insertChapterAtDate: (date: string, realDate?: string, atSelection?: boolean, cursorPos?: number) => ReturnType;
         };
     }
 }
@@ -35,6 +35,9 @@ export const ChapterHeading = Node.create({
             },
             realDate: {
                 default: '',
+            },
+            breakBefore: {
+                default: true,
             },
         };
     },
@@ -112,23 +115,22 @@ export const ChapterHeading = Node.create({
                     },
 
             insertChapterAtDate:
-                (date: string, realDate?: string, atSelection?: boolean) =>
+                (date: string, realDate?: string, atSelection?: boolean, cursorPos?: number) =>
                     ({ chain, state }: CommandProps) => {
                         const finalRealDate = realDate || new Date().toISOString().split('T')[0];
 
                         if (atSelection) {
+                            const pos = cursorPos ?? state.selection.$to.pos;
                             return chain()
-                                .focus()
-                                .splitBlock()
-                                .insertContent({
-                                    type: this.name,
-                                    attrs: {
-                                        date,
-                                        realDate: finalRealDate
+                                .insertContentAt(pos, [
+                                    {
+                                        type: this.name,
+                                        attrs: { date, realDate: finalRealDate, breakBefore: false },
+                                        content: [{ type: 'text', text: 'Nouveau Chapitre' }],
                                     },
-                                    content: [{ type: 'text', text: 'Nouveau Chapitre' }],
-                                })
-                                .insertContent({ type: 'paragraph' })
+                                    { type: 'paragraph' }
+                                ])
+                                .focus()
                                 .run();
                         }
 

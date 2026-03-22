@@ -1,12 +1,12 @@
 import React, { useRef, useEffect } from 'react';
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react';
 import { Editor, NodeViewProps } from '@tiptap/core';
-import { Calendar, Sun, CloudRain, Swords, Moon, Snowflake, Cloud } from 'lucide-react';
+import { Calendar, Sun, CloudRain, Swords, Moon, Snowflake, Cloud, ArrowUpToLine } from 'lucide-react';
 
 interface ChapterHeaderViewProps extends Omit<NodeViewProps, 'node' | 'editor'> {
-    node: NodeViewProps['node'] & { attrs: { date: string, weather: string, realDate: string } };
+    node: NodeViewProps['node'] & { attrs: { date: string, weather: string, realDate: string, breakBefore: boolean } };
     editor: Editor;
-    updateAttributes: (attrs: Partial<{ date: string, weather: string, realDate: string }>) => void;
+    updateAttributes: (attrs: Partial<{ date: string, weather: string, realDate: string, breakBefore: boolean }>) => void;
 }
 
 const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, getPos, updateAttributes }) => {
@@ -44,7 +44,7 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
 
             return () => clearTimeout(timer);
         }
-    }, []); // Run only once on mount
+    }, [editor, getPos, node]);
 
     const formatDate = (dateStr: string, isReal: boolean = false) => {
         if (!dateStr) return isReal ? '' : 'Date du récit...';
@@ -86,9 +86,22 @@ const ChapterHeaderView: React.FC<ChapterHeaderViewProps> = ({ node, editor, get
     const currentWeatherColor = WEATHER_ICONS.find(w => w.id === node.attrs.weather)?.color || 'text-stone-400';
 
     return (
-        <NodeViewWrapper className="chapter-header-wrapper mt-8 mb-6 border-b border-stone-800/30 pb-4 relative group w-full">
+        <NodeViewWrapper
+            className="chapter-header-wrapper mt-8 mb-6 border-b border-stone-800/30 pb-4 relative group w-full"
+            style={node.attrs.breakBefore ? { breakBefore: 'column' } : undefined}
+            data-break-before={node.attrs.breakBefore ? 'true' : 'false'}
+        >
             <div className="flex flex-col gap-2 w-full text-center">
                 <div className="flex items-center justify-center gap-2 text-stone-500 font-serif italic tracking-wider">
+                    <button
+                        type="button"
+                        onClick={() => updateAttributes({ breakBefore: !node.attrs.breakBefore })}
+                        className={`p-1.5 rounded-lg transition-all opacity-0 group-hover:opacity-100 hover:bg-indigo-50 ${node.attrs.breakBefore ? 'bg-indigo-100 ring-1 ring-indigo-300' : ''}`}
+                        title={node.attrs.breakBefore ? 'Ne plus forcer le haut de page' : 'Forcer le haut de page'}
+                    >
+                        <ArrowUpToLine size={12} className={node.attrs.breakBefore ? 'text-indigo-500' : 'text-stone-400'} />
+                    </button>
+
                     <button
                         type="button"
                         onClick={handleIconClick}

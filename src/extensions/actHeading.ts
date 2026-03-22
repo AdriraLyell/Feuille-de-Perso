@@ -8,7 +8,7 @@ declare module '@tiptap/core' {
         actHeading: {
             setAct: () => ReturnType;
             appendAct: () => ReturnType;
-            insertAct: (atSelection?: boolean) => ReturnType;
+            insertAct: (atSelection?: boolean, cursorPos?: number) => ReturnType;
         };
     }
 }
@@ -21,6 +21,14 @@ export const ActHeading = Node.create({
     content: 'inline*',
 
     defining: true,
+
+    addAttributes() {
+        return {
+            breakBefore: {
+                default: true,
+            },
+        };
+    },
 
     parseHTML() {
         return [
@@ -81,17 +89,20 @@ export const ActHeading = Node.create({
                     },
 
             insertAct:
-                (atSelection?: boolean) =>
+                (atSelection?: boolean, cursorPos?: number) =>
                     ({ chain, state }: CommandProps) => {
                         if (atSelection) {
+                            const pos = cursorPos ?? state.selection.$to.pos;
                             return chain()
+                                .insertContentAt(pos, [
+                                    {
+                                        type: this.name,
+                                        attrs: { breakBefore: false },
+                                        content: [{ type: 'text', text: 'Nouvel Acte' }],
+                                    },
+                                    { type: 'paragraph' }
+                                ])
                                 .focus()
-                                .splitBlock()
-                                .insertContent({
-                                    type: this.name,
-                                    content: [{ type: 'text', text: 'Nouvel Acte' }],
-                                })
-                                .insertContent({ type: 'paragraph' })
                                 .run();
                         }
 
@@ -114,7 +125,7 @@ export const ActHeading = Node.create({
     },
 
     addNodeView() {
-        return ReactNodeViewRenderer(ActHeaderView);
+        return ReactNodeViewRenderer(ActHeaderView as any); // eslint-disable-line @typescript-eslint/no-explicit-any
     },
 });
 

@@ -1,3 +1,33 @@
+## [2.116.0] - 2026-03-21 [FIX/FEAT]
+
+- **Système :** Protection de l'état d'activation du mode création et du système de cartes lors de la réconciliation des règles.
+- **Reset :** Garantie du lancement immédiat du HUD de création après une réinitialisation complète.
+- **Admin :** Ajout de labels explicites sur les boutons de navigation (Journal, Gestion de Groupe).
+- **Journal :** Option 'Haut de page' par chapitre/acte avec recalcul du sommaire.
+- **Journal :** Correction du positionnement des titres de chapitres via suppression du break-before parasite.
+
+---
+
+## [2.115.0] - 2026-03-21 [FEAT]
+
+- **Journal :** Option 'Haut de page' par chapitre et acte (toggle au survol).
+- **Journal :** Checkbox discret dans le sommaire pour chaque chapitre/acte.
+- **Journal :** Les anciens chapitres/actes conservent le comportement haut de page par défaut.
+- **Journal :** Les chapitres/actes insérés au curseur respectent la position du curseur.
+
+---
+
+## [2.114.0] - 2026-03-21 [FIX]
+
+### Journal de campagne - Insertion au curseur
+- fix(journal): correction du positionnement aléatoire des chapitres et actes insérés au curseur
+- fix(journal): retrait du `break-before: column` CSS sur les chapitres qui les forçait en haut de colonne
+- fix(journal): passage de la position du curseur en paramètre explicite depuis le composant React
+- fix(journal): remplacement du pattern `splitBlock/insertContent` par `insertContentAt` (pattern prouvé de narrativeSection)
+- fix(journal): ajout de `onMouseDown preventDefault` sur les boutons sidebar pour préserver le focus éditeur
+- fix(journal): correction des dépendances du useEffect dans ChapterHeaderView (alignement avec ActHeaderView)
+- fix(journal): double RAF dans useBookTableOfContents pour fiabiliser le calcul de page après reflow CSS
+
 # Historique Ancien (Legacy Changelog)
 
 ## [2.75.9] - 2026-02-23 [FIX]

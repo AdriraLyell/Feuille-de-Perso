@@ -1,5 +1,39 @@
 [
     {
+        "version": "2.116.0",
+        "date": "2026-03-21",
+        "type": "fix/feat",
+        "changes": [
+            "Système : Protection de l'état d'activation du mode création et du système de cartes lors de la réconciliation des règles.",
+            "Reset : Garantie du lancement immédiat du HUD de création après une réinitialisation complète.",
+            "Admin : Ajout de labels explicites sur les boutons de navigation (Journal, Gestion de Groupe).",
+            "Journal : Option 'Haut de page' par chapitre/acte avec recalcul du sommaire.",
+            "Journal : Correction du positionnement des titres de chapitres via suppression du break-before parasite."
+        ]
+    },
+    {
+        "version": "2.115.0",
+        "date": "2026-03-21",
+        "type": "feature/journal",
+        "changes": [
+            "Journal : Option 'Haut de page' par chapitre et acte — toggle au survol pour forcer ou non le début en haut de colonne.",
+            "Journal : Checkbox discret dans le sommaire pour basculer le haut de page de chaque chapitre/acte.",
+            "Journal : Les anciens chapitres/actes conservent le comportement haut de page par défaut.",
+            "Journal : Les chapitres/actes insérés au curseur restent à la position du curseur (pas de saut automatique)."
+        ]
+    },
+    {
+        "version": "2.114.0",
+        "date": "2026-03-21",
+        "type": "fix/journal",
+        "changes": [
+            "Journal : Correction du positionnement des chapitres et actes insérés au curseur depuis la barre latérale.",
+            "Journal : Passage explicite de la position du curseur depuis le composant React pour contourner le timing du Proxy TipTap.",
+            "Journal : Correction des dépendances useEffect dans ChapterHeaderView pour éviter les closures obsolètes.",
+            "Journal : Ajout de onMouseDown preventDefault sur les boutons de la sidebar pour préserver le focus éditeur."
+        ]
+    },
+    {
         "version": "2.113.1",
         "date": "2026-03-21",
         "type": "ui/fix",
@@ -155,46 +189,6 @@
         "changes": [
             "CI/CD : Sécurisation du script de notification Realtime (ajout d'un timeout de sécurité et gestion des erreurs de connexion).",
             "CI/CD : Amélioration de la fiabilité du processus de terminaison du job de déploiement."
-        ]
-    },
-    {
-        "version": "2.99.7",
-        "date": "2026-03-07",
-        "type": "fix",
-        "changes": [
-            "CI/CD : Correction du pipeline de déploiement (ajout des étapes manquantes pour la notification Realtime).",
-            "CI/CD : Synchronisation des dépendances dans le job de déploiement."
-        ]
-    },
-    {
-        "version": "2.99.6",
-        "date": "2026-03-07",
-        "type": "feat",
-        "changes": [
-            "CI/CD : Intégration de Supabase Realtime dans le pipeline de déploiement.",
-            "System : Les notifications de mise à jour sont désormais instantanées pour tous les utilisateurs connectés.",
-            "Realtime : Ajout d'un canal broadcast 'app-deployments' pour la diffusion globale des versions."
-        ]
-    },
-    {
-        "version": "2.99.5",
-        "date": "2026-03-07",
-        "type": "fix",
-        "changes": [
-            "UI : Mise en place d'une file d'attente séquentielle pour les modales de sélection (Habilités Mystiques, Maîtrise).",
-            "UI : Correction de la superposition du bandeau de sélection dans la bibliothèque de traits.",
-            "Bug : Résolution du saut d'étapes dans la file d'attente lors de la validation d'une habilité mystique."
-        ]
-    },
-    {
-        "version": "2.99.4",
-        "date": "2026-03-07",
-        "type": "fix",
-        "changes": [
-            "UI/Layout : Correction de l'alignement horizontal de la grille de secours pour les nouveaux personnages.",
-            "Logic : Correction du calcul d'équivalence XP pour les attributs et exclusion des traits en mode Rangs.",
-            "System : Unification du moteur de réinitialisation pour garantir l'injection immédiate des règles.",
-            "Security : Remplacement de la sauvegarde automatique par une alerte visuelle 'Safety Alert' après 30 min."
         ]
     }
 ]

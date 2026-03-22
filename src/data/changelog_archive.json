@@ -1,5 +1,45 @@
 [
     {
+        "version": "2.99.7",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "CI/CD : Correction du pipeline de déploiement (ajout des étapes manquantes pour la notification Realtime).",
+            "CI/CD : Synchronisation des dépendances dans le job de déploiement."
+        ]
+    },
+    {
+        "version": "2.99.6",
+        "date": "2026-03-07",
+        "type": "feat",
+        "changes": [
+            "CI/CD : Intégration de Supabase Realtime dans le pipeline de déploiement.",
+            "System : Les notifications de mise à jour sont désormais instantanées pour tous les utilisateurs connectés.",
+            "Realtime : Ajout d'un canal broadcast 'app-deployments' pour la diffusion globale des versions."
+        ]
+    },
+    {
+        "version": "2.99.5",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "UI : Mise en place d'une file d'attente séquentielle pour les modales de sélection (Habilités Mystiques, Maîtrise).",
+            "UI : Correction de la superposition du bandeau de sélection dans la bibliothèque de traits.",
+            "Bug : Résolution du saut d'étapes dans la file d'attente lors de la validation d'une habilité mystique."
+        ]
+    },
+    {
+        "version": "2.99.4",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "UI/Layout : Correction de l'alignement horizontal de la grille de secours pour les nouveaux personnages.",
+            "Logic : Correction du calcul d'équivalence XP pour les attributs et exclusion des traits en mode Rangs.",
+            "System : Unification du moteur de réinitialisation pour garantir l'injection immédiate des règles.",
+            "Security : Remplacement de la sauvegarde automatique par une alerte visuelle 'Safety Alert' après 30 min."
+        ]
+    },
+    {
         "version": "2.99.3",
         "date": "2026-03-07",
         "type": "fix",
@@ -748,29 +788,5 @@
         "date": "2026-02-23",
         "type": "feat",
         "description": "Registre (Roster) : Ajout d'options de tri global pour les avantages et désavantages dans la section Profils. Permet de trier les traits par nom ou par coût pour tous les personnages simultanément."
-    },
-    {
-        "version": "2.75.13",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Bibliothèque de Traits : Amélioration des options de tri. Ajout de boutons explicites pour le tri par ordre alphabétique et par coût, avec retour visuel amélioré et icônes directionnelles."
-    },
-    {
-        "version": "2.75.12",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Interface (Registre) : Refonte de la mise en page des attributs pour regrouper les colonnes par 'pavés' (Physique, Mental, Social). Ajout de séparateurs visuels forts et d'un fond coloré subtil par catégorie pour une lecture plus structurée."
-    },
-    {
-        "version": "2.75.11",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Ergonomie : Généralisation du bouton de suppression (croix) dans tous les champs de recherche de l'application (Bibliothèques Joueur, Registre, Vues Admin, etc.) pour une expérience utilisateur cohérente."
-    },
-    {
-        "version": "2.75.10",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Ergonomie (Registre) : Ajout d'un bouton de suppression (croix) dans le champ de recherche des compétences pour vider rapidement la saisie."
     }
 ]
