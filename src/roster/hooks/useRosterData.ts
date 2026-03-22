@@ -49,9 +49,13 @@ export const useRosterData = (settingId: string) => {
         }
     };
 
+    const sortedAllCharacters = useMemo(() => {
+        return [...allCharacters].sort((a, b) => a.character_name.localeCompare(b.character_name));
+    }, [allCharacters]);
+
     const characters = useMemo(() => {
-        return allCharacters.filter(c => !hiddenCharacterIds.includes(c.id));
-    }, [allCharacters, hiddenCharacterIds]);
+        return sortedAllCharacters.filter(c => !hiddenCharacterIds.includes(c.id));
+    }, [sortedAllCharacters, hiddenCharacterIds]);
 
     const toggleCharacterVisibility = (id: string) => {
         setHiddenCharacterIds(prev =>
@@ -303,7 +307,7 @@ export const useRosterData = (settingId: string) => {
 
     return {
         characters,
-        allCharacters,
+        allCharacters: sortedAllCharacters,
         hiddenCharacterIds,
         toggleCharacterVisibility,
         rules,
