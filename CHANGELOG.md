@@ -1,3 +1,21 @@
+# Historique Ancien (Legacy Changelog)
+
+## [2.75.17] - 2026-02-23 [FIX]
+
+
+
+## [2.75.16] - 2026-02-23 [FEAT]
+
+
+
+## [2.75.15] - 2026-02-23 [FIX]
+
+
+
+## [2.75.14] - 2026-02-23 [FEAT]
+
+
+
 ## [2.120.0] - 2026-03-22 [FIX/FEAT]
 
 - **Roster :** Résolution du bug de persistance de la date. Les incréments temporels sont désormais sauvegardés instantanément.

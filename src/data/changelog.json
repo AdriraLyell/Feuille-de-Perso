@@ -1,5 +1,48 @@
 [
     {
+        "version": "2.120.0",
+        "date": "2026-03-22",
+        "type": "fix/feat",
+        "changes": [
+            "Roster : Résolution du bug de persistance de la date. Les incréments temporels sont désormais sauvegardés instantanément.",
+            "Système : Implémentation d'une mise à jour chirurgicale du calendrier (patchCalendar) pour supprimer les lenteurs de synchronisation.",
+            "Realtime : Synchronisation bidirectionnelle de la date entre le Roster, l'Administration et toutes les fiches de personnages ouvertes.",
+            "UI : Uniformisation du format de date au standard français JJ/MM/AAAA sur l'ensemble de l'application.",
+            "Fiche : Ajout d'un masque de saisie intelligent sur le champ de date de naissance (auto-formatage JJ/MM/AAAA pendant la frappe).",
+            "Technique : Correction de plantages critiques en console liés à des imports manquants ou des fonctions inexistantes dans les logs."
+        ]
+    },
+    {
+        "version": "2.119.0",
+        "date": "2026-03-22",
+        "type": "feat/ui",
+        "changes": [
+            "Roster : Implémentation des tooltips au clic sur les traits pour consulter leurs descriptions sans quitter la vue d'ensemble.",
+            "Roster : Ajout d'un curseur d'aide (?) sur les traits possédant une description ou une note personnelle.",
+            "Roster : Optimisation de l'affichage : les traits sans contenu ne déclenchent plus d'interaction et conservent le curseur standard."
+        ]
+    },
+    {
+        "version": "2.118.0",
+        "date": "2026-03-22",
+        "type": "fix/feat",
+        "changes": [
+            "Journal : Migration de la persistance locale vers IndexedDB pour garantir la conservation du texte lors d'un arrêt brutal ou redémarrage du PC.",
+            "Journal : Le contenu est désormais sauvegardé en temps réel et restauré automatiquement si le stockage principal (localStorage) est incomplet.",
+            "Système : Optimisation du poids du stockage local en déportant les données volumineuses du journal vers une base de données dédiée plus robuste."
+        ]
+    },
+    {
+        "version": "2.117.0",
+        "date": "2026-03-22",
+        "type": "feat",
+        "changes": [
+            "Roster : Mise en place d'un tri alphabétique permanent sur les noms de personnages.",
+            "Roster : Alignement cohérent de l'ordre dans les tableaux d'attributs, matrices de compétences et grilles de traits.",
+            "Roster : Le menu de gestion de la visibilité des personnages suit également l'ordre alphabétique pour une navigation plus fluide."
+        ]
+    },
+    {
         "version": "2.116.0",
         "date": "2026-03-21",
         "type": "fix/feat",
@@ -155,40 +198,6 @@
         "type": "fix",
         "changes": [
             "Logic : Rendu de l'évaluateur de formules insensible à la casse pour supporter les accents et majuscules dans les variables (ex: 'Athlétisme', 'Volonté')."
-        ]
-    },
-    {
-        "version": "2.102.0",
-        "date": "2026-03-08",
-        "type": "fix",
-        "changes": [
-            "Sync : Correction de la race condition lors de la mise à jour des règles (l'enregistrement des bibliothèques précède désormais la notification de mise à jour pour garantir la disponibilité immédiate des nouveaux traits)."
-        ]
-    },
-    {
-        "version": "2.101.0",
-        "date": "2026-03-07",
-        "type": "fix",
-        "changes": [
-            "Sync : Correction du bug de disparition du portrait lors de la sauvegarde (décompression automatique des images lors des mises à jour Realtime)."
-        ]
-    },
-    {
-        "version": "2.99.9",
-        "date": "2026-03-07",
-        "type": "cleanup",
-        "changes": [
-            "Admin : Suppression du bouton 'Nettoyer' dans la bibliothèque de compteurs pour éviter les fusions accidentelles d'identifiants système.",
-            "Refactor : Suppression de la logique handleCleanDuplicates devenue obsolète."
-        ]
-    },
-    {
-        "version": "2.99.8",
-        "date": "2026-03-07",
-        "type": "fix",
-        "changes": [
-            "CI/CD : Sécurisation du script de notification Realtime (ajout d'un timeout de sécurité et gestion des erreurs de connexion).",
-            "CI/CD : Amélioration de la fiabilité du processus de terminaison du job de déploiement."
         ]
     }
 ]

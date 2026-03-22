@@ -1,5 +1,39 @@
 [
     {
+        "version": "2.102.0",
+        "date": "2026-03-08",
+        "type": "fix",
+        "changes": [
+            "Sync : Correction de la race condition lors de la mise à jour des règles (l'enregistrement des bibliothèques précède désormais la notification de mise à jour pour garantir la disponibilité immédiate des nouveaux traits)."
+        ]
+    },
+    {
+        "version": "2.101.0",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "Sync : Correction du bug de disparition du portrait lors de la sauvegarde (décompression automatique des images lors des mises à jour Realtime)."
+        ]
+    },
+    {
+        "version": "2.99.9",
+        "date": "2026-03-07",
+        "type": "cleanup",
+        "changes": [
+            "Admin : Suppression du bouton 'Nettoyer' dans la bibliothèque de compteurs pour éviter les fusions accidentelles d'identifiants système.",
+            "Refactor : Suppression de la logique handleCleanDuplicates devenue obsolète."
+        ]
+    },
+    {
+        "version": "2.99.8",
+        "date": "2026-03-07",
+        "type": "fix",
+        "changes": [
+            "CI/CD : Sécurisation du script de notification Realtime (ajout d'un timeout de sécurité et gestion des erreurs de connexion).",
+            "CI/CD : Amélioration de la fiabilité du processus de terminaison du job de déploiement."
+        ]
+    },
+    {
         "version": "2.99.7",
         "date": "2026-03-07",
         "type": "fix",
@@ -764,29 +798,5 @@
         "date": "2026-02-23",
         "type": "fix",
         "description": "Interface (Fiche) : Agrandissement de la zone de texte des noms de compteurs (Confiance, Volonté, etc.) pour une meilleure lisibilité et éviter les coupures de mots."
-    },
-    {
-        "version": "2.75.17",
-        "date": "2026-02-23",
-        "type": "fix",
-        "description": "Interface (Fiche) : Suppression des libellés 'MAXI' et 'UTILISÉ' (ou 'Cases') dans la section des compteurs pour un design plus épuré, conformément aux retours utilisateur."
-    },
-    {
-        "version": "2.75.16",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Mécaniques : Implémentation du blocage d'augmentation de compétence par les traits. Un trait peut désormais être configuré pour empêcher le joueur d'augmenter le niveau d'une compétence spécifique. Visualisation immédiate par le nom barré et la disparition des bulles de progression futures, avec retour d'erreur (toast) en cas de tentative d'augmentation."
-    },
-    {
-        "version": "2.75.15",
-        "date": "2026-02-23",
-        "type": "fix",
-        "description": "CI : Correction du workflow de nettoyage des anciens runs (prune-history). Ajout du contexte explicite du dépôt aux commandes GitHub CLI pour éviter les erreurs d'exécution en environnement sans dossier .git."
-    },
-    {
-        "version": "2.75.14",
-        "date": "2026-02-23",
-        "type": "feat",
-        "description": "Registre (Roster) : Ajout d'options de tri global pour les avantages et désavantages dans la section Profils. Permet de trier les traits par nom ou par coût pour tous les personnages simultanément."
     }
 ]
