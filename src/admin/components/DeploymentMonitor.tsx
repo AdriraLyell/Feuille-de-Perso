@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Loader2, CheckCircle, XCircle, Github } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, GitBranch } from 'lucide-react';
 import { getLatestWorkflowRun, GitHubConnectConfig, WorkflowRun } from '../../services/githubService';
 
 const POLL_INTERVAL = 5000; // 5 seconds as requested
@@ -89,13 +89,13 @@ const DeploymentMonitor: React.FC = () => {
         if (notification) {
             if (notification.type === 'success') return { icon: <CheckCircle className="text-green-500" />, color: 'border-green-500 bg-green-50' };
             if (notification.type === 'error') return { icon: <XCircle className="text-red-500" />, color: 'border-red-500 bg-red-50' };
-            return { icon: <Github className="text-blue-500" />, color: 'border-blue-500 bg-blue-50' };
+            return { icon: <GitBranch className="text-blue-500" />, color: 'border-blue-500 bg-blue-50' };
         }
 
         if (currentRun?.status === 'in_progress' || currentRun?.status === 'queued') {
             return { icon: <Loader2 className="animate-spin text-amber-600" />, color: 'border-amber-500 bg-amber-50' };
         }
-        return { icon: <Github />, color: 'bg-white' };
+        return { icon: <GitBranch />, color: 'bg-white' };
     };
 
     const ui = getStatusUI();

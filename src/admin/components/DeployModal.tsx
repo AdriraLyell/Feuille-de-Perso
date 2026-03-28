@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { generateRulesJSONContent } from '../utils/rulesGenerator';
 import { publishFileToGitHub } from '../../services/githubService';
 import { RulesData } from '../../types/rules';
-import { Save, AlertTriangle, CheckCircle, Loader2, Github, X, Info } from 'lucide-react';
+import { Save, AlertTriangle, CheckCircle, Loader2, GitBranch, X, Info } from 'lucide-react';
 import { APP_VERSION } from '../../constants/app';
 import { logger } from '../../utils/logger';
 import { MotionFade } from '../../components/ui/motion/MotionFade';
@@ -132,7 +132,7 @@ const DeployToGithubModal: React.FC<DeployToGithubModalProps> = ({ isOpen, onClo
                     <div className="bg-mystic-deep/50 p-6 border-b border-stone-800 flex justify-between items-center">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-amber-900/20 text-amber-500 rounded-sm border border-amber-900/30">
-                                <Github size={20} />
+                                <GitBranch size={20} />
                             </div>
                             <div>
                                 <h2 className="text-xl font-serif font-black text-amber-500 uppercase tracking-widest leading-none">Transmission du Corpus</h2>
